@@ -64,7 +64,7 @@ namespace Mahakam
 		BufferElement() {}
 
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-			: name(name), type(type), size(ShaderDataTypeSize(type)), offset(0), normalized(normalized) {}
+			: type(type), name(name), size(ShaderDataTypeSize(type)), offset(0), normalized(normalized) {}
 
 		uint32_t getComponentCount() const
 		{
@@ -116,6 +116,7 @@ namespace Mahakam
 			calculateOffsetAndStride();
 		}
 
+		inline const BufferElement& getElement(int index) const { return elements[index]; }
 		inline const std::vector<BufferElement>& getElements() const { return elements; }
 		inline uint32_t getStride() const { return stride; }
 
@@ -137,7 +138,7 @@ namespace Mahakam
 		virtual void setLayout(const BufferLayout& layout) = 0;
 		virtual const BufferLayout& getLayout() const = 0;
 
-		static Ref<VertexBuffer> create(float* vertices, uint32_t size);
+		static Ref<VertexBuffer> create(const char* vertices, uint32_t size);
 		static Ref<VertexBuffer> create(uint32_t size);
 	};
 

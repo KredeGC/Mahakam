@@ -24,12 +24,75 @@ private:
 public:
 	BasicLayer() : Layer("Basic Quad"), camera(-1.6f, 1.6f, -0.9f, 0.9f)
 	{
-		float vertices[7 * 4]
+		// Setup vertex position array
+		float positions[3 * 4]
 		{
-			-0.5f, 0.0f, -0.5f, 0.0f, 0.0f,
-			 0.5f, 0.0f, -0.5f, 1.0f, 0.0f,
-			 0.5f, 0.0f,  0.5f, 1.0f, 1.0f,
-			-0.5f, 0.0f,  0.5f, 0.0f, 1.0f,
+			-0.5f, 0.0f, -0.5f,
+			 0.5f, 0.0f, -0.5f,
+			 0.5f, 0.0f,  0.5f,
+			-0.5f, 0.0f,  0.5f
+		};
+
+		// Setup UV array
+		float uvs[2 * 4]
+		{
+			0.0f, 0.0f,
+			1.0f, 0.0f,
+			1.0f, 1.0f,
+			0.0f, 1.0f
+		};
+
+		// Setup indices
+		uint32_t indices[6]{ 0, 1, 2, 2, 3, 0 };
+
+		// Setup vertex attribute layout
+		BufferLayout layout = {
+			{ ShaderDataType::Float3, "i_Pos" },
+			{ ShaderDataType::Float2, "i_UV" }
+		};
+
+		// Initialize mesh
+		mesh = Mesh::create();
+		mesh->setVertexCount(4);
+		mesh->setLayout(layout);
+		mesh->addVertices("i_Pos", (const char*)positions);
+		mesh->addVertices("i_UV", (const char*)uvs);
+		mesh->setIndices(indices, 6);
+		mesh->init();
+		
+
+		// Setup texture
+		Ref<Texture> albedo = Texture2D::create("assets/textures/fern.png");
+
+		// Setup shader
+		Ref<Shader> shader = shaderLibrary.load("assets/shaders/Albedo.glsl");
+
+		// Setup material with texture
+		Ref<Material> material = Material::create(shader);
+		material->setTexture("u_Albedo", 0, albedo);
+
+
+		// Set material in mesh
+		mesh->setMaterial(material);
+	}
+
+	void onUpdate(Timestep dt) override
+	{
+		// Memory leak test
+		/*float positions[3 * 4]
+		{
+			-0.5f, 0.0f, -0.5f,
+			 0.5f, 0.0f, -0.5f,
+			 0.5f, 0.0f,  0.5f,
+			-0.5f, 0.0f,  0.5f
+		};
+
+		float uvs[2 * 4]
+		{
+			0.0f, 0.0f,
+			1.0f, 0.0f,
+			1.0f, 1.0f,
+			0.0f, 1.0f
 		};
 
 		BufferLayout layout = {
@@ -39,23 +102,28 @@ public:
 
 		uint32_t indices[6]{ 0, 1, 2, 2, 3, 0 };
 
-		mesh = Mesh::create(vertices, sizeof(vertices), indices, 6, layout);
-		
+		mesh = Mesh::create();
+		mesh->setVertexCount(4);
+		mesh->setLayout(layout);
+		mesh->setVertices("i_Pos", 0, (const char*)positions);
+		mesh->setVertices("i_UV", 1, (const char*)uvs);
+		mesh->setIndices(indices, 6);
+		mesh->init();
 
 		Ref<Texture> albedo = Texture2D::create("assets/textures/fern.png");
 
-		Ref<Shader> shader = shaderLibrary.load("assets/shaders/Albedo.glsl");
+		Ref<Shader> shader = shaderLibrary.get("Albedo");
 
 		Ref<Material> material = Material::create(shader);
 
 		material->setTexture("u_Albedo", 0, albedo);
 
+		mesh->setMaterial(material);*/
 
-		mesh->setMaterial(material);
-	}
 
-	void onUpdate(Timestep dt) override
-	{
+
+
+
 		// Camera movement
 		if (Input::isKeyPressed(MH_KEY_LEFT))
 			camera.setPosition(camera.getPosition() - glm::vec3({ dt, 0.0f, 0.0f }));

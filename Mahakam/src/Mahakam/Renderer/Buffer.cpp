@@ -20,7 +20,7 @@ namespace Mahakam
 	}
 
 
-	Ref<VertexBuffer> VertexBuffer::create(float* vertices, uint32_t size)
+	Ref<VertexBuffer> VertexBuffer::create(const char* vertices, uint32_t size)
 	{
 		switch (Renderer::getAPI())
 		{

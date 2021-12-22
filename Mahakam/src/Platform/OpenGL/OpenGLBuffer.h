@@ -11,7 +11,7 @@ namespace Mahakam
 
 	public:
 		OpenGLVertexBuffer(uint32_t size);
-		OpenGLVertexBuffer(float* vertices, uint32_t size);
+		OpenGLVertexBuffer(const char* vertices, uint32_t size);
 		virtual ~OpenGLVertexBuffer() override;
 
 		virtual void bind() const override;
