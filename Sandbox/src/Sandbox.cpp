@@ -24,41 +24,42 @@ private:
 public:
 	BasicLayer() : Layer("Basic Quad"), camera(-1.6f, 1.6f, -0.9f, 0.9f)
 	{
-		// Setup vertex position array
-		float positions[3 * 4]
-		{
-			-0.5f, 0.0f, -0.5f,
-			 0.5f, 0.0f, -0.5f,
-			 0.5f, 0.0f,  0.5f,
-			-0.5f, 0.0f,  0.5f
-		};
+		//// Setup vertex position array
+		//float positions[3 * 4]
+		//{
+		//	-0.5f, 0.0f, -0.5f,
+		//	 0.5f, 0.0f, -0.5f,
+		//	 0.5f, 0.0f,  0.5f,
+		//	-0.5f, 0.0f,  0.5f
+		//};
 
-		// Setup UV array
-		float uvs[2 * 4]
-		{
-			0.0f, 0.0f,
-			1.0f, 0.0f,
-			1.0f, 1.0f,
-			0.0f, 1.0f
-		};
+		//// Setup UV array
+		//float uvs[2 * 4]
+		//{
+		//	0.0f, 0.0f,
+		//	1.0f, 0.0f,
+		//	1.0f, 1.0f,
+		//	0.0f, 1.0f
+		//};
 
-		// Setup indices
-		uint32_t indices[6]{ 0, 1, 2, 2, 3, 0 };
+		//// Setup indices
+		//uint32_t indices[6]{ 0, 1, 2, 2, 3, 0 };
 
-		// Setup vertex attribute layout
-		BufferLayout layout = {
-			{ ShaderDataType::Float3, "i_Pos" },
-			{ ShaderDataType::Float2, "i_UV" }
-		};
+		//// Setup vertex attribute layout
+		//BufferLayout layout = {
+		//	{ ShaderDataType::Float3, "i_Pos" },
+		//	{ ShaderDataType::Float2, "i_UV" }
+		//};
 
-		// Initialize mesh
-		mesh = Mesh::create();
-		mesh->setVertexCount(4);
-		mesh->setLayout(layout);
-		mesh->addVertices("i_Pos", (const char*)positions);
-		mesh->addVertices("i_UV", (const char*)uvs);
-		mesh->setIndices(indices, 6);
-		mesh->init();
+		//// Initialize mesh
+		//mesh = Mesh::create(4, layout, indices, 6);
+		//mesh->addVertices("i_Pos", (const char*)positions);
+		//mesh->addVertices("i_UV", (const char*)uvs);
+		//mesh->init();
+
+
+		mesh = Mesh::createCube(2);
+
 		
 
 		// Setup texture
@@ -151,7 +152,7 @@ public:
 		glm::quat rotation({ 0.0f, glm::radians(-45.0f), 0.0f });
 
 		glm::mat4 modelMatrix = glm::mat4(rotation)
-			* glm::scale(glm::mat4(1.0f), { 2.0f, 2.0f, 2.0f });
+			* glm::scale(glm::mat4(1.0f), { 0.5f, 0.5f, 0.5f });
 
 		// Submitting to render queue
 		Renderer::submit(modelMatrix, mesh);

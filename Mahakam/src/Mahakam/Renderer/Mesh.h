@@ -60,26 +60,18 @@ namespace Mahakam
 		}
 
 	public:
-		Mesh() : vertices(0), vertexCount(0), indices(0), indexCount(0), bufferLayout(), material(0) {}
+		Mesh() : vertexCount(0), bufferLayout(), indices(0), indexCount(0), material(0) {}
 
-		Mesh(const char* vertices, unsigned int vertexCount,
-			uint32_t* indices, unsigned int indexCount, const BufferLayout& layout)
-			: interleavedVertices(new char[vertexCount * layout.getStride()]), vertexCount(vertexCount),
-			indices(indices), indexCount(indexCount), bufferLayout(layout)
+		Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount)
+			: vertexCount(vertexCount), bufferLayout(layout), indices(new uint32_t[indexCount]), indexCount(indexCount), material(0)
 		{
-			memcpy(interleavedVertices, vertices, vertexCount * layout.getStride());
-
-			init();
+			memcpy(indices, triangles, indexCount * sizeof(uint32_t));
 		}
 
-		Mesh(const char* vertices, unsigned int vertexCount, uint32_t* indices,
-			unsigned int indexCount, const BufferLayout& layout, const Ref<Material> mat)
-			: interleavedVertices(new char[vertexCount * layout.getStride()]), vertexCount(vertexCount),
-			indices(indices), indexCount(indexCount), bufferLayout(layout), material(mat)
+		Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount, const Ref<Material>& material)
+			: vertexCount(vertexCount), bufferLayout(layout), indices(new uint32_t[indexCount]), indexCount(indexCount), material(material)
 		{
-			memcpy(interleavedVertices, vertices, vertexCount * layout.getStride());
-
-			init();
+			memcpy(indices, triangles, indexCount * sizeof(uint32_t));
 		}
 
 		~Mesh()
@@ -180,30 +172,96 @@ namespace Mahakam
 
 		static Ref<Mesh> create() { return std::make_shared<Mesh>(); }
 
-		static Ref<Mesh> create(char* vertices, unsigned int vertexSize, uint32_t* indices, unsigned int indexCount, const BufferLayout& layout)
+		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* indices, uint32_t indexCount)
 		{
-			return std::make_shared<Mesh>(vertices, vertexSize, indices, indexCount, layout);
+			return std::make_shared<Mesh>(vertexCount, layout, indices, indexCount);
 		}
 
-		static Ref<Mesh> create(char* vertices, unsigned int vertexSize, uint32_t* indices, unsigned int indexCount,
-			const BufferLayout& layout, const Ref<Material>& material)
+		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout,
+			const uint32_t* indices, uint32_t indexCount, const Ref<Material>& material)
 		{
-			return std::make_shared<Mesh>(vertices, vertexSize, indices, indexCount, layout, material);
+			return std::make_shared<Mesh>(vertexCount, layout, indices, indexCount, material);
 		}
 
-		static Ref<Mesh> createCube(unsigned int tessellation)
+		static Ref<Mesh> createCube(int tessellation)
 		{
-			const int mods = 2 + 3; // UV + normals
-
-			float vertices[24 * (3 + mods)]
+			uint32_t vertexCount = 6 * tessellation * tessellation;
+			uint32_t indexCount = 6 * 6 * (tessellation - 1) * (tessellation - 1);
+			
+			glm::vec3 faces[6]
 			{
-				-0.5f, 0.0f, -0.5f, 0.0f, 0.0f,
-				 0.5f, 0.0f, -0.5f, 1.0f, 0.0f,
-				 0.5f, 0.0f,  0.5f, 1.0f, 1.0f,
-				-0.5f, 0.0f,  0.5f, 0.0f, 1.0f,
+				{  1.0f,  0.0f,  0.0f },
+				{  0.0f,  1.0f,  0.0f },
+				{  0.0f,  0.0f,  1.0f },
+				{ -1.0f,  0.0f,  0.0f },
+				{  0.0f, -1.0f,  0.0f },
+				{  0.0f,  0.0f, -1.0f }
 			};
 
+			glm::vec3* positions = new glm::vec3[vertexCount];
 
+			glm::vec2* uvs = new glm::vec2[vertexCount];
+
+			uint32_t* indices = new uint32_t[indexCount];
+
+			int index = 0;
+			int triIndex = 0;
+			for (int i = 0; i < 6; i++)
+			{
+				glm::vec3 upwards = faces[i];
+				glm::vec3 axisA(upwards.y, upwards.z, upwards.x);
+				glm::vec3 axisB = glm::cross(upwards, axisA);
+
+				for (int y = 0; y < tessellation; y++)
+				{
+					for (int x = 0; x < tessellation; x++)
+					{
+						glm::vec2 percent = { x / (tessellation - 1), y / (tessellation - 1) };
+
+						glm::vec3 pointOnCube = upwards * 0.5f
+							+ (percent.x - 0.5f) * axisA
+							+ (percent.y - 0.5f) * axisB;
+
+						positions[index] = pointOnCube;
+						uvs[index] = percent;
+
+						if (x != tessellation - 1 && y != tessellation - 1)
+						{
+							indices[triIndex] = index;
+							indices[triIndex + 1] = index + tessellation + 1;
+							indices[triIndex + 2] = index + tessellation;
+
+							indices[triIndex + 3] = index;
+							indices[triIndex + 4] = index + 1;
+							indices[triIndex + 5] = index + tessellation + 1;
+
+							triIndex += 6;
+						}
+
+						index++;
+					}
+				}
+			}
+
+			//glm::vec3 pos = positions[0];
+
+			BufferLayout layout
+			{
+				{ ShaderDataType::Float3, "i_Pos"},
+				{ ShaderDataType::Float2, "i_UV"},
+				//{ ShaderDataType::Float3, "i_Normal"}
+			};
+
+			Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount);
+			mesh->addVertices("i_Pos", positions);
+			mesh->addVertices("i_UV", uvs);
+			mesh->init();
+
+			//delete[] positions;
+			//delete[] uvs;
+			//delete[] indices;
+
+			return mesh;
 		}
 	};
 }

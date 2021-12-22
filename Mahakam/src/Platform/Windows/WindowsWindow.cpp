@@ -134,7 +134,7 @@ namespace Mahakam {
 			data.eventCallback(event);
 		});
 
-		glfwSetCursorPosCallback(window, [](GLFWwindow * window, double posX, double posY)
+		glfwSetCursorPosCallback(window, [](GLFWwindow* window, double posX, double posY)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -174,5 +174,13 @@ namespace Mahakam {
 	bool WindowsWindow::isVSync() const
 	{
 		return data.vsync;
+	}
+
+	void WindowsWindow::setCursorVisible(bool visible) const
+	{
+		if (visible)
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		else
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 }

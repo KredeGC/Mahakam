@@ -18,14 +18,7 @@ namespace Mahakam
 
 	const char* OpenGLRendererAPI::getGraphicsVendor()
 	{
-		//std::stringstream ss;
-		//ss << std::string((const char*)glGetString(GL_VENDOR)) << ": " << std::string((const char*)glGetString(GL_RENDERER));
-
 		return (const char*)glGetString(GL_RENDERER);
-
-		//return std::string((const char*)glGetString(GL_VENDOR)) + ": " + std::string((const char*)glGetString(GL_RENDERER));
-
-		//return ss.str().c_str();
 	}
 
 	void OpenGLRendererAPI::setClearColor(const glm::vec4 color)

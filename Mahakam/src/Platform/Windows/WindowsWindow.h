@@ -40,6 +40,8 @@ namespace Mahakam
 		void setVSync(bool enabled) override;
 		bool isVSync() const override;
 
+		virtual void setCursorVisible(bool visible) const override;
+
 		inline virtual void* getNativeWindow() const override { return window; }
 	};
 }
