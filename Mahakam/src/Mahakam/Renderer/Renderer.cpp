@@ -15,7 +15,7 @@ namespace Mahakam
 		GL::init();
 	}
 
-	void Renderer::beginScene(OrthographicCamera& cam)
+	void Renderer::beginScene(Camera& cam)
 	{
 		sceneData->viewProjectionMatrix = cam.getViewProjectionMatrix();
 	}

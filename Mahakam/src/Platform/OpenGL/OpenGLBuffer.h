@@ -17,6 +17,8 @@ namespace Mahakam
 		virtual void bind() const override;
 		virtual void unbind() const override;
 
+		virtual void setData(const char* data, uint32_t size) override;
+
 		virtual void setLayout(const BufferLayout& layout) override;
 		virtual const BufferLayout& getLayout() const override;
 	};

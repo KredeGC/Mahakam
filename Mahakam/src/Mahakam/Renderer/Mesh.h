@@ -7,6 +7,35 @@
 
 namespace Mahakam
 {
+	enum class ShaderSemantic
+	{
+		Position,
+		Normal,
+		Tangent,
+		Color,
+		TexCoord // Texcoord 0-9?
+	};
+
+	struct MeshElement
+	{
+
+	};
+
+	class MeshLayout
+	{
+	private:
+		std::vector<BufferElement> elements;
+
+	public:
+
+
+		std::vector<BufferElement>::iterator begin() { return elements.begin(); }
+		std::vector<BufferElement>::iterator end() { return elements.end(); }
+		std::vector<BufferElement>::const_iterator begin() const { return elements.begin(); }
+		std::vector<BufferElement>::const_iterator end() const { return elements.end(); }
+	};
+
+
 	class Mesh
 	{
 	private:
@@ -15,6 +44,8 @@ namespace Mahakam
 			char* data;
 			std::string name;
 		};
+
+		bool interleaved = true;
 
 		char* interleavedVertices = 0;
 		uint32_t vertexCount = 0;
@@ -28,6 +59,31 @@ namespace Mahakam
 		Ref<VertexArray> vertexArray;
 
 		Ref<Material> material;
+
+		void interleaveBuffers()
+		{
+			uint32_t stride = bufferLayout.getStride();
+			uint32_t size = stride * vertexCount;
+
+			interleavedVertices = new char[size];
+
+			const std::vector<BufferElement>& elements = bufferLayout.getElements();
+
+			uint32_t dstOffset = 0;
+			for (uint32_t i = 0; i < vertexCount; i++)
+			{
+				uint32_t srcOffset = 0;
+				for (auto& vert : vertices)
+				{
+					uint32_t size = elements[srcOffset++].size;
+					char* src = vert.second.data + i * size;
+					char* dst = interleavedVertices + dstOffset;
+
+					memcpy(dst, src, size);
+					dstOffset += size;
+				}
+			}
+		}
 
 		void initBuffers(bool interleave)
 		{
@@ -77,7 +133,7 @@ namespace Mahakam
 		~Mesh()
 		{
 			for (auto& kv : vertices)
-				delete kv.second.data;
+				delete[] kv.second.data;
 
 			delete[] interleavedVertices;
 		}
@@ -94,11 +150,8 @@ namespace Mahakam
 
 		inline void addVertices(const std::string& name, const void* verts)
 		{
-			setVertices(name, (int)vertices.size(), verts);
-		}
+			int index = (int)vertices.size();
 
-		void setVertices(const std::string& name, int index, const void* verts)
-		{
 			unsigned int stride = bufferLayout.getElement(index).size;
 			uint32_t size = stride * vertexCount;
 
@@ -113,32 +166,37 @@ namespace Mahakam
 			vertices[index] = vertex;
 		}
 
+		void setVertices(const std::string& name, int index, const char* verts)
+		{
+			unsigned int stride = bufferLayout.getElement(index).size;
+			uint32_t elementSize = stride * vertexCount;
+
+			if (interleaved)
+			{
+				memcpy(vertices[index].data, verts, elementSize);
+
+				interleaveBuffers();
+
+				const Ref<VertexBuffer>& buffer = vertexArray->getVertexBuffers()[0];
+
+				uint32_t bufferSize = bufferLayout.getStride() * vertexCount;
+
+				buffer->setData(interleavedVertices, bufferSize);
+			}
+			else
+			{
+				auto& buffers = vertexArray->getVertexBuffers();
+
+				buffers[index]->setData(verts, elementSize);
+			}
+		}
+
 		void init(bool interleave = true)
 		{
+			interleaved = interleave;
+
 			if (interleave)
-			{
-				uint32_t stride = bufferLayout.getStride();
-				uint32_t size = stride * vertexCount;
-
-				interleavedVertices = new char[size];
-
-				const std::vector<BufferElement>& elements = bufferLayout.getElements();
-
-				uint32_t dstOffset = 0;
-				for (uint32_t i = 0; i < vertexCount; i++)
-				{
-					uint32_t srcOffset = 0;
-					for (auto& vert : vertices)
-					{
-						uint32_t size = elements[srcOffset++].size;
-						char* src = vert.second.data + i * size;
-						char* dst = interleavedVertices + dstOffset;
-
-						memcpy(dst, src, size);
-						dstOffset += size;
-					}
-				}
-			}
+				interleaveBuffers();
 
 			initBuffers(interleave);
 		}

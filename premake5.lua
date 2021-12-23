@@ -11,17 +11,20 @@ workspace "Mahakam"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
-IncludeDir["spdlog"] = "Mahakam/vendor/spdlog/include"
+IncludeDir["assimp"] = "Mahakam/vendor/assimp"
 IncludeDir["GLFW"] = "Mahakam/vendor/GLFW/include"
 IncludeDir["glad"] = "Mahakam/vendor/glad/include"
-IncludeDir["imgui"] = "Mahakam/vendor/imgui"
 IncludeDir["glm"] = "Mahakam/vendor/glm"
+IncludeDir["imgui"] = "Mahakam/vendor/imgui"
+IncludeDir["spdlog"] = "Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"] = "Mahakam/vendor/stb_image"
 
 group "Dependencies"
+    os.execute("CMake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
+    --include "Mahakam/vendor/assimp"
     include "Mahakam/vendor/GLFW"
-    include "Mahakam/vendor/glad"
     include "Mahakam/vendor/imgui"
+    include "Mahakam/vendor/glad"
 group ""
 
 project "Mahakam"
@@ -40,19 +43,20 @@ project "Mahakam"
     files {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
-        "%{prj.name}/vendor/stb_image/**.h",
-        "%{prj.name}/vendor/stb_image/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl"
+        "%{prj.name}/vendor/glm/glm/**.inl",
+        "%{prj.name}/vendor/stb_image/**.h",
+        "%{prj.name}/vendor/stb_image/**.cpp"
     }
     
     includedirs {
         "%{prj.name}/src",
-        "%{IncludeDir.spdlog}",
+        "%{IncludeDir.assimp}",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.glad}",
-        "%{IncludeDir.imgui}",
         "%{IncludeDir.glm}",
+        "%{IncludeDir.imgui}",
+        "%{IncludeDir.spdlog}",
         "%{IncludeDir.stb_image}"
     }
     
@@ -60,6 +64,7 @@ project "Mahakam"
         "GLFW",
         "glad",
         "ImGui",
+        "assimp",
         "opengl32.lib"
     }
 

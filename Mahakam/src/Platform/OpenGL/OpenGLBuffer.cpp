@@ -5,6 +5,7 @@
 
 namespace Mahakam
 {
+#pragma region VertexBuffer
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
 	{
 		glCreateBuffers(1, &rendererID);
@@ -34,6 +35,12 @@ namespace Mahakam
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
+	void OpenGLVertexBuffer::setData(const char* data, uint32_t size)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, rendererID);
+		glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
+	}
+
 	void OpenGLVertexBuffer::setLayout(const BufferLayout& layout)
 	{
 		this->layout = layout;
@@ -43,9 +50,10 @@ namespace Mahakam
 	{
 		return layout;
 	}
+#pragma endregion
 
 
-
+#pragma region IndexBuffer
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* vertices, uint32_t count) : count(count)
 	{
 		glCreateBuffers(1, &rendererID);
@@ -67,4 +75,5 @@ namespace Mahakam
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
+#pragma endregion
 }

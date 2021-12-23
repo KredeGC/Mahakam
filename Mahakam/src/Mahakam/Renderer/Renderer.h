@@ -21,7 +21,7 @@ namespace Mahakam
 		static void onWindowResie(uint32_t width, uint32_t height);
 		static void init();
 
-		static void beginScene(OrthographicCamera& cam);
+		static void beginScene(Camera& cam);
 		static void endScene();
 
 		static void submit(const glm::mat4& transform, const Ref<Mesh>& mesh);

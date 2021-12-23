@@ -19,10 +19,10 @@ private:
 	ShaderLibrary shaderLibrary;
 	Ref<Mesh> mesh;
 
-	OrthographicCamera camera;
+	PerspectiveCamera camera;
 
 public:
-	BasicLayer() : Layer("Basic Quad"), camera(-1.6f, 1.6f, -0.9f, 0.9f)
+	BasicLayer() : Layer("Basic Quad"), camera(1.6f / 0.9f, 0.01f, 100.0f)
 	{
 		//// Setup vertex position array
 		//float positions[3 * 4]
@@ -42,6 +42,15 @@ public:
 		//	0.0f, 1.0f
 		//};
 
+		//// Setup UV array
+		//float uvs2[2 * 4]
+		//{
+		//	1.0f, 0.0f,
+		//	0.0f, 0.0f,
+		//	1.0f, 1.0f,
+		//	0.0f, 1.0f
+		//};
+
 		//// Setup indices
 		//uint32_t indices[6]{ 0, 1, 2, 2, 3, 0 };
 
@@ -55,7 +64,9 @@ public:
 		//mesh = Mesh::create(4, layout, indices, 6);
 		//mesh->addVertices("i_Pos", (const char*)positions);
 		//mesh->addVertices("i_UV", (const char*)uvs);
-		//mesh->init();
+		//mesh->init(false);
+
+		//mesh->setVertices("i_UV", 1, (const char*)uvs2);
 
 
 		mesh = Mesh::createCube(2);
@@ -132,12 +143,12 @@ public:
 			camera.setPosition(camera.getPosition() + glm::vec3({ dt, 0.0f, 0.0f }));
 
 		if (Input::isKeyPressed(MH_KEY_UP))
-			camera.setPosition(camera.getPosition() + glm::vec3({ 0.0f, 0.0f, dt }));
-		else if (Input::isKeyPressed(MH_KEY_DOWN))
 			camera.setPosition(camera.getPosition() - glm::vec3({ 0.0f, 0.0f, dt }));
+		else if (Input::isKeyPressed(MH_KEY_DOWN))
+			camera.setPosition(camera.getPosition() + glm::vec3({ 0.0f, 0.0f, dt }));
 
 		// Camera rotation
-		glm::quat rot({ glm::radians(45.0f), 0.0f, 0.0f });
+		glm::quat rot({ glm::radians(-45.0f), 0.0f, 0.0f });
 
 		camera.setRotation(rot);
 
@@ -151,7 +162,8 @@ public:
 		// Mesh transform setup
 		glm::quat rotation({ 0.0f, glm::radians(-45.0f), 0.0f });
 
-		glm::mat4 modelMatrix = glm::mat4(rotation)
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), {0.0f, -0.5f, 0.0f})
+			* glm::mat4(rotation)
 			* glm::scale(glm::mat4(1.0f), { 0.5f, 0.5f, 0.5f });
 
 		// Submitting to render queue
