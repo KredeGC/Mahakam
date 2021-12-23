@@ -6,6 +6,14 @@
 Mahakam/vendor/assimp/lib/
 Mahakam/vendor/assimp/generated/
 
+Mahakam/vendor/assimp/code/assimp.dir/
+Mahakam/vendor/assimp/code/Debug/
+Mahakam/vendor/assimp/code/Release/
+
+Mahakam/vendor/assimp/contrib/zlib/zlibstatic.dir/
+Mahakam/vendor/assimp/contrib/zlib/Debug/
+Mahakam/vendor/assimp/contrib/zlib/Release/
+
 # Hazel files
 *.log
 
