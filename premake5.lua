@@ -11,7 +11,7 @@ workspace "Mahakam"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
-IncludeDir["assimp"] = "Mahakam/vendor/assimp"
+IncludeDir["assimp"] = "Mahakam/vendor/assimp/include"
 IncludeDir["GLFW"] = "Mahakam/vendor/GLFW/include"
 IncludeDir["glad"] = "Mahakam/vendor/glad/include"
 IncludeDir["glm"] = "Mahakam/vendor/glm"
@@ -19,8 +19,25 @@ IncludeDir["imgui"] = "Mahakam/vendor/imgui"
 IncludeDir["spdlog"] = "Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"] = "Mahakam/vendor/stb_image"
 
+group "Dependencies/Assimp"
+    os.execute("cmake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
+    --os.execute("cmake --build \"Mahakam/vendor/assimp/\"")
+    
+    externalproject "assimp"
+        location "Mahakam/vendor/assimp/code"
+        kind "StaticLib"
+        language "C++"
+        cppdialect "C++17"
+        uuid "A8CB2FE6-9AD5-3CE2-8D32-B7DFAF8EC735"
+    
+    externalproject "zlibstatic"
+        location "Mahakam/vendor/assimp/contrib/zlib"
+        kind "StaticLib"
+        language "C"
+        uuid "A1367BDB-5B32-37E6-9FEA-6F7654E7330B"
+        
+
 group "Dependencies"
-    os.execute("CMake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
     --include "Mahakam/vendor/assimp"
     include "Mahakam/vendor/GLFW"
     include "Mahakam/vendor/imgui"
@@ -115,6 +132,7 @@ project "Sandbox"
     
     includedirs {
         "Mahakam/src",
+        "%{IncludeDir.assimp}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.imgui}",
         "%{IncludeDir.glm}"

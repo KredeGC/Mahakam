@@ -1,6 +1,10 @@
 # Binaries
 **/bin/
 **/bin-obj/
+**/out/
+
+Mahakam/vendor/assimp/lib/
+Mahakam/vendor/assimp/generated/
 
 # Hazel files
 *.log

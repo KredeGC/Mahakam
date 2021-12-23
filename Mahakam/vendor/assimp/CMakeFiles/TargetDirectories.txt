@@ -1,0 +1,15 @@
+D:/CPP/Mahakam/Mahakam/vendor/assimp/CMakeFiles/uninstall.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/CMakeFiles/UpdateAssimpLibsDebugSymbolsAndDLLs.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/CMakeFiles/INSTALL.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/CMakeFiles/ALL_BUILD.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/CMakeFiles/ZERO_CHECK.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/contrib/zlib/CMakeFiles/zlibstatic.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/contrib/zlib/CMakeFiles/INSTALL.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/contrib/zlib/CMakeFiles/ALL_BUILD.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/code/CMakeFiles/assimp.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/code/CMakeFiles/INSTALL.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/tools/assimp_cmd/CMakeFiles/assimp_cmd.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/tools/assimp_cmd/CMakeFiles/INSTALL.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/test/CMakeFiles/unit.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/test/CMakeFiles/INSTALL.dir
+D:/CPP/Mahakam/Mahakam/vendor/assimp/test/headercheck/CMakeFiles/INSTALL.dir

@@ -40,6 +40,9 @@ SET(CMAKE_POLICY_DEFAULT_CMP0092 NEW)
 
 CMAKE_MINIMUM_REQUIRED( VERSION 3.10 )
 
+cmake_policy(SET CMP0091 NEW)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 # Disabled importers: m3d for 5.1
 ADD_DEFINITIONS( -DASSIMP_BUILD_NO_M3D_IMPORTER)
 ADD_DEFINITIONS( -DASSIMP_BUILD_NO_M3D_EXPORTER)
@@ -62,7 +65,7 @@ PROJECT(Assimp VERSION 5.1.4)
 
 OPTION( BUILD_SHARED_LIBS
   "Build package with shared libraries."
-  ON
+  OF
 )
 OPTION( ASSIMP_BUILD_FRAMEWORK
   "Build package as Mac OS X Framework bundle."
@@ -86,7 +89,7 @@ OPTION( ASSIMP_NO_EXPORT
 )
 OPTION( ASSIMP_BUILD_ZLIB
   "Build your own zlib"
-  OFF
+  ON
 )
 OPTION( ASSIMP_BUILD_ASSIMP_TOOLS
   "If the supplementary tools for Assimp are built in addition to the library."
