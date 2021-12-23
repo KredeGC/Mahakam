@@ -9,7 +9,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <Mahakam/Renderer/Mesh.h>
+#include <Mahakam/Renderer/Model.h>
 
 using namespace Mahakam;
 
@@ -17,64 +17,35 @@ class BasicLayer : public Layer
 {
 private:
 	ShaderLibrary shaderLibrary;
-	Ref<Mesh> mesh;
+	Ref<Model> model;
+
+	uint32_t* drawCalls;
+	uint32_t* vertexCount;
+	uint32_t* triCount;
 
 	PerspectiveCamera camera;
 
+	bool wireframe = false;
+
 public:
-	BasicLayer() : Layer("Basic Quad"), camera(1.6f / 0.9f, 0.01f, 100.0f)
+	BasicLayer(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
+		: Layer("Basic Quad"), camera(1.6f / 0.9f, 0.01f, 100.0f), drawCalls(drawCalls), vertexCount(vertexCount), triCount(triCount)
 	{
-		//// Setup vertex position array
-		//float positions[3 * 4]
-		//{
-		//	-0.5f, 0.0f, -0.5f,
-		//	 0.5f, 0.0f, -0.5f,
-		//	 0.5f, 0.0f,  0.5f,
-		//	-0.5f, 0.0f,  0.5f
-		//};
-
-		//// Setup UV array
-		//float uvs[2 * 4]
-		//{
-		//	0.0f, 0.0f,
-		//	1.0f, 0.0f,
-		//	1.0f, 1.0f,
-		//	0.0f, 1.0f
-		//};
-
-		//// Setup UV array
-		//float uvs2[2 * 4]
-		//{
-		//	1.0f, 0.0f,
-		//	0.0f, 0.0f,
-		//	1.0f, 1.0f,
-		//	0.0f, 1.0f
-		//};
-
-		//// Setup indices
-		//uint32_t indices[6]{ 0, 1, 2, 2, 3, 0 };
-
-		//// Setup vertex attribute layout
-		//BufferLayout layout = {
-		//	{ ShaderDataType::Float3, "i_Pos" },
-		//	{ ShaderDataType::Float2, "i_UV" }
-		//};
-
-		//// Initialize mesh
-		//mesh = Mesh::create(4, layout, indices, 6);
-		//mesh->addVertices("i_Pos", (const char*)positions);
-		//mesh->addVertices("i_UV", (const char*)uvs);
-		//mesh->init(false);
-
-		//mesh->setVertices("i_UV", 1, (const char*)uvs2);
+		//mesh = Mesh::createCube(2);
 
 
-		mesh = Mesh::createCube(2);
+		MeshLayout layout
+		{
+			{ ShaderSemantic::Position, "i_Pos" },
+			{ ShaderSemantic::TexCoord0, "i_UV" },
+			{ ShaderSemantic::Normal, "i_Normal" }
+		};
 
-		
+		model = Model::load("assets/models/backpack.obj", layout);
+
 
 		// Setup texture
-		Ref<Texture> albedo = Texture2D::create("assets/textures/fern.png");
+		Ref<Texture> albedo = Texture2D::create("assets/textures/backpack/diffuse.jpg");
 
 		// Setup shader
 		Ref<Shader> shader = shaderLibrary.load("assets/shaders/Albedo.glsl");
@@ -85,54 +56,27 @@ public:
 
 
 		// Set material in mesh
-		mesh->setMaterial(material);
+		for (auto& mesh : model->getMeshes())
+			mesh->setMaterial(material);
+	}
+
+	void onEvent(Event& event) override
+	{
+		if (event.getEventType() == EventType::KeyPressed)
+		{
+			KeyPressedEvent& keyPressed = (KeyPressedEvent&)event;
+
+			if (keyPressed.getKeyCode() == MH_KEY_F5)
+			{
+				GL::setFillMode(wireframe);
+				wireframe = !wireframe;
+			}
+		}
 	}
 
 	void onUpdate(Timestep dt) override
 	{
-		// Memory leak test
-		/*float positions[3 * 4]
-		{
-			-0.5f, 0.0f, -0.5f,
-			 0.5f, 0.0f, -0.5f,
-			 0.5f, 0.0f,  0.5f,
-			-0.5f, 0.0f,  0.5f
-		};
-
-		float uvs[2 * 4]
-		{
-			0.0f, 0.0f,
-			1.0f, 0.0f,
-			1.0f, 1.0f,
-			0.0f, 1.0f
-		};
-
-		BufferLayout layout = {
-			{ ShaderDataType::Float3, "i_Pos" },
-			{ ShaderDataType::Float2, "i_UV" }
-		};
-
-		uint32_t indices[6]{ 0, 1, 2, 2, 3, 0 };
-
-		mesh = Mesh::create();
-		mesh->setVertexCount(4);
-		mesh->setLayout(layout);
-		mesh->setVertices("i_Pos", 0, (const char*)positions);
-		mesh->setVertices("i_UV", 1, (const char*)uvs);
-		mesh->setIndices(indices, 6);
-		mesh->init();
-
-		Ref<Texture> albedo = Texture2D::create("assets/textures/fern.png");
-
-		Ref<Shader> shader = shaderLibrary.get("Albedo");
-
-		Ref<Material> material = Material::create(shader);
-
-		material->setTexture("u_Albedo", 0, albedo);
-
-		mesh->setMaterial(material);*/
-
-
+		
 
 
 
@@ -162,14 +106,15 @@ public:
 		// Mesh transform setup
 		glm::quat rotation({ 0.0f, glm::radians(-45.0f), 0.0f });
 
-		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), {0.0f, -0.5f, 0.0f})
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), { 0.0f, -0.5f, 0.0f })
 			* glm::mat4(rotation)
-			* glm::scale(glm::mat4(1.0f), { 0.5f, 0.5f, 0.5f });
+			* glm::scale(glm::mat4(1.0f), { 0.2f, 0.2f, 0.2f });
 
 		// Submitting to render queue
-		Renderer::submit(modelMatrix, mesh);
+		for (auto& mesh : model->getMeshes())
+			Renderer::submit(modelMatrix, mesh);
 
-		Renderer::endScene();
+		Renderer::endScene(drawCalls, vertexCount, triCount);
 	}
 };
 
@@ -223,11 +168,14 @@ class StatsLayer : public Layer
 {
 private:
 	Timestep frametime = 0.0f;
-	unsigned int drawCalls = 0, vertexCount = 0, indexCount = 0;
+	uint32_t* drawCalls;
+	uint32_t* vertexCount;
+	uint32_t* triCount;
 	bool open = true;
 
 public:
-	StatsLayer() : Layer("Stats") {}
+	StatsLayer(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
+		: drawCalls(drawCalls), vertexCount(vertexCount), triCount(triCount), Layer("Stats") {}
 
 	void onUpdate(Timestep dt)
 	{
@@ -240,8 +188,9 @@ public:
 		{
 			ImGui::Begin("Stats", &open);
 			ImGui::Text("Graphics unit: %s", GL::getGraphicsVendor());
-			ImGui::Text("Drawcalls: %d", drawCalls);
-			ImGui::Text("Vertex count: %d", vertexCount);
+			ImGui::Text("Drawcalls: %d", *drawCalls);
+			ImGui::Text("Vertex count: %d", *vertexCount);
+			ImGui::Text("Tri count: %d", *triCount);
 			ImGui::Text("Frametime: %d fps (%.4g ms)", (int)(1.0f / frametime), frametime.getMilliSeconds());
 			ImGui::End();
 		}
@@ -250,12 +199,17 @@ public:
 
 class Sandbox : public Application
 {
+private:
+	uint32_t drawCalls = 0;
+	uint32_t vertexCount = 0;
+	uint32_t triCount = 0;
+
 public:
 	Sandbox()
 	{
-		pushLayer(new BasicLayer());
+		pushLayer(new BasicLayer(&drawCalls, &vertexCount, &triCount));
 		pushOverlay(new DockingLayer());
-		pushOverlay(new StatsLayer());
+		pushOverlay(new StatsLayer(&drawCalls, &vertexCount, &triCount));
 
 		//getWindow().setVSync(true);
 	}

@@ -25,6 +25,8 @@ namespace Mahakam
 		virtual void setClearColor(const glm::vec4 color) = 0;
 		virtual void clear(bool color, bool depth) = 0;
 
+		virtual void setFillMode(bool fill) = 0;
+
 		virtual void drawIndexed(uint32_t count) = 0;
 
 		static inline API getAPI() { return api; }

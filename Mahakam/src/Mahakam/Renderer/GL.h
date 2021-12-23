@@ -19,6 +19,8 @@ namespace Mahakam
 		inline static void setClearColor(const glm::vec4& color) { rendererAPI->setClearColor(color); }
 		inline static void clear(bool color = true, bool depth = true) { rendererAPI->clear(color, depth); }
 
+		inline static void setFillMode(bool fill) { rendererAPI->setFillMode(fill); }
+
 		inline static void drawIndexed(uint32_t count) { rendererAPI->drawIndexed(count); }
 	};
 }

@@ -13,26 +13,91 @@ namespace Mahakam
 		Normal,
 		Tangent,
 		Color,
-		TexCoord // Texcoord 0-9?
+		TexCoord0 // Texcoord 0-9?
 	};
+
+	static ShaderDataType ShaderSemanticDataType(ShaderSemantic semantic)
+	{
+		switch (semantic)
+		{
+		case ShaderSemantic::Position:
+			return ShaderDataType::Float3;
+		case ShaderSemantic::Normal:
+			return ShaderDataType::Float3;
+		case ShaderSemantic::Tangent:
+			return ShaderDataType::Float4;
+		case ShaderSemantic::Color:
+			return ShaderDataType::Float4;
+		case ShaderSemantic::TexCoord0:
+			return ShaderDataType::Float2;
+		}
+
+		MH_CORE_ASSERT(false, "Unknown shader semantic!");
+		return ShaderDataType::None;
+	}
+
+	static uint32_t ShaderSemanticSize(ShaderSemantic semantic)
+	{
+		switch (semantic)
+		{
+		case ShaderSemantic::Position:
+			return 12;
+		case ShaderSemantic::Normal:
+			return 12;
+		case ShaderSemantic::Tangent:
+			return 16;
+		case ShaderSemantic::Color:
+			return 16;
+		case ShaderSemantic::TexCoord0:
+			return 8;
+		}
+
+		MH_CORE_ASSERT(false, "Unknown shader semantic!");
+		return 0;
+	}
 
 	struct MeshElement
 	{
+		ShaderSemantic semantic;
+		std::string name;
 
+		MeshElement() {}
+
+		MeshElement(ShaderSemantic semantic, const std::string& name)
+			: semantic(semantic), name(name) {}
 	};
 
 	class MeshLayout
 	{
 	private:
-		std::vector<BufferElement> elements;
+		std::vector<MeshElement> elements;
+		BufferLayout bufferLayout;
 
 	public:
+		MeshLayout(const std::initializer_list<MeshElement>& elements) : elements(elements)
+		{
+			std::vector<BufferElement> bufferElements;
+			for (auto& kv : elements)
+			{
+				BufferElement el
+				{
+					ShaderSemanticDataType(kv.semantic),
+					kv.name
+				};
 
+				bufferElements.push_back(el);
+			}
 
-		std::vector<BufferElement>::iterator begin() { return elements.begin(); }
-		std::vector<BufferElement>::iterator end() { return elements.end(); }
-		std::vector<BufferElement>::const_iterator begin() const { return elements.begin(); }
-		std::vector<BufferElement>::const_iterator end() const { return elements.end(); }
+			bufferLayout = bufferElements;
+		}
+
+		inline const BufferLayout& getBufferLayout() const { return bufferLayout; }
+		inline const std::vector<MeshElement>& getElements() const { return elements; }
+
+		std::vector<MeshElement>::iterator begin() { return elements.begin(); }
+		std::vector<MeshElement>::iterator end() { return elements.end(); }
+		std::vector<MeshElement>::const_iterator begin() const { return elements.begin(); }
+		std::vector<MeshElement>::const_iterator end() const { return elements.end(); }
 	};
 
 
@@ -116,7 +181,8 @@ namespace Mahakam
 		}
 
 	public:
-		Mesh() : vertexCount(0), bufferLayout(), indices(0), indexCount(0), material(0) {}
+		Mesh(uint32_t vertexCount, const BufferLayout& layout, uint32_t indexCount)
+			: vertexCount(vertexCount), bufferLayout(layout), indexCount(indexCount), indices(0), material(0) {}
 
 		Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount)
 			: vertexCount(vertexCount), bufferLayout(layout), indices(new uint32_t[indexCount]), indexCount(indexCount), material(0)
@@ -136,16 +202,6 @@ namespace Mahakam
 				delete[] kv.second.data;
 
 			delete[] interleavedVertices;
-		}
-
-		void setLayout(const BufferLayout& layout)
-		{
-			bufferLayout = layout;
-		}
-
-		void setVertexCount(int count)
-		{
-			vertexCount = count;
 		}
 
 		inline void addVertices(const std::string& name, const void* verts)
@@ -171,10 +227,10 @@ namespace Mahakam
 			unsigned int stride = bufferLayout.getElement(index).size;
 			uint32_t elementSize = stride * vertexCount;
 
+			memcpy(vertices[index].data, verts, elementSize);
+
 			if (interleaved)
 			{
-				memcpy(vertices[index].data, verts, elementSize);
-
 				interleaveBuffers();
 
 				const Ref<VertexBuffer>& buffer = vertexArray->getVertexBuffers()[0];
@@ -203,6 +259,7 @@ namespace Mahakam
 
 		void setIndices(uint32_t* inds, unsigned int count)
 		{
+			// TODO: Update VAO if necessary
 			indices = inds;
 			indexCount = count;
 		}
@@ -214,7 +271,7 @@ namespace Mahakam
 
 		template<typename T>
 		inline const T& getVertices(int slot) const { return vertices[slot].data; }
-		inline uint32_t getVertexSize() const { return vertexCount; }
+		inline uint32_t getVertexCount() const { return vertexCount; }
 
 		inline const uint32_t* getIndices() const { return indices; }
 		inline uint32_t getIndexCount() const { return indexCount; }
@@ -228,7 +285,10 @@ namespace Mahakam
 			vertexArray->bind();
 		}
 
-		static Ref<Mesh> create() { return std::make_shared<Mesh>(); }
+		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout, uint32_t indexCount)
+		{
+			return std::make_shared<Mesh>(vertexCount, layout, indexCount);
+		}
 
 		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* indices, uint32_t indexCount)
 		{
@@ -241,85 +301,6 @@ namespace Mahakam
 			return std::make_shared<Mesh>(vertexCount, layout, indices, indexCount, material);
 		}
 
-		static Ref<Mesh> createCube(int tessellation)
-		{
-			uint32_t vertexCount = 6 * tessellation * tessellation;
-			uint32_t indexCount = 6 * 6 * (tessellation - 1) * (tessellation - 1);
-			
-			glm::vec3 faces[6]
-			{
-				{  1.0f,  0.0f,  0.0f },
-				{  0.0f,  1.0f,  0.0f },
-				{  0.0f,  0.0f,  1.0f },
-				{ -1.0f,  0.0f,  0.0f },
-				{  0.0f, -1.0f,  0.0f },
-				{  0.0f,  0.0f, -1.0f }
-			};
-
-			glm::vec3* positions = new glm::vec3[vertexCount];
-
-			glm::vec2* uvs = new glm::vec2[vertexCount];
-
-			uint32_t* indices = new uint32_t[indexCount];
-
-			int index = 0;
-			int triIndex = 0;
-			for (int i = 0; i < 6; i++)
-			{
-				glm::vec3 upwards = faces[i];
-				glm::vec3 axisA(upwards.y, upwards.z, upwards.x);
-				glm::vec3 axisB = glm::cross(upwards, axisA);
-
-				for (int y = 0; y < tessellation; y++)
-				{
-					for (int x = 0; x < tessellation; x++)
-					{
-						glm::vec2 percent = { x / (tessellation - 1), y / (tessellation - 1) };
-
-						glm::vec3 pointOnCube = upwards * 0.5f
-							+ (percent.x - 0.5f) * axisA
-							+ (percent.y - 0.5f) * axisB;
-
-						positions[index] = pointOnCube;
-						uvs[index] = percent;
-
-						if (x != tessellation - 1 && y != tessellation - 1)
-						{
-							indices[triIndex] = index;
-							indices[triIndex + 1] = index + tessellation + 1;
-							indices[triIndex + 2] = index + tessellation;
-
-							indices[triIndex + 3] = index;
-							indices[triIndex + 4] = index + 1;
-							indices[triIndex + 5] = index + tessellation + 1;
-
-							triIndex += 6;
-						}
-
-						index++;
-					}
-				}
-			}
-
-			//glm::vec3 pos = positions[0];
-
-			BufferLayout layout
-			{
-				{ ShaderDataType::Float3, "i_Pos"},
-				{ ShaderDataType::Float2, "i_UV"},
-				//{ ShaderDataType::Float3, "i_Normal"}
-			};
-
-			Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount);
-			mesh->addVertices("i_Pos", positions);
-			mesh->addVertices("i_UV", uvs);
-			mesh->init();
-
-			//delete[] positions;
-			//delete[] uvs;
-			//delete[] indices;
-
-			return mesh;
-		}
+		static Ref<Mesh> createCube(int tessellation);
 	};
 }

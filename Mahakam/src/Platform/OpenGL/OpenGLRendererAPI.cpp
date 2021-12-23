@@ -7,8 +7,8 @@ namespace Mahakam
 {
 	void OpenGLRendererAPI::init()
 	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glEnable(GL_DEPTH_TEST);
 	}
@@ -21,6 +21,14 @@ namespace Mahakam
 	const char* OpenGLRendererAPI::getGraphicsVendor()
 	{
 		return (const char*)glGetString(GL_RENDERER);
+	}
+
+	void OpenGLRendererAPI::setFillMode(bool fill)
+	{
+		if (fill)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
 	void OpenGLRendererAPI::setClearColor(const glm::vec4 color)

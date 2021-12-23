@@ -111,7 +111,12 @@ namespace Mahakam
 	public:
 		BufferLayout() {}
 
-		BufferLayout(const std::initializer_list<BufferElement>& elements) : elements(elements) 
+		BufferLayout(const std::initializer_list<BufferElement>& elements) : elements(elements)
+		{
+			calculateOffsetAndStride();
+		}
+
+		BufferLayout(const std::vector<BufferElement>& elements) : elements(elements)
 		{
 			calculateOffsetAndStride();
 		}

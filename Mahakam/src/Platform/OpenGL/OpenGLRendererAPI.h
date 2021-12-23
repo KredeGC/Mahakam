@@ -14,6 +14,8 @@ namespace Mahakam
 		virtual void setClearColor(const glm::vec4 color) override;
 		virtual void clear(bool color, bool depth) override;
 
+		virtual void setFillMode(bool fill) override;
+
 		virtual void drawIndexed(uint32_t count) override;
 	};
 }
