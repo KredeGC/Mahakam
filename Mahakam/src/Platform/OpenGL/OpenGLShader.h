@@ -18,7 +18,8 @@ namespace Mahakam
 
 		void compile(const std::unordered_map<GLenum, std::string>& sources);
 		std::unordered_map<GLenum, std::string> parse(const std::string& source);
-		std::string readFile(const std::string filepath);
+		std::string sortIncludes(const std::string& source);
+		std::string readFile(const std::string& filepath);
 
 	public:
 		OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
@@ -27,6 +28,8 @@ namespace Mahakam
 
 		virtual void bind() const override;
 		virtual void unbind() const override;
+
+		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) override;
 
 		virtual const std::string& getName() const override { return name; }
 

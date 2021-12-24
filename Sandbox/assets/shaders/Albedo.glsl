@@ -1,19 +1,18 @@
 #type vertex
 #version 330
+#include "assets/shaders/Matrix.glsl"
 
 layout(location = 0) in vec3 i_Pos;
 layout(location = 1) in vec2 i_UV;
 layout(location = 2) in vec3 i_Normal;
 
-uniform mat4 u_MVP;
-
 out vec3 v_WorldNormal;
 out vec2 v_UV;
 
 void main() {
-    gl_Position = u_MVP * vec4(i_Pos, 1.0);
+    gl_Position = MATRIX_MVP * vec4(i_Pos, 1.0);
     v_UV = i_UV;
-    v_WorldNormal = (u_MVP * vec4(i_Normal, 0.0)).xyz;
+    v_WorldNormal = (MATRIX_MVP * vec4(i_Normal, 0.0)).xyz;
 }
 
 

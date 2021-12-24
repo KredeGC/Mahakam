@@ -17,6 +17,8 @@ namespace Mahakam
 
 		virtual void bind() const = 0;
 
+		virtual void setTransform(const glm::mat4& modelMatrix) = 0;
+
 		virtual void setTexture(const std::string& name, int slot, Ref<Texture> tex) = 0;
 
 		virtual void setMat3(const std::string& name, const glm::mat3& value) = 0;

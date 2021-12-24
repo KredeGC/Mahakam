@@ -8,7 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Mahakam
-{	
+{
 	static GLenum ShaderTypeFromString(const std::string& type)
 	{
 		if (type == "vertex")
@@ -31,9 +31,11 @@ namespace Mahakam
 		int index = 0;
 		for (auto& kv : sources)
 		{
-			GLenum type = kv.first;
-			const std::string& source = kv.second;
+			std::string source = sortIncludes(kv.second);
 
+			MH_CORE_TRACE("{0}", source);
+
+			GLenum type = kv.first;
 			GLuint shader = glCreateShader(type);
 
 			const char* sourceC = source.c_str();
@@ -76,7 +78,7 @@ namespace Mahakam
 			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
 
 			glDeleteProgram(program);
-			
+
 			for (auto& id : shaderIDs)
 				glDeleteShader(id);
 
@@ -90,6 +92,38 @@ namespace Mahakam
 			glDetachShader(program, shaderIDs[i]);
 
 		rendererID = program;
+	}
+
+	std::string OpenGLShader::sortIncludes(const std::string& source)
+	{
+		std::stringstream sourceStream;
+
+		const char* typeToken = "#include \"";
+		size_t typeTokenLength = strlen(typeToken);
+		size_t lastPos = 0;
+		size_t pos = source.find(typeToken, 0);
+		while (pos != std::string::npos)
+		{
+			sourceStream << source.substr(lastPos, pos - lastPos);
+
+			size_t end = source.find("\"", pos + typeTokenLength);
+			size_t begin = pos + typeTokenLength;
+
+			lastPos = end + 1;
+
+			pos = source.find(typeToken, end);
+
+
+			std::string includeFile = source.substr(begin, end - begin);
+
+			std::string includeSource = readFile(includeFile);
+
+			sourceStream << sortIncludes(includeSource);
+		}
+
+		sourceStream << source.substr(lastPos, source.size() - lastPos);
+
+		return sourceStream.str();
 	}
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::parse(const std::string& source)
@@ -116,7 +150,7 @@ namespace Mahakam
 		return sources;
 	}
 
-	std::string OpenGLShader::readFile(const std::string filepath)
+	std::string OpenGLShader::readFile(const std::string& filepath)
 	{
 		std::string result;
 		std::ifstream stream(filepath, std::ios::in | std::ios::binary);
@@ -137,7 +171,7 @@ namespace Mahakam
 
 		return result;
 	}
-	
+
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource) : name(name)
 	{
 		std::unordered_map<GLenum, std::string> sources;
@@ -177,6 +211,12 @@ namespace Mahakam
 	void OpenGLShader::unbind() const
 	{
 		glUseProgram(0);
+	}
+
+	void OpenGLShader::setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
+	{
+		setUniformMat4("u_m4_V", viewMatrix);
+		setUniformMat4("u_m4_P", projectionMatrix);
 	}
 
 	void OpenGLShader::setUniformMat3(const std::string& name, const glm::mat3& value)

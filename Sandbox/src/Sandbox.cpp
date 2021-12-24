@@ -103,16 +103,20 @@ public:
 		// Scene setup
 		Renderer::beginScene(camera);
 
-		// Mesh transform setup
-		glm::quat rotation({ 0.0f, glm::radians(-45.0f), 0.0f });
+		// Render many objects
+		for (int i = 0; i < 40; i++)
+		{
+			// Mesh transform setup
+			glm::quat rotation({ 0.0f, glm::radians(-45.0f), 0.0f });
 
-		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), { 0.0f, -0.5f, 0.0f })
-			* glm::mat4(rotation)
-			* glm::scale(glm::mat4(1.0f), { 0.2f, 0.2f, 0.2f });
+			glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), { (float)i, -0.5f, 0.0f })
+				* glm::mat4(rotation)
+				* glm::scale(glm::mat4(1.0f), { 0.2f, 0.2f, 0.2f });
 
-		// Submitting to render queue
-		for (auto& mesh : model->getMeshes())
-			Renderer::submit(modelMatrix, mesh);
+			// Submitting to render queue
+			for (auto& mesh : model->getMeshes())
+				Renderer::submit(modelMatrix, mesh);
+		}
 
 		Renderer::endScene(drawCalls, vertexCount, triCount);
 	}

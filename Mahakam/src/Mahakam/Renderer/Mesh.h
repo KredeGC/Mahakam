@@ -281,7 +281,7 @@ namespace Mahakam
 
 		void bind()
 		{
-			material->bind();
+			//material->bind();
 			vertexArray->bind();
 		}
 

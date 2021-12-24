@@ -14,7 +14,8 @@ namespace Mahakam
 	private:
 		struct SceneData
 		{
-			glm::mat4 viewProjectionMatrix;
+			glm::mat4 viewMatrix;
+			glm::mat4 projectionMatrix;
 		};
 
 		struct MeshData
@@ -25,7 +26,9 @@ namespace Mahakam
 
 		static SceneData* sceneData;
 
-		static std::vector<MeshData> renderQueue;
+		//static std::vector<MeshData> renderQueue;
+
+		static std::unordered_map<Ref<Shader>, std::unordered_map<Ref<Material>, std::vector<MeshData>>> renderQueue;
 
 	public:
 		static void onWindowResie(uint32_t width, uint32_t height);

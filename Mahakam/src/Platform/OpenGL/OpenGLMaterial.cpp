@@ -8,7 +8,7 @@ namespace Mahakam
 
 	void OpenGLMaterial::bind() const
 	{
-		shader->bind();
+		//shader->bind();
 
 		for (auto& kv : ints)
 			shader->setUniformInt(kv.first, kv.second);
@@ -33,6 +33,11 @@ namespace Mahakam
 
 		for (auto& kv : float4s)
 			shader->setUniformFloat4(kv.first, kv.second);
+	}
+
+	void OpenGLMaterial::setTransform(const glm::mat4& modelMatrix)
+	{
+		shader->setUniformMat4("u_m4_M", modelMatrix);
 	}
 
 	const Ref<Texture> OpenGLMaterial::getTexture(const std::string& name) const

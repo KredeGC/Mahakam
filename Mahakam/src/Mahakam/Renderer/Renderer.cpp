@@ -5,7 +5,9 @@ namespace Mahakam
 {
 	Renderer::SceneData* Renderer::sceneData = new Renderer::SceneData;
 
-	std::vector<Renderer::MeshData> Renderer::renderQueue;
+	//std::vector<Renderer::MeshData> Renderer::renderQueue;
+
+	std::unordered_map<Ref<Shader>, std::unordered_map<Ref<Material>, std::vector<Renderer::MeshData>>> Renderer::renderQueue;
 
 	void Renderer::onWindowResie(uint32_t width, uint32_t height)
 	{
@@ -19,18 +21,43 @@ namespace Mahakam
 
 	void Renderer::beginScene(Camera& cam)
 	{
-		sceneData->viewProjectionMatrix = cam.getViewProjectionMatrix();
+		sceneData->viewMatrix = cam.getViewMatrix();
+		sceneData->projectionMatrix = cam.getProjectionMatrix();
 
 		renderQueue.clear();
 	}
 	
 	void Renderer::endScene(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
 	{
-		*drawCalls = (uint32_t)renderQueue.size();
+		*drawCalls = 0;
 		*vertexCount = 0;
 		*triCount = 0;
 
-		for (auto& data : renderQueue)
+		for (auto& shaderPair : renderQueue)
+		{
+			shaderPair.first->bind();
+			shaderPair.first->setViewProjection(sceneData->viewMatrix, sceneData->projectionMatrix);
+
+			for (auto& materialPair : shaderPair.second)
+			{
+				materialPair.first->bind();
+
+				for (auto& data : materialPair.second)
+				{
+					materialPair.first->setTransform(data.transform);
+
+					*drawCalls += 1;
+					*vertexCount += data.mesh->getVertexCount();
+					*triCount += data.mesh->getIndexCount();
+
+					data.mesh->bind();
+
+					GL::drawIndexed(data.mesh->getIndexCount());
+				}
+			}
+		}
+
+		/*for (auto& data : renderQueue)
 		{
 			*vertexCount += data.mesh->getVertexCount();
 			*triCount += data.mesh->getIndexCount();
@@ -40,14 +67,19 @@ namespace Mahakam
 			data.mesh->bind();
 
 			GL::drawIndexed(data.mesh->getIndexCount());
-		}
+		}*/
 
 		*triCount /= 3;
 	}
 	
 	void Renderer::submit(const glm::mat4& transform, const Ref<Mesh>& mesh)
 	{
-		renderQueue.push_back({ mesh, transform });
+		const Ref<Material>& material = mesh->getMaterial();
+		const Ref<Shader>& shader = material->getShader();
+
+		renderQueue[shader][material].push_back({ mesh, transform });
+
+		//renderQueue.push_back({ mesh, transform });
 
 		/*mesh->getMaterial()->setMat4("u_MVP", sceneData->viewProjectionMatrix * transform);
 
