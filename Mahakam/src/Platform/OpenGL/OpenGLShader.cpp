@@ -213,6 +213,12 @@ namespace Mahakam
 		glUseProgram(0);
 	}
 
+	void OpenGLShader::bindBuffer(const std::string& name, int slot)
+	{
+		uint32_t blockID = glGetUniformBlockIndex(rendererID, name.c_str());
+		glUniformBlockBinding(rendererID, blockID, slot);
+	}
+
 	void OpenGLShader::setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
 	{
 		setUniformMat4("u_m4_V", viewMatrix);

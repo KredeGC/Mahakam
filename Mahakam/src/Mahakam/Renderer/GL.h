@@ -21,6 +21,8 @@ namespace Mahakam
 
 		inline static void setFillMode(bool fill) { rendererAPI->setFillMode(fill); }
 
-		inline static void drawIndexed(uint32_t count) { rendererAPI->drawIndexed(count); }
+		inline static void drawIndexed(uint32_t indexCount) { rendererAPI->drawIndexed(indexCount); }
+
+		inline static void drawInstanced(uint32_t indexCount, uint32_t count) { rendererAPI->drawInstanced(indexCount, count); }
 	};
 }

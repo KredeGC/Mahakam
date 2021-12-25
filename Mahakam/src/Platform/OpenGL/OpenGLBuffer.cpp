@@ -54,11 +54,12 @@ namespace Mahakam
 
 
 #pragma region IndexBuffer
-	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* vertices, uint32_t count) : count(count)
+	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : count(count)
 	{
 		glCreateBuffers(1, &rendererID);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendererID);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * count, vertices, GL_STATIC_DRAW);
+		glNamedBufferStorage(rendererID, sizeof(uint32_t) * count, indices, GL_MAP_WRITE_BIT);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendererID);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * count, indices, GL_STATIC_DRAW);
 	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
@@ -74,6 +75,41 @@ namespace Mahakam
 	void OpenGLIndexBuffer::unbind() const
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+#pragma endregion
+
+
+#pragma region OpenGLUniformBuffer
+	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size) : size(size)
+	{
+		glCreateBuffers(1, &rendererID);
+		glBindBuffer(GL_UNIFORM_BUFFER, rendererID);
+		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+	}
+
+	OpenGLUniformBuffer::~OpenGLUniformBuffer()
+	{
+		glDeleteBuffers(1, &rendererID);
+	}
+
+	void OpenGLUniformBuffer::bind(int slot, int offset, int size) const
+	{
+		glBindBufferRange(GL_UNIFORM_BUFFER, slot, rendererID, offset, size > 0 ? size : this->size);
+	}
+
+	void OpenGLUniformBuffer::unbind(int slot) const
+	{
+		glBindBufferRange(GL_UNIFORM_BUFFER, slot, 0, 0, 0);
+	}
+
+	void OpenGLUniformBuffer::setData(const void* data, uint32_t offset, uint32_t size)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, rendererID);
+		//glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+
+		void* ptr = glMapBufferRange(GL_UNIFORM_BUFFER, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+		memcpy(ptr, data, size);
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 #pragma endregion
 }

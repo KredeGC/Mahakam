@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Buffer.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -12,6 +14,8 @@ namespace Mahakam
 		virtual const glm::mat4& getViewMatrix() const = 0;
 		virtual const glm::mat4& getProjectionMatrix() const = 0;
 		virtual const glm::mat4& getViewProjectionMatrix() const = 0;
+
+		virtual const Ref<UniformBuffer>& getMatrixBuffer() const = 0;
 	};
 #pragma endregion
 
@@ -27,6 +31,8 @@ namespace Mahakam
 		glm::vec3 position = { 0.0f, 0.0f, 0.0f };
 		glm::quat rotation = { 1.0f, 0.0f, 0.0f, 0.0f };
 
+		Ref<UniformBuffer> matrixBuffer;
+
 		void recalculateViewMatrix();
 
 	public:
@@ -38,9 +44,11 @@ namespace Mahakam
 		const glm::vec3& getPosition() const;
 		const glm::quat& getRotation() const;
 
-		const glm::mat4& getViewMatrix() const { return viewMatrix; }
-		const glm::mat4& getProjectionMatrix() const { return projectionMatrix; }
-		const glm::mat4& getViewProjectionMatrix() const { return viewProjectionMatrix; }
+		const glm::mat4& getViewMatrix() const override { return viewMatrix; }
+		const glm::mat4& getProjectionMatrix() const override { return projectionMatrix; }
+		const glm::mat4& getViewProjectionMatrix() const override { return viewProjectionMatrix; }
+
+		virtual const Ref<UniformBuffer>& getMatrixBuffer() const override { return matrixBuffer; }
 	};
 #pragma endregion
 
@@ -56,6 +64,8 @@ namespace Mahakam
 		glm::vec3 position = { 0.0f, 0.0f, 0.0f };
 		glm::quat rotation = { 1.0f, 0.0f, 0.0f, 0.0f };
 
+		Ref<UniformBuffer> matrixBuffer;
+
 		void recalculateViewMatrix();
 
 	public:
@@ -67,9 +77,11 @@ namespace Mahakam
 		const glm::vec3& getPosition() const;
 		const glm::quat& getRotation() const;
 
-		const glm::mat4& getViewMatrix() const { return viewMatrix; }
-		const glm::mat4& getProjectionMatrix() const { return projectionMatrix; }
-		const glm::mat4& getViewProjectionMatrix() const { return viewProjectionMatrix; }
+		const glm::mat4& getViewMatrix() const override { return viewMatrix; }
+		const glm::mat4& getProjectionMatrix() const override { return projectionMatrix; }
+		const glm::mat4& getViewProjectionMatrix() const override { return viewProjectionMatrix; }
+
+		virtual const Ref<UniformBuffer>& getMatrixBuffer() const override { return matrixBuffer; }
 	};
 #pragma endregion
 }

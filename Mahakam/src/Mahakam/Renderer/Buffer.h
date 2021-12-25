@@ -132,6 +132,7 @@ namespace Mahakam
 	};
 
 
+#pragma region VertexBuffer
 	class VertexBuffer
 	{
 	public:
@@ -148,8 +149,10 @@ namespace Mahakam
 		static Ref<VertexBuffer> create(const char* vertices, uint32_t size);
 		static Ref<VertexBuffer> create(uint32_t size);
 	};
+#pragma endregion
 
 
+#pragma region IndexBuffer
 	class IndexBuffer
 	{
 	public:
@@ -160,6 +163,23 @@ namespace Mahakam
 
 		virtual uint32_t getCount() const = 0;
 
-		static Ref<IndexBuffer> create(uint32_t* vertices, uint32_t count);
+		static Ref<IndexBuffer> create(uint32_t* indices, uint32_t count);
 	};
+#pragma endregion
+
+
+#pragma region UniformBuffer
+	class UniformBuffer
+	{
+	public:
+		virtual ~UniformBuffer() {}
+
+		virtual void bind(int slot = 0, int offset = 0, int size = 0) const = 0;
+		virtual void unbind(int slot = 0) const = 0;
+
+		virtual void setData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
+
+		static Ref<UniformBuffer> create(uint32_t size);
+	};
+#pragma endregion
 }

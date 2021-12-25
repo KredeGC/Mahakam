@@ -29,6 +29,8 @@ namespace Mahakam
 
 		virtual void drawIndexed(uint32_t count) = 0;
 
+		virtual void drawInstanced(uint32_t indexCount, uint32_t count) = 0;
+
 		static inline API getAPI() { return api; }
 	};
 }

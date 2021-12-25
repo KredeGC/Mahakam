@@ -20,6 +20,7 @@ namespace Mahakam
 	}
 
 
+#pragma region VertexBuffer
 	Ref<VertexBuffer> VertexBuffer::create(const char* vertices, uint32_t size)
 	{
 		switch (Renderer::getAPI())
@@ -49,8 +50,10 @@ namespace Mahakam
 
 		return nullptr;
 	}
+#pragma endregion
 
 
+#pragma region IndexBuffer
 	Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t count)
 	{
 		switch (Renderer::getAPI())
@@ -65,4 +68,23 @@ namespace Mahakam
 
 		return nullptr;
 	}
+#pragma endregion
+
+
+#pragma region UniformBuffer
+	Ref<UniformBuffer> UniformBuffer::create(uint32_t size)
+	{
+		switch (Renderer::getAPI())
+		{
+		case RendererAPI::API::None:
+			MH_CORE_ASSERT(false, "Renderer API not supported!");
+		case RendererAPI::API::OpenGL:
+			return std::make_shared<OpenGLUniformBuffer>(size);
+		}
+
+		MH_CORE_ASSERT(false, "Unknown renderer API!");
+
+		return nullptr;
+	}
+#pragma endregion
 }

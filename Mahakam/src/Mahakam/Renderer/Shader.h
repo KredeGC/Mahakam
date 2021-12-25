@@ -12,6 +12,8 @@ namespace Mahakam
 		virtual void bind() const = 0;
 		virtual void unbind() const = 0;
 
+		virtual void bindBuffer(const std::string& name, int slot = 0) = 0;
+
 		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) = 0;
 
 		virtual const std::string& getName() const = 0;
@@ -20,6 +22,8 @@ namespace Mahakam
 		static Ref<Shader> create(const std::string& filepath);
 	};
 
+
+#pragma region ShaderLibrary
 	class ShaderLibrary
 	{
 	private:
@@ -32,4 +36,5 @@ namespace Mahakam
 
 		Ref<Shader> get(const std::string& name);
 	};
+#pragma endregion
 }

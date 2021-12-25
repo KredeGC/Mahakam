@@ -17,5 +17,7 @@ namespace Mahakam
 		virtual void setFillMode(bool fill) override;
 
 		virtual void drawIndexed(uint32_t count) override;
+
+		virtual void drawInstanced(uint32_t indexCount, uint32_t count) override;
 	};
 }

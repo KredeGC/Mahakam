@@ -23,14 +23,16 @@ private:
 	uint32_t* vertexCount;
 	uint32_t* triCount;
 
-	PerspectiveCamera camera;
+	Ref<PerspectiveCamera> camera;
 
 	bool wireframe = false;
 
 public:
 	BasicLayer(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
-		: Layer("Basic Quad"), camera(1.6f / 0.9f, 0.01f, 100.0f), drawCalls(drawCalls), vertexCount(vertexCount), triCount(triCount)
+		: Layer("Basic Quad"), drawCalls(drawCalls), vertexCount(vertexCount), triCount(triCount)
 	{
+		camera = std::make_shared<PerspectiveCamera>(1.6f / 0.9f, 0.01f, 100.0f);
+
 		//mesh = Mesh::createCube(2);
 
 
@@ -81,20 +83,20 @@ public:
 
 
 		// Camera movement
-		if (Input::isKeyPressed(MH_KEY_LEFT))
-			camera.setPosition(camera.getPosition() - glm::vec3({ dt, 0.0f, 0.0f }));
-		else if (Input::isKeyPressed(MH_KEY_RIGHT))
-			camera.setPosition(camera.getPosition() + glm::vec3({ dt, 0.0f, 0.0f }));
+		if (Input::isKeyPressed(MH_KEY_A))
+			camera->setPosition(camera->getPosition() - glm::vec3({ dt, 0.0f, 0.0f }));
+		else if (Input::isKeyPressed(MH_KEY_D))
+			camera->setPosition(camera->getPosition() + glm::vec3({ dt, 0.0f, 0.0f }));
 
-		if (Input::isKeyPressed(MH_KEY_UP))
-			camera.setPosition(camera.getPosition() - glm::vec3({ 0.0f, 0.0f, dt }));
-		else if (Input::isKeyPressed(MH_KEY_DOWN))
-			camera.setPosition(camera.getPosition() + glm::vec3({ 0.0f, 0.0f, dt }));
+		if (Input::isKeyPressed(MH_KEY_W))
+			camera->setPosition(camera->getPosition() - glm::vec3({ 0.0f, 0.0f, dt }));
+		else if (Input::isKeyPressed(MH_KEY_S))
+			camera->setPosition(camera->getPosition() + glm::vec3({ 0.0f, 0.0f, dt }));
 
 		// Camera rotation
 		glm::quat rot({ glm::radians(-45.0f), 0.0f, 0.0f });
 
-		camera.setRotation(rot);
+		camera->setRotation(rot);
 
 		// Clearing screen
 		GL::setClearColor({ 0.1f, 0.1f, 0.1f, 0.1f });
@@ -104,12 +106,12 @@ public:
 		Renderer::beginScene(camera);
 
 		// Render many objects
-		for (int i = 0; i < 40; i++)
+		for (int i = 0; i < 50; i++)
 		{
 			// Mesh transform setup
 			glm::quat rotation({ 0.0f, glm::radians(-45.0f), 0.0f });
 
-			glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), { (float)i, -0.5f, 0.0f })
+			glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), { (float)(i * 0.05f), -0.5f, 0.0f })
 				* glm::mat4(rotation)
 				* glm::scale(glm::mat4(1.0f), { 0.2f, 0.2f, 0.2f });
 

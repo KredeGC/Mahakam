@@ -29,6 +29,8 @@ namespace Mahakam
 		virtual void bind() const override;
 		virtual void unbind() const override;
 
+		virtual void bindBuffer(const std::string& name, int slot) override;
+
 		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) override;
 
 		virtual const std::string& getName() const override { return name; }

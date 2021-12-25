@@ -23,6 +23,8 @@ namespace Mahakam
 		virtual const BufferLayout& getLayout() const override;
 	};
 
+
+#pragma region OpenGLIndexBuffer
 	class OpenGLIndexBuffer : public IndexBuffer
 	{
 	private:
@@ -38,4 +40,25 @@ namespace Mahakam
 
 		virtual uint32_t getCount() const { return count; }
 	};
+#pragma endregion
+
+
+#pragma region OpenGLUniformBuffer
+	class OpenGLUniformBuffer : public UniformBuffer
+	{
+	private:
+		uint32_t rendererID;
+		BufferLayout layout;
+		uint32_t size;
+
+	public:
+		OpenGLUniformBuffer(uint32_t size);
+		virtual ~OpenGLUniformBuffer() override;
+
+		virtual void bind(int slot, int offset, int size) const override;
+		virtual void unbind(int slot) const override;
+
+		virtual void setData(const void* data, uint32_t offset, uint32_t size) override;
+	};
+#pragma endregion
 }

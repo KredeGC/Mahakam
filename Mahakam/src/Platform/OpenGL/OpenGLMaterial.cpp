@@ -40,6 +40,11 @@ namespace Mahakam
 		shader->setUniformMat4("u_m4_M", modelMatrix);
 	}
 
+	void OpenGLMaterial::setTransformIndex(int index, const glm::mat4& modelMatrix)
+	{
+		shader->setUniformMat4("u_m4_M[" + std::to_string(index) + "]", modelMatrix);
+	}
+
 	const Ref<Texture> OpenGLMaterial::getTexture(const std::string& name) const
 	{
 		auto& intIter = ints.find(name);

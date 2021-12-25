@@ -47,4 +47,9 @@ namespace Mahakam
 	{
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
+
+	void OpenGLRendererAPI::drawInstanced(uint32_t indexCount, uint32_t count)
+	{
+		glDrawElementsInstanced(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr, count);
+	}
 }
