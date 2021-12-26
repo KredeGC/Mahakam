@@ -182,4 +182,20 @@ namespace Mahakam
 		static Ref<UniformBuffer> create(uint32_t size);
 	};
 #pragma endregion
+
+
+#pragma region StorageBuffer
+	class StorageBuffer
+	{
+	public:
+		virtual ~StorageBuffer() {}
+
+		virtual void bind(int slot = 0, int offset = 0, int size = 0) const = 0;
+		virtual void unbind(int slot = 0) const = 0;
+
+		virtual void setData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
+
+		static Ref<StorageBuffer> create(uint32_t size);
+	};
+#pragma endregion
 }

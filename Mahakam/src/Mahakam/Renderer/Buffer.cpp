@@ -87,4 +87,22 @@ namespace Mahakam
 		return nullptr;
 	}
 #pragma endregion
+
+
+#pragma region StorageBuffer
+	Ref<StorageBuffer> StorageBuffer::create(uint32_t size)
+	{
+		switch (Renderer::getAPI())
+		{
+		case RendererAPI::API::None:
+			MH_CORE_ASSERT(false, "Renderer API not supported!");
+		case RendererAPI::API::OpenGL:
+			return std::make_shared<OpenGLStorageBuffer>(size);
+		}
+
+		MH_CORE_ASSERT(false, "Unknown renderer API!");
+
+		return nullptr;
+	}
+#pragma endregion
 }

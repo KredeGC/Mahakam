@@ -35,20 +35,11 @@ namespace Mahakam
 		transformData.clear();
 	}
 
-	inline size_t uboAligned(size_t size) { return ((size + 255) / 256) * 256; }
-
 	void Renderer::endScene(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
 	{
-		//Ref<UniformBuffer> transformBuffer = UniformBuffer::create(2 * 79 * uboAligned(sizeof(glm::mat4)));
-
 		*drawCalls = 0;
 		*vertexCount = 0;
 		*triCount = 0;
-
-		/*for (int i = 0; i < 2 * 79; i++)
-		{
-			transformBuffer->setData(&transformData[i], i * uboAligned(sizeof(glm::mat4)), sizeof(glm::mat4));
-		}*/
 
 		sceneData->camera->getMatrixBuffer()->bind(0);
 
@@ -56,7 +47,7 @@ namespace Mahakam
 		{
 			shaderPair.first->bind();
 			shaderPair.first->bindBuffer("Matrices", 0);
-			//shaderPair.first->bindBuffer("Transform", 1);
+			//shaderPair.first->bindBuffer("Lights", 1);
 
 			for (auto& materialPair : shaderPair.second)
 			{
@@ -69,8 +60,6 @@ namespace Mahakam
 					meshPair.first->bind();
 					for (auto& transform : meshPair.second)
 					{
-						//transformBuffer->bind(1, (*drawCalls) * uboAligned(sizeof(glm::mat4)), sizeof(glm::mat4));
-
 						materialPair.first->setTransform(transform);
 
 						*drawCalls += 1;

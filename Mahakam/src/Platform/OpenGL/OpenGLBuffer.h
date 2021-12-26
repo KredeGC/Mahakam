@@ -48,12 +48,30 @@ namespace Mahakam
 	{
 	private:
 		uint32_t rendererID;
-		BufferLayout layout;
 		uint32_t size;
 
 	public:
 		OpenGLUniformBuffer(uint32_t size);
 		virtual ~OpenGLUniformBuffer() override;
+
+		virtual void bind(int slot, int offset, int size) const override;
+		virtual void unbind(int slot) const override;
+
+		virtual void setData(const void* data, uint32_t offset, uint32_t size) override;
+	};
+#pragma endregion
+
+
+#pragma region OpenGLStorageBuffer
+	class OpenGLStorageBuffer : public StorageBuffer
+	{
+	private:
+		uint32_t rendererID;
+		uint32_t size;
+
+	public:
+		OpenGLStorageBuffer(uint32_t size);
+		virtual ~OpenGLStorageBuffer() override;
 
 		virtual void bind(int slot, int offset, int size) const override;
 		virtual void unbind(int slot) const override;

@@ -112,4 +112,39 @@ namespace Mahakam
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 #pragma endregion
+
+
+#pragma region OpenGLStorageBuffer
+	OpenGLStorageBuffer::OpenGLStorageBuffer(uint32_t size) : size(size)
+	{
+		glCreateBuffers(1, &rendererID);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererID);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+	}
+
+	OpenGLStorageBuffer::~OpenGLStorageBuffer()
+	{
+		glDeleteBuffers(1, &rendererID);
+	}
+
+	void OpenGLStorageBuffer::bind(int slot, int offset, int size) const
+	{
+		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, slot, rendererID, offset, size > 0 ? size : this->size);
+	}
+
+	void OpenGLStorageBuffer::unbind(int slot) const
+	{
+		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, slot, 0, 0, 0);
+	}
+	
+	void OpenGLStorageBuffer::setData(const void* data, uint32_t offset, uint32_t size)
+	{
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererID);
+		//glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+
+		void* ptr = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+		memcpy(ptr, data, size);
+		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	}
+#pragma endregion
 }
