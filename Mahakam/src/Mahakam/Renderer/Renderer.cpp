@@ -24,9 +24,12 @@ namespace Mahakam
 		GL::init();
 	}
 
-	void Renderer::beginScene(const Ref<Camera>& cam)
+	void Renderer::beginScene(const Ref<Camera>& cam, const Ref<Light>& mainLight)
 	{
+		sceneData->lights.clear();
+
 		sceneData->camera = cam;
+		sceneData->lights.push_back(mainLight);
 
 		//sceneData->viewMatrix = cam.getViewMatrix();
 		//sceneData->projectionMatrix = cam.getProjectionMatrix();
@@ -37,17 +40,25 @@ namespace Mahakam
 
 	void Renderer::endScene(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
 	{
+		Ref<UniformBuffer> lightBuffer = UniformBuffer::create(2 * 16);
+
+		glm::vec3 lightPos = sceneData->lights[0]->getPosition();
+		glm::vec3 lightCol = sceneData->lights[0]->getColor();
+		lightBuffer->setData(&lightPos, 0, sizeof(glm::vec3));
+		lightBuffer->setData(&lightCol, 16, sizeof(glm::vec3));
+
 		*drawCalls = 0;
 		*vertexCount = 0;
 		*triCount = 0;
 
 		sceneData->camera->getMatrixBuffer()->bind(0);
+		lightBuffer->bind(1);
 
 		for (auto& shaderPair : renderQueue)
 		{
 			shaderPair.first->bind();
 			shaderPair.first->bindBuffer("Matrices", 0);
-			//shaderPair.first->bindBuffer("Lights", 1);
+			shaderPair.first->bindBuffer("Lights", 1);
 
 			for (auto& materialPair : shaderPair.second)
 			{

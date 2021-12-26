@@ -4,6 +4,7 @@
 
 #include "Camera.h"
 #include "Mesh.h"
+#include "Light.h"
 
 #include <vector>
 
@@ -21,6 +22,7 @@ namespace Mahakam
 		struct SceneData
 		{
 			Ref<Camera> camera;
+			std::vector<Ref<Light>> lights;
 		};
 
 		struct MeshData
@@ -45,7 +47,7 @@ namespace Mahakam
 		static void onWindowResie(uint32_t width, uint32_t height);
 		static void init();
 
-		static void beginScene(const Ref<Camera>& cam);
+		static void beginScene(const Ref<Camera>& cam, const Ref<Light>& mainLight);
 		static void endScene(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount);
 
 		static void submit(const glm::mat4& transform, const Ref<Mesh>& mesh);

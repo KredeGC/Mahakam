@@ -139,10 +139,10 @@ namespace Mahakam
 	
 	void OpenGLStorageBuffer::setData(const void* data, uint32_t offset, uint32_t size)
 	{
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererID);
+		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererID);
 		//glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
 
-		void* ptr = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+		void* ptr = glMapNamedBufferRange(rendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
 		memcpy(ptr, data, size);
 		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	}

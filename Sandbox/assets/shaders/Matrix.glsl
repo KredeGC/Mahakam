@@ -9,4 +9,5 @@ uniform mat4 u_m4_M;
 layout (std140) uniform Matrices {
     mat4 u_m4_V;
     mat4 u_m4_P;
+    vec3 u_CameraPos;
 };

@@ -24,6 +24,7 @@ private:
 	uint32_t* triCount;
 
 	Ref<PerspectiveCamera> camera;
+	Ref<Light> mainLight;
 
 	bool wireframe = false;
 
@@ -32,6 +33,7 @@ public:
 		: Layer("Basic Quad"), drawCalls(drawCalls), vertexCount(vertexCount), triCount(triCount)
 	{
 		camera = std::make_shared<PerspectiveCamera>(1.6f / 0.9f, 0.01f, 100.0f);
+		mainLight = std::make_shared<Light>(glm::vec3(1.0f, 0.0f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
 
 		//mesh = Mesh::createCube(2);
 
@@ -55,6 +57,11 @@ public:
 		// Setup material with texture
 		Ref<Material> material = Material::create(shader);
 		material->setTexture("u_Albedo", 0, albedo);
+		material->setFloat("u_Metallic", 0.0f);
+		material->setFloat("u_Roughness", 1.0f);
+		material->setFloat("u_AO", 1.0f);
+		//material->setFloat3("u_LightPosition", mainLight->getPosition());
+		//material->setFloat3("u_LightColor", mainLight->getColor());
 
 
 		// Set material in mesh
@@ -103,7 +110,7 @@ public:
 		GL::clear();
 
 		// Scene setup
-		Renderer::beginScene(camera);
+		Renderer::beginScene(camera, mainLight);
 
 		// Render many objects
 		for (int i = 0; i < 50; i++)
