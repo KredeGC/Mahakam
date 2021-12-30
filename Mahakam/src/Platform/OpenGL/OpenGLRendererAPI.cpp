@@ -31,6 +31,20 @@ namespace Mahakam
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
+	void OpenGLRendererAPI::setBlendMode(bool enable)
+	{
+		if (enable)
+		{
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else
+		{
+			glDisable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
+		}
+	}
+
 	void OpenGLRendererAPI::setClearColor(const glm::vec4 color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);

@@ -31,21 +31,24 @@ in vec3 v_WorldPos;
 in vec3 v_WorldNormal;
 in vec2 v_UV;
 
-uniform sampler2D u_Albedo;
+uniform vec3 u_Color;
 uniform float u_Metallic;
 uniform float u_Roughness;
 uniform float u_AO;
 
 void main() {
     // Surface values
-    vec3 albedo = texture(u_Albedo, v_UV).rgb;
+    vec3 albedo = u_Color;
     float metallic = u_Metallic;
     float roughness = u_Roughness;
     float ao = 1.0;
 
-    vec3 directLighting = BRDF_Direct(light, albedo, metallic, roughness, v_WorldPos, v_WorldNormal);
+    vec3 viewdir = normalize(u_CameraPos - v_WorldPos);
+    vec3 normal = normalize(v_WorldNormal);
 
-    vec3 color = directLighting + vec3(0.01) * albedo;
+    vec3 directLighting = BRDF_Direct(light, albedo, metallic, roughness, ao, viewdir, v_WorldPos, normal);
+
+    vec3 color = directLighting;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));

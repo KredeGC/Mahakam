@@ -27,6 +27,8 @@ namespace Mahakam
 
 		virtual void setFillMode(bool fill) = 0;
 
+		virtual void setBlendMode(bool enable) = 0;
+
 		virtual void drawIndexed(uint32_t count) = 0;
 
 		virtual void drawInstanced(uint32_t indexCount, uint32_t count) = 0;

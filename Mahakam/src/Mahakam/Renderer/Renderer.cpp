@@ -5,8 +5,6 @@ namespace Mahakam
 {
 	Renderer::SceneData* Renderer::sceneData = new Renderer::SceneData;
 
-	std::vector<glm::mat4> Renderer::transformData;
-
 	std::unordered_map<Ref<Shader>,
 		std::unordered_map<Ref<Material>,
 		std::unordered_map<Ref<Mesh>,
@@ -31,11 +29,8 @@ namespace Mahakam
 		sceneData->camera = cam;
 		sceneData->lights.push_back(mainLight);
 
-		//sceneData->viewMatrix = cam.getViewMatrix();
-		//sceneData->projectionMatrix = cam.getProjectionMatrix();
-
 		renderQueue.clear();
-		transformData.clear();
+		transparentQueue.clear();
 	}
 
 	void Renderer::endScene(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
@@ -97,6 +92,30 @@ namespace Mahakam
 			return 0;
 		});
 
+		if (transparentQueue.size() > 0)
+		{
+			GL::setBlendMode(true);
+			for (auto& data : transparentQueue)
+			{
+				const Ref<Material>& material = data.mesh->getMaterial();
+				const Ref<Shader>& shader = material->getShader();
+
+				shader->bind();
+				shader->bindBuffer("Matrices", 0);
+				shader->bindBuffer("Lights", 1);
+				material->bind();
+				material->setTransform(data.transform);
+				data.mesh->bind();
+
+				*drawCalls += 1;
+				*vertexCount += data.mesh->getVertexCount();
+				*triCount += data.mesh->getIndexCount();
+
+				GL::drawIndexed(data.mesh->getIndexCount());
+			}
+			GL::setBlendMode(false);
+		}
+
 		*triCount /= 3;
 	}
 
@@ -106,8 +125,6 @@ namespace Mahakam
 		const Ref<Shader>& shader = material->getShader();
 
 		renderQueue[shader][material][mesh].push_back(transform);
-
-		transformData.push_back(transform);
 	}
 
 	void Renderer::submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh)

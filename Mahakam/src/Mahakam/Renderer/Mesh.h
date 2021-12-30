@@ -285,6 +285,16 @@ namespace Mahakam
 			vertexArray->bind();
 		}
 
+		const void* serialize(int& outLength)
+		{
+			outLength = sizeof(Mesh);
+
+			void* data = new char[outLength];
+			memcpy(data, this, outLength);
+
+			return data;
+		}
+
 		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout, uint32_t indexCount)
 		{
 			return std::make_shared<Mesh>(vertexCount, layout, indexCount);
@@ -302,5 +312,8 @@ namespace Mahakam
 		}
 
 		static Ref<Mesh> createCube(int tessellation);
+		static Ref<Mesh> createPlane(int rows, int columns);
+		static Ref<Mesh> createUVSphere(int rows, int columns);
+		static Ref<Mesh> createCubeSphere(int tessellation, bool equirectangular = false);
 	};
 }

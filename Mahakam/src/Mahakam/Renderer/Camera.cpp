@@ -6,16 +6,14 @@
 
 namespace Mahakam
 {
+#pragma region OrthographicCamera
 	void OrthographicCamera::recalculateViewMatrix()
 	{
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::mat4(rotation);
-
-		viewMatrix = glm::inverse(transform);
+		viewMatrix = glm::inverse(transform.getModelMatrix());
 		viewProjectionMatrix = projectionMatrix * viewMatrix;
 
-		matrixBuffer->setData(&position, 0, sizeof(glm::vec3));
-		matrixBuffer->setData(&viewMatrix, sizeof(glm::vec3), sizeof(glm::mat4));
+		matrixBuffer->setData(&viewMatrix, 0, sizeof(glm::mat4));
+		matrixBuffer->setData(&transform.getPosition(), sizeof(glm::mat4) * 2, sizeof(glm::vec3));
 	}
 
 	OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top)
@@ -23,72 +21,53 @@ namespace Mahakam
 	{
 		matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2);
 		matrixBuffer->setData(&projectionMatrix, sizeof(glm::vec3) + sizeof(glm::mat4), sizeof(glm::mat4));
-		viewProjectionMatrix = projectionMatrix * viewMatrix;
+
+		recalculateViewMatrix();
 	}
 
 	void OrthographicCamera::setPosition(const glm::vec3& pos)
 	{
-		position = pos;
+		transform.setPosition(pos);
 		recalculateViewMatrix();
 	}
 
 	void OrthographicCamera::setRotation(const glm::quat& rot)
 	{
-		rotation = rot;
+		transform.setRotation(rot);
 		recalculateViewMatrix();
 	}
-	
-	const glm::vec3& OrthographicCamera::getPosition() const
-	{
-		return position;
-	}
-	
-	const glm::quat& OrthographicCamera::getRotation() const
-	{
-		return rotation;
-	}
+#pragma endregion
 
 
 #pragma region PerspectiveCamera
 	void PerspectiveCamera::recalculateViewMatrix()
 	{
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::mat4(rotation);
-
-		viewMatrix = glm::inverse(transform);
+		viewMatrix = glm::inverse(transform.getModelMatrix());
 		viewProjectionMatrix = projectionMatrix * viewMatrix;
 
 		matrixBuffer->setData(&viewMatrix, 0, sizeof(glm::mat4));
-		matrixBuffer->setData(&position, sizeof(glm::mat4) * 2, sizeof(glm::vec3));
+		matrixBuffer->setData(&transform.getPosition(), sizeof(glm::mat4) * 2, sizeof(glm::vec3));
 	}
 
-	PerspectiveCamera::PerspectiveCamera(float ratio, float nearPlane, float farPlane)
-		: projectionMatrix(glm::perspective(45.0f, ratio, nearPlane, farPlane)), viewMatrix(1.0f)
+	PerspectiveCamera::PerspectiveCamera(float fov, float ratio, float nearPlane, float farPlane)
+		: projectionMatrix(glm::perspective(fov, ratio, nearPlane, farPlane)), viewMatrix(1.0f)
 	{
 		matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2);
 		matrixBuffer->setData(&projectionMatrix, sizeof(glm::mat4), sizeof(glm::mat4));
-		viewProjectionMatrix = projectionMatrix * viewMatrix;
+		
+		recalculateViewMatrix();
 	}
-	
+
 	void PerspectiveCamera::setPosition(const glm::vec3& pos)
 	{
-		position = pos;
+		transform.setPosition(pos);
 		recalculateViewMatrix();
 	}
-	
+
 	void PerspectiveCamera::setRotation(const glm::quat& rot)
 	{
-		rotation = rot;
+		transform.setRotation(rot);
 		recalculateViewMatrix();
-	}
-	
-	const glm::vec3& PerspectiveCamera::getPosition() const
-	{
-		return position;
-	}
-	const glm::quat& PerspectiveCamera::getRotation() const
-	{
-		return rotation;
 	}
 #pragma endregion
 }

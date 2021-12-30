@@ -32,8 +32,6 @@ namespace Mahakam
 			glm::mat4 transform;
 		};
 
-		static std::vector<glm::mat4> transformData;
-
 		static SceneData* sceneData;
 
 		static std::unordered_map<Ref<Shader>, // Sort by shader

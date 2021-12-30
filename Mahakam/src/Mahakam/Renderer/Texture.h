@@ -17,11 +17,13 @@ namespace Mahakam
 		virtual void bind(uint32_t slot = 0) const = 0;
 	};
 
+
 	class Texture2D : public Texture
 	{
 	public:
 		static Ref<Texture2D> create(const std::string& filepath);
 	};
+
 
 	class Texture3D : public Texture
 	{
@@ -29,5 +31,15 @@ namespace Mahakam
 		virtual uint32_t getDepth() const = 0;
 
 		static Ref<Texture3D> create(const std::string& filepath);
+	};
+
+
+	class TextureCube : public Texture
+	{
+	private:
+		uint32_t resolution;
+
+	public:
+		static Ref<TextureCube> create(const std::string& filepath);
 	};
 }
