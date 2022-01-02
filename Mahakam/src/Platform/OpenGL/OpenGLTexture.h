@@ -28,7 +28,11 @@ namespace Mahakam {
 		uint32_t width, height;
 		std::string filepath;
 
+		uint32_t captureFBO;
+		uint32_t captureRBO;
+
 	public:
+		OpenGLTextureCube(const std::vector<std::string>& faces);
 		OpenGLTextureCube(const std::string& filepath);
 		virtual ~OpenGLTextureCube();
 

@@ -15,6 +15,15 @@ namespace Mahakam
 		return s;
 	}
 
+	static glm::vec2 calculateEquirectangularUVs(const glm::vec3& v)
+	{
+		const glm::vec2 invAtan = glm::vec2(0.1591, 0.3183);
+		glm::vec2 uv = glm::vec2(glm::atan(v.z, v.x), glm::asin(v.y));
+		uv *= invAtan;
+		uv += 0.5;
+		return uv;
+	}
+
 	Ref<Mesh> Mesh::createCube(int tessellation)
 	{
 		uint32_t vertexCount = 6 * tessellation * tessellation;
@@ -193,6 +202,9 @@ namespace Mahakam
 				float theta = percent.x * 2.0f * 3.1415f;
 				float phi = (percent.y - 0.5f) * 3.1415f;
 
+				if (x == rows - 1)
+					theta = 0.0f;
+
 				// This determines the radius of the ring of this line of latitude.
 				// It's widest at the equator, and narrows as phi increases/decreases.
 				float c = cos(phi);
@@ -289,7 +301,10 @@ namespace Mahakam
 					glm::vec3 pointOnSphere = calculateCubeSphereVertex(pointOnCube);
 
 					positions[index] = pointOnSphere * 0.5f;
-					uvs[index] = percent;
+					if (equirectangular)
+						uvs[index] = calculateEquirectangularUVs(pointOnSphere);
+					else
+						uvs[index] = percent;
 					normals[index] = pointOnSphere;
 
 					if (x != tessellation - 1 && y != tessellation - 1)

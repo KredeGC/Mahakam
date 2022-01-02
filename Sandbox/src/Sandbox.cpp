@@ -199,12 +199,12 @@ public:
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 
 		// Setup texture
-		Ref<Texture> skybox = Texture2D::create("assets/textures/skybox.jpg");
+		Ref<Texture> skybox = TextureCube::create("assets/textures/studio.hdr");
 
 		// Setup skybox
 		skyboxDome = Mesh::createUVSphere(20, 20);
 		Ref<Material> skyboxMaterial = Material::create(skyboxShader);
-		skyboxMaterial->setTexture("u_Albedo", 0, skybox);
+		skyboxMaterial->setTexture("u_Environment", 0, skybox);
 		skyboxDome->setMaterial(skyboxMaterial);
 
 		for (int y = 0; y < 10; y++)
@@ -215,9 +215,9 @@ public:
 				Ref<Material> material = Material::create(shader);
 				//material->setTexture("u_Albedo", 0, tex);
 				material->setTexture("u_IrradianceMap", 0, skybox);
-				material->setFloat3("u_Color", { 1.0f, 0.8f, 0.0f });
-				material->setFloat("u_Metallic", x / 10.0f);
-				material->setFloat("u_Roughness", y / 10.0f);
+				material->setFloat3("u_Color", { 1.0f, 0.7f, 0.0f });
+				material->setFloat("u_Metallic", y / 9.0f);
+				material->setFloat("u_Roughness", x / 9.0f);
 
 				// Create sphere
 				Ref<Mesh> sphereMesh = Mesh::createCubeSphere(8.0f);

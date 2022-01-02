@@ -12,15 +12,7 @@ const float PI = 3.14159265359;
 const float Epsilon = 0.00001;
 const vec3 Fdielectric = vec3(0.04);
 
-uniform sampler2D u_IrradianceMap;
-
-const vec2 invAtan = vec2(0.1591, 0.3183);
-vec2 sampleSphericalMap(vec3 v) {
-    vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
-    uv *= invAtan;
-    uv += 0.5;
-    return uv;
-}
+uniform samplerCube u_IrradianceMap;
 
 // GGX/Towbridge-Reitz normal distribution function.
 // Uses Disney's reparametrization of alpha = roughness^2.
@@ -113,11 +105,9 @@ vec3 BRDF_Direct(Light light, vec3 albedo, float metallic, float roughness, floa
     directLighting += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
 
 
-    vec2 uv = sampleSphericalMap(worldNormal);
-
-    vec3 kS = fresnelSchlickRoughness(max(dot(worldNormal, viewDir), 0.0), F0, roughness); 
+    vec3 kS = fresnelSchlickRoughness(max(dot(worldNormal, viewDir), 0.0), F0, roughness);
     vec3 kD = 1.0 - kS;
-    vec3 irradiance = texture(u_IrradianceMap, uv, roughness * 4.0).rgb;
+    vec3 irradiance = texture(u_IrradianceMap, worldNormal).rgb;
     vec3 diffuse    = irradiance * albedo;
     vec3 ambient    = (kD * diffuse) * ao;
 

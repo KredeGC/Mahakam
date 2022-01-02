@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "Renderer.h"
 
+#include "Mahakam/Core/Application.h"
+
 namespace Mahakam
 {
 	Renderer::SceneData* Renderer::sceneData = new Renderer::SceneData;
@@ -35,6 +37,11 @@ namespace Mahakam
 
 	void Renderer::endScene(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
 	{
+		//uint32_t width = Application::getInstance().getWindow().getWidth();
+		//uint32_t height = Application::getInstance().getWindow().getHeight();
+
+		//GL::setViewport(0, 0, width, height);
+
 		Ref<UniformBuffer> lightBuffer = UniformBuffer::create(2 * 16);
 
 		glm::vec3 lightPos = sceneData->lights[0]->getPosition();
