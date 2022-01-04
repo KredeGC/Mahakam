@@ -1,4 +1,4 @@
-# Install script for directory: D:/CPP/Mahakam/Mahakam/vendor/assimp/test/headercheck
+# Install script for directory: C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/test/headercheck
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

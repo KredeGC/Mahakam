@@ -1,4 +1,4 @@
-# Install script for directory: D:/CPP/Mahakam/Mahakam/vendor/assimp/test
+# Install script for directory: C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/test
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("D:/CPP/Mahakam/Mahakam/vendor/assimp/test/headercheck/cmake_install.cmake")
+  include("C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/test/headercheck/cmake_install.cmake")
 
 endif()
 

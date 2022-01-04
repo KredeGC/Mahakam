@@ -21,11 +21,15 @@ namespace Mahakam
 
 	void Renderer::init()
 	{
+		MH_PROFILE_FUNCTION();
+
 		GL::init();
 	}
 
 	void Renderer::beginScene(const Ref<Camera>& cam, const Ref<Light>& mainLight)
 	{
+		MH_PROFILE_FUNCTION();
+
 		sceneData->lights.clear();
 
 		sceneData->camera = cam;
@@ -37,6 +41,8 @@ namespace Mahakam
 
 	void Renderer::endScene(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
 	{
+		MH_PROFILE_FUNCTION();
+
 		//uint32_t width = Application::getInstance().getWindow().getWidth();
 		//uint32_t height = Application::getInstance().getWindow().getHeight();
 
@@ -128,6 +134,8 @@ namespace Mahakam
 
 	void Renderer::submit(const glm::mat4& transform, const Ref<Mesh>& mesh)
 	{
+		MH_PROFILE_FUNCTION();
+
 		const Ref<Material>& material = mesh->getMaterial();
 		const Ref<Shader>& shader = material->getShader();
 
@@ -136,6 +144,8 @@ namespace Mahakam
 
 	void Renderer::submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh)
 	{
+		MH_PROFILE_FUNCTION();
+
 		float depth = (sceneData->camera->getViewProjectionMatrix() * transform[3]).z;
 
 		transparentQueue.push_back({ depth, mesh, transform });

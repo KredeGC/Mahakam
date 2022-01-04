@@ -76,6 +76,8 @@ namespace Mahakam
 	public:
 		MeshLayout(const std::initializer_list<MeshElement>& elements) : elements(elements)
 		{
+			MH_PROFILE_FUNCTION();
+
 			std::vector<BufferElement> bufferElements;
 			for (auto& kv : elements)
 			{
@@ -127,6 +129,8 @@ namespace Mahakam
 
 		void interleaveBuffers()
 		{
+			MH_PROFILE_FUNCTION();
+
 			uint32_t stride = bufferLayout.getStride();
 			uint32_t size = stride * vertexCount;
 
@@ -152,6 +156,8 @@ namespace Mahakam
 
 		void initBuffers(bool interleave)
 		{
+			MH_PROFILE_FUNCTION();
+
 			vertexArray = VertexArray::create();
 
 			if (interleave)
@@ -198,6 +204,8 @@ namespace Mahakam
 
 		~Mesh()
 		{
+			MH_PROFILE_FUNCTION();
+
 			for (auto& kv : vertices)
 				delete[] kv.second.data;
 
@@ -206,6 +214,8 @@ namespace Mahakam
 
 		inline void addVertices(const std::string& name, const void* verts)
 		{
+			MH_PROFILE_FUNCTION();
+
 			int index = (int)vertices.size();
 
 			unsigned int stride = bufferLayout.getElement(index).size;
@@ -224,6 +234,8 @@ namespace Mahakam
 
 		void setVertices(const std::string& name, int index, const char* verts)
 		{
+			MH_PROFILE_FUNCTION();
+
 			unsigned int stride = bufferLayout.getElement(index).size;
 			uint32_t elementSize = stride * vertexCount;
 
@@ -249,6 +261,8 @@ namespace Mahakam
 
 		void init(bool interleave = true)
 		{
+			MH_PROFILE_FUNCTION();
+
 			interleaved = interleave;
 
 			if (interleave)
@@ -259,6 +273,8 @@ namespace Mahakam
 
 		void setIndices(uint32_t* inds, unsigned int count)
 		{
+			MH_PROFILE_FUNCTION();
+
 			// TODO: Update VAO if necessary
 			indices = inds;
 			indexCount = count;
@@ -281,6 +297,8 @@ namespace Mahakam
 
 		void bind()
 		{
+			MH_PROFILE_FUNCTION();
+
 			//material->bind();
 			vertexArray->bind();
 		}

@@ -16,12 +16,18 @@ namespace Mahakam
 		matrixBuffer->setData(&transform.getPosition(), sizeof(glm::mat4) * 2, sizeof(glm::vec3));
 	}
 
+	void OrthographicCamera::recalculateProjectionMatrix()
+	{
+		projectionMatrix = glm::ortho(left, right, bottom, top, nearZ, farZ);
+		matrixBuffer->setData(&projectionMatrix, sizeof(glm::mat4), sizeof(glm::mat4));
+	}
+
 	OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top)
-		: projectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)), viewMatrix(1.0f)
+		: left(left), right(right), bottom(bottom), top(top), viewMatrix(1.0f)
 	{
 		matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2);
-		matrixBuffer->setData(&projectionMatrix, sizeof(glm::vec3) + sizeof(glm::mat4), sizeof(glm::mat4));
 
+		recalculateProjectionMatrix();
 		recalculateViewMatrix();
 	}
 
@@ -36,6 +42,18 @@ namespace Mahakam
 		transform.setRotation(rot);
 		recalculateViewMatrix();
 	}
+
+	void OrthographicCamera::setNearPlane(float nearZ)
+	{
+		this->nearZ = nearZ;
+		recalculateProjectionMatrix();
+	}
+
+	void OrthographicCamera::setFarPlane(float farZ)
+	{
+		this->farZ = farZ;
+		recalculateProjectionMatrix();
+	}
 #pragma endregion
 
 
@@ -49,12 +67,21 @@ namespace Mahakam
 		matrixBuffer->setData(&transform.getPosition(), sizeof(glm::mat4) * 2, sizeof(glm::vec3));
 	}
 
-	PerspectiveCamera::PerspectiveCamera(float fov, float ratio, float nearPlane, float farPlane)
-		: projectionMatrix(glm::perspective(fov, ratio, nearPlane, farPlane)), viewMatrix(1.0f)
+	void PerspectiveCamera::recalculateProjectionMatrix()
 	{
-		matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2);
+		projectionMatrix = glm::perspective(fov, ratio, nearZ, farZ);
 		matrixBuffer->setData(&projectionMatrix, sizeof(glm::mat4), sizeof(glm::mat4));
+	}
+
+	PerspectiveCamera::PerspectiveCamera(float fov, float ratio, float nearPlane, float farPlane)
+		: fov(fov), ratio(ratio), viewMatrix(1.0f)
+	{
+		nearZ = nearPlane;
+		farZ = farPlane;
+
+		matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2);
 		
+		recalculateProjectionMatrix();
 		recalculateViewMatrix();
 	}
 
@@ -68,6 +95,30 @@ namespace Mahakam
 	{
 		transform.setRotation(rot);
 		recalculateViewMatrix();
+	}
+
+	void PerspectiveCamera::setFOV(float fov)
+	{
+		this->fov = fov;
+		recalculateProjectionMatrix();
+	}
+
+	void PerspectiveCamera::setRatio(float ratio)
+	{
+		this->ratio = ratio;
+		recalculateProjectionMatrix();
+	}
+
+	void PerspectiveCamera::setNearPlane(float nearZ)
+	{
+		this->nearZ = nearZ;
+		recalculateProjectionMatrix();
+	}
+
+	void PerspectiveCamera::setFarPlane(float farZ)
+	{
+		this->farZ = farZ;
+		recalculateProjectionMatrix();
 	}
 #pragma endregion
 }

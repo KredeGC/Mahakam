@@ -34,6 +34,8 @@ namespace Mahakam
 
 		Ref<Mesh> processMesh(aiMesh* mesh, const aiScene* scene)
 		{
+			MH_PROFILE_FUNCTION();
+
 			unsigned int numFaces = mesh->mNumFaces;
 
 			uint32_t vertexCount = mesh->mNumVertices;
@@ -119,6 +121,8 @@ namespace Mahakam
 
 		void processNode(aiNode* node, const aiScene* scene)
 		{
+			MH_PROFILE_FUNCTION();
+
 			// Go through each mesh in this node
 			for (unsigned int i = 0; i < node->mNumMeshes; i++)
 			{
@@ -143,6 +147,8 @@ namespace Mahakam
 		Model(const std::string& filepath, const MeshLayout& layout)
 			: rootBone(0), meshLayout(layout)
 		{
+			MH_PROFILE_FUNCTION();
+
 			// Read model
 			Assimp::Importer importer;
 			const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -158,6 +164,8 @@ namespace Mahakam
 
 		~Model()
 		{
+			MH_PROFILE_FUNCTION();
+
 			//delete rootBone; recursively
 		}
 

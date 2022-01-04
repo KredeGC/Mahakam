@@ -41,26 +41,36 @@ namespace Mahakam
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glCreateVertexArrays(1, &rendererID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glDeleteVertexArrays(1, &rendererID);
 	}
 	
 	void OpenGLVertexArray::bind() const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindVertexArray(rendererID);
 	}
 	
 	void OpenGLVertexArray::unbind() const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& buffer)
 	{
+		MH_PROFILE_FUNCTION();
+
 		MH_CORE_ASSERT(buffer->getLayout().getElements().size(), "Vertex buffer has no layout!");
 
 		glBindVertexArray(rendererID);
@@ -84,6 +94,8 @@ namespace Mahakam
 	
 	void OpenGLVertexArray::setIndexBuffer(const Ref<IndexBuffer>& buffer)
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindVertexArray(rendererID);
 		buffer->bind();
 		indexBuffer = buffer;

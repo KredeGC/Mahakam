@@ -1,8 +1,8 @@
-IF(NOT EXISTS "D:/CPP/Mahakam/Mahakam/vendor/assimp/install_manifest.txt")
-  MESSAGE(FATAL_ERROR "Cannot find install manifest: \"D:/CPP/Mahakam/Mahakam/vendor/assimp/install_manifest.txt\"")
-ENDIF(NOT EXISTS "D:/CPP/Mahakam/Mahakam/vendor/assimp/install_manifest.txt")
+IF(NOT EXISTS "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/install_manifest.txt")
+  MESSAGE(FATAL_ERROR "Cannot find install manifest: \"C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/install_manifest.txt\"")
+ENDIF(NOT EXISTS "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/install_manifest.txt")
 
-FILE(READ "D:/CPP/Mahakam/Mahakam/vendor/assimp/install_manifest.txt" files)
+FILE(READ "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/install_manifest.txt" files)
 STRING(REGEX REPLACE "\n" ";" files "${files}")
 FOREACH(file ${files})
   MESSAGE(STATUS "Uninstalling \"$ENV{DESTDIR}${file}\"")

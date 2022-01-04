@@ -18,7 +18,7 @@ namespace Mahakam {
 
 		virtual void onAttach() override;
 		virtual void onDetach() override;
-		virtual void onImGuiRender() override;
+		virtual void onEvent(Event& event) override;
 
 		void begin();
 		void end();

@@ -8,6 +8,8 @@ namespace Mahakam
 #pragma region VertexBuffer
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
 	{
+		MH_PROFILE_FUNCTION();
+
 		glCreateBuffers(1, &rendererID);
 		glBindBuffer(GL_ARRAY_BUFFER, rendererID);
 		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
@@ -15,6 +17,8 @@ namespace Mahakam
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(const char* vertices, uint32_t size)
 	{
+		MH_PROFILE_FUNCTION();
+
 		glCreateBuffers(1, &rendererID);
 		glBindBuffer(GL_ARRAY_BUFFER, rendererID);
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
@@ -22,16 +26,22 @@ namespace Mahakam
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glDeleteBuffers(1, &rendererID);
 	}
 
 	void OpenGLVertexBuffer::bind() const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindBuffer(GL_ARRAY_BUFFER, rendererID);
 	}
 	
 	void OpenGLVertexBuffer::unbind() const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
@@ -43,6 +53,8 @@ namespace Mahakam
 
 	void OpenGLVertexBuffer::setLayout(const BufferLayout& layout)
 	{
+		MH_PROFILE_FUNCTION();
+
 		this->layout = layout;
 	}
 
@@ -56,6 +68,8 @@ namespace Mahakam
 #pragma region IndexBuffer
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : count(count)
 	{
+		MH_PROFILE_FUNCTION();
+
 		glCreateBuffers(1, &rendererID);
 		glNamedBufferStorage(rendererID, sizeof(uint32_t) * count, indices, GL_MAP_WRITE_BIT);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendererID);
@@ -64,16 +78,22 @@ namespace Mahakam
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glDeleteBuffers(1, &rendererID);
 	}
 
 	void OpenGLIndexBuffer::bind() const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendererID);
 	}
 
 	void OpenGLIndexBuffer::unbind() const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 #pragma endregion
@@ -82,6 +102,8 @@ namespace Mahakam
 #pragma region OpenGLUniformBuffer
 	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size) : size(size)
 	{
+		MH_PROFILE_FUNCTION();
+
 		glCreateBuffers(1, &rendererID);
 		glBindBuffer(GL_UNIFORM_BUFFER, rendererID);
 		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
@@ -89,16 +111,22 @@ namespace Mahakam
 
 	OpenGLUniformBuffer::~OpenGLUniformBuffer()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glDeleteBuffers(1, &rendererID);
 	}
 
 	void OpenGLUniformBuffer::bind(int slot, int offset, int size) const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindBufferRange(GL_UNIFORM_BUFFER, slot, rendererID, offset, size > 0 ? size : this->size);
 	}
 
 	void OpenGLUniformBuffer::unbind(int slot) const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindBufferRange(GL_UNIFORM_BUFFER, slot, 0, 0, 0);
 	}
 
@@ -117,6 +145,8 @@ namespace Mahakam
 #pragma region OpenGLStorageBuffer
 	OpenGLStorageBuffer::OpenGLStorageBuffer(uint32_t size) : size(size)
 	{
+		MH_PROFILE_FUNCTION();
+
 		glCreateBuffers(1, &rendererID);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererID);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
@@ -124,16 +154,22 @@ namespace Mahakam
 
 	OpenGLStorageBuffer::~OpenGLStorageBuffer()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glDeleteBuffers(1, &rendererID);
 	}
 
 	void OpenGLStorageBuffer::bind(int slot, int offset, int size) const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, slot, rendererID, offset, size > 0 ? size : this->size);
 	}
 
 	void OpenGLStorageBuffer::unbind(int slot) const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, slot, 0, 0, 0);
 	}
 	

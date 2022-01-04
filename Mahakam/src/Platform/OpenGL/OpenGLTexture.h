@@ -11,11 +11,12 @@ namespace Mahakam {
 		std::string filepath;
 
 	public:
-		OpenGLTexture2D(const std::string& filepath);
+		OpenGLTexture2D(const std::string& filepath, const TextureProps& props);
 		virtual ~OpenGLTexture2D();
 
-		virtual uint32_t getWidth() const { return width; }
-		virtual uint32_t getHeight() const { return height; }
+		virtual uint32_t getWidth() const override { return width; }
+		virtual uint32_t getHeight() const override { return height; }
+		virtual uint32_t getRendererID() const override { return rendererID; }
 
 		virtual void bind(uint32_t slot = 0) const override;
 	};
@@ -32,12 +33,13 @@ namespace Mahakam {
 		uint32_t captureRBO;
 
 	public:
-		OpenGLTextureCube(const std::vector<std::string>& faces);
-		OpenGLTextureCube(const std::string& filepath);
+		OpenGLTextureCube(const std::vector<std::string>& faces, const TextureProps& props);
+		OpenGLTextureCube(const std::string& filepath, const TextureProps& props);
 		virtual ~OpenGLTextureCube();
 
-		virtual uint32_t getWidth() const { return width; }
-		virtual uint32_t getHeight() const { return height; }
+		virtual uint32_t getWidth() const override { return width; }
+		virtual uint32_t getHeight() const override { return height; }
+		virtual uint32_t getRendererID() const override { return rendererID; }
 
 		virtual void bind(uint32_t slot = 0) const override;
 	};

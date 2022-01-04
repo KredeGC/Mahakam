@@ -245,19 +245,27 @@ public:
 
 	void onUpdate(Timestep dt) override
 	{
+		MH_PROFILE_FUNCTION();
+
 		// Clearing screen
-		GL::setClearColor({ 0.1f, 0.1f, 0.1f, 0.1f });
-		GL::clear();
+		{
+			MH_PROFILE_SCOPE("Renderer Clear");
+			GL::setClearColor({ 0.1f, 0.1f, 0.1f, 0.1f });
+			GL::clear();
+		}
 
-		// Scene setup
-		Renderer::beginScene(camera, mainLight);
+		// Scene draw
+		{
+			MH_PROFILE_SCOPE("Renderer Draw");
+			Renderer::beginScene(camera, mainLight);
 
-		Renderer::submit(glm::scale(glm::mat4(1.0f), { 50.0f, 50.0f, 50.0f }), skyboxDome);
+			Renderer::submit(glm::scale(glm::mat4(1.0f), { 50.0f, 50.0f, 50.0f }), skyboxDome);
 
-		for (int i = 0; i < 100; i++)
-			Renderer::submit(transforms[i].getModelMatrix(), spheres[i]);
+			for (int i = 0; i < 100; i++)
+				Renderer::submit(transforms[i].getModelMatrix(), spheres[i]);
 
-		Renderer::endScene(drawCalls, vertexCount, triCount);
+			Renderer::endScene(drawCalls, vertexCount, triCount);
+		}
 	}
 
 	void onImGuiRender()
@@ -267,57 +275,11 @@ public:
 		ImGui::End();
 
 		camera->setRotation(glm::quat({ 0.0f, rotation, 0.0f }));
-		
+
 		glm::vec3 pos = { 4.5f, 4.5f, 0.0f };
 		pos += camera->getForward() * 12.5f;
 
 		camera->setPosition(pos);
-	}
-};
-
-class DockingLayer : public Layer
-{
-private:
-	bool open = true;
-	bool opt_fullscreen = true;
-	ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
-
-public:
-	DockingLayer() : Layer("Dock") {}
-
-	void onImGuiRender() override
-	{
-		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
-
-		ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImGui::SetNextWindowPos(viewport->GetWorkPos());
-		ImGui::SetNextWindowSize(viewport->GetWorkSize());
-		ImGui::SetNextWindowViewport(viewport->ID);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-
-		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-			window_flags |= ImGuiWindowFlags_NoBackground;
-
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-		ImGui::Begin("DockSpace", &open, window_flags);
-
-		ImGui::PopStyleVar();
-
-		if (opt_fullscreen)
-			ImGui::PopStyleVar(2);
-
-		ImGuiIO& io = ImGui::GetIO();
-		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-		{
-			ImGuiID dockspace_id = ImGui::GetID("DockSpace");
-			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-		}
-
-		ImGui::End();
 	}
 };
 
@@ -364,7 +326,6 @@ private:
 public:
 	Sandbox()
 	{
-		pushLayer(new DockingLayer());
 		pushLayer(new TestLightingLayer(&drawCalls, &vertexCount, &triCount));
 		//pushLayer(new BasicLayer(&drawCalls, &vertexCount, &triCount));
 		pushOverlay(new StatsLayer(&drawCalls, &vertexCount, &triCount));

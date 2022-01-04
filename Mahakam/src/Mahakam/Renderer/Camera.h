@@ -13,13 +13,17 @@ namespace Mahakam
 	{
 	protected:
 		Transform transform;
+		float nearZ, farZ;
 
 	public:
-		Camera() : transform({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }) {}
+		Camera() : transform({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }), nearZ(0.03f), farZ(1000.0f) {}
 
 		virtual const glm::mat4& getViewMatrix() const = 0;
 		virtual const glm::mat4& getProjectionMatrix() const = 0;
 		virtual const glm::mat4& getViewProjectionMatrix() const = 0;
+
+		virtual void setNearPlane(float nearZ) = 0;
+		virtual void setFarPlane(float farZ) = 0;
 
 		virtual const Ref<UniformBuffer>& getMatrixBuffer() const = 0;
 	};
@@ -34,9 +38,12 @@ namespace Mahakam
 		glm::mat4 projectionMatrix;
 		glm::mat4 viewProjectionMatrix;
 
+		float left, right, bottom, top;
+
 		Ref<UniformBuffer> matrixBuffer;
 
 		void recalculateViewMatrix();
+		void recalculateProjectionMatrix();
 
 	public:
 		OrthographicCamera(float left, float right, float bottom, float top);
@@ -51,9 +58,12 @@ namespace Mahakam
 		inline const glm::vec3& getRight() const { return transform.getRight(); }
 		inline const glm::vec3& getUp() const { return transform.getUp(); }
 
-		const glm::mat4& getViewMatrix() const override { return viewMatrix; }
-		const glm::mat4& getProjectionMatrix() const override { return projectionMatrix; }
-		const glm::mat4& getViewProjectionMatrix() const override { return viewProjectionMatrix; }
+		virtual const glm::mat4& getViewMatrix() const override { return viewMatrix; }
+		virtual const glm::mat4& getProjectionMatrix() const override { return projectionMatrix; }
+		virtual const glm::mat4& getViewProjectionMatrix() const override { return viewProjectionMatrix; }
+
+		virtual void setNearPlane(float nearZ) override;
+		virtual void setFarPlane(float farZ) override;
 
 		virtual const Ref<UniformBuffer>& getMatrixBuffer() const override { return matrixBuffer; }
 	};
@@ -68,12 +78,12 @@ namespace Mahakam
 		glm::mat4 projectionMatrix;
 		glm::mat4 viewProjectionMatrix;
 
-		glm::vec3 position = { 0.0f, 0.0f, 0.0f };
-		glm::quat rotation = { 1.0f, 0.0f, 0.0f, 0.0f };
+		float fov, ratio;
 
 		Ref<UniformBuffer> matrixBuffer;
 
 		void recalculateViewMatrix();
+		void recalculateProjectionMatrix();
 
 	public:
 		PerspectiveCamera(float fov, float ratio, float nearPlane, float farPlane);
@@ -88,9 +98,15 @@ namespace Mahakam
 		inline const glm::vec3& getRight() const { return transform.getRight(); }
 		inline const glm::vec3& getUp() const { return transform.getUp(); }
 
-		const glm::mat4& getViewMatrix() const override { return viewMatrix; }
-		const glm::mat4& getProjectionMatrix() const override { return projectionMatrix; }
-		const glm::mat4& getViewProjectionMatrix() const override { return viewProjectionMatrix; }
+		void setFOV(float fov);
+		void setRatio(float ratio);
+
+		virtual const glm::mat4& getViewMatrix() const override { return viewMatrix; }
+		virtual const glm::mat4& getProjectionMatrix() const override { return projectionMatrix; }
+		virtual const glm::mat4& getViewProjectionMatrix() const override { return viewProjectionMatrix; }
+
+		virtual void setNearPlane(float nearZ) override;
+		virtual void setFarPlane(float farZ) override;
 
 		virtual const Ref<UniformBuffer>& getMatrixBuffer() const override { return matrixBuffer; }
 	};

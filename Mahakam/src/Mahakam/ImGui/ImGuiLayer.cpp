@@ -27,6 +27,8 @@ namespace Mahakam
 
 	void ImGuiLayer::onAttach()
 	{
+		MH_PROFILE_FUNCTION();
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -55,18 +57,24 @@ namespace Mahakam
 
 	void ImGuiLayer::onDetach()
 	{
+		MH_PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
 
-	void ImGuiLayer::onImGuiRender()
+	void ImGuiLayer::onEvent(Event& event)
 	{
-		
+		ImGuiIO& io = ImGui::GetIO();
+		event.handled |= event.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+		event.handled |= event.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
 	}
 
 	void ImGuiLayer::begin()
 	{
+		MH_PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -74,6 +82,8 @@ namespace Mahakam
 	
 	void ImGuiLayer::end()
 	{
+		MH_PROFILE_FUNCTION();
+
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::getInstance();
 		io.DisplaySize = ImVec2((float)app.getWindow().getWidth(), (float)app.getWindow().getHeight());

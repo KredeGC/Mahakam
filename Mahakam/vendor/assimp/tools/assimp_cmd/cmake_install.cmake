@@ -1,4 +1,4 @@
-# Install script for directory: D:/CPP/Mahakam/Mahakam/vendor/assimp/tools/assimp_cmd
+# Install script for directory: C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/tools/assimp_cmd
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,13 +34,13 @@ endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xassimp-binx" OR NOT CMAKE_INSTALL_COMPONENT)
   if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "D:/CPP/Mahakam/Mahakam/vendor/assimp/bin/Debug/assimpd.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/bin/Debug/assimpd.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "D:/CPP/Mahakam/Mahakam/vendor/assimp/bin/Release/assimp.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/bin/Release/assimp.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "D:/CPP/Mahakam/Mahakam/vendor/assimp/bin/MinSizeRel/assimp.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/bin/MinSizeRel/assimp.exe")
   elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "D:/CPP/Mahakam/Mahakam/vendor/assimp/bin/RelWithDebInfo/assimp.exe")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/bin/RelWithDebInfo/assimp.exe")
   endif()
 endif()
 

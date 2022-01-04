@@ -13,6 +13,8 @@ namespace Mahakam
 	
 	void OpenGLContext::init()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glfwMakeContextCurrent(window);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		MH_ASSERT(status, "Could not initialize glad!");
@@ -20,6 +22,8 @@ namespace Mahakam
 	
 	void OpenGLContext::swapBuffers()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glfwSwapBuffers(window);
 	}
 }

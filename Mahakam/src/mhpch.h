@@ -13,6 +13,7 @@
 #include <unordered_set>
 
 #include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/Profiler.h"
 
 #include <glm/glm.hpp>
 

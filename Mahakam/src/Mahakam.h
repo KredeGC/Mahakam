@@ -1,5 +1,6 @@
 #pragma once
 
+// Core
 #include "Mahakam/Core/Application.h"
 #include "Mahakam/Core/Entity.h"
 #include "Mahakam/Core/Input.h"
@@ -7,11 +8,9 @@
 #include "Mahakam/Core/Layer.h"
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/MouseButtonCodes.h"
+#include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/Timestep.h"
 #include "Mahakam/Core/Transform.h"
-
-// Core
-#include "Mahakam/Core/Timestep.h"
 
 // Rendering
 #include "Mahakam/Renderer/Buffer.h"
@@ -29,6 +28,3 @@
 
 // Layers
 #include "Mahakam/ImGui/ImGuiLayer.h"
-
-// Entry
-#include "Mahakam/Core/EntryPoint.h"

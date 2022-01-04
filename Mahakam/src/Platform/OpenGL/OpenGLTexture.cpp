@@ -14,11 +14,17 @@
 
 namespace Mahakam
 {
-	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath) : filepath(filepath)
+	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath, const TextureProps& props) : filepath(filepath)
 	{
+		MH_PROFILE_FUNCTION();
+
 		int w, h, channels;
 		stbi_set_flip_vertically_on_load(1);
-		stbi_uc* data = stbi_load(filepath.c_str(), &w, &h, &channels, 0);
+		stbi_uc* data = nullptr;
+		{
+			MH_PROFILE_SCOPE("OpenGLTexture2D::OpenGLTexture2D stbi_load");
+			data = stbi_load(filepath.c_str(), &w, &h, &channels, 0);
+		}
 
 		MH_CORE_ASSERT(data, "Failed to load image!");
 
@@ -42,37 +48,68 @@ namespace Mahakam
 		glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
 		glBindTexture(GL_TEXTURE_2D, rendererID);
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
 
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		if (props.mipmaps)
+			glGenerateMipmap(GL_TEXTURE_2D);
+
+		// Wrap X
+		if (props.wrapX == TextureWrapMode::Repeat)
+			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		else
+			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+
+		// Wrap Y
+		if (props.wrapX == TextureWrapMode::Repeat)
+			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		else
+			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		// Minification
+		if (props.filterMode == TextureFilter::Bilinear)
+			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		else
+			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
+		// Magnification
+		if (props.filterMode == TextureFilter::Bilinear)
+			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		else
+			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		stbi_image_free(data);
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glDeleteTextures(1, &rendererID);
 	}
 
 	void OpenGLTexture2D::bind(uint32_t slot) const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindTextureUnit(slot, rendererID);
 	}
 
 
 
-	OpenGLTextureCube::OpenGLTextureCube(const std::vector<std::string>& faces)
+	OpenGLTextureCube::OpenGLTextureCube(const std::vector<std::string>& faces, const TextureProps& props)
 	{
+		MH_PROFILE_FUNCTION();
+
 		glGenTextures(1, &rendererID);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID);
 
-		int w, h, nrChannels;
+		int w, h, channels;
 		for (unsigned int i = 0; i < faces.size(); i++)
 		{
-			unsigned char* data = stbi_load(faces[i].c_str(), &w, &h, &nrChannels, 0);
+			stbi_uc* data = nullptr;
+			{
+				MH_PROFILE_SCOPE("OpenGLTextureCube::OpenGLTextureCube stbi_load");
+				data = stbi_load(faces[i].c_str(), &w, &h, &channels, 0);
+			}
 
 			MH_CORE_ASSERT(data, "Failed to load image!");
 
@@ -83,11 +120,6 @@ namespace Mahakam
 			stbi_image_free(data);
 		}
 
-		int numMips = 1 + glm::floor(glm::log2(glm::max((float)w, (float)h)));
-
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, numMips);
-
 		width = w;
 		height = h;
 
@@ -97,16 +129,23 @@ namespace Mahakam
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		if (props.mipmaps)
+			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 	}
 
-	OpenGLTextureCube::OpenGLTextureCube(const std::string& filepath) : filepath(filepath)
+	OpenGLTextureCube::OpenGLTextureCube(const std::string& filepath, const TextureProps& props) : filepath(filepath)
 	{
+		MH_PROFILE_FUNCTION();
+
 		bool equirectangular = true;
 
 		stbi_set_flip_vertically_on_load(true);
 		int w, h, channels;
-		float* data = stbi_loadf(filepath.c_str(), &w, &h, &channels, 0);
+		float* data = nullptr;
+		{
+			MH_PROFILE_SCOPE("OpenGLTextureCube::OpenGLTextureCube stbi_loadf");
+			data = stbi_loadf(filepath.c_str(), &w, &h, &channels, 0);
+		}
 
 		int resolution = 32;
 
@@ -194,7 +233,9 @@ namespace Mahakam
 			glDrawElements(GL_TRIANGLES, cube->getIndexCount(), GL_UNSIGNED_INT, nullptr);
 		}
 
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+		if (props.mipmaps)
+			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
@@ -206,6 +247,8 @@ namespace Mahakam
 
 	OpenGLTextureCube::~OpenGLTextureCube()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glDeleteBuffers(1, &captureFBO);
 		glDeleteBuffers(1, &captureRBO);
 		glDeleteTextures(1, &rendererID);
@@ -213,6 +256,8 @@ namespace Mahakam
 
 	void OpenGLTextureCube::bind(uint32_t slot) const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindTextureUnit(slot, rendererID);
 	}
 }

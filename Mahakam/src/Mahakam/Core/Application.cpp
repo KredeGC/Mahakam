@@ -13,12 +13,12 @@ namespace Mahakam
 {
 	Application* Application::instance = nullptr;
 
-	Application::Application()
+	Application::Application(const std::string& name)
 	{
 		MH_CORE_ASSERT(!instance, "Application instance already created!");
 		instance = this;
 
-		window = std::unique_ptr<Window>(Window::create({ "Gaem" }));
+		window = std::unique_ptr<Window>(Window::create({ name }));
 		window->setEventCallback(MH_BIND_EVENT(Application::onEvent));
 
 		Renderer::init();
@@ -29,11 +29,13 @@ namespace Mahakam
 
 	Application::~Application()
 	{
-
+		MH_PROFILE_FUNCTION();
 	}
 
 	void Application::run()
 	{
+		MH_PROFILE_FUNCTION();
+
 		while (running)
 		{
 			// TEMPORARY
@@ -56,8 +58,15 @@ namespace Mahakam
 		}
 	}
 
+	void Application::close()
+	{
+		running = false;
+	}
+
 	void Application::onEvent(Event& event)
 	{
+		MH_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(event);
 
 		dispatcher.dispatchEvent<WindowCloseEvent>(MH_BIND_EVENT(Application::onWindowClose));
@@ -65,20 +74,24 @@ namespace Mahakam
 
 		for (auto iter = layerStack.end(); iter != layerStack.begin();)
 		{
-			(*--iter)->onEvent(event);
-			if (event.isHandled())
+			if (event.handled)
 				break;
+			(*--iter)->onEvent(event);
 		}
 	}
 
 	void Application::pushLayer(Layer* layer)
 	{
+		MH_PROFILE_FUNCTION();
+
 		layerStack.pushLayer(layer);
 		layer->onAttach();
 	}
 
 	void Application::pushOverlay(Layer* overlay)
 	{
+		MH_PROFILE_FUNCTION();
+
 		layerStack.pushOverlay(overlay);
 		overlay->onAttach();
 	}
@@ -91,6 +104,8 @@ namespace Mahakam
 
 	bool Application::onWindowResize(WindowResizeEvent& event)
 	{
+		MH_PROFILE_FUNCTION();
+
 		if (event.getWidth() == 0 || event.getHeight() == 0)
 		{
 			minimized = true;

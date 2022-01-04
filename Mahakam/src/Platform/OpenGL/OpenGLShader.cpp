@@ -23,6 +23,8 @@ namespace Mahakam
 
 	void OpenGLShader::compile(const std::unordered_map<GLenum, std::string>& sources)
 	{
+		MH_PROFILE_FUNCTION();
+
 		MH_CORE_ASSERT(sources.size() <= 4, "Shader source too big");
 
 		GLuint program = glCreateProgram();
@@ -32,8 +34,6 @@ namespace Mahakam
 		for (auto& kv : sources)
 		{
 			std::string source = sortIncludes(kv.second);
-
-			MH_CORE_TRACE("{0}", source);
 
 			GLenum type = kv.first;
 			GLuint shader = glCreateShader(type);
@@ -96,6 +96,8 @@ namespace Mahakam
 
 	std::string OpenGLShader::sortIncludes(const std::string& source)
 	{
+		MH_PROFILE_FUNCTION();
+
 		std::stringstream sourceStream;
 
 		const char* typeToken = "#include \"";
@@ -128,6 +130,8 @@ namespace Mahakam
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::parse(const std::string& source)
 	{
+		MH_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> sources;
 
 		const char* typeToken = "#type";
@@ -152,6 +156,8 @@ namespace Mahakam
 
 	std::string OpenGLShader::readFile(const std::string& filepath)
 	{
+		MH_PROFILE_FUNCTION();
+
 		std::string result;
 		std::ifstream stream(filepath, std::ios::in | std::ios::binary);
 		if (stream)
@@ -174,6 +180,8 @@ namespace Mahakam
 
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource) : name(name)
 	{
+		MH_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSource;
 		sources[GL_FRAGMENT_SHADER] = fragmentSource;
@@ -183,6 +191,8 @@ namespace Mahakam
 
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 	{
+		MH_PROFILE_FUNCTION();
+
 		std::string source = readFile(filepath);
 
 		auto sources = parse(source);
@@ -200,16 +210,22 @@ namespace Mahakam
 
 	OpenGLShader::~OpenGLShader()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glDeleteProgram(rendererID);
 	}
 
 	void OpenGLShader::bind() const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glUseProgram(rendererID);
 	}
 
 	void OpenGLShader::unbind() const
 	{
+		MH_PROFILE_FUNCTION();
+
 		glUseProgram(0);
 	}
 

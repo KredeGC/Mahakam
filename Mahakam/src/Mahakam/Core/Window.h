@@ -8,9 +8,9 @@ namespace Mahakam
 	struct WindowProps
 	{
 		std::string title;
-		unsigned int width, height;
+		uint32_t width, height;
 
-		WindowProps(const std::string& title = "Mahakam", unsigned int width = 1600, unsigned int height = 900)
+		WindowProps(const std::string& title = "Mahakam", uint32_t width = 1600, uint32_t height = 900)
 			: title(title), width(width), height(height) {}
 	};
 
@@ -24,8 +24,8 @@ namespace Mahakam
 
 		virtual void onUpdate() = 0;
 
-		virtual unsigned int getWidth() const = 0;
-		virtual unsigned int getHeight() const = 0;
+		virtual uint32_t getWidth() const = 0;
+		virtual uint32_t getHeight() const = 0;
 
 		virtual void setEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void setVSync(bool enabled) = 0;

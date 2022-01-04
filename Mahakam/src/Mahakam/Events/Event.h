@@ -37,9 +37,6 @@ namespace Mahakam
 	private:
 		friend class EventDispatcher;
 
-	protected:
-		bool handled = false;
-
 	public:
 		virtual EventType getEventType() const = 0;
 		virtual const char* getEventName() const = 0;
@@ -51,10 +48,7 @@ namespace Mahakam
 			return getCategoryFlags() & category;
 		}
 
-		inline bool isHandled() const
-		{
-			return handled;
-		}
+		bool handled = false;
 	};
 
 

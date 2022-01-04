@@ -26,6 +26,8 @@ namespace Mahakam
 
 	Ref<Mesh> Mesh::createCube(int tessellation)
 	{
+		MH_PROFILE_FUNCTION();
+
 		uint32_t vertexCount = 6 * tessellation * tessellation;
 		uint32_t indexCount = 6 * 6 * (tessellation - 1) * (tessellation - 1);
 
@@ -110,6 +112,8 @@ namespace Mahakam
 
 	Ref<Mesh> Mesh::createPlane(int rows, int columns)
 	{
+		MH_PROFILE_FUNCTION();
+
 		uint32_t vertexCount = rows * columns;
 		uint32_t indexCount = 6 * (rows - 1) * (columns - 1);
 
@@ -178,6 +182,8 @@ namespace Mahakam
 
 	Ref<Mesh> Mesh::createUVSphere(int rows, int columns)
 	{
+		MH_PROFILE_FUNCTION();
+
 		uint32_t vertexCount = rows * columns;
 		uint32_t indexCount = 6 * (rows - 1) * (columns - 1);
 
@@ -261,6 +267,8 @@ namespace Mahakam
 
 	Ref<Mesh> Mesh::createCubeSphere(int tessellation, bool equirectangular)
 	{
+		MH_PROFILE_FUNCTION();
+
 		uint32_t vertexCount = 6 * tessellation * tessellation;
 		uint32_t indexCount = 6 * 6 * (tessellation - 1) * (tessellation - 1);
 

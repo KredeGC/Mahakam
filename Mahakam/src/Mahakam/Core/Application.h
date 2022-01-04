@@ -26,10 +26,12 @@ namespace Mahakam
 		bool onWindowResize(WindowResizeEvent& event);
 
 	public:
-		Application();
+		Application(const std::string& name = "Mahakam");
 		virtual ~Application();
 
 		void run();
+
+		void close();
 
 		void onEvent(Event& event);
 

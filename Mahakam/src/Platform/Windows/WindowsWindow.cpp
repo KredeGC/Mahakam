@@ -27,6 +27,8 @@ namespace Mahakam {
 		FreeConsole();
 #endif
 
+		MH_PROFILE_FUNCTION();
+
 		data.title = props.title;
 		data.width = props.width;
 		data.height = props.height;
@@ -145,6 +147,8 @@ namespace Mahakam {
 
 	void WindowsWindow::shutdown()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(window);
 	}
 
@@ -160,12 +164,16 @@ namespace Mahakam {
 
 	void WindowsWindow::onUpdate()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		context->swapBuffers();
 	}
 
 	void WindowsWindow::setVSync(bool enabled)
 	{
+		MH_PROFILE_FUNCTION();
+
 		glfwSwapInterval(enabled ? 1 : 0);
 
 		data.vsync = true;
@@ -178,6 +186,8 @@ namespace Mahakam {
 
 	void WindowsWindow::setCursorVisible(bool visible) const
 	{
+		MH_PROFILE_FUNCTION();
+
 		if (visible)
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		else
