@@ -5,6 +5,8 @@
 
 namespace Mahakam
 {
+	static const uint32_t MAX_FRAMEBUFFER_SIZE = 8192;
+
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferProps& prop)
 		: prop(prop)
 	{
@@ -36,8 +38,22 @@ namespace Mahakam
 
 	void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height)
 	{
+		if (width == 0 || height == 0 || width > MAX_FRAMEBUFFER_SIZE || height > MAX_FRAMEBUFFER_SIZE)
+		{
+			MH_CORE_WARN("Attempted to resize framebuffer to an unsupported size: ({0},{1})", width, height);
+			return;
+		}
+
 		prop.width = width;
 		prop.height = height;
+
+		invalidate();
+	}
+
+	void OpenGLFrameBuffer::attachColorTexture(uint32_t width, uint32_t height, TextureFormat format)
+	{
+		// TODO: Use a FrameBufferTextureProps struct to construct these textures instead
+		colorAttachments.push_back(0);
 
 		invalidate();
 	}

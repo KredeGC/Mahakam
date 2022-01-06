@@ -25,6 +25,9 @@ namespace Mahakam
 
 		glm::vec2 viewportSize = { 0.0f, 0.0f };
 
+		bool open = true;
+		bool focused = false;
+		bool hovered = false;
 		bool wireframe = false;
 
 		float rotation = 0;
@@ -40,5 +43,6 @@ namespace Mahakam
 
 		bool onKeyPressed(KeyPressedEvent& event);
 		bool onWindowResize(WindowResizeEvent& event);
+		bool onMouseScrolled(MouseScrolledEvent& event);
 	};
 }

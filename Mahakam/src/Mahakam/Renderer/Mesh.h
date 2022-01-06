@@ -303,6 +303,14 @@ namespace Mahakam
 			vertexArray->bind();
 		}
 
+		void unbind()
+		{
+			MH_PROFILE_FUNCTION();
+
+			//material->bind();
+			vertexArray->unbind();
+		}
+
 		const void* serialize(int& outLength)
 		{
 			outLength = sizeof(Mesh);

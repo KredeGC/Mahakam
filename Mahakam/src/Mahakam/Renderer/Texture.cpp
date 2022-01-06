@@ -7,6 +7,21 @@
 
 namespace Mahakam
 {
+	Ref<Texture2D> Texture2D::create(const TextureProps& props)
+	{
+		switch (Renderer::getAPI())
+		{
+		case RendererAPI::API::None:
+			MH_CORE_ASSERT(false, "Renderer API not supported!");
+		case RendererAPI::API::OpenGL:
+			return std::make_shared<OpenGLTexture2D>(props);
+		}
+
+		MH_CORE_ASSERT(false, "Unknown renderer API!");
+
+		return nullptr;
+	}
+
 	Ref<Texture2D> Texture2D::create(const std::string& filepath, const TextureProps& props)
 	{
 		switch (Renderer::getAPI())
@@ -23,7 +38,7 @@ namespace Mahakam
 	}
 
 
-	Ref<TextureCube> TextureCube::create(const std::string& filepath, const TextureProps& props)
+	Ref<TextureCube> TextureCube::create(const std::string& filepath, const CubeTextureProps& props)
 	{
 		switch (Renderer::getAPI())
 		{

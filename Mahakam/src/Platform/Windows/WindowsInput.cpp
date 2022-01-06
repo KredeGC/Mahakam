@@ -1,14 +1,12 @@
 #include "mhpch.h"
-#include "WindowsInput.h"
+#include "Mahakam/Core/Input.h"
 #include "Mahakam/Core/Application.h"
 
 #include <GLFW/glfw3.h>
 
 namespace Mahakam
 {
-	Input* Input::instance = new WindowsInput();
-
-	bool WindowsInput::isKeyPressedImpl(int keycode)
+	bool Input::isKeyPressed(int keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::getInstance().getWindow().getNativeWindow());
 
@@ -17,7 +15,7 @@ namespace Mahakam
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool WindowsInput::isMouseButtonPressedImpl(int button)
+	bool Input::isMouseButtonPressed(int button)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::getInstance().getWindow().getNativeWindow());
 
@@ -26,19 +24,19 @@ namespace Mahakam
 		return state == GLFW_PRESS;
 	}
 	
-	float WindowsInput::getMouseXImpl()
+	float Input::getMouseX()
 	{
-		auto [x, y] = getMousePosImpl();
+		auto [x, y] = getMousePos();
 		return x;
 	}
 	
-	float WindowsInput::getMouseYImpl()
+	float Input::getMouseY()
 	{
-		auto [x, y] = getMousePosImpl();
+		auto [x, y] = getMousePos();
 		return y;
 	}
 
-	std::pair<float, float> WindowsInput::getMousePosImpl()
+	std::pair<float, float> Input::getMousePos()
 	{
 		auto window = static_cast<GLFWwindow*>(Application::getInstance().getWindow().getNativeWindow());
 

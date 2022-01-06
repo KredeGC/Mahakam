@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Texture.h"
 
 #include <vector>
 
@@ -23,6 +24,8 @@ namespace Mahakam
 		virtual void unbind() = 0;
 
 		virtual void resize(uint32_t width, uint32_t height) = 0;
+
+		virtual void attachColorTexture(uint32_t width, uint32_t height, TextureFormat format) = 0;
 
 		virtual const std::vector<uint32_t> getColorAttachments() const = 0;
 		virtual uint32_t getDepthAttachment() const = 0;

@@ -10,10 +10,10 @@ namespace Mahakam
 		unsigned int width, height;
 
 	public:
-		WindowResizeEvent(unsigned int width, unsigned int height) : width(width), height(height) {}
+		WindowResizeEvent(uint32_t width, uint32_t height) : width(width), height(height) {}
 
-		inline unsigned int getWidth() { return width; }
-		inline unsigned int getHeight() { return height; }
+		inline uint32_t getWidth() { return width; }
+		inline uint32_t getHeight() { return height; }
 
 		std::string toString() const override
 		{

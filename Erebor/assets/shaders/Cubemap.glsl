@@ -37,6 +37,8 @@ const float PI = 3.14159265359;
 
 void main() {
     vec3 normal = normalize(v_LocalPos);
+    //vec2 uv = sampleSphericalMap(normal);
+    //vec3 irradiance = texture(equirectangularMap, uv).rgb;
 
     // if (irradiance)
     vec3 irradiance = vec3(0.0);

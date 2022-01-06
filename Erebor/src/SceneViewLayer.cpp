@@ -1,23 +1,24 @@
 #include "SceneViewLayer.h"
 
-// TEMPORARY
-//#include <glm/gtc/matrix_transform.hpp>
-//
-//#include <glm/gtc/type_ptr.hpp>
-//#include <glm/gtc/quaternion.hpp>
-//#include <glm/gtc/matrix_transform.hpp>
-
 namespace Mahakam
 {
 	void SceneViewLayer::onAttach()
 	{
-		// Debug stuff
+		// Setup BRDF LUT
+		//Ref<Texture> brdfLut = Texture2D::create(TextureProps{ 512, 512, TextureFormat::RG16F });
+		//Ref<FrameBuffer> brdfFramebuffer = FrameBuffer::create({ 512, 512 });
+		//brdfFramebuffer->attachColorTexture(brdfLut);
+
+
+		// TEMPORARY BRDF LUT
+		Ref<Texture> brdfLut = Texture2D::create("assets/textures/brdf_lut.png", { TextureFormat::RGB });
+
+
+		// Viewport framebuffer
 		FrameBufferProps prop;
 		prop.width = Application::getInstance().getWindow().getWidth();
 		prop.height = Application::getInstance().getWindow().getHeight();
 		viewportFramebuffer = FrameBuffer::create(prop);
-
-
 
 		// Setup camera
 		camera = std::make_shared<PerspectiveCamera>(glm::radians(45.0f), 1.6f / 0.9f, 0.01f, 100.0f);
@@ -31,7 +32,10 @@ namespace Mahakam
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 
 		// Setup texture
-		Ref<Texture> skybox = TextureCube::create("assets/textures/studio.hdr");
+		Ref<Texture> fern = Texture2D::create("assets/textures/fern.png", { TextureFormat::RGB });
+		Ref<Texture> skybox = TextureCube::create("assets/textures/studio.hdr", { 2048, TextureFormat::RGB });
+		Ref<Texture> skyboxIrradiance = TextureCube::create("assets/textures/studio.hdr", { 32, TextureFormat::RGB, true, TextureCubePrefilter::Convolute });
+		Ref<Texture> skyboxSpecular = TextureCube::create("assets/textures/studio.hdr", { 1024, TextureFormat::RGB, true, TextureCubePrefilter::Prefilter });
 
 		// Setup skybox
 		skyboxDome = Mesh::createUVSphere(20, 20);
@@ -46,8 +50,10 @@ namespace Mahakam
 				// Setup material with texture
 				Ref<Material> material = Material::create(shader);
 				//material->setTexture("u_Albedo", 0, tex);
-				material->setTexture("u_IrradianceMap", 0, skybox);
-				material->setFloat3("u_Color", { 1.0f, 0.7f, 0.0f });
+				material->setTexture("u_IrradianceMap", 0, skyboxIrradiance);
+				material->setTexture("u_SpecularMap", 1, skyboxSpecular);
+				material->setTexture("u_BRDFLUT", 2, brdfLut);
+				material->setFloat3("u_Color", { 0.5f, 0.0f, 0.0f });
 				material->setFloat("u_Metallic", y / 9.0f);
 				material->setFloat("u_Roughness", x / 9.0f);
 
@@ -91,7 +97,9 @@ namespace Mahakam
 	void SceneViewLayer::onImGuiRender()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::Begin("Viewport");
+		ImGui::Begin("Viewport", &open);
+		focused = ImGui::IsWindowFocused();
+		hovered = ImGui::IsWindowHovered();
 		ImVec2 size = ImGui::GetContentRegionAvail();
 		if (size.x != viewportSize.x || size.y != viewportSize.y)
 		{
@@ -124,6 +132,7 @@ namespace Mahakam
 		EventDispatcher dispatcher(event);
 		dispatcher.dispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(SceneViewLayer::onKeyPressed));
 		dispatcher.dispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(SceneViewLayer::onWindowResize));
+		dispatcher.dispatchEvent<MouseScrolledEvent>(MH_BIND_EVENT(SceneViewLayer::onMouseScrolled));
 	}
 
 	bool SceneViewLayer::onKeyPressed(KeyPressedEvent& event)
@@ -139,7 +148,21 @@ namespace Mahakam
 
 	bool SceneViewLayer::onWindowResize(WindowResizeEvent& event)
 	{
-		viewportFramebuffer->resize(event.getWidth(), event.getHeight());
+		uint32_t width = event.getWidth();
+		uint32_t height = event.getHeight();
+		if (width > 0 && height > 0)
+			viewportFramebuffer->resize(width, height);
+
+		return false;
+	}
+
+	bool SceneViewLayer::onMouseScrolled(MouseScrolledEvent& event)
+	{
+		if (focused && hovered)
+		{
+			MH_CORE_TRACE("Scrolled!");
+			return true;
+		}
 
 		return false;
 	}

@@ -132,12 +132,14 @@ namespace Mahakam
 
 	void OpenGLUniformBuffer::setData(const void* data, uint32_t offset, uint32_t size)
 	{
-		glBindBuffer(GL_UNIFORM_BUFFER, rendererID);
-		//glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
-
+		/*glBindBuffer(GL_UNIFORM_BUFFER, rendererID);
 		void* ptr = glMapBufferRange(GL_UNIFORM_BUFFER, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
 		memcpy(ptr, data, size);
-		glUnmapBuffer(GL_UNIFORM_BUFFER);
+		glUnmapBuffer(GL_UNIFORM_BUFFER);*/
+
+		void* ptr = glMapNamedBufferRange(rendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+		memcpy(ptr, data, size);
+		glUnmapNamedBuffer(rendererID);
 	}
 #pragma endregion
 
