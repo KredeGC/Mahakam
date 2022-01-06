@@ -5,6 +5,8 @@
 
 #include "Mahakam/Renderer/Mesh.h"
 
+#include "OpenGLTextureFormats.h"
+
 #include <stb_image.h>
 
 #include <glad/glad.h>
@@ -14,69 +16,6 @@
 
 namespace Mahakam
 {
-	static GLenum TextureFormatToOpenGLFormat(TextureFormat format)
-	{
-		switch (format)
-		{
-		case TextureFormat::RG:
-			return GL_RG;
-		case TextureFormat::RGB:
-			return GL_RGB;
-		case TextureFormat::RGBA:
-			return GL_RGBA;
-		case TextureFormat::RG16F:
-			return GL_RG;
-		case TextureFormat::RGBA16F:
-			return GL_RGB;
-		default:
-			MH_CORE_ASSERT(false, "Unknown TextureFormat provided!");
-		}
-
-		return 0;
-	}
-
-	static GLenum TextureFormatToOpenGLInternalFormat(TextureFormat format)
-	{
-		switch (format)
-		{
-		case TextureFormat::RG:
-			return GL_RG8;
-		case TextureFormat::RGB:
-			return GL_RGB8;
-		case TextureFormat::RGBA:
-			return GL_RGBA8;
-		case TextureFormat::RG16F:
-			return GL_RG16F;
-		case TextureFormat::RGBA16F:
-			return GL_RGBA16F;
-		default:
-			MH_CORE_ASSERT(false, "Unknown TextureFormat provided!");
-		}
-
-		return 0;
-	}
-
-	static GLenum TextureFormatToOpenGLType(TextureFormat format)
-	{
-		switch (format)
-		{
-		case TextureFormat::RG:
-			return GL_UNSIGNED_BYTE;
-		case TextureFormat::RGB:
-			return GL_UNSIGNED_BYTE;
-		case TextureFormat::RGBA:
-			return GL_UNSIGNED_BYTE;
-		case TextureFormat::RG16F:
-			return GL_FLOAT;
-		case TextureFormat::RGBA16F:
-			return GL_FLOAT;
-		default:
-			MH_CORE_ASSERT(false, "Unknown TextureFormat provided!");
-		}
-
-		return 0;
-	}
-
 	static void* loadImageFile(const char* filepath, int* w, int* h, int* channels, int* hdr, int desiredChannels = 0)
 	{
 		MH_PROFILE_FUNCTION();
@@ -218,7 +157,7 @@ namespace Mahakam
 	static Ref<Mesh> cubeMesh;
 
 	OpenGLTextureCube::OpenGLTextureCube(const std::vector<std::string>& faces, const CubeTextureProps& props)
-		: props(props), captureFBO(0), captureRBO(0)
+		: props(props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -302,6 +241,7 @@ namespace Mahakam
 
 
 		// Create framebuffer
+		uint32_t captureFBO, captureRBO;
 		glGenFramebuffers(1, &captureFBO);
 		glGenRenderbuffers(1, &captureRBO);
 
@@ -422,14 +362,14 @@ namespace Mahakam
 
 		// Delete buffer
 		glDeleteTextures(1, &hdrID);
+		glDeleteFramebuffers(1, &captureFBO);
+		glDeleteRenderbuffers(1, &captureRBO);
 	}
 
 	OpenGLTextureCube::~OpenGLTextureCube()
 	{
 		MH_PROFILE_FUNCTION();
 
-		glDeleteFramebuffers(1, &captureFBO);
-		glDeleteRenderbuffers(1, &captureRBO);
 		glDeleteTextures(1, &rendererID);
 	}
 

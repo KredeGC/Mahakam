@@ -1,16 +1,26 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
-#include "Texture.h"
+#include "TextureFormats.h"
+#include "RenderBuffer.h"
 
 #include <vector>
 
 namespace Mahakam
 {
+	struct FrameBufferAttachmentProps
+	{
+		TextureFormat format = TextureFormat::RGBA8;
+		TextureFilter filterMode = TextureFilter::Bilinear;
+		bool immutable = false;
+	};
+
 	struct FrameBufferProps
 	{
 		uint32_t width;
 		uint32_t height;
+		std::vector<FrameBufferAttachmentProps> colorAttachments;
+		FrameBufferAttachmentProps depthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, true };
 
 		bool swapChainTarget = false;
 	};
@@ -25,13 +35,11 @@ namespace Mahakam
 
 		virtual void resize(uint32_t width, uint32_t height) = 0;
 
-		virtual void attachColorTexture(uint32_t width, uint32_t height, TextureFormat format) = 0;
-
-		virtual const std::vector<uint32_t> getColorAttachments() const = 0;
-		virtual uint32_t getDepthAttachment() const = 0;
+		virtual const std::vector<Ref<RenderBuffer>>& getColorAttachments() const = 0;
+		virtual const Ref<RenderBuffer>& getDepthAttachment() const = 0;
 
 		virtual const FrameBufferProps& getSpecification() const = 0;
 
-		static Ref<FrameBuffer> create(const FrameBufferProps& prop);
+		static Ref<FrameBuffer> create(const FrameBufferProps& props);
 	};
 }

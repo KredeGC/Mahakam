@@ -36,9 +36,6 @@ namespace Mahakam {
 		uint32_t internalFormat;
 		uint32_t dataFormat;
 
-		uint32_t captureFBO;
-		uint32_t captureRBO;
-
 		CubeTextureProps props;
 
 	public:

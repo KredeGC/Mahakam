@@ -337,6 +337,7 @@ namespace Mahakam
 			return std::make_shared<Mesh>(vertexCount, layout, indices, indexCount, material);
 		}
 
+		static Ref<Mesh> createQuad();
 		static Ref<Mesh> createCube(int tessellation);
 		static Ref<Mesh> createPlane(int rows, int columns);
 		static Ref<Mesh> createUVSphere(int rows, int columns);

@@ -24,6 +24,43 @@ namespace Mahakam
 		return uv;
 	}
 
+	Ref<Mesh> Mesh::createQuad()
+	{
+		MH_PROFILE_FUNCTION();
+
+		glm::vec3 positions[] = {
+			{ -1.0f, 1.0f, 0.0f },
+			{ 1.0f, 1.0f, 0.0f  },
+			{ -1.0f, -1.0f, 0.0f },
+			{ 1.0f, -1.0f, 0.0f }
+		};
+
+		glm::vec2 uvs[] = {
+			{ 0.0f, 1.0f, },
+			{ 1.0f, 1.0f, },
+			{ 0.0f, 0.0f, },
+			{ 1.0f, 0.0f }
+		};
+
+		uint32_t indices[] = {
+			0, 3, 2,
+			0, 1, 3
+		};
+
+		BufferLayout layout
+		{
+			{ ShaderDataType::Float3, "i_Pos"},
+			{ ShaderDataType::Float2, "i_UV"}
+		};
+
+		Ref<Mesh> mesh = Mesh::create(4, layout, indices, 6);
+		mesh->addVertices("i_Pos", positions);
+		mesh->addVertices("i_UV", uvs);
+		mesh->init();
+
+		return mesh;
+	}
+
 	Ref<Mesh> Mesh::createCube(int tessellation)
 	{
 		MH_PROFILE_FUNCTION();

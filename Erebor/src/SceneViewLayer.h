@@ -21,6 +21,7 @@ namespace Mahakam
 		uint32_t* vertexCount;
 		uint32_t* triCount;
 
+		Ref<FrameBuffer> brdfFramebuffer;
 		Ref<FrameBuffer> viewportFramebuffer;
 
 		glm::vec2 viewportSize = { 0.0f, 0.0f };

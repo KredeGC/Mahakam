@@ -5,19 +5,35 @@ namespace Mahakam
 	void SceneViewLayer::onAttach()
 	{
 		// Setup BRDF LUT
-		//Ref<Texture> brdfLut = Texture2D::create(TextureProps{ 512, 512, TextureFormat::RG16F });
-		//Ref<FrameBuffer> brdfFramebuffer = FrameBuffer::create({ 512, 512 });
-		//brdfFramebuffer->attachColorTexture(brdfLut);
+		FrameBufferProps brdfProps;
+		brdfProps.width = 512;
+		brdfProps.height = 512;
+		brdfProps.colorAttachments = { { TextureFormat::RG16F } };
+		brdfProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, true };
+		Ref<FrameBuffer> brdfFramebuffer = FrameBuffer::create(brdfProps);
 
+		Ref<Shader> brdfShader = Shader::create("assets/shaders/internal/BRDF.glsl");
 
-		// TEMPORARY BRDF LUT
-		Ref<Texture> brdfLut = Texture2D::create("assets/textures/brdf_lut.png", { TextureFormat::RGB });
+		Ref<Mesh> quadMesh = Mesh::createQuad();
+
+		brdfFramebuffer->bind();
+
+		brdfShader->bind();
+		quadMesh->bind();
+
+		GL::clear();
+		GL::drawIndexed(quadMesh->getIndexCount());
+
+		brdfFramebuffer->unbind();
+
+		Ref<Texture> brdfLut = std::static_pointer_cast<Texture>(brdfFramebuffer->getColorAttachments()[0]);
 
 
 		// Viewport framebuffer
 		FrameBufferProps prop;
 		prop.width = Application::getInstance().getWindow().getWidth();
 		prop.height = Application::getInstance().getWindow().getHeight();
+		prop.colorAttachments = { { TextureFormat::RGB8 } };
 		viewportFramebuffer = FrameBuffer::create(prop);
 
 		// Setup camera
@@ -32,10 +48,10 @@ namespace Mahakam
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 
 		// Setup texture
-		Ref<Texture> fern = Texture2D::create("assets/textures/fern.png", { TextureFormat::RGB });
-		Ref<Texture> skybox = TextureCube::create("assets/textures/studio.hdr", { 2048, TextureFormat::RGB });
-		Ref<Texture> skyboxIrradiance = TextureCube::create("assets/textures/studio.hdr", { 32, TextureFormat::RGB, true, TextureCubePrefilter::Convolute });
-		Ref<Texture> skyboxSpecular = TextureCube::create("assets/textures/studio.hdr", { 1024, TextureFormat::RGB, true, TextureCubePrefilter::Prefilter });
+		Ref<Texture> fern = Texture2D::create("assets/textures/fern.png", { TextureFormat::RGB8 });
+		Ref<Texture> skybox = TextureCube::create("assets/textures/studio.hdr", { 2048, TextureFormat::RGB8 });
+		Ref<Texture> skyboxIrradiance = TextureCube::create("assets/textures/studio.hdr", { 32, TextureFormat::RGB8, true, TextureCubePrefilter::Convolute });
+		Ref<Texture> skyboxSpecular = TextureCube::create("assets/textures/studio.hdr", { 1024, TextureFormat::RGB8, true, TextureCubePrefilter::Prefilter });
 
 		// Setup skybox
 		skyboxDome = Mesh::createUVSphere(20, 20);
@@ -108,7 +124,7 @@ namespace Mahakam
 
 			camera->setRatio(size.x / size.y);
 		}
-		ImGui::Image((void*)viewportFramebuffer->getColorAttachments()[0], size, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((void*)viewportFramebuffer->getColorAttachments()[0]->getRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
 		ImGui::PopStyleVar();
 

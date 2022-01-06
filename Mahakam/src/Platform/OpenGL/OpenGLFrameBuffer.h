@@ -8,12 +8,12 @@ namespace Mahakam
 	{
 	private:
 		uint32_t rendererID;
-		FrameBufferProps prop;
-		std::vector<uint32_t> colorAttachments;
-		uint32_t depthAttachment = 0;
+		FrameBufferProps props;
+		std::vector<Ref<RenderBuffer>> colorAttachments;
+		Ref<RenderBuffer> depthAttachment = 0;
 
 	public:
-		OpenGLFrameBuffer(const FrameBufferProps& prop);
+		OpenGLFrameBuffer(const FrameBufferProps& props);
 		virtual ~OpenGLFrameBuffer() override;
 
 		virtual void bind() override;
@@ -21,12 +21,10 @@ namespace Mahakam
 
 		virtual void resize(uint32_t width, uint32_t height) override;
 
-		virtual void attachColorTexture(uint32_t width, uint32_t height, TextureFormat format) override;
+		virtual const std::vector<Ref<RenderBuffer>>& getColorAttachments() const override { return colorAttachments; }
+		virtual const Ref<RenderBuffer>& getDepthAttachment() const override { return depthAttachment; }
 
-		virtual const std::vector<uint32_t> getColorAttachments() const override { return colorAttachments; }
-		virtual uint32_t getDepthAttachment() const override { return depthAttachment; }
-
-		virtual const FrameBufferProps& getSpecification() const override { return prop; }
+		virtual const FrameBufferProps& getSpecification() const override { return props; }
 
 		void invalidate();
 	};

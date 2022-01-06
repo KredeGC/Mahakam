@@ -4,14 +4,11 @@
 layout(location = 0) in vec3 i_Pos;
 layout(location = 1) in vec2 i_UV;
 
-out vec3 v_UV;
-
-uniform mat4 projection;
-uniform mat4 view;
+out vec2 v_UV;
 
 void main() {
     v_UV = i_UV;
-    gl_Position = projection * view * vec4(i_Pos, 1.0);
+    gl_Position = vec4(i_Pos, 1.0);
 }
 
 
@@ -21,7 +18,9 @@ void main() {
 
 layout(location = 0) out vec4 o_Color;
 
-in vec3 v_UV;
+in vec2 v_UV;
+
+const float PI = 3.14159265359;
 
 // ----------------------------------------------------------------------------
 // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
@@ -121,5 +120,5 @@ vec2 IntegrateBRDF(float NdotV, float roughness) {
 
 void main() {
     vec2 integratedBRDF = IntegrateBRDF(v_UV.x, v_UV.y);
-    o_Color = integratedBRDF;
+    o_Color = vec4(integratedBRDF, 1.0, 1.0);
 }

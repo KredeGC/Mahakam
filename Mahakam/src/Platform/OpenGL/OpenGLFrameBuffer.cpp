@@ -1,38 +1,39 @@
 #include "mhpch.h"
 #include "OpenGLFrameBuffer.h"
 
+#include "OpenGLTextureFormats.h"
+
 #include <glad/glad.h>
 
 namespace Mahakam
 {
 	static const uint32_t MAX_FRAMEBUFFER_SIZE = 8192;
 
-	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferProps& prop)
-		: prop(prop)
+	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferProps& props)
+		: props(props)
 	{
-		colorAttachments.push_back(0);
-
 		invalidate();
 	}
 
 	OpenGLFrameBuffer::~OpenGLFrameBuffer()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glDeleteFramebuffers(1, &rendererID);
-
-		for (int i = 0; i < colorAttachments.size(); i++)
-			glDeleteTextures(1, &colorAttachments[i]);
-
-		glDeleteTextures(1, &depthAttachment);
 	}
 
 	void OpenGLFrameBuffer::bind()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
-		glViewport(0, 0, prop.width, prop.height);
+		glViewport(0, 0, props.width, props.height);
 	}
 
 	void OpenGLFrameBuffer::unbind()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -44,51 +45,61 @@ namespace Mahakam
 			return;
 		}
 
-		prop.width = width;
-		prop.height = height;
-
-		invalidate();
-	}
-
-	void OpenGLFrameBuffer::attachColorTexture(uint32_t width, uint32_t height, TextureFormat format)
-	{
-		// TODO: Use a FrameBufferTextureProps struct to construct these textures instead
-		colorAttachments.push_back(0);
+		props.width = width;
+		props.height = height;
 
 		invalidate();
 	}
 
 	void OpenGLFrameBuffer::invalidate()
 	{
+		MH_PROFILE_FUNCTION();
+
 		if (rendererID)
 		{
 			glDeleteFramebuffers(1, &rendererID);
 
-			for (int i = 0; i < colorAttachments.size(); i++)
-				glDeleteTextures(1, &colorAttachments[i]);
-
-			glDeleteTextures(1, &depthAttachment);
+			colorAttachments.clear();
+			depthAttachment = 0;
 		}
 
 		glCreateFramebuffers(1, &rendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 
 		// Color buffer
-		glCreateTextures(GL_TEXTURE_2D, 1, &colorAttachments[0]);
-		glBindTexture(GL_TEXTURE_2D, colorAttachments[0]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, prop.width, prop.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		for (int i = 0; i < props.colorAttachments.size(); i++)
+		{
+			FrameBufferAttachmentProps& spec = props.colorAttachments[i];
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			Ref<Texture> tex = Texture2D::create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachments[0], 0);
+			colorAttachments.push_back(tex);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->getRendererID(), 0);
+		}
 
 		// Depth buffer
-		glCreateTextures(GL_TEXTURE_2D, 1, &depthAttachment);
-		glTextureStorage2D(depthAttachment, 1, GL_DEPTH24_STENCIL8, prop.width, prop.height);
-		//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, prop.width, prop.height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+		{
+			FrameBufferAttachmentProps& spec = props.depthAttachment;
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthAttachment, 0);
+			uint32_t internalFormat = TextureFormatToOpenGLInternalFormat(spec.format);
+			uint32_t dataFormat = TextureFormatToOpenGLFormat(spec.format);
+			uint32_t type = TextureFormatToOpenGLType(spec.format);
+			uint32_t attachment = TextureFormatToOpenGLAttachment(spec.format);
+
+			if (spec.immutable)
+			{
+				depthAttachment = RenderBuffer::create(props.width, props.height, spec.format);
+
+				glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depthAttachment->getRendererID());
+			}
+			else
+			{
+				depthAttachment = Texture2D::create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+
+				glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, depthAttachment->getRendererID(), 0);
+			}
+		}
 
 		// Bind framebuffer
 		MH_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "FrameBuffer is incomplete!");
