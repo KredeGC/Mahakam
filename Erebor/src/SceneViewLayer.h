@@ -9,6 +9,8 @@ namespace Mahakam
 	class SceneViewLayer : public Layer
 	{
 	private:
+		Ref<Scene> activeScene;
+
 		Ref<Mesh> skyboxDome;
 
 		Transform transforms[100];

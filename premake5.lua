@@ -11,12 +11,13 @@ workspace "Mahakam"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
-IncludeDir["assimp"] = "Mahakam/vendor/assimp/include"
-IncludeDir["GLFW"] = "Mahakam/vendor/GLFW/include"
-IncludeDir["glad"] = "Mahakam/vendor/glad/include"
-IncludeDir["glm"] = "Mahakam/vendor/glm"
-IncludeDir["imgui"] = "Mahakam/vendor/imgui"
-IncludeDir["spdlog"] = "Mahakam/vendor/spdlog/include"
+IncludeDir["assimp"]    = "Mahakam/vendor/assimp/include"
+IncludeDir["entt"]      = "Mahakam/vendor/entt/include"
+IncludeDir["GLFW"]      = "Mahakam/vendor/GLFW/include"
+IncludeDir["glad"]      = "Mahakam/vendor/glad/include"
+IncludeDir["glm"]       = "Mahakam/vendor/glm"
+IncludeDir["imgui"]     = "Mahakam/vendor/imgui"
+IncludeDir["spdlog"]    = "Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"] = "Mahakam/vendor/stb_image"
 
 group "Dependencies/Assimp"
@@ -69,6 +70,7 @@ project "Mahakam"
     includedirs {
         "%{prj.name}/src",
         "%{IncludeDir.assimp}",
+        "%{IncludeDir.entt}",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.glm}",
@@ -133,6 +135,7 @@ project "Erebor"
     includedirs {
         "Mahakam/src",
         "%{IncludeDir.assimp}",
+        "%{IncludeDir.entt}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.imgui}",
         "%{IncludeDir.glm}"
@@ -140,6 +143,10 @@ project "Erebor"
 
     links {
         "Mahakam"
+    }
+
+    defines {
+        "_CRT_SECURE_NO_WARNINGS"
     }
 
     filter "system:windows"
@@ -184,6 +191,7 @@ project "Sandbox"
     includedirs {
         "Mahakam/src",
         "%{IncludeDir.assimp}",
+        "%{IncludeDir.entt}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.imgui}",
         "%{IncludeDir.glm}"
@@ -191,6 +199,10 @@ project "Sandbox"
     
     links {
         "Mahakam"
+    }
+
+    defines {
+        "_CRT_SECURE_NO_WARNINGS"
     }
     
     filter "system:windows"

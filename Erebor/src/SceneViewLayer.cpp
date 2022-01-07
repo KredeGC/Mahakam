@@ -4,6 +4,14 @@ namespace Mahakam
 {
 	void SceneViewLayer::onAttach()
 	{
+		activeScene = Scene::createScene();
+
+		Entity entity = activeScene->createEntity();
+		entity.hasComponent<MeshComponent>();
+		entity.addComponent<MeshComponent>();
+
+
+
 		// Setup BRDF LUT
 		FrameBufferProps brdfProps;
 		brdfProps.width = 512;
@@ -28,7 +36,6 @@ namespace Mahakam
 
 		Ref<Texture> brdfLut = std::static_pointer_cast<Texture>(brdfFramebuffer->getColorAttachments()[0]);
 
-
 		// Viewport framebuffer
 		FrameBufferProps prop;
 		prop.width = Application::getInstance().getWindow().getWidth();
@@ -49,9 +56,9 @@ namespace Mahakam
 
 		// Setup texture
 		Ref<Texture> fern = Texture2D::create("assets/textures/fern.png", { TextureFormat::RGB8 });
-		Ref<Texture> skybox = TextureCube::create("assets/textures/studio.hdr", { 2048, TextureFormat::RGB8 });
-		Ref<Texture> skyboxIrradiance = TextureCube::create("assets/textures/studio.hdr", { 32, TextureFormat::RGB8, true, TextureCubePrefilter::Convolute });
-		Ref<Texture> skyboxSpecular = TextureCube::create("assets/textures/studio.hdr", { 1024, TextureFormat::RGB8, true, TextureCubePrefilter::Prefilter });
+		Ref<Texture> skybox = TextureCube::create("assets/textures/apt.hdr", { 2048, TextureFormat::RGB8 });
+		Ref<Texture> skyboxIrradiance = TextureCube::create("assets/textures/apt.hdr", { 32, TextureFormat::RGB8, true, TextureCubePrefilter::Convolute });
+		Ref<Texture> skyboxSpecular = TextureCube::create("assets/textures/apt.hdr", { 1024, TextureFormat::RGB8, true, TextureCubePrefilter::Prefilter });
 
 		// Setup skybox
 		skyboxDome = Mesh::createUVSphere(20, 20);
@@ -86,6 +93,8 @@ namespace Mahakam
 	void SceneViewLayer::onUpdate(Timestep dt)
 	{
 		MH_PROFILE_FUNCTION();
+
+		activeScene->onUpdate(dt);
 
 		viewportFramebuffer->bind();
 		// Clearing screen

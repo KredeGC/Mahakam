@@ -85,7 +85,7 @@ namespace Mahakam
 				ShaderDataTypeToOpenGLBaseType(element.type),
 				element.normalized ? GL_TRUE : GL_FALSE,
 				layout.getStride(),
-				(const void*)element.offset);
+				(const void*)(uintptr_t)element.offset);
 			vertexBufferIndex++;
 		}
 

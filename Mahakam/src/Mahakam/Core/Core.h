@@ -16,7 +16,7 @@
 
 #define BIT(x) (1 << x)
 
-#define MH_BIND_EVENT(x) std::bind(&x, this, std::placeholders::_1)
+#define MH_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 namespace Mahakam
 {
