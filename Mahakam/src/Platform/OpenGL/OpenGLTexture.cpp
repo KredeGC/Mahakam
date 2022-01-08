@@ -92,6 +92,10 @@ namespace Mahakam
 
 		MH_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
 
+		// TODO: Fix TextureFormatToOpenGLFormat() to take in the number of channels
+		if (channels == 1)
+			dataFormat = GL_R8;
+
 		glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
 		glBindTexture(GL_TEXTURE_2D, rendererID);
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, this->props.width, this->props.height, 0, dataFormat, formatType, data);

@@ -67,6 +67,9 @@ namespace Mahakam
 		{
 			auto [transform, camera] = cameras.get<TransformComponent, CameraComponent>(entity);
 
+			// Recalculate all projection matrices, if they've changed
+			camera.getCamera().recalculateProjectionMatrix();
+
 			mainCamera = &camera;
 			mainTransform = &transform;
 		}

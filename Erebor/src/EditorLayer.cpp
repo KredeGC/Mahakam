@@ -48,13 +48,14 @@ namespace Mahakam
 
 
 		// Setup shaders
+		Ref<Shader> textureShader = Shader::create("assets/shaders/Albedo.glsl");
 		Ref<Shader> shader = Shader::create("assets/shaders/LitColor.glsl");
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 
 
 		// Setup scene camera
 		cameraEntity = activeScene->createEntity("Camera");
-		cameraEntity.addComponent<CameraComponent>(true, glm::radians(45.0f), 1.0f, 0.01f, 100.0f);
+		cameraEntity.addComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 1.0f, 0.01f, 100.0f);
 		cameraEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.5f, 12.5f });
 
 		class CameraController : public ScriptableEntity
@@ -117,6 +118,36 @@ namespace Mahakam
 		baseMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
 		baseMaterial->setFloat3("u_Color", { 0.5f, 0.0f, 0.0f });
 
+
+		// Create backpack model
+		Ref<Model> backpackModel = Model::load("assets/models/backpack.obj", {
+			{ ShaderSemantic::Position, "i_Pos" },
+			{ ShaderSemantic::TexCoord0, "i_UV" },
+			{ ShaderSemantic::Normal, "i_Normal" } });
+
+		// Create backpack material
+		Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg");
+		Ref<Texture> backpackMetallic = Texture2D::create("assets/textures/backpack/specular.jpg", { TextureFormat::RGB8 });
+		Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", { TextureFormat::RGB8 });
+
+		Ref<Material> backpackMaterial = Material::create(textureShader);
+		backpackMaterial->setTexture("u_IrradianceMap", 0, skyboxIrradiance);
+		backpackMaterial->setTexture("u_SpecularMap", 1, skyboxSpecular);
+		backpackMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
+		backpackMaterial->setTexture("u_Albedo", 3, backpackDiffuse);
+		backpackMaterial->setTexture("u_Metallic", 4, backpackMetallic);
+		backpackMaterial->setTexture("u_Roughness", 5, backpackRoughness);
+
+		const auto& meshes = backpackModel->getMeshes();
+		for (auto& mesh : meshes)
+		{
+			// Create backpack entity
+			Entity entity = activeScene->createEntity("Bacpack");
+			entity.addComponent<MeshComponent>(mesh, backpackMaterial);
+			entity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.5f, 5.0f });
+		}
+
+
 		// Create scene entities
 		for (int y = 0; y < 10; y++)
 		{
@@ -128,7 +159,7 @@ namespace Mahakam
 				material->setFloat("u_Roughness", x / 9.0f);
 
 				// Create entity
-				Entity entity = activeScene->createEntity("Sphere");
+				Entity entity = activeScene->createEntity(std::string("Sphere ") + std::to_string(x) + std::string(",") + std::to_string(y));
 				entity.addComponent<MeshComponent>(sphereMesh, material);
 				entity.getComponent<TransformComponent>().setPosition({ x, y, 0.0f });
 			}
@@ -160,22 +191,6 @@ namespace Mahakam
 		sceneViewPanel.onImGuiRender();
 		sceneHierarchyPanel.onImGuiRender();
 		statsPanel.onImGuiRender();
-
-
-
-		// TEMPORARY
-		ImGui::Begin("Camera");
-		ImGui::SliderAngle("Rotation", &rotation, -180, 180);
-		ImGui::End();
-
-		/*TransformComponent& cameraTransform = cameraEntity.getComponent<TransformComponent>();
-
-		cameraTransform.setRotation(glm::quat({ 0.0f, rotation, 0.0f }));
-
-		glm::vec3 pos = { 4.5f, 4.5f, 0.0f };
-		pos += cameraTransform.getForward() * 12.5f;
-
-		cameraTransform.setPosition(pos);*/
 	}
 
 	void EditorLayer::onEvent(Event& event)

@@ -11,29 +11,30 @@ namespace Mahakam
 {
 	class Camera
 	{
+	public:
+		enum class ProjectionType
+		{
+			Perspective = 0,
+			Orthographic
+		};
+
 	private:
 		glm::mat4 projectionMatrix;
 
-		bool perspective = true;
+		bool changed = false;
+
+		ProjectionType projectionType = ProjectionType::Perspective;
 		float nearZ, farZ;
 		float size = 0;
 		float fov = 0, ratio = 0;
 
-		void recalculateProjectionMatrix()
-		{
-			if (perspective)
-				projectionMatrix = glm::perspective(fov, ratio, nearZ, farZ);
-			else
-				projectionMatrix = glm::ortho(-ratio * size / 2, ratio * size / 2, -size / 2, size / 2, nearZ, farZ);
-		}
-
 	public:
 		Camera() : projectionMatrix({ 1.0f }), nearZ(0), farZ(0) {}
 
-		Camera(bool perspective, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
-			: perspective(perspective)
+		Camera(ProjectionType projection, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
+			: projectionType(projection)
 		{
-			if (perspective)
+			if (projectionType == ProjectionType::Perspective)
 				setPerspective(fov, ratio, nearPlane, farPlane);
 			else
 				setOrthographic(fov, ratio, nearPlane, farPlane);
@@ -41,9 +42,20 @@ namespace Mahakam
 
 		Camera(const glm::mat4& projection) : projectionMatrix(projection), nearZ(0), farZ(0) {}
 
+		void recalculateProjectionMatrix()
+		{
+			if (changed)
+			{
+				if (projectionType == ProjectionType::Perspective)
+					projectionMatrix = glm::perspective(fov, ratio, nearZ, farZ);
+				else
+					projectionMatrix = glm::ortho(-ratio * size / 2, ratio * size / 2, -size / 2, size / 2, nearZ, farZ);
+			}
+		}
+
 		void setPerspective(float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
 		{
-			perspective = true;
+			projectionType = ProjectionType::Perspective;
 			this->fov = fov;
 			this->ratio = ratio;
 			nearZ = nearPlane;
@@ -53,7 +65,7 @@ namespace Mahakam
 
 		void setOrthographic(float size, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
 		{
-			perspective = false;
+			projectionType = ProjectionType::Orthographic;
 			this->size = size;
 			this->ratio = ratio;
 			nearZ = nearPlane;
@@ -61,15 +73,29 @@ namespace Mahakam
 			recalculateProjectionMatrix();
 		}
 
-		void setFov(float f) { fov = f; recalculateProjectionMatrix(); }
+		void setFov(float f) { fov = f; changed = true; }
 
-		void setSize(float s) { size = s; recalculateProjectionMatrix(); }
+		float getFov() const { return fov; }
 
-		void setRatio(float r) { ratio = r; recalculateProjectionMatrix(); }
+		void setSize(float s) { size = s; changed = true; }
 
-		void setNearPlane(float nearPlane) { nearZ = nearPlane; recalculateProjectionMatrix(); }
+		float getSize() const { return size; }
 
-		void setFarPlane(float farPlane) { nearZ = farPlane; recalculateProjectionMatrix(); }
+		void setRatio(float r) { ratio = r; changed = true; }
+
+		float getRatio() const { return ratio; }
+
+		void setNearPlane(float nearPlane) { nearZ = nearPlane; changed = true; }
+
+		float getNearPlane() const { return nearZ; }
+
+		void setFarPlane(float farPlane) { farZ = farPlane; changed = true; }
+
+		float getFarPlane() const { return farZ; }
+
+		void setProjectionType(ProjectionType type) { projectionType = type; changed = true; }
+
+		ProjectionType getProjectionType() const { return projectionType; }
 
 		void setProjectionMatrix(const glm::mat4& projection) { projectionMatrix = projection; }
 

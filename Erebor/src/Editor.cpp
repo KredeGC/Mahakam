@@ -4,12 +4,6 @@
 
 #include <imgui.h>
 
-#include "Panels/DockSpace.h"
-#include "Panels/ProfilerPanel.h"
-#include "Panels/SceneHierarchyPanel.h"
-#include "Panels/SceneViewPanel.h"
-#include "Panels/StatsPanel.h"
-
 #include "EditorLayer.h"
 
 namespace Mahakam

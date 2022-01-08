@@ -34,8 +34,6 @@ namespace Mahakam
 
 		bool wireframe = false;
 
-		float rotation = 0;
-
 	public:
 		EditorLayer(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
 			: Layer("Editor"), drawCalls(drawCalls), vertexCount(vertexCount), triCount(triCount),

@@ -19,16 +19,13 @@ namespace Mahakam
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent& camera) = default;
 
-		CameraComponent(bool perspective, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
-			: camera(perspective, fov, ratio, nearPlane, farPlane) {}
+		CameraComponent(Camera::ProjectionType projection, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
+			: camera(projection, fov, ratio, nearPlane, farPlane) {}
 
 		operator Camera& () { return camera; }
 		operator const Camera& () const { return camera; }
 
-		//void setFov(float f) { fov = f; recalculatePerspectiveProjectionMatrix(); }
-
-		//void setNearPlane(float nearPlane) { nearZ = nearPlane; }
-		//void setFarPlane(float farPlane) { nearZ = farPlane; }
+		void setFixedAspectRatio(bool fixed) { fixedAspectRatio = fixed; }
 
 		bool hasFixedAspectRatio() const { return fixedAspectRatio; }
 
