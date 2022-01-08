@@ -14,7 +14,7 @@ namespace Mahakam
 		{
 			std::string title;
 			unsigned int width, height;
-			bool vsync;
+			bool vsync, cursorVisible;
 
 			EventCallbackFn eventCallback;
 		};
@@ -40,7 +40,7 @@ namespace Mahakam
 		void setVSync(bool enabled) override;
 		bool isVSync() const override;
 
-		virtual void setCursorVisible(bool visible) const override;
+		virtual void setCursorVisible(bool visible) override;
 
 		inline virtual void* getNativeWindow() const override { return window; }
 	};

@@ -8,6 +8,7 @@ layout(location = 2) in vec3 i_Normal;
 
 out vec3 v_WorldPos;
 out vec3 v_WorldNormal;
+out vec3 v_ViewDir;
 out vec2 v_UV;
 
 void main() {
@@ -16,6 +17,7 @@ void main() {
     //v_WorldNormal = (MATRIX_M * vec4(i_Normal, 0.0)).xyz;
     v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
     v_UV = i_UV;
+    v_ViewDir = getViewDir(v_WorldPos);
 }
 
 
@@ -29,6 +31,7 @@ layout(location = 0) out vec4 o_Color;
 
 in vec3 v_WorldPos;
 in vec3 v_WorldNormal;
+in vec3 v_ViewDir;
 in vec2 v_UV;
 
 uniform vec3 u_Color;
@@ -43,7 +46,7 @@ void main() {
     float roughness = u_Roughness;
     float ao = 1.0;
 
-    vec3 viewdir = normalize(u_CameraPos - v_WorldPos);
+    vec3 viewdir = normalize(v_ViewDir);
     vec3 normal = normalize(v_WorldNormal);
 
     vec3 directLighting = BRDF_Direct(light, albedo, metallic, roughness, ao, viewdir, v_WorldPos, normal);

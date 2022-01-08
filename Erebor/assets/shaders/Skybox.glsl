@@ -3,14 +3,17 @@
 #include "assets/shaders/include/Matrix.glsl"
 
 layout(location = 0) in vec3 i_Pos;
-layout(location = 2) in vec3 i_Normal;
 
 out vec3 v_Normal;
 
 void main() {
-    mat4 rotView = mat4(mat3(MATRIX_V));
-    gl_Position = (MATRIX_P * rotView * vec4(i_Pos, 1.0)).xyww;
-    v_Normal = i_Normal;
+    mat4 invProjection = inverse(MATRIX_P);
+    mat3 invView = transpose(mat3(MATRIX_V));
+    vec3 unprojected = (invProjection * vec4(i_Pos, 1.0)).xyz;
+    vec3 viewDir = invView * unprojected;
+    
+    gl_Position = vec4(i_Pos.xy, 1.0, 1.0);
+    v_Normal = viewDir;
 }
 
 
@@ -34,6 +37,8 @@ vec2 sampleSphericalMap(vec3 v)
 }
 
 void main() {
+    
+    
     //vec2 uv = sampleSphericalMap(v_Normal);
     o_Color = texture(u_Environment, normalize(v_Normal));
 }

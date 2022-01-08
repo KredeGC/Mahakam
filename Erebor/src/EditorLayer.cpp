@@ -96,27 +96,19 @@ namespace Mahakam
 
 
 		// Setup scene cubemaps
-		Ref<Texture> skyboxTexture = TextureCube::create("assets/textures/apt.hdr", { 2048, TextureFormat::RGB8 });
-		Ref<Texture> skyboxIrradiance = TextureCube::create("assets/textures/apt.hdr", { 32, TextureFormat::RGB8, true, TextureCubePrefilter::Convolute });
-		Ref<Texture> skyboxSpecular = TextureCube::create("assets/textures/apt.hdr", { 256, TextureFormat::RGB8, true, TextureCubePrefilter::Prefilter });
+		Ref<Texture> skyboxTexture = TextureCube::create("assets/textures/apt.hdr", { 2048, TextureFormat::RGB16F });
+		Ref<Texture> skyboxIrradiance = TextureCube::create("assets/textures/apt.hdr", { 32, TextureFormat::RGB16F, true, TextureCubePrefilter::Convolute });
+		Ref<Texture> skyboxSpecular = TextureCube::create("assets/textures/apt.hdr", { 256, TextureFormat::RGB16F, true, TextureCubePrefilter::Prefilter });
 
 
 		// Setup scene skybox
-		Ref<Mesh> skyboxMesh = Mesh::createUVSphere(10, 10);
+		Ref<Mesh> skyboxMesh = Mesh::createQuad();
+		//Ref<Mesh> skyboxMesh = Mesh::createUVSphere(10, 10);
 		Ref<Material> skyboxMaterial = Material::create(skyboxShader);
 		skyboxMaterial->setTexture("u_Environment", 0, skyboxTexture);
 
 		Entity skybox = activeScene->createEntity("Skybox");
 		skybox.addComponent<MeshComponent>(skyboxMesh, skyboxMaterial);
-
-
-		// Create mesh & base material
-		Ref<Mesh> sphereMesh = Mesh::createCubeSphere(8);
-		Ref<Material> baseMaterial = Material::create(shader);
-		baseMaterial->setTexture("u_IrradianceMap", 0, skyboxIrradiance);
-		baseMaterial->setTexture("u_SpecularMap", 1, skyboxSpecular);
-		baseMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
-		baseMaterial->setFloat3("u_Color", { 0.5f, 0.0f, 0.0f });
 
 
 		// Create backpack model
@@ -128,7 +120,7 @@ namespace Mahakam
 		// Create backpack material
 		Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg");
 		Ref<Texture> backpackMetallic = Texture2D::create("assets/textures/backpack/specular.jpg", { TextureFormat::RGB8 });
-		Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", { TextureFormat::RGB8 });
+		Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", { TextureFormat::R8 });
 
 		Ref<Material> backpackMaterial = Material::create(textureShader);
 		backpackMaterial->setTexture("u_IrradianceMap", 0, skyboxIrradiance);
@@ -138,14 +130,45 @@ namespace Mahakam
 		backpackMaterial->setTexture("u_Metallic", 4, backpackMetallic);
 		backpackMaterial->setTexture("u_Roughness", 5, backpackRoughness);
 
+		// Create backpack script
+		class RotateScript : public ScriptableEntity
+		{
+		private:
+			float rotation = 0.0f;
+			TransformComponent* transform = nullptr;
+
+		public:
+			virtual void onCreate() override
+			{
+				transform = &entity.getComponent<TransformComponent>();
+			}
+
+			virtual void onUpdate(Timestep dt) override
+			{
+				rotation += dt * 10.0f;
+				transform->setRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(rotation), 0.0f }));
+			}
+		};
+
+		// Create backpack entities
 		const auto& meshes = backpackModel->getMeshes();
 		for (auto& mesh : meshes)
 		{
 			// Create backpack entity
 			Entity entity = activeScene->createEntity("Bacpack");
 			entity.addComponent<MeshComponent>(mesh, backpackMaterial);
-			entity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.5f, 5.0f });
+			entity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
+			entity.addComponent<NativeScriptComponent>().bind<RotateScript>();
 		}
+
+
+		// Create mesh & base material
+		Ref<Mesh> sphereMesh = Mesh::createCubeSphere(8);
+		Ref<Material> baseMaterial = Material::create(shader);
+		baseMaterial->setTexture("u_IrradianceMap", 0, skyboxIrradiance);
+		baseMaterial->setTexture("u_SpecularMap", 1, skyboxSpecular);
+		baseMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
+		baseMaterial->setFloat3("u_Color", { 0.5f, 0.0f, 0.0f });
 
 
 		// Create scene entities

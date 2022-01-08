@@ -83,7 +83,6 @@ namespace Mahakam
 			FrameBufferAttachmentProps& spec = props.depthAttachment;
 
 			uint32_t internalFormat = TextureFormatToOpenGLInternalFormat(spec.format);
-			uint32_t dataFormat = TextureFormatToOpenGLFormat(spec.format);
 			uint32_t type = TextureFormatToOpenGLType(spec.format);
 			uint32_t attachment = TextureFormatToOpenGLAttachment(spec.format);
 

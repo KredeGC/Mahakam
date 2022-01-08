@@ -31,7 +31,7 @@ namespace Mahakam
 		virtual void setVSync(bool enabled) = 0;
 		virtual bool isVSync() const = 0;
 
-		virtual void setCursorVisible(bool visible) const = 0;
+		virtual void setCursorVisible(bool visible) = 0;
 
 		virtual void* getNativeWindow() const = 0;
 

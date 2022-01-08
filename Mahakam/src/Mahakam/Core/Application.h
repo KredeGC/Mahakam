@@ -19,7 +19,7 @@ namespace Mahakam
 		bool running = true;
 		bool minimized = false;
 		LayerStack layerStack;
-		double lastFrameTime;
+		double lastFrameTime = 0.0;
 		static Application* instance;
 
 		bool onWindowClose(WindowCloseEvent& event);

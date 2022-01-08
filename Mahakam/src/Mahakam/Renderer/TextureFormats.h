@@ -4,11 +4,15 @@ namespace Mahakam
 {
 	enum class TextureFormat
 	{
-		RG8 = 0,
+		R8 = 0,
+		RG8,
 		RGB8,
 		RGBA8,
+		R16F,
 		RG16F,
+		RGB16F,
 		RGBA16F,
+		Depth16,
 		Depth24,
 		Depth24Stencil8
 	};

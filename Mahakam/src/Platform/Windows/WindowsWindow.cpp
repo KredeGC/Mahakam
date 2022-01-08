@@ -7,6 +7,8 @@
 
 #include "Platform/OpenGL/OpenGLContext.h"
 
+#include <stb_image.h>
+
 namespace Mahakam {
 
 	static bool glfwInitialized = false;
@@ -45,12 +47,30 @@ namespace Mahakam {
 			glfwInitialized = true;
 		}
 
+
+		// Loading the window icon
+		stbi_set_flip_vertically_on_load(0);
+		int width, height;
+		unsigned char* pixels = stbi_load("assets/textures/icon.png", &width, &height, 0, 4); // Free?
+		GLFWimage* icon = new GLFWimage
+		{
+			width,
+			height,
+			pixels
+		};
+
+
+		// Creating the window
 		window = glfwCreateWindow((int)data.width, (int)data.height, data.title.c_str(), nullptr, nullptr);
 		context = new OpenGLContext(window);
 		context->init();
 		glfwSetWindowUserPointer(window, &data);
+		if (pixels)
+			glfwSetWindowIcon(window, 1, icon);
 		setVSync(false);
 
+
+		// Callbacks
 		glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
@@ -176,7 +196,7 @@ namespace Mahakam {
 
 		glfwSwapInterval(enabled ? 1 : 0);
 
-		data.vsync = true;
+		data.vsync = enabled;
 	}
 
 	bool WindowsWindow::isVSync() const
@@ -184,7 +204,7 @@ namespace Mahakam {
 		return data.vsync;
 	}
 
-	void WindowsWindow::setCursorVisible(bool visible) const
+	void WindowsWindow::setCursorVisible(bool visible)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -192,5 +212,7 @@ namespace Mahakam {
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		else
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		data.cursorVisible = visible;
 	}
 }
