@@ -11,13 +11,7 @@ namespace Mahakam
 	private:
 		Ref<Scene> activeScene;
 
-		Ref<Mesh> skyboxDome;
-
-		Transform transforms[100];
-		Ref<Mesh> spheres[100];
-
-		Ref<PerspectiveCamera> camera;
-		Ref<Light> mainLight;
+		Entity cameraEntity;
 
 		uint32_t* drawCalls;
 		uint32_t* vertexCount;

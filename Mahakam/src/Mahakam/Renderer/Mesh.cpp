@@ -24,6 +24,127 @@ namespace Mahakam
 		return uv;
 	}
 
+	void Mesh::interleaveBuffers()
+	{
+		MH_PROFILE_FUNCTION();
+
+		uint32_t stride = bufferLayout.getStride();
+		uint32_t size = stride * vertexCount;
+
+		interleavedVertices = new char[size];
+
+		const std::vector<BufferElement>& elements = bufferLayout.getElements();
+
+		uint32_t dstOffset = 0;
+		for (uint32_t i = 0; i < vertexCount; i++)
+		{
+			uint32_t srcOffset = 0;
+			for (auto& vert : vertices)
+			{
+				uint32_t size = elements[srcOffset++].size;
+				char* src = vert.second.data + i * size;
+				char* dst = interleavedVertices + dstOffset;
+
+				memcpy(dst, src, size);
+				dstOffset += size;
+			}
+		}
+	}
+
+	void Mesh::initBuffers(bool interleave)
+	{
+		MH_PROFILE_FUNCTION();
+
+		vertexArray = VertexArray::create();
+
+		if (interleave)
+		{
+			Ref<VertexBuffer> vertexBuffer = VertexBuffer::create(interleavedVertices, bufferLayout.getStride() * vertexCount);
+			vertexBuffer->setLayout(bufferLayout);
+			vertexArray->addVertexBuffer(vertexBuffer);
+		}
+		else
+		{
+			const std::vector<BufferElement>& elements = bufferLayout.getElements();
+
+			uint32_t offset = 0;
+			for (auto& kv : vertices)
+			{
+				BufferLayout layout({ elements[offset] });
+
+				Ref<VertexBuffer> vertexBuffer = VertexBuffer::create(kv.second.data, vertexCount * elements[offset].size);
+				vertexBuffer->setLayout(layout);
+				vertexArray->addVertexBuffer(vertexBuffer);
+				offset++;
+			}
+		}
+
+		Ref<IndexBuffer> indexBuffer = IndexBuffer::create(indices, indexCount);
+		vertexArray->setIndexBuffer(indexBuffer);
+	}
+
+	Mesh::Mesh(uint32_t vertexCount, const BufferLayout& layout, uint32_t indexCount)
+		: vertexCount(vertexCount), bufferLayout(layout), indexCount(indexCount), indices(0) {}
+
+	Mesh::Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount)
+		: vertexCount(vertexCount), bufferLayout(layout), indices(new uint32_t[indexCount]), indexCount(indexCount)
+	{
+		memcpy(indices, triangles, indexCount * sizeof(uint32_t));
+	}
+
+	Mesh::Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount, const std::initializer_list<void*>& verts)
+		: vertexCount(vertexCount), bufferLayout(layout), indices(new uint32_t[indexCount]), indexCount(indexCount)
+	{
+		int offset = 0;
+		int index = 0;
+		for (auto& vert : verts)
+		{
+			const BufferElement& element = bufferLayout.getElement(index);
+			uint32_t size = vertexCount * element.size;
+
+			Vertex vertex
+			{
+				new char[size],
+				element.name
+			};
+
+			memcpy(vertex.data, vert, size);
+
+			vertices[index] = vertex;
+			offset += size;
+			index++;
+		}
+
+		memcpy(indices, triangles, indexCount * sizeof(uint32_t));
+
+		init();
+	}
+
+	Mesh::Mesh(const Mesh& mesh)
+		: vertexCount(mesh.vertexCount), bufferLayout(mesh.bufferLayout), indexCount(mesh.indexCount), vertexArray(mesh.vertexArray)
+	{
+		uint32_t size = vertexCount * bufferLayout.getStride();
+
+		interleavedVertices = new char[size];
+		indices = new uint32_t[indexCount];
+
+		for (auto& kv : vertices)
+			memcpy(&kv, &mesh.vertices.at(kv.first), vertexCount * bufferLayout.getElement(kv.first).size);
+		memcpy(indices, mesh.indices, indexCount * sizeof(uint32_t));
+
+		memcpy(interleavedVertices, mesh.interleavedVertices, size);
+	}
+
+	Mesh::~Mesh()
+	{
+		MH_PROFILE_FUNCTION();
+
+		for (auto& kv : vertices)
+			delete[] kv.second.data;
+
+		delete[] interleavedVertices;
+	}
+
 	Ref<Mesh> Mesh::createQuad()
 	{
 		MH_PROFILE_FUNCTION();
@@ -53,10 +174,7 @@ namespace Mahakam
 			{ ShaderDataType::Float2, "i_UV"}
 		};
 
-		Ref<Mesh> mesh = Mesh::create(4, layout, indices, 6);
-		mesh->addVertices("i_Pos", positions);
-		mesh->addVertices("i_UV", uvs);
-		mesh->init();
+		Ref<Mesh> mesh = Mesh::create(4, layout, indices, 6, { positions, uvs });
 
 		return mesh;
 	}
@@ -133,11 +251,7 @@ namespace Mahakam
 			{ ShaderDataType::Float3, "i_Normal"}
 		};
 
-		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount);
-		mesh->addVertices("i_Pos", positions);
-		mesh->addVertices("i_UV", uvs);
-		mesh->addVertices("i_Normal", normals);
-		mesh->init();
+		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount, { positions, uvs, normals });
 
 		delete[] positions;
 		delete[] uvs;
@@ -203,11 +317,7 @@ namespace Mahakam
 			{ ShaderDataType::Float3, "i_Normal"}
 		};
 
-		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount);
-		mesh->addVertices("i_Pos", positions);
-		mesh->addVertices("i_UV", uvs);
-		mesh->addVertices("i_Normal", normals);
-		mesh->init();
+		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount, { positions, uvs, normals });
 
 		delete[] positions;
 		delete[] uvs;
@@ -288,11 +398,7 @@ namespace Mahakam
 			{ ShaderDataType::Float3, "i_Normal"}
 		};
 
-		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount);
-		mesh->addVertices("i_Pos", positions);
-		mesh->addVertices("i_UV", uvs);
-		mesh->addVertices("i_Normal", normals);
-		mesh->init();
+		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount, { positions, uvs, normals });
 
 		delete[] positions;
 		delete[] uvs;
@@ -377,11 +483,7 @@ namespace Mahakam
 			{ ShaderDataType::Float3, "i_Normal"}
 		};
 
-		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount);
-		mesh->addVertices("i_Pos", positions);
-		mesh->addVertices("i_UV", uvs);
-		mesh->addVertices("i_Normal", normals);
-		mesh->init();
+		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount, { positions, uvs, normals });
 
 		delete[] positions;
 		delete[] uvs;

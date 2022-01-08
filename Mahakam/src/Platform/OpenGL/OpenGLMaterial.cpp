@@ -3,8 +3,19 @@
 
 namespace Mahakam
 {
-	OpenGLMaterial::OpenGLMaterial(Ref<Shader> shader)
-		: shader(std::dynamic_pointer_cast<OpenGLShader>(shader)) { }
+	OpenGLMaterial::OpenGLMaterial(const Ref<Shader>& shader)
+		: shader(std::dynamic_pointer_cast<OpenGLShader>(shader)) {}
+
+	OpenGLMaterial::OpenGLMaterial(const Ref<Material>& material)
+		: shader(std::static_pointer_cast<OpenGLMaterial>(material)->shader),
+		textures(std::static_pointer_cast<OpenGLMaterial>(material)->textures),
+		mat3s(std::static_pointer_cast<OpenGLMaterial>(material)->mat3s),
+		mat4s(std::static_pointer_cast<OpenGLMaterial>(material)->mat4s),
+		ints(std::static_pointer_cast<OpenGLMaterial>(material)->ints),
+		floats(std::static_pointer_cast<OpenGLMaterial>(material)->floats),
+		float2s(std::static_pointer_cast<OpenGLMaterial>(material)->float2s),
+		float3s(std::static_pointer_cast<OpenGLMaterial>(material)->float3s),
+		float4s(std::static_pointer_cast<OpenGLMaterial>(material)->float4s) {}
 
 	void OpenGLMaterial::bind() const
 	{

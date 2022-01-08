@@ -9,11 +9,11 @@
 #include "Mahakam/Core/MouseButtonCodes.h"
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/Timestep.h"
-#include "Mahakam/Core/Transform.h"
 
 //Scene
 #include "Mahakam/Scene/Components/CameraComponent.h"
 #include "Mahakam/Scene/Components/MeshComponent.h"
+#include "Mahakam/Scene/Components/NativeScriptComponent.h"
 #include "Mahakam/Scene/Components/TransformComponent.h"
 #include "Mahakam/Scene/Entity.h"
 #include "Mahakam/Scene/Scene.h"

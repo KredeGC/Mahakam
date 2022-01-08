@@ -24,7 +24,8 @@ namespace Mahakam
 		std::unordered_map<std::string, glm::vec4> float4s;
 
 	public:
-		OpenGLMaterial(Ref<Shader> shader);
+		OpenGLMaterial(const Ref<Shader>& shader);
+		OpenGLMaterial(const Ref<Material>& material);
 
 		inline virtual Ref<Shader> getShader() const override { return shader; }
 

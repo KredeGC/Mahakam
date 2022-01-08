@@ -47,6 +47,7 @@ namespace Mahakam
 		virtual const glm::vec3 getFloat3(const std::string& name) const = 0;
 		virtual const glm::vec4 getFloat4(const std::string& name) const = 0;
 
-		static Ref<Material> create(Ref<Shader> shader);
+		static Ref<Material> copy(const Ref<Material>& material);
+		static Ref<Material> create(const Ref<Shader>& shader);
 	};
 }

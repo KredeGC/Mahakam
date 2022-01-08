@@ -30,7 +30,7 @@ namespace Mahakam
 		}
 
 		template<typename T>
-		T& getComponent()
+		T& getComponent() const
 		{
 			MH_CORE_ASSERT(hasComponent<T>(), "Entity has no such component!");
 
@@ -46,7 +46,7 @@ namespace Mahakam
 		}
 
 		template<typename T>
-		bool hasComponent()
+		bool hasComponent() const
 		{
 			return scene->registry.any_of<T>(entity);
 		}

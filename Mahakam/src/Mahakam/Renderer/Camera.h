@@ -1,114 +1,78 @@
 #pragma once
 
 #include "Buffer.h"
-#include "Mahakam/Core/Transform.h"
 
 #include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 
 namespace Mahakam
 {
-#pragma region Camera
 	class Camera
 	{
-	protected:
-		Transform transform;
-		float nearZ, farZ;
-
-	public:
-		Camera() : transform({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }), nearZ(0.03f), farZ(1000.0f) {}
-
-		virtual const glm::mat4& getViewMatrix() const = 0;
-		virtual const glm::mat4& getProjectionMatrix() const = 0;
-		virtual const glm::mat4& getViewProjectionMatrix() const = 0;
-
-		virtual void setNearPlane(float nearZ) = 0;
-		virtual void setFarPlane(float farZ) = 0;
-
-		virtual const Ref<UniformBuffer>& getMatrixBuffer() const = 0;
-	};
-#pragma endregion
-
-
-#pragma region OrthographicCamera
-	class OrthographicCamera : public Camera
-	{
-	protected:
-		glm::mat4 viewMatrix;
-		glm::mat4 projectionMatrix;
-		glm::mat4 viewProjectionMatrix;
-
-		float left, right, bottom, top;
-
-		Ref<UniformBuffer> matrixBuffer;
-
-		void recalculateViewMatrix();
-		void recalculateProjectionMatrix();
-
-	public:
-		OrthographicCamera(float left, float right, float bottom, float top);
-
-		void setPosition(const glm::vec3& pos);
-		void setRotation(const glm::quat& rot);
-
-		inline const glm::vec3& getPosition() const { return transform.getPosition(); }
-		inline const glm::quat& getRotation() const { return transform.getRotation(); }
-
-		inline const glm::vec3& getForward() const { return transform.getForward(); }
-		inline const glm::vec3& getRight() const { return transform.getRight(); }
-		inline const glm::vec3& getUp() const { return transform.getUp(); }
-
-		virtual const glm::mat4& getViewMatrix() const override { return viewMatrix; }
-		virtual const glm::mat4& getProjectionMatrix() const override { return projectionMatrix; }
-		virtual const glm::mat4& getViewProjectionMatrix() const override { return viewProjectionMatrix; }
-
-		virtual void setNearPlane(float nearZ) override;
-		virtual void setFarPlane(float farZ) override;
-
-		virtual const Ref<UniformBuffer>& getMatrixBuffer() const override { return matrixBuffer; }
-	};
-#pragma endregion
-
-
-#pragma region PerspectiveCamera
-	class PerspectiveCamera : public Camera
-	{
 	private:
-		glm::mat4 viewMatrix;
 		glm::mat4 projectionMatrix;
-		glm::mat4 viewProjectionMatrix;
 
-		float fov, ratio;
+		bool perspective = true;
+		float nearZ, farZ;
+		float size = 0;
+		float fov = 0, ratio = 0;
 
-		Ref<UniformBuffer> matrixBuffer;
-
-		void recalculateViewMatrix();
-		void recalculateProjectionMatrix();
+		void recalculateProjectionMatrix()
+		{
+			if (perspective)
+				projectionMatrix = glm::perspective(fov, ratio, nearZ, farZ);
+			else
+				projectionMatrix = glm::ortho(-ratio * size / 2, ratio * size / 2, -size / 2, size / 2, nearZ, farZ);
+		}
 
 	public:
-		PerspectiveCamera(float fov, float ratio, float nearPlane, float farPlane);
+		Camera() : projectionMatrix({ 1.0f }), nearZ(0), farZ(0) {}
 
-		void setPosition(const glm::vec3& pos);
-		void setRotation(const glm::quat& rot);
+		Camera(bool perspective, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
+			: perspective(perspective)
+		{
+			if (perspective)
+				setPerspective(fov, ratio, nearPlane, farPlane);
+			else
+				setOrthographic(fov, ratio, nearPlane, farPlane);
+		}
 
-		inline const glm::vec3& getPosition() const { return transform.getPosition(); }
-		inline const glm::quat& getRotation() const { return transform.getRotation(); }
+		Camera(const glm::mat4& projection) : projectionMatrix(projection), nearZ(0), farZ(0) {}
 
-		inline const glm::vec3& getForward() const { return transform.getForward(); }
-		inline const glm::vec3& getRight() const { return transform.getRight(); }
-		inline const glm::vec3& getUp() const { return transform.getUp(); }
+		void setPerspective(float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
+		{
+			perspective = true;
+			this->fov = fov;
+			this->ratio = ratio;
+			nearZ = nearPlane;
+			farZ = farPlane;
+			recalculateProjectionMatrix();
+		}
 
-		void setFOV(float fov);
-		void setRatio(float ratio);
+		void setOrthographic(float size, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
+		{
+			perspective = false;
+			this->size = size;
+			this->ratio = ratio;
+			nearZ = nearPlane;
+			farZ = farPlane;
+			recalculateProjectionMatrix();
+		}
 
-		virtual const glm::mat4& getViewMatrix() const override { return viewMatrix; }
-		virtual const glm::mat4& getProjectionMatrix() const override { return projectionMatrix; }
-		virtual const glm::mat4& getViewProjectionMatrix() const override { return viewProjectionMatrix; }
+		void setFov(float f) { fov = f; recalculateProjectionMatrix(); }
 
-		virtual void setNearPlane(float nearZ) override;
-		virtual void setFarPlane(float farZ) override;
+		void setSize(float s) { size = s; recalculateProjectionMatrix(); }
 
-		virtual const Ref<UniformBuffer>& getMatrixBuffer() const override { return matrixBuffer; }
+		void setRatio(float r) { ratio = r; recalculateProjectionMatrix(); }
+
+		void setNearPlane(float nearPlane) { nearZ = nearPlane; recalculateProjectionMatrix(); }
+
+		void setFarPlane(float farPlane) { nearZ = farPlane; recalculateProjectionMatrix(); }
+
+		void setProjectionMatrix(const glm::mat4& projection) { projectionMatrix = projection; }
+
+		const glm::mat4& getProjectionMatrix() const { return projectionMatrix; }
 	};
-#pragma endregion
 }

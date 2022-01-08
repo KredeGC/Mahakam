@@ -124,6 +124,9 @@ project "Erebor"
 
     targetdir ("bin/"..outputdir.."/%{prj.name}")
     objdir ("bin-obj/"..outputdir.."/%{prj.name}")
+    
+    pchheader "ebpch.h"
+    pchsource "Erebor/src/ebpch.cpp"
 
     files {
         "%{prj.name}/src/**.h",
@@ -133,6 +136,7 @@ project "Erebor"
     }
 
     includedirs {
+        "%{prj.name}/src",
         "Mahakam/src",
         "%{IncludeDir.assimp}",
         "%{IncludeDir.entt}",
@@ -189,6 +193,7 @@ project "Sandbox"
     }
     
     includedirs {
+        "%{prj.name}/src",
         "Mahakam/src",
         "%{IncludeDir.assimp}",
         "%{IncludeDir.entt}",

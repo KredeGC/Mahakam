@@ -8,15 +8,18 @@ namespace Mahakam
 	{
 	private:
 		Ref<Mesh> mesh;
+		Ref<Material> material;
 
 	public:
 		MeshComponent() : mesh(nullptr) {}
 
 		MeshComponent(const MeshComponent&) = default;
 
-		MeshComponent(const Ref<Mesh>& mesh) : mesh(mesh) {}
+		MeshComponent(const Ref<Mesh>& mesh) : mesh(mesh), material(0) {}
 
-		operator Ref<Mesh>& () { return mesh; }
-		operator const Ref<Mesh>& () const { return mesh; }
+		MeshComponent(const Ref<Mesh>& mesh, const Ref<Material>& material) : mesh(mesh), material(material) {}
+
+		const Ref<Mesh>& getMesh() const { return mesh; }
+		const Ref<Material>& getMaterial() const { return material; }
 	};
 }

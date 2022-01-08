@@ -24,15 +24,25 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		GL::init();
+
+		sceneData->matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2);
 	}
 
-	void Renderer::beginScene(const Ref<Camera>& cam, const Ref<Light>& mainLight)
+	void Renderer::beginScene(const Camera& cam, const glm::mat4& transform, const Ref<Light>& mainLight)
 	{
 		MH_PROFILE_FUNCTION();
 
-		sceneData->lights.clear();
+		glm::mat4 viewMatrix = glm::inverse(transform);
 
-		sceneData->camera = cam;
+		// Position
+		sceneData->matrixBuffer->setData(&viewMatrix, 0, sizeof(glm::mat4));
+		sceneData->matrixBuffer->setData(&transform[3], sizeof(glm::mat4) * 2, sizeof(glm::vec3));
+
+		// Projection
+		sceneData->matrixBuffer->setData(&cam.getProjectionMatrix(), sizeof(glm::mat4), sizeof(glm::mat4));
+
+		sceneData->viewProjectionMatrix = cam.getProjectionMatrix() * viewMatrix;
+		sceneData->lights.clear();
 		sceneData->lights.push_back(mainLight);
 
 		renderQueue.clear();
@@ -59,7 +69,7 @@ namespace Mahakam
 		*vertexCount = 0;
 		*triCount = 0;
 
-		sceneData->camera->getMatrixBuffer()->bind(0);
+		sceneData->matrixBuffer->bind(0);
 		lightBuffer->bind(1);
 
 		for (auto& shaderPair : renderQueue)
@@ -110,7 +120,7 @@ namespace Mahakam
 			GL::setBlendMode(true);
 			for (auto& data : transparentQueue)
 			{
-				const Ref<Material>& material = data.mesh->getMaterial();
+				const Ref<Material>& material = data.material;
 				const Ref<Shader>& shader = material->getShader();
 
 				shader->bind();
@@ -132,22 +142,21 @@ namespace Mahakam
 		*triCount /= 3;
 	}
 
-	void Renderer::submit(const glm::mat4& transform, const Ref<Mesh>& mesh)
+	void Renderer::submit(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
 		MH_PROFILE_FUNCTION();
 
-		const Ref<Material>& material = mesh->getMaterial();
 		const Ref<Shader>& shader = material->getShader();
 
 		renderQueue[shader][material][mesh].push_back(transform);
 	}
 
-	void Renderer::submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh)
+	void Renderer::submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
 		MH_PROFILE_FUNCTION();
 
-		float depth = (sceneData->camera->getViewProjectionMatrix() * transform[3]).z;
+		float depth = (sceneData->viewProjectionMatrix * transform[3]).z;
 
-		transparentQueue.push_back({ depth, mesh, transform });
+		transparentQueue.push_back({ depth, mesh, material, transform });
 	}
 }

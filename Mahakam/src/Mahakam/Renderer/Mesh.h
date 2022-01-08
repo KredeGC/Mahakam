@@ -61,7 +61,7 @@ namespace Mahakam
 		ShaderSemantic semantic;
 		std::string name;
 
-		MeshElement() {}
+		MeshElement() = default;
 
 		MeshElement(ShaderSemantic semantic, const std::string& name)
 			: semantic(semantic), name(name) {}
@@ -125,93 +125,22 @@ namespace Mahakam
 
 		Ref<VertexArray> vertexArray;
 
-		Ref<Material> material;
+		void interleaveBuffers();
 
-		void interleaveBuffers()
-		{
-			MH_PROFILE_FUNCTION();
-
-			uint32_t stride = bufferLayout.getStride();
-			uint32_t size = stride * vertexCount;
-
-			interleavedVertices = new char[size];
-
-			const std::vector<BufferElement>& elements = bufferLayout.getElements();
-
-			uint32_t dstOffset = 0;
-			for (uint32_t i = 0; i < vertexCount; i++)
-			{
-				uint32_t srcOffset = 0;
-				for (auto& vert : vertices)
-				{
-					uint32_t size = elements[srcOffset++].size;
-					char* src = vert.second.data + i * size;
-					char* dst = interleavedVertices + dstOffset;
-
-					memcpy(dst, src, size);
-					dstOffset += size;
-				}
-			}
-		}
-
-		void initBuffers(bool interleave)
-		{
-			MH_PROFILE_FUNCTION();
-
-			vertexArray = VertexArray::create();
-
-			if (interleave)
-			{
-				Ref<VertexBuffer> vertexBuffer = VertexBuffer::create(interleavedVertices, bufferLayout.getStride() * vertexCount);
-				vertexBuffer->setLayout(bufferLayout);
-				vertexArray->addVertexBuffer(vertexBuffer);
-			}
-			else
-			{
-				const std::vector<BufferElement>& elements = bufferLayout.getElements();
-
-				uint32_t offset = 0;
-				for (auto& kv : vertices)
-				{
-					BufferLayout layout({ elements[offset] });
-
-					Ref<VertexBuffer> vertexBuffer = VertexBuffer::create(kv.second.data, vertexCount * elements[offset].size);
-					vertexBuffer->setLayout(layout);
-					vertexArray->addVertexBuffer(vertexBuffer);
-					offset++;
-				}
-			}
-
-			Ref<IndexBuffer> indexBuffer = IndexBuffer::create(indices, indexCount);
-			vertexArray->setIndexBuffer(indexBuffer);
-		}
+		void initBuffers(bool interleave);
 
 	public:
-		Mesh(uint32_t vertexCount, const BufferLayout& layout, uint32_t indexCount)
-			: vertexCount(vertexCount), bufferLayout(layout), indexCount(indexCount), indices(0), material(0) {}
+		Mesh(uint32_t vertexCount, const BufferLayout& layout, uint32_t indexCount);
 
-		Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount)
-			: vertexCount(vertexCount), bufferLayout(layout), indices(new uint32_t[indexCount]), indexCount(indexCount), material(0)
-		{
-			memcpy(indices, triangles, indexCount * sizeof(uint32_t));
-		}
+		Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount);
 
-		Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount, const Ref<Material>& material)
-			: vertexCount(vertexCount), bufferLayout(layout), indices(new uint32_t[indexCount]), indexCount(indexCount), material(material)
-		{
-			memcpy(indices, triangles, indexCount * sizeof(uint32_t));
-		}
+		Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount, const std::initializer_list<void*>& verts);
 
-		~Mesh()
-		{
-			MH_PROFILE_FUNCTION();
+		Mesh(const Mesh& mesh);
 
-			for (auto& kv : vertices)
-				delete[] kv.second.data;
+		~Mesh();
 
-			delete[] interleavedVertices;
-		}
-
+		// TODO: Merge with setVertices automatically call init()
 		inline void addVertices(const std::string& name, const void* verts)
 		{
 			MH_PROFILE_FUNCTION();
@@ -271,6 +200,7 @@ namespace Mahakam
 			initBuffers(interleave);
 		}
 
+		// TODO: Update the actual buffers
 		void setIndices(uint32_t* inds, unsigned int count)
 		{
 			MH_PROFILE_FUNCTION();
@@ -280,11 +210,6 @@ namespace Mahakam
 			indexCount = count;
 		}
 
-		void setMaterial(const Ref<Material>& mat)
-		{
-			material = mat;
-		}
-
 		template<typename T>
 		inline const T& getVertices(int slot) const { return vertices[slot].data; }
 		inline uint32_t getVertexCount() const { return vertexCount; }
@@ -292,14 +217,12 @@ namespace Mahakam
 		inline const uint32_t* getIndices() const { return indices; }
 		inline uint32_t getIndexCount() const { return indexCount; }
 
-		inline const Ref<Material>& getMaterial() const { return material; }
 		inline const Ref<VertexArray>& getVertexArray() const { return vertexArray; }
 
 		void bind()
 		{
 			MH_PROFILE_FUNCTION();
 
-			//material->bind();
 			vertexArray->bind();
 		}
 
@@ -307,18 +230,7 @@ namespace Mahakam
 		{
 			MH_PROFILE_FUNCTION();
 
-			//material->bind();
 			vertexArray->unbind();
-		}
-
-		const void* serialize(int& outLength)
-		{
-			outLength = sizeof(Mesh);
-
-			void* data = new char[outLength];
-			memcpy(data, this, outLength);
-
-			return data;
 		}
 
 		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout, uint32_t indexCount)
@@ -332,9 +244,9 @@ namespace Mahakam
 		}
 
 		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout,
-			const uint32_t* indices, uint32_t indexCount, const Ref<Material>& material)
+			const uint32_t* indices, uint32_t indexCount, const std::initializer_list<void*>& verts)
 		{
-			return std::make_shared<Mesh>(vertexCount, layout, indices, indexCount, material);
+			return std::make_shared<Mesh>(vertexCount, layout, indices, indexCount, verts);
 		}
 
 		static Ref<Mesh> createQuad();

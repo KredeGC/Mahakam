@@ -5,7 +5,7 @@
 
 namespace Mahakam
 {
-	class TransformComponent
+	struct TransformComponent
 	{
 	private:
 		glm::vec3 position = { 0.0f, 0.0f, 0.0f };
