@@ -1,13 +1,14 @@
-#include "StatsLayer.h"
+#include "ebpch.h"
+#include "StatsPanel.h"
 
 namespace Mahakam
 {
-	void StatsLayer::onUpdate(Timestep dt)
+	void StatsPanel::onUpdate(Timestep dt)
 	{
 		frametime = dt;
 	}
 
-	void StatsLayer::onImGuiRender()
+	void StatsPanel::onImGuiRender()
 	{
 		if (open)
 		{

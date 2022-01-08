@@ -1,12 +1,16 @@
+#include "ebpch.h"
 #include <Mahakam.h>
 #include <Mahakam/Core/EntryPoint.h>
 
 #include <imgui.h>
 
-#include "DockLayer.h"
-#include "StatsLayer.h"
-#include "ProfilerLayer.h"
-#include "SceneViewLayer.h"
+#include "Panels/DockSpace.h"
+#include "Panels/ProfilerPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/SceneViewPanel.h"
+#include "Panels/StatsPanel.h"
+
+#include "EditorLayer.h"
 
 namespace Mahakam
 {
@@ -20,10 +24,7 @@ namespace Mahakam
 	public:
 		Editor() : Application("Erebor")
 		{
-			pushOverlay(new DockLayer());
-			pushOverlay(new SceneViewLayer(&drawCalls, &vertexCount, &triCount));
-			pushOverlay(new StatsLayer(&drawCalls, &vertexCount, &triCount));
-			pushOverlay(new ProfilerLayer());
+			pushOverlay(new EditorLayer(&drawCalls, &vertexCount, &triCount));
 
 			//getWindow().setVSync(true);
 		}

@@ -6,14 +6,12 @@
 
 namespace Mahakam
 {
-	class ProfilerLayer : public Layer
+	class ProfilerPanel
 	{
 	private:
 		bool open = true;
 
 	public:
-		ProfilerLayer() : Layer("Profiler") {}
-
-		virtual void onImGuiRender() override;
+		void onImGuiRender();
 	};
 }

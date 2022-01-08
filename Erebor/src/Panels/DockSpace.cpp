@@ -1,8 +1,9 @@
-#include "DockLayer.h"
+#include "ebpch.h"
+#include "DockSpace.h"
 
 namespace Mahakam
 {
-	void DockLayer::onImGuiRender()
+	void DockSpace::onImGuiRender()
 	{
 		// Render dockspace
 		ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None; // ImGuiDockNodeFlags_None

@@ -1,8 +1,9 @@
-#include "ProfilerLayer.h"
+#include "ebpch.h"
+#include "ProfilerPanel.h"
 
 namespace Mahakam
 {
-	void ProfilerLayer::onImGuiRender()
+	void ProfilerPanel::onImGuiRender()
 	{
 		if (open)
 		{

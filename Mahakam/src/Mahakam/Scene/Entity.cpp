@@ -6,5 +6,5 @@
 namespace Mahakam
 {
 	Entity::Entity(entt::entity handle, Scene* scene)
-		: entity(handle), scene(scene) {}
+		: handle(handle), scene(scene) {}
 }

@@ -1,12 +1,18 @@
 #pragma once
 
+#include "Panels/DockSpace.h"
+#include "Panels/ProfilerPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/SceneViewPanel.h"
+#include "Panels/StatsPanel.h"
+
 #include <Mahakam.h>
 
 #include <imgui.h>
 
 namespace Mahakam
 {
-	class SceneViewLayer : public Layer
+	class EditorLayer : public Layer
 	{
 	private:
 		Ref<Scene> activeScene;
@@ -20,18 +26,20 @@ namespace Mahakam
 		Ref<FrameBuffer> brdfFramebuffer;
 		Ref<FrameBuffer> viewportFramebuffer;
 
-		glm::vec2 viewportSize = { 0.0f, 0.0f };
+		DockSpace dockSpace;
+		ProfilerPanel profilerPanel;
+		SceneViewPanel sceneViewPanel;
+		SceneHierarchyPanel sceneHierarchyPanel;
+		StatsPanel statsPanel;
 
-		bool open = true;
-		bool focused = false;
-		bool hovered = false;
 		bool wireframe = false;
 
 		float rotation = 0;
 
 	public:
-		SceneViewLayer(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
-			: Layer("SceneView"), drawCalls(drawCalls), vertexCount(vertexCount), triCount(triCount) {}
+		EditorLayer(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
+			: Layer("Editor"), drawCalls(drawCalls), vertexCount(vertexCount), triCount(triCount),
+			dockSpace(), profilerPanel(), sceneViewPanel(), sceneHierarchyPanel(), statsPanel(drawCalls, vertexCount, triCount) {}
 
 		virtual void onAttach() override;
 		virtual void onUpdate(Timestep dt) override;

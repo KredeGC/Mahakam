@@ -2,7 +2,7 @@
 
 #include "Mahakam/Core/Timestep.h"
 
-#include <entt/ent.hpp>
+#include <entt/entt.hpp>
 
 namespace Mahakam
 {
@@ -12,6 +12,7 @@ namespace Mahakam
 	{
 	private:
 		friend class Entity;
+		friend class SceneHierarchyPanel;
 
 		entt::registry registry;
 
@@ -23,7 +24,7 @@ namespace Mahakam
 
 		void onViewportResize(uint32_t width, uint32_t height);
 
-		Entity createEntity();
+		Entity createEntity(const std::string& name = "Entity");
 
 		static Ref<Scene> createScene();
 	};

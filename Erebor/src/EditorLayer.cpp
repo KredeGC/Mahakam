@@ -1,8 +1,9 @@
-#include "SceneViewLayer.h"
+#include "ebpch.h"
+#include "EditorLayer.h"
 
 namespace Mahakam
 {
-	void SceneViewLayer::onAttach()
+	void EditorLayer::onAttach()
 	{
 		// Viewport framebuffer
 		FrameBufferProps prop;
@@ -41,13 +42,18 @@ namespace Mahakam
 		activeScene = Scene::createScene();
 
 
+		// Setup the viewport in editor
+		sceneViewPanel.setContext(activeScene, viewportFramebuffer);
+		sceneHierarchyPanel.setContext(activeScene);
+
+
 		// Setup shaders
 		Ref<Shader> shader = Shader::create("assets/shaders/LitColor.glsl");
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 
 
 		// Setup scene camera
-		cameraEntity = activeScene->createEntity();
+		cameraEntity = activeScene->createEntity("Camera");
 		cameraEntity.addComponent<CameraComponent>(true, glm::radians(45.0f), 1.0f, 0.01f, 100.0f);
 		cameraEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.5f, 12.5f });
 
@@ -95,11 +101,11 @@ namespace Mahakam
 
 
 		// Setup scene skybox
-		Ref<Mesh> skyboxMesh = Mesh::createUVSphere(20, 20);
+		Ref<Mesh> skyboxMesh = Mesh::createUVSphere(10, 10);
 		Ref<Material> skyboxMaterial = Material::create(skyboxShader);
 		skyboxMaterial->setTexture("u_Environment", 0, skyboxTexture);
 
-		Entity skybox = activeScene->createEntity();
+		Entity skybox = activeScene->createEntity("Skybox");
 		skybox.addComponent<MeshComponent>(skyboxMesh, skyboxMaterial);
 
 
@@ -122,14 +128,14 @@ namespace Mahakam
 				material->setFloat("u_Roughness", x / 9.0f);
 
 				// Create entity
-				Entity entity = activeScene->createEntity();
+				Entity entity = activeScene->createEntity("Sphere");
 				entity.addComponent<MeshComponent>(sphereMesh, material);
 				entity.getComponent<TransformComponent>().setPosition({ x, y, 0.0f });
 			}
 		}
 	}
 
-	void SceneViewLayer::onUpdate(Timestep dt)
+	void EditorLayer::onUpdate(Timestep dt)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -141,33 +147,19 @@ namespace Mahakam
 		activeScene->onUpdate(dt);
 
 		viewportFramebuffer->unbind();
+
+		statsPanel.onUpdate(dt);
 	}
 
-	void SceneViewLayer::onImGuiRender()
+	void EditorLayer::onImGuiRender()
 	{
 		MH_PROFILE_FUNCTION();
 
-		if (open)
-		{
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			ImGui::Begin("Viewport", &open);
-			focused = ImGui::IsWindowFocused();
-			hovered = ImGui::IsWindowHovered();
-			ImVec2 size = ImGui::GetContentRegionAvail();
-			if (size.x != viewportSize.x || size.y != viewportSize.y)
-			{
-				viewportSize.x = size.x;
-				viewportSize.y = size.y;
-
-				// TODO: Find a better place for this
-				//camera.setRatio(size.x / size.y);
-
-				activeScene->onViewportResize((uint32_t)size.x, (uint32_t)size.y);
-			}
-			ImGui::Image((void*)viewportFramebuffer->getColorAttachments()[0]->getRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
-			ImGui::End();
-			ImGui::PopStyleVar();
-		}
+		dockSpace.onImGuiRender();
+		profilerPanel.onImGuiRender();
+		sceneViewPanel.onImGuiRender();
+		sceneHierarchyPanel.onImGuiRender();
+		statsPanel.onImGuiRender();
 
 
 
@@ -186,15 +178,15 @@ namespace Mahakam
 		cameraTransform.setPosition(pos);*/
 	}
 
-	void SceneViewLayer::onEvent(Event& event)
+	void EditorLayer::onEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
-		dispatcher.dispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(SceneViewLayer::onKeyPressed));
-		dispatcher.dispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(SceneViewLayer::onWindowResize));
-		dispatcher.dispatchEvent<MouseScrolledEvent>(MH_BIND_EVENT(SceneViewLayer::onMouseScrolled));
+		dispatcher.dispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::onKeyPressed));
+		dispatcher.dispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(EditorLayer::onWindowResize));
+		dispatcher.dispatchEvent<MouseScrolledEvent>(MH_BIND_EVENT(EditorLayer::onMouseScrolled));
 	}
 
-	bool SceneViewLayer::onKeyPressed(KeyPressedEvent& event)
+	bool EditorLayer::onKeyPressed(KeyPressedEvent& event)
 	{
 		if (event.getKeyCode() == MH_KEY_F5)
 		{
@@ -205,7 +197,7 @@ namespace Mahakam
 		return false;
 	}
 
-	bool SceneViewLayer::onWindowResize(WindowResizeEvent& event)
+	bool EditorLayer::onWindowResize(WindowResizeEvent& event)
 	{
 		uint32_t width = event.getWidth();
 		uint32_t height = event.getHeight();
@@ -215,13 +207,9 @@ namespace Mahakam
 		return false;
 	}
 
-	bool SceneViewLayer::onMouseScrolled(MouseScrolledEvent& event)
+	bool EditorLayer::onMouseScrolled(MouseScrolledEvent& event)
 	{
-		if (focused && hovered)
-		{
-			MH_CORE_TRACE("Scrolled!");
-			return true;
-		}
+		sceneViewPanel.onMouseScrolled(event);
 
 		return false;
 	}

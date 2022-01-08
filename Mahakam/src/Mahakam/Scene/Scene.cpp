@@ -2,9 +2,10 @@
 #include "Scene.h"
 
 #include "Components/CameraComponent.h"
-#include "Components/TransformComponent.h"
 #include "Components/MeshComponent.h"
 #include "Components/NativeScriptComponent.h"
+#include "Components/TagComponent.h"
+#include "Components/TransformComponent.h"
 
 #include "Mahakam/Renderer/Renderer.h"
 
@@ -103,10 +104,12 @@ namespace Mahakam
 		}
 	}
 
-	Entity Scene::createEntity()
+	Entity Scene::createEntity(const std::string& name)
 	{
 		Entity entity(registry.create(), this);
 		entity.addComponent<TransformComponent>();
+		auto& tag = entity.addComponent<TagComponent>();
+		tag.tag = name.empty() ? "Entity" : name;
 		return entity;
 	}
 
