@@ -15,7 +15,7 @@ namespace Mahakam
 {
 	Scene::Scene()
 	{
-
+		
 	}
 
 	Scene::~Scene()
@@ -29,15 +29,6 @@ namespace Mahakam
 		registry.view<NativeScriptComponent>().each([=](auto entity, auto& scriptComponent)
 		{
 			// TODO: onScenePlay
-			/*if (!scriptComponent.script)
-			{
-				scriptComponent.script = scriptComponent.instantiateScript();
-				scriptComponent.script->entity = Entity{ entity, this };
-				scriptComponent.script->onCreate();
-			}
-
-			scriptComponent.script->onUpdate(ts);*/
-
 			for (auto& runtime : scriptComponent.scripts)
 			{
 				if (!runtime.script)
@@ -82,9 +73,13 @@ namespace Mahakam
 			auto meshes = registry.view<TransformComponent, MeshComponent>();
 			for (auto& entity : meshes)
 			{
-				auto [transform, mesh] = meshes.get<TransformComponent, MeshComponent>(entity);
+				auto [transform, meshComponent] = meshes.get<TransformComponent, MeshComponent>(entity);
 
-				Renderer::submit(transform, mesh.getMesh(), mesh.getMaterial());
+				Ref<Mesh> mesh = meshComponent.getMesh();
+				Ref<Material> material = meshComponent.getMaterial();
+
+				if (mesh && material)
+					Renderer::submit(transform, mesh, material);
 			}
 
 			Renderer::endScene(&drawCalls, &vertexCount, &triCount);
@@ -93,7 +88,7 @@ namespace Mahakam
 
 	void Scene::onViewportResize(uint32_t width, uint32_t height)
 	{
-		float ratio = (float)width / (float)height;
+		viewportRatio = (float)width / (float)height;
 
 		auto cameras = registry.view<CameraComponent>();
 		for (auto& entity : cameras)
@@ -102,7 +97,7 @@ namespace Mahakam
 
 			if (!cameraComponent.hasFixedAspectRatio())
 			{
-				cameraComponent.getCamera().setRatio(ratio);
+				cameraComponent.getCamera().setRatio(viewportRatio);
 			}
 		}
 	}
@@ -114,6 +109,11 @@ namespace Mahakam
 		auto& tag = entity.addComponent<TagComponent>();
 		tag.tag = name.empty() ? "Entity" : name;
 		return entity;
+	}
+
+	void Scene::destroyEntity(Entity entity)
+	{
+		registry.destroy(entity);
 	}
 
 	Ref<Scene> Scene::createScene()

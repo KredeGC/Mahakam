@@ -24,5 +24,10 @@ namespace Mahakam
 				[](ScriptableEntity* script) { delete (T*)script; }
 			});
 		}
+
+		void unbind(int index)
+		{
+			scripts.erase(scripts.begin() + index);
+		}
 	};
 }

@@ -19,12 +19,9 @@ namespace Mahakam
 				viewportSize.x = size.x;
 				viewportSize.y = size.y;
 
-				// TODO: Find a better place for this
-				//camera.setRatio(size.x / size.y);
-
 				activeScene->onViewportResize((uint32_t)size.x, (uint32_t)size.y);
 			}
-			ImGui::Image((void*)viewportFramebuffer->getColorAttachments()[0]->getRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image((void*)(uintptr_t)viewportFramebuffer->getColorAttachments()[0]->getRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}

@@ -26,10 +26,13 @@ namespace Mahakam
 		ProjectionType projectionType = ProjectionType::Perspective;
 		float nearZ, farZ;
 		float size = 10.0f;
-		float fov = glm::radians(45.0f), ratio = 0;
+		float fov = glm::radians(45.0f), ratio = 1;
 
 	public:
-		Camera() : projectionMatrix({ 1.0f }), nearZ(0), farZ(0) {}
+		Camera() : projectionMatrix({ 1.0f }), nearZ(0.03f), farZ(1000.0f)
+		{
+			setPerspective(fov, ratio, nearZ, farZ);
+		}
 
 		Camera(ProjectionType projection, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
 			: projectionType(projection)
