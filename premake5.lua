@@ -19,6 +19,7 @@ IncludeDir["glm"]       = "Mahakam/vendor/glm"
 IncludeDir["imgui"]     = "Mahakam/vendor/imgui"
 IncludeDir["spdlog"]    = "Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"] = "Mahakam/vendor/stb_image"
+IncludeDir["yaml"]      = "Mahakam/vendor/yaml-cpp/include"
 
 group "Dependencies/Assimp"
     os.execute("cmake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
@@ -43,6 +44,7 @@ group "Dependencies"
     include "Mahakam/vendor/GLFW"
     include "Mahakam/vendor/imgui"
     include "Mahakam/vendor/glad"
+    include "Mahakam/vendor/yaml-cpp"
 group ""
 
 project "Mahakam"
@@ -76,7 +78,8 @@ project "Mahakam"
         "%{IncludeDir.glm}",
         "%{IncludeDir.imgui}",
         "%{IncludeDir.spdlog}",
-        "%{IncludeDir.stb_image}"
+        "%{IncludeDir.stb_image}",
+        "%{IncludeDir.yaml}"
     }
     
     links {
@@ -84,6 +87,7 @@ project "Mahakam"
         "glad",
         "ImGui",
         "assimp",
+        "yaml-cpp",
         "opengl32.lib"
     }
 

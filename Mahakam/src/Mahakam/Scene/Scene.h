@@ -43,6 +43,12 @@ namespace Mahakam
 		Entity createEntity(const std::string& name = "Entity");
 		void destroyEntity(Entity entity);
 
+		bool serialize(const std::string& filepath);
+		bool deserialize(const std::string& filepath);
+
+		bool serializeRuntime(const std::string& filepath);
+		bool deserializeRuntime(const std::string& filepath);
+
 		static Ref<Scene> createScene();
 	};
 }

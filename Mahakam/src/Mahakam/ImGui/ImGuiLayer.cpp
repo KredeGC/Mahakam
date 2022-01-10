@@ -25,6 +25,39 @@ namespace Mahakam
 
 	}
 
+	static void setDarkTheme()
+	{
+		auto& style = ImGui::GetStyle().Colors;
+		style[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.105f, 0.11f, 1.0f);
+
+		// Header
+		style[ImGuiCol_Header] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+		style[ImGuiCol_HeaderHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
+		style[ImGuiCol_HeaderActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+
+		// Buttons
+		style[ImGuiCol_Button] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+		style[ImGuiCol_ButtonHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
+		style[ImGuiCol_ButtonActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+
+		// Frame
+		style[ImGuiCol_FrameBg] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+		style[ImGuiCol_FrameBgHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
+		style[ImGuiCol_FrameBgActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+
+		// Tabs
+		style[ImGuiCol_Tab] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		style[ImGuiCol_TabHovered] = ImVec4(0.38f, 0.385f, 0.39f, 1.0f);
+		style[ImGuiCol_TabActive] = ImVec4(0.28f, 0.285f, 0.29f, 1.0f);
+		style[ImGuiCol_TabUnfocused] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		style[ImGuiCol_TabUnfocusedActive] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+
+		// Title
+		style[ImGuiCol_TitleBg] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		style[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		style[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+	}
+
 	void ImGuiLayer::onAttach()
 	{
 		MH_PROFILE_FUNCTION();
@@ -39,6 +72,8 @@ namespace Mahakam
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Roboto/Roboto-Regular.ttf", 18.0f);
+
 		ImGui::StyleColorsDark();
 
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -47,6 +82,8 @@ namespace Mahakam
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
+
+		setDarkTheme();
 
 		Application& app = Application::getInstance();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.getWindow().getNativeWindow());

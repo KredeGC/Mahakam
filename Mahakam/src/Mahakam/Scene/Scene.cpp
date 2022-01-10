@@ -9,10 +9,91 @@
 
 #include "Mahakam/Renderer/Renderer.h"
 
-#include "Entity.h"
+#include <yaml-cpp/yaml.h>
+
+#include <fstream>
 
 namespace Mahakam
 {
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+		return out;
+	}
+
+	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::quat& q)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << q.x << q.y << q.z << q.w << YAML::EndSeq;
+		return out;
+	}
+
+	static void serializeEntity(YAML::Emitter& out, Entity entity)
+	{
+		out << YAML::BeginMap;
+		out << YAML::Key << "Entity" << YAML::Value << "123679821";
+
+		if (entity.hasComponent<TagComponent>())
+		{
+			out << YAML::Key << "TagComponent";
+			out << YAML::BeginMap; // TagComponent
+
+			auto& tag = entity.getComponent<TagComponent>().tag;
+			out << YAML::Key << "Tag" << YAML::Value << tag;
+
+			out << YAML::EndMap; // TagComponent
+		}
+
+		if (entity.hasComponent<TransformComponent>())
+		{
+			out << YAML::Key << "TransformComponent";
+			out << YAML::BeginMap; // TransformComponent
+
+			auto& tc = entity.getComponent<TransformComponent>();
+			out << YAML::Key << "Translation" << YAML::Value << tc.getPosition();
+			out << YAML::Key << "Rotation" << YAML::Value << tc.getRotation();
+			out << YAML::Key << "Scale" << YAML::Value << tc.getScale();
+
+			out << YAML::EndMap; // TransformComponent
+		}
+
+		if (entity.hasComponent<CameraComponent>())
+		{
+			out << YAML::Key << "CameraComponent";
+			out << YAML::BeginMap; // CameraComponent
+
+			auto& cameraComponent = entity.getComponent<CameraComponent>();
+			auto& camera = cameraComponent.getCamera();
+
+			out << YAML::Key << "Camera" << YAML::Value;
+			out << YAML::BeginMap; // Camera
+			out << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.getProjectionType();
+			out << YAML::Key << "FOV" << YAML::Value << camera.getFov();
+			out << YAML::Key << "Near" << YAML::Value << camera.getNearPlane();
+			out << YAML::Key << "Far" << YAML::Value << camera.getFarPlane();
+			out << YAML::Key << "Size" << YAML::Value << camera.getSize();
+			out << YAML::EndMap; // Camera
+
+			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.hasFixedAspectRatio();
+
+			out << YAML::EndMap; // CameraComponent
+		}
+
+		if (entity.hasComponent<MeshComponent>())
+		{
+			out << YAML::Key << "MeshComponent";
+			out << YAML::BeginMap; // MeshComponent
+
+			auto& meshComponent = entity.getComponent<MeshComponent>();
+			//out << YAML::Key << "Color" << YAML::Value << meshComponent;
+
+			out << YAML::EndMap; // MeshComponent
+		}
+
+		out << YAML::EndMap;
+	}
+
 	Scene::Scene()
 	{
 		
@@ -119,5 +200,89 @@ namespace Mahakam
 	Ref<Scene> Scene::createScene()
 	{
 		return std::make_shared<Scene>();
+	}
+
+	bool Scene::serialize(const std::string& filepath)
+	{
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
+		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+		registry.each([&](auto entityID)
+		{
+			Entity entity = { entityID, this };
+			if (!entity)
+				return;
+
+			serializeEntity(out, entity);
+		});
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
+
+		std::ofstream fout(filepath);
+		fout << out.c_str();
+
+		return true;
+	}
+
+	bool Scene::deserialize(const std::string& filepath)
+	{
+		/*std::ifstream stream(filepath);
+		std::stringstream stringStream;
+
+		stringStream << stream.rdbuf();
+
+		YAML::Node data = YAML::Load(stringStream.str());
+		if (!data["Scene"])
+			return false;
+
+		std::string sceneName = data["Scene"].as<std::string>();
+		MH_CORE_TRACE("Deserializing scene {0}", sceneName);
+
+		auto entities = data["Entities"];
+		if (entities)
+		{
+			for (auto& entityNode : entities)
+			{
+				if (entityNode["CameraComponent"])
+				{
+					uint64_t uuid = entityNode["Entity"].as<uint64_t>();
+
+					std::string name;
+					auto tagComponent = entityNode["TagComponent"];
+					if (tagComponent)
+						name = tagComponent["Tag"].as<std::string>();
+
+					MH_CORE_TRACE("Deserialized Entity ({0}), {1}", uuid, name);
+
+					Entity entity = createEntity(name);
+
+					auto transformComponent = entityNode["TransformComponent"];
+					if (transformComponent)
+					{
+						auto& transform = entity.getComponent<TransformComponent>();
+						transform.setPosition(transformComponent["Translation"].as<glm::vec3>());
+						transform.setRotation(transformComponent["Rotation"].as<glm::quat>());
+						transform.setScale(transformComponent["Scale"].as<glm::vec3>());
+					}
+
+
+				}
+			}
+		}*/
+
+		return true;
+	}
+
+	bool Scene::serializeRuntime(const std::string& filepath)
+	{
+		MH_CORE_BREAK("Not implemented!");
+		return false;
+	}
+
+	bool Scene::deserializeRuntime(const std::string& filepath)
+	{
+		MH_CORE_BREAK("Not implemented!");
+		return false;
 	}
 }

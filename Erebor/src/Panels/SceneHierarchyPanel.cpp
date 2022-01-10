@@ -89,7 +89,7 @@ namespace Mahakam
 	{
 		std::string& tag = entity.getComponent<TagComponent>().tag;
 
-		ImGuiTreeNodeFlags flags = ((entity == selectedEntity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+		ImGuiTreeNodeFlags flags = ((entity == selectedEntity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 
@@ -174,6 +174,31 @@ namespace Mahakam
 				tag = std::string(buffer);
 			}
 		}
+
+		ImGui::SameLine();
+		ImGui::PushItemWidth(-1);
+
+		if (ImGui::Button("Add Component"))
+			ImGui::OpenPopup("AddComponent");
+
+		if (ImGui::BeginPopup("AddComponent"))
+		{
+			if (ImGui::MenuItem("Camera"))
+			{
+				selectedEntity.addComponent<CameraComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (ImGui::MenuItem("Mesh"))
+			{
+				selectedEntity.addComponent<MeshComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+
+		ImGui::PopItemWidth();
 
 		drawComponent<TransformComponent>("Transform", entity, [](TransformComponent& transform)
 		{
@@ -304,26 +329,6 @@ namespace Mahakam
 			if (selectedEntity)
 			{
 				drawInspector(selectedEntity);
-
-				if (ImGui::Button("Add Component"))
-					ImGui::OpenPopup("AddComponent");
-
-				if (ImGui::BeginPopup("AddComponent"))
-				{
-					if (ImGui::MenuItem("Camera"))
-					{
-						selectedEntity.addComponent<CameraComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-
-					if (ImGui::MenuItem("Mesh"))
-					{
-						selectedEntity.addComponent<MeshComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-
-					ImGui::EndPopup();
-				}
 			}
 
 			ImGui::End();
