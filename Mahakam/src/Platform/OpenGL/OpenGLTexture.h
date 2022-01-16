@@ -10,6 +10,7 @@ namespace Mahakam {
 		std::string filepath;
 		uint32_t internalFormat;
 		uint32_t dataFormat;
+		uint32_t formatType;
 
 		TextureProps props;
 
@@ -22,9 +23,11 @@ namespace Mahakam {
 		virtual uint32_t getHeight() const override { return props.height; }
 		virtual uint32_t getRendererID() const override { return rendererID; }
 
-		virtual void setData(void* data, uint32_t size) override;
+		virtual void setData(void* data, bool mipmaps) override;
 
 		virtual void bind(uint32_t slot = 0) const override;
+
+		virtual void readPixels(void* pixels, bool mipmaps) override;
 	};
 
 
@@ -35,10 +38,12 @@ namespace Mahakam {
 		std::string filepath;
 		uint32_t internalFormat;
 		uint32_t dataFormat;
+		uint32_t formatType;
 
 		CubeTextureProps props;
 
 	public:
+		OpenGLTextureCube(const CubeTextureProps& props);
 		OpenGLTextureCube(const std::vector<std::string>& faces, const CubeTextureProps& props);
 		OpenGLTextureCube(const std::string& filepath, const CubeTextureProps& props);
 		virtual ~OpenGLTextureCube();
@@ -47,8 +52,10 @@ namespace Mahakam {
 		virtual uint32_t getHeight() const override { return props.resolution; }
 		virtual uint32_t getRendererID() const override { return rendererID; }
 
-		virtual void setData(void* data, uint32_t size) override;
+		virtual void setData(void* data, bool mipmaps) override;
 
 		virtual void bind(uint32_t slot = 0) const override;
+
+		virtual void readPixels(void* pixels, bool mipmaps) override;
 	};
 }

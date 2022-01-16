@@ -1,55 +1,64 @@
 #type vertex
-#version 330
+#version 450 core
 #include "assets/shaders/include/Matrix.glsl"
 
 layout(location = 0) in vec3 i_Pos;
 layout(location = 1) in vec2 i_UV;
 layout(location = 2) in vec3 i_Normal;
 
-out vec3 v_WorldPos;
-out vec3 v_WorldNormal;
-out vec3 v_ViewDir;
-out vec2 v_UV;
+struct v2f {
+    vec3 v_WorldPos;
+    vec3 v_WorldNormal;
+    vec3 v_ViewDir;
+    vec2 v_UV;
+};
+
+layout(location = 0) out v2f o;
 
 void main() {
     gl_Position = MATRIX_MVP * vec4(i_Pos, 1.0);
-    v_WorldPos = (MATRIX_M * vec4(i_Pos, 1.0)).xyz;
-    //v_WorldNormal = (MATRIX_M * vec4(i_Normal, 0.0)).xyz;
-    v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
-    v_UV = i_UV;
-    v_ViewDir = getViewDir(v_WorldPos);
+    
+    o.v_WorldPos = (MATRIX_M * vec4(i_Pos, 1.0)).xyz;
+    //o.v_WorldNormal = (MATRIX_M * vec4(i_Normal, 0.0)).xyz;
+    o.v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
+    o.v_UV = i_UV;
+    o.v_ViewDir = getViewDir(o.v_WorldPos);
 }
 
 
 
 #type fragment
-#version 330
+#version 450 core
 #include "assets/shaders/include/Matrix.glsl"
 #include "assets/shaders/include/Lighting.glsl"
 
+struct v2f {
+    vec3 v_WorldPos;
+    vec3 v_WorldNormal;
+    vec3 v_ViewDir;
+    vec2 v_UV;
+};
+
+layout(location = 0) in v2f i;
+
 layout(location = 0) out vec4 o_Color;
 
-in vec3 v_WorldPos;
-in vec3 v_WorldNormal;
-in vec3 v_ViewDir;
-in vec2 v_UV;
-
-uniform sampler2D u_Albedo;
-uniform sampler2D u_Metallic;
-uniform sampler2D u_Roughness;
-uniform float u_AO;
+layout(binding = 3) uniform sampler2D u_Albedo;
+layout(binding = 4) uniform sampler2D u_Metallic;
+layout(binding = 5) uniform sampler2D u_Roughness;
+layout(location = 0) uniform float u_AO; // ??
 
 void main() {
     // Surface values
-    vec3 albedo = texture(u_Albedo, v_UV).rgb;
-    float metallic = texture(u_Metallic, v_UV).r;
-    float roughness = texture(u_Roughness, v_UV).r;
+    vec3 albedo = texture(u_Albedo, i.v_UV).rgb;
+    float metallic = texture(u_Metallic, i.v_UV).r;
+    float roughness = texture(u_Roughness, i.v_UV).r;
     float ao = 1.0;
 
-    vec3 viewdir = normalize(v_ViewDir);
-    vec3 normal = normalize(v_WorldNormal);
+    vec3 viewdir = normalize(i.v_ViewDir);
+    vec3 normal = normalize(i.v_WorldNormal);
 
-    vec3 directLighting = BRDF_Direct(light, albedo, metallic, roughness, ao, viewdir, v_WorldPos, normal);
+    vec3 directLighting = BRDF_Direct(light, albedo, metallic, roughness, ao, viewdir, i.v_WorldPos, normal);
 
     vec3 color = directLighting;
 

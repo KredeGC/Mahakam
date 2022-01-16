@@ -8,6 +8,39 @@
 
 namespace Mahakam
 {
+	static uint32_t TextureFormatToByteSize(TextureFormat format)
+	{
+		switch (format)
+		{
+		case TextureFormat::R8:
+			return 1;
+		case TextureFormat::RG8:
+			return 2;
+		case TextureFormat::RGB8:
+			return 3;
+		case TextureFormat::RGBA8:
+			return 4;
+		case TextureFormat::R16F:
+			return 2;
+		case TextureFormat::RG16F:
+			return 4;
+		case TextureFormat::RGB16F:
+			return 6;
+		case TextureFormat::RGBA16F:
+			return 8;
+		case TextureFormat::Depth16:
+			return 2;
+		case TextureFormat::Depth24:
+			return 3;
+		case TextureFormat::Depth24Stencil8:
+			return 4;
+		default:
+			MH_CORE_BREAK("Unknown TextureFormat provided!");
+		}
+
+		return 0;
+	}
+
 	static GLenum TextureFormatToOpenGLFormat(TextureFormat format, int channels)
 	{
 		uint32_t component = 0;
@@ -26,7 +59,7 @@ namespace Mahakam
 			component = GL_RGBA;
 			break;
 		default:
-			MH_CORE_ASSERT(false, "Unsupported number of channels!");
+			MH_CORE_BREAK("Unsupported number of channels!");
 		}
 
 		switch (format)
@@ -54,7 +87,40 @@ namespace Mahakam
 		case TextureFormat::Depth24Stencil8:
 			return GL_DEPTH_STENCIL;
 		default:
-			MH_CORE_ASSERT(false, "Unknown TextureFormat provided!");
+			MH_CORE_BREAK("Unknown TextureFormat provided!");
+		}
+
+		return 0;
+	}
+
+	static GLenum TextureFormatToOpenGLFormat(TextureFormat format)
+	{
+		switch (format)
+		{
+		case TextureFormat::R8:
+			return GL_RED;
+		case TextureFormat::RG8:
+			return GL_RG;
+		case TextureFormat::RGB8:
+			return GL_RGB;
+		case TextureFormat::RGBA8:
+			return GL_RGBA;
+		case TextureFormat::R16F:
+			return GL_RED;
+		case TextureFormat::RG16F:
+			return GL_RG;
+		case TextureFormat::RGB16F:
+			return GL_RGB;
+		case TextureFormat::RGBA16F:
+			return GL_RGBA;
+		case TextureFormat::Depth16:
+			return GL_DEPTH_COMPONENT;
+		case TextureFormat::Depth24:
+			return GL_DEPTH_COMPONENT;
+		case TextureFormat::Depth24Stencil8:
+			return GL_DEPTH_STENCIL;
+		default:
+			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
 		return 0;
@@ -87,7 +153,7 @@ namespace Mahakam
 		case TextureFormat::Depth24Stencil8:
 			return GL_DEPTH24_STENCIL8;
 		default:
-			MH_CORE_ASSERT(false, "Unknown TextureFormat provided!");
+			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
 		return 0;
@@ -106,13 +172,13 @@ namespace Mahakam
 		case TextureFormat::RGBA8:
 			return GL_UNSIGNED_BYTE;
 		case TextureFormat::R16F:
-			return GL_FLOAT;
+			return GL_HALF_FLOAT;
 		case TextureFormat::RG16F:
-			return GL_FLOAT;
+			return GL_HALF_FLOAT;
 		case TextureFormat::RGB16F:
-			return GL_FLOAT;
+			return GL_HALF_FLOAT;
 		case TextureFormat::RGBA16F:
-			return GL_FLOAT;
+			return GL_HALF_FLOAT;
 		case TextureFormat::Depth16:
 			return GL_UNSIGNED_SHORT;
 		case TextureFormat::Depth24:
@@ -120,7 +186,7 @@ namespace Mahakam
 		case TextureFormat::Depth24Stencil8:
 			return GL_UNSIGNED_INT_24_8;
 		default:
-			MH_CORE_ASSERT(false, "Unknown TextureFormat provided!");
+			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
 		return 0;
@@ -130,22 +196,6 @@ namespace Mahakam
 	{
 		switch (format)
 		{
-		case TextureFormat::R8:
-			return GL_COLOR_ATTACHMENT0;
-		case TextureFormat::RG8:
-			return GL_COLOR_ATTACHMENT0;
-		case TextureFormat::RGB8:
-			return GL_COLOR_ATTACHMENT0;
-		case TextureFormat::RGBA8:
-			return GL_COLOR_ATTACHMENT0;
-		case TextureFormat::R16F:
-			return GL_COLOR_ATTACHMENT0;
-		case TextureFormat::RG16F:
-			return GL_COLOR_ATTACHMENT0;
-		case TextureFormat::RGB16F:
-			return GL_COLOR_ATTACHMENT0;
-		case TextureFormat::RGBA16F:
-			return GL_COLOR_ATTACHMENT0;
 		case TextureFormat::Depth16:
 			return GL_DEPTH_ATTACHMENT;
 		case TextureFormat::Depth24:
@@ -153,7 +203,7 @@ namespace Mahakam
 		case TextureFormat::Depth24Stencil8:
 			return GL_DEPTH_STENCIL_ATTACHMENT;
 		default:
-			MH_CORE_ASSERT(false, "Unknown TextureFormat provided!");
+			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
 		return 0;

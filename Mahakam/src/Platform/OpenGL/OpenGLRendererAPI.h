@@ -7,12 +7,13 @@ namespace Mahakam
 	class OpenGLRendererAPI : public RendererAPI
 	{
 		virtual void init() override;
-		virtual void setViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) override;
-
 		virtual const char* getGraphicsVendor() override;
+		virtual void setViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) override;
 
 		virtual void setClearColor(const glm::vec4 color) override;
 		virtual void clear(bool color, bool depth) override;
+
+		virtual void enableCulling(bool enable, bool cullFront) override;
 
 		virtual void setFillMode(bool fill) override;
 

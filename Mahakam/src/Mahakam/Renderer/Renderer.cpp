@@ -5,6 +5,7 @@
 
 namespace Mahakam
 {
+	Renderer::RendererResults* Renderer::rendererResults = new Renderer::RendererResults;
 	Renderer::SceneData* Renderer::sceneData = new Renderer::SceneData;
 
 	std::unordered_map<Ref<Shader>,
@@ -49,14 +50,9 @@ namespace Mahakam
 		transparentQueue.clear();
 	}
 
-	void Renderer::endScene(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount)
+	void Renderer::endScene()
 	{
 		MH_PROFILE_FUNCTION();
-
-		//uint32_t width = Application::getInstance().getWindow().getWidth();
-		//uint32_t height = Application::getInstance().getWindow().getHeight();
-
-		//GL::setViewport(0, 0, width, height);
 
 		Ref<UniformBuffer> lightBuffer = UniformBuffer::create(2 * 16);
 
@@ -65,9 +61,9 @@ namespace Mahakam
 		lightBuffer->setData(&lightPos, 0, sizeof(glm::vec3));
 		lightBuffer->setData(&lightCol, 16, sizeof(glm::vec3));
 
-		*drawCalls = 0;
-		*vertexCount = 0;
-		*triCount = 0;
+		rendererResults->drawCalls = 0;
+		rendererResults->vertexCount = 0;
+		rendererResults->triCount = 0;
 
 		sceneData->matrixBuffer->bind(0);
 		lightBuffer->bind(1);
@@ -75,8 +71,8 @@ namespace Mahakam
 		for (auto& shaderPair : renderQueue)
 		{
 			shaderPair.first->bind();
-			shaderPair.first->bindBuffer("Matrices", 0);
-			shaderPair.first->bindBuffer("Lights", 1);
+			//shaderPair.first->bindBuffer("Matrices", 0);
+			//shaderPair.first->bindBuffer("Lights", 1);
 
 			for (auto& materialPair : shaderPair.second)
 			{
@@ -91,9 +87,9 @@ namespace Mahakam
 					{
 						materialPair.first->setTransform(transform);
 
-						*drawCalls += 1;
-						*vertexCount += meshPair.first->getVertexCount();
-						*triCount += meshPair.first->getIndexCount();
+						rendererResults->drawCalls += 1;
+						rendererResults->vertexCount += meshPair.first->getVertexCount();
+						rendererResults->triCount += meshPair.first->getIndexCount();
 
 						GL::drawIndexed(meshPair.first->getIndexCount());
 					}
@@ -130,16 +126,16 @@ namespace Mahakam
 				material->setTransform(data.transform);
 				data.mesh->bind();
 
-				*drawCalls += 1;
-				*vertexCount += data.mesh->getVertexCount();
-				*triCount += data.mesh->getIndexCount();
+				rendererResults->drawCalls += 1;
+				rendererResults->vertexCount += data.mesh->getVertexCount();
+				rendererResults->triCount += data.mesh->getIndexCount();
 
 				GL::drawIndexed(data.mesh->getIndexCount());
 			}
 			GL::setBlendMode(false);
 		}
 
-		*triCount /= 3;
+		rendererResults->triCount /= 3;
 	}
 
 	void Renderer::submit(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material)

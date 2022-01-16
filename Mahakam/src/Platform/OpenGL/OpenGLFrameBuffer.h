@@ -26,6 +26,8 @@ namespace Mahakam
 
 		virtual const FrameBufferProps& getSpecification() const override { return props; }
 
+		virtual void readColorPixels(void* pixels, int attachmentSlot) const;
+
 		void invalidate();
 	};
 }

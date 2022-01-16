@@ -125,9 +125,6 @@ namespace Mahakam
 
 
 
-		uint32_t drawCalls;
-		uint32_t vertexCount;
-		uint32_t triCount;
 
 		Ref<Light> mainLight = std::make_shared<Light>(glm::vec3(1.0f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
 
@@ -163,7 +160,7 @@ namespace Mahakam
 					Renderer::submit(transform, mesh, material);
 			}
 
-			Renderer::endScene(&drawCalls, &vertexCount, &triCount);
+			Renderer::endScene();
 		}
 	}
 

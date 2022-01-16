@@ -4,7 +4,7 @@ struct Light {
 };
 
 
-layout (std140) uniform Lights {
+layout (std140, binding = 1) uniform Lights {
     Light light;
 };
 
@@ -12,9 +12,9 @@ const float PI = 3.14159265359;
 const float Epsilon = 0.00001;
 const vec3 Fdielectric = vec3(0.04);
 
-uniform samplerCube u_IrradianceMap;
-uniform samplerCube u_SpecularMap;
-uniform sampler2D u_BRDFLUT;
+layout(binding = 0) uniform samplerCube u_IrradianceMap;
+layout(binding = 1) uniform samplerCube u_SpecularMap;
+layout(binding = 2) uniform sampler2D u_BRDFLUT;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {

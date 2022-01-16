@@ -11,6 +11,13 @@ namespace Mahakam
 		glDepthFunc(GL_LEQUAL);
 
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+	}
+
+	const char* OpenGLRendererAPI::getGraphicsVendor()
+	{
+		return (const char*)glGetString(GL_RENDERER);
 	}
 
 	void OpenGLRendererAPI::setViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
@@ -18,9 +25,33 @@ namespace Mahakam
 		glViewport(x, y, w, h);
 	}
 
-	const char* OpenGLRendererAPI::getGraphicsVendor()
+	void OpenGLRendererAPI::setClearColor(const glm::vec4 color)
 	{
-		return (const char*)glGetString(GL_RENDERER);
+		glClearColor(color.r, color.g, color.b, color.a);
+	}
+
+	void OpenGLRendererAPI::clear(bool color, bool depth)
+	{
+		glClear(
+			(color ? GL_COLOR_BUFFER_BIT : 0x00) |
+			(depth ? GL_DEPTH_BUFFER_BIT : 0x00));
+	}
+
+	void OpenGLRendererAPI::enableCulling(bool enable, bool cullFront)
+	{
+		if (enable)
+		{
+			glEnable(GL_CULL_FACE);
+
+			if (cullFront)
+				glCullFace(GL_FRONT);
+			else
+				glCullFace(GL_BACK);
+		}
+		else
+		{
+			glDisable(GL_CULL_FACE);
+		}
 	}
 
 	void OpenGLRendererAPI::setFillMode(bool fill)
@@ -43,18 +74,6 @@ namespace Mahakam
 			glDisable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-	}
-
-	void OpenGLRendererAPI::setClearColor(const glm::vec4 color)
-	{
-		glClearColor(color.r, color.g, color.b, color.a);
-	}
-
-	void OpenGLRendererAPI::clear(bool color, bool depth)
-	{
-		glClear(
-			(color ? GL_COLOR_BUFFER_BIT : 0x00) |
-			(depth ? GL_DEPTH_BUFFER_BIT : 0x00));
 	}
 
 	void OpenGLRendererAPI::drawIndexed(uint32_t count)

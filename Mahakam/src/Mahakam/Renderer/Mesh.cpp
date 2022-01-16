@@ -145,7 +145,7 @@ namespace Mahakam
 		delete[] interleavedVertices;
 	}
 
-	Ref<Mesh> Mesh::createQuad()
+	Ref<Mesh> Mesh::createScreenQuad()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -164,14 +164,14 @@ namespace Mahakam
 		};
 
 		uint32_t indices[] = {
-			0, 3, 2,
-			0, 1, 3
+			0, 2, 3,
+			0, 3, 1
 		};
 
 		BufferLayout layout
 		{
-			{ ShaderDataType::Float3, "i_Pos"},
-			{ ShaderDataType::Float2, "i_UV"}
+			{ ShaderDataType::Float3, "i_Pos" },
+			{ ShaderDataType::Float2, "i_UV" }
 		};
 
 		Ref<Mesh> mesh = Mesh::create(4, layout, indices, 6, { positions, uvs });
@@ -179,7 +179,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Ref<Mesh> Mesh::createCube(int tessellation)
+	Ref<Mesh> Mesh::createCube(int tessellation, bool reverse)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -195,6 +195,8 @@ namespace Mahakam
 			{  0.0f, -1.0f,  0.0f },
 			{  0.0f,  0.0f, -1.0f }
 		};
+
+		std::vector<Vertex> vertexAttributes;
 
 		glm::vec3* positions = new glm::vec3[vertexCount];
 		glm::vec2* uvs = new glm::vec2[vertexCount];
@@ -226,13 +228,26 @@ namespace Mahakam
 
 					if (x != tessellation - 1 && y != tessellation - 1)
 					{
-						indices[triIndex] = index;
-						indices[triIndex + 1] = index + tessellation + 1;
-						indices[triIndex + 2] = index + tessellation;
+						if (reverse)
+						{
+							indices[triIndex] = index;
+							indices[triIndex + 1] = index + tessellation;
+							indices[triIndex + 2] = index + tessellation + 1;
 
-						indices[triIndex + 3] = index;
-						indices[triIndex + 4] = index + 1;
-						indices[triIndex + 5] = index + tessellation + 1;
+							indices[triIndex + 3] = index;
+							indices[triIndex + 4] = index + tessellation + 1;
+							indices[triIndex + 5] = index + 1;
+						}
+						else
+						{
+							indices[triIndex] = index;
+							indices[triIndex + 1] = index + tessellation + 1;
+							indices[triIndex + 2] = index + tessellation;
+
+							indices[triIndex + 3] = index;
+							indices[triIndex + 4] = index + 1;
+							indices[triIndex + 5] = index + tessellation + 1;
+						}
 
 						triIndex += 6;
 					}
@@ -246,9 +261,9 @@ namespace Mahakam
 
 		BufferLayout layout
 		{
-			{ ShaderDataType::Float3, "i_Pos"},
-			{ ShaderDataType::Float2, "i_UV"},
-			{ ShaderDataType::Float3, "i_Normal"}
+			{ ShaderDataType::Float3, "i_Pos" },
+			{ ShaderDataType::Float2, "i_UV" },
+			{ ShaderDataType::Float3, "i_Normal" }
 		};
 
 		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount, { positions, uvs, normals });
@@ -312,9 +327,9 @@ namespace Mahakam
 
 		BufferLayout layout
 		{
-			{ ShaderDataType::Float3, "i_Pos"},
-			{ ShaderDataType::Float2, "i_UV"},
-			{ ShaderDataType::Float3, "i_Normal"}
+			{ ShaderDataType::Float3, "i_Pos" },
+			{ ShaderDataType::Float2, "i_UV" },
+			{ ShaderDataType::Float3, "i_Normal" }
 		};
 
 		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount, { positions, uvs, normals });
@@ -393,9 +408,9 @@ namespace Mahakam
 
 		BufferLayout layout
 		{
-			{ ShaderDataType::Float3, "i_Pos"},
-			{ ShaderDataType::Float2, "i_UV"},
-			{ ShaderDataType::Float3, "i_Normal"}
+			{ ShaderDataType::Float3, "i_Pos" },
+			{ ShaderDataType::Float2, "i_UV" },
+			{ ShaderDataType::Float3, "i_Normal" }
 		};
 
 		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount, { positions, uvs, normals });
@@ -478,9 +493,9 @@ namespace Mahakam
 
 		BufferLayout layout
 		{
-			{ ShaderDataType::Float3, "i_Pos"},
-			{ ShaderDataType::Float2, "i_UV"},
-			{ ShaderDataType::Float3, "i_Normal"}
+			{ ShaderDataType::Float3, "i_Pos" },
+			{ ShaderDataType::Float2, "i_UV" },
+			{ ShaderDataType::Float3, "i_Normal" }
 		};
 
 		Ref<Mesh> mesh = Mesh::create(vertexCount, layout, indices, indexCount, { positions, uvs, normals });

@@ -12,7 +12,7 @@ namespace Mahakam
 		virtual void bind() const = 0;
 		virtual void unbind() const = 0;
 
-		virtual void bindBuffer(const std::string& name, int slot = 0) = 0;
+		virtual void bindBuffer(const std::string& name, int slot = 0) = 0; // TODO: Remove
 
 		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) = 0;
 

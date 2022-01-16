@@ -13,6 +13,12 @@ namespace Mahakam
 		TextureFormat format = TextureFormat::RGBA8;
 		TextureFilter filterMode = TextureFilter::Bilinear;
 		bool immutable = false;
+
+		FrameBufferAttachmentProps(TextureFormat format)
+			: format(format) {}
+
+		FrameBufferAttachmentProps(TextureFormat format, TextureFilter filterMode, bool immutable = false)
+			: format(format), filterMode(filterMode), immutable(immutable) {}
 	};
 
 	struct FrameBufferProps
@@ -22,7 +28,14 @@ namespace Mahakam
 		std::vector<FrameBufferAttachmentProps> colorAttachments;
 		FrameBufferAttachmentProps depthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, true };
 
+		bool dontUseDepth = false;
 		bool swapChainTarget = false;
+
+		FrameBufferProps() = default;
+
+		FrameBufferProps(uint32_t width, uint32_t height, std::initializer_list<FrameBufferAttachmentProps> colorAttachments,
+			FrameBufferAttachmentProps depthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, true }, bool dontUseDepth = false, bool swapChainTarget = false)
+			: width(width), height(height), colorAttachments(colorAttachments), depthAttachment(depthAttachment), dontUseDepth(dontUseDepth), swapChainTarget(swapChainTarget) {}
 	};
 
 	class FrameBuffer
@@ -39,6 +52,8 @@ namespace Mahakam
 		virtual const Ref<RenderBuffer>& getDepthAttachment() const = 0;
 
 		virtual const FrameBufferProps& getSpecification() const = 0;
+
+		virtual void readColorPixels(void* pixels, int attachmentSlot = 0) const = 0;
 
 		static Ref<FrameBuffer> create(const FrameBufferProps& props);
 	};

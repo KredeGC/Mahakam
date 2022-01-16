@@ -37,7 +37,7 @@ namespace Mahakam
 
 		virtual void setTexture(const std::string& name, int slot, Ref<Texture> tex) override
 		{
-			ints[name] = slot;
+			//ints[name] = slot;
 			textures[slot] = tex;
 		}
 

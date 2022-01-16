@@ -1,5 +1,5 @@
 #type vertex
-#version 330
+#version 450
 #include "assets/shaders/include/Matrix.glsl"
 
 layout(location = 0) in vec3 i_Pos;
@@ -15,7 +15,7 @@ void main() {
 
 
 #type fragment
-#version 330
+#version 450
 
 layout(location = 0) out vec4 o_Color;
 

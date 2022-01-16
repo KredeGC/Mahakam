@@ -51,6 +51,22 @@ namespace Mahakam
 		invalidate();
 	}
 
+	void OpenGLFrameBuffer::readColorPixels(void* pixels, int attachmentSlot) const
+	{
+		MH_PROFILE_FUNCTION();
+
+		MH_CORE_ASSERT(attachmentSlot < colorAttachments.size(), "Index outside range of framebuffer textures!");
+
+		auto& spec = props.colorAttachments[attachmentSlot];
+
+		GLenum format = TextureFormatToOpenGLFormat(spec.format);
+		GLenum type = TextureFormatToOpenGLType(spec.format);
+
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentSlot);
+
+		glReadPixels(0, 0, props.width, props.height, format, type, pixels);
+	}
+
 	void OpenGLFrameBuffer::invalidate()
 	{
 		MH_PROFILE_FUNCTION();
@@ -66,7 +82,7 @@ namespace Mahakam
 		glCreateFramebuffers(1, &rendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 
-		// Color buffer
+		// Color buffers
 		for (int i = 0; i < props.colorAttachments.size(); i++)
 		{
 			FrameBufferAttachmentProps& spec = props.colorAttachments[i];
@@ -75,10 +91,11 @@ namespace Mahakam
 
 			colorAttachments.push_back(tex);
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->getRendererID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, tex->getRendererID(), 0);
 		}
 
 		// Depth buffer
+		if (!props.dontUseDepth)
 		{
 			FrameBufferAttachmentProps& spec = props.depthAttachment;
 

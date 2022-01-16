@@ -20,6 +20,13 @@ namespace Mahakam
 			std::vector<Ref<Light>> lights;
 		};
 
+		struct RendererResults
+		{
+			uint32_t drawCalls = 0;
+			uint32_t vertexCount = 0;
+			uint32_t triCount = 0;
+		};
+
 		struct MeshData
 		{
 			float depth;
@@ -28,6 +35,7 @@ namespace Mahakam
 			glm::mat4 transform;
 		};
 
+		static RendererResults* rendererResults;
 		static SceneData* sceneData;
 
 		static std::unordered_map<Ref<Shader>, // Sort by shader
@@ -42,10 +50,12 @@ namespace Mahakam
 		static void init();
 
 		static void beginScene(const Camera& cam, const glm::mat4& transform, const Ref<Light>& mainLight);
-		static void endScene(uint32_t* drawCalls, uint32_t* vertexCount, uint32_t* triCount);
+		static void endScene();
 
 		static void submit(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);
 		static void submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);
+
+		inline static const RendererResults* getPerformanceResults() { return rendererResults; }
 
 		inline static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
 	};

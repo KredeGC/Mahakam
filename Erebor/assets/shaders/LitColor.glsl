@@ -1,5 +1,5 @@
 #type vertex
-#version 330
+#version 450
 #include "assets/shaders/include/Matrix.glsl"
 
 layout(location = 0) in vec3 i_Pos;
@@ -14,7 +14,6 @@ out vec2 v_UV;
 void main() {
     gl_Position = MATRIX_MVP * vec4(i_Pos, 1.0);
     v_WorldPos = (MATRIX_M * vec4(i_Pos, 1.0)).xyz;
-    //v_WorldNormal = (MATRIX_M * vec4(i_Normal, 0.0)).xyz;
     v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
     v_UV = i_UV;
     v_ViewDir = getViewDir(v_WorldPos);
@@ -23,7 +22,7 @@ void main() {
 
 
 #type fragment
-#version 330
+#version 450
 #include "assets/shaders/include/Matrix.glsl"
 #include "assets/shaders/include/Lighting.glsl"
 

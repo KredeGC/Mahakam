@@ -31,25 +31,25 @@ namespace Mahakam
 		uint32_t resolution;
 		TextureFormat format;
 		TextureFilter filterMode;
-		TextureWrapMode wrapX;
-		TextureWrapMode wrapY;
 		bool mipmaps;
 		TextureCubePrefilter prefilter;
 
-		CubeTextureProps(uint32_t resolution = 1024, TextureFormat format = TextureFormat::RGB8, TextureFilter filterMode = TextureFilter::Bilinear, TextureWrapMode wrapX = TextureWrapMode::Repeat, TextureWrapMode wrapY = TextureWrapMode::Repeat, bool mipmaps = true, TextureCubePrefilter prefilter = TextureCubePrefilter::None)
-			: resolution(resolution), format(format), filterMode(filterMode), wrapX(wrapX), wrapY(wrapY), mipmaps(mipmaps), prefilter(prefilter) {}
+		CubeTextureProps(uint32_t resolution = 1024, TextureFormat format = TextureFormat::RGB8, TextureFilter filterMode = TextureFilter::Bilinear, bool mipmaps = true, TextureCubePrefilter prefilter = TextureCubePrefilter::None)
+			: resolution(resolution), format(format), filterMode(filterMode), mipmaps(mipmaps), prefilter(prefilter) {}
 
 		CubeTextureProps(uint32_t resolution, TextureFormat format, bool mipmaps, TextureCubePrefilter prefilter)
-			: resolution(resolution), format(format), filterMode(TextureFilter::Bilinear), wrapX(TextureWrapMode::Repeat), wrapY(TextureWrapMode::Repeat), mipmaps(mipmaps), prefilter(prefilter) {}
+			: resolution(resolution), format(format), filterMode(TextureFilter::Bilinear), mipmaps(mipmaps), prefilter(prefilter) {}
 	};
 
 
 	class Texture : public RenderBuffer
 	{
 	public:
-		virtual void setData(void* data, uint32_t size) = 0;
+		virtual void setData(void* data, bool mipmaps = false) = 0;
 
 		virtual void bind(uint32_t slot = 0) const = 0;
+
+		virtual void readPixels(void* pixels, bool mipmaps = false) = 0;
 	};
 
 
@@ -77,6 +77,7 @@ namespace Mahakam
 		uint32_t resolution;
 
 	public:
+		static Ref<TextureCube> create(const CubeTextureProps& props = CubeTextureProps());
 		static Ref<TextureCube> create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps());
 	};
 }
