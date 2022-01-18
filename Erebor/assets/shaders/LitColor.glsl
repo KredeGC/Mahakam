@@ -6,17 +6,21 @@ layout(location = 0) in vec3 i_Pos;
 layout(location = 1) in vec2 i_UV;
 layout(location = 2) in vec3 i_Normal;
 
-out vec3 v_WorldPos;
-out vec3 v_WorldNormal;
-out vec3 v_ViewDir;
-out vec2 v_UV;
+struct v2f {
+    vec3 v_WorldPos;
+    vec3 v_WorldNormal;
+    vec3 v_ViewDir;
+    vec2 v_UV;
+};
+
+layout(location = 0) out v2f o;
 
 void main() {
     gl_Position = MATRIX_MVP * vec4(i_Pos, 1.0);
-    v_WorldPos = (MATRIX_M * vec4(i_Pos, 1.0)).xyz;
-    v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
-    v_UV = i_UV;
-    v_ViewDir = getViewDir(v_WorldPos);
+    o.v_WorldPos = (MATRIX_M * vec4(i_Pos, 1.0)).xyz;
+    o.v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
+    o.v_UV = i_UV;
+    o.v_ViewDir = getViewDir(o.v_WorldPos);
 }
 
 
@@ -26,12 +30,19 @@ void main() {
 #include "assets/shaders/include/Matrix.glsl"
 #include "assets/shaders/include/Lighting.glsl"
 
-layout(location = 0) out vec4 o_Color;
+layout(location = 0) out vec4 o_Albedo;
+layout(location = 1) out vec4 o_Specular;
+layout(location = 2) out vec4 o_Pos;
+layout(location = 3) out vec4 o_Normal;
 
-in vec3 v_WorldPos;
-in vec3 v_WorldNormal;
-in vec3 v_ViewDir;
-in vec2 v_UV;
+struct v2f {
+    vec3 v_WorldPos;
+    vec3 v_WorldNormal;
+    vec3 v_ViewDir;
+    vec2 v_UV;
+};
+
+layout(location = 0) in v2f i;
 
 uniform vec3 u_Color;
 uniform float u_Metallic;
@@ -44,18 +55,11 @@ void main() {
     float metallic = u_Metallic;
     float roughness = u_Roughness;
     float ao = 1.0;
-
-    vec3 viewdir = normalize(v_ViewDir);
-    vec3 normal = normalize(v_WorldNormal);
-
-    vec3 directLighting = BRDF_Direct(light, albedo, metallic, roughness, ao, viewdir, v_WorldPos, normal);
-
-    vec3 color = directLighting;
-
-    // HDR tonemapping
-    color = color / (color + vec3(1.0));
-    // Gamma correction
-    color = pow(color, vec3(1.0 / 2.2)); 
-
-    o_Color = vec4(color, 1.0);
+    
+    vec3 normal = normalize(i.v_WorldNormal);
+    
+    o_Albedo = vec4(albedo, ao);
+    o_Specular = vec4(metallic, roughness, 1.0, 1.0);
+    o_Pos = vec4(i.v_WorldPos, 1.0);
+    o_Normal = vec4(normal, 0.0);
 }

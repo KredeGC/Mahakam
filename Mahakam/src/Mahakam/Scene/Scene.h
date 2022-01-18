@@ -2,6 +2,9 @@
 
 #include "Mahakam/Core/Timestep.h"
 
+#include "Mahakam/Renderer/Material.h"
+#include "Mahakam/Renderer/Texture.h"
+
 #include "Components/CameraComponent.h"
 
 #include "Entity.h"
@@ -15,6 +18,11 @@ namespace Mahakam
 	private:
 		friend class Entity;
 		friend class SceneHierarchyPanel;
+
+		Ref<Material> skyboxMaterial;
+		Ref<Texture> skyboxTexture;
+		Ref<Texture> skyboxIrradiance;
+		Ref<Texture> skyboxSpecular;
 
 		entt::registry registry;
 
@@ -33,7 +41,8 @@ namespace Mahakam
 		}
 
 	public:
-		Scene();
+		Scene(const std::string& filepath);
+		Scene(const Ref<Texture>& irradianceMap, const Ref<Texture>& specularMap);
 		~Scene();
 
 		void onUpdate(Timestep ts);
@@ -43,12 +52,7 @@ namespace Mahakam
 		Entity createEntity(const std::string& name = "Entity");
 		void destroyEntity(Entity entity);
 
-		bool serialize(const std::string& filepath);
-		bool deserialize(const std::string& filepath);
-
-		bool serializeRuntime(const std::string& filepath);
-		bool deserializeRuntime(const std::string& filepath);
-
-		static Ref<Scene> createScene();
+		static Ref<Scene> createScene(const std::string& filepath);
+		static Ref<Scene> createScene(const Ref<Texture>& irradianceMap, const Ref<Texture>& specularMap);
 	};
 }

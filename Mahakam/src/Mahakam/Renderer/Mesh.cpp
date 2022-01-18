@@ -3,6 +3,8 @@
 
 namespace Mahakam
 {
+	static Mesh* staticScreenQuad = nullptr;
+
 	static glm::vec3 calculateCubeSphereVertex(const glm::vec3& v)
 	{
 		float x2 = v.x * v.x;
@@ -145,38 +147,41 @@ namespace Mahakam
 		delete[] interleavedVertices;
 	}
 
-	Ref<Mesh> Mesh::createScreenQuad()
+	Mesh* Mesh::getScreenQuad()
 	{
 		MH_PROFILE_FUNCTION();
 
-		glm::vec3 positions[] = {
-			{ -1.0f, 1.0f, 0.0f },
-			{ 1.0f, 1.0f, 0.0f  },
-			{ -1.0f, -1.0f, 0.0f },
-			{ 1.0f, -1.0f, 0.0f }
-		};
-
-		glm::vec2 uvs[] = {
-			{ 0.0f, 1.0f, },
-			{ 1.0f, 1.0f, },
-			{ 0.0f, 0.0f, },
-			{ 1.0f, 0.0f }
-		};
-
-		uint32_t indices[] = {
-			0, 2, 3,
-			0, 3, 1
-		};
-
-		BufferLayout layout
+		if (!staticScreenQuad)
 		{
-			{ ShaderDataType::Float3, "i_Pos" },
-			{ ShaderDataType::Float2, "i_UV" }
-		};
+			glm::vec3 positions[] = {
+				{ -1.0f, 1.0f, 0.0f },
+				{ 1.0f, 1.0f, 0.0f  },
+				{ -1.0f, -1.0f, 0.0f },
+				{ 1.0f, -1.0f, 0.0f }
+			};
 
-		Ref<Mesh> mesh = Mesh::create(4, layout, indices, 6, { positions, uvs });
+			glm::vec2 uvs[] = {
+				{ 0.0f, 1.0f, },
+				{ 1.0f, 1.0f, },
+				{ 0.0f, 0.0f, },
+				{ 1.0f, 0.0f }
+			};
 
-		return mesh;
+			uint32_t indices[] = {
+				0, 2, 3,
+				0, 3, 1
+			};
+
+			BufferLayout layout
+			{
+				{ ShaderDataType::Float3, "i_Pos" },
+				{ ShaderDataType::Float2, "i_UV" }
+			};
+
+			staticScreenQuad = new Mesh(4, layout, indices, 6, { positions, uvs });
+		}
+
+		return staticScreenQuad;
 	}
 
 	Ref<Mesh> Mesh::createCube(int tessellation, bool reverse)

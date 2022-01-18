@@ -21,7 +21,7 @@ namespace Mahakam
 		window = std::unique_ptr<Window>(Window::create({ name }));
 		window->setEventCallback(MH_BIND_EVENT(Application::onEvent));
 
-		Renderer::init();
+		Renderer::init(1600, 900);
 
 		imGuiLayer = new ImGuiLayer();
 		pushOverlay(imGuiLayer);

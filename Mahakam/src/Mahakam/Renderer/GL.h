@@ -2,6 +2,8 @@
 
 #include "RendererAPI.h"
 
+#include "Mesh.h"
+
 namespace Mahakam
 {
 	class GL
@@ -24,6 +26,8 @@ namespace Mahakam
 		inline static void setFillMode(bool fill) { rendererAPI->setFillMode(fill); }
 
 		inline static void setBlendMode(bool enable) { rendererAPI->setBlendMode(enable); }
+
+		inline static void drawScreenQuad() { Mesh::getScreenQuad()->bind(); drawIndexed(Mesh::getScreenQuad()->getIndexCount()); }
 
 		inline static void drawIndexed(uint32_t indexCount) { rendererAPI->drawIndexed(indexCount); }
 

@@ -9,100 +9,70 @@
 
 #include "Mahakam/Renderer/Renderer.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <fstream>
+#include <filesystem>
 
 namespace Mahakam
 {
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
+	static Ref<Texture> loadOrCreate(const std::string& cachePath, const std::string& src, bool saveMips, const CubeTextureProps& props)
 	{
-		out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-		return out;
-	}
-
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::quat& q)
-	{
-		out << YAML::Flow;
-		out << YAML::BeginSeq << q.x << q.y << q.z << q.w << YAML::EndSeq;
-		return out;
-	}
-
-	static void serializeEntity(YAML::Emitter& out, Entity entity)
-	{
-		out << YAML::BeginMap;
-		out << YAML::Key << "Entity" << YAML::Value << "123679821";
-
-		if (entity.hasComponent<TagComponent>())
+		if (!std::filesystem::exists(cachePath))
 		{
-			out << YAML::Key << "TagComponent";
-			out << YAML::BeginMap; // TagComponent
+			Ref<Texture> texture = TextureCube::create(src, props);
 
-			auto& tag = entity.getComponent<TagComponent>().tag;
-			out << YAML::Key << "Tag" << YAML::Value << tag;
+			uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(props.resolution)));
+			uint32_t maxMipLevels = saveMips ? mipLevels : 1;
 
-			out << YAML::EndMap; // TagComponent
+			uint32_t size = 0;
+			for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
+			{
+				uint32_t mipResolution = (uint32_t)(props.resolution * std::pow(0.5, mip));
+				size += 6 * 6 * mipResolution * mipResolution;
+			}
+
+			// Save to cache
+			char* pixels = new char[size];
+			texture->readPixels(pixels, saveMips);
+			std::ofstream stream(cachePath, std::ios::binary);
+			stream.write(pixels, size);
+
+			delete[] pixels;
+
+			return texture;
 		}
-
-		if (entity.hasComponent<TransformComponent>())
+		else
 		{
-			out << YAML::Key << "TransformComponent";
-			out << YAML::BeginMap; // TransformComponent
+			// Load from cache
+			std::ifstream stream(cachePath, std::ios::binary);
+			std::stringstream ss;
+			ss << stream.rdbuf();
+			Ref<Texture> texture = TextureCube::create(props);
+			texture->setData((void*)ss.str().c_str(), saveMips);
 
-			auto& tc = entity.getComponent<TransformComponent>();
-			out << YAML::Key << "Translation" << YAML::Value << tc.getPosition();
-			out << YAML::Key << "Rotation" << YAML::Value << tc.getRotation();
-			out << YAML::Key << "Scale" << YAML::Value << tc.getScale();
+			stream.close();
 
-			out << YAML::EndMap; // TransformComponent
+			return texture;
 		}
-
-		if (entity.hasComponent<CameraComponent>())
-		{
-			out << YAML::Key << "CameraComponent";
-			out << YAML::BeginMap; // CameraComponent
-
-			auto& cameraComponent = entity.getComponent<CameraComponent>();
-			auto& camera = cameraComponent.getCamera();
-
-			out << YAML::Key << "Camera" << YAML::Value;
-			out << YAML::BeginMap; // Camera
-			out << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.getProjectionType();
-			out << YAML::Key << "FOV" << YAML::Value << camera.getFov();
-			out << YAML::Key << "Near" << YAML::Value << camera.getNearPlane();
-			out << YAML::Key << "Far" << YAML::Value << camera.getFarPlane();
-			out << YAML::Key << "Size" << YAML::Value << camera.getSize();
-			out << YAML::EndMap; // Camera
-
-			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.hasFixedAspectRatio();
-
-			out << YAML::EndMap; // CameraComponent
-		}
-
-		if (entity.hasComponent<MeshComponent>())
-		{
-			out << YAML::Key << "MeshComponent";
-			out << YAML::BeginMap; // MeshComponent
-
-			auto& meshComponent = entity.getComponent<MeshComponent>();
-			//out << YAML::Key << "Color" << YAML::Value << meshComponent;
-
-			out << YAML::EndMap; // MeshComponent
-		}
-
-		out << YAML::EndMap;
 	}
 
-	Scene::Scene()
+
+
+
+	Scene::Scene(const std::string& filepath)
 	{
-		
+		skyboxTexture = TextureCube::create(filepath, { 2048, TextureFormat::RGB16F });
+		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", filepath, false, {32, TextureFormat::RGB16F, true, TextureCubePrefilter::Convolute});
+		skyboxSpecular = loadOrCreate(filepath + ".specular", filepath, true, {256, TextureFormat::RGB16F, true, TextureCubePrefilter::Prefilter});
+
+		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
+		skyboxMaterial = Material::create(skyboxShader);
+		skyboxMaterial->setTexture("u_Environment", 3, skyboxTexture);
 	}
 
-	Scene::~Scene()
-	{
+	Scene::Scene(const Ref<Texture>& irradianceMap, const Ref<Texture>& specularMap)
+		: skyboxIrradiance(irradianceMap), skyboxSpecular(specularMap) {}
 
-	}
+	Scene::~Scene() {}
 
 	void Scene::onUpdate(Timestep ts)
 	{
@@ -128,6 +98,13 @@ namespace Mahakam
 
 		Ref<Light> mainLight = std::make_shared<Light>(glm::vec3(1.0f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
 
+		Renderer::EnvironmentData environment
+		{
+			{ mainLight },
+			skyboxIrradiance,
+			skyboxSpecular
+		};
+
 		// Get the rendering camera
 		CameraComponent* mainCamera = nullptr;
 		TransformComponent* mainTransform = nullptr;
@@ -146,7 +123,7 @@ namespace Mahakam
 		// Render each entity with a mesh
 		if (mainCamera && mainTransform)
 		{
-			Renderer::beginScene(*mainCamera, *mainTransform, mainLight);
+			Renderer::beginScene(*mainCamera, *mainTransform, environment);
 
 			auto meshes = registry.view<TransformComponent, MeshComponent>();
 			for (auto& entity : meshes)
@@ -161,6 +138,16 @@ namespace Mahakam
 			}
 
 			Renderer::endScene();
+
+			// Render skybox
+			// TODO: Render as transparent queue instead
+			Renderer::getFrameBuffer()->bind();
+
+			skyboxMaterial->getShader()->bind();
+			skyboxMaterial->bind();
+			GL::drawScreenQuad();
+
+			Renderer::getFrameBuffer()->unbind();
 		}
 	}
 
@@ -194,92 +181,13 @@ namespace Mahakam
 		registry.destroy(entity);
 	}
 
-	Ref<Scene> Scene::createScene()
+	Ref<Scene> Scene::createScene(const std::string& filepath)
 	{
-		return std::make_shared<Scene>();
+		return std::make_shared<Scene>(filepath);
 	}
 
-	bool Scene::serialize(const std::string& filepath)
+	Ref<Scene> Scene::createScene(const Ref<Texture>& irradianceMap, const Ref<Texture>& specularMap)
 	{
-		YAML::Emitter out;
-		out << YAML::BeginMap;
-		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
-		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-		registry.each([&](auto entityID)
-		{
-			Entity entity = { entityID, this };
-			if (!entity)
-				return;
-
-			serializeEntity(out, entity);
-		});
-		out << YAML::EndSeq;
-		out << YAML::EndMap;
-
-		std::ofstream fout(filepath);
-		fout << out.c_str();
-
-		return true;
-	}
-
-	bool Scene::deserialize(const std::string& filepath)
-	{
-		/*std::ifstream stream(filepath);
-		std::stringstream stringStream;
-
-		stringStream << stream.rdbuf();
-
-		YAML::Node data = YAML::Load(stringStream.str());
-		if (!data["Scene"])
-			return false;
-
-		std::string sceneName = data["Scene"].as<std::string>();
-		MH_CORE_TRACE("Deserializing scene {0}", sceneName);
-
-		auto entities = data["Entities"];
-		if (entities)
-		{
-			for (auto& entityNode : entities)
-			{
-				if (entityNode["CameraComponent"])
-				{
-					uint64_t uuid = entityNode["Entity"].as<uint64_t>();
-
-					std::string name;
-					auto tagComponent = entityNode["TagComponent"];
-					if (tagComponent)
-						name = tagComponent["Tag"].as<std::string>();
-
-					MH_CORE_TRACE("Deserialized Entity ({0}), {1}", uuid, name);
-
-					Entity entity = createEntity(name);
-
-					auto transformComponent = entityNode["TransformComponent"];
-					if (transformComponent)
-					{
-						auto& transform = entity.getComponent<TransformComponent>();
-						transform.setPosition(transformComponent["Translation"].as<glm::vec3>());
-						transform.setRotation(transformComponent["Rotation"].as<glm::quat>());
-						transform.setScale(transformComponent["Scale"].as<glm::vec3>());
-					}
-
-
-				}
-			}
-		}*/
-
-		return true;
-	}
-
-	bool Scene::serializeRuntime(const std::string& filepath)
-	{
-		MH_CORE_BREAK("Not implemented!");
-		return false;
-	}
-
-	bool Scene::deserializeRuntime(const std::string& filepath)
-	{
-		MH_CORE_BREAK("Not implemented!");
-		return false;
+		return std::make_shared<Scene>(irradianceMap, specularMap);
 	}
 }

@@ -21,7 +21,7 @@ namespace Mahakam
 
 				activeScene->onViewportResize((uint32_t)size.x, (uint32_t)size.y);
 			}
-			ImGui::Image((void*)(uintptr_t)viewportFramebuffer->getColorAttachments()[0]->getRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image((void*)(uintptr_t)viewportFramebuffer->getColorBuffer(0)->getRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}

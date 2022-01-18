@@ -37,6 +37,31 @@ namespace Mahakam
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	void OpenGLFrameBuffer::blit(const Ref<FrameBuffer>& dest)
+	{
+		Ref<OpenGLFrameBuffer> fbo = std::static_pointer_cast<OpenGLFrameBuffer>(dest);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID);
+
+		glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void OpenGLFrameBuffer::blitDepth(const Ref<FrameBuffer>& dest)
+	{
+		Ref<OpenGLFrameBuffer> fbo = std::static_pointer_cast<OpenGLFrameBuffer>(dest);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID);
+
+		glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
 	void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height)
 	{
 		if (width == 0 || height == 0 || width > MAX_FRAMEBUFFER_SIZE || height > MAX_FRAMEBUFFER_SIZE)
@@ -117,7 +142,22 @@ namespace Mahakam
 			}
 		}
 
-		// Bind framebuffer
+		if (colorAttachments.size() > 1)
+		{
+			GLenum* buffers = new GLenum[colorAttachments.size()];
+			for (GLenum i = 0; i < colorAttachments.size(); i++)
+				buffers[i] = GL_COLOR_ATTACHMENT0 + i;
+
+			glDrawBuffers(colorAttachments.size(), buffers);
+
+			delete[] buffers;
+		}
+		else if (colorAttachments.empty())
+		{
+			glDrawBuffer(GL_NONE);
+		}
+
+		// Check framebuffer
 		MH_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "FrameBuffer is incomplete!");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

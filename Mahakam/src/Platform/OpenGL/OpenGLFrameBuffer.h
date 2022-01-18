@@ -19,10 +19,16 @@ namespace Mahakam
 		virtual void bind() override;
 		virtual void unbind() override;
 
+		virtual void blit(const Ref<FrameBuffer>& dest) override;
+		virtual void blitDepth(const Ref<FrameBuffer>& dest) override;
 		virtual void resize(uint32_t width, uint32_t height) override;
 
-		virtual const std::vector<Ref<RenderBuffer>>& getColorAttachments() const override { return colorAttachments; }
-		virtual const Ref<RenderBuffer>& getDepthAttachment() const override { return depthAttachment; }
+		virtual const std::vector<Ref<RenderBuffer>>& getColorBuffers() const override { return colorAttachments; }
+		virtual const Ref<RenderBuffer>& getColorBuffer(int index) const override { return colorAttachments[index]; }
+		virtual const Ref<Texture>& getColorTexture(int index) const override { return std::static_pointer_cast<Texture>(colorAttachments[index]); }
+
+		virtual const Ref<RenderBuffer>& getDepthBuffer() const override { return depthAttachment; }
+		virtual const Ref<Texture>& getDepthTexture() const override { return std::static_pointer_cast<Texture>(depthAttachment); }
 
 		virtual const FrameBufferProps& getSpecification() const override { return props; }
 

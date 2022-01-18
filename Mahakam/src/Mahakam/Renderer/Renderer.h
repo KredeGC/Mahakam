@@ -2,6 +2,8 @@
 
 #include "GL.h"
 
+#include "FrameBuffer.h"
+
 #include "Camera.h"
 #include "Mesh.h"
 #include "Light.h"
@@ -12,12 +14,24 @@ namespace Mahakam
 {
 	class Renderer
 	{
+	public:
+		struct EnvironmentData
+		{
+			std::vector<Ref<Light>> lights;
+			Ref<Texture> irradianceMap;
+			Ref<Texture> specularMap;
+		};
+
 	private:
 		struct SceneData
 		{
+			EnvironmentData environment;
+
 			Ref<UniformBuffer> matrixBuffer;
 			glm::mat4 viewProjectionMatrix;
-			std::vector<Ref<Light>> lights;
+			Ref<FrameBuffer> gBuffer;
+			Ref<FrameBuffer> viewportFramebuffer;
+			Ref<Material> lightingMaterial;
 		};
 
 		struct RendererResults
@@ -47,13 +61,16 @@ namespace Mahakam
 
 	public:
 		static void onWindowResie(uint32_t width, uint32_t height);
-		static void init();
+		static void init(uint32_t width, uint32_t height);
 
-		static void beginScene(const Camera& cam, const glm::mat4& transform, const Ref<Light>& mainLight);
+		static void beginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
 		static void endScene();
 
 		static void submit(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);
 		static void submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);
+
+		inline static const Ref<FrameBuffer>& getGBuffer() { return sceneData->gBuffer; }
+		inline static const Ref<FrameBuffer>& getFrameBuffer() { return sceneData->viewportFramebuffer; }
 
 		inline static const RendererResults* getPerformanceResults() { return rendererResults; }
 
