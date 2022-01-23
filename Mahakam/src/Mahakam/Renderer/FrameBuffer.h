@@ -52,11 +52,11 @@ namespace Mahakam
 		virtual void resize(uint32_t width, uint32_t height) = 0;
 
 		virtual const std::vector<Ref<RenderBuffer>>& getColorBuffers() const = 0;
-		virtual const Ref<RenderBuffer>& getColorBuffer(int index) const = 0;
-		virtual const Ref<Texture>& getColorTexture(int index) const = 0;
+		virtual Ref<RenderBuffer> getColorBuffer(int index) const = 0;
+		virtual Ref<Texture> getColorTexture(int index) const = 0;
 
-		virtual const Ref<RenderBuffer>& getDepthBuffer() const = 0;
-		virtual const Ref<Texture>& getDepthTexture() const = 0;
+		virtual Ref<RenderBuffer> getDepthBuffer() const = 0;
+		virtual Ref<Texture> getDepthTexture() const = 0;
 
 		virtual const FrameBufferProps& getSpecification() const = 0;
 

@@ -89,11 +89,7 @@ namespace Mahakam
 		dataFormat = TextureFormatToOpenGLFormat(this->props.format, channels);
 		formatType = TextureFormatToOpenGLType(this->props.format);
 
-		MH_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
-
-		// TODO: Fix TextureFormatToOpenGLFormat() to take in the number of channels
-		//if (channels == 1)
-		//	dataFormat = GL_R8;
+		MH_CORE_ASSERT(internalFormat && dataFormat, "Format not supported!");
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
 		glBindTexture(GL_TEXTURE_2D, rendererID);

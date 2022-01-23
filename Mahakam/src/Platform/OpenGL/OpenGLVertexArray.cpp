@@ -10,7 +10,7 @@ namespace Mahakam
 		switch (type)
 		{
 		case Mahakam::ShaderDataType::None:
-			return GL_FLOAT;
+			MH_CORE_BREAK("None is not a supported shader type!");
 		case Mahakam::ShaderDataType::Float:
 			return GL_FLOAT;
 		case Mahakam::ShaderDataType::Float2:
@@ -35,11 +35,11 @@ namespace Mahakam
 			return GL_BOOL;
 		}
 
-		MH_CORE_ASSERT(false, "Unknown shader data type!");
+		MH_CORE_BREAK("Unknown shader data type!");
 		return 0;
 	}
 
-	OpenGLVertexArray::OpenGLVertexArray()
+	OpenGLVertexArray::OpenGLVertexArray(uint32_t vertexCount) : vertexCount(vertexCount)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -67,7 +67,7 @@ namespace Mahakam
 		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& buffer)
+	void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& buffer, bool interleave)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -77,16 +77,57 @@ namespace Mahakam
 		buffer->bind();
 
 		const auto& layout = buffer->getLayout();
-		for (const auto& element : layout)
+		if (interleave)
 		{
-			glEnableVertexAttribArray(vertexBufferIndex);
-			glVertexAttribPointer(vertexBufferIndex,
-				element.getComponentCount(),
-				ShaderDataTypeToOpenGLBaseType(element.type),
-				element.normalized ? GL_TRUE : GL_FALSE,
-				layout.getStride(),
-				(const void*)(uintptr_t)element.offset);
-			vertexBufferIndex++;
+			for (const auto& element : layout)
+			{
+				glEnableVertexAttribArray(vertexBufferIndex);
+				GLenum type = ShaderDataTypeToOpenGLBaseType(element.type);
+				if (type == GL_INT)
+				{
+					glVertexAttribIPointer(vertexBufferIndex,
+						element.getComponentCount(),
+						type,
+						layout.getStride(),
+						(const void*)(uintptr_t)element.offset);
+				}
+				else
+				{
+					glVertexAttribPointer(vertexBufferIndex,
+						element.getComponentCount(),
+						type,
+						element.normalized ? GL_TRUE : GL_FALSE,
+						layout.getStride(),
+						(const void*)(uintptr_t)element.offset);
+				}
+				vertexBufferIndex++;
+			}
+		}
+		else
+		{
+			for (const auto& element : layout)
+			{
+				glEnableVertexAttribArray(vertexBufferIndex);
+				GLenum type = ShaderDataTypeToOpenGLBaseType(element.type);
+				if (type == GL_INT)
+				{
+					glVertexAttribIPointer(vertexBufferIndex,
+						element.getComponentCount(),
+						type,
+						0,
+						(const void*)(uintptr_t)(vertexCount * element.offset));
+				}
+				else
+				{
+					glVertexAttribPointer(vertexBufferIndex,
+						element.getComponentCount(),
+						type,
+						element.normalized ? GL_TRUE : GL_FALSE,
+						0,
+						(const void*)(uintptr_t)(vertexCount * element.offset));
+				}
+				vertexBufferIndex++;
+			}
 		}
 
 		vertexBuffers.push_back(buffer);

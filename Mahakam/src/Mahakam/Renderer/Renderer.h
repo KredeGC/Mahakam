@@ -69,8 +69,8 @@ namespace Mahakam
 		static void submit(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);
 		static void submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);
 
-		inline static const Ref<FrameBuffer>& getGBuffer() { return sceneData->gBuffer; }
-		inline static const Ref<FrameBuffer>& getFrameBuffer() { return sceneData->viewportFramebuffer; }
+		inline static Ref<FrameBuffer> getGBuffer() { return sceneData->gBuffer; }
+		inline static Ref<FrameBuffer> getFrameBuffer() { return sceneData->viewportFramebuffer; }
 
 		inline static const RendererResults* getPerformanceResults() { return rendererResults; }
 

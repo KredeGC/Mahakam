@@ -19,7 +19,7 @@ namespace Mahakam
 	public:
 		SceneHierarchyPanel() = default;
 
-		void setContext(const Ref<Scene>& scene);
+		void setContext(Ref<Scene> scene);
 
 		virtual void onImGuiRender() override;
 	};

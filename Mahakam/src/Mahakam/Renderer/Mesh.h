@@ -7,119 +7,36 @@
 
 namespace Mahakam
 {
-	enum class ShaderSemantic
-	{
-		Position,
-		Normal,
-		Tangent,
-		Color,
-		TexCoord0 // Texcoord 0-9?
-	};
-
-	static ShaderDataType ShaderSemanticDataType(ShaderSemantic semantic)
-	{
-		switch (semantic)
-		{
-		case ShaderSemantic::Position:
-			return ShaderDataType::Float3;
-		case ShaderSemantic::Normal:
-			return ShaderDataType::Float3;
-		case ShaderSemantic::Tangent:
-			return ShaderDataType::Float3;
-		case ShaderSemantic::Color:
-			return ShaderDataType::Float4;
-		case ShaderSemantic::TexCoord0:
-			return ShaderDataType::Float2;
-		}
-
-		MH_CORE_ASSERT(false, "Unknown shader semantic!");
-		return ShaderDataType::None;
-	}
-
-	static uint32_t ShaderSemanticSize(ShaderSemantic semantic)
-	{
-		switch (semantic)
-		{
-		case ShaderSemantic::Position:
-			return 12;
-		case ShaderSemantic::Normal:
-			return 12;
-		case ShaderSemantic::Tangent:
-			return 12;
-		case ShaderSemantic::Color:
-			return 16;
-		case ShaderSemantic::TexCoord0:
-			return 8;
-		}
-
-		MH_CORE_ASSERT(false, "Unknown shader semantic!");
-		return 0;
-	}
-
-	struct MeshElement
-	{
-		ShaderSemantic semantic;
-		std::string name;
-
-		MeshElement() = default;
-
-		MeshElement(ShaderSemantic semantic, const std::string& name)
-			: semantic(semantic), name(name) {}
-	};
-
-	class MeshLayout
-	{
-	private:
-		std::vector<MeshElement> elements;
-		BufferLayout bufferLayout;
-
-	public:
-		MeshLayout(const std::initializer_list<MeshElement>& elements) : elements(elements)
-		{
-			MH_PROFILE_FUNCTION();
-
-			std::vector<BufferElement> bufferElements;
-			for (auto& kv : elements)
-			{
-				BufferElement el
-				{
-					ShaderSemanticDataType(kv.semantic),
-					kv.name
-				};
-
-				bufferElements.push_back(el);
-			}
-
-			bufferLayout = bufferElements;
-		}
-
-		inline const BufferLayout& getBufferLayout() const { return bufferLayout; }
-		inline const std::vector<MeshElement>& getElements() const { return elements; }
-
-		std::vector<MeshElement>::iterator begin() { return elements.begin(); }
-		std::vector<MeshElement>::iterator end() { return elements.end(); }
-		std::vector<MeshElement>::const_iterator begin() const { return elements.begin(); }
-		std::vector<MeshElement>::const_iterator end() const { return elements.end(); }
-	};
-
-
 	class Mesh
 	{
-	private:
+	public:
 		struct Vertex
 		{
 			char* data;
+			uint32_t size;
 			std::string name;
 		};
 
-		bool interleaved = true;
-
+	private:
 		char* interleavedVertices = 0;
 		uint32_t vertexCount = 0;
+
 		std::unordered_map<int, Vertex> vertices;
 
 		uint32_t* indices = 0;
 		unsigned int indexCount = 0;
+
+		bool interleave = true;
+
+		BufferElement bufferElements[7]{
+			{ ShaderDataType::Float3,	"i_Pos" },
+			{ ShaderDataType::Float2,	"i_UV" },
+			{ ShaderDataType::Float3,	"i_Normal" },
+			{ ShaderDataType::Float3,	"i_Tangent" },
+			{ ShaderDataType::Float4,	"i_Color" },
+			{ ShaderDataType::Int4,		"i_BoneIDs" },
+			{ ShaderDataType::Float4,	"i_BoneWeights" }
+		};
 
 		BufferLayout bufferLayout;
 
@@ -127,77 +44,73 @@ namespace Mahakam
 
 		void interleaveBuffers();
 
-		void initBuffers(bool interleave);
+		void initBuffers();
 
 	public:
-		Mesh(uint32_t vertexCount, const BufferLayout& layout, uint32_t indexCount);
+		Mesh(uint32_t vertexCount, uint32_t indexCount);
 
-		Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount);
+		Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount);
 
-		Mesh(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* triangles, uint32_t indexCount, const std::initializer_list<void*>& verts);
+		Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount, const std::initializer_list<void*>& verts);
 
 		Mesh(const Mesh& mesh);
 
 		~Mesh();
 
-		// TODO: Merge with setVertices automatically call init()
-		inline void addVertices(const std::string& name, const void* verts)
-		{
-			MH_PROFILE_FUNCTION();
-
-			int index = (int)vertices.size();
-
-			unsigned int stride = bufferLayout.getElement(index).size;
-			uint32_t size = stride * vertexCount;
-
-			Vertex vertex
-			{
-				new char[size],
-				name
-			};
-
-			memcpy(vertex.data, verts, size);
-
-			vertices[index] = vertex;
-		}
-
 		void setVertices(const std::string& name, int index, const char* verts)
 		{
 			MH_PROFILE_FUNCTION();
 
-			unsigned int stride = bufferLayout.getElement(index).size;
-			uint32_t elementSize = stride * vertexCount;
+			uint32_t elementSize = bufferElements[index].size;
+			uint32_t size = elementSize * vertexCount;
 
-			memcpy(vertices[index].data, verts, elementSize);
-
-			if (interleaved)
+			auto& iter = vertices.find(index);
+			if (iter == vertices.end())
 			{
-				interleaveBuffers();
+				// The buffer doesn't exist
+				Vertex vertex
+				{
+					new char[size],
+					size,
+					name
+				};
 
-				const Ref<VertexBuffer>& buffer = vertexArray->getVertexBuffers()[0];
+				memcpy(vertex.data, verts, size);
 
-				uint32_t bufferSize = bufferLayout.getStride() * vertexCount;
-
-				buffer->setData(interleavedVertices, bufferSize);
+				vertices[index] = vertex;
 			}
 			else
 			{
-				auto& buffers = vertexArray->getVertexBuffers();
+				// The buffer already exists
+				memcpy(vertices[index].data, verts, size);
 
-				buffers[index]->setData(verts, elementSize);
+				if (interleave)
+				{
+					interleaveBuffers();
+
+					const Ref<VertexBuffer>& buffer = vertexArray->getVertexBuffers()[0];
+
+					uint32_t bufferSize = bufferLayout.getStride() * vertexCount;
+
+					buffer->setData(interleavedVertices, bufferSize);
+				}
+				else
+				{
+					const Ref<VertexBuffer>& buffer = vertexArray->getVertexBuffers()[0];
+
+					buffer->setData(verts, size);
+				}
 			}
 		}
 
-		void init(bool interleave = true)
+		void init(bool interleave = false)
 		{
 			MH_PROFILE_FUNCTION();
 
-			interleaved = interleave;
+			this->interleave = interleave;
 
-			if (interleave)
-				interleaveBuffers();
-
-			initBuffers(interleave);
+			interleaveBuffers();
+			initBuffers();
 		}
 
 		// TODO: Update the actual buffers
@@ -208,11 +121,18 @@ namespace Mahakam
 			// TODO: Update VAO if necessary
 			indices = inds;
 			indexCount = count;
+			// vertexArray::getIndexBuffer()->setData(...);
 		}
 
 		template<typename T>
 		inline const T& getVertices(int slot) const { return vertices[slot].data; }
 		inline uint32_t getVertexCount() const { return vertexCount; }
+
+		inline const glm::vec3& getPositions() const { return *(glm::vec3*)vertices.at(0).data; }
+		inline const glm::vec2& getTexcoords() const { return *(glm::vec2*)vertices.at(1).data; }
+		inline const glm::vec3& getNormals() const { return *(glm::vec3*)vertices.at(2).data; }
+		inline const glm::vec3& getTangents() const { return *(glm::vec3*)vertices.at(3).data; }
+		inline const glm::vec4& getColors() const { return *(glm::vec4*)vertices.at(4).data; }
 
 		inline const uint32_t* getIndices() const { return indices; }
 		inline uint32_t getIndexCount() const { return indexCount; }
@@ -233,20 +153,20 @@ namespace Mahakam
 			vertexArray->unbind();
 		}
 
-		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout, uint32_t indexCount)
+		static Ref<Mesh> create(uint32_t vertexCount, uint32_t indexCount)
 		{
-			return std::make_shared<Mesh>(vertexCount, layout, indexCount);
+			return std::make_shared<Mesh>(vertexCount, indexCount);
 		}
 
-		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout, const uint32_t* indices, uint32_t indexCount)
+		static Ref<Mesh> create(uint32_t vertexCount, const uint32_t* indices, uint32_t indexCount)
 		{
-			return std::make_shared<Mesh>(vertexCount, layout, indices, indexCount);
+			return std::make_shared<Mesh>(vertexCount, indices, indexCount);
 		}
 
-		static Ref<Mesh> create(uint32_t vertexCount, const BufferLayout& layout,
+		static Ref<Mesh> create(uint32_t vertexCount,
 			const uint32_t* indices, uint32_t indexCount, const std::initializer_list<void*>& verts)
 		{
-			return std::make_shared<Mesh>(vertexCount, layout, indices, indexCount, verts);
+			return std::make_shared<Mesh>(vertexCount, indices, indexCount, verts);
 		}
 
 		static Mesh* getScreenQuad();

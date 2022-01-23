@@ -7,17 +7,17 @@
 
 namespace Mahakam
 {
-	Ref<VertexArray> VertexArray::create()
+	Ref<VertexArray> VertexArray::create(uint32_t vertexCount)
 	{
 		switch (Renderer::getAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_ASSERT(false, "Renderer API not supported!");
+			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return std::make_shared<OpenGLVertexArray>();
+			return std::make_shared<OpenGLVertexArray>(vertexCount);
 		}
 
-		MH_CORE_ASSERT(false, "Unknown renderer API!");
+		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	}

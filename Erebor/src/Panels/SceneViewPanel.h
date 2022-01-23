@@ -21,7 +21,7 @@ namespace Mahakam
 	public:
 		SceneViewPanel() = default;
 
-		void setContext(const Ref<Scene>& scene, const Ref<FrameBuffer>& framebuffer);
+		void setContext(Ref<Scene> scene, Ref<FrameBuffer> framebuffer);
 
 		void onImGuiRender();
 

@@ -4,7 +4,7 @@
 namespace Mahakam
 {
 	OpenGLMaterial::OpenGLMaterial(const Ref<Shader>& shader)
-		: shader(std::dynamic_pointer_cast<OpenGLShader>(shader)) {}
+		: shader(std::static_pointer_cast<OpenGLShader>(shader)) {}
 
 	OpenGLMaterial::OpenGLMaterial(const Ref<Material>& material)
 		: shader(std::static_pointer_cast<OpenGLMaterial>(material)->shader),
@@ -56,7 +56,7 @@ namespace Mahakam
 		shader->setUniformMat4("u_m4_M[" + std::to_string(index) + "]", modelMatrix);
 	}
 
-	const Ref<Texture> OpenGLMaterial::getTexture(const std::string& name) const
+	Ref<Texture> OpenGLMaterial::getTexture(const std::string& name) const
 	{
 		auto& intIter = ints.find(name);
 		if (intIter != ints.end())

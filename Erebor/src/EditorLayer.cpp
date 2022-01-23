@@ -8,13 +8,6 @@ namespace Mahakam
 {
 	void EditorLayer::onAttach()
 	{
-		// Viewport framebuffer
-		FrameBufferProps prop;
-		prop.width = Application::getInstance().getWindow().getWidth();
-		prop.height = Application::getInstance().getWindow().getHeight();
-		prop.colorAttachments = { TextureFormat::RGB8 };
-		viewportFramebuffer = FrameBuffer::create(prop);
-
 		// Create a new active scene
 		activeScene = Scene::createScene("assets/textures/apt.hdr");
 
@@ -25,8 +18,29 @@ namespace Mahakam
 
 
 		// Setup shaders
+		Ref<Shader> skinnedShader = Shader::create("assets/shaders/Skinned.glsl");
 		Ref<Shader> textureShader = Shader::create("assets/shaders/Albedo.glsl");
 		Ref<Shader> shader = Shader::create("assets/shaders/LitColor.glsl");
+
+
+		// Setup dancing monke
+		Ref<Texture> vampireDiffuse = Texture2D::create("assets/textures/vampire.png", TextureFormat::RGBA8);
+		debugMaterial = Material::create(skinnedShader);
+		debugMaterial->setTexture("u_Albedo", 3, vampireDiffuse);
+
+		Ref<Model> vampireModel = Model::load("assets/models/Defeated.fbx");
+		debugAnimation = std::make_shared<Animation>("assets/models/Defeated.fbx", vampireModel.get());
+		debugAnimator = std::make_shared<Animator>(debugAnimation.get());
+
+		const auto& vampireMeshes = vampireModel->getMeshes();
+		for (auto& mesh : vampireMeshes)
+		{
+			// Create backpack entity
+			Entity entity = activeScene->createEntity("Vampire");
+			entity.addComponent<MeshComponent>(mesh, debugMaterial);
+			entity.getComponent<TransformComponent>().setPosition({ -4.5f, 0.0f, 0.0f });
+			entity.getComponent<TransformComponent>().setScale({ 0.01f, 0.01f, 0.01f });
+		}
 
 
 		// Setup scene camera
@@ -72,10 +86,7 @@ namespace Mahakam
 
 
 		// Create backpack model
-		Ref<Model> backpackModel = Model::load("assets/models/backpack.obj", {
-			{ ShaderSemantic::Position, "i_Pos" },
-			{ ShaderSemantic::TexCoord0, "i_UV" },
-			{ ShaderSemantic::Normal, "i_Normal" } });
+		Ref<Model> backpackModel = Model::load("assets/models/backpack.obj");
 
 		// Create backpack material
 		Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg");
@@ -147,6 +158,12 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
+		debugAnimator->UpdateAnimation(dt);
+
+		auto transforms = debugAnimator->GetFinalBoneMatrices();
+		for (int i = 0; i < transforms.size(); ++i)
+			debugMaterial->setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+
 		activeScene->onUpdate(dt);
 
 		//Renderer::getFrameBuffer()->blit(viewportFramebuffer);
@@ -186,10 +203,10 @@ namespace Mahakam
 
 	bool EditorLayer::onWindowResize(WindowResizeEvent& event)
 	{
-		uint32_t width = event.getWidth();
+		/*uint32_t width = event.getWidth();
 		uint32_t height = event.getHeight();
 		if (width > 0 && height > 0)
-			viewportFramebuffer->resize(width, height);
+			viewportFramebuffer->resize(width, height);*/
 
 		return false;
 	}

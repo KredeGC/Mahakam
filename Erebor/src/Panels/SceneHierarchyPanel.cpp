@@ -291,7 +291,7 @@ namespace Mahakam
 		});
 	}
 
-	void SceneHierarchyPanel::setContext(const Ref<Scene>& scene)
+	void SceneHierarchyPanel::setContext(Ref<Scene> scene)
 	{
 		context = scene;
 	}

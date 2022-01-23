@@ -7,7 +7,7 @@
 
 namespace Mahakam
 {
-	Ref<Material> Material::copy(const Ref<Material>& material)
+	Ref<Material> Material::copy(Ref<Material> material)
 	{
 		switch (Renderer::getAPI())
 		{
@@ -22,7 +22,7 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	Ref<Material> Material::create(const Ref<Shader>& shader)
+	Ref<Material> Material::create(Ref<Shader> shader)
 	{
 		switch (Renderer::getAPI())
 		{

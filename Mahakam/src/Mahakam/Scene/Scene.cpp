@@ -140,7 +140,7 @@ namespace Mahakam
 			Renderer::endScene();
 
 			// Render skybox
-			// TODO: Render as transparent queue instead
+			// TODO: Render after opaque and before transparent queue
 			Renderer::getFrameBuffer()->bind();
 
 			skyboxMaterial->getShader()->bind();

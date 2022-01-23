@@ -35,7 +35,7 @@ namespace Mahakam
 
 		virtual void setTransformIndex(int index, const glm::mat4& modelMatrix) override;
 
-		virtual void setTexture(const std::string& name, int slot, const Ref<Texture>& tex) override
+		virtual void setTexture(const std::string& name, int slot, Ref<Texture> tex) override
 		{
 			//ints[name] = slot;
 			textures[slot] = tex;
@@ -52,7 +52,7 @@ namespace Mahakam
 		virtual void setFloat4(const std::string& name, const glm::vec4& value) override { float4s[name] = value; }
 
 
-		virtual const Ref<Texture> getTexture(const std::string& name) const override;
+		virtual Ref<Texture> getTexture(const std::string& name) const override;
 
 		virtual const glm::mat3 getMat3(const std::string& name) const override;
 		virtual const glm::mat4 getMat4(const std::string& name) const override;

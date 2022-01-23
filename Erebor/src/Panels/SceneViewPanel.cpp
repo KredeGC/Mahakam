@@ -38,7 +38,7 @@ namespace Mahakam
 		return false;
 	}
 
-	void SceneViewPanel::setContext(const Ref<Scene>& scene, const Ref<FrameBuffer>& framebuffer)
+	void SceneViewPanel::setContext(Ref<Scene> scene, Ref<FrameBuffer> framebuffer)
 	{
 		activeScene = scene;
 		viewportFramebuffer = framebuffer;

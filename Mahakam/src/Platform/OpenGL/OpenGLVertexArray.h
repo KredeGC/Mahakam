@@ -12,14 +12,16 @@ namespace Mahakam
 		std::vector<Ref<VertexBuffer>> vertexBuffers;
 		Ref<IndexBuffer> indexBuffer;
 
+		uint32_t vertexCount;
+
 	public:
-		OpenGLVertexArray();
+		OpenGLVertexArray(uint32_t vertexCount);
 		virtual ~OpenGLVertexArray();
 
 		virtual void bind() const override;
 		virtual void unbind() const override;
 
-		virtual void addVertexBuffer(const Ref<VertexBuffer>& buffer) override;
+		virtual void addVertexBuffer(const Ref<VertexBuffer>& buffer, bool interleave) override;
 		virtual void setIndexBuffer(const Ref<IndexBuffer>& buffer) override;
 
 		virtual const std::vector<Ref<VertexBuffer>>& getVertexBuffers() const { return vertexBuffers; }
