@@ -130,11 +130,10 @@ namespace Mahakam
 			{
 				auto [transform, meshComponent] = meshes.get<TransformComponent, MeshComponent>(entity);
 
-				Ref<Mesh> mesh = meshComponent.getMesh();
-				Ref<Material> material = meshComponent.getMaterial();
-
-				if (mesh && material)
-					Renderer::submit(transform, mesh, material);
+				auto& meshes = meshComponent.getMeshes();
+				auto& materials = meshComponent.getMaterials();
+				for (int i = 0; i < meshComponent.getMeshCount(); i++)
+					Renderer::submit(transform, meshes[i], materials[i]);
 			}
 
 			Renderer::endScene();

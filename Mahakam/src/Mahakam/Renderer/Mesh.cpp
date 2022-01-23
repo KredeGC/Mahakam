@@ -84,6 +84,160 @@ namespace Mahakam
 		vertexArray->setIndexBuffer(indexBuffer);
 	}
 
+	Ref<Mesh> Mesh::processMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
+	{
+		MH_PROFILE_FUNCTION();
+
+		unsigned int numFaces = mesh->mNumFaces;
+
+		uint32_t vertexCount = mesh->mNumVertices;
+
+		uint32_t indexCount = 0;
+		for (unsigned int i = 0; i < numFaces; i++)
+			indexCount += mesh->mFaces[i].mNumIndices;
+
+		glm::vec3* positions = new glm::vec3[mesh->mNumVertices];
+		glm::vec2* texcoords = new glm::vec2[mesh->mNumVertices];
+		glm::vec3* normals = new glm::vec3[mesh->mNumVertices];
+		glm::vec3* tangents = new glm::vec3[mesh->mNumVertices];
+		glm::vec4* colors = new glm::vec4[mesh->mNumVertices];
+		glm::ivec4* boneIDs = new glm::ivec4[mesh->mNumVertices];
+		glm::vec4* boneWeights = new glm::vec4[mesh->mNumVertices];
+
+		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
+		{
+			boneIDs[i] = glm::ivec4(-1, -1, -1, -1);
+			boneWeights[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		}
+
+		uint32_t* indices = new uint32_t[indexCount];
+
+		// Extract vertex values
+		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
+		{
+			if (mesh->HasPositions())
+				memcpy(positions + i, mesh->mVertices + i, sizeof(glm::vec3));
+			if (mesh->HasTextureCoords(0))
+				memcpy(texcoords + i, mesh->mTextureCoords[0] + i, sizeof(glm::vec2));
+			if (mesh->HasNormals())
+				memcpy(normals + i, mesh->mNormals + i, sizeof(glm::vec3));
+			if (mesh->HasTangentsAndBitangents())
+				memcpy(tangents + i, mesh->mTangents + i, sizeof(glm::vec3));
+			if (mesh->HasVertexColors(0))
+				memcpy(colors + i, mesh->mColors[0] + i, sizeof(glm::vec4));
+		}
+
+		// Extract indices
+		uint32_t indexOffset = 0;
+		for (uint32_t i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+			memcpy(indices + indexOffset, face.mIndices, sizeof(uint32_t) * face.mNumIndices);
+
+			indexOffset += face.mNumIndices;
+		}
+
+		// Extract bone information
+		if (mesh->HasBones())
+		{
+			for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
+			{
+				int boneID = -1;
+				std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+				if (skinnedMesh.boneInfo.find(boneName) == skinnedMesh.boneInfo.end())
+				{
+					BoneInfo newBoneInfo;
+					newBoneInfo.id = skinnedMesh.boneCount;
+					newBoneInfo.offset = assimpToMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
+					skinnedMesh.boneInfo[boneName] = newBoneInfo;
+					boneID = skinnedMesh.boneCount;
+					skinnedMesh.boneCount++;
+				}
+				else
+				{
+					boneID = skinnedMesh.boneInfo[boneName].id;
+				}
+
+				MH_CORE_ASSERT(boneID != -1, "Invalid bone!");
+				auto weights = mesh->mBones[boneIndex]->mWeights;
+				int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+				for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+				{
+					uint32_t vertexId = weights[weightIndex].mVertexId;
+					float weight = weights[weightIndex].mWeight;
+					MH_CORE_ASSERT(vertexId <= vertexCount, "Invalid vertex index!");
+					//SetVertexBoneData(vertices[vertexId], boneID, weight);
+
+					for (int i = 0; i < 4; ++i)
+					{
+						if (boneIDs[vertexId][i] < 0)
+						{
+							boneWeights[vertexId][i] = weight;
+							boneIDs[vertexId][i] = boneID;
+							break;
+						}
+					}
+				}
+			}
+
+			// Normalize bone weights, because FBX is a bitch
+			for (unsigned int vertIndex = 0; vertIndex < mesh->mNumVertices; ++vertIndex)
+			{
+				glm::vec4& weight = boneWeights[vertIndex];
+				float length = weight.x + weight.y + weight.z + weight.w;
+
+				boneWeights[vertIndex] = weight / length;
+			}
+		}
+
+		Ref<Mesh> m = Mesh::create(vertexCount, indices, indexCount);
+		if (mesh->HasPositions())
+			m->setVertices("i_Pos", 0, (const char*)positions);
+		if (mesh->HasTextureCoords(0))
+			m->setVertices("i_UV", 1, (const char*)texcoords);
+		if (mesh->HasNormals())
+			m->setVertices("i_Normal", 2, (const char*)normals);
+		if (mesh->HasTangentsAndBitangents())
+			m->setVertices("i_Tangent", 3, (const char*)tangents);
+		if (mesh->HasVertexColors(0))
+			m->setVertices("i_Color", 4, (const char*)colors);
+		if (mesh->HasBones())
+		{
+			m->setVertices("i_BoneIDs", 5, (const char*)boneIDs);
+			m->setVertices("i_BoneWeights", 6, (const char*)boneWeights);
+		}
+		m->init();
+
+		delete[] positions;
+		delete[] texcoords;
+		delete[] normals;
+		delete[] tangents;
+		delete[] colors;
+		delete[] boneIDs;
+		delete[] boneWeights;
+
+		delete[] indices;
+
+		return m;
+	}
+
+	void Mesh::processNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene)
+	{
+		MH_PROFILE_FUNCTION();
+
+		// Go through each mesh in this node
+		for (uint32_t i = 0; i < node->mNumMeshes; i++)
+		{
+			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+			skinnedMesh.meshes.push_back(processMesh(skinnedMesh, mesh, scene));
+		}
+
+		// Go through any child nodes
+		for (uint32_t i = 0; i < node->mNumChildren; i++)
+			processNode(skinnedMesh, node->mChildren[i], scene);
+	}
+
 	Mesh::Mesh(uint32_t vertexCount, uint32_t indexCount)
 		: vertexCount(vertexCount), indexCount(indexCount), indices(0) {}
 
@@ -182,6 +336,32 @@ namespace Mahakam
 		}
 
 		return staticScreenQuad;
+	}
+
+	SkinnedMesh Mesh::loadModel(const std::string& filepath)
+	{
+		MH_PROFILE_FUNCTION();
+
+		// Read model
+		Assimp::Importer importer;
+		const aiScene* scene = importer.ReadFile(filepath,
+			aiProcess_LimitBoneWeights |
+			aiProcess_Triangulate |
+			aiProcess_FlipUVs |
+			aiProcess_GenSmoothNormals |
+			aiProcess_ImproveCacheLocality |
+			aiProcess_OptimizeMeshes |
+			aiProcess_JoinIdenticalVertices);
+
+		SkinnedMesh skinnedMesh;
+
+		// Process nodes in mesh
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+			MH_CORE_WARN("Could not load model \"{0}\": {1}", filepath, importer.GetErrorString());
+		else
+			processNode(skinnedMesh, scene->mRootNode, scene);
+
+		return skinnedMesh;
 	}
 
 	Ref<Mesh> Mesh::createCube(int tessellation, bool reverse)

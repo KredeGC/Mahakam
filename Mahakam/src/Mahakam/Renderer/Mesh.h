@@ -5,8 +5,28 @@
 #include "VertexArray.h"
 #include "Material.h"
 
+#include "Assimp.h"
+
+#include <map>
+
 namespace Mahakam
 {
+	class Mesh;
+
+	struct BoneInfo
+	{
+		int id;
+		glm::mat4 offset;
+	};
+
+	struct SkinnedMesh
+	{
+		std::vector<Ref<Mesh>> meshes;
+		std::vector<Ref<Material>> materials;
+		std::map<std::string, BoneInfo> boneInfo;
+		int boneCount = 0;
+	};
+
 	class Mesh
 	{
 	public:
@@ -45,6 +65,10 @@ namespace Mahakam
 		void interleaveBuffers();
 
 		void initBuffers();
+
+		static Ref<Mesh> processMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
+
+		static void processNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene);
 
 	public:
 		Mesh(uint32_t vertexCount, uint32_t indexCount);
@@ -166,10 +190,11 @@ namespace Mahakam
 		static Ref<Mesh> create(uint32_t vertexCount,
 			const uint32_t* indices, uint32_t indexCount, const std::initializer_list<void*>& verts)
 		{
-			return std::make_shared<Mesh>(vertexCount, indices, indexCount, verts);
+			return CreateRef<Mesh>(vertexCount, indices, indexCount, verts);
 		}
 
 		static Mesh* getScreenQuad();
+		static SkinnedMesh loadModel(const std::string& filepath);
 		static Ref<Mesh> createCube(int tessellation, bool reverse = false);
 		static Ref<Mesh> createPlane(int rows, int columns);
 		static Ref<Mesh> createUVSphere(int rows, int columns);

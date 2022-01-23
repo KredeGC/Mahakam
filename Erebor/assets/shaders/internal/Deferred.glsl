@@ -66,5 +66,5 @@ void main() {
 
     o_Color = vec4(color, 1.0);
     
-    //o_Color = gBuffer2;
+    //o_Color = vec4(gBuffer3.rgb, 1.0);
 }

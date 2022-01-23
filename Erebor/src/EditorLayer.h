@@ -8,12 +8,6 @@
 
 #include <Mahakam.h>
 
-#include <Mahakam/Renderer/Shader.h>
-#include <Mahakam/Renderer/Material.h>
-
-#include <Mahakam/Renderer/Animation.h>
-#include <Mahakam/Renderer/Animator.h>
-
 #include <imgui.h>
 
 namespace Mahakam
@@ -23,10 +17,7 @@ namespace Mahakam
 	private:
 		Ref<Scene> activeScene;
 
-		/*Ref<Shader> skinnedShader = nullptr;
-		Ref<Shader> textureShader = nullptr;
-		Ref<Shader> shader = nullptr;*/
-
+		SkinnedMesh debugModel;
 		Ref<Material> debugMaterial;
 		Ref<Animation> debugAnimation;
 		Ref<Animator> debugAnimator;

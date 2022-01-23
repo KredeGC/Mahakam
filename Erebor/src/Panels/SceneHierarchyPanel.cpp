@@ -269,13 +269,24 @@ namespace Mahakam
 
 		drawComponent<MeshComponent>("Mesh", entity, [](MeshComponent& meshComponent)
 		{
-			Ref<Mesh>& mesh = meshComponent.getMesh();
+			auto& meshes = meshComponent.getMeshes();
 			Ref<Material>& material = meshComponent.getMaterial();
 
-			if (mesh)
+			uint32_t vertexCount = 0;
+			uint32_t indexCount = 0;
+			for (auto& mesh : meshes)
 			{
-				ImGui::Text("Vertex count: %d", mesh->getVertexCount());
-				ImGui::Text("Triangle count: %d", mesh->getIndexCount() * 3);
+				if (mesh)
+				{
+					vertexCount += mesh->getVertexCount();
+					indexCount += mesh->getIndexCount();
+				}
+			}
+
+			if (vertexCount > 0 && indexCount > 0)
+			{
+				ImGui::Text("Vertex count: %d", vertexCount);
+				ImGui::Text("Triangle count: %d", indexCount / 3);
 			}
 
 			if (material)

@@ -3,7 +3,7 @@
 #include "Mahakam/Core/Core.h"
 
 #include "Bone.h"
-#include "Model.h"
+#include "Mesh.h"
 
 #include <map>
 #include <vector>
@@ -26,16 +26,17 @@ namespace Mahakam
     public:
         Animation() = default;
 
-        Animation(const std::string& animationPath, Model* model)
+        Animation(const std::string& filepath, SkinnedMesh& skinnedMesh)
         {
             Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
-            MH_CORE_ASSERT(scene && scene->mRootNode, "Animation not found!");
+            const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate);
+            if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+                MH_CORE_WARN("Could not load model \"{0}\": {1}", filepath, importer.GetErrorString());
             auto animation = scene->mAnimations[0];
             m_Duration = animation->mDuration;
             m_TicksPerSecond = animation->mTicksPerSecond;
             ReadHeirarchyData(m_RootNode, scene->mRootNode);
-            ReadMissingBones(animation, *model);
+            ReadMissingBones(animation, skinnedMesh.boneInfo, skinnedMesh.boneCount);
         }
 
         ~Animation()
@@ -67,12 +68,12 @@ namespace Mahakam
         }
 
     private:
-        void ReadMissingBones(const aiAnimation* animation, Model& model)
+        void ReadMissingBones(const aiAnimation* animation, std::map<std::string, BoneInfo>& boneInfoMap, int& boneCount)
         {
             int size = animation->mNumChannels;
 
-            auto& boneInfoMap = model.GetBoneInfoMap();//getting m_BoneInfoMap from Model class
-            int& boneCount = model.GetBoneCount(); //getting the m_BoneCounter from Model class
+            //auto& boneInfoMap = model.GetBoneInfoMap();//getting m_BoneInfoMap from Model class
+            //int& boneCount = model.GetBoneCount(); //getting the m_BoneCounter from Model class
 
             //reading channels(bones engaged in an animation and their keyframes)
             for (int i = 0; i < size; i++)
@@ -82,6 +83,7 @@ namespace Mahakam
 
                 if (boneInfoMap.find(boneName) == boneInfoMap.end())
                 {
+                    MH_CORE_BREAK("HMM");
                     boneInfoMap[boneName].id = boneCount;
                     boneCount++;
                 }
@@ -97,7 +99,7 @@ namespace Mahakam
             MH_CORE_ASSERT(src, "Invalid root!");
 
             dest.name = src->mName.data;
-            dest.transformation = ConvertMatrixToGLMFormat(src->mTransformation);
+            dest.transformation = assimpToMat4(src->mTransformation);
             dest.childrenCount = src->mNumChildren;
 
             for (int i = 0; i < src->mNumChildren; i++)
@@ -107,6 +109,7 @@ namespace Mahakam
                 dest.children.push_back(newData);
             }
         }
+
         float m_Duration;
         int m_TicksPerSecond;
         std::vector<Bone> m_Bones;

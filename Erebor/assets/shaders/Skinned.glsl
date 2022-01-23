@@ -22,25 +22,24 @@ const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 
 void main() {
-    vec4 pos = vec4(0.0);
-    for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
-        if (i_BoneIDs[i] == -1) continue;
-        
-        if (i_BoneIDs[i] >= MAX_BONES) {
-            pos = vec4(i_Pos, 1.0);
-            break;
-        }
-        
-        vec4 localPosition = finalBonesMatrices[i_BoneIDs[i]] * vec4(i_Pos, 1.0);
-        pos += localPosition * i_BoneWeights[i];
-        //vec3 localNormal = mat3(finalBonesMatrices[i_BoneIDs[i]]) * norm;
-    }
+    // vec4 boneWeights = i_BoneWeights;
+    // float size = boneWeights.x + boneWeights.y + boneWeights.z + boneWeights.w;
+    // boneWeights = boneWeights / size;
+    
+    mat4 boneTransform = finalBonesMatrices[i_BoneIDs[0]] * i_BoneWeights[0];
+    boneTransform += finalBonesMatrices[i_BoneIDs[1]] * i_BoneWeights[1];
+    boneTransform += finalBonesMatrices[i_BoneIDs[2]] * i_BoneWeights[2];
+    boneTransform += finalBonesMatrices[i_BoneIDs[3]] * i_BoneWeights[3];
+    
+    //mat3 normalMatrix = transpose(inverse(mat3(boneTransform)));
+    vec4 pos = boneTransform * vec4(i_Pos, 1.0);
+    vec3 normal = mat3(boneTransform) * i_Normal;
     
     gl_Position = MATRIX_MVP * pos; //vec4(i_Pos, 1.0)
     
     o.v_WorldPos = (MATRIX_M * pos).xyz;
-    //o.v_WorldNormal = (MATRIX_M * vec4(i_Normal, 0.0)).xyz;
-    o.v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
+    o.v_WorldNormal = (MATRIX_M * vec4(normal, 0.0)).xyz;
+    //o.v_WorldNormal = (vec4(normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
     o.v_UV = i_UV;
 }
 
@@ -71,9 +70,9 @@ uniform float u_AO; // ??
 
 void main() {
     // Surface values
-    vec3 albedo = texture(u_Albedo, i.v_UV).rgb;
+    vec3 albedo = vec3(0.5, 0.0, 0.0); //texture(u_Albedo, i.v_UV).rgb;
     float metallic = 0.0; //texture(u_Metallic, i.v_UV).r;
-    float roughness = 1.0; //texture(u_Roughness, i.v_UV).r;
+    float roughness = 0.0; //texture(u_Roughness, i.v_UV).r;
     float ao = 1.0;
     
     vec3 normal = normalize(i.v_WorldNormal);

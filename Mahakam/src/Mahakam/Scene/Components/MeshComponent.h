@@ -7,22 +7,39 @@ namespace Mahakam
 	struct MeshComponent
 	{
 	private:
-		Ref<Mesh> mesh;
-		Ref<Material> material;
+		SkinnedMesh skinnedMesh;
 
 	public:
-		MeshComponent() : mesh(nullptr) {}
+		MeshComponent() = default;
 
 		MeshComponent(const MeshComponent&) = default;
 
-		MeshComponent(const Ref<Mesh>& mesh) : mesh(mesh), material(0) {}
+		MeshComponent(const SkinnedMesh& skinnedMesh) : skinnedMesh(skinnedMesh) {}
 
-		MeshComponent(const Ref<Mesh>& mesh, const Ref<Material>& material) : mesh(mesh), material(material) {}
+		MeshComponent(const SkinnedMesh& skinnedMesh, Ref<Material> material) : skinnedMesh(skinnedMesh)
+		{
+			this->skinnedMesh.materials.clear();
+			for (auto& kv : this->skinnedMesh.meshes)
+				this->skinnedMesh.materials.push_back(material);
+		}
 
-		Ref<Mesh>& getMesh() { return mesh; }
-		const Ref<Mesh>& getMesh() const { return mesh; }
+		MeshComponent(Ref<Mesh> mesh)
+		{
+			this->skinnedMesh.meshes.push_back(mesh);
+		}
 
-		Ref<Material>& getMaterial() { return material; }
-		const Ref<Material>& getMaterial() const { return material; }
+		MeshComponent(Ref<Mesh> mesh, Ref<Material> material)
+		{
+			this->skinnedMesh.meshes.push_back(mesh);
+			this->skinnedMesh.materials.push_back(material);
+		}
+
+		inline size_t getMeshCount() const { return skinnedMesh.meshes.size(); }
+
+		inline Ref<Mesh> getMesh() { return skinnedMesh.meshes[0]; }
+		inline const std::vector<Ref<Mesh>>& getMeshes() { return skinnedMesh.meshes; }
+
+		inline Ref<Material> getMaterial() { return skinnedMesh.materials[0]; }
+		inline const std::vector<Ref<Material>> getMaterials()& { return skinnedMesh.materials; }
 	};
 }

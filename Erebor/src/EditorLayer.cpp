@@ -6,6 +6,26 @@
 
 namespace Mahakam
 {
+	// Create Rotate script
+	class RotateScript : public ScriptableEntity
+	{
+	private:
+		float rotation = 0.0f;
+		TransformComponent* transform = nullptr;
+
+	public:
+		virtual void onCreate() override
+		{
+			transform = &entity.getComponent<TransformComponent>();
+		}
+
+		virtual void onUpdate(Timestep dt) override
+		{
+			rotation += dt * 10.0f;
+			transform->setRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(rotation), 0.0f }));
+		}
+	};
+
 	void EditorLayer::onAttach()
 	{
 		// Create a new active scene
@@ -25,22 +45,28 @@ namespace Mahakam
 
 		// Setup dancing monke
 		Ref<Texture> vampireDiffuse = Texture2D::create("assets/textures/vampire.png", TextureFormat::RGBA8);
+		Ref<Material> inanimateMaterial = Material::create(shader);
+		inanimateMaterial->setFloat4("u_Color", glm::vec4(0.5f, 0.0f, 0.0f, 1.0f));
+		inanimateMaterial->setFloat("u_Metallic", 0.0f);
+		inanimateMaterial->setFloat("u_Roughness", 0.0f);
 		debugMaterial = Material::create(skinnedShader);
 		debugMaterial->setTexture("u_Albedo", 3, vampireDiffuse);
 
-		Ref<Model> vampireModel = Model::load("assets/models/Defeated.fbx");
-		debugAnimation = std::make_shared<Animation>("assets/models/Defeated.fbx", vampireModel.get());
+		debugModel = Mesh::loadModel("assets/models/Defeated.fbx");
+		debugAnimation = std::make_shared<Animation>("assets/models/Defeated.fbx", debugModel);
 		debugAnimator = std::make_shared<Animator>(debugAnimation.get());
 
-		const auto& vampireMeshes = vampireModel->getMeshes();
-		for (auto& mesh : vampireMeshes)
-		{
-			// Create backpack entity
-			Entity entity = activeScene->createEntity("Vampire");
-			entity.addComponent<MeshComponent>(mesh, debugMaterial);
-			entity.getComponent<TransformComponent>().setPosition({ -4.5f, 0.0f, 0.0f });
-			entity.getComponent<TransformComponent>().setScale({ 0.01f, 0.01f, 0.01f });
-		}
+		Entity animatedEntity = activeScene->createEntity("Animated");
+		animatedEntity.addComponent<MeshComponent>(debugModel, debugMaterial);
+		animatedEntity.getComponent<TransformComponent>().setPosition({ 2.5f, 1.5f, 5.0f });
+		animatedEntity.getComponent<TransformComponent>().setScale({ 0.02f, 0.02f, 0.02f });
+		animatedEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
+
+		Entity inanimateEntity = activeScene->createEntity("Inanimate");
+		inanimateEntity.addComponent<MeshComponent>(debugModel, inanimateMaterial);
+		inanimateEntity.getComponent<TransformComponent>().setPosition({ 6.5f, 1.5f, 5.0f });
+		inanimateEntity.getComponent<TransformComponent>().setScale({ 0.02f, 0.02f, 0.02f });
+		inanimateEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
 
 
 		// Setup scene camera
@@ -86,7 +112,7 @@ namespace Mahakam
 
 
 		// Create backpack model
-		Ref<Model> backpackModel = Model::load("assets/models/backpack.obj");
+		SkinnedMesh backpackModel = Mesh::loadModel("assets/models/backpack.obj");
 
 		// Create backpack material
 		Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg");
@@ -98,36 +124,11 @@ namespace Mahakam
 		backpackMaterial->setTexture("u_Metallic", 4, backpackMetallic);
 		backpackMaterial->setTexture("u_Roughness", 5, backpackRoughness);
 
-		// Create backpack script
-		class RotateScript : public ScriptableEntity
-		{
-		private:
-			float rotation = 0.0f;
-			TransformComponent* transform = nullptr;
-
-		public:
-			virtual void onCreate() override
-			{
-				transform = &entity.getComponent<TransformComponent>();
-			}
-
-			virtual void onUpdate(Timestep dt) override
-			{
-				rotation += dt * 10.0f;
-				transform->setRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(rotation), 0.0f }));
-			}
-		};
-
 		// Create backpack entities
-		const auto& meshes = backpackModel->getMeshes();
-		for (auto& mesh : meshes)
-		{
-			// Create backpack entity
-			Entity entity = activeScene->createEntity("Bacpack");
-			entity.addComponent<MeshComponent>(mesh, backpackMaterial);
-			entity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
-			entity.addComponent<NativeScriptComponent>().bind<RotateScript>();
-		}
+		Entity backpackEntity = activeScene->createEntity("Bacpack");
+		backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
+		backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
+		backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
 
 
 		// Create mesh & base material
@@ -165,8 +166,6 @@ namespace Mahakam
 			debugMaterial->setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
 		activeScene->onUpdate(dt);
-
-		//Renderer::getFrameBuffer()->blit(viewportFramebuffer);
 
 		statsPanel.onUpdate(dt);
 	}
