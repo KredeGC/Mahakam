@@ -26,6 +26,7 @@ namespace Mahakam
     public:
         Animation() = default;
 
+        // TODO: Make into a ref-counted asset
         Animation(const std::string& filepath, SkinnedMesh& skinnedMesh)
         {
             Assimp::Importer importer;
@@ -37,10 +38,6 @@ namespace Mahakam
             m_TicksPerSecond = animation->mTicksPerSecond;
             ReadHeirarchyData(m_RootNode, scene->mRootNode);
             ReadMissingBones(animation, skinnedMesh.boneInfo, skinnedMesh.boneCount);
-        }
-
-        ~Animation()
-        {
         }
 
         Bone* FindBone(const std::string& name)

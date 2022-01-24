@@ -7,6 +7,8 @@ namespace Mahakam
     class Animator
     {
     public:
+        // TODO: Make into a component
+        // Or alternatively add a component that uses this class
         Animator::Animator(Animation* currentAnimation)
         {
             m_CurrentTime = 0.0;

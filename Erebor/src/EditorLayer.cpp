@@ -44,13 +44,11 @@ namespace Mahakam
 
 
 		// Setup dancing monke
-		Ref<Texture> vampireDiffuse = Texture2D::create("assets/textures/vampire.png", TextureFormat::RGBA8);
 		Ref<Material> inanimateMaterial = Material::create(shader);
 		inanimateMaterial->setFloat4("u_Color", glm::vec4(0.5f, 0.0f, 0.0f, 1.0f));
 		inanimateMaterial->setFloat("u_Metallic", 0.0f);
 		inanimateMaterial->setFloat("u_Roughness", 0.0f);
 		debugMaterial = Material::create(skinnedShader);
-		debugMaterial->setTexture("u_Albedo", 3, vampireDiffuse);
 
 		debugModel = Mesh::loadModel("assets/models/Defeated.fbx");
 		debugAnimation = std::make_shared<Animation>("assets/models/Defeated.fbx", debugModel);
@@ -124,7 +122,7 @@ namespace Mahakam
 		backpackMaterial->setTexture("u_Metallic", 4, backpackMetallic);
 		backpackMaterial->setTexture("u_Roughness", 5, backpackRoughness);
 
-		// Create backpack entities
+		// Create backpack entity
 		Entity backpackEntity = activeScene->createEntity("Bacpack");
 		backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
 		backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });

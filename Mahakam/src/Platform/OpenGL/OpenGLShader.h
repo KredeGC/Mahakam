@@ -16,6 +16,8 @@ namespace Mahakam
 		uint32_t rendererID;
 		std::string name;
 
+		std::vector<ShaderProps> properties;
+
 		void compile(const std::unordered_map<GLenum, std::string>& sources);
 		std::unordered_map<GLenum, std::string> parse(const std::string& source);
 		std::string sortIncludes(const std::string& source);
@@ -34,6 +36,8 @@ namespace Mahakam
 		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) override;
 
 		virtual const std::string& getName() const override { return name; }
+
+		virtual const std::vector<ShaderProps>& getProperties() const { return properties; }
 
 		void setUniformMat3(const std::string& name, const glm::mat3& value);
 		void setUniformMat4(const std::string& name, const glm::mat4& value);

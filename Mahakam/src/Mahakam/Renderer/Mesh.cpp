@@ -338,8 +338,10 @@ namespace Mahakam
 		return staticScreenQuad;
 	}
 
-	SkinnedMesh Mesh::loadModel(const std::string& filepath)
+	SkinnedMesh Mesh::loadModel(const std::string& filepath, const SkinnedMeshProps& props)
 	{
+		// TODO: Use SkinnedMeshProps to determine if we should load textures and create materials, or use the provided materials
+
 		MH_PROFILE_FUNCTION();
 
 		// Read model

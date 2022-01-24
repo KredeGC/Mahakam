@@ -27,6 +27,20 @@ namespace Mahakam
 		int boneCount = 0;
 	};
 
+	// TODO: Use this prop struct when loading a model
+	struct SkinnedMeshProps
+	{
+		bool createMaterials = false;
+		std::vector<Ref<Material>> overrideMaterials;
+		std::vector<Ref<Shader>> overrideShaders;
+
+		SkinnedMeshProps() = default;
+
+		SkinnedMeshProps(std::initializer_list<Ref<Shader>> shaders) : createMaterials(true), overrideShaders(shaders) {}
+
+		SkinnedMeshProps(std::initializer_list<Ref<Material>> materials) : createMaterials(false), overrideMaterials(materials) {}
+	};
+
 	class Mesh
 	{
 	public:
@@ -179,12 +193,12 @@ namespace Mahakam
 
 		static Ref<Mesh> create(uint32_t vertexCount, uint32_t indexCount)
 		{
-			return std::make_shared<Mesh>(vertexCount, indexCount);
+			return CreateRef<Mesh>(vertexCount, indexCount);
 		}
 
 		static Ref<Mesh> create(uint32_t vertexCount, const uint32_t* indices, uint32_t indexCount)
 		{
-			return std::make_shared<Mesh>(vertexCount, indices, indexCount);
+			return CreateRef<Mesh>(vertexCount, indices, indexCount);
 		}
 
 		static Ref<Mesh> create(uint32_t vertexCount,
@@ -194,7 +208,7 @@ namespace Mahakam
 		}
 
 		static Mesh* getScreenQuad();
-		static SkinnedMesh loadModel(const std::string& filepath);
+		static SkinnedMesh loadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps());
 		static Ref<Mesh> createCube(int tessellation, bool reverse = false);
 		static Ref<Mesh> createPlane(int rows, int columns);
 		static Ref<Mesh> createUVSphere(int rows, int columns);

@@ -29,52 +29,17 @@ namespace Mahakam
 		float fov = glm::radians(45.0f), ratio = 1;
 
 	public:
-		Camera() : projectionMatrix({ 1.0f }), nearZ(0.03f), farZ(1000.0f)
-		{
-			setPerspective(fov, ratio, nearZ, farZ);
-		}
+		Camera();
 
-		Camera(ProjectionType projection, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
-			: projectionType(projection)
-		{
-			if (projectionType == ProjectionType::Perspective)
-				setPerspective(fov, ratio, nearPlane, farPlane);
-			else
-				setOrthographic(fov, ratio, nearPlane, farPlane);
-		}
+		Camera(ProjectionType projection, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f);
 
 		Camera(const glm::mat4& projection) : projectionMatrix(projection), nearZ(0), farZ(0) {}
 
-		void recalculateProjectionMatrix()
-		{
-			if (changed)
-			{
-				if (projectionType == ProjectionType::Perspective)
-					projectionMatrix = glm::perspective(fov, ratio, nearZ, farZ);
-				else
-					projectionMatrix = glm::ortho(-ratio * size / 2, ratio * size / 2, -size / 2, size / 2, nearZ, farZ);
-			}
-		}
+		void recalculateProjectionMatrix();
 
-		void setPerspective(float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
-		{
-			projectionType = ProjectionType::Perspective;
-			this->fov = fov;
-			this->ratio = ratio;
-			nearZ = nearPlane;
-			farZ = farPlane;
-			recalculateProjectionMatrix();
-		}
+		void setPerspective(float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f);
 
-		void setOrthographic(float size, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f)
-		{
-			projectionType = ProjectionType::Orthographic;
-			this->size = size;
-			this->ratio = ratio;
-			nearZ = nearPlane;
-			farZ = farPlane;
-			recalculateProjectionMatrix();
-		}
+		void setOrthographic(float size, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f);
 
 		void setFov(float f) { fov = f; changed = true; }
 

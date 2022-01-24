@@ -26,12 +26,12 @@ namespace Mahakam
 		switch (Renderer::getAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_ASSERT(false, "Renderer API not supported!");
+			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return std::make_shared<OpenGLVertexBuffer>(vertices, size);
+			return CreateRef<OpenGLVertexBuffer>(vertices, size);
 		}
 
-		MH_CORE_ASSERT(false, "Unknown renderer API!");
+		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	}
@@ -41,12 +41,12 @@ namespace Mahakam
 		switch (Renderer::getAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_ASSERT(false, "Renderer API not supported!");
+			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return std::make_shared<OpenGLVertexBuffer>(size);
+			return CreateRef<OpenGLVertexBuffer>(size);
 		}
 
-		MH_CORE_ASSERT(false, "Unknown renderer API!");
+		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	}
@@ -59,12 +59,12 @@ namespace Mahakam
 		switch (Renderer::getAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_ASSERT(false, "Renderer API not supported!");
+			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return std::make_shared<OpenGLIndexBuffer>(indices, count);
+			return CreateRef<OpenGLIndexBuffer>(indices, count);
 		}
 
-		MH_CORE_ASSERT(false, "Unknown renderer API!");
+		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	}
@@ -77,12 +77,12 @@ namespace Mahakam
 		switch (Renderer::getAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_ASSERT(false, "Renderer API not supported!");
+			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return std::make_shared<OpenGLUniformBuffer>(size);
+			return CreateRef<OpenGLUniformBuffer>(size);
 		}
 
-		MH_CORE_ASSERT(false, "Unknown renderer API!");
+		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	}
@@ -95,12 +95,12 @@ namespace Mahakam
 		switch (Renderer::getAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_ASSERT(false, "Renderer API not supported!");
+			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return std::make_shared<OpenGLStorageBuffer>(size);
+			return CreateRef<OpenGLStorageBuffer>(size);
 		}
 
-		MH_CORE_ASSERT(false, "Unknown renderer API!");
+		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	}

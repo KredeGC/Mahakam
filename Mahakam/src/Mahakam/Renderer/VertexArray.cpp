@@ -14,7 +14,7 @@ namespace Mahakam
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return std::make_shared<OpenGLVertexArray>(vertexCount);
+			return CreateRef<OpenGLVertexArray>(vertexCount);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

@@ -38,8 +38,8 @@ void main() {
     gl_Position = MATRIX_MVP * pos; //vec4(i_Pos, 1.0)
     
     o.v_WorldPos = (MATRIX_M * pos).xyz;
-    o.v_WorldNormal = (MATRIX_M * vec4(normal, 0.0)).xyz;
-    //o.v_WorldNormal = (vec4(normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
+    //o.v_WorldNormal = (MATRIX_M * vec4(normal, 0.0)).xyz;
+    o.v_WorldNormal = (normal * inverse(mat3(MATRIX_M))).xyz; // Correct for non-uniform scaled objects
     o.v_UV = i_UV;
 }
 

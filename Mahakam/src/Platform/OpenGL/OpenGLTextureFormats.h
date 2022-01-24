@@ -1,6 +1,6 @@
 #pragma once
 #include "Mahakam/Core/Log.h"
-#include "Mahakam/Renderer/Texture.h"
+#include "Mahakam/Renderer/TextureFormats.h"
 
 #include <glad/glad.h>
 
@@ -34,10 +34,9 @@ namespace Mahakam
 			return 3;
 		case TextureFormat::Depth24Stencil8:
 			return 4;
-		default:
-			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
+		MH_CORE_BREAK("Unknown TextureFormat provided!");
 		return 0;
 	}
 
@@ -86,10 +85,9 @@ namespace Mahakam
 			return GL_DEPTH_COMPONENT;
 		case TextureFormat::Depth24Stencil8:
 			return GL_DEPTH_STENCIL;
-		default:
-			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
+		MH_CORE_BREAK("Unknown TextureFormat provided!");
 		return 0;
 	}
 
@@ -119,10 +117,9 @@ namespace Mahakam
 			return GL_DEPTH_COMPONENT;
 		case TextureFormat::Depth24Stencil8:
 			return GL_DEPTH_STENCIL;
-		default:
-			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
+		MH_CORE_BREAK("Unknown TextureFormat provided!");
 		return 0;
 	}
 
@@ -152,10 +149,9 @@ namespace Mahakam
 			return GL_DEPTH_COMPONENT24;
 		case TextureFormat::Depth24Stencil8:
 			return GL_DEPTH24_STENCIL8;
-		default:
-			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
+		MH_CORE_BREAK("Unknown TextureFormat provided!");
 		return 0;
 	}
 
@@ -185,10 +181,9 @@ namespace Mahakam
 			return GL_UNSIGNED_INT;
 		case TextureFormat::Depth24Stencil8:
 			return GL_UNSIGNED_INT_24_8;
-		default:
-			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
+		MH_CORE_BREAK("Unknown TextureFormat provided!");
 		return 0;
 	}
 
@@ -202,10 +197,9 @@ namespace Mahakam
 			return GL_DEPTH_ATTACHMENT;
 		case TextureFormat::Depth24Stencil8:
 			return GL_DEPTH_STENCIL_ATTACHMENT;
-		default:
-			MH_CORE_BREAK("Unknown TextureFormat provided!");
 		}
 
+		MH_CORE_BREAK("Unknown TextureFormat provided!");
 		return 0;
 	}
 }

@@ -1,7 +1,7 @@
 #include "mhpch.h"
 #include "OpenGLShader.h"
 
-#include <fstream>
+#include "OpenGLShaderDataTypes.h"
 
 #include <glad/glad.h>
 
@@ -92,6 +92,33 @@ namespace Mahakam
 			glDetachShader(program, shaderIDs[i]);
 
 		rendererID = program;
+
+
+		GLint numUniforms = 0;
+		glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms);
+		const GLenum props[4] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION };
+
+		for (int unif = 0; unif < numUniforms; ++unif)
+		{
+			GLint values[4];
+			glGetProgramResourceiv(program, GL_UNIFORM, unif, 4, props, 4, NULL, values);
+
+			// Skip any uniforms that are in a block.
+			if (values[0] != -1)
+				continue;
+
+			// Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
+			// C++11 would let you use a std::string directly.
+			std::vector<char> nameData(values[2]);
+			glGetProgramResourceName(program, GL_UNIFORM, unif, nameData.size(), NULL, &nameData[0]);
+			std::string name(nameData.begin(), nameData.end() - 1);
+
+			ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
+
+			MH_CORE_TRACE("{0} - {1}", name, dataType);
+
+			properties.push_back({ OpenGLDataTypeToShaderDataType(values[1]), name });
+		}
 	}
 
 	std::string OpenGLShader::sortIncludes(const std::string& source)

@@ -19,8 +19,7 @@ namespace Mahakam
 		MeshComponent(const SkinnedMesh& skinnedMesh, Ref<Material> material) : skinnedMesh(skinnedMesh)
 		{
 			this->skinnedMesh.materials.clear();
-			for (auto& kv : this->skinnedMesh.meshes)
-				this->skinnedMesh.materials.push_back(material);
+			this->skinnedMesh.materials.push_back(material);
 		}
 
 		MeshComponent(Ref<Mesh> mesh)
@@ -40,6 +39,6 @@ namespace Mahakam
 		inline const std::vector<Ref<Mesh>>& getMeshes() { return skinnedMesh.meshes; }
 
 		inline Ref<Material> getMaterial() { return skinnedMesh.materials[0]; }
-		inline const std::vector<Ref<Material>> getMaterials()& { return skinnedMesh.materials; }
+		inline const std::vector<Ref<Material>>& getMaterials() { return skinnedMesh.materials; }
 	};
 }

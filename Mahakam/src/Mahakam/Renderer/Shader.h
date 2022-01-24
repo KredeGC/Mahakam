@@ -1,9 +1,17 @@
 #pragma once
 
+#include "ShaderDataTypes.h"
+
 #include <string>
 
 namespace Mahakam
 {
+	struct ShaderProps
+	{
+		ShaderDataType dataType;
+		std::string name;
+	};
+
 	class Shader
 	{
 	public:
@@ -17,6 +25,9 @@ namespace Mahakam
 		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) = 0;
 
 		virtual const std::string& getName() const = 0;
+
+		//virtual const ShaderProps& getProperty() const = 0;
+		virtual const std::vector<ShaderProps>& getProperties() const = 0;
 
 		static Ref<Shader> create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSrouce);
 		static Ref<Shader> create(const std::string& filepath);

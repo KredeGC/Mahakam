@@ -132,8 +132,9 @@ namespace Mahakam
 
 				auto& meshes = meshComponent.getMeshes();
 				auto& materials = meshComponent.getMaterials();
+				int materialCount = materials.size() - 1;
 				for (int i = 0; i < meshComponent.getMeshCount(); i++)
-					Renderer::submit(transform, meshes[i], materials[i]);
+					Renderer::submit(transform, meshes[i], materials[i < materialCount ? i : materialCount]);
 			}
 
 			Renderer::endScene();

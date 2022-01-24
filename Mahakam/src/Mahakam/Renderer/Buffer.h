@@ -1,25 +1,11 @@
 #pragma once
 
+#include "ShaderDataTypes.h"
+
 #include <vector>
 
 namespace Mahakam
 {
-	enum class ShaderDataType
-	{
-		None = 0,
-		Float,
-		Float2,
-		Float3,
-		Float4,
-		Mat3,
-		Mat4,
-		Int,
-		Int2,
-		Int3,
-		Int4,
-		Bool
-	};
-
 	static uint32_t ShaderDataTypeSize(ShaderDataType type)
 	{
 		switch (type)
@@ -48,7 +34,7 @@ namespace Mahakam
 			return 1;
 		}
 
-		MH_CORE_ASSERT(false, "Unknown shader data type!");
+		MH_CORE_BREAK("Unknown shader data type!");
 		return 0;
 	}
 
@@ -94,7 +80,7 @@ namespace Mahakam
 				return 1;
 			}
 
-			MH_CORE_ASSERT(false, "Unknown shader data type!");
+			MH_CORE_BREAK("Unknown shader data type!");
 			return 0;
 		}
 	};
