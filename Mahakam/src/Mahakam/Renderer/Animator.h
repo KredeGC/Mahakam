@@ -4,75 +4,82 @@
 
 namespace Mahakam
 {
-    class Animator
-    {
-    public:
-        // TODO: Make into a component
-        // Or alternatively add a component that uses this class
-        Animator::Animator(Animation* currentAnimation)
-        {
-            m_CurrentTime = 0.0;
-            m_CurrentAnimation = currentAnimation;
+	class Animator
+	{
+	public:
+		// TODO: Make into a component
+		// Or alternatively add a component that uses this class
+		Animator::Animator()
+			: m_CurrentTime(0.0f)
+		{
+			m_FinalBoneMatrices.reserve(100);
 
-            m_FinalBoneMatrices.reserve(100);
+			for (int i = 0; i < 100; i++)
+				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
+		}
 
-            for (int i = 0; i < 100; i++)
-                m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
-        }
+		Animator::Animator(Animation* currentAnimation)
+			: m_CurrentTime(0.0f), m_CurrentAnimation(currentAnimation)
+		{
+			m_FinalBoneMatrices.reserve(100);
 
-        void Animator::UpdateAnimation(float dt)
-        {
-            m_DeltaTime = dt;
-            if (m_CurrentAnimation)
-            {
-                m_CurrentTime += m_CurrentAnimation->GetTicksPerSecond() * dt;
-                m_CurrentTime = fmod(m_CurrentTime, m_CurrentAnimation->GetDuration());
-                CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
-            }
-        }
+			for (int i = 0; i < 100; i++)
+				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
+		}
 
-        void Animator::PlayAnimation(Animation* pAnimation)
-        {
-            m_CurrentAnimation = pAnimation;
-            m_CurrentTime = 0.0f;
-        }
+		void Animator::UpdateAnimation(float dt)
+		{
+			m_DeltaTime = dt;
+			if (m_CurrentAnimation)
+			{
+				m_CurrentTime += m_CurrentAnimation->GetTicksPerSecond() * dt;
+				m_CurrentTime = fmod(m_CurrentTime, m_CurrentAnimation->GetDuration());
+				CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
+			}
+		}
 
-        void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform)
-        {
-            std::string nodeName = node->name;
-            glm::mat4 nodeTransform = node->transformation;
+		void Animator::PlayAnimation(Animation* pAnimation)
+		{
+			m_CurrentAnimation = pAnimation;
+			m_CurrentTime = 0.0f;
+		}
 
-            Bone* Bone = m_CurrentAnimation->FindBone(nodeName);
+		void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform)
+		{
+			std::string nodeName = node->name;
+			glm::mat4 nodeTransform = node->transformation;
 
-            if (Bone)
-            {
-                Bone->Update(m_CurrentTime);
-                nodeTransform = Bone->GetLocalTransform();
-            }
+			Bone* Bone = m_CurrentAnimation->FindBone(nodeName);
 
-            glm::mat4 globalTransformation = parentTransform * nodeTransform;
+			if (Bone)
+			{
+				Bone->Update(m_CurrentTime);
+				nodeTransform = Bone->GetLocalTransform();
+			}
 
-            auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
-            if (boneInfoMap.find(nodeName) != boneInfoMap.end())
-            {
-                int index = boneInfoMap[nodeName].id;
-                glm::mat4 offset = boneInfoMap[nodeName].offset;
-                m_FinalBoneMatrices[index] = globalTransformation * offset;
-            }
+			glm::mat4 globalTransformation = parentTransform * nodeTransform;
 
-            for (int i = 0; i < node->childrenCount; i++)
-                CalculateBoneTransform(&node->children[i], globalTransformation);
-        }
+			auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
+			if (boneInfoMap.find(nodeName) != boneInfoMap.end())
+			{
+				int index = boneInfoMap[nodeName].id;
+				glm::mat4 offset = boneInfoMap[nodeName].offset;
+				m_FinalBoneMatrices[index] = globalTransformation * offset;
+			}
 
-        std::vector<glm::mat4> GetFinalBoneMatrices()
-        {
-            return m_FinalBoneMatrices;
-        }
+			for (int i = 0; i < node->childrenCount; i++)
+				CalculateBoneTransform(&node->children[i], globalTransformation);
+		}
 
-    private:
-        std::vector<glm::mat4> m_FinalBoneMatrices;
-        Animation* m_CurrentAnimation;
-        float m_CurrentTime;
-        float m_DeltaTime;
-    };
+		std::vector<glm::mat4> GetFinalBoneMatrices()
+		{
+			return m_FinalBoneMatrices;
+		}
+
+	private:
+		std::vector<glm::mat4> m_FinalBoneMatrices;
+		Animation* m_CurrentAnimation;
+		float m_CurrentTime;
+		float m_DeltaTime;
+	};
 }
