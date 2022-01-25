@@ -22,6 +22,13 @@ namespace Mahakam
 			Ref<Texture> specularMap;
 		};
 
+		struct RendererResults
+		{
+			uint32_t drawCalls = 0;
+			uint32_t vertexCount = 0;
+			uint32_t triCount = 0;
+		};
+
 	private:
 		struct SceneData
 		{
@@ -32,13 +39,6 @@ namespace Mahakam
 			Ref<FrameBuffer> gBuffer;
 			Ref<FrameBuffer> viewportFramebuffer;
 			Ref<Material> lightingMaterial;
-		};
-
-		struct RendererResults
-		{
-			uint32_t drawCalls = 0;
-			uint32_t vertexCount = 0;
-			uint32_t triCount = 0;
 		};
 
 		struct MeshData

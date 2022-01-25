@@ -1,6 +1,7 @@
 #include "mhpch.h"
 #include "Scene.h"
 
+#include "Components/AnimatorComponent.h"
 #include "Components/CameraComponent.h"
 #include "Components/MeshComponent.h"
 #include "Components/NativeScriptComponent.h"
@@ -61,8 +62,8 @@ namespace Mahakam
 	Scene::Scene(const std::string& filepath)
 	{
 		skyboxTexture = TextureCube::create(filepath, { 2048, TextureFormat::RGB16F });
-		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", filepath, false, {32, TextureFormat::RGB16F, true, TextureCubePrefilter::Convolute});
-		skyboxSpecular = loadOrCreate(filepath + ".specular", filepath, true, {256, TextureFormat::RGB16F, true, TextureCubePrefilter::Prefilter});
+		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", filepath, false, { 32, TextureFormat::RGB16F, true, TextureCubePrefilter::Convolute });
+		skyboxSpecular = loadOrCreate(filepath + ".specular", filepath, true, { 256, TextureFormat::RGB16F, true, TextureCubePrefilter::Prefilter });
 
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 		skyboxMaterial = Material::create(skyboxShader);
@@ -91,6 +92,21 @@ namespace Mahakam
 
 				runtime.script->onUpdate(ts);
 			}
+		});
+
+		// Update animators
+		registry.view<AnimatorComponent, MeshComponent>().each([=](auto entity, auto& animatorComponent, auto& meshComponent)
+		{
+			auto& animator = animatorComponent.getAnimator();
+
+			animator.UpdateAnimation(ts);
+
+			auto& materials = meshComponent.getMaterials();
+			auto& transforms = animator.GetFinalBoneMatrices();
+
+			for (auto& material : materials)
+				for (int j = 0; j < transforms.size(); ++j)
+					material->setMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
 		});
 
 

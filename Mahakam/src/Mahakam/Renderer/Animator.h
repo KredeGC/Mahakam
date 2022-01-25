@@ -38,9 +38,9 @@ namespace Mahakam
 			}
 		}
 
-		void Animator::PlayAnimation(Animation* pAnimation)
+		void Animator::PlayAnimation(Ref<Animation> animation)
 		{
-			m_CurrentAnimation = pAnimation;
+			m_CurrentAnimation = animation;
 			m_CurrentTime = 0.0f;
 		}
 
@@ -71,15 +71,15 @@ namespace Mahakam
 				CalculateBoneTransform(&node->children[i], globalTransformation);
 		}
 
-		std::vector<glm::mat4> GetFinalBoneMatrices()
+		const std::vector<glm::mat4>& GetFinalBoneMatrices()
 		{
 			return m_FinalBoneMatrices;
 		}
 
 	private:
 		std::vector<glm::mat4> m_FinalBoneMatrices;
-		Animation* m_CurrentAnimation;
+		Ref<Animation> m_CurrentAnimation;
 		float m_CurrentTime;
-		float m_DeltaTime;
+		float m_DeltaTime = 0.0f;
 	};
 }

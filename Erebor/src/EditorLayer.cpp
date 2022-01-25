@@ -48,17 +48,17 @@ namespace Mahakam
 		inanimateMaterial->setFloat4("u_Color", glm::vec4(0.5f, 0.0f, 0.0f, 1.0f));
 		inanimateMaterial->setFloat("u_Metallic", 0.0f);
 		inanimateMaterial->setFloat("u_Roughness", 0.0f);
-		debugMaterial = Material::create(skinnedShader);
+		Ref<Material> debugMaterial = Material::create(skinnedShader);
 
-		debugModel = Mesh::loadModel("assets/models/Defeated.fbx");
-		debugAnimation = std::make_shared<Animation>("assets/models/Defeated.fbx", debugModel);
-		debugAnimator = std::make_shared<Animator>(debugAnimation.get());
+		SkinnedMesh debugModel = Mesh::loadModel("assets/models/Defeated.fbx");
+		Ref<Animation> debugAnimation = Animation::load("assets/models/Defeated.fbx", debugModel);
 
 		Entity animatedEntity = activeScene->createEntity("Animated");
 		animatedEntity.addComponent<MeshComponent>(debugModel, debugMaterial);
 		animatedEntity.getComponent<TransformComponent>().setPosition({ 2.5f, 1.5f, 5.0f });
 		animatedEntity.getComponent<TransformComponent>().setScale({ 0.02f, 0.02f, 0.02f });
 		animatedEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
+		animatedEntity.addComponent<AnimatorComponent>(debugAnimation);
 
 		Entity inanimateEntity = activeScene->createEntity("Inanimate");
 		inanimateEntity.addComponent<MeshComponent>(debugModel, inanimateMaterial);
@@ -156,12 +156,6 @@ namespace Mahakam
 	void EditorLayer::onUpdate(Timestep dt)
 	{
 		MH_PROFILE_FUNCTION();
-
-		debugAnimator->UpdateAnimation(dt);
-
-		auto transforms = debugAnimator->GetFinalBoneMatrices();
-		for (int i = 0; i < transforms.size(); ++i)
-			debugMaterial->setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
 		activeScene->onUpdate(dt);
 

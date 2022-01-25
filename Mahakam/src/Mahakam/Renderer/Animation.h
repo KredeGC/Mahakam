@@ -33,23 +33,26 @@ namespace Mahakam
             const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate);
             if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
                 MH_CORE_WARN("Could not load model \"{0}\": {1}", filepath, importer.GetErrorString());
+
             auto animation = scene->mAnimations[0];
             m_Duration = animation->mDuration;
             m_TicksPerSecond = animation->mTicksPerSecond;
+
             ReadHeirarchyData(m_RootNode, scene->mRootNode);
             ReadMissingBones(animation, skinnedMesh.boneInfo, skinnedMesh.boneCount);
         }
 
         Bone* FindBone(const std::string& name)
         {
-            auto iter = std::find_if(m_Bones.begin(), m_Bones.end(),
-                [&](const Bone& Bone)
+            auto iter = std::find_if(m_Bones.begin(), m_Bones.end(), [&](const Bone& Bone)
             {
                 return Bone.GetBoneName() == name;
-            }
-            );
-            if (iter == m_Bones.end()) return nullptr;
-            else return &(*iter);
+            });
+
+            if (iter == m_Bones.end())
+                return nullptr;
+            else
+                return &(*iter);
         }
 
 
@@ -62,6 +65,11 @@ namespace Mahakam
         inline const std::map<std::string, BoneInfo>& GetBoneIDMap()
         {
             return m_BoneInfoMap;
+        }
+
+        static Ref<Animation> load(const std::string& filepath, SkinnedMesh& skinnedMesh)
+        {
+            return CreateRef<Animation>(filepath, skinnedMesh);
         }
 
     private:
@@ -80,7 +88,6 @@ namespace Mahakam
 
                 if (boneInfoMap.find(boneName) == boneInfoMap.end())
                 {
-                    MH_CORE_BREAK("HMM");
                     boneInfoMap[boneName].id = boneCount;
                     boneCount++;
                 }

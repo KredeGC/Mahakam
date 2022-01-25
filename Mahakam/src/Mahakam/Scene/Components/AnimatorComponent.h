@@ -14,7 +14,7 @@ namespace Mahakam
 
 		AnimatorComponent(Ref<Animation> animation)
 		{
-			// TODO: Create animator with animation clip
+			animator.PlayAnimation(animation);
 		}
 
 		Animator& getAnimator() { return animator; }

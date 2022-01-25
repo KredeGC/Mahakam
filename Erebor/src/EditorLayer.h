@@ -17,11 +17,6 @@ namespace Mahakam
 	private:
 		Ref<Scene> activeScene;
 
-		SkinnedMesh debugModel;
-		Ref<Material> debugMaterial;
-		Ref<Animation> debugAnimation;
-		Ref<Animator> debugAnimator;
-
 		Entity cameraEntity;
 
 		DockSpace dockSpace;
