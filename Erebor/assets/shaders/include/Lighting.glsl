@@ -58,13 +58,11 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 }
 
 vec3 depthToWorldSpace(vec2 uv, float depth) {
-    mat4 viewProjectionInverseMatrix = inverse(MATRIX_P * MATRIX_V);
-    
     vec4 clipSpaceLocation;
     clipSpaceLocation.xy = uv * 2.0 - 1.0;
     clipSpaceLocation.z = depth * 2.0 - 1.0;
     clipSpaceLocation.w = 1.0;
-    vec4 homogenousLocation = viewProjectionInverseMatrix * clipSpaceLocation;
+    vec4 homogenousLocation = MATRIX_IVP * clipSpaceLocation;
     return homogenousLocation.xyz / homogenousLocation.w;
 }
 

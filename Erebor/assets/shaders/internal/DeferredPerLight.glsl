@@ -15,7 +15,7 @@ layout(location = 1) out v2f o;
 void main() {
     v_InstanceID = gl_InstanceID;
     #if defined(POINT)
-        gl_Position = MATRIX_P * MATRIX_V * vec4(i_Pos * 5.0 + lights[v_InstanceID].position.xyz, 1.0);
+        gl_Position = MATRIX_P * MATRIX_V * vec4(i_Pos / lights[v_InstanceID].position.w + lights[v_InstanceID].position.xyz, 1.0);
     #else
         gl_Position = vec4(i_Pos, 1.0);
     #endif
@@ -42,14 +42,20 @@ layout(binding = 4) uniform sampler2D u_GBuffer0;
 layout(binding = 5) uniform sampler2D u_GBuffer1;
 layout(binding = 6) uniform sampler2D u_GBuffer2;
 layout(binding = 7) uniform sampler2D u_Depth;
+// layout(binding = 8) uniform sampler2D u_GBuffer3;
 
 void main() {
     vec2 screenUV = (i.v_LocalPos.xy / i.v_LocalPos.z) * 0.5 + 0.5;
     
     // Surface values
+    #ifdef DEBUG
+        screenUV *= 2.0;
+    #endif
+    
     vec4 gBuffer0 = texture(u_GBuffer0, screenUV);
     vec4 gBuffer1 = texture(u_GBuffer1, screenUV);
     vec4 gBuffer2 = texture(u_GBuffer2, screenUV);
+    //vec4 gBuffer3 = texture(u_GBuffer3, screenUV);
     float depth = texture(u_Depth, screenUV).r;
     
     // GBuffer0
@@ -57,7 +63,6 @@ void main() {
     float ao = gBuffer0.a;
     
     // GBuffer1
-    vec2 uv = gBuffer1.xy;
     float metallic = gBuffer1.b;
     float roughness = clamp(gBuffer1.a, 0.05, 1.0);
     
@@ -66,14 +71,32 @@ void main() {
     
     // Depth Buffer
     vec3 worldPos = depthToWorldSpace(screenUV, depth);
-    float texelDepth = texture(u_Depth, uv).r;
-    worldPos += (inverse(MATRIX_P) * inverse(MATRIX_V) * vec4(uv * 2.0 - 1.0, texelDepth, 0.0)).xyz;
+    
+    // GBuffer3
+    // vec3 worldPosOffset = gBuffer3.xyz;
+    // worldPos += worldPosOffset;
     
     vec3 viewDir = getViewDir(worldPos);
     
     vec3 color = BRDF(albedo, metallic, roughness, ao, viewDir, worldPos, worldNormal);
 
     o_Color = vec4(color, 1.0);
+    
+    #ifdef DEBUG
+        #ifdef DIRECTIONAL
+            gBuffer0 = texture(u_GBuffer0, screenUV - vec2(1.0, 1.0));
+            gBuffer1 = texture(u_GBuffer1, screenUV - vec2(1.0, 0.0));
+            gBuffer2 = texture(u_GBuffer2, screenUV - vec2(0.0, 1.0));
+            
+            o_Color = vec4(0.0);
+            o_Color += screenUV.x > 1.0 && screenUV.y > 1.0 ? gBuffer0 : vec4(0.0);
+            o_Color += screenUV.x > 1.0 && screenUV.y < 1.0 ? gBuffer1 : vec4(0.0);
+            o_Color += screenUV.x < 1.0 && screenUV.y > 1.0 ? gBuffer2 : vec4(0.0);
+            o_Color += screenUV.x < 1.0 && screenUV.y < 1.0 ? vec4(color, 1.0) : vec4(0.0);
+        #else
+            o_Color = vec4(0.0);
+        #endif
+    #endif
     
     // #if defined(DIRECTIONAL)
     //     o_Color = vec4(worldPos, 1.0);

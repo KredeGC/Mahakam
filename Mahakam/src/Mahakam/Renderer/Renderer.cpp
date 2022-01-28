@@ -74,103 +74,6 @@ namespace Mahakam
 
 	std::vector<Renderer::MeshData> Renderer::transparentQueue;
 
-	void Renderer::onWindowResie(uint32_t width, uint32_t height)
-	{
-		GL::setViewport(0, 0, width, height);
-
-		// Resize gbuffer and viewport buffer
-		sceneData->gBuffer->resize(width, height);
-		sceneData->hdrFrameBuffer->resize(width, height);
-		sceneData->viewportFramebuffer->resize(width, height);
-
-		// The buffers have been recreated, update them
-		sceneData->deferredMaterial->setTexture("u_GBuffer0", 4, sceneData->gBuffer->getColorTexture(0));
-		sceneData->deferredMaterial->setTexture("u_GBuffer1", 5, sceneData->gBuffer->getColorTexture(1));
-		sceneData->deferredMaterial->setTexture("u_GBuffer2", 6, sceneData->gBuffer->getColorTexture(3));
-		sceneData->deferredMaterial->setTexture("u_Depth", 7, sceneData->gBuffer->getDepthTexture());
-
-		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
-	}
-
-	void Renderer::init(uint32_t width, uint32_t height)
-	{
-		MH_PROFILE_FUNCTION();
-
-		GL::init();
-
-		// Initialize
-		brdfLut = loadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.glsl", TextureFormat::RG16F, 512, 512);
-		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.glsl", TextureFormat::R8, 256, 256);
-
-		inverseSphereMesh = Mesh::createCubeSphere(5, true);
-
-		sceneData->matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2); // TODO: Include inverse normal matrix
-
-		// Create gbuffer
-		FrameBufferProps gProps;
-		gProps.width = width;
-		gProps.height = height;
-		gProps.colorAttachments = {
-			TextureFormat::RGBA8, // RGB - Albedo, A - Occlussion
-			TextureFormat::RGBA8, // RG - UV-offset (unused by default), B - Metallic, A - Roughness
-			TextureFormat::RG11B10F, // RGB - Emission (not affected by light)
-			TextureFormat::RGB10A2 }; // RGB - World normal, A - unused
-		gProps.depthAttachment = TextureFormat::Depth24; // Mutable
-
-		sceneData->gBuffer = FrameBuffer::create(gProps);
-
-		// Create HDR lighting framebuffer
-		FrameBufferProps lightingProps;
-		lightingProps.width = width;
-		lightingProps.height = height;
-		lightingProps.colorAttachments = { TextureFormat::RG11B10F };
-
-		sceneData->hdrFrameBuffer = FrameBuffer::create(lightingProps);
-
-		// Create viewport framebuffer
-		FrameBufferProps viewportProps;
-		viewportProps.width = width;
-		viewportProps.height = height;
-		viewportProps.colorAttachments = { TextureFormat::RGBA8 };
-
-		sceneData->viewportFramebuffer = FrameBuffer::create(viewportProps);
-
-		// Create lighting shader & material
-		Ref<Shader> deferredShader = Shader::create("assets/shaders/internal/DeferredPerLight.glsl", { "DIRECTIONAL", "POINT", "SPOT" });
-		sceneData->deferredMaterial = Material::create(deferredShader);
-		sceneData->deferredMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
-		sceneData->deferredMaterial->setTexture("u_AttenuationLUT", 3, falloffLut);
-		sceneData->deferredMaterial->setTexture("u_GBuffer0", 4, sceneData->gBuffer->getColorTexture(0));
-		sceneData->deferredMaterial->setTexture("u_GBuffer1", 5, sceneData->gBuffer->getColorTexture(1));
-		sceneData->deferredMaterial->setTexture("u_GBuffer2", 6, sceneData->gBuffer->getColorTexture(3));
-		sceneData->deferredMaterial->setTexture("u_Depth", 7, sceneData->gBuffer->getDepthTexture());
-
-		// Create tonemapping shader & material
-		Ref<Shader> tonemappingShader = Shader::create("assets/shaders/internal/Tonemapping.glsl");
-		sceneData->tonemappingMaterial = Material::create(tonemappingShader);
-		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
-	}
-
-	void Renderer::beginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
-	{
-		MH_PROFILE_FUNCTION();
-
-		sceneData->environment = environment;
-
-		glm::mat4 viewMatrix = glm::inverse(transform);
-
-		// Setup camera matrices
-		sceneData->matrixBuffer->setData(&viewMatrix, 0, sizeof(glm::mat4));
-		sceneData->matrixBuffer->setData(&transform[3], sizeof(glm::mat4) * 2, sizeof(glm::vec3));
-		sceneData->matrixBuffer->setData(&cam.getProjectionMatrix(), sizeof(glm::mat4), sizeof(glm::mat4));
-
-		sceneData->viewProjectionMatrix = cam.getProjectionMatrix() * viewMatrix;
-
-		// Clear render queues
-		renderQueue.clear();
-		transparentQueue.clear();
-	}
-
 	void Renderer::drawOpaqueQueue()
 	{
 		MH_PROFILE_FUNCTION();
@@ -290,7 +193,7 @@ namespace Mahakam
 		GL::clear();
 
 		// Bind matrix buffer
-		sceneData->matrixBuffer->bind(0);
+		sceneData->cameraBuffer->bind(0);
 
 		// Render opaque queue
 		drawOpaqueQueue();
@@ -416,6 +319,102 @@ namespace Mahakam
 		sceneData->viewportFramebuffer->unbind();
 	}
 
+	void Renderer::onWindowResie(uint32_t width, uint32_t height)
+	{
+		GL::setViewport(0, 0, width, height);
+
+		// Resize gbuffer and viewport buffer
+		sceneData->gBuffer->resize(width, height);
+		sceneData->hdrFrameBuffer->resize(width, height);
+		sceneData->viewportFramebuffer->resize(width, height);
+
+		// The buffers have been recreated, update them
+		sceneData->deferredMaterial->setTexture("u_GBuffer0", 4, sceneData->gBuffer->getColorTexture(0));
+		sceneData->deferredMaterial->setTexture("u_GBuffer1", 5, sceneData->gBuffer->getColorTexture(1));
+		sceneData->deferredMaterial->setTexture("u_GBuffer2", 6, sceneData->gBuffer->getColorTexture(3));
+		sceneData->deferredMaterial->setTexture("u_Depth", 7, sceneData->gBuffer->getDepthTexture());
+		//sceneData->deferredMaterial->setTexture("u_GBuffer3", 8, sceneData->gBuffer->getColorTexture(4));
+
+		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
+	}
+
+	void Renderer::init(uint32_t width, uint32_t height)
+	{
+		MH_PROFILE_FUNCTION();
+
+		GL::init();
+
+		// Initialize
+		brdfLut = loadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.glsl", TextureFormat::RG16F, 512, 512);
+		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.glsl", TextureFormat::R8, 256, 256);
+
+		inverseSphereMesh = Mesh::createCubeSphere(5, true);
+
+		sceneData->cameraBuffer = UniformBuffer::create(sizeof(CameraData));
+
+		// Create gbuffer
+		FrameBufferProps gProps;
+		gProps.width = width;
+		gProps.height = height;
+		gProps.colorAttachments = {
+			TextureFormat::RGBA8, // RGB - Albedo, A - Occlussion
+			TextureFormat::RGBA8, // RG - Unused, B - Metallic, A - Roughness
+			TextureFormat::RG11B10F, // RGB - Emission (not affected by light)
+			TextureFormat::RGB10A2 }; // RGB - World normal, A - Unused
+			//TextureFormat::RG11B10F }; // RGB - World position offset
+		gProps.depthAttachment = TextureFormat::Depth24; // Mutable
+
+		sceneData->gBuffer = FrameBuffer::create(gProps);
+
+		// Create HDR lighting framebuffer
+		FrameBufferProps lightingProps;
+		lightingProps.width = width;
+		lightingProps.height = height;
+		lightingProps.colorAttachments = { TextureFormat::RG11B10F };
+
+		sceneData->hdrFrameBuffer = FrameBuffer::create(lightingProps);
+
+		// Create viewport framebuffer
+		FrameBufferProps viewportProps;
+		viewportProps.width = width;
+		viewportProps.height = height;
+		viewportProps.colorAttachments = { TextureFormat::RGBA8 };
+
+		sceneData->viewportFramebuffer = FrameBuffer::create(viewportProps);
+
+		// Create lighting shader & material
+		Ref<Shader> deferredShader = Shader::create("assets/shaders/internal/DeferredPerLight.glsl", { "DIRECTIONAL", "POINT", "SPOT" });
+		sceneData->deferredMaterial = Material::create(deferredShader);
+		sceneData->deferredMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
+		sceneData->deferredMaterial->setTexture("u_AttenuationLUT", 3, falloffLut);
+		sceneData->deferredMaterial->setTexture("u_GBuffer0", 4, sceneData->gBuffer->getColorTexture(0));
+		sceneData->deferredMaterial->setTexture("u_GBuffer1", 5, sceneData->gBuffer->getColorTexture(1));
+		sceneData->deferredMaterial->setTexture("u_GBuffer2", 6, sceneData->gBuffer->getColorTexture(3));
+		sceneData->deferredMaterial->setTexture("u_Depth", 7, sceneData->gBuffer->getDepthTexture());
+		//sceneData->deferredMaterial->setTexture("u_GBuffer3", 8, sceneData->gBuffer->getColorTexture(4));
+
+		// Create tonemapping shader & material
+		Ref<Shader> tonemappingShader = Shader::create("assets/shaders/internal/Tonemapping.glsl");
+		sceneData->tonemappingMaterial = Material::create(tonemappingShader);
+		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
+	}
+
+	void Renderer::beginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
+	{
+		MH_PROFILE_FUNCTION();
+
+		sceneData->environment = environment;
+
+		// Setup camera matrices
+		CameraData cameraData(cam, transform);
+
+		sceneData->cameraBuffer->setData(&cameraData, 0, sizeof(CameraData));
+
+		// Clear render queues
+		renderQueue.clear();
+		transparentQueue.clear();
+	}
+
 	void Renderer::endScene()
 	{
 		MH_PROFILE_FUNCTION();
@@ -455,8 +454,10 @@ namespace Mahakam
 
 	void Renderer::submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
-		float depth = (sceneData->viewProjectionMatrix * transform[3]).z;
+		MH_CORE_BREAK("Transparency not yet supported ;_;!")
 
-		transparentQueue.push_back({ depth, mesh, material, transform });
+		//float depth = (sceneData->viewProjectionMatrix * transform[3]).z;
+
+		//transparentQueue.push_back({ depth, mesh, material, transform });
 	}
 }

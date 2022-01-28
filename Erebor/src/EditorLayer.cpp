@@ -87,7 +87,7 @@ namespace Mahakam
 			for (int x = 0; x < 10; x++)
 			{
 				Entity pointLightEntity = activeScene->createEntity("Point Light");
-				pointLightEntity.addComponent<LightComponent>(Light::LightType::Point, glm::vec3(0.0f, 1.0f, 1.0f));
+				pointLightEntity.addComponent<LightComponent>(Light::LightType::Point, glm::vec3(1.0f, 1.0f, 1.0f));
 				//pointLightEntity.getComponent<TransformComponent>().setPosition({ 1.0f, 1.0f, 1.0f });
 				pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
 			}
@@ -104,9 +104,6 @@ namespace Mahakam
 		planeMaterial->setTexture("u_Albedo", 0, brickAlbedo);
 		planeMaterial->setTexture("u_Metallic", 1, brickMetallic);
 		planeMaterial->setTexture("u_Roughness", 2, brickRoughness);
-		/*planeMaterial->setFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
-		planeMaterial->setFloat("u_Metallic", 0.0f);
-		planeMaterial->setFloat("u_Roughness", 1.0f);*/
 
 		Entity planeEntity = activeScene->createEntity("Plane");
 		planeEntity.addComponent<MeshComponent>(planeMesh, planeMaterial);

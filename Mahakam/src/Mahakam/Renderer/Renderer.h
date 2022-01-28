@@ -15,13 +15,6 @@ namespace Mahakam
 	class Renderer
 	{
 	public:
-		struct LightData
-		{
-			glm::vec3 position;
-			glm::quat rotation;
-			Light* light;
-		};
-
 		struct DirectionalLight
 		{
 		public:
@@ -76,8 +69,7 @@ namespace Mahakam
 			EnvironmentData environment;
 
 			// Render camera matrices
-			glm::mat4 viewProjectionMatrix;
-			Ref<UniformBuffer> matrixBuffer;
+			Ref<UniformBuffer> cameraBuffer;
 
 			// Deferred lighting
 			Ref<FrameBuffer> gBuffer;
@@ -99,6 +91,38 @@ namespace Mahakam
 			Ref<Mesh> mesh;
 			Ref<Material> material;
 			glm::mat4 transform;
+		};
+
+		struct CameraData
+		{
+		public:
+			// View & projection matrices
+			glm::mat4 u_m4_V;
+			glm::mat4 u_m4_P;
+
+			// Inverse view & projection matrices
+			glm::mat4 u_m4_IV;
+			glm::mat4 u_m4_IP;
+
+			// View-projection matrices
+			glm::mat4 u_m4_VP;
+			glm::mat4 u_m4_IVP;
+
+			// Camera position
+			glm::vec3 u_CameraPos;
+
+		private:
+			float padding01 = 0.0f;
+
+		public:
+			CameraData(const Camera& camera, const glm::mat4& transform) :
+				u_m4_V(glm::inverse(transform)),
+				u_m4_P(camera.getProjectionMatrix()),
+				u_m4_IV(transform),
+				u_m4_IP(glm::inverse(camera.getProjectionMatrix())),
+				u_m4_VP(u_m4_P * u_m4_V),
+				u_m4_IVP(u_m4_IV * u_m4_IP),
+				u_CameraPos(transform[3]) {}
 		};
 
 		static RendererResults* rendererResults;

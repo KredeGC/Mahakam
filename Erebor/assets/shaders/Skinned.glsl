@@ -77,7 +77,7 @@ void main() {
     vec3 normal = normalize(i.v_WorldNormal);
     
     o_Albedo = vec4(albedo, ao);
-    o_Specular = vec4(0.0, 0.0, metallic, roughness);
+    o_Specular = vec4(0.5, 0.5, metallic, roughness);
     o_Pos = vec4(i.v_WorldPos, 1.0);
     o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
 }
