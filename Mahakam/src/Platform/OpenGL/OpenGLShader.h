@@ -16,37 +16,38 @@ namespace Mahakam
 		uint32_t rendererID;
 		std::string name;
 
-		std::vector<ShaderProps> properties;
+		std::unordered_map<std::string, uint32_t> shaderVariants;
+		std::unordered_map<std::string, int> uniformIDCache;
+		ShaderProps properties;
 
-		void compile(const std::unordered_map<GLenum, std::string>& sources);
+		uint32_t compile(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives);
 		std::unordered_map<GLenum, std::string> parse(const std::string& source);
 		std::string sortIncludes(const std::string& source);
 		std::string readFile(const std::string& filepath);
 
+		int getUniformLocation(const std::string& name);
+
 	public:
 		OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
-		OpenGLShader(const std::string& filepath);
+		OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& defines = {});
 		virtual ~OpenGLShader();
 
-		virtual void bind() const override;
-		virtual void unbind() const override;
+		virtual void bind(const std::string& variant = "") override;
 
-		virtual void bindBuffer(const std::string& name, int slot) override;
-
-		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) override;
+		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) override; // Remove??
 
 		virtual const std::string& getName() const override { return name; }
 
-		virtual const std::vector<ShaderProps>& getProperties() const { return properties; }
+		virtual const std::vector<ShaderElement>& getProperties() const { return properties.elements; }
 
-		void setUniformMat3(const std::string& name, const glm::mat3& value);
-		void setUniformMat4(const std::string& name, const glm::mat4& value);
-
-		void setUniformInt(const std::string& name, int value);
-
-		void setUniformFloat(const std::string& name, float value);
-		void setUniformFloat2(const std::string& name, const glm::vec2& value);
-		void setUniformFloat3(const std::string& name, const glm::vec3& value);
-		void setUniformFloat4(const std::string& name, const glm::vec4& value);
+		virtual void setUniformMat3(const std::string& name, const glm::mat3& value) override;
+		virtual void setUniformMat4(const std::string& name, const glm::mat4& value) override;
+		 
+		virtual void setUniformInt(const std::string& name, int value) override;
+		 
+		virtual void setUniformFloat(const std::string& name, float value) override;
+		virtual void setUniformFloat2(const std::string& name, const glm::vec2& value) override;
+		virtual void setUniformFloat3(const std::string& name, const glm::vec3& value) override;
+		virtual void setUniformFloat4(const std::string& name, const glm::vec4& value) override;
 	};
 }

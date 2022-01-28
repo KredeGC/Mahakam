@@ -303,8 +303,6 @@ namespace Mahakam
 
 	Mesh* Mesh::getScreenQuad()
 	{
-		MH_PROFILE_FUNCTION();
-
 		if (!staticScreenQuad)
 		{
 			glm::vec3 positions[] = {

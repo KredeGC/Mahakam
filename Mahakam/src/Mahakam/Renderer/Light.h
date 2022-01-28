@@ -7,21 +7,33 @@ namespace Mahakam
 {
 	class Light
 	{
+	public:
+		enum class LightType
+		{
+			Directional = 0,
+			Spot,
+			Point
+		};
+
 	private:
-		glm::vec3 position;
-		//glm::quat rotation;
-		glm::vec3 color;
-		//LightType type;
+		LightType lightType = LightType::Directional;
+		glm::vec3 color = { 1.0f, 1.0f, 1.0f };
+
+		float range = 5.0f;
+		float fov;
 
 	public:
-		Light(const glm::vec3& pos, const glm::vec3& color);
+		Light() = default;
 
-		void setPosition(const glm::vec3& pos);
-		//void setRotation(const glm::quat& rot);
-		void setColor(const glm::vec3& col);
+		Light(LightType lightType, const glm::vec3& color)
+			: lightType(lightType), color(color) {}
 
-		const glm::vec3& getPosition() const { return position; }
-		//const glm::quat& getRotation() const { return rotation; }
-		const glm::vec3& getColor() const { return color; }
+		inline void setLightType(LightType type) { lightType = type; }
+		inline void setColor(const glm::vec3& col) { color = col; }
+		inline void setRange(float dist) { range = dist; }
+
+		inline LightType getLightType() const { return lightType; }
+		inline const glm::vec3& getColor() const { return color; }
+		inline float getRange() const { return range; }
 	};
 }

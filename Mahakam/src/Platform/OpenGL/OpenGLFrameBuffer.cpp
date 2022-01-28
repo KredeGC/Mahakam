@@ -24,16 +24,12 @@ namespace Mahakam
 
 	void OpenGLFrameBuffer::bind()
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 		glViewport(0, 0, props.width, props.height);
 	}
 
 	void OpenGLFrameBuffer::unbind()
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -50,7 +46,7 @@ namespace Mahakam
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLFrameBuffer::blitDepth(const Ref<FrameBuffer>& dest)
+	void OpenGLFrameBuffer::blitDepth(const Ref<FrameBuffer>& dest) // TODO: Merge with blit(const Ref<FrameBuffer>& dest, bool color, bool depth)
 	{
 		Ref<OpenGLFrameBuffer> fbo = std::static_pointer_cast<OpenGLFrameBuffer>(dest);
 
@@ -148,7 +144,7 @@ namespace Mahakam
 			for (GLenum i = 0; i < colorAttachments.size(); i++)
 				buffers[i] = GL_COLOR_ATTACHMENT0 + i;
 
-			glDrawBuffers(colorAttachments.size(), buffers);
+			glDrawBuffers((GLsizei)colorAttachments.size(), buffers);
 
 			delete[] buffers;
 		}

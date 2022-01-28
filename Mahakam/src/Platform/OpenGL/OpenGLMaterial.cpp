@@ -3,8 +3,49 @@
 
 namespace Mahakam
 {
-	OpenGLMaterial::OpenGLMaterial(const Ref<Shader>& shader)
-		: shader(std::static_pointer_cast<OpenGLShader>(shader)) {}
+	OpenGLMaterial::OpenGLMaterial(const Ref<Shader>& shader, const ShaderProps& props)
+		: shader(std::static_pointer_cast<OpenGLShader>(shader))
+	{
+		auto& defaultProps = shader->getProperties();
+
+		for (auto& prop : defaultProps)
+		{
+			switch (prop.dataType)
+			{
+			case ShaderDataType::Sampler2D:
+				textures[prop.location] = Texture2D::white;
+				break;
+			case ShaderDataType::SamplerCube:
+				textures[prop.location] = TextureCube::white;
+				break;
+			case ShaderDataType::Float:
+				floats[prop.name] = 0.0f;
+				break;
+			case ShaderDataType::Float2:
+				float2s[prop.name] = glm::vec2(0.0f);
+				break;
+			case ShaderDataType::Float3:
+				float3s[prop.name] = glm::vec3(0.0f);
+				break;
+			case ShaderDataType::Float4:
+				float4s[prop.name] = glm::vec4(0.0f);
+				break;
+			case ShaderDataType::Mat3:
+				mat3s[prop.name] = glm::mat3(1.0f);
+				break;
+			case ShaderDataType::Mat4:
+				mat4s[prop.name] = glm::mat4(1.0f);
+				break;
+			case ShaderDataType::Int:
+				ints[prop.name] = 0;
+				break;
+			default:
+				MH_CORE_BREAK("Unsupported ShaderDataType!");
+			}
+		}
+
+		// TODO: Initialize using the specified props
+	}
 
 	OpenGLMaterial::OpenGLMaterial(const Ref<Material>& material)
 		: shader(std::static_pointer_cast<OpenGLMaterial>(material)->shader),
@@ -49,11 +90,6 @@ namespace Mahakam
 	void OpenGLMaterial::setTransform(const glm::mat4& modelMatrix)
 	{
 		shader->setUniformMat4("u_m4_M", modelMatrix);
-	}
-
-	void OpenGLMaterial::setTransformIndex(int index, const glm::mat4& modelMatrix)
-	{
-		shader->setUniformMat4("u_m4_M[" + std::to_string(index) + "]", modelMatrix);
 	}
 
 	Ref<Texture> OpenGLMaterial::getTexture(const std::string& name) const

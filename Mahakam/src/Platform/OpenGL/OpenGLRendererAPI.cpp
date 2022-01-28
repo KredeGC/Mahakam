@@ -5,6 +5,33 @@
 
 namespace Mahakam
 {
+	static GLenum BlendModeToOpenGLBlendMode(RendererAPI::BlendMode blendMode)
+	{
+		switch (blendMode)
+		{
+		case RendererAPI::BlendMode::Zero:
+			return GL_ZERO;
+		case RendererAPI::BlendMode::One:
+			return GL_ONE;
+		case RendererAPI::BlendMode::SrcColor:
+			return GL_SRC_COLOR;
+		case RendererAPI::BlendMode::SrcAlpha:
+			return GL_SRC_ALPHA;
+		case RendererAPI::BlendMode::OneMinusSrcColor:
+			return GL_ONE_MINUS_SRC_COLOR;
+		case RendererAPI::BlendMode::OneMinusSrcAlpha:
+			return GL_ONE_MINUS_SRC_ALPHA;
+		case RendererAPI::BlendMode::DstColor:
+			return GL_DST_COLOR;
+		case RendererAPI::BlendMode::DstAlpha:
+			return GL_DST_ALPHA;
+		}
+
+		MH_CORE_BREAK("BlendMode not supported!");
+
+		return 0;
+	}
+
 	void OpenGLRendererAPI::init()
 	{
 		glEnable(GL_DEPTH_TEST);
@@ -23,6 +50,11 @@ namespace Mahakam
 	void OpenGLRendererAPI::setViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 	{
 		glViewport(x, y, w, h);
+	}
+
+	void OpenGLRendererAPI::finishRendering()
+	{
+		glFinish();
 	}
 
 	void OpenGLRendererAPI::setClearColor(const glm::vec4 color)
@@ -54,6 +86,19 @@ namespace Mahakam
 		}
 	}
 
+	void OpenGLRendererAPI::enableZWriting(bool enable)
+	{
+		glDepthMask(enable ? GL_TRUE : GL_FALSE);
+	}
+
+	void OpenGLRendererAPI::enableZTesting(bool enable)
+	{
+		if (enable)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+	}
+
 	void OpenGLRendererAPI::setFillMode(bool fill)
 	{
 		if (fill)
@@ -62,17 +107,20 @@ namespace Mahakam
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	void OpenGLRendererAPI::setBlendMode(bool enable)
+	void OpenGLRendererAPI::setBlendMode(BlendMode src, BlendMode dst, bool enable)
 	{
+		GLenum srcBlend = BlendModeToOpenGLBlendMode(src);
+		GLenum dstBlend = BlendModeToOpenGLBlendMode(dst);
+
 		if (enable)
 		{
 			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBlendFunc(srcBlend, dstBlend);
 		}
 		else
 		{
 			glDisable(GL_BLEND);
-			glBlendFunc(GL_ONE, GL_ONE);
+			glBlendFunc(srcBlend, dstBlend);
 		}
 	}
 

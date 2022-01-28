@@ -76,6 +76,8 @@ namespace Mahakam
 		virtual void bind(int slot, int offset, int size) const override;
 		virtual void unbind(int slot) const override;
 
+		virtual uint32_t getSize() const override;
+
 		virtual void setData(const void* data, uint32_t offset, uint32_t size) override;
 	};
 #pragma endregion

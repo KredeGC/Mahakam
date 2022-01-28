@@ -62,10 +62,20 @@ namespace Mahakam
 			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		// Minification
-		if (this->props.filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		if (props.mipmaps)
+		{
+			if (this->props.filterMode == TextureFilter::Bilinear)
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			else
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		}
 		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		{
+			if (this->props.filterMode == TextureFilter::Bilinear)
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			else
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		}
 
 		// Magnification
 		if (this->props.filterMode == TextureFilter::Bilinear)
@@ -145,8 +155,6 @@ namespace Mahakam
 
 	void OpenGLTexture2D::bind(uint32_t slot) const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindTextureUnit(slot, rendererID);
 	}
 
@@ -473,8 +481,6 @@ namespace Mahakam
 
 	void OpenGLTextureCube::bind(uint32_t slot) const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindTextureUnit(slot, rendererID);
 	}
 

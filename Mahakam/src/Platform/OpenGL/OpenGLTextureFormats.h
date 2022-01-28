@@ -28,6 +28,18 @@ namespace Mahakam
 			return 6;
 		case TextureFormat::RGBA16F:
 			return 8;
+		case TextureFormat::R32F:
+			return 4;
+		case TextureFormat::RG32F:
+			return 8;
+		case TextureFormat::RGB32F:
+			return 12;
+		case TextureFormat::RGBA32F:
+			return 16;
+		case TextureFormat::RG11B10F:
+			return 4;
+		case TextureFormat::RGB10A2:
+			return 4;
 		case TextureFormat::Depth16:
 			return 2;
 		case TextureFormat::Depth24:
@@ -79,6 +91,18 @@ namespace Mahakam
 			return component;
 		case TextureFormat::RGBA16F:
 			return component;
+		case TextureFormat::R32F:
+			return component;
+		case TextureFormat::RG32F:
+			return component;
+		case TextureFormat::RGB32F:
+			return component;
+		case TextureFormat::RGBA32F:
+			return component;
+		case TextureFormat::RG11B10F:
+			return GL_R11F_G11F_B10F;
+		case TextureFormat::RGB10A2:
+			return GL_RGB10_A2;
 		case TextureFormat::Depth16:
 			return GL_DEPTH_COMPONENT;
 		case TextureFormat::Depth24:
@@ -111,6 +135,18 @@ namespace Mahakam
 			return GL_RGB;
 		case TextureFormat::RGBA16F:
 			return GL_RGBA;
+		case TextureFormat::R32F:
+			return GL_RED;
+		case TextureFormat::RG32F:
+			return GL_RG;
+		case TextureFormat::RGB32F:
+			return GL_RGB;
+		case TextureFormat::RGBA32F:
+			return GL_RGBA;
+		case TextureFormat::RG11B10F:
+			return GL_R11F_G11F_B10F;
+		case TextureFormat::RGB10A2:
+			return GL_RGB10_A2;
 		case TextureFormat::Depth16:
 			return GL_DEPTH_COMPONENT;
 		case TextureFormat::Depth24:
@@ -143,6 +179,18 @@ namespace Mahakam
 			return GL_RGB16F;
 		case TextureFormat::RGBA16F:
 			return GL_RGBA16F;
+		case TextureFormat::R32F:
+			return GL_R32F;
+		case TextureFormat::RG32F:
+			return GL_RG32F;
+		case TextureFormat::RGB32F:
+			return GL_RGB32F;
+		case TextureFormat::RGBA32F:
+			return GL_RGBA32F;
+		case TextureFormat::RG11B10F:
+			return GL_R11F_G11F_B10F;
+		case TextureFormat::RGB10A2:
+			return GL_RGB10_A2;
 		case TextureFormat::Depth16:
 			return GL_DEPTH_COMPONENT16;
 		case TextureFormat::Depth24:
@@ -175,6 +223,18 @@ namespace Mahakam
 			return GL_HALF_FLOAT;
 		case TextureFormat::RGBA16F:
 			return GL_HALF_FLOAT;
+		case TextureFormat::R32F:
+			return GL_FLOAT;
+		case TextureFormat::RG32F:
+			return GL_FLOAT;
+		case TextureFormat::RGB32F:
+			return GL_FLOAT;
+		case TextureFormat::RGBA32F:
+			return GL_FLOAT;
+		case TextureFormat::RG11B10F:
+			return GL_FLOAT;
+		case TextureFormat::RGB10A2:
+			return GL_UNSIGNED_INT_10_10_10_2;
 		case TextureFormat::Depth16:
 			return GL_UNSIGNED_SHORT;
 		case TextureFormat::Depth24:

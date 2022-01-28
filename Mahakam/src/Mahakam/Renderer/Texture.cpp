@@ -7,6 +7,9 @@
 
 namespace Mahakam
 {
+	Ref<Texture2D> Texture2D::white;
+	Ref<TextureCube> TextureCube::white;
+
 	Ref<Texture2D> Texture2D::create(const TextureProps& props)
 	{
 		switch (Renderer::getAPI())

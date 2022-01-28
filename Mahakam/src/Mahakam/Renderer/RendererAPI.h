@@ -13,6 +13,17 @@ namespace Mahakam
 			None = 0,
 			OpenGL = 1
 		};
+
+		enum class BlendMode {
+			Zero = 0,
+			One,
+			SrcColor,
+			SrcAlpha,
+			OneMinusSrcColor,
+			OneMinusSrcAlpha,
+			DstColor,
+			DstAlpha
+		};
 	private:
 		static API api;
 
@@ -21,14 +32,20 @@ namespace Mahakam
 		virtual const char* getGraphicsVendor() = 0;
 		virtual void setViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) = 0;
 
+		virtual void finishRendering() = 0;
+
 		virtual void setClearColor(const glm::vec4 color) = 0;
 		virtual void clear(bool color, bool depth) = 0;
 
 		virtual void enableCulling(bool enable, bool cullFront) = 0;
 
+		virtual void enableZWriting(bool enable) = 0;
+
+		virtual void enableZTesting(bool enable) = 0;
+
 		virtual void setFillMode(bool fill) = 0;
 
-		virtual void setBlendMode(bool enable) = 0;
+		virtual void setBlendMode(BlendMode src, BlendMode dst, bool enable) = 0;
 
 		virtual void drawIndexed(uint32_t count) = 0;
 

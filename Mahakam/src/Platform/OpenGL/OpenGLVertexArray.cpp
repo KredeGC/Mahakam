@@ -55,15 +55,11 @@ namespace Mahakam
 	
 	void OpenGLVertexArray::bind() const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindVertexArray(rendererID);
 	}
 	
 	void OpenGLVertexArray::unbind() const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindVertexArray(0);
 	}
 

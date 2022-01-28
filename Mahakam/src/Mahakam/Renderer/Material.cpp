@@ -22,14 +22,14 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	Ref<Material> Material::create(Ref<Shader> shader)
+	Ref<Material> Material::create(Ref<Shader> shader, const ShaderProps& props)
 	{
 		switch (Renderer::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLMaterial>(shader);
+			return CreateRef<OpenGLMaterial>(shader, props);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

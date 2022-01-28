@@ -15,11 +15,49 @@ namespace Mahakam
 	class Renderer
 	{
 	public:
+		struct LightData
+		{
+			glm::vec3 position;
+			glm::quat rotation;
+			Light* light;
+		};
+
+		struct DirectionalLight
+		{
+		public:
+			glm::vec3 direction;
+		private:
+			float padding01;
+		public:
+			glm::vec3 color;
+		private:
+			float padding02;
+
+		public:
+			DirectionalLight(glm::vec3 direction, glm::vec3 color)
+				: direction(direction), color(color) {}
+		};
+
+		struct PointLight
+		{
+		public:
+			glm::vec4 position;
+			glm::vec3 color;
+		private:
+			float padding01;
+
+		public:
+			PointLight(glm::vec3 position, float range, glm::vec3 color)
+				: position(glm::vec4(position, 1.0f / (range * range))), color(color) {}
+		};
+
 		struct EnvironmentData
 		{
-			std::vector<Ref<Light>> lights;
+			Ref<Material> skyboxMaterial;
 			Ref<Texture> irradianceMap;
 			Ref<Texture> specularMap;
+			std::vector<DirectionalLight> directionalLights;
+			std::vector<PointLight> pointLights;
 		};
 
 		struct RendererResults
@@ -32,13 +70,27 @@ namespace Mahakam
 	private:
 		struct SceneData
 		{
+			bool wireframe = false;
+
+			// Environment data, provided by scene
 			EnvironmentData environment;
 
-			Ref<UniformBuffer> matrixBuffer;
+			// Render camera matrices
 			glm::mat4 viewProjectionMatrix;
+			Ref<UniformBuffer> matrixBuffer;
+
+			// Deferred lighting
 			Ref<FrameBuffer> gBuffer;
+			Ref<FrameBuffer> hdrFrameBuffer;
 			Ref<FrameBuffer> viewportFramebuffer;
-			Ref<Material> lightingMaterial;
+
+			// Lighting buffers
+			Ref<StorageBuffer> directionalLightBuffer;
+			Ref<StorageBuffer> pointLightBuffer;
+
+			// Materials
+			Ref<Material> deferredMaterial;
+			Ref<Material> tonemappingMaterial;
 		};
 
 		struct MeshData
@@ -59,12 +111,23 @@ namespace Mahakam
 
 		static std::vector<MeshData> transparentQueue;
 
+		static void drawOpaqueQueue();
+		static void drawSkybox();
+		static void drawTransparentQueue();
+		static void drawScreenQuad();
+
+		static void renderGeometryPass();
+		static void renderLightingPass();
+		static void renderFinalPass();
+
 	public:
 		static void onWindowResie(uint32_t width, uint32_t height);
 		static void init(uint32_t width, uint32_t height);
 
 		static void beginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
 		static void endScene();
+
+		static void enableWireframe(bool enable);
 
 		static void submit(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);
 		static void submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);

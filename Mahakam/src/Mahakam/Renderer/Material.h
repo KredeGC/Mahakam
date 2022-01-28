@@ -15,11 +15,10 @@ namespace Mahakam
 
 		virtual Ref<Shader> getShader() const = 0;
 
+		virtual void bindShader(const std::string& variant = "") const = 0;
 		virtual void bind() const = 0;
 
 		virtual void setTransform(const glm::mat4& modelMatrix) = 0;
-
-		virtual void setTransformIndex(int index, const glm::mat4& modelMatrix) = 0;
 
 		virtual void setTexture(const std::string& name, int slot, Ref<Texture> tex) = 0;
 
@@ -47,6 +46,6 @@ namespace Mahakam
 		virtual const glm::vec4 getFloat4(const std::string& name) const = 0;
 
 		static Ref<Material> copy(Ref<Material> material);
-		static Ref<Material> create(Ref<Shader> shader);
+		static Ref<Material> create(Ref<Shader> shader, const ShaderProps& props = {});
 	};
 }

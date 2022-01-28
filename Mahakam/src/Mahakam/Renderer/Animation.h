@@ -35,8 +35,8 @@ namespace Mahakam
                 MH_CORE_WARN("Could not load model \"{0}\": {1}", filepath, importer.GetErrorString());
 
             auto animation = scene->mAnimations[0];
-            m_Duration = animation->mDuration;
-            m_TicksPerSecond = animation->mTicksPerSecond;
+            m_Duration = (float)animation->mDuration;
+            m_TicksPerSecond = (int)animation->mTicksPerSecond;
 
             ReadHeirarchyData(m_RootNode, scene->mRootNode);
             ReadMissingBones(animation, skinnedMesh.boneInfo, skinnedMesh.boneCount);
@@ -56,7 +56,7 @@ namespace Mahakam
         }
 
 
-        inline float GetTicksPerSecond() { return m_TicksPerSecond; }
+        inline int GetTicksPerSecond() { return m_TicksPerSecond; }
 
         inline float GetDuration() { return m_Duration; }
 
@@ -106,7 +106,7 @@ namespace Mahakam
             dest.transformation = assimpToMat4(src->mTransformation);
             dest.childrenCount = src->mNumChildren;
 
-            for (int i = 0; i < src->mNumChildren; i++)
+            for (unsigned int i = 0; i < src->mNumChildren; i++)
             {
                 AssimpNodeData newData;
                 ReadHeirarchyData(newData, src->mChildren[i]);

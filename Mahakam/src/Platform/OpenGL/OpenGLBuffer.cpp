@@ -33,15 +33,11 @@ namespace Mahakam
 
 	void OpenGLVertexBuffer::bind() const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindBuffer(GL_ARRAY_BUFFER, rendererID);
 	}
 	
 	void OpenGLVertexBuffer::unbind() const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
@@ -85,15 +81,11 @@ namespace Mahakam
 
 	void OpenGLIndexBuffer::bind() const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendererID);
 	}
 
 	void OpenGLIndexBuffer::unbind() const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 #pragma endregion
@@ -118,28 +110,28 @@ namespace Mahakam
 
 	void OpenGLUniformBuffer::bind(int slot, int offset, int size) const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindBufferRange(GL_UNIFORM_BUFFER, slot, rendererID, offset, size > 0 ? size : this->size);
 	}
 
 	void OpenGLUniformBuffer::unbind(int slot) const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindBufferRange(GL_UNIFORM_BUFFER, slot, 0, 0, 0);
 	}
 
 	void OpenGLUniformBuffer::setData(const void* data, uint32_t offset, uint32_t size)
 	{
+		MH_PROFILE_FUNCTION();
+
+		glNamedBufferSubData(rendererID, offset, size, data);
+
 		/*glBindBuffer(GL_UNIFORM_BUFFER, rendererID);
 		void* ptr = glMapBufferRange(GL_UNIFORM_BUFFER, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
 		memcpy(ptr, data, size);
 		glUnmapBuffer(GL_UNIFORM_BUFFER);*/
 
-		void* ptr = glMapNamedBufferRange(rendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+		/*void* ptr = glMapNamedBufferRange(rendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
 		memcpy(ptr, data, size);
-		glUnmapNamedBuffer(rendererID);
+		glUnmapNamedBuffer(rendererID);*/
 	}
 #pragma endregion
 
@@ -163,26 +155,28 @@ namespace Mahakam
 
 	void OpenGLStorageBuffer::bind(int slot, int offset, int size) const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, slot, rendererID, offset, size > 0 ? size : this->size);
 	}
 
 	void OpenGLStorageBuffer::unbind(int slot) const
 	{
-		MH_PROFILE_FUNCTION();
-
 		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, slot, 0, 0, 0);
+	}
+
+	uint32_t OpenGLStorageBuffer::getSize() const
+	{
+		return size;
 	}
 	
 	void OpenGLStorageBuffer::setData(const void* data, uint32_t offset, uint32_t size)
 	{
-		//glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererID);
-		//glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+		MH_PROFILE_FUNCTION();
 
-		void* ptr = glMapNamedBufferRange(rendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+		glNamedBufferSubData(rendererID, offset, size, data);
+
+		/*void* ptr = glMapNamedBufferRange(rendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
 		memcpy(ptr, data, size);
-		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+		glUnmapNamedBuffer(rendererID);*/
 	}
 #pragma endregion
 }

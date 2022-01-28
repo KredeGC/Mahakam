@@ -43,9 +43,9 @@ layout(location = 1) out vec4 o_Specular;
 layout(location = 2) out vec4 o_Pos;
 layout(location = 3) out vec4 o_Normal;
 
-layout(binding = 3) uniform sampler2D u_Albedo;
-layout(binding = 4) uniform sampler2D u_Metallic;
-layout(binding = 5) uniform sampler2D u_Roughness;
+layout(binding = 0) uniform sampler2D u_Albedo;
+layout(binding = 1) uniform sampler2D u_Metallic;
+layout(binding = 2) uniform sampler2D u_Roughness;
 uniform float u_AO; // ??
 
 void main() {
@@ -60,5 +60,5 @@ void main() {
     o_Albedo = vec4(albedo, ao);
     o_Specular = vec4(metallic, roughness, 1.0, 1.0);
     o_Pos = vec4(i.v_WorldPos, 1.0);
-    o_Normal = vec4(normal, 0.0);
+    o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
 }

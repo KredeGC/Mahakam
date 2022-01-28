@@ -41,7 +41,7 @@ namespace Mahakam
 			for (int positionIndex = 0; positionIndex < m_NumPositions; ++positionIndex)
 			{
 				aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
-				float timeStamp = channel->mPositionKeys[positionIndex].mTime;
+				float timeStamp = (float)channel->mPositionKeys[positionIndex].mTime;
 				KeyPosition data;
 				data.position = glm::vec3(aiPosition.x, aiPosition.y, aiPosition.z);
 				data.timeStamp = timeStamp;
@@ -52,7 +52,7 @@ namespace Mahakam
 			for (int rotationIndex = 0; rotationIndex < m_NumRotations; ++rotationIndex)
 			{
 				aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
-				float timeStamp = channel->mRotationKeys[rotationIndex].mTime;
+				float timeStamp = (float)channel->mRotationKeys[rotationIndex].mTime;
 				KeyRotation data;
 				data.orientation = glm::quat(aiOrientation.w, aiOrientation.x, aiOrientation.y, aiOrientation.z);
 				data.timeStamp = timeStamp;
@@ -63,7 +63,7 @@ namespace Mahakam
 			for (int keyIndex = 0; keyIndex < m_NumScalings; ++keyIndex)
 			{
 				aiVector3D scale = channel->mScalingKeys[keyIndex].mValue;
-				float timeStamp = channel->mScalingKeys[keyIndex].mTime;
+				float timeStamp = (float)channel->mScalingKeys[keyIndex].mTime;
 				KeyScale data;
 				data.scale = glm::vec3(scale.x, scale.y, scale.z);
 				data.timeStamp = timeStamp;
@@ -91,7 +91,10 @@ namespace Mahakam
 				if (animationTime < m_Positions[index + 1].timeStamp)
 					return index;
 			}
-			assert(0);
+
+			MH_CORE_BREAK("Outside of animation range!");
+
+			return 0;
 		}
 
 		int GetRotationIndex(float animationTime)
@@ -101,7 +104,10 @@ namespace Mahakam
 				if (animationTime < m_Rotations[index + 1].timeStamp)
 					return index;
 			}
-			assert(0);
+
+			MH_CORE_BREAK("Outside of animation range!");
+
+			return 0;
 		}
 
 		int GetScaleIndex(float animationTime)
@@ -111,7 +117,10 @@ namespace Mahakam
 				if (animationTime < m_Scales[index + 1].timeStamp)
 					return index;
 			}
-			assert(0);
+
+			MH_CORE_BREAK("Outside of animation range!");
+
+			return 0;
 		}
 
 

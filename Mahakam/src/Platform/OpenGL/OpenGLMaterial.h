@@ -24,22 +24,17 @@ namespace Mahakam
 		std::unordered_map<std::string, glm::vec4> float4s;
 
 	public:
-		OpenGLMaterial(const Ref<Shader>& shader);
+		OpenGLMaterial(const Ref<Shader>& shader, const ShaderProps& props = {});
 		OpenGLMaterial(const Ref<Material>& material);
 
 		inline virtual Ref<Shader> getShader() const override { return shader; }
 
+		virtual void bindShader(const std::string& variant = "") const override { shader->bind(variant); }
 		virtual void bind() const override;
 
-		virtual void setTransform(const glm::mat4& modelMatrix) override;
+		virtual void setTransform(const glm::mat4& modelMatrix) override; // Remove??
 
-		virtual void setTransformIndex(int index, const glm::mat4& modelMatrix) override;
-
-		virtual void setTexture(const std::string& name, int slot, Ref<Texture> tex) override
-		{
-			//ints[name] = slot;
-			textures[slot] = tex;
-		}
+		virtual void setTexture(const std::string& name, int slot, Ref<Texture> tex) override { textures[slot] = tex; }
 
 		virtual void setMat3(const std::string& name, const glm::mat3& value) override { mat3s[name] = value; }
 		virtual void setMat4(const std::string& name, const glm::mat4& value) override { mat4s[name] = value; }

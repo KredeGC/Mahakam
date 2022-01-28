@@ -70,9 +70,9 @@ uniform float u_AO; // ??
 
 void main() {
     // Surface values
-    vec3 albedo = vec3(0.5, 0.0, 0.0); //texture(u_Albedo, i.v_UV).rgb;
+    vec3 albedo = vec3(1.0, 1.0, 1.0); //texture(u_Albedo, i.v_UV).rgb;
     float metallic = 0.0; //texture(u_Metallic, i.v_UV).r;
-    float roughness = 0.0; //texture(u_Roughness, i.v_UV).r;
+    float roughness = 0.5; //texture(u_Roughness, i.v_UV).r;
     float ao = 1.0;
     
     vec3 normal = normalize(i.v_WorldNormal);
@@ -80,5 +80,5 @@ void main() {
     o_Albedo = vec4(albedo, ao);
     o_Specular = vec4(metallic, roughness, 1.0, 1.0);
     o_Pos = vec4(i.v_WorldPos, 1.0);
-    o_Normal = vec4(normal, 0.0);
+    o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
 }

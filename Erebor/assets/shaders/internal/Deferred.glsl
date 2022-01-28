@@ -11,7 +11,7 @@ struct v2f {
 layout(location = 0) out v2f o;
 
 void main() {
-    gl_Position = vec4(i_Pos.xy, 0.5, 1.0);
+    gl_Position = vec4(i_Pos, 1.0);
     o.v_UV = i_UV;
 }
 
@@ -30,10 +30,20 @@ layout(location = 0) in v2f i;
 
 layout(location = 0) out vec4 o_Color;
 
-layout(binding = 3) uniform sampler2D u_Albedo;
-layout(binding = 4) uniform sampler2D u_Specular;
-layout(binding = 5) uniform sampler2D u_Pos;
-layout(binding = 6) uniform sampler2D u_Normal;
+layout(binding = 4) uniform sampler2D u_Albedo;
+layout(binding = 5) uniform sampler2D u_Specular;
+layout(binding = 6) uniform sampler2D u_Pos;
+layout(binding = 7) uniform sampler2D u_Normal;
+
+
+// vec3 worldSpaceFromDepth(in float depth) {
+//     float z = depth * 2.0 - 1.0;
+
+//     vec4 clipSpacePosition = vec4(uv0 * 2.0 - 1.0, z, 1.0);
+//     vec4 direct = pc.projectionCameraMatInverse * clipSpacePosition;
+//     return direct.xyz / direct.w;
+// }
+
 
 void main() {
     // Surface values
@@ -46,25 +56,21 @@ void main() {
     float ao = gBuffer0.a;
     
     float metallic = gBuffer1.r;
-    float roughness = gBuffer1.g;
+    float roughness = clamp(gBuffer1.g, 0.05, 1.0);
     
     vec3 worldPos = gBuffer2.xyz;
     
-    vec3 worldNormal = gBuffer3.xyz;
+    vec3 worldNormal = normalize(gBuffer3.xyz * 2.0 - 1.0);
     
     vec3 viewDir = getViewDir(worldPos);
-
-    vec3 directLighting = BRDF_Direct(light, albedo, metallic, roughness, ao, viewDir, worldPos, worldNormal);
-
-    vec3 color = directLighting;
-
-
-    // HDR tonemapping
-    color = color / (color + vec3(1.0));
-    // Gamma correction
-    color = pow(color, vec3(1.0 / 2.2)); 
+    
+    vec3 color = BRDF(albedo, metallic, roughness, ao, viewDir, worldPos, worldNormal);
 
     o_Color = vec4(color, 1.0);
     
-    //o_Color = vec4(gBuffer3.rgb, 1.0);
+    // #if defined(DIRECTIONAL)
+    //     o_Color = vec4(gBuffer3.rgb, 1.0);
+    // #else
+    //     o_Color = vec4(0.0);
+    // #endif
 }

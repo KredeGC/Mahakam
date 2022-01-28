@@ -11,12 +11,7 @@
 #include "Mahakam/Core/Timestep.h"
 
 //Scene
-#include "Mahakam/Scene/Components/AnimatorComponent.h"
-#include "Mahakam/Scene/Components/CameraComponent.h"
-#include "Mahakam/Scene/Components/MeshComponent.h"
-#include "Mahakam/Scene/Components/NativeScriptComponent.h"
-#include "Mahakam/Scene/Components/TagComponent.h"
-#include "Mahakam/Scene/Components/TransformComponent.h"
+#include "Mahakam/Scene/Components.h"
 #include "Mahakam/Scene/Entity.h"
 #include "Mahakam/Scene/Scene.h"
 #include "Mahakam/Scene/ScriptableEntity.h"

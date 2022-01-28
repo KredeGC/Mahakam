@@ -1,12 +1,7 @@
 #include "mhpch.h"
 #include "Scene.h"
 
-#include "Components/AnimatorComponent.h"
-#include "Components/CameraComponent.h"
-#include "Components/MeshComponent.h"
-#include "Components/NativeScriptComponent.h"
-#include "Components/TagComponent.h"
-#include "Components/TransformComponent.h"
+#include "Components.h"
 
 #include "Mahakam/Renderer/Renderer.h"
 
@@ -61,13 +56,13 @@ namespace Mahakam
 
 	Scene::Scene(const std::string& filepath)
 	{
-		skyboxTexture = TextureCube::create(filepath, { 2048, TextureFormat::RGB16F });
+		skyboxTexture = TextureCube::create(filepath, { 4096, TextureFormat::RGB16F });
 		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", filepath, false, { 32, TextureFormat::RGB16F, true, TextureCubePrefilter::Convolute });
-		skyboxSpecular = loadOrCreate(filepath + ".specular", filepath, true, { 256, TextureFormat::RGB16F, true, TextureCubePrefilter::Prefilter });
+		skyboxSpecular = loadOrCreate(filepath + ".specular", filepath, true, { 512, TextureFormat::RGB16F, true, TextureCubePrefilter::Prefilter });
 
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 		skyboxMaterial = Material::create(skyboxShader);
-		skyboxMaterial->setTexture("u_Environment", 3, skyboxTexture);
+		skyboxMaterial->setTexture("u_Environment", 0, skyboxTexture);
 	}
 
 	Scene::Scene(const Ref<Texture>& irradianceMap, const Ref<Texture>& specularMap)
@@ -77,7 +72,7 @@ namespace Mahakam
 
 	void Scene::onUpdate(Timestep ts)
 	{
-		// Update scripts
+		// Update scripts.... REMOVE
 		registry.view<NativeScriptComponent>().each([=](auto entity, auto& scriptComponent)
 		{
 			// TODO: onScenePlay
@@ -94,76 +89,92 @@ namespace Mahakam
 			}
 		});
 
+
 		// Update animators
-		registry.view<AnimatorComponent, MeshComponent>().each([=](auto entity, auto& animatorComponent, auto& meshComponent)
 		{
-			auto& animator = animatorComponent.getAnimator();
+			MH_PROFILE_SCOPE("Scene::onUpdate - AnimatorComponent");
 
-			animator.UpdateAnimation(ts);
+			registry.view<AnimatorComponent, MeshComponent>().each([=](auto entity, auto& animatorComponent, auto& meshComponent)
+			{
+				auto& animator = animatorComponent.getAnimator();
 
-			auto& materials = meshComponent.getMaterials();
-			auto& transforms = animator.GetFinalBoneMatrices();
+				animator.UpdateAnimation(ts);
 
-			for (auto& material : materials)
-				for (int j = 0; j < transforms.size(); ++j)
-					material->setMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
-		});
+				auto& materials = meshComponent.getMaterials();
+				auto& transforms = animator.GetFinalBoneMatrices();
 
-
-
-
-		Ref<Light> mainLight = std::make_shared<Light>(glm::vec3(1.0f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f));
+				for (auto& material : materials)
+					for (int j = 0; j < transforms.size(); ++j)
+						material->setMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
+			});
+		}
 
 		Renderer::EnvironmentData environment
 		{
-			{ mainLight },
+			skyboxMaterial,
 			skyboxIrradiance,
 			skyboxSpecular
 		};
 
+		// Setup scene lights
+		{
+			MH_PROFILE_SCOPE("Scene::onUpdate - LightComponent");
+
+			registry.view<LightComponent, TransformComponent>().each([&](auto entity, auto& lightComponent, auto& transformComponent)
+			{
+				glm::vec3 pos = transformComponent.getPosition();
+				glm::quat rot = transformComponent.getRotation();
+				glm::vec3 dir = rot * glm::vec3(0.0f, 0.0f, 1.0f);
+				Light& light = lightComponent.getLight();
+
+				if (light.getLightType() == Light::LightType::Directional)
+					environment.directionalLights.push_back(Renderer::DirectionalLight{ dir, light.getColor() });
+				else if (light.getLightType() == Light::LightType::Point)
+					environment.pointLights.push_back(Renderer::PointLight{ pos, light.getRange(), light.getColor() });
+			});
+		}
+
 		// Get the rendering camera
 		CameraComponent* mainCamera = nullptr;
 		TransformComponent* mainTransform = nullptr;
-		auto cameras = registry.view<TransformComponent, CameraComponent>();
-		for (auto& entity : cameras)
 		{
-			auto [transform, camera] = cameras.get<TransformComponent, CameraComponent>(entity);
+			MH_PROFILE_SCOPE("Scene::onUpdate - CameraComponent");
 
-			// Recalculate all projection matrices, if they've changed
-			camera.getCamera().recalculateProjectionMatrix();
+			auto cameras = registry.view<TransformComponent, CameraComponent>();
+			for (auto& entity : cameras)
+			{
+				auto [transform, camera] = cameras.get<TransformComponent, CameraComponent>(entity);
 
-			mainCamera = &camera;
-			mainTransform = &transform;
+				// Recalculate all projection matrices, if they've changed
+				camera.getCamera().recalculateProjectionMatrix();
+
+				mainCamera = &camera;
+				mainTransform = &transform;
+			}
 		}
 
 		// Render each entity with a mesh
-		if (mainCamera && mainTransform)
 		{
-			Renderer::beginScene(*mainCamera, *mainTransform, environment);
+			MH_PROFILE_SCOPE("Scene::onUpdate - Render loop");
 
-			auto meshes = registry.view<TransformComponent, MeshComponent>();
-			for (auto& entity : meshes)
+			if (mainCamera && mainTransform)
 			{
-				auto [transform, meshComponent] = meshes.get<TransformComponent, MeshComponent>(entity);
+				Renderer::beginScene(*mainCamera, *mainTransform, environment);
 
-				auto& meshes = meshComponent.getMeshes();
-				auto& materials = meshComponent.getMaterials();
-				int materialCount = materials.size() - 1;
-				for (int i = 0; i < meshComponent.getMeshCount(); i++)
-					Renderer::submit(transform, meshes[i], materials[i < materialCount ? i : materialCount]);
+				auto meshes = registry.view<TransformComponent, MeshComponent>();
+				for (auto& entity : meshes)
+				{
+					auto [transform, meshComponent] = meshes.get<TransformComponent, MeshComponent>(entity);
+
+					auto& meshes = meshComponent.getMeshes();
+					auto& materials = meshComponent.getMaterials();
+					int materialCount = (int)materials.size() - 1;
+					for (int i = 0; i < meshComponent.getMeshCount(); i++)
+						Renderer::submit(transform, meshes[i], materials[i < materialCount ? i : materialCount]);
+				}
+
+				Renderer::endScene();
 			}
-
-			Renderer::endScene();
-
-			// Render skybox
-			// TODO: Render after opaque and before transparent queue
-			Renderer::getFrameBuffer()->bind();
-
-			skyboxMaterial->getShader()->bind();
-			skyboxMaterial->bind();
-			GL::drawScreenQuad();
-
-			Renderer::getFrameBuffer()->unbind();
 		}
 	}
 

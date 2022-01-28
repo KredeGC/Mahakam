@@ -179,15 +179,11 @@ namespace Mahakam
 
 		void bind()
 		{
-			MH_PROFILE_FUNCTION();
-
 			vertexArray->bind();
 		}
 
 		void unbind()
 		{
-			MH_PROFILE_FUNCTION();
-
 			vertexArray->unbind();
 		}
 

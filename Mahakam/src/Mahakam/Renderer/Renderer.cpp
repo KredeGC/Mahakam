@@ -10,43 +10,44 @@
 namespace Mahakam
 {
 	static Ref<Texture> brdfLut;
+	static Ref<Texture> falloffLut;
 
-	static Ref<Texture> loadOrCreateBRDF(const std::string& cachePath, uint32_t width, uint32_t height)
+	static Ref<Texture> loadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height)
 	{
 		if (!std::filesystem::exists(cachePath))
 		{
-			// Setup BRDF LUT for lighting
-			FrameBufferProps brdfProps;
-			brdfProps.width = width;
-			brdfProps.height = height;
-			brdfProps.colorAttachments = { TextureFormat::RG16F };
-			brdfProps.dontUseDepth = true;
-			Ref<FrameBuffer> brdfFramebuffer = FrameBuffer::create(brdfProps);
+			// Setup LUT shader and framebuffer for capturing
+			FrameBufferProps framebufferProps;
+			framebufferProps.width = width;
+			framebufferProps.height = height;
+			framebufferProps.colorAttachments = { format };
+			framebufferProps.dontUseDepth = true;
+			Ref<FrameBuffer> framebuffer = FrameBuffer::create(framebufferProps);
 
-			Ref<Shader> brdfShader = Shader::create("assets/shaders/internal/BRDF.glsl");
+			Ref<Shader> shader = Shader::create(shaderPath);
 
-			brdfFramebuffer->bind();
+			framebuffer->bind();
 
-			brdfShader->bind();
+			shader->bind();
 
 			GL::clear();
 
 			GL::drawScreenQuad();
 
-			brdfFramebuffer->unbind();
+			framebuffer->unbind();
 
-			Ref<Texture> brdfLut = brdfFramebuffer->getColorTexture(0);
+			Ref<Texture> lut = framebuffer->getColorTexture(0);
 
 			// Save to cache
 			uint32_t size = width * height * 4;
 			char* pixels = new char[size];
-			brdfLut->readPixels(pixels);
+			lut->readPixels(pixels);
 			std::ofstream stream(cachePath, std::ios::binary);
 			stream.write(pixels, size);
 
 			delete[] pixels;
 
-			return brdfLut;
+			return lut;
 		}
 		else
 		{
@@ -54,10 +55,10 @@ namespace Mahakam
 			std::ifstream inStream(cachePath, std::ios::binary);
 			std::stringstream ss;
 			ss << inStream.rdbuf();
-			Ref<Texture> brdfLut = Texture2D::create({ width, height, TextureFormat::RG16F, TextureFilter::Bilinear, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
-			brdfLut->setData((void*)ss.str().c_str(), ss.str().size());
+			Ref<Texture> lut = Texture2D::create({ width, height, format, TextureFilter::Bilinear, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+			lut->setData((void*)ss.str().c_str(), ss.str().size());
 
-			return brdfLut;
+			return lut;
 		}
 	}
 
@@ -77,13 +78,16 @@ namespace Mahakam
 
 		// Resize gbuffer and viewport buffer
 		sceneData->gBuffer->resize(width, height);
+		sceneData->hdrFrameBuffer->resize(width, height);
 		sceneData->viewportFramebuffer->resize(width, height);
 
 		// The buffers have been recreated, update them
-		sceneData->lightingMaterial->setTexture("u_Albedo", 3, sceneData->gBuffer->getColorTexture(0));
-		sceneData->lightingMaterial->setTexture("u_Specular", 4, sceneData->gBuffer->getColorTexture(1));
-		sceneData->lightingMaterial->setTexture("u_Pos", 5, sceneData->gBuffer->getColorTexture(2));
-		sceneData->lightingMaterial->setTexture("u_Normal", 6, sceneData->gBuffer->getColorTexture(3));
+		sceneData->deferredMaterial->setTexture("u_Albedo", 4, sceneData->gBuffer->getColorTexture(0));
+		sceneData->deferredMaterial->setTexture("u_Specular", 5, sceneData->gBuffer->getColorTexture(1));
+		sceneData->deferredMaterial->setTexture("u_Pos", 6, sceneData->gBuffer->getColorTexture(2));
+		sceneData->deferredMaterial->setTexture("u_Normal", 7, sceneData->gBuffer->getColorTexture(3));
+
+		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
 	}
 
 	void Renderer::init(uint32_t width, uint32_t height)
@@ -93,17 +97,26 @@ namespace Mahakam
 		GL::init();
 
 		// Initialize
-		brdfLut = loadOrCreateBRDF("assets/textures/brdf.dat", 512, 512);
+		brdfLut = loadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.glsl", TextureFormat::RG16F, 512, 512);
+		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.glsl", TextureFormat::R8, 256, 256);
 
-		sceneData->matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2);
+		sceneData->matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2); // TODO: Include inverse normal matrix
 
 		// Create gbuffer
 		FrameBufferProps gProps;
 		gProps.width = width;
 		gProps.height = height;
-		gProps.colorAttachments = { TextureFormat::RGBA8, TextureFormat::RGBA8, TextureFormat::RGBA16F, TextureFormat::RGBA16F };
+		gProps.colorAttachments = { TextureFormat::RGBA8, TextureFormat::RG8, TextureFormat::RGB16F, TextureFormat::RGB10A2 };
 
 		sceneData->gBuffer = FrameBuffer::create(gProps);
+
+		// Create HDR lighting framebuffer
+		FrameBufferProps lightingProps;
+		lightingProps.width = width;
+		lightingProps.height = height;
+		lightingProps.colorAttachments = { TextureFormat::RG11B10F };
+
+		sceneData->hdrFrameBuffer = FrameBuffer::create(lightingProps);
 
 		// Create viewport framebuffer
 		FrameBufferProps viewportProps;
@@ -114,13 +127,19 @@ namespace Mahakam
 		sceneData->viewportFramebuffer = FrameBuffer::create(viewportProps);
 
 		// Create lighting shader & material
-		Ref<Shader> deferredShader = Shader::create("assets/shaders/internal/Deferred.glsl");
-		sceneData->lightingMaterial = Material::create(deferredShader);
-		sceneData->lightingMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
-		sceneData->lightingMaterial->setTexture("u_Albedo", 3, sceneData->gBuffer->getColorTexture(0));
-		sceneData->lightingMaterial->setTexture("u_Specular", 4, sceneData->gBuffer->getColorTexture(1));
-		sceneData->lightingMaterial->setTexture("u_Pos", 5, sceneData->gBuffer->getColorTexture(2));
-		sceneData->lightingMaterial->setTexture("u_Normal", 6, sceneData->gBuffer->getColorTexture(3));
+		Ref<Shader> deferredShader = Shader::create("assets/shaders/internal/Deferred.glsl", { "DIRECTIONAL", "POINT", "SPOT" });
+		sceneData->deferredMaterial = Material::create(deferredShader);
+		sceneData->deferredMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
+		sceneData->deferredMaterial->setTexture("u_AttenuationLUT", 3, falloffLut);
+		sceneData->deferredMaterial->setTexture("u_Albedo", 4, sceneData->gBuffer->getColorTexture(0));
+		sceneData->deferredMaterial->setTexture("u_Specular", 5, sceneData->gBuffer->getColorTexture(1));
+		sceneData->deferredMaterial->setTexture("u_Pos", 6, sceneData->gBuffer->getColorTexture(2));
+		sceneData->deferredMaterial->setTexture("u_Normal", 7, sceneData->gBuffer->getColorTexture(3));
+
+		// Create tonemapping shader & material
+		Ref<Shader> tonemappingShader = Shader::create("assets/shaders/internal/Tonemapping.glsl");
+		sceneData->tonemappingMaterial = Material::create(tonemappingShader);
+		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
 	}
 
 	void Renderer::beginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
@@ -143,39 +162,13 @@ namespace Mahakam
 		transparentQueue.clear();
 	}
 
-	void Renderer::endScene()
+	void Renderer::drawOpaqueQueue()
 	{
 		MH_PROFILE_FUNCTION();
 
-		sceneData->gBuffer->bind();
-
-		GL::setClearColor({ 0.1f, 0.1f, 0.1f, 0.1f });
-		GL::clear();
-
-		sceneData->lightingMaterial->setTexture("u_IrradianceMap", 0, sceneData->environment.irradianceMap);
-		sceneData->lightingMaterial->setTexture("u_SpecularMap", 1, sceneData->environment.specularMap);
-
-		Ref<UniformBuffer> lightBuffer = UniformBuffer::create(2 * 16);
-
-		glm::vec3 lightPos = sceneData->environment.lights[0]->getPosition();
-		glm::vec3 lightCol = sceneData->environment.lights[0]->getColor();
-		lightBuffer->setData(&lightPos, 0, sizeof(glm::vec3));
-		lightBuffer->setData(&lightCol, 16, sizeof(glm::vec3));
-
-		rendererResults->drawCalls = 0;
-		rendererResults->vertexCount = 0;
-		rendererResults->triCount = 0;
-
-		// Bind uniform buffers
-		sceneData->matrixBuffer->bind(0);
-		lightBuffer->bind(1);
-
-		// Render opaque queue
 		for (auto& shaderPair : renderQueue)
 		{
 			shaderPair.first->bind();
-			//shaderPair.first->bindBuffer("Matrices", 0);
-			//shaderPair.first->bindBuffer("Lights", 1);
 
 			for (auto& materialPair : shaderPair.second)
 			{
@@ -199,10 +192,21 @@ namespace Mahakam
 				}
 			}
 		}
+	}
 
+	void Renderer::drawSkybox()
+	{
+		MH_PROFILE_FUNCTION();
 
-		// TODO: Move after deferred rendering
-		// Render transparent queue
+		sceneData->environment.skyboxMaterial->getShader()->bind();
+		sceneData->environment.skyboxMaterial->bind();
+		drawScreenQuad();
+	}
+
+	void Renderer::drawTransparentQueue()
+	{
+		MH_PROFILE_FUNCTION();
+
 		if (transparentQueue.size() > 0)
 		{
 			// Sort transparent queue
@@ -220,15 +224,12 @@ namespace Mahakam
 				return 0;
 			});
 
-			GL::setBlendMode(true);
+			GL::setBlendMode(RendererAPI::BlendMode::SrcAlpha, RendererAPI::BlendMode::OneMinusSrcAlpha, true);
 			for (auto& data : transparentQueue)
 			{
 				const Ref<Material>& material = data.material;
-				const Ref<Shader>& shader = material->getShader();
 
-				shader->bind();
-				//shader->bindBuffer("Matrices", 0);
-				//shader->bindBuffer("Lights", 1);
+				material->bindShader();
 				material->bind();
 				material->setTransform(data.transform);
 				data.mesh->bind();
@@ -239,39 +240,196 @@ namespace Mahakam
 
 				GL::drawIndexed(data.mesh->getIndexCount());
 			}
-			GL::setBlendMode(false);
+			GL::setBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
 		}
+	}
 
-		rendererResults->triCount /= 3;
+	void Renderer::drawScreenQuad()
+	{
+		rendererResults->drawCalls += 1;
+		rendererResults->vertexCount += 4;
+		rendererResults->triCount += 6;
+
+		GL::drawScreenQuad();
+	}
+
+	void Renderer::renderGeometryPass()
+	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
+		GL::setFillMode(!sceneData->wireframe);
+
+		// Setup drawcalls
+		rendererResults->drawCalls = 0;
+		rendererResults->vertexCount = 0;
+		rendererResults->triCount = 0;
+
+		// Bind and clear gBuffer
+		sceneData->gBuffer->bind();
+		GL::setClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		GL::clear();
+
+		// Bind matrix buffer
+		sceneData->matrixBuffer->bind(0);
+
+		// Render opaque queue
+		drawOpaqueQueue();
+
+		// TODO: Move after deferred rendering
+		// Use forward rendering, somehow, find a way i guess?
+		// Render transparent queue
+		drawTransparentQueue();
 
 		sceneData->gBuffer->unbind();
 
+		GL::setFillMode(true);
+	}
 
-		// Do lighting calculations
+	void Renderer::renderLightingPass()
+	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
+		// Blit depth buffer from gBuffer
+		sceneData->gBuffer->blitDepth(sceneData->hdrFrameBuffer);
+
+		// Bind and clear lighting buffer
+		sceneData->hdrFrameBuffer->bind();
+		GL::setClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
+		GL::clear(true, false);
+
+		sceneData->deferredMaterial->setTexture("u_IrradianceMap", 0, sceneData->environment.irradianceMap);
+		sceneData->deferredMaterial->setTexture("u_SpecularMap", 1, sceneData->environment.specularMap);
+
+		// Ambient lighting and don't write or read depth
+		GL::enableZTesting(false);
+		GL::enableZWriting(false);
+
+		// Directional lights + ambient
+		{
+			MH_PROFILE_RENDERING_SCOPE("Renderer::renderLightingPass - Directional lights");
+
+			uint32_t amountSize = 16;
+			uint32_t amount = (uint32_t)sceneData->environment.directionalLights.size();
+
+			if (amount > 0)
+			{
+				uint32_t lightSize = sizeof(DirectionalLight);
+				uint32_t bufferSize = amountSize + amount * lightSize;
+
+				if (!sceneData->directionalLightBuffer || sceneData->directionalLightBuffer->getSize() != bufferSize)
+					sceneData->directionalLightBuffer = StorageBuffer::create(bufferSize);
+
+				sceneData->directionalLightBuffer->setData(&amount, 0, sizeof(int));
+				sceneData->directionalLightBuffer->setData(&sceneData->environment.directionalLights[0], amountSize, amount * lightSize);
+			}
+			else if (!sceneData->directionalLightBuffer || sceneData->directionalLightBuffer->getSize() != amountSize)
+			{
+				sceneData->directionalLightBuffer = StorageBuffer::create(amountSize);
+
+				sceneData->directionalLightBuffer->setData(&amount, 0, sizeof(int));
+			}
+
+			sceneData->deferredMaterial->bindShader("DIRECTIONAL");
+			sceneData->deferredMaterial->bind();
+			sceneData->directionalLightBuffer->bind(1);
+
+			drawScreenQuad();
+		}
+
+		// Render additional lights with additive blend mode
+		GL::setBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, true);
+
+		// Point lights
+		{
+			MH_PROFILE_RENDERING_SCOPE("Renderer::renderLightingPass - Point lights");
+
+			uint32_t amountSize = 16;
+			uint32_t amount = (uint32_t)sceneData->environment.pointLights.size();
+
+			if (amount > 0)
+			{
+				uint32_t lightSize = sizeof(PointLight);
+				uint32_t bufferSize = amountSize + amount * lightSize;
+
+				if (!sceneData->pointLightBuffer || sceneData->pointLightBuffer->getSize() != bufferSize)
+					sceneData->pointLightBuffer = StorageBuffer::create(bufferSize);
+
+				sceneData->pointLightBuffer->setData(&amount, 0, sizeof(int));
+				sceneData->pointLightBuffer->setData(&sceneData->environment.pointLights[0], amountSize, amount * lightSize);
+
+				sceneData->deferredMaterial->bindShader("POINT");
+				sceneData->deferredMaterial->bind();
+				sceneData->pointLightBuffer->bind(1);
+
+				drawScreenQuad();
+			}
+		}
+
+		// Disable blending
+		GL::setBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
+		GL::enableZTesting(true);
+
+		// Render skybox
+		drawSkybox();
+
+		sceneData->hdrFrameBuffer->unbind();
+	}
+
+	void Renderer::renderFinalPass()
+	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
+		sceneData->gBuffer->blitDepth(sceneData->viewportFramebuffer);
+
 		sceneData->viewportFramebuffer->bind();
+		GL::setClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
+		GL::clear(true, false);
 
-		GL::setClearColor({ 1.0f, 0.1f, 0.1f, 0.1f });
-		GL::clear();
+		// HDR Tonemapping
+		sceneData->tonemappingMaterial->getShader()->bind();
+		sceneData->tonemappingMaterial->bind();
 
-		sceneData->matrixBuffer->bind(0);
-		lightBuffer->bind(1);
-
-		sceneData->lightingMaterial->getShader()->bind();
-		sceneData->lightingMaterial->bind();
-
-		GL::drawScreenQuad();
+		GL::enableZTesting(false);
+		GL::enableZWriting(false);
+		drawScreenQuad();
+		GL::enableZWriting(true);
+		GL::enableZTesting(true);
 
 		sceneData->viewportFramebuffer->unbind();
+	}
 
+	void Renderer::endScene()
+	{
+		MH_PROFILE_FUNCTION();
 
-		// Blit depth from gBuffer to viewport
-		sceneData->gBuffer->blitDepth(sceneData->viewportFramebuffer);
+		// Pass 1 - Geometry
+		renderGeometryPass();
+
+		// Render wireframe
+		if (sceneData->wireframe)
+		{
+			sceneData->gBuffer->blit(sceneData->viewportFramebuffer);
+
+			rendererResults->triCount /= 3;
+			return;
+		}
+
+		// Pass 2 - Lighting
+		renderLightingPass();
+
+		// Pass 3 - Render back into main viewport (Can't use the lighting buffer directly, since it's in HDR)
+		renderFinalPass();
+
+		rendererResults->triCount /= 3;
+	}
+
+	void Renderer::enableWireframe(bool enable)
+	{
+		sceneData->wireframe = enable;
 	}
 
 	void Renderer::submit(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
-		MH_PROFILE_FUNCTION();
-
 		const Ref<Shader>& shader = material->getShader();
 
 		renderQueue[shader][material][mesh].push_back(transform);
@@ -279,8 +437,6 @@ namespace Mahakam
 
 	void Renderer::submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
-		MH_PROFILE_FUNCTION();
-
 		float depth = (sceneData->viewProjectionMatrix * transform[3]).z;
 
 		transparentQueue.push_back({ depth, mesh, material, transform });
