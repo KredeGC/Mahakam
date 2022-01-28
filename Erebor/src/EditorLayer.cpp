@@ -95,11 +95,19 @@ namespace Mahakam
 
 
 		// Setup plane
+		Ref<Texture> brickAlbedo = Texture2D::create("assets/textures/brick/brick_albedo.png", { TextureFormat::RGB8, TextureFilter::Point });
+		Ref<Texture> brickMetallic = Texture2D::create("assets/textures/brick/brick_metallic.png", { TextureFormat::R8, TextureFilter::Point });
+		Ref<Texture> brickRoughness = Texture2D::create("assets/textures/brick/brick_albedo.png", { TextureFormat::R8, TextureFilter::Point });
 		Ref<Mesh> planeMesh = Mesh::createPlane(2, 2);
-		Ref<Material> planeMaterial = Material::create(shader);
-		planeMaterial->setFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
+
+		Ref<Material> planeMaterial = Material::create(textureShader);
+		planeMaterial->setTexture("u_Albedo", 0, brickAlbedo);
+		planeMaterial->setTexture("u_Metallic", 1, brickMetallic);
+		planeMaterial->setTexture("u_Roughness", 2, brickRoughness);
+		/*planeMaterial->setFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 		planeMaterial->setFloat("u_Metallic", 0.0f);
-		planeMaterial->setFloat("u_Roughness", 1.0f);
+		planeMaterial->setFloat("u_Roughness", 1.0f);*/
+
 		Entity planeEntity = activeScene->createEntity("Plane");
 		planeEntity.addComponent<MeshComponent>(planeMesh, planeMaterial);
 		planeEntity.getComponent<TransformComponent>().setPosition({ 0.0f, -1.0f, 0.0f });
@@ -107,7 +115,7 @@ namespace Mahakam
 
 
 		// Setup dancing monke
-		Ref<Material> skinnedMaterial = Material::create(skinnedShader);
+		/*Ref<Material> skinnedMaterial = Material::create(skinnedShader);
 
 		SkinnedMesh skinnedModel = Mesh::loadModel("assets/models/Defeated.fbx");
 		Ref<Animation> animation = Animation::load("assets/models/Defeated.fbx", skinnedModel);
@@ -117,7 +125,7 @@ namespace Mahakam
 		animatedEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 1.5f, 5.0f });
 		animatedEntity.getComponent<TransformComponent>().setScale({ 0.02f, 0.02f, 0.02f });
 		animatedEntity.addComponent<AnimatorComponent>(animation);
-		animatedEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
+		animatedEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();*/
 
 
 		// Setup scene camera
@@ -132,8 +140,8 @@ namespace Mahakam
 
 		//// Create backpack textures
 		//Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg");
-		//Ref<Texture> backpackMetallic = Texture2D::create("assets/textures/backpack/specular.jpg", { TextureFormat::R8 });
-		//Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", { TextureFormat::R8 });
+		//Ref<Texture> backpackMetallic = Texture2D::create("assets/textures/backpack/specular.jpg", TextureFormat::R8);
+		//Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", TextureFormat::R8);
 
 		//// Create backpack material
 		//Ref<Material> backpackMaterial = Material::create(textureShader);

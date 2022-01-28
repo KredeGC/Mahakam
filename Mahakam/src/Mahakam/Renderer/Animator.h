@@ -9,6 +9,30 @@ namespace Mahakam
 	public:
 		// TODO: Make into a component
 		// Or alternatively add a component that uses this class
+
+
+		// TODO: Implement this idea:
+		/*Dear Ankit,
+
+		I agree with the approach suggested by Ndaba. Storing the node hierarchy, either as an Assimp object or as your own object structure, is wasteful and unnecessary.
+		This is because you have to recursively traverse the tree to find nodes, which not only is CPU cache-unfriendly,
+		as you're jumping all over the place in your tree to compare a bunch of strings to each other, but it also makes the code unnecessarily complex.
+
+		A much more efficient and simple way is to simply store the nodes in an array. For every node, you can store the index of its parent node.
+		You only have to find parent nodes once, when you import your scene. Importantly, parent nodes should be stored first in the array, and their children after.
+		This is easy if you traverse the tree from the root towards the leaves.
+
+		Because parent nodes were stored first, when you are looking at a certain node to calculate its transforms, you can be sure the transforms for its parents have already been calculated,
+		and you can simply access them as bones[child_bone->parent_index].
+		Therefore, you can simply iterate over the array from start to finish and construct all the transforms!
+		You don't have to traverse any kind of tree, or have any recursive function calls.
+
+		With this approach, everything is structured in a much simpler way (an array),
+		which makes the code much easier to work with, and also makes things much faster for the CPU to process.
+
+		Hope that was helpful! :)*/
+
+
 		Animator::Animator()
 			: m_CurrentTime(0.0f)
 		{
@@ -44,7 +68,7 @@ namespace Mahakam
 			m_CurrentTime = 0.0f;
 		}
 
-		void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform)
+		void Animator::CalculateBoneTransform(const AssimpNodeData* node, const glm::mat4& parentTransform)
 		{
 			std::string nodeName = node->name;
 			glm::mat4 nodeTransform = node->transformation;
@@ -59,11 +83,11 @@ namespace Mahakam
 
 			glm::mat4 globalTransformation = parentTransform * nodeTransform;
 
-			auto boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
+			auto& boneInfoMap = m_CurrentAnimation->GetBoneIDMap();
 			if (boneInfoMap.find(nodeName) != boneInfoMap.end())
 			{
-				int index = boneInfoMap[nodeName].id;
-				glm::mat4 offset = boneInfoMap[nodeName].offset;
+				int index = boneInfoMap.at(nodeName).id;
+				const glm::mat4& offset = boneInfoMap.at(nodeName).offset;
 				m_FinalBoneMatrices[index] = globalTransformation * offset;
 			}
 

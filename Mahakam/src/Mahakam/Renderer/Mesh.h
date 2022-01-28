@@ -208,6 +208,6 @@ namespace Mahakam
 		static Ref<Mesh> createCube(int tessellation, bool reverse = false);
 		static Ref<Mesh> createPlane(int rows, int columns);
 		static Ref<Mesh> createUVSphere(int rows, int columns);
-		static Ref<Mesh> createCubeSphere(int tessellation, bool equirectangular = false);
+		static Ref<Mesh> createCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
 	};
 }

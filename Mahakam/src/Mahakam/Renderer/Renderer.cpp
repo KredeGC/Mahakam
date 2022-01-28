@@ -12,6 +12,8 @@ namespace Mahakam
 	static Ref<Texture> brdfLut;
 	static Ref<Texture> falloffLut;
 
+	static Ref<Mesh> inverseSphereMesh;
+
 	static Ref<Texture> loadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height)
 	{
 		if (!std::filesystem::exists(cachePath))
@@ -82,10 +84,10 @@ namespace Mahakam
 		sceneData->viewportFramebuffer->resize(width, height);
 
 		// The buffers have been recreated, update them
-		sceneData->deferredMaterial->setTexture("u_Albedo", 4, sceneData->gBuffer->getColorTexture(0));
-		sceneData->deferredMaterial->setTexture("u_Specular", 5, sceneData->gBuffer->getColorTexture(1));
-		sceneData->deferredMaterial->setTexture("u_Pos", 6, sceneData->gBuffer->getColorTexture(2));
-		sceneData->deferredMaterial->setTexture("u_Normal", 7, sceneData->gBuffer->getColorTexture(3));
+		sceneData->deferredMaterial->setTexture("u_GBuffer0", 4, sceneData->gBuffer->getColorTexture(0));
+		sceneData->deferredMaterial->setTexture("u_GBuffer1", 5, sceneData->gBuffer->getColorTexture(1));
+		sceneData->deferredMaterial->setTexture("u_GBuffer2", 6, sceneData->gBuffer->getColorTexture(3));
+		sceneData->deferredMaterial->setTexture("u_Depth", 7, sceneData->gBuffer->getDepthTexture());
 
 		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
 	}
@@ -100,13 +102,20 @@ namespace Mahakam
 		brdfLut = loadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.glsl", TextureFormat::RG16F, 512, 512);
 		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.glsl", TextureFormat::R8, 256, 256);
 
+		inverseSphereMesh = Mesh::createCubeSphere(5, true);
+
 		sceneData->matrixBuffer = UniformBuffer::create(sizeof(glm::vec3) + sizeof(glm::mat4) * 2); // TODO: Include inverse normal matrix
 
 		// Create gbuffer
 		FrameBufferProps gProps;
 		gProps.width = width;
 		gProps.height = height;
-		gProps.colorAttachments = { TextureFormat::RGBA8, TextureFormat::RG8, TextureFormat::RGB16F, TextureFormat::RGB10A2 };
+		gProps.colorAttachments = {
+			TextureFormat::RGBA8, // RGB - Albedo, A - Occlussion
+			TextureFormat::RGBA8, // RG - UV-offset (unused by default), B - Metallic, A - Roughness
+			TextureFormat::RG11B10F, // RGB - Emission (not affected by light)
+			TextureFormat::RGB10A2 }; // RGB - World normal, A - unused
+		gProps.depthAttachment = TextureFormat::Depth24; // Mutable
 
 		sceneData->gBuffer = FrameBuffer::create(gProps);
 
@@ -127,14 +136,14 @@ namespace Mahakam
 		sceneData->viewportFramebuffer = FrameBuffer::create(viewportProps);
 
 		// Create lighting shader & material
-		Ref<Shader> deferredShader = Shader::create("assets/shaders/internal/Deferred.glsl", { "DIRECTIONAL", "POINT", "SPOT" });
+		Ref<Shader> deferredShader = Shader::create("assets/shaders/internal/DeferredPerLight.glsl", { "DIRECTIONAL", "POINT", "SPOT" });
 		sceneData->deferredMaterial = Material::create(deferredShader);
 		sceneData->deferredMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
 		sceneData->deferredMaterial->setTexture("u_AttenuationLUT", 3, falloffLut);
-		sceneData->deferredMaterial->setTexture("u_Albedo", 4, sceneData->gBuffer->getColorTexture(0));
-		sceneData->deferredMaterial->setTexture("u_Specular", 5, sceneData->gBuffer->getColorTexture(1));
-		sceneData->deferredMaterial->setTexture("u_Pos", 6, sceneData->gBuffer->getColorTexture(2));
-		sceneData->deferredMaterial->setTexture("u_Normal", 7, sceneData->gBuffer->getColorTexture(3));
+		sceneData->deferredMaterial->setTexture("u_GBuffer0", 4, sceneData->gBuffer->getColorTexture(0));
+		sceneData->deferredMaterial->setTexture("u_GBuffer1", 5, sceneData->gBuffer->getColorTexture(1));
+		sceneData->deferredMaterial->setTexture("u_GBuffer2", 6, sceneData->gBuffer->getColorTexture(3));
+		sceneData->deferredMaterial->setTexture("u_Depth", 7, sceneData->gBuffer->getDepthTexture());
 
 		// Create tonemapping shader & material
 		Ref<Shader> tonemappingShader = Shader::create("assets/shaders/internal/Tonemapping.glsl");
@@ -253,6 +262,17 @@ namespace Mahakam
 		GL::drawScreenQuad();
 	}
 
+	void Renderer::drawInstancedSphere(uint32_t amount)
+	{
+		rendererResults->drawCalls += 1;
+		rendererResults->vertexCount += amount * inverseSphereMesh->getVertexCount();
+		rendererResults->triCount += amount * inverseSphereMesh->getIndexCount();
+
+		inverseSphereMesh->bind();
+
+		GL::drawInstanced(inverseSphereMesh->getIndexCount(), amount);
+	}
+
 	void Renderer::renderGeometryPass()
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
@@ -343,25 +363,23 @@ namespace Mahakam
 		{
 			MH_PROFILE_RENDERING_SCOPE("Renderer::renderLightingPass - Point lights");
 
-			uint32_t amountSize = 16;
 			uint32_t amount = (uint32_t)sceneData->environment.pointLights.size();
 
 			if (amount > 0)
 			{
 				uint32_t lightSize = sizeof(PointLight);
-				uint32_t bufferSize = amountSize + amount * lightSize;
+				uint32_t bufferSize = amount * lightSize;
 
 				if (!sceneData->pointLightBuffer || sceneData->pointLightBuffer->getSize() != bufferSize)
 					sceneData->pointLightBuffer = StorageBuffer::create(bufferSize);
 
-				sceneData->pointLightBuffer->setData(&amount, 0, sizeof(int));
-				sceneData->pointLightBuffer->setData(&sceneData->environment.pointLights[0], amountSize, amount * lightSize);
+				sceneData->pointLightBuffer->setData(&sceneData->environment.pointLights[0], 0, bufferSize);
 
 				sceneData->deferredMaterial->bindShader("POINT");
 				sceneData->deferredMaterial->bind();
 				sceneData->pointLightBuffer->bind(1);
 
-				drawScreenQuad();
+				drawInstancedSphere(amount);
 			}
 		}
 

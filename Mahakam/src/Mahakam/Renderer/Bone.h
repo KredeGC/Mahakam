@@ -30,6 +30,8 @@ namespace Mahakam
 	class Bone
 	{
 	public:
+		Bone() = default;
+
 		Bone(const std::string& name, int ID, const aiNodeAnim* channel)
 			:
 			m_Name(name),

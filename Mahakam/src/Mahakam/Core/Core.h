@@ -2,10 +2,30 @@
 
 #include <memory>
 
+
 #ifdef MH_DEBUG
+#define MH_ENABLE_ASSERT // Enable asserts in debug builds
+#define MH_ENABLE_RENDER_PROFILING // Enable render profiling in debug builds
+#endif // MH_DEBUG
+
+#define MH_ENABLE_PROFILING // Enable profiling in all builds
+
+
+#ifdef MH_ENABLE_ASSERT
 #define MH_CORE_BREAK(...) { MH_CORE_ERROR("Assertion failed: {0}", __VA_ARGS__); __debugbreak(); }
 #define MH_BREAK(...) { MH_ERROR("Assertion failed: {0}", __VA_ARGS__); __debugbreak(); }
 
+#define MH_CORE_ASSERT(x, ...) { if(!(x)) { MH_CORE_BREAK(__VA_ARGS__) } }
+#define MH_ASSERT(x, ...) { if(!(x)) { MH_BREAK(__VA_ARGS__) } }
+#else // MH_ENABLE_ASSERT
+#define MH_CORE_BREAK(...)
+#define MH_BREAK(...)
+
+#define MH_CORE_ASSERT(x, ...)
+#define MH_ASSERT(x, ...)
+#endif // MH_ENABLE_ASSERT
+
+#ifdef MH_ENABLE_PROFILING
 #define MH_PROFILE_SCOPE_LINE2(name, line, flushRenderer) ::Mahakam::Profiler profiler##line(name, flushRenderer);
 #define MH_PROFILE_SCOPE_LINE(name, line, flushRenderer) MH_PROFILE_SCOPE_LINE2(name, line, flushRenderer)
 
@@ -14,22 +34,13 @@
 
 #define MH_PROFILE_RENDERING_SCOPE(name) MH_PROFILE_SCOPE_LINE(name, __LINE__, true)
 #define MH_PROFILE_RENDERING_FUNCTION() MH_PROFILE_RENDERING_SCOPE(__FUNCTION__)
-
-#define MH_CORE_ASSERT(x, ...) { if(!(x)) { MH_CORE_BREAK(__VA_ARGS__) } }
-#define MH_ASSERT(x, ...) { if(!(x)) { MH_BREAK(__VA_ARGS__) } }
-#else
-#define MH_CORE_BREAK(...)
-#define MH_BREAK(...)
-
+#else // MH_ENABLE_PROFILING
 #define MH_PROFILE_SCOPE(name)
 #define MH_PROFILE_FUNCTION()
 
 #define MH_PROFILE_RENDERING_SCOPE(name)
 #define MH_PROFILE_RENDERING_FUNCTION()
-
-#define MH_CORE_ASSERT(x, ...)
-#define MH_ASSERT(x, ...)
-#endif
+#endif // MH_ENABLE_PROFILING
 
 #define BIT(x) (1 << x)
 

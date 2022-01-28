@@ -59,7 +59,7 @@ namespace Mahakam
 
 				glDeleteShader(shader);
 
-				MH_CORE_ERROR("{0}", infoLog.data());
+				MH_CORE_ERROR("{0}\r\n\r\n{1}", source, infoLog.data());
 				MH_CORE_ASSERT(false, "Shader failed to compile!");
 
 				break;

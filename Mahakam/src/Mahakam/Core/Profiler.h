@@ -25,12 +25,12 @@ namespace Mahakam
 		Profiler(const char* name, bool flushRenderer)
 			: name(name), stopped(false), flushRenderer(flushRenderer)
 		{
-#ifdef MH_DEBUG
+#ifdef MH_ENABLE_PROFILING
 			startPoint = std::chrono::high_resolution_clock::now();
 #endif
 		}
 
-#ifdef MH_DEBUG
+#ifdef MH_ENABLE_PROFILING
 		~Profiler()
 		{
 			if (!stopped)

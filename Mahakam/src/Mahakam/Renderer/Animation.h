@@ -6,7 +6,7 @@
 #include "Mesh.h"
 
 #include <map>
-#include <vector>
+#include <unordered_map>
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <assimp/scene.h>
@@ -44,15 +44,13 @@ namespace Mahakam
 
         Bone* FindBone(const std::string& name)
         {
-            auto iter = std::find_if(m_Bones.begin(), m_Bones.end(), [&](const Bone& Bone)
+            auto iter = m_Bones.find(name);
+            if (iter != m_Bones.end())
             {
-                return Bone.GetBoneName() == name;
-            });
+                return &iter->second;
+            }
 
-            if (iter == m_Bones.end())
-                return nullptr;
-            else
-                return &(*iter);
+            return nullptr;
         }
 
 
@@ -91,8 +89,8 @@ namespace Mahakam
                     boneInfoMap[boneName].id = boneCount;
                     boneCount++;
                 }
-                m_Bones.push_back(Bone(channel->mNodeName.data,
-                    boneInfoMap[channel->mNodeName.data].id, channel));
+
+                m_Bones[boneName] = Bone(channel->mNodeName.data, boneInfoMap[channel->mNodeName.data].id, channel);
             }
 
             m_BoneInfoMap = boneInfoMap;
@@ -116,7 +114,7 @@ namespace Mahakam
 
         float m_Duration;
         int m_TicksPerSecond;
-        std::vector<Bone> m_Bones;
+        std::unordered_map<std::string, Bone> m_Bones;
         AssimpNodeData m_RootNode;
         std::map<std::string, BoneInfo> m_BoneInfoMap;
     };

@@ -349,6 +349,7 @@ namespace Mahakam
 			aiProcess_Triangulate |
 			aiProcess_FlipUVs |
 			aiProcess_GenSmoothNormals |
+			aiProcess_CalcTangentSpace |
 			aiProcess_ImproveCacheLocality |
 			aiProcess_OptimizeMeshes |
 			aiProcess_JoinIdenticalVertices);
@@ -608,7 +609,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Ref<Mesh> Mesh::createCubeSphere(int tessellation, bool equirectangular)
+	Ref<Mesh> Mesh::createCubeSphere(int tessellation, bool reverse, bool equirectangular)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -660,13 +661,26 @@ namespace Mahakam
 
 					if (x != tessellation - 1 && y != tessellation - 1)
 					{
-						indices[triIndex] = index;
-						indices[triIndex + 1] = index + tessellation + 1;
-						indices[triIndex + 2] = index + tessellation;
+						if (reverse)
+						{
+							indices[triIndex] = index;
+							indices[triIndex + 1] = index + tessellation;
+							indices[triIndex + 2] = index + tessellation + 1;
 
-						indices[triIndex + 3] = index;
-						indices[triIndex + 4] = index + 1;
-						indices[triIndex + 5] = index + tessellation + 1;
+							indices[triIndex + 3] = index;
+							indices[triIndex + 4] = index + tessellation + 1;
+							indices[triIndex + 5] = index + 1;
+						}
+						else
+						{
+							indices[triIndex] = index;
+							indices[triIndex + 1] = index + tessellation + 1;
+							indices[triIndex + 2] = index + tessellation;
+
+							indices[triIndex + 3] = index;
+							indices[triIndex + 4] = index + 1;
+							indices[triIndex + 5] = index + tessellation + 1;
+						}
 
 						triIndex += 6;
 					}

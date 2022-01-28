@@ -9,7 +9,7 @@ namespace Mahakam
 
 	void Profiler::addResult(const char* name, std::chrono::time_point<std::chrono::steady_clock> startTime, std::chrono::time_point<std::chrono::steady_clock> endTime)
 	{
-#ifdef MH_DEBUG
+#ifdef MH_ENABLE_PROFILING
 		uint64_t start = std::chrono::time_point_cast<std::chrono::microseconds>(startTime).time_since_epoch().count();
 		uint64_t end = std::chrono::time_point_cast<std::chrono::microseconds>(endTime).time_since_epoch().count();
 
@@ -21,13 +21,14 @@ namespace Mahakam
 
 	void Profiler::stop()
 	{
-#ifdef MH_DEBUG
+#ifdef MH_ENABLE_PROFILING
 		auto endPoint = std::chrono::high_resolution_clock::now();
 
 		addResult(name, startPoint, endPoint);
 
 		stopped = true;
 
+#ifdef MH_ENABLE_RENDER_PROFILING
 		if (flushRenderer)
 		{
 			GL::finishRendering();
@@ -36,6 +37,7 @@ namespace Mahakam
 
 			addResult("Waiting on GPU", endPoint, renderPoint);
 		}
+#endif
 #endif
 	}
 }

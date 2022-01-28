@@ -48,7 +48,7 @@ namespace Mahakam
 
 		public:
 			PointLight(glm::vec3 position, float range, glm::vec3 color)
-				: position(glm::vec4(position, 1.0f / (range * range))), color(color) {}
+				: position(glm::vec4(position, 1.0f / range)), color(color) {}
 		};
 
 		struct EnvironmentData
@@ -115,6 +115,7 @@ namespace Mahakam
 		static void drawSkybox();
 		static void drawTransparentQueue();
 		static void drawScreenQuad();
+		static void drawInstancedSphere(uint32_t amount);
 
 		static void renderGeometryPass();
 		static void renderLightingPass();

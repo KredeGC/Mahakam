@@ -65,8 +65,6 @@ namespace Mahakam
 
 	void Application::onEvent(Event& event)
 	{
-		MH_PROFILE_FUNCTION();
-
 		EventDispatcher dispatcher(event);
 
 		dispatcher.dispatchEvent<WindowCloseEvent>(MH_BIND_EVENT(Application::onWindowClose));
@@ -82,16 +80,12 @@ namespace Mahakam
 
 	void Application::pushLayer(Layer* layer)
 	{
-		MH_PROFILE_FUNCTION();
-
 		layerStack.pushLayer(layer);
 		layer->onAttach();
 	}
 
 	void Application::pushOverlay(Layer* overlay)
 	{
-		MH_PROFILE_FUNCTION();
-
 		layerStack.pushOverlay(overlay);
 		overlay->onAttach();
 	}
@@ -104,8 +98,6 @@ namespace Mahakam
 
 	bool Application::onWindowResize(WindowResizeEvent& event)
 	{
-		MH_PROFILE_FUNCTION();
-
 		if (event.getWidth() == 0 || event.getHeight() == 0)
 		{
 			minimized = true;

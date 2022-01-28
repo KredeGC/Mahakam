@@ -28,7 +28,6 @@ void main() {
 #type fragment
 #version 450
 #include "assets/shaders/include/Matrix.glsl"
-#include "assets/shaders/include/Lighting.glsl"
 
 layout(location = 0) out vec4 o_Albedo;
 layout(location = 1) out vec4 o_Specular;
@@ -59,7 +58,7 @@ void main() {
     vec3 normal = normalize(i.v_WorldNormal);
     
     o_Albedo = vec4(albedo, ao);
-    o_Specular = vec4(metallic, roughness, 1.0, 1.0);
+    o_Specular = vec4(0.0, 0.0, metallic, roughness);
     o_Pos = vec4(i.v_WorldPos, 1.0);
     o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
 }
