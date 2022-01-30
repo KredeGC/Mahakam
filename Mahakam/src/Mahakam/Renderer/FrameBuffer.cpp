@@ -1,7 +1,7 @@
 #include "mhpch.h"
 #include "FrameBuffer.h"
 
-#include "Renderer.h"
+#include "RendererAPI.h"
 
 #include "Platform/OpenGL/OpenGLFrameBuffer.h"
 
@@ -9,7 +9,7 @@ namespace Mahakam
 {
 	Ref<FrameBuffer> FrameBuffer::create(const FrameBufferProps& prop)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");

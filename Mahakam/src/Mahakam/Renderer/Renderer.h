@@ -1,7 +1,5 @@
 #pragma once
 
-#include "GL.h"
-
 #include "FrameBuffer.h"
 
 #include "Camera.h"
@@ -52,7 +50,7 @@ namespace Mahakam
 
 		public:
 			SpotLight(const glm::vec3& position, const glm::quat& rotation, float fov, float range, const glm::vec3& color) :
-				worldToLight(glm::perspective(fov, 1.0f, 0.03f, range) * glm::inverse(glm::translate(glm::mat4(1.0f), position) * glm::mat4(rotation))),
+				worldToLight(glm::perspective(fov, 1.0f, 0.03f, range)* glm::inverse(glm::translate(glm::mat4(1.0f), position)* glm::mat4(rotation))),
 				color(color, 1.0f / (range * range))
 			{
 				float xy = glm::tan(fov / 2.0f) * range;
@@ -140,8 +138,8 @@ namespace Mahakam
 				u_m4_P(camera.getProjectionMatrix()),
 				u_m4_IV(transform),
 				u_m4_IP(glm::inverse(camera.getProjectionMatrix())),
-				u_m4_VP(u_m4_P * u_m4_V),
-				u_m4_IVP(u_m4_IV * u_m4_IP),
+				u_m4_VP(u_m4_P* u_m4_V),
+				u_m4_IVP(u_m4_IV* u_m4_IP),
 				u_CameraPos(transform[3]) {}
 		};
 
@@ -155,21 +153,9 @@ namespace Mahakam
 
 		static std::vector<MeshData> transparentQueue;
 
-		static void drawOpaqueQueue();
-		static void drawTransparentQueue();
-
-		static void drawSkybox();
-		static void drawScreenQuad();
-		static void drawInstancedSphere(uint32_t amount);
-		static void drawInstancedPyramid(uint32_t amount);
-
-		static void renderGeometryPass();
-		static void renderLightingPass();
-		static void renderFinalPass();
-
 	public:
-		static void onWindowResie(uint32_t width, uint32_t height);
 		static void init(uint32_t width, uint32_t height);
+		static void onWindowResie(uint32_t width, uint32_t height);
 
 		static void beginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
 		static void endScene();
@@ -184,6 +170,17 @@ namespace Mahakam
 
 		inline static const RendererResults* getPerformanceResults() { return rendererResults; }
 
-		inline static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
+	private:
+		static void drawOpaqueQueue();
+		static void drawTransparentQueue();
+
+		static void drawSkybox();
+		static void drawScreenQuad();
+		static void drawInstancedSphere(uint32_t amount);
+		static void drawInstancedPyramid(uint32_t amount);
+
+		static void renderGeometryPass();
+		static void renderLightingPass();
+		static void renderFinalPass();
 	};
 }

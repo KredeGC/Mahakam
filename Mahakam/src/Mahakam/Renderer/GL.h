@@ -12,7 +12,7 @@ namespace Mahakam
 		static RendererAPI* rendererAPI;
 
 	public:
-		inline static void init() { rendererAPI->init(); }
+		static void init();
 
 		inline static const char* getGraphicsVendor() { return rendererAPI->getGraphicsVendor(); }
 

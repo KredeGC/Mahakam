@@ -10,11 +10,11 @@
 
 namespace Mahakam
 {
-	static Ref<TextureCube> loadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, const CubeTextureProps& props)
+	static Ref<TextureCube> loadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 	{
 		if (!std::filesystem::exists(cachePath))
 		{
-			Ref<TextureCube> texture = TextureCube::create(src, props);
+			Ref<TextureCube> texture = TextureCube::create(src, prefilter, props);
 
 			uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(props.resolution)));
 			uint32_t maxMipLevels = saveMips ? mipLevels : 1;
@@ -57,8 +57,8 @@ namespace Mahakam
 	Scene::Scene(const std::string& filepath)
 	{
 		skyboxTexture = TextureCube::create(filepath, { 4096, TextureFormat::RGB16F });
-		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, { 64, TextureFormat::RGB16F, true, TextureCubePrefilter::Convolute });
-		skyboxSpecular = loadOrCreate(filepath + ".specular", skyboxTexture, true, { 512, TextureFormat::RGB16F, true, TextureCubePrefilter::Prefilter });
+		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, true });
+		skyboxSpecular = loadOrCreate(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
 
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 		skyboxMaterial = Material::create(skyboxShader);

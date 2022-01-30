@@ -15,7 +15,8 @@ namespace Mahakam
 
 		virtual Ref<Shader> getShader() const = 0;
 
-		virtual void bindShader(const std::string& variant = "") const = 0;
+		virtual void bindShader(const std::string& variant) const = 0;
+		virtual void bindShader() const = 0;
 		virtual void bind() const = 0;
 
 		virtual void setTransform(const glm::mat4& modelMatrix) = 0;
@@ -25,7 +26,7 @@ namespace Mahakam
 		virtual void setMat3(const std::string& name, const glm::mat3& value) = 0;
 		virtual void setMat4(const std::string& name, const glm::mat4& value) = 0;
 
-		virtual void setInt(const std::string& name, int value) = 0;
+		virtual void setInt(const std::string& name, int32_t value) = 0;
 
 		virtual void setFloat(const std::string& name, float value) = 0;
 		virtual void setFloat2(const std::string& name, const glm::vec2& value) = 0;
@@ -38,7 +39,7 @@ namespace Mahakam
 		virtual const glm::mat3 getMat3(const std::string& name) const = 0;
 		virtual const glm::mat4 getMat4(const std::string& name) const = 0;
 
-		virtual int getInt(const std::string& name) const = 0;
+		virtual int32_t getInt(const std::string& name) const = 0;
 
 		virtual float getFloat(const std::string& name) const = 0;
 		virtual const glm::vec2 getFloat2(const std::string& name) const = 0;
@@ -46,6 +47,6 @@ namespace Mahakam
 		virtual const glm::vec4 getFloat4(const std::string& name) const = 0;
 
 		static Ref<Material> copy(Ref<Material> material);
-		static Ref<Material> create(Ref<Shader> shader, const ShaderProps& props = {});
+		static Ref<Material> create(Ref<Shader> shader, const std::string& variant = "");
 	};
 }

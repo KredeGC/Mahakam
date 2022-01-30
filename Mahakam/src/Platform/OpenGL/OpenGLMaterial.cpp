@@ -3,8 +3,8 @@
 
 namespace Mahakam
 {
-	OpenGLMaterial::OpenGLMaterial(const Ref<Shader>& shader, const ShaderProps& props)
-		: shader(std::static_pointer_cast<OpenGLShader>(shader))
+	OpenGLMaterial::OpenGLMaterial(const Ref<Shader>& shader, const std::string& variant)
+		: shader(std::static_pointer_cast<OpenGLShader>(shader)), variant(variant)
 	{
 		auto& defaultProps = shader->getProperties();
 
@@ -13,10 +13,10 @@ namespace Mahakam
 			switch (prop.dataType)
 			{
 			case ShaderDataType::Sampler2D:
-				textures[prop.location] = Texture2D::white;
+				textures[prop.name] = Texture2D::white;
 				break;
 			case ShaderDataType::SamplerCube:
-				textures[prop.location] = TextureCube::white;
+				textures[prop.name] = TextureCube::white;
 				break;
 			case ShaderDataType::Float:
 				floats[prop.name] = 0.0f;
@@ -43,12 +43,11 @@ namespace Mahakam
 				MH_CORE_BREAK("Unsupported ShaderDataType!");
 			}
 		}
-
-		// TODO: Initialize using the specified props
 	}
 
-	OpenGLMaterial::OpenGLMaterial(const Ref<Material>& material)
-		: shader(std::static_pointer_cast<OpenGLMaterial>(material)->shader),
+	OpenGLMaterial::OpenGLMaterial(const Ref<Material>& material) :
+		shader(std::static_pointer_cast<OpenGLMaterial>(material)->shader),
+		variant(std::static_pointer_cast<OpenGLMaterial>(material)->variant),
 		textures(std::static_pointer_cast<OpenGLMaterial>(material)->textures),
 		mat3s(std::static_pointer_cast<OpenGLMaterial>(material)->mat3s),
 		mat4s(std::static_pointer_cast<OpenGLMaterial>(material)->mat4s),
@@ -62,17 +61,17 @@ namespace Mahakam
 	{
 		//shader->bind();
 
-		for (auto& kv : ints)
-			shader->setUniformInt(kv.first, kv.second);
-
 		for (auto& kv : textures)
-			kv.second->bind(kv.first);
+			shader->setTexture(kv.first, kv.second);
 
 		for (auto& kv : mat3s)
 			shader->setUniformMat3(kv.first, kv.second);
 
 		for (auto& kv : mat4s)
 			shader->setUniformMat4(kv.first, kv.second);
+
+		for (auto& kv : ints)
+			shader->setUniformInt(kv.first, kv.second);
 
 		for (auto& kv : floats)
 			shader->setUniformFloat(kv.first, kv.second);
@@ -94,13 +93,9 @@ namespace Mahakam
 
 	Ref<Texture> OpenGLMaterial::getTexture(const std::string& name) const
 	{
-		auto& intIter = ints.find(name);
-		if (intIter != ints.end())
-		{
-			auto& texIter = textures.find(intIter->second);
-			if (texIter != textures.end())
-				return texIter->second;
-		}
+		auto& texIter = textures.find(name);
+		if (texIter != textures.end())
+			return texIter->second;
 
 		MH_CORE_WARN("Material ({0}) has no texture named {0}", getShader()->getName(), name);
 
@@ -129,7 +124,7 @@ namespace Mahakam
 		return glm::mat4(1.0f);
 	}
 
-	int OpenGLMaterial::getInt(const std::string& name) const
+	int32_t OpenGLMaterial::getInt(const std::string& name) const
 	{
 		auto& intIter = ints.find(name);
 		if (intIter != ints.end())

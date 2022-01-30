@@ -1,3 +1,6 @@
+#ifndef MATRIX_INCLUDED
+#define MATRIX_INCLUDED
+
 #define MATRIX_M u_m4_M
 #define MATRIX_V u_m4_V
 #define MATRIX_P u_m4_P
@@ -29,3 +32,5 @@ vec3 getViewDir(vec3 worldPos) {
     else
         return normalize(u_CameraPos - worldPos);
 }
+
+#endif

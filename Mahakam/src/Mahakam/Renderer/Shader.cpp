@@ -1,7 +1,7 @@
 #include "mhpch.h"
 #include "Shader.h"
 
-#include "Renderer.h"
+#include "RendererAPI.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
 
@@ -9,7 +9,7 @@ namespace Mahakam
 {
 	Ref<Shader> Shader::create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSrouce)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -24,7 +24,7 @@ namespace Mahakam
 
 	Ref<Shader> Shader::create(const std::string& filepath, const std::initializer_list<std::string>& defines)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");

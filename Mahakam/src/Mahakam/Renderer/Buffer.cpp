@@ -1,7 +1,7 @@
 #include "mhpch.h"
 #include "Buffer.h"
 
-#include "Renderer.h"
+#include "RendererAPI.h"
 
 #include "Platform/OpenGL/OpenGLBuffer.h"
 
@@ -23,7 +23,7 @@ namespace Mahakam
 #pragma region VertexBuffer
 	Ref<VertexBuffer> VertexBuffer::create(const char* vertices, uint32_t size)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -38,7 +38,7 @@ namespace Mahakam
 
 	Ref<VertexBuffer> VertexBuffer::create(uint32_t size)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -56,7 +56,7 @@ namespace Mahakam
 #pragma region IndexBuffer
 	Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t count)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -74,7 +74,7 @@ namespace Mahakam
 #pragma region UniformBuffer
 	Ref<UniformBuffer> UniformBuffer::create(uint32_t size)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -92,7 +92,7 @@ namespace Mahakam
 #pragma region StorageBuffer
 	Ref<StorageBuffer> StorageBuffer::create(uint32_t size)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");

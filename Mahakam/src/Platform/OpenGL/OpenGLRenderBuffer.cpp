@@ -10,7 +10,7 @@ namespace Mahakam
 	OpenGLRenderBuffer::OpenGLRenderBuffer(uint32_t width, uint32_t height, TextureFormat format)
 		: width(width), height(height)
 	{
-		internalFormat = TextureFormatToOpenGLInternalFormat(format);
+		internalFormat = TextureFormatToOpenGLInternalFormat(format, false);
 
 		glCreateRenderbuffers(1, &rendererID);
 		glNamedRenderbufferStorage(rendererID, internalFormat, width, height);

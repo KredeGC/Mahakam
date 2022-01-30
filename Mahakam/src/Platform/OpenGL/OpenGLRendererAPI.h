@@ -6,6 +6,7 @@ namespace Mahakam
 {
 	class OpenGLRendererAPI : public RendererAPI
 	{
+	public:
 		virtual void init() override;
 		virtual const char* getGraphicsVendor() override;
 		virtual void setViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) override;

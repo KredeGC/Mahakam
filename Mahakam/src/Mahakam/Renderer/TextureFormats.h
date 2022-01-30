@@ -39,8 +39,7 @@ namespace Mahakam
 
 	enum class TextureCubePrefilter
 	{
-		None = 0,
-		Convolute,
+		Convolute = 0,
 		Prefilter
 	};
 }

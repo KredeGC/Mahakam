@@ -1,53 +1,66 @@
 #type vertex
 #version 450 core
-layout(location = 0) out flat int v_InstanceID;
+#if defined(POINT) || defined(SPOT)
+    layout(location = 0) out flat int v_InstanceID;
+#endif
+
 #include "assets/shaders/include/Matrix.glsl"
 #include "assets/shaders/include/LightStruct.glsl"
 
 layout(location = 0) in vec3 i_Pos;
 
 struct v2f {
-    vec3 v_LocalPos;
+    vec3 v_ScreenPos;
 };
 
 layout(location = 1) out v2f o;
 
 void main() {
-    v_InstanceID = gl_InstanceID;
-    #if defined(POINT)
-        gl_Position = MATRIX_P * MATRIX_V * vec4(i_Pos * 2.0 * lights[v_InstanceID].position.w + lights[v_InstanceID].position.xyz, 1.0);
-    #elif defined(SPOT)
-        gl_Position = MATRIX_P * MATRIX_V * lights[v_InstanceID].objectToWorld * vec4(i_Pos, 1.0);
+    #if defined(POINT) || defined(SPOT)
+        v_InstanceID = gl_InstanceID;
+        #if defined(POINT)
+            gl_Position = MATRIX_P * MATRIX_V * vec4(i_Pos * 2.0 * lights[v_InstanceID].position.w + lights[v_InstanceID].position.xyz, 1.0);
+        #else
+            gl_Position = MATRIX_P * MATRIX_V * lights[v_InstanceID].objectToWorld * vec4(i_Pos, 1.0);
+        #endif
+        o.v_ScreenPos = gl_Position.xyw;
     #else
         gl_Position = vec4(i_Pos, 1.0);
+        o.v_ScreenPos = vec3(gl_Position.xy * 0.5 + 0.5, 1.0);
     #endif
-    o.v_LocalPos = gl_Position.xyw;
 }
 
 
 
 #type fragment
 #version 450 core
-layout(location = 0) in flat int v_InstanceID;
+#if defined(POINT) || defined(SPOT)
+    layout(location = 0) in flat int v_InstanceID;
+#endif
+
 #include "assets/shaders/include/Matrix.glsl"
 #include "assets/shaders/include/Lighting.glsl"
 
 struct v2f {
-    vec3 v_LocalPos;
+    vec3 v_ScreenPos;
 };
 
 layout(location = 1) in v2f i;
 
 layout(location = 0) out vec4 o_Color;
 
-layout(binding = 4) uniform sampler2D u_GBuffer0;
-layout(binding = 5) uniform sampler2D u_GBuffer1;
-layout(binding = 6) uniform sampler2D u_GBuffer2;
-layout(binding = 7) uniform sampler2D u_Depth;
+layout(binding = 4, location = 4) uniform sampler2D u_GBuffer0;
+layout(binding = 5, location = 5) uniform sampler2D u_GBuffer1;
+layout(binding = 6, location = 6) uniform sampler2D u_GBuffer2;
+layout(binding = 7, location = 7) uniform sampler2D u_Depth;
 // layout(binding = 8) uniform sampler2D u_GBuffer3;
 
 void main() {
-    vec2 screenUV = (i.v_LocalPos.xy / i.v_LocalPos.z) * 0.5 + 0.5;
+    #if defined(POINT) || defined(SPOT)
+        vec2 screenUV = (i.v_ScreenPos.xy / i.v_ScreenPos.z) * 0.5 + 0.5;
+    #else
+        vec2 screenUV = i.v_ScreenPos.xy;
+    #endif
     
     // Surface values
     #ifdef DEBUG

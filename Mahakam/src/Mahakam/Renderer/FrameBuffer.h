@@ -47,8 +47,7 @@ namespace Mahakam
 		virtual void bind() = 0;
 		virtual void unbind() = 0;
 
-		virtual void blit(const Ref<FrameBuffer>& dest) = 0;
-		virtual void blitDepth(const Ref<FrameBuffer>& dest) = 0;
+		virtual void blit(const Ref<FrameBuffer>& dest, bool color = true, bool depth = true) = 0;
 		virtual void resize(uint32_t width, uint32_t height) = 0;
 
 		virtual const std::vector<Ref<RenderBuffer>>& getColorBuffers() const = 0;

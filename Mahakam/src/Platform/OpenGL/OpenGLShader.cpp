@@ -21,6 +21,125 @@ namespace Mahakam
 		return 0;
 	}
 
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource) : name(name)
+	{
+		MH_PROFILE_FUNCTION();
+
+		std::unordered_map<GLenum, std::string> sources;
+		sources[GL_VERTEX_SHADER] = vertexSource;
+		sources[GL_FRAGMENT_SHADER] = fragmentSource;
+
+		uint32_t program = compile(sources, "");
+
+		shaderVariants[""] = program;
+	}
+
+	OpenGLShader::OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& variants)
+	{
+		MH_PROFILE_FUNCTION();
+
+		// Naming
+		auto lastSlash = filepath.find_last_of("/\\");
+		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+
+		auto lastDot = filepath.rfind(".");
+		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
+
+		name = filepath.substr(lastSlash, count);
+
+		// Multiple shader variants
+		for (const std::string& combinedDefines : variants)
+		{
+			std::stringstream definitions;
+
+			// Multiple definitions
+			if (combinedDefines.size() > 0)
+			{
+				std::string delim = ";";
+				size_t start = 0;
+				size_t end = combinedDefines.find(delim);
+				while (end != std::string::npos)
+				{
+					definitions << "#define " << combinedDefines.substr(start, end - start) << std::endl;
+					start = end + delim.length();
+					end = combinedDefines.find(delim, start);
+				}
+
+				definitions << "#define " << combinedDefines.substr(start, end) << std::endl;
+			}
+
+			std::string source = readFile(filepath);
+
+			auto sources = parse(source);
+
+			uint32_t program = compile(sources, definitions.str());
+
+			shaderVariants[combinedDefines] = program;
+		}
+	}
+
+	OpenGLShader::~OpenGLShader()
+	{
+		MH_PROFILE_FUNCTION();
+
+		for (auto& pair : shaderVariants)
+			glDeleteProgram(pair.second);
+	}
+
+	void OpenGLShader::bind(const std::string& variant)
+	{
+		uint32_t program = shaderVariants.at(variant);
+		rendererID = program;
+
+		glUseProgram(program);
+	}
+
+	void OpenGLShader::setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
+	{
+		setUniformMat4("u_m4_V", viewMatrix);
+		setUniformMat4("u_m4_P", projectionMatrix);
+	}
+
+	void OpenGLShader::setTexture(const std::string& name, Ref<Texture> tex)
+	{
+		glBindTextureUnit(getUniformLocation(name), tex->getRendererID());
+	}
+
+	void OpenGLShader::setUniformMat3(const std::string& name, const glm::mat3& value)
+	{
+		glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	void OpenGLShader::setUniformMat4(const std::string& name, const glm::mat4& value)
+	{
+		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	void OpenGLShader::setUniformInt(const std::string& name, int value)
+	{
+		glUniform1i(getUniformLocation(name), value);
+	}
+
+	void OpenGLShader::setUniformFloat(const std::string& name, float value)
+	{
+		glUniform1f(getUniformLocation(name), value);
+	}
+
+	void OpenGLShader::setUniformFloat2(const std::string& name, const glm::vec2& value)
+	{
+		glUniform2f(getUniformLocation(name), value.x, value.y);
+	}
+
+	void OpenGLShader::setUniformFloat3(const std::string& name, const glm::vec3& value)
+	{
+		glUniform3f(getUniformLocation(name), value.x, value.y, value.z);
+	}
+
+	void OpenGLShader::setUniformFloat4(const std::string& name, const glm::vec4& value)
+	{
+		glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w);
+	}
+
 	uint32_t OpenGLShader::compile(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
 	{
 		MH_PROFILE_FUNCTION();
@@ -98,6 +217,8 @@ namespace Mahakam
 
 		if (properties.elements.empty())
 		{
+			MH_CORE_INFO("Loading properties for shader: {0}", name);
+
 			GLint numUniforms = 0;
 			glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms);
 			const GLenum props[4] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION };
@@ -119,7 +240,7 @@ namespace Mahakam
 
 				ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
 
-				//MH_CORE_TRACE("{0}, {1}", name, (uint32_t)values[3]);
+				MH_CORE_INFO("  layout(location = {0}) {1}", (uint32_t)values[3], name);
 
 				properties.elements.push_back({ OpenGLDataTypeToShaderDataType(values[1]), name, (uint32_t)values[3] });
 			}
@@ -223,126 +344,5 @@ namespace Mahakam
 			uniformIDCache[name] = uniformID;
 
 		return uniformID;
-	}
-
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource) : name(name)
-	{
-		MH_PROFILE_FUNCTION();
-
-		std::unordered_map<GLenum, std::string> sources;
-		sources[GL_VERTEX_SHADER] = vertexSource;
-		sources[GL_FRAGMENT_SHADER] = fragmentSource;
-
-		uint32_t program = compile(sources, "");
-
-		shaderVariants[""] = program;
-	}
-
-	OpenGLShader::OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& variants)
-	{
-		MH_PROFILE_FUNCTION();
-
-		// Default shader variant
-		{
-			std::string source = readFile(filepath);
-
-			auto sources = parse(source);
-
-			uint32_t program = compile(sources, "");
-
-			shaderVariants[""] = program;
-		}
-
-		// User-defined shader variants
-		for (const std::string& combinedDefines : variants)
-		{
-			std::stringstream definitions;
-
-			std::string delim = ";";
-			size_t start = 0;
-			size_t end = combinedDefines.find(delim);
-			while (end != std::string::npos)
-			{
-				definitions << "#define " << combinedDefines.substr(start, end - start) << std::endl;
-				start = end + delim.length();
-				end = combinedDefines.find(delim, start);
-			}
-
-			definitions << "#define " << combinedDefines.substr(start, end) << std::endl;
-
-			std::string source = readFile(filepath);
-
-			auto sources = parse(source);
-
-			uint32_t program = compile(sources, definitions.str());
-
-			shaderVariants[combinedDefines] = program;
-		}
-
-		// Naming
-		auto lastSlash = filepath.find_last_of("/\\");
-		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-
-		auto lastDot = filepath.rfind(".");
-		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
-
-		name = filepath.substr(lastSlash, count);
-	}
-
-	OpenGLShader::~OpenGLShader()
-	{
-		MH_PROFILE_FUNCTION();
-
-		for (auto& pair : shaderVariants)
-			glDeleteProgram(pair.second);
-	}
-
-	void OpenGLShader::bind(const std::string& variant)
-	{
-		uint32_t program = shaderVariants.at(variant);
-		rendererID = program;
-
-		glUseProgram(program);
-	}
-
-	void OpenGLShader::setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
-	{
-		setUniformMat4("u_m4_V", viewMatrix);
-		setUniformMat4("u_m4_P", projectionMatrix);
-	}
-
-	void OpenGLShader::setUniformMat3(const std::string& name, const glm::mat3& value)
-	{
-		glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
-	}
-
-	void OpenGLShader::setUniformMat4(const std::string& name, const glm::mat4& value)
-	{
-		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
-	}
-
-	void OpenGLShader::setUniformInt(const std::string& name, int value)
-	{
-		glUniform1i(getUniformLocation(name), value);
-	}
-
-	void OpenGLShader::setUniformFloat(const std::string& name, float value)
-	{
-		glUniform1f(getUniformLocation(name), value);
-	}
-
-	void OpenGLShader::setUniformFloat2(const std::string& name, const glm::vec2& value)
-	{
-		glUniform2f(getUniformLocation(name), value.x, value.y);
-	}
-
-	void OpenGLShader::setUniformFloat3(const std::string& name, const glm::vec3& value)
-	{
-		glUniform3f(getUniformLocation(name), value.x, value.y, value.z);
-	}
-
-	void OpenGLShader::setUniformFloat4(const std::string& name, const glm::vec4& value)
-	{
-		glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w);
 	}
 }

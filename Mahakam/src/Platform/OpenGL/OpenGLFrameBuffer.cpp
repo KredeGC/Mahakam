@@ -33,27 +33,17 @@ namespace Mahakam
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLFrameBuffer::blit(const Ref<FrameBuffer>& dest)
+	void OpenGLFrameBuffer::blit(const Ref<FrameBuffer>& dest, bool color, bool depth)
 	{
 		Ref<OpenGLFrameBuffer> fbo = std::static_pointer_cast<OpenGLFrameBuffer>(dest);
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID);
 
-		glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	}
-
-	void OpenGLFrameBuffer::blitDepth(const Ref<FrameBuffer>& dest) // TODO: Merge with blit(const Ref<FrameBuffer>& dest, bool color, bool depth)
-	{
-		Ref<OpenGLFrameBuffer> fbo = std::static_pointer_cast<OpenGLFrameBuffer>(dest);
-
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID);
-
-		glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		if (color)
+			glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		if (depth)
+			glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
@@ -120,8 +110,8 @@ namespace Mahakam
 		{
 			FrameBufferAttachmentProps& spec = props.depthAttachment;
 
-			uint32_t internalFormat = TextureFormatToOpenGLInternalFormat(spec.format);
-			uint32_t type = TextureFormatToOpenGLType(spec.format);
+			/*uint32_t internalFormat = TextureFormatToOpenGLInternalFormat(spec.format);
+			uint32_t type = TextureFormatToOpenGLType(spec.format);*/
 			uint32_t attachment = TextureFormatToOpenGLAttachment(spec.format);
 
 			if (spec.immutable)

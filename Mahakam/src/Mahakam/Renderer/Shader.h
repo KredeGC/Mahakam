@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ShaderDataTypes.h"
+#include "Texture.h"
 
 #include <string>
 
@@ -40,6 +41,8 @@ namespace Mahakam
 
 		virtual const std::vector<ShaderElement>& getProperties() const = 0;
 
+		virtual void setTexture(const std::string& name, Ref<Texture> tex) = 0;
+
 		virtual void setUniformMat3(const std::string& name, const glm::mat3& value) = 0;
 		virtual void setUniformMat4(const std::string& name, const glm::mat4& value) = 0;
 		 
@@ -51,7 +54,7 @@ namespace Mahakam
 		virtual void setUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
 
 		static Ref<Shader> create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSrouce);
-		static Ref<Shader> create(const std::string& filepath, const std::initializer_list<std::string>& defines = {});
+		static Ref<Shader> create(const std::string& filepath, const std::initializer_list<std::string>& defines = { "" });
 	};
 
 

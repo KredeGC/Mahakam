@@ -87,7 +87,7 @@ namespace Mahakam
 			for (int x = 0; x < 10; x++)
 			{*/
 				Entity pointLightEntity = activeScene->createEntity("Point Light");
-				pointLightEntity.addComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(100.0f, 100.0f, 100.0f));
+				pointLightEntity.addComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 				pointLightEntity.getComponent<TransformComponent>().setPosition({ 1.0f, 1.0f, -6.5f });
 				//pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
 				pointLightEntity.getComponent<TransformComponent>().setRotation(glm::quat({ glm::radians(-155.0f), 0.0f, 0.0f }));
@@ -96,15 +96,16 @@ namespace Mahakam
 
 
 		// Setup plane
-		Ref<Texture> brickAlbedo = Texture2D::create("assets/textures/brick/brick_albedo.png", { TextureFormat::RGB8, TextureFilter::Point });
-		Ref<Texture> brickMetallic = Texture2D::create("assets/textures/brick/brick_metallic.png", { TextureFormat::R8, TextureFilter::Point });
-		Ref<Texture> brickRoughness = Texture2D::create("assets/textures/brick/brick_albedo.png", { TextureFormat::R8, TextureFilter::Point });
+		Ref<Texture> brickAlbedo = Texture2D::create("assets/textures/brick/brick_albedo.png", true, { TextureFormat::RGB8, TextureFilter::Point });
+		Ref<Texture> brickBump = Texture2D::create("assets/textures/brick/brick_bump.png", false, { TextureFormat::RGB8, TextureFilter::Point });
+		Ref<Texture> brickRoughness = Texture2D::create("assets/textures/brick/brick_albedo.png", false, { TextureFormat::R8, TextureFilter::Point });
 		Ref<Mesh> planeMesh = Mesh::createPlane(2, 2);
 
 		Ref<Material> planeMaterial = Material::create(textureShader);
 		planeMaterial->setTexture("u_Albedo", 0, brickAlbedo);
-		planeMaterial->setTexture("u_Metallic", 1, brickMetallic);
-		planeMaterial->setTexture("u_Roughness", 2, brickRoughness);
+		planeMaterial->setTexture("u_Bump", 0, brickBump);
+		planeMaterial->setTexture("u_Metallic", 0, Texture2D::black);
+		planeMaterial->setTexture("u_Roughness", 0, brickRoughness);
 
 		Entity planeEntity = activeScene->createEntity("Plane");
 		planeEntity.addComponent<MeshComponent>(planeMesh, planeMaterial);
@@ -112,8 +113,35 @@ namespace Mahakam
 		planeEntity.getComponent<TransformComponent>().setScale({ 10.0f, 10.0f, 10.0f });
 
 
+		// Create backpack model
+		SkinnedMesh backpackModel = Mesh::loadModel("assets/models/backpack.obj");
+
+		// Create backpack textures
+		Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg");
+		Ref<Texture> backpackBump = Texture2D::create("assets/textures/backpack/normal.png", false);
+		Ref<Texture> backpackMetallic = Texture2D::create("assets/textures/backpack/specular.jpg", false, TextureFormat::R8);
+		Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", false, TextureFormat::R8);
+
+		// Create backpack material
+		Ref<Material> backpackMaterial = Material::create(textureShader);
+		backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
+		backpackMaterial->setTexture("u_Bump", 0, backpackBump);
+		backpackMaterial->setTexture("u_Metallic", 0, backpackMetallic);
+		backpackMaterial->setTexture("u_Roughness", 0, backpackRoughness);
+
+		// Create backpack entity
+		Entity backpackEntity = activeScene->createEntity("Bacpack");
+		backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
+		backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
+		backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
+
+
 		// Setup dancing monke
 		/*Ref<Material> skinnedMaterial = Material::create(skinnedShader);
+		skinnedMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
+		skinnedMaterial->setTexture("u_Bump", 0, backpackBump);
+		skinnedMaterial->setTexture("u_Metallic", 0, backpackMetallic);
+		skinnedMaterial->setTexture("u_Roughness", 0, backpackRoughness);
 
 		SkinnedMesh skinnedModel = Mesh::loadModel("assets/models/Defeated.fbx");
 		Ref<Animation> animation = Animation::load("assets/models/Defeated.fbx", skinnedModel);
@@ -133,31 +161,10 @@ namespace Mahakam
 		cameraEntity.addComponent<NativeScriptComponent>().bind<CameraController>();
 
 
-		// Create backpack model
-		//SkinnedMesh backpackModel = Mesh::loadModel("assets/models/backpack.obj");
-
-		//// Create backpack textures
-		//Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg");
-		//Ref<Texture> backpackMetallic = Texture2D::create("assets/textures/backpack/specular.jpg", TextureFormat::R8);
-		//Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", TextureFormat::R8);
-
-		//// Create backpack material
-		//Ref<Material> backpackMaterial = Material::create(textureShader);
-		//backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
-		//backpackMaterial->setTexture("u_Metallic", 1, backpackMetallic);
-		//backpackMaterial->setTexture("u_Roughness", 2, backpackRoughness);
-
-		//// Create backpack entity
-		//Entity backpackEntity = activeScene->createEntity("Bacpack");
-		//backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
-		//backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
-		//backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
-
-
 		// Create mesh & base material
 		Ref<Mesh> sphereMesh = Mesh::createCubeSphere(8);
 		Ref<Material> baseMaterial = Material::create(shader);
-		baseMaterial->setFloat3("u_Color", { 0.5f, 0.0f, 0.0f });
+		baseMaterial->setFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 
 		// Create scene entities
 		for (int y = 0; y < 10; y++)

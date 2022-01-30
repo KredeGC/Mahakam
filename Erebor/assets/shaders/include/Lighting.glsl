@@ -7,11 +7,11 @@ const float PI = 3.14159265359;
 const float Epsilon = 0.00001;
 const vec3 Fdielectric = vec3(0.04);
 
-layout(binding = 0) uniform samplerCube u_IrradianceMap;
-layout(binding = 1) uniform samplerCube u_SpecularMap;
-layout(binding = 2) uniform sampler2D u_BRDFLUT;
-layout(binding = 3) uniform sampler2D u_AttenuationLUT;
-layout(binding = 8) uniform sampler2D u_LightCookie;
+layout(binding = 0, location = 0) uniform samplerCube u_IrradianceMap;
+layout(binding = 1, location = 1) uniform samplerCube u_SpecularMap;
+layout(binding = 2, location = 2) uniform sampler2D u_BRDFLUT;
+layout(binding = 3, location = 3) uniform sampler2D u_AttenuationLUT;
+layout(binding = 8, location = 8) uniform sampler2D u_LightCookie;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -50,12 +50,16 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 // ----------------------------------------------------------------------------
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    vec3 inv = 1.0 - F0;
+    float term = pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    return F0 + inv * term;
 }
 
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 {
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    vec3 inv = max(vec3(1.0 - roughness), F0) - F0;
+    float term = pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    return F0 + inv * term;
 }
 
 vec3 depthToWorldSpace(vec2 uv, float depth) {
@@ -106,7 +110,6 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             vec4 uvCookie = light.worldToLight * vec4(worldPos, 1.0);
             // negative bias because http://aras-p.info/blog/2010/01/07/screenspace-vs-mip-mapping/
             vec3 cookie = texture(u_LightCookie, uvCookie.xy / uvCookie.w * 0.5 + vec2(0.5, 0.5), -8.0).rgb;
-            cookie = pow(cookie, vec3(2.2)); // sRGB correction?
             float attenuation = uvCookie.w > 0.0 ? 1.0 : 0.0;
             
             float normalizedDist = max(distSqr * rcpRangeSqr, 0.00001);
@@ -168,7 +171,7 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             // for energy conservation, the diffuse and specular light can't
             // be above 1.0 (unless the surface emits light); to preserve this
             // relationship the diffuse component (kD) should equal 1.0 - kS.
-            vec3 kD = vec3(1.0) - kS;
+            vec3 kD = 1.0 - kS;
             // multiply kD by the inverse metalness such that only non-metals 
             // have diffuse lighting, or a linear blend if partly metal (pure metals
             // have no diffuse light).

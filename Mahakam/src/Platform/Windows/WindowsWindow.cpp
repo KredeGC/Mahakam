@@ -51,7 +51,7 @@ namespace Mahakam {
 		// Loading the window icon
 		stbi_set_flip_vertically_on_load(0);
 		int width, height;
-		unsigned char* pixels = stbi_load("assets/textures/icon.png", &width, &height, 0, 4); // Free?
+		unsigned char* pixels = stbi_load("assets/textures/internal/icon.png", &width, &height, 0, 4); // Free?
 		GLFWimage* icon = new GLFWimage
 		{
 			width,

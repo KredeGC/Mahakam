@@ -28,18 +28,6 @@ namespace Mahakam
 
 		float viewportRatio;
 
-		template<typename T>
-		void onComponentAdded(Entity entity, T& component)
-		{
-			//static_assert(false);
-		}
-
-		template<>
-		void onComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
-		{
-			component.getCamera().setRatio(viewportRatio);
-		}
-
 	public:
 		Scene(const std::string& filepath);
 		Scene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
@@ -54,5 +42,18 @@ namespace Mahakam
 
 		static Ref<Scene> createScene(const std::string& filepath);
 		static Ref<Scene> createScene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
+
+	private:
+		template<typename T>
+		void onComponentAdded(Entity entity, T& component)
+		{
+			//static_assert(false);
+		}
+
+		template<>
+		void onComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
+		{
+			component.getCamera().setRatio(viewportRatio);
+		}
 	};
 }

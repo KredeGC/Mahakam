@@ -1,7 +1,7 @@
 #include "mhpch.h"
 #include "VertexArray.h"
 
-#include "Renderer.h"
+#include "RendererAPI.h"
 
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 
@@ -9,7 +9,7 @@ namespace Mahakam
 {
 	Ref<VertexArray> VertexArray::create(uint32_t vertexCount)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");

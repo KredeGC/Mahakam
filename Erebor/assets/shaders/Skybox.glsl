@@ -33,7 +33,7 @@ layout(location = 0) in v2f i;
 
 layout(location = 0) out vec4 o_Color;
 
-layout(binding = 0) uniform samplerCube u_Environment;
+layout(binding = 0, binding = 0) uniform samplerCube u_Environment;
 
 void main() {
     vec3 normal = normalize(i.v_Normal);

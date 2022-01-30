@@ -19,8 +19,7 @@ namespace Mahakam
 		virtual void bind() override;
 		virtual void unbind() override;
 
-		virtual void blit(const Ref<FrameBuffer>& dest) override;
-		virtual void blitDepth(const Ref<FrameBuffer>& dest) override;
+		virtual void blit(const Ref<FrameBuffer>& dest, bool color = true, bool depth = true) override;
 		virtual void resize(uint32_t width, uint32_t height) override;
 
 		virtual const std::vector<Ref<RenderBuffer>>& getColorBuffers() const override { return colorAttachments; }

@@ -1,7 +1,7 @@
 #include "mhpch.h"
 #include "Material.h"
 
-#include "Renderer.h"
+#include "RendererAPI.h"
 
 #include "Platform/OpenGL/OpenGLMaterial.h"
 
@@ -9,7 +9,7 @@ namespace Mahakam
 {
 	Ref<Material> Material::copy(Ref<Material> material)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -22,14 +22,14 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	Ref<Material> Material::create(Ref<Shader> shader, const ShaderProps& props)
+	Ref<Material> Material::create(Ref<Shader> shader, const std::string& variant)
 	{
-		switch (Renderer::getAPI())
+		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLMaterial>(shader, props);
+			return CreateRef<OpenGLMaterial>(shader, variant);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

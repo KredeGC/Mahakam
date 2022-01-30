@@ -89,7 +89,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, false);
 		dataFormat = TextureFormatToOpenGLFormat(this->props.format);
 		formatType = TextureFormatToOpenGLType(this->props.format);
 
@@ -103,13 +103,13 @@ namespace Mahakam
 		setWrapMode(rendererID, GL_TEXTURE_WRAP_T, this->props.wrapY);
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, props.mipmaps, props.filterMode);
+		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
 			glGenerateTextureMipmap(rendererID);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath, const TextureProps& props)
+	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath, bool sRGB, const TextureProps& props)
 		: filepath(filepath), props(props)
 	{
 		MH_PROFILE_FUNCTION();
@@ -120,11 +120,13 @@ namespace Mahakam
 		this->props.width = w;
 		this->props.height = h;
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
-		dataFormat = TextureFormatToOpenGLFormat(this->props.format, channels);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, sRGB);
+		dataFormat = ChannelCountToOpenGLFormat(channels);
 		formatType = TextureFormatToOpenGLType(this->props.format);
 
 		MH_CORE_ASSERT(internalFormat && dataFormat, "Format not supported!");
+
+		// TODO: sRGB correction
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
 		glBindTexture(GL_TEXTURE_2D, rendererID);
@@ -143,7 +145,7 @@ namespace Mahakam
 		setWrapMode(rendererID, GL_TEXTURE_WRAP_T, this->props.wrapY);
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, props.mipmaps, props.filterMode);
+		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
 			glGenerateTextureMipmap(rendererID);
@@ -162,7 +164,6 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		uint32_t bpp = TextureFormatToByteSize(props.format);
 		glTextureSubImage2D(rendererID, 0, 0, 0, props.width, props.height, dataFormat, formatType, data);
 
 		if (props.mipmaps)
@@ -196,7 +197,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, false);
 		dataFormat = TextureFormatToOpenGLFormat(this->props.format);
 		formatType = TextureFormatToOpenGLType(this->props.format);
 
@@ -216,49 +217,7 @@ namespace Mahakam
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, props.mipmaps, props.filterMode);
-
-		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
-	}
-
-	OpenGLTextureCube::OpenGLTextureCube(const std::vector<std::string>& faces, const CubeTextureProps& props)
-		: props(props)
-	{
-		MH_PROFILE_FUNCTION();
-
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &rendererID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID);
-
-		internalFormat = 0, dataFormat = 0;
-		int w = 0, h = 0, channels, hdr;
-		for (unsigned int i = 0; i < faces.size(); i++)
-		{
-			void* data = loadImageFile(filepath.c_str(), &w, &h, &channels, &hdr);
-
-			if (channels == 4)
-			{
-				internalFormat = GL_RGBA8;
-				dataFormat = GL_RGBA;
-			}
-			else if (channels == 3)
-			{
-				internalFormat = GL_RGB8;
-				dataFormat = GL_RGB;
-			}
-
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, w, h, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-
-			stbi_image_free(data);
-		}
-
-		// Wrap mode doesn't make sense on a cubemap
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-		// Filter mode & mipmaps
-		setFilterMode(rendererID, props.mipmaps, props.filterMode);
+		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
 			glGenerateTextureMipmap(rendererID);
@@ -273,10 +232,10 @@ namespace Mahakam
 			cubeMesh = Mesh::createCube(2, true);
 
 		int w, h, channels, hdr;
-		void* data = loadImageFile(filepath.c_str(), &w, &h, &channels, &hdr);
+		void* data = loadImageFile(this->filepath.c_str(), &w, &h, &channels, &hdr);
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
-		dataFormat = TextureFormatToOpenGLFormat(this->props.format, channels);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, false);
+		dataFormat = ChannelCountToOpenGLFormat(channels);
 		formatType = TextureFormatToOpenGLType(this->props.format);
 
 		uint32_t hdrID;
@@ -320,7 +279,7 @@ namespace Mahakam
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, props.mipmaps, props.filterMode);
+		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
 			glGenerateTextureMipmap(rendererID);
@@ -381,7 +340,7 @@ namespace Mahakam
 		glDeleteRenderbuffers(1, &captureRBO);
 	}
 
-	OpenGLTextureCube::OpenGLTextureCube(Ref<TextureCube> cubemap, const CubeTextureProps& props)
+	OpenGLTextureCube::OpenGLTextureCube(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 		: props(props)
 	{
 		MH_PROFILE_FUNCTION();
@@ -389,7 +348,7 @@ namespace Mahakam
 		if (!cubeMesh)
 			cubeMesh = Mesh::createCube(2, true);
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, false);
 		dataFormat = TextureFormatToOpenGLFormat(this->props.format);
 		formatType = TextureFormatToOpenGLType(this->props.format);
 
@@ -420,7 +379,7 @@ namespace Mahakam
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, props.mipmaps, props.filterMode);
+		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
 			glGenerateTextureMipmap(rendererID);
@@ -441,12 +400,10 @@ namespace Mahakam
 
 		// Convert HDR equirectangular environment map to cubemap equivalent
 		std::string shaderPath = "assets/shaders/internal/";
-		if (this->props.prefilter == TextureCubePrefilter::Convolute)
+		if (prefilter == TextureCubePrefilter::Convolute)
 			shaderPath += "CubemapBlur.glsl";
-		else if (this->props.prefilter == TextureCubePrefilter::Prefilter)
+		else if (prefilter == TextureCubePrefilter::Prefilter)
 			shaderPath += "CubemapSpec.glsl";
-		else
-			shaderPath += "Cubemap.glsl";
 		OpenGLShader equiToCubeShader(shaderPath);
 		equiToCubeShader.bind();
 		equiToCubeShader.setUniformInt("environmentMap", 0);
@@ -460,7 +417,7 @@ namespace Mahakam
 		glGetIntegerv(GL_VIEWPORT, viewport);
 		glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
 
-		if (this->props.mipmaps && this->props.prefilter == TextureCubePrefilter::Prefilter)
+		if (this->props.mipmaps && prefilter == TextureCubePrefilter::Prefilter)
 		{
 			glGenerateTextureMipmap(rendererID);
 
@@ -507,7 +464,7 @@ namespace Mahakam
 
 
 		// Generate mipmaps if not convoluting
-		if (this->props.mipmaps && this->props.prefilter != TextureCubePrefilter::Prefilter)
+		if (this->props.mipmaps && prefilter != TextureCubePrefilter::Prefilter)
 			glGenerateTextureMipmap(rendererID);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
