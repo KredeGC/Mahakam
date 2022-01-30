@@ -34,6 +34,56 @@ namespace Mahakam
 		return data;
 	}
 
+	static void setWrapMode(uint32_t rendererID, GLenum axis, TextureWrapMode wrapMode)
+	{
+		const float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+		switch (wrapMode)
+		{
+		case TextureWrapMode::Repeat:
+			glTextureParameteri(rendererID, axis, GL_REPEAT);
+			break;
+		case TextureWrapMode::Clamp:
+			glTextureParameteri(rendererID, axis, GL_CLAMP_TO_EDGE);
+			break;
+		case TextureWrapMode::ClampBorder:
+			glTextureParameterfv(rendererID, GL_TEXTURE_BORDER_COLOR, borderColor);
+			glTextureParameteri(rendererID, axis, GL_CLAMP_TO_BORDER);
+			break;
+		default:
+			MH_CORE_BREAK("Unsupported TextureWrapMode!");
+		}
+	}
+
+	static void setFilterMode(uint32_t rendererID, bool mipmaps, TextureFilter filterMode)
+	{
+		// Minification
+		if (mipmaps)
+		{
+			if (filterMode == TextureFilter::Trilinear)
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			else if (filterMode == TextureFilter::Bilinear)
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			else
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		}
+		else
+		{
+			if (filterMode == TextureFilter::Trilinear)
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			else if (filterMode == TextureFilter::Bilinear)
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			else
+				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		}
+
+		// Magnification
+		if (filterMode == TextureFilter::Bilinear)
+			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		else
+			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
+
 	OpenGLTexture2D::OpenGLTexture2D(const TextureProps& props)
 		: props(props)
 	{
@@ -46,42 +96,17 @@ namespace Mahakam
 		glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
 		glTextureStorage2D(rendererID, 1, internalFormat, this->props.width, this->props.height);
 
-		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
-
 		// Wrap X
-		if (this->props.wrapX == TextureWrapMode::Repeat)
-			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		setWrapMode(rendererID, GL_TEXTURE_WRAP_S, this->props.wrapX);
 
 		// Wrap Y
-		if (this->props.wrapX == TextureWrapMode::Repeat)
-			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		setWrapMode(rendererID, GL_TEXTURE_WRAP_T, this->props.wrapY);
 
-		// Minification
-		if (props.mipmaps)
-		{
-			if (this->props.filterMode == TextureFilter::Bilinear)
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			else
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		}
-		else
-		{
-			if (this->props.filterMode == TextureFilter::Bilinear)
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			else
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		}
+		// Filter mode & mipmaps
+		setFilterMode(rendererID, props.mipmaps, props.filterMode);
 
-		// Magnification
-		if (this->props.filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (this->props.mipmaps)
+			glGenerateTextureMipmap(rendererID);
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath, const TextureProps& props)
@@ -105,32 +130,23 @@ namespace Mahakam
 		glBindTexture(GL_TEXTURE_2D, rendererID);
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, this->props.width, this->props.height, 0, dataFormat, formatType, data);
 
-		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
+		if (channels == 2) // Look some more into this, but keep it for now
+		{
+			const GLint swizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_GREEN };
+			glTextureParameteriv(rendererID, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+		}
 
 		// Wrap X
-		if (this->props.wrapX == TextureWrapMode::Repeat)
-			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		setWrapMode(rendererID, GL_TEXTURE_WRAP_S, this->props.wrapX);
 
 		// Wrap Y
-		if (this->props.wrapX == TextureWrapMode::Repeat)
-			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		setWrapMode(rendererID, GL_TEXTURE_WRAP_T, this->props.wrapY);
 
-		// Minification
-		if (this->props.filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		// Filter mode & mipmaps
+		setFilterMode(rendererID, props.mipmaps, props.filterMode);
 
-		// Magnification
-		if (this->props.filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (this->props.mipmaps)
+			glGenerateTextureMipmap(rendererID);
 
 		stbi_image_free(data);
 	}
@@ -194,35 +210,16 @@ namespace Mahakam
 				this->props.resolution, this->props.resolution, 0, dataFormat, formatType, nullptr);
 		}
 
-		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
-
-		// Wrap
+		// Wrap mode doesn't make sense on a cubemap
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-		// Minification
-		if (this->props.mipmaps)
-		{
-			if (this->props.filterMode == TextureFilter::Bilinear)
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			else
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		}
-		else
-		{
-			if (this->props.filterMode == TextureFilter::Bilinear)
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			else
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		}
+		// Filter mode & mipmaps
+		setFilterMode(rendererID, props.mipmaps, props.filterMode);
 
-		// Magnification
-		if (this->props.filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (this->props.mipmaps)
+			glGenerateTextureMipmap(rendererID);
 	}
 
 	OpenGLTextureCube::OpenGLTextureCube(const std::vector<std::string>& faces, const CubeTextureProps& props)
@@ -255,22 +252,13 @@ namespace Mahakam
 			stbi_image_free(data);
 		}
 
-		// Wrap
+		// Wrap mode doesn't make sense on a cubemap
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-		// Minification
-		if (this->props.filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-
-		// Magnification
-		if (this->props.filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		// Filter mode & mipmaps
+		setFilterMode(rendererID, props.mipmaps, props.filterMode);
 
 		if (this->props.mipmaps)
 			glGenerateTextureMipmap(rendererID);
@@ -279,15 +267,13 @@ namespace Mahakam
 	OpenGLTextureCube::OpenGLTextureCube(const std::string& filepath, const CubeTextureProps& props)
 		: filepath(filepath), props(props)
 	{
+		MH_PROFILE_FUNCTION();
+
 		if (!cubeMesh)
 			cubeMesh = Mesh::createCube(2, true);
 
-		MH_PROFILE_FUNCTION();
-
 		int w, h, channels, hdr;
 		void* data = loadImageFile(filepath.c_str(), &w, &h, &channels, &hdr);
-
-		this->props.resolution = this->props.resolution;
 
 		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
 		dataFormat = TextureFormatToOpenGLFormat(this->props.format, channels);
@@ -298,9 +284,8 @@ namespace Mahakam
 		glBindTexture(GL_TEXTURE_2D, hdrID);
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, dataFormat, hdr ? GL_FLOAT : formatType, data);
 
-		glGenerateMipmap(GL_TEXTURE_2D); // Might not be useful?
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -334,17 +319,108 @@ namespace Mahakam
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-		// Minification
-		if (this->props.filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		// Filter mode & mipmaps
+		setFilterMode(rendererID, props.mipmaps, props.filterMode);
 
-		// Magnification
-		if (this->props.filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (this->props.mipmaps)
+			glGenerateTextureMipmap(rendererID);
+
+
+		// Create matrices
+		glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+		glm::mat4 captureViews[] =
+		{
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		   glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+		};
+
+
+		// Convert HDR equirectangular environment map to cubemap equivalent
+		OpenGLShader equiToCubeShader("assets/shaders/internal/Cubemap.glsl");
+		equiToCubeShader.bind();
+		equiToCubeShader.setUniformInt("equirectangularMap", 0);
+		equiToCubeShader.setUniformMat4("projection", captureProjection);
+
+		glBindTextureUnit(0, hdrID);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, hdrID);
+
+		GLint viewport[4];
+		glGetIntegerv(GL_VIEWPORT, viewport);
+		glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+
+		glViewport(0, 0, this->props.resolution, this->props.resolution); // don't forget to configure the viewport to the capture dimensions.
+		for (unsigned int i = 0; i < 6; ++i)
+		{
+			equiToCubeShader.setUniformMat4("view", captureViews[i]);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, 0);
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			cubeMesh->bind();
+			glDrawElements(GL_TRIANGLES, cubeMesh->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+			cubeMesh->unbind();
+		}
+
+
+		// Generate mipmaps if not convoluting
+		if (this->props.mipmaps)
+			glGenerateTextureMipmap(rendererID);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+
+
+		// Delete buffer
+		glDeleteTextures(1, &hdrID);
+		glDeleteFramebuffers(1, &captureFBO);
+		glDeleteRenderbuffers(1, &captureRBO);
+	}
+
+	OpenGLTextureCube::OpenGLTextureCube(Ref<TextureCube> cubemap, const CubeTextureProps& props)
+		: props(props)
+	{
+		MH_PROFILE_FUNCTION();
+
+		if (!cubeMesh)
+			cubeMesh = Mesh::createCube(2, true);
+
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		dataFormat = TextureFormatToOpenGLFormat(this->props.format);
+		formatType = TextureFormatToOpenGLType(this->props.format);
+
+		// Create framebuffer
+		uint32_t captureFBO, captureRBO;
+		glGenFramebuffers(1, &captureFBO);
+		glGenRenderbuffers(1, &captureRBO);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+		glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, this->props.resolution, this->props.resolution);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+
+
+		// Create cubemap
+		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &rendererID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID);
+		for (uint32_t i = 0; i < 6; ++i)
+		{
+			// note that we store each face with 16 bit floating point values
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
+				this->props.resolution, this->props.resolution, 0, dataFormat, formatType, nullptr);
+		}
+
+		// Wrap
+		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		// Filter mode & mipmaps
+		setFilterMode(rendererID, props.mipmaps, props.filterMode);
 
 		if (this->props.mipmaps)
 			glGenerateTextureMipmap(rendererID);
@@ -373,12 +449,12 @@ namespace Mahakam
 			shaderPath += "Cubemap.glsl";
 		OpenGLShader equiToCubeShader(shaderPath);
 		equiToCubeShader.bind();
-		equiToCubeShader.setUniformInt("equirectangularMap", 0);
+		equiToCubeShader.setUniformInt("environmentMap", 0);
 		equiToCubeShader.setUniformMat4("projection", captureProjection);
 
-		glBindTextureUnit(0, hdrID);
+		glBindTextureUnit(0, cubemap->getRendererID());
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, hdrID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->getRendererID());
 
 		GLint viewport[4];
 		glGetIntegerv(GL_VIEWPORT, viewport);
@@ -439,7 +515,6 @@ namespace Mahakam
 
 
 		// Delete buffer
-		glDeleteTextures(1, &hdrID);
 		glDeleteFramebuffers(1, &captureFBO);
 		glDeleteRenderbuffers(1, &captureRBO);
 	}

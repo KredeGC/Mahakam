@@ -15,6 +15,12 @@ namespace Mahakam
 		LightComponent(Light::LightType lightType, const glm::vec3& color)
 			: light(lightType, color) {}
 
+		LightComponent(Light::LightType lightType, float range, const glm::vec3& color)
+			: light(lightType, range, color) {}
+
+		LightComponent(Light::LightType lightType, float fov, float range, const glm::vec3& color)
+			: light(lightType, fov, range, color) {}
+
 		Light& getLight() { return light; }
 	};
 }

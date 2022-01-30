@@ -46,6 +46,7 @@ namespace Mahakam {
 		OpenGLTextureCube(const CubeTextureProps& props);
 		OpenGLTextureCube(const std::vector<std::string>& faces, const CubeTextureProps& props);
 		OpenGLTextureCube(const std::string& filepath, const CubeTextureProps& props);
+		OpenGLTextureCube(Ref<TextureCube> cubemap, const CubeTextureProps& props);
 		virtual ~OpenGLTextureCube();
 
 		virtual uint32_t getWidth() const override { return props.resolution; }

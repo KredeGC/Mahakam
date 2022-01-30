@@ -25,7 +25,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_ASSERT(sources.size() <= 4, "Shader source too big");
+		MH_CORE_ASSERT(sources.size() <= 4, "Shader source too big!");
 
 		GLuint program = glCreateProgram();
 		GLenum shaderIDs[4];
@@ -59,7 +59,7 @@ namespace Mahakam
 
 				glDeleteShader(shader);
 
-				MH_CORE_ERROR("{0}\r\n\r\n{1}", source, infoLog.data());
+				MH_CORE_ERROR("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, infoLog.data());
 				MH_CORE_ASSERT(false, "Shader failed to compile!");
 
 				break;
@@ -86,7 +86,7 @@ namespace Mahakam
 			for (auto& id : shaderIDs)
 				glDeleteShader(id);
 
-			MH_CORE_ERROR("{0}", infoLog.data());
+			MH_CORE_ERROR("{0}\r\n\r\n{1}", directives, infoLog.data());
 			MH_CORE_ASSERT(false, "Shader failed to link!");
 
 			return 0;

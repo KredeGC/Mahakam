@@ -15,7 +15,9 @@ layout(location = 1) out v2f o;
 void main() {
     v_InstanceID = gl_InstanceID;
     #if defined(POINT)
-        gl_Position = MATRIX_P * MATRIX_V * vec4(i_Pos / lights[v_InstanceID].position.w + lights[v_InstanceID].position.xyz, 1.0);
+        gl_Position = MATRIX_P * MATRIX_V * vec4(i_Pos * 2.0 * lights[v_InstanceID].position.w + lights[v_InstanceID].position.xyz, 1.0);
+    #elif defined(SPOT)
+        gl_Position = MATRIX_P * MATRIX_V * lights[v_InstanceID].objectToWorld * vec4(i_Pos, 1.0);
     #else
         gl_Position = vec4(i_Pos, 1.0);
     #endif
@@ -99,8 +101,8 @@ void main() {
     #endif
     
     // #if defined(DIRECTIONAL)
-    //     o_Color = vec4(worldPos, 1.0);
-    // #else
     //     o_Color = vec4(0.0);
+    // #else
+    //     o_Color = vec4(1.0);
     // #endif
 }

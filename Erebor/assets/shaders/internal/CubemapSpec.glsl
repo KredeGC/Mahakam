@@ -1,5 +1,5 @@
 #type vertex
-#version 330 core
+#version 450 core
 
 layout(location = 0) in vec3 i_Pos;
 
@@ -16,22 +16,22 @@ void main() {
 
 
 #type fragment
-#version 330 core
+#version 450 core
 
 layout(location = 0) out vec4 o_Color;
 
 in vec3 v_LocalPos;
 
-uniform sampler2D equirectangularMap;
+layout(binding = 0) uniform samplerCube environmentMap;
 uniform float roughness;
 
-const vec2 invAtan = vec2(0.1591, 0.3183);
-vec2 sampleSphericalMap(vec3 v) {
-    vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
-    uv *= invAtan;
-    uv += 0.5;
-    return uv;
-}
+// const vec2 invAtan = vec2(0.1591, 0.3183);
+// vec2 sampleSphericalMap(vec3 v) {
+//     vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
+//     uv *= invAtan;
+//     uv += 0.5;
+//     return uv;
+// }
 
 const float PI = 3.14159265359;
 
@@ -94,7 +94,7 @@ void main() {
     vec3 R = N;
     vec3 V = R;
 
-    const uint SAMPLE_COUNT = 1024u;
+    const uint SAMPLE_COUNT = 4096u;
     vec3 prefilteredColor = vec3(0.0);
     float totalWeight = 0.0;
     
@@ -112,14 +112,13 @@ void main() {
             float HdotV = max(dot(H, V), 0.0);
             float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
 
-            float resolution = 512.0; // resolution of source cubemap (per face)
+            float resolution = 4096.0; // resolution of source cubemap (per face)
             float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
             float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
 
             float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
             
-            vec2 uv = sampleSphericalMap(L);
-            prefilteredColor += textureLod(equirectangularMap, uv, mipLevel).rgb * NdotL;
+            prefilteredColor += min(textureLod(environmentMap, L, mipLevel).rgb, 1000.0) * NdotL;
             totalWeight      += NdotL;
         }
     }

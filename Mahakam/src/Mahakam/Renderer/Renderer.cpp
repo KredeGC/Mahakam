@@ -7,6 +7,11 @@
 #include <sstream>
 #include <fstream>
 
+
+// TEMPORARY
+#include <glad/glad.h>
+
+
 namespace Mahakam
 {
 	static Ref<Texture> brdfLut;
@@ -106,15 +111,6 @@ namespace Mahakam
 		}
 	}
 
-	void Renderer::drawSkybox()
-	{
-		MH_PROFILE_FUNCTION();
-
-		sceneData->environment.skyboxMaterial->getShader()->bind();
-		sceneData->environment.skyboxMaterial->bind();
-		drawScreenQuad();
-	}
-
 	void Renderer::drawTransparentQueue()
 	{
 		MH_PROFILE_FUNCTION();
@@ -156,6 +152,15 @@ namespace Mahakam
 		}
 	}
 
+	void Renderer::drawSkybox()
+	{
+		MH_PROFILE_FUNCTION();
+
+		sceneData->environment.skyboxMaterial->getShader()->bind();
+		sceneData->environment.skyboxMaterial->bind();
+		drawScreenQuad();
+	}
+
 	void Renderer::drawScreenQuad()
 	{
 		rendererResults->drawCalls += 1;
@@ -174,6 +179,19 @@ namespace Mahakam
 		inverseSphereMesh->bind();
 
 		GL::drawInstanced(inverseSphereMesh->getIndexCount(), amount);
+	}
+
+	void Renderer::drawInstancedPyramid(uint32_t amount)
+	{
+		Mesh* pyramidMesh = Mesh::getPyramid();
+
+		rendererResults->drawCalls += 1;
+		rendererResults->vertexCount += amount * pyramidMesh->getVertexCount();
+		rendererResults->triCount += amount * pyramidMesh->getIndexCount();
+
+		pyramidMesh->bind();
+
+		GL::drawInstanced(pyramidMesh->getIndexCount(), amount);
 	}
 
 	void Renderer::renderGeometryPass()
@@ -261,6 +279,8 @@ namespace Mahakam
 
 		// Render additional lights with additive blend mode
 		GL::setBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, true);
+		GL::enableZTesting(true);
+		glDepthFunc(GL_GEQUAL);
 
 		// Point lights
 		{
@@ -285,6 +305,31 @@ namespace Mahakam
 				drawInstancedSphere(amount);
 			}
 		}
+
+		// Spot lights
+		{
+			MH_PROFILE_RENDERING_SCOPE("Renderer::renderLightingPass - Spot lights");
+
+			uint32_t amount = (uint32_t)sceneData->environment.spotLights.size();
+
+			if (amount > 0)
+			{
+				uint32_t lightSize = sizeof(SpotLight);
+				uint32_t bufferSize = amount * lightSize;
+
+				if (!sceneData->spotLightBuffer || sceneData->spotLightBuffer->getSize() != bufferSize)
+					sceneData->spotLightBuffer = StorageBuffer::create(bufferSize);
+
+				sceneData->spotLightBuffer->setData(&sceneData->environment.spotLights[0], 0, bufferSize);
+
+				sceneData->deferredMaterial->bindShader("SPOT");
+				sceneData->deferredMaterial->bind();
+				sceneData->spotLightBuffer->bind(1);
+
+				drawInstancedPyramid(amount);
+			}
+		}
+		glDepthFunc(GL_LEQUAL);
 
 		// Disable blending
 		GL::setBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
@@ -333,6 +378,7 @@ namespace Mahakam
 		sceneData->deferredMaterial->setTexture("u_GBuffer1", 5, sceneData->gBuffer->getColorTexture(1));
 		sceneData->deferredMaterial->setTexture("u_GBuffer2", 6, sceneData->gBuffer->getColorTexture(3));
 		sceneData->deferredMaterial->setTexture("u_Depth", 7, sceneData->gBuffer->getDepthTexture());
+		sceneData->deferredMaterial->setTexture("u_LightCookie", 8, Texture2D::create("assets/textures/cookie128.png", { TextureFormat::RGB8, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder }));
 		//sceneData->deferredMaterial->setTexture("u_GBuffer3", 8, sceneData->gBuffer->getColorTexture(4));
 
 		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
@@ -346,7 +392,7 @@ namespace Mahakam
 
 		// Initialize
 		brdfLut = loadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.glsl", TextureFormat::RG16F, 512, 512);
-		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.glsl", TextureFormat::R8, 256, 256);
+		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.glsl", TextureFormat::R16F, 16, 16);
 
 		inverseSphereMesh = Mesh::createCubeSphere(5, true);
 
@@ -391,6 +437,7 @@ namespace Mahakam
 		sceneData->deferredMaterial->setTexture("u_GBuffer1", 5, sceneData->gBuffer->getColorTexture(1));
 		sceneData->deferredMaterial->setTexture("u_GBuffer2", 6, sceneData->gBuffer->getColorTexture(3));
 		sceneData->deferredMaterial->setTexture("u_Depth", 7, sceneData->gBuffer->getDepthTexture());
+		sceneData->deferredMaterial->setTexture("u_LightCookie", 8, Texture2D::create("assets/textures/spotlight.png", { TextureFormat::RGB8, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder }));
 		//sceneData->deferredMaterial->setTexture("u_GBuffer3", 8, sceneData->gBuffer->getColorTexture(4));
 
 		// Create tonemapping shader & material

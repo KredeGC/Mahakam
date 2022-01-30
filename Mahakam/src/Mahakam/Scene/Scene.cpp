@@ -10,11 +10,11 @@
 
 namespace Mahakam
 {
-	static Ref<Texture> loadOrCreate(const std::string& cachePath, const std::string& src, bool saveMips, const CubeTextureProps& props)
+	static Ref<TextureCube> loadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, const CubeTextureProps& props)
 	{
 		if (!std::filesystem::exists(cachePath))
 		{
-			Ref<Texture> texture = TextureCube::create(src, props);
+			Ref<TextureCube> texture = TextureCube::create(src, props);
 
 			uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(props.resolution)));
 			uint32_t maxMipLevels = saveMips ? mipLevels : 1;
@@ -23,7 +23,7 @@ namespace Mahakam
 			for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
 			{
 				uint32_t mipResolution = (uint32_t)(props.resolution * std::pow(0.5, mip));
-				size += 6 * 6 * mipResolution * mipResolution;
+				size += 6 * 2 * 3 * mipResolution * mipResolution; // 6 faces * bytes * channels * res * res
 			}
 
 			// Save to cache
@@ -42,7 +42,7 @@ namespace Mahakam
 			std::ifstream stream(cachePath, std::ios::binary);
 			std::stringstream ss;
 			ss << stream.rdbuf();
-			Ref<Texture> texture = TextureCube::create(props);
+			Ref<TextureCube> texture = TextureCube::create(props);
 			texture->setData((void*)ss.str().c_str(), saveMips);
 
 			stream.close();
@@ -57,15 +57,15 @@ namespace Mahakam
 	Scene::Scene(const std::string& filepath)
 	{
 		skyboxTexture = TextureCube::create(filepath, { 4096, TextureFormat::RGB16F });
-		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", filepath, false, { 32, TextureFormat::RGB16F, true, TextureCubePrefilter::Convolute });
-		skyboxSpecular = loadOrCreate(filepath + ".specular", filepath, true, { 512, TextureFormat::RGB16F, true, TextureCubePrefilter::Prefilter });
+		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, { 64, TextureFormat::RGB16F, true, TextureCubePrefilter::Convolute });
+		skyboxSpecular = loadOrCreate(filepath + ".specular", skyboxTexture, true, { 512, TextureFormat::RGB16F, true, TextureCubePrefilter::Prefilter });
 
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 		skyboxMaterial = Material::create(skyboxShader);
 		skyboxMaterial->setTexture("u_Environment", 0, skyboxTexture);
 	}
 
-	Scene::Scene(const Ref<Texture>& irradianceMap, const Ref<Texture>& specularMap)
+	Scene::Scene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
 		: skyboxIrradiance(irradianceMap), skyboxSpecular(specularMap) {}
 
 	Scene::~Scene() {}
@@ -127,10 +127,18 @@ namespace Mahakam
 				glm::vec3 dir = rot * glm::vec3(0.0f, 0.0f, 1.0f);
 				Light& light = lightComponent.getLight();
 
-				if (light.getLightType() == Light::LightType::Directional)
+				switch (light.getLightType())
+				{
+				case Light::LightType::Directional:
 					environment.directionalLights.push_back(Renderer::DirectionalLight{ dir, light.getColor() });
-				else if (light.getLightType() == Light::LightType::Point)
+					break;
+				case Light::LightType::Point:
 					environment.pointLights.push_back(Renderer::PointLight{ pos, light.getRange(), light.getColor() });
+					break;
+				case Light::LightType::Spot:
+					environment.spotLights.push_back(Renderer::SpotLight{ pos, rot, light.getFov(), light.getRange(), light.getColor() });
+					break;
+				}
 			});
 		}
 
@@ -213,7 +221,7 @@ namespace Mahakam
 		return std::make_shared<Scene>(filepath);
 	}
 
-	Ref<Scene> Scene::createScene(const Ref<Texture>& irradianceMap, const Ref<Texture>& specularMap)
+	Ref<Scene> Scene::createScene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
 	{
 		return std::make_shared<Scene>(irradianceMap, specularMap);
 	}

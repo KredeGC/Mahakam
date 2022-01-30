@@ -33,11 +33,11 @@ namespace Mahakam
 		bool mipmaps;
 		TextureCubePrefilter prefilter;
 
-		CubeTextureProps(uint32_t resolution = 1024, TextureFormat format = TextureFormat::RGB8, TextureFilter filterMode = TextureFilter::Bilinear, bool mipmaps = true, TextureCubePrefilter prefilter = TextureCubePrefilter::None)
+		CubeTextureProps(uint32_t resolution = 1024, TextureFormat format = TextureFormat::RGB8, TextureFilter filterMode = TextureFilter::Trilinear, bool mipmaps = true, TextureCubePrefilter prefilter = TextureCubePrefilter::None)
 			: resolution(resolution), format(format), filterMode(filterMode), mipmaps(mipmaps), prefilter(prefilter) {}
 
 		CubeTextureProps(uint32_t resolution, TextureFormat format, bool mipmaps, TextureCubePrefilter prefilter)
-			: resolution(resolution), format(format), filterMode(TextureFilter::Bilinear), mipmaps(mipmaps), prefilter(prefilter) {}
+			: resolution(resolution), format(format), filterMode(TextureFilter::Trilinear), mipmaps(mipmaps), prefilter(prefilter) {}
 	};
 
 
@@ -82,5 +82,6 @@ namespace Mahakam
 
 		static Ref<TextureCube> create(const CubeTextureProps& props = CubeTextureProps());
 		static Ref<TextureCube> create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps());
+		static Ref<TextureCube> create(Ref<TextureCube> cubemap, const CubeTextureProps& props = CubeTextureProps());
 	};
 }

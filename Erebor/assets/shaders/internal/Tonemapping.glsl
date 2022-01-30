@@ -34,7 +34,9 @@ void main() {
     vec3 color = texture(u_Albedo, i.v_UV).rgb;
     
     // HDR tonemapping
-    color = color / (color + vec3(1.0));
+    //color = color / (color + vec3(1.0));
+    const float exposure = 1.0;
+    color = vec3(1.0) - exp(-color * exposure);
     // Gamma correction
     color = pow(color, vec3(0.45454545)); 
 

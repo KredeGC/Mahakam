@@ -11,6 +11,7 @@ layout(binding = 0) uniform samplerCube u_IrradianceMap;
 layout(binding = 1) uniform samplerCube u_SpecularMap;
 layout(binding = 2) uniform sampler2D u_BRDFLUT;
 layout(binding = 3) uniform sampler2D u_AttenuationLUT;
+layout(binding = 8) uniform sampler2D u_LightCookie;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -85,18 +86,36 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             vec3 H = normalize(V + L);
             
             float distSqr = dot(lightVec, lightVec);
+            float rcpRangeSqr = light.color.w;
             
-            float normalizedDist = distSqr * light.position.w;
-            float attenuation = texture(u_AttenuationLUT, (distSqr * light.position.w).rr).r;
+            float normalizedDist = max(distSqr * rcpRangeSqr, 0.00001);
+            float attenuation = texture(u_AttenuationLUT, normalizedDist.rr).r;
             
             if (normalizedDist > 1.0) // Find something that saves more performance?
-                discard; // Continue
+                discard;
             
-            vec3 radiance = light.color * attenuation;
+            vec3 radiance = light.color.rgb * attenuation;
         #elif defined(SPOT)
-            vec3 L = normalize(-light.direction);
+            vec3 lightVec = light.objectToWorld[3].xyz - worldPos;
+            vec3 L = normalize(lightVec);
             vec3 H = normalize(V + L);
-            vec3 radiance = light.color;
+            
+            float distSqr = dot(lightVec, lightVec);
+            float rcpRangeSqr = light.color.w;
+            
+            vec4 uvCookie = light.worldToLight * vec4(worldPos, 1.0);
+            // negative bias because http://aras-p.info/blog/2010/01/07/screenspace-vs-mip-mapping/
+            vec3 cookie = texture(u_LightCookie, uvCookie.xy / uvCookie.w * 0.5 + vec2(0.5, 0.5), -8.0).rgb;
+            cookie = pow(cookie, vec3(2.2)); // sRGB correction?
+            float attenuation = uvCookie.w > 0.0 ? 1.0 : 0.0;
+            
+            float normalizedDist = max(distSqr * rcpRangeSqr, 0.00001);
+            attenuation *= texture(u_AttenuationLUT, normalizedDist.rr).r;
+            
+            if (normalizedDist > 1.0 || dot(cookie, cookie) <= 0.0) // Find something that saves more performance?
+                discard;
+            
+            vec3 radiance = light.color.rgb * cookie * attenuation;
         #endif
 
         // Cook-Torrance BRDF

@@ -32,8 +32,9 @@ namespace Mahakam
 
 	enum class TextureWrapMode
 	{
-		Clamp = 0,
-		Repeat
+		Repeat = 0,
+		Clamp,
+		ClampBorder
 	};
 
 	enum class TextureCubePrefilter

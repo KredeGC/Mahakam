@@ -9,17 +9,15 @@
     };
 #elif defined(POINT)
     struct Light {
-        vec4 position; // xyz - pos, w - light range/distance
-        vec3 color;
+        vec4 position; // xyz - pos, w - range
+        vec4 color; // xyz - pos, w - 1.0 / (range * range)
         //mat4 worldToLight;
     };
 #elif defined(SPOT)
     struct Light {
-        vec4 position; // xyz - pos, w - light range/distance
-        vec3 direction;
-        vec3 color;
-        float cutoff;
-        //mat4 worldToLight;
+        mat4 objectToWorld;
+        mat4 worldToLight;
+        vec4 color; // xyz - color, w - 1.0 / (range * range)
     };
 #endif
 

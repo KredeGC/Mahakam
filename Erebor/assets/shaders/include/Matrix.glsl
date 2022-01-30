@@ -25,7 +25,7 @@ layout (std140, binding = 0) uniform Matrices {
 
 vec3 getViewDir(vec3 worldPos) {
     if (MATRIX_P[3][3] > 0)
-        return normalize(inverse(MATRIX_V)[2].xyz);
+        return normalize(MATRIX_IV[2].xyz);
     else
         return normalize(u_CameraPos - worldPos);
 }

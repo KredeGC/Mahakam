@@ -20,9 +20,9 @@ namespace Mahakam
 		friend class SceneHierarchyPanel;
 
 		Ref<Material> skyboxMaterial;
-		Ref<Texture> skyboxTexture;
-		Ref<Texture> skyboxIrradiance;
-		Ref<Texture> skyboxSpecular;
+		Ref<TextureCube> skyboxTexture;
+		Ref<TextureCube> skyboxIrradiance;
+		Ref<TextureCube> skyboxSpecular;
 
 		entt::registry registry;
 
@@ -42,7 +42,7 @@ namespace Mahakam
 
 	public:
 		Scene(const std::string& filepath);
-		Scene(const Ref<Texture>& irradianceMap, const Ref<Texture>& specularMap);
+		Scene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
 		~Scene();
 
 		void onUpdate(Timestep ts);
@@ -53,6 +53,6 @@ namespace Mahakam
 		void destroyEntity(Entity entity);
 
 		static Ref<Scene> createScene(const std::string& filepath);
-		static Ref<Scene> createScene(const Ref<Texture>& irradianceMap, const Ref<Texture>& specularMap);
+		static Ref<Scene> createScene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
 	};
 }

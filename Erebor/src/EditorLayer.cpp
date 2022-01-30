@@ -63,7 +63,7 @@ namespace Mahakam
 	void EditorLayer::onAttach()
 	{
 		// Create a new active scene
-		activeScene = Scene::createScene("assets/textures/night.hdr");
+		activeScene = Scene::createScene("assets/textures/pines.hdr");
 
 
 		// Setup the viewport in editor
@@ -82,16 +82,17 @@ namespace Mahakam
 		mainLightEntity.addComponent<LightComponent>(Light::LightType::Directional, glm::vec3(1.0f, 1.0f, 1.0f));
 		mainLightEntity.getComponent<TransformComponent>().setRotation(glm::quat({ 0.0f, 1.7f, 0.0f }));
 
-		for (int y = 0; y < 10; y++)
+		/*for (int y = 0; y < 10; y++)
 		{
 			for (int x = 0; x < 10; x++)
-			{
+			{*/
 				Entity pointLightEntity = activeScene->createEntity("Point Light");
-				pointLightEntity.addComponent<LightComponent>(Light::LightType::Point, glm::vec3(1.0f, 1.0f, 1.0f));
-				//pointLightEntity.getComponent<TransformComponent>().setPosition({ 1.0f, 1.0f, 1.0f });
-				pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
-			}
-		}
+				pointLightEntity.addComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(100.0f, 100.0f, 100.0f));
+				pointLightEntity.getComponent<TransformComponent>().setPosition({ 1.0f, 1.0f, -6.5f });
+				//pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
+				pointLightEntity.getComponent<TransformComponent>().setRotation(glm::quat({ glm::radians(-155.0f), 0.0f, 0.0f }));
+		/*	}
+		}*/
 
 
 		// Setup plane

@@ -204,6 +204,7 @@ namespace Mahakam
 		}
 
 		static Mesh* getScreenQuad();
+		static Mesh* getPyramid();
 		static SkinnedMesh loadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps());
 		static Ref<Mesh> createCube(int tessellation, bool reverse = false);
 		static Ref<Mesh> createPlane(int rows, int columns);

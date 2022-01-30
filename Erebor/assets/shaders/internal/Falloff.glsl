@@ -25,7 +25,9 @@ float calculateFalloff(vec2 uv) {
     
     //return 1.0 / (1.0 + 25.0 * normalizedDist * normalizedDist);
     
-    return clamp(1.0 / (1.0 + 25.0 * normalizedDist * normalizedDist) * clamp((1.0 - normalizedDist) * 5.0, 0.0, 1.0), 0.0, 1.0);
+    //return clamp(1.0 / (1.0 + 25.0 * normalizedDist * normalizedDist) * clamp((1.0 - normalizedDist) * 5.0, 0.0, 1.0), 0.0, 1.0);
+    
+    return pow(clamp(1.0 - normalizedDist * normalizedDist, 0.0, 1.0), 2.0);
 }
 
 void main() {

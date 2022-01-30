@@ -70,4 +70,19 @@ namespace Mahakam
 
 		return nullptr;
 	}
+
+	Ref<TextureCube> TextureCube::create(Ref<TextureCube> cubemap, const CubeTextureProps& props)
+	{
+		switch (Renderer::getAPI())
+		{
+		case RendererAPI::API::None:
+			MH_CORE_BREAK("Renderer API not supported!");
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLTextureCube>(cubemap, props);
+		}
+
+		MH_CORE_BREAK("Unknown renderer API!");
+
+		return nullptr;
+	}
 }

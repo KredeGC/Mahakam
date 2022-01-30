@@ -20,28 +20,46 @@ namespace Mahakam
 		public:
 			glm::vec3 direction;
 		private:
-			float padding01;
+			float padding01 = 0.0f;
 		public:
 			glm::vec3 color;
 		private:
-			float padding02;
+			float padding02 = 0.0f;
 
 		public:
-			DirectionalLight(glm::vec3 direction, glm::vec3 color)
+			DirectionalLight(const glm::vec3& direction, const glm::vec3& color)
 				: direction(direction), color(color) {}
 		};
 
 		struct PointLight
 		{
 		public:
-			glm::vec4 position;
-			glm::vec3 color;
-		private:
-			float padding01;
+			glm::vec4 position; // w - range
+			glm::vec4 color; // w - 1.0 / (range * range)
 
 		public:
-			PointLight(glm::vec3 position, float range, glm::vec3 color)
-				: position(glm::vec4(position, 1.0f / range)), color(color) {}
+			PointLight(const glm::vec3& position, float range, const glm::vec3& color) :
+				position(glm::vec4(position, range)),
+				color(color, 1.0f / (range * range)) {}
+		};
+
+		struct SpotLight
+		{
+		public:
+			glm::mat4 objectToWorld;
+			glm::mat4 worldToLight;
+			glm::vec4 color; // w - 1.0 / (range * range)
+
+		public:
+			SpotLight(const glm::vec3& position, const glm::quat& rotation, float fov, float range, const glm::vec3& color) :
+				worldToLight(glm::perspective(fov, 1.0f, 0.03f, range) * glm::inverse(glm::translate(glm::mat4(1.0f), position) * glm::mat4(rotation))),
+				color(color, 1.0f / (range * range))
+			{
+				float xy = glm::tan(fov / 2.0f) * range;
+				objectToWorld = glm::translate(glm::mat4(1.0f), position)
+					* glm::mat4(rotation)
+					* glm::scale(glm::mat4(1.0f), glm::vec3(xy, xy, range));
+			}
 		};
 
 		struct EnvironmentData
@@ -51,6 +69,7 @@ namespace Mahakam
 			Ref<Texture> specularMap;
 			std::vector<DirectionalLight> directionalLights;
 			std::vector<PointLight> pointLights;
+			std::vector<SpotLight> spotLights;
 		};
 
 		struct RendererResults
@@ -79,6 +98,7 @@ namespace Mahakam
 			// Lighting buffers
 			Ref<StorageBuffer> directionalLightBuffer;
 			Ref<StorageBuffer> pointLightBuffer;
+			Ref<StorageBuffer> spotLightBuffer;
 
 			// Materials
 			Ref<Material> deferredMaterial;
@@ -136,10 +156,12 @@ namespace Mahakam
 		static std::vector<MeshData> transparentQueue;
 
 		static void drawOpaqueQueue();
-		static void drawSkybox();
 		static void drawTransparentQueue();
+
+		static void drawSkybox();
 		static void drawScreenQuad();
 		static void drawInstancedSphere(uint32_t amount);
+		static void drawInstancedPyramid(uint32_t amount);
 
 		static void renderGeometryPass();
 		static void renderLightingPass();
