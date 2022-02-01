@@ -61,6 +61,9 @@ namespace Mahakam {
 
 
 		// Creating the window
+//#ifdef MH_DEBUG
+//		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1); // ;_;
+//#endif
 		window = glfwCreateWindow((int)data.width, (int)data.height, data.title.c_str(), nullptr, nullptr);
 		context = new OpenGLContext(window);
 		context->init();

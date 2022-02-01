@@ -193,13 +193,13 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             vec3 kD = 1.0 - kS;
             kD *= 1.0 - metallic;
             vec3 irradiance = texture(u_IrradianceMap, N).rgb;
-            vec3 diffuse = irradiance * albedo;
+            vec3 diffuse = irradiance * albedo * ao;
             
             // Indirect specular lighting
             const float MAX_REFLECTION_LOD = 4.0;
             vec3 prefilteredColor = textureLod(u_SpecularMap, R, roughness * MAX_REFLECTION_LOD).rgb;  
             vec2 brdf = texture(u_BRDFLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-            vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+            vec3 specular = prefilteredColor * ao * (F * brdf.x + brdf.y);
             
             ambient = (kD * diffuse + specular) * ao;
         }

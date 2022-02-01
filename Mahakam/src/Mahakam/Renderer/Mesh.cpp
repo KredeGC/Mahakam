@@ -5,6 +5,7 @@ namespace Mahakam
 {
 	static Mesh* staticScreenQuad = nullptr;
 	static Mesh* staticPyramid = nullptr;
+	static Mesh* staticCubemapMesh = nullptr;
 
 	static glm::vec3 calculateCubeSphereVertex(const glm::vec3& v)
 	{
@@ -302,96 +303,7 @@ namespace Mahakam
 		delete[] interleavedVertices;
 	}
 
-	Mesh* Mesh::getScreenQuad()
-	{
-		if (!staticScreenQuad)
-		{
-			MH_PROFILE_FUNCTION();
-
-			glm::vec3 positions[] = {
-				{ -1.0f, 1.0f, 0.0f },
-				{ 1.0f, 1.0f, 0.0f  },
-				{ -1.0f, -1.0f, 0.0f },
-				{ 1.0f, -1.0f, 0.0f }
-			};
-
-			glm::vec2 uvs[] = {
-				{ 0.0f, 1.0f, },
-				{ 1.0f, 1.0f, },
-				{ 0.0f, 0.0f, },
-				{ 1.0f, 0.0f }
-			};
-
-			uint32_t indices[] = {
-				0, 2, 3,
-				0, 3, 1
-			};
-
-			BufferLayout layout
-			{
-				{ ShaderDataType::Float3, "i_Pos" },
-				{ ShaderDataType::Float2, "i_UV" }
-			};
-
-			staticScreenQuad = new Mesh(4, indices, 6, { positions, uvs });
-		}
-
-		return staticScreenQuad;
-	}
-
-	Mesh* Mesh::getPyramid()
-	{
-		if (!staticPyramid)
-		{
-			MH_PROFILE_FUNCTION();
-
-			const uint32_t vertexCount = 5;
-			const uint32_t indexCount = 18;
-
-			glm::vec3 positions[vertexCount];
-			uint32_t indices[indexCount];
-
-			positions[0] = { 0.0f, 0.0f, 0.0f };
-			positions[1] = { -1.0f, -1.0f, -1.0f };
-			positions[2] = { 1.0f, -1.0f, -1.0f };
-			positions[3] = { 1.0f, 1.0f, -1.0f };
-			positions[4] = { -1.0f, 1.0f, -1.0f };
-
-			indices[0] = 0;
-			indices[1] = 2;
-			indices[2] = 1;
-
-			indices[3] = 0;
-			indices[4] = 3;
-			indices[5] = 2;
-
-			indices[6] = 0;
-			indices[7] = 4;
-			indices[8] = 3;
-
-			indices[9] = 0;
-			indices[10] = 1;
-			indices[11] = 4;
-
-			indices[12] = 1;
-			indices[13] = 2;
-			indices[14] = 3;
-
-			indices[15] = 1;
-			indices[16] = 3;
-			indices[17] = 4;
-
-			BufferLayout layout
-			{
-				{ ShaderDataType::Float3, "i_Pos" }
-			};
-
-			staticPyramid = new Mesh(vertexCount, indices, indexCount, { positions });
-		}
-
-		return staticPyramid;
-	}
-
+	
 	SkinnedMesh Mesh::loadModel(const std::string& filepath, const SkinnedMeshProps& props)
 	{
 		// TODO: Use SkinnedMeshProps to determine if we should load textures and create materials, or use the provided materials

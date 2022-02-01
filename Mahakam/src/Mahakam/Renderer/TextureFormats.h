@@ -18,6 +18,12 @@ namespace Mahakam
 		RGBA32F,
 		RG11B10F,
 		RGB10A2,
+		SRGB8,
+		SRGBA8,
+		DXT1,
+		DXT5,
+		SRGBDXT1,
+		SRGBDXT5,
 		Depth16,
 		Depth24,
 		Depth24Stencil8

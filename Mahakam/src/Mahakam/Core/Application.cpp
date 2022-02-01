@@ -30,6 +30,8 @@ namespace Mahakam
 	Application::~Application()
 	{
 		MH_PROFILE_FUNCTION();
+
+		Renderer::Shutdown();
 	}
 
 	void Application::run()

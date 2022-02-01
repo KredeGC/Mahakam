@@ -1,4 +1,5 @@
 #include "mhpch.h"
+#include "OpenGLBase.h"
 #include "OpenGLFrameBuffer.h"
 
 #include "OpenGLTextureFormats.h"
@@ -19,33 +20,33 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		glDeleteFramebuffers(1, &rendererID);
+		MH_GL_CALL(glDeleteFramebuffers(1, &rendererID));
 	}
 
 	void OpenGLFrameBuffer::bind()
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
-		glViewport(0, 0, props.width, props.height);
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, rendererID));
+		MH_GL_CALL(glViewport(0, 0, props.width, props.height));
 	}
 
 	void OpenGLFrameBuffer::unbind()
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
 	void OpenGLFrameBuffer::blit(const Ref<FrameBuffer>& dest, bool color, bool depth)
 	{
 		Ref<OpenGLFrameBuffer> fbo = std::static_pointer_cast<OpenGLFrameBuffer>(dest);
 
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID);
+		MH_GL_CALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID));
+		MH_GL_CALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID));
 
 		if (color)
-			glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_COLOR_BUFFER_BIT, GL_NEAREST))
 		if (depth)
-			glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+			MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST))
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
 	void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height)
@@ -70,12 +71,12 @@ namespace Mahakam
 
 		auto& spec = props.colorAttachments[attachmentSlot];
 
-		GLenum format = TextureFormatToOpenGLFormat(spec.format);
+		GLenum format = TextureFormatToOpenGLInternalFormat(spec.format);
 		GLenum type = TextureFormatToOpenGLType(spec.format);
 
-		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentSlot);
+		MH_GL_CALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentSlot));
 
-		glReadPixels(0, 0, props.width, props.height, format, type, pixels);
+		MH_GL_CALL(glReadPixels(0, 0, props.width, props.height, format, type, pixels));
 	}
 
 	void OpenGLFrameBuffer::invalidate()
@@ -84,14 +85,14 @@ namespace Mahakam
 
 		if (rendererID)
 		{
-			glDeleteFramebuffers(1, &rendererID);
-
 			colorAttachments.clear();
 			depthAttachment = 0;
+
+			MH_GL_CALL(glDeleteFramebuffers(1, &rendererID));
 		}
 
-		glCreateFramebuffers(1, &rendererID);
-		glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
+		MH_GL_CALL(glCreateFramebuffers(1, &rendererID));
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, rendererID));
 
 		// Color buffers
 		for (int i = 0; i < props.colorAttachments.size(); i++)
@@ -102,7 +103,7 @@ namespace Mahakam
 
 			colorAttachments.push_back(tex);
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, tex->getRendererID(), 0);
+			MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, tex->getRendererID(), 0));
 		}
 
 		// Depth buffer
@@ -118,13 +119,13 @@ namespace Mahakam
 			{
 				depthAttachment = RenderBuffer::create(props.width, props.height, spec.format);
 
-				glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depthAttachment->getRendererID());
+				MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depthAttachment->getRendererID()));
 			}
 			else
 			{
 				depthAttachment = Texture2D::create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
 
-				glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, depthAttachment->getRendererID(), 0);
+				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, depthAttachment->getRendererID(), 0));
 			}
 		}
 
@@ -134,18 +135,18 @@ namespace Mahakam
 			for (GLenum i = 0; i < colorAttachments.size(); i++)
 				buffers[i] = GL_COLOR_ATTACHMENT0 + i;
 
-			glDrawBuffers((GLsizei)colorAttachments.size(), buffers);
+			MH_GL_CALL(glDrawBuffers((GLsizei)colorAttachments.size(), buffers));
 
 			delete[] buffers;
 		}
 		else if (colorAttachments.empty())
 		{
-			glDrawBuffer(GL_NONE);
+			MH_GL_CALL(glDrawBuffer(GL_NONE));
 		}
 
 		// Check framebuffer
 		MH_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "FrameBuffer is incomplete!");
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 }

@@ -203,8 +203,6 @@ namespace Mahakam
 			return CreateRef<Mesh>(vertexCount, indices, indexCount, verts);
 		}
 
-		static Mesh* getScreenQuad();
-		static Mesh* getPyramid();
 		static SkinnedMesh loadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps());
 		static Ref<Mesh> createCube(int tessellation, bool reverse = false);
 		static Ref<Mesh> createPlane(int rows, int columns);

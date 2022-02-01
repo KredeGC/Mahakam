@@ -45,7 +45,9 @@ namespace Mahakam
 	class Texture : public RenderBuffer
 	{
 	public:
-		virtual void setData(void* data, bool mipmaps = false) = 0;
+		virtual uint32_t getTotalSize() const = 0;
+
+		virtual void setData(void* data, uint32_t size, bool mipmaps = false) = 0;
 
 		virtual void bind(uint32_t slot = 0) const = 0;
 
@@ -61,7 +63,7 @@ namespace Mahakam
 		static Ref<Texture2D> bump;
 
 		static Ref<Texture2D> create(const TextureProps& props = TextureProps());
-		static Ref<Texture2D> create(const std::string& filepath, bool sRGB = true, const TextureProps& props = TextureProps());
+		static Ref<Texture2D> create(const std::string& filepath, const TextureProps& props = TextureProps());
 	};
 
 

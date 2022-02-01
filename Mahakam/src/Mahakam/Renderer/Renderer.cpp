@@ -20,8 +20,6 @@ namespace Mahakam
 	static Ref<Texture> falloffLut;
 	static Ref<Texture> spotlightTexture;
 
-	static Ref<Mesh> inverseSphereMesh;
-
 	static Ref<Texture> loadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height)
 	{
 		if (!std::filesystem::exists(cachePath))
@@ -66,7 +64,7 @@ namespace Mahakam
 			std::stringstream ss;
 			ss << inStream.rdbuf();
 			Ref<Texture> lut = Texture2D::create({ width, height, format, TextureFilter::Bilinear, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
-			lut->setData((void*)ss.str().c_str(), ss.str().size());
+			lut->setData((void*)ss.str().c_str(), 512 * 512 * 4); // TODO: Un-hardcode this value
 
 			return lut;
 		}
@@ -92,9 +90,7 @@ namespace Mahakam
 		brdfLut = loadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.glsl", TextureFormat::RG16F, 512, 512);
 		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.glsl", TextureFormat::R16F, 16, 16);
 
-		spotlightTexture = Texture2D::create("assets/textures/internal/spotlight.png", true, { TextureFormat::RGB8, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
-
-		inverseSphereMesh = Mesh::createCubeSphere(5, true);
+		spotlightTexture = Texture2D::create("assets/textures/internal/spotlight.png", { TextureFormat::SRGBDXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
 
 		sceneData->cameraBuffer = UniformBuffer::create(sizeof(CameraData));
 
@@ -144,6 +140,21 @@ namespace Mahakam
 		Ref<Shader> tonemappingShader = Shader::create("assets/shaders/internal/Tonemapping.glsl");
 		sceneData->tonemappingMaterial = Material::create(tonemappingShader);
 		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
+	}
+
+	void Renderer::Shutdown()
+	{
+		GL::Shutdown();
+
+		renderQueue.clear();
+		transparentQueue.clear();
+
+		brdfLut = nullptr;
+		falloffLut = nullptr;
+		spotlightTexture = nullptr;
+
+		delete rendererResults;
+		delete sceneData;
 	}
 
 	void Renderer::onWindowResie(uint32_t width, uint32_t height)
@@ -211,14 +222,14 @@ namespace Mahakam
 		sceneData->wireframe = enable;
 	}
 
-	void Renderer::submit(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material)
+	void Renderer::submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
 	{
 		const Ref<Shader>& shader = material->getShader();
 
 		renderQueue[shader][material][mesh].push_back(transform);
 	}
 
-	void Renderer::submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material)
+	void Renderer::submitTransparent(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
 	{
 		MH_CORE_BREAK("Transparency not yet supported ;_;!")
 
@@ -320,26 +331,28 @@ namespace Mahakam
 
 	void Renderer::drawInstancedSphere(uint32_t amount)
 	{
+		Ref<Mesh> invertedSphere = GL::GetInvertedSphere();
+
 		rendererResults->drawCalls += 1;
-		rendererResults->vertexCount += amount * inverseSphereMesh->getVertexCount();
-		rendererResults->triCount += amount * inverseSphereMesh->getIndexCount();
+		rendererResults->vertexCount += amount * invertedSphere->getVertexCount();
+		rendererResults->triCount += amount * invertedSphere->getIndexCount();
 
-		inverseSphereMesh->bind();
+		invertedSphere->bind();
 
-		GL::drawInstanced(inverseSphereMesh->getIndexCount(), amount);
+		GL::drawInstanced(invertedSphere->getIndexCount(), amount);
 	}
 
 	void Renderer::drawInstancedPyramid(uint32_t amount)
 	{
-		Mesh* pyramidMesh = Mesh::getPyramid();
+		Ref<Mesh> invertedPyramid = GL::GetInvertedPyramid();
 
 		rendererResults->drawCalls += 1;
-		rendererResults->vertexCount += amount * pyramidMesh->getVertexCount();
-		rendererResults->triCount += amount * pyramidMesh->getIndexCount();
+		rendererResults->vertexCount += amount * invertedPyramid->getVertexCount();
+		rendererResults->triCount += amount * invertedPyramid->getIndexCount();
 
-		pyramidMesh->bind();
+		invertedPyramid->bind();
 
-		GL::drawInstanced(pyramidMesh->getIndexCount(), amount);
+		GL::drawInstanced(invertedPyramid->getIndexCount(), amount);
 	}
 
 	void Renderer::renderGeometryPass()

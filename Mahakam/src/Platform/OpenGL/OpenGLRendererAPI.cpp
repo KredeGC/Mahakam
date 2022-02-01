@@ -1,4 +1,5 @@
 #include "mhpch.h"
+#include "OpenGLBase.h"
 #include "OpenGLRendererAPI.h"
 
 #include <glad/glad.h>
@@ -32,6 +33,12 @@ namespace Mahakam
 		return 0;
 	}
 
+	static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+	{
+		if (type != GL_DEBUG_TYPE_OTHER)
+			MH_CORE_ERROR("[OpenGL Error] {0}", message);
+	}
+
 	void OpenGLRendererAPI::init()
 	{
 		glEnable(GL_DEPTH_TEST);
@@ -40,6 +47,11 @@ namespace Mahakam
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+
+#if MH_DEBUG
+		glEnable(GL_DEBUG_OUTPUT);
+		glDebugMessageCallback(MessageCallback, 0);
+#endif
 	}
 
 	const char* OpenGLRendererAPI::getGraphicsVendor()
@@ -49,7 +61,7 @@ namespace Mahakam
 
 	void OpenGLRendererAPI::setViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 	{
-		glViewport(x, y, w, h);
+		MH_GL_CALL(glViewport(x, y, w, h));
 	}
 
 	void OpenGLRendererAPI::finishRendering()
@@ -126,11 +138,11 @@ namespace Mahakam
 
 	void OpenGLRendererAPI::drawIndexed(uint32_t count)
 	{
-		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+		MH_GL_CALL(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr));
 	}
 
 	void OpenGLRendererAPI::drawInstanced(uint32_t indexCount, uint32_t count)
 	{
-		glDrawElementsInstanced(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr, count);
+		MH_GL_CALL(glDrawElementsInstanced(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr, count));
 	}
 }

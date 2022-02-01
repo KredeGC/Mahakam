@@ -155,6 +155,7 @@ namespace Mahakam
 
 	public:
 		static void init(uint32_t width, uint32_t height);
+		static void Shutdown();
 		static void onWindowResie(uint32_t width, uint32_t height);
 
 		static void beginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
@@ -162,8 +163,8 @@ namespace Mahakam
 
 		static void enableWireframe(bool enable);
 
-		static void submit(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);
-		static void submitTransparent(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<Material>& material);
+		static void submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
+		static void submitTransparent(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
 
 		inline static Ref<FrameBuffer> getGBuffer() { return sceneData->gBuffer; }
 		inline static Ref<FrameBuffer> getFrameBuffer() { return sceneData->viewportFramebuffer; }

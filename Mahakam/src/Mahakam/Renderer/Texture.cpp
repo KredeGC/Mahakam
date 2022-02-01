@@ -27,14 +27,14 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	Ref<Texture2D> Texture2D::create(const std::string& filepath, bool sRGB, const TextureProps& props)
+	Ref<Texture2D> Texture2D::create(const std::string& filepath, const TextureProps& props)
 	{
 		switch (RendererAPI::getAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTexture2D>(filepath, sRGB, props);
+			return CreateRef<OpenGLTexture2D>(filepath, props);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

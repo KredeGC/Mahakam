@@ -40,6 +40,18 @@ namespace Mahakam
 			return 4;
 		case TextureFormat::RGB10A2:
 			return 4;
+		case TextureFormat::SRGB8:
+			return 3;
+		case TextureFormat::SRGBA8:
+			return 4;
+		case TextureFormat::DXT1:
+			return 3;
+		case TextureFormat::DXT5:
+			return 4;
+		case TextureFormat::SRGBDXT1:
+			return 3;
+		case TextureFormat::SRGBDXT5:
+			return 4;
 		case TextureFormat::Depth16:
 			return 2;
 		case TextureFormat::Depth24:
@@ -52,7 +64,42 @@ namespace Mahakam
 		return 0;
 	}
 
-	static GLenum ChannelCountToOpenGLFormat(int channels)
+	static bool IsTextureFormatCompressed(TextureFormat format)
+	{
+		switch (format)
+		{
+		case TextureFormat::DXT1:
+		case TextureFormat::DXT5:
+		case TextureFormat::SRGBDXT1:
+		case TextureFormat::SRGBDXT5:
+			return true;
+		case TextureFormat::R8:
+		case TextureFormat::RG8:
+		case TextureFormat::RGB8:
+		case TextureFormat::RGBA8:
+		case TextureFormat::R16F:
+		case TextureFormat::RG16F:
+		case TextureFormat::RGB16F:
+		case TextureFormat::RGBA16F:
+		case TextureFormat::R32F:
+		case TextureFormat::RG32F:
+		case TextureFormat::RGB32F:
+		case TextureFormat::RGBA32F:
+		case TextureFormat::RG11B10F:
+		case TextureFormat::RGB10A2:
+		case TextureFormat::SRGB8:
+		case TextureFormat::SRGBA8:
+		case TextureFormat::Depth16:
+		case TextureFormat::Depth24:
+		case TextureFormat::Depth24Stencil8:
+			return false;
+		}
+
+		MH_CORE_BREAK("Unknown TextureFormat provided!");
+		return false;
+	}
+
+	static GLenum ChannelCountToOpenGLBaseFormat(int channels)
 	{
 		uint32_t component = 0;
 		switch (channels)
@@ -72,30 +119,50 @@ namespace Mahakam
 		return 0;
 	}
 
-	static GLenum TextureFormatToOpenGLFormat(TextureFormat format)
+	static GLenum TextureFormatToOpenGLBaseFormat(TextureFormat format)
 	{
 		switch (format)
 		{
 		case TextureFormat::R8:
+			return GL_RED;
 		case TextureFormat::R16F:
+			return GL_RED;
 		case TextureFormat::R32F:
 			return GL_RED;
 		case TextureFormat::RG8:
+			return GL_RG;
 		case TextureFormat::RG16F:
+			return GL_RG;
 		case TextureFormat::RG32F:
 			return GL_RG;
 		case TextureFormat::RGB8:
+			return GL_RGB;
 		case TextureFormat::RGB16F:
+			return GL_RGB;
 		case TextureFormat::RGB32F:
 			return GL_RGB;
 		case TextureFormat::RGBA8:
+			return GL_RGBA;
 		case TextureFormat::RGBA16F:
+			return GL_RGBA;
 		case TextureFormat::RGBA32F:
 			return GL_RGBA;
+		case TextureFormat::DXT1:
+			return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+		case TextureFormat::DXT5:
+			return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		case TextureFormat::SRGBDXT1:
+			return GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
+		case TextureFormat::SRGBDXT5:
+			return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
 		case TextureFormat::RG11B10F:
-			return GL_R11F_G11F_B10F;
+			return GL_RGB;
 		case TextureFormat::RGB10A2:
-			return GL_RGB10_A2;
+			return GL_RGBA;
+		case TextureFormat::SRGB8:
+			return GL_RGB;
+		case TextureFormat::SRGBA8:
+			return GL_RGB;
 		case TextureFormat::Depth16:
 			return GL_DEPTH_COMPONENT;
 		case TextureFormat::Depth24:
@@ -108,69 +175,56 @@ namespace Mahakam
 		return 0;
 	}
 
-	static GLenum TextureFormatToOpenGLInternalFormat(TextureFormat format, bool sRGB)
+	static GLenum TextureFormatToOpenGLInternalFormat(TextureFormat format)
 	{
-		if (sRGB)
+		switch (format)
 		{
-			switch (format)
-			{
-			case TextureFormat::R8:
-			case TextureFormat::RG8:
-			case TextureFormat::RGB8:
-			case TextureFormat::R16F:
-			case TextureFormat::RG16F:
-			case TextureFormat::RGB16F:
-			case TextureFormat::R32F:
-			case TextureFormat::RG32F:
-			case TextureFormat::RGB32F:
-			case TextureFormat::RG11B10F:
-			case TextureFormat::RGB10A2:
-				return GL_SRGB8;
-			case TextureFormat::RGBA8:
-			case TextureFormat::RGBA16F:
-			case TextureFormat::RGBA32F:
-				return GL_SRGB8_ALPHA8;
-			}
-		}
-		else
-		{
-			switch (format)
-			{
-			case TextureFormat::R8:
-				return GL_R8;
-			case TextureFormat::RG8:
-				return GL_RG8;
-			case TextureFormat::RGB8:
-				return GL_RGB8;
-			case TextureFormat::RGBA8:
-				return GL_RGBA8;
-			case TextureFormat::R16F:
-				return GL_R16F;
-			case TextureFormat::RG16F:
-				return GL_RG16F;
-			case TextureFormat::RGB16F:
-				return GL_RGB16F;
-			case TextureFormat::RGBA16F:
-				return GL_RGBA16F;
-			case TextureFormat::R32F:
-				return GL_R32F;
-			case TextureFormat::RG32F:
-				return GL_RG32F;
-			case TextureFormat::RGB32F:
-				return GL_RGB32F;
-			case TextureFormat::RGBA32F:
-				return GL_RGBA32F;
-			case TextureFormat::RG11B10F:
-				return GL_R11F_G11F_B10F;
-			case TextureFormat::RGB10A2:
-				return GL_RGB10_A2;
-			case TextureFormat::Depth16:
-				return GL_DEPTH_COMPONENT16;
-			case TextureFormat::Depth24:
-				return GL_DEPTH_COMPONENT24;
-			case TextureFormat::Depth24Stencil8:
-				return GL_DEPTH24_STENCIL8;
-			}
+		case TextureFormat::R8:
+			return GL_R8;
+		case TextureFormat::RG8:
+			return GL_RG8;
+		case TextureFormat::RGB8:
+			return GL_RGB8;
+		case TextureFormat::RGBA8:
+			return GL_RGBA8;
+		case TextureFormat::R16F:
+			return GL_R16F;
+		case TextureFormat::RG16F:
+			return GL_RG16F;
+		case TextureFormat::RGB16F:
+			return GL_RGB16F;
+		case TextureFormat::RGBA16F:
+			return GL_RGBA16F;
+		case TextureFormat::R32F:
+			return GL_R32F;
+		case TextureFormat::RG32F:
+			return GL_RG32F;
+		case TextureFormat::RGB32F:
+			return GL_RGB32F;
+		case TextureFormat::RGBA32F:
+			return GL_RGBA32F;
+		case TextureFormat::RG11B10F:
+			return GL_R11F_G11F_B10F;
+		case TextureFormat::RGB10A2:
+			return GL_RGB10_A2;
+		case TextureFormat::SRGB8:
+			return GL_SRGB8;
+		case TextureFormat::SRGBA8:
+			return GL_SRGB8_ALPHA8;
+		case TextureFormat::DXT1:
+			return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+		case TextureFormat::DXT5:
+			return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		case TextureFormat::SRGBDXT1:
+			return GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
+		case TextureFormat::SRGBDXT5:
+			return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
+		case TextureFormat::Depth16:
+			return GL_DEPTH_COMPONENT16;
+		case TextureFormat::Depth24:
+			return GL_DEPTH_COMPONENT24;
+		case TextureFormat::Depth24Stencil8:
+			return GL_DEPTH24_STENCIL8;
 		}
 
 		MH_CORE_BREAK("Unknown TextureFormat provided!");
@@ -185,6 +239,12 @@ namespace Mahakam
 		case TextureFormat::RG8:
 		case TextureFormat::RGB8:
 		case TextureFormat::RGBA8:
+		case TextureFormat::SRGB8:
+		case TextureFormat::SRGBA8:
+		case TextureFormat::DXT1:
+		case TextureFormat::DXT5:
+		case TextureFormat::SRGBDXT1:
+		case TextureFormat::SRGBDXT5:
 			return GL_UNSIGNED_BYTE;
 		case TextureFormat::R16F:
 		case TextureFormat::RG16F:

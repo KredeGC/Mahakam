@@ -40,6 +40,8 @@ namespace Mahakam
 
 		inline static Application& getInstance() { return *instance; }
 
+		inline static bool IsRunning() { return instance->running; }
+
 		inline Window& getWindow() { return *window; }
 	};
 

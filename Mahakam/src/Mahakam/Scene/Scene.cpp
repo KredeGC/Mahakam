@@ -16,21 +16,15 @@ namespace Mahakam
 		{
 			Ref<TextureCube> texture = TextureCube::create(src, prefilter, props);
 
-			uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(props.resolution)));
-			uint32_t maxMipLevels = saveMips ? mipLevels : 1;
-
-			uint32_t size = 0;
-			for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
-			{
-				uint32_t mipResolution = (uint32_t)(props.resolution * std::pow(0.5, mip));
-				size += 6 * 2 * 3 * mipResolution * mipResolution; // 6 faces * bytes * channels * res * res
-			}
+			uint32_t size = texture->getSize();
+			uint32_t totalSize = texture->getTotalSize();
 
 			// Save to cache
-			char* pixels = new char[size];
+			char* pixels = new char[totalSize];
 			texture->readPixels(pixels, saveMips);
 			std::ofstream stream(cachePath, std::ios::binary);
-			stream.write(pixels, size);
+			stream.write((char*)&size, sizeof(uint32_t));
+			stream.write(pixels, totalSize);
 
 			delete[] pixels;
 
@@ -41,9 +35,11 @@ namespace Mahakam
 			// Load from cache
 			std::ifstream stream(cachePath, std::ios::binary);
 			std::stringstream ss;
+			uint32_t size = 0;
+			stream.read((char*)&size, sizeof(uint32_t));
 			ss << stream.rdbuf();
 			Ref<TextureCube> texture = TextureCube::create(props);
-			texture->setData((void*)ss.str().c_str(), saveMips);
+			texture->setData((void*)ss.str().c_str(), size, saveMips);
 
 			stream.close();
 
@@ -57,7 +53,7 @@ namespace Mahakam
 	Scene::Scene(const std::string& filepath)
 	{
 		skyboxTexture = TextureCube::create(filepath, { 4096, TextureFormat::RGB16F });
-		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, true });
+		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
 		skyboxSpecular = loadOrCreate(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
 
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");

@@ -1,4 +1,5 @@
 #include "mhpch.h"
+#include "OpenGLBase.h"
 #include "OpenGLVertexArray.h"
 
 #include <glad/glad.h>
@@ -43,24 +44,24 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		glCreateVertexArrays(1, &rendererID);
+		MH_GL_CALL(glCreateVertexArrays(1, &rendererID));
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
 		MH_PROFILE_FUNCTION();
 
-		glDeleteVertexArrays(1, &rendererID);
+		MH_GL_CALL(glDeleteVertexArrays(1, &rendererID));
 	}
 	
 	void OpenGLVertexArray::bind() const
 	{
-		glBindVertexArray(rendererID);
+		MH_GL_CALL(glBindVertexArray(rendererID));
 	}
 	
 	void OpenGLVertexArray::unbind() const
 	{
-		glBindVertexArray(0);
+		MH_GL_CALL(glBindVertexArray(0));
 	}
 
 	void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& buffer, bool interleave)
@@ -69,7 +70,7 @@ namespace Mahakam
 
 		MH_CORE_ASSERT(buffer->getLayout().getElements().size(), "Vertex buffer has no layout!");
 
-		glBindVertexArray(rendererID);
+		MH_GL_CALL(glBindVertexArray(rendererID));
 		buffer->bind();
 
 		const auto& layout = buffer->getLayout();
@@ -77,24 +78,24 @@ namespace Mahakam
 		{
 			for (const auto& element : layout)
 			{
-				glEnableVertexAttribArray(vertexBufferIndex);
+				MH_GL_CALL(glEnableVertexAttribArray(vertexBufferIndex));
 				GLenum type = ShaderDataTypeToOpenGLBaseType(element.type);
 				if (type == GL_INT)
 				{
-					glVertexAttribIPointer(vertexBufferIndex,
+					MH_GL_CALL(glVertexAttribIPointer(vertexBufferIndex,
 						element.getComponentCount(),
 						type,
 						layout.getStride(),
-						(const void*)(uintptr_t)element.offset);
+						(const void*)(uintptr_t)element.offset));
 				}
 				else
 				{
-					glVertexAttribPointer(vertexBufferIndex,
+					MH_GL_CALL(glVertexAttribPointer(vertexBufferIndex,
 						element.getComponentCount(),
 						type,
 						element.normalized ? GL_TRUE : GL_FALSE,
 						layout.getStride(),
-						(const void*)(uintptr_t)element.offset);
+						(const void*)(uintptr_t)element.offset));
 				}
 				vertexBufferIndex++;
 			}
@@ -103,24 +104,24 @@ namespace Mahakam
 		{
 			for (const auto& element : layout)
 			{
-				glEnableVertexAttribArray(vertexBufferIndex);
+				MH_GL_CALL(glEnableVertexAttribArray(vertexBufferIndex));
 				GLenum type = ShaderDataTypeToOpenGLBaseType(element.type);
 				if (type == GL_INT)
 				{
-					glVertexAttribIPointer(vertexBufferIndex,
+					MH_GL_CALL(glVertexAttribIPointer(vertexBufferIndex,
 						element.getComponentCount(),
 						type,
 						0,
-						(const void*)(uintptr_t)(vertexCount * element.offset));
+						(const void*)(uintptr_t)(vertexCount * element.offset)));
 				}
 				else
 				{
-					glVertexAttribPointer(vertexBufferIndex,
+					MH_GL_CALL(glVertexAttribPointer(vertexBufferIndex,
 						element.getComponentCount(),
 						type,
 						element.normalized ? GL_TRUE : GL_FALSE,
 						0,
-						(const void*)(uintptr_t)(vertexCount * element.offset));
+						(const void*)(uintptr_t)(vertexCount * element.offset)));
 				}
 				vertexBufferIndex++;
 			}
@@ -133,7 +134,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		glBindVertexArray(rendererID);
+		MH_GL_CALL(glBindVertexArray(rendererID));
 		buffer->bind();
 		indexBuffer = buffer;
 	}

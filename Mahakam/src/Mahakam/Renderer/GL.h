@@ -11,8 +11,20 @@ namespace Mahakam
 	private:
 		static RendererAPI* rendererAPI;
 
+		static Ref<Mesh> staticScreenQuad;
+		static Ref<Mesh> staticPyramid;
+		static Ref<Mesh> staticSphereMesh;
+		static Ref<Mesh> staticCubemapMesh;
+
 	public:
 		static void init();
+
+		static void Shutdown();
+
+		inline static Ref<Mesh> GetScreenQuad() { return staticScreenQuad; }
+		inline static Ref<Mesh> GetInvertedPyramid() { return staticPyramid; }
+		inline static Ref<Mesh> GetInvertedSphere() { return staticSphereMesh; }
+		inline static Ref<Mesh> GetInvertedCube() { return staticCubemapMesh; }
 
 		inline static const char* getGraphicsVendor() { return rendererAPI->getGraphicsVendor(); }
 
@@ -33,10 +45,14 @@ namespace Mahakam
 
 		inline static void setBlendMode(RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable) { rendererAPI->setBlendMode(src, dst, enable); }
 
-		inline static void drawScreenQuad() { Mesh::getScreenQuad()->bind(); drawIndexed(Mesh::getScreenQuad()->getIndexCount()); }
+		inline static void drawScreenQuad() { staticScreenQuad->bind(); drawIndexed(staticScreenQuad->getIndexCount()); }
 
 		inline static void drawIndexed(uint32_t indexCount) { rendererAPI->drawIndexed(indexCount); }
 
 		inline static void drawInstanced(uint32_t indexCount, uint32_t count) { rendererAPI->drawInstanced(indexCount, count); }
+
+	private:
+		static Ref<Mesh> CreateScreenQuad();
+		static Ref<Mesh> CreatePyramid();
 	};
 }

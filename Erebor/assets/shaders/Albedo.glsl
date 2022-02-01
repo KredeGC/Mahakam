@@ -53,6 +53,7 @@ layout(binding = 0, location = 0) uniform sampler2D u_Albedo;
 layout(binding = 1, location = 1) uniform sampler2D u_Bump;
 layout(binding = 2, location = 2) uniform sampler2D u_Metallic;
 layout(binding = 3, location = 3) uniform sampler2D u_Roughness;
+layout(binding = 4, location = 4) uniform sampler2D u_Occlussion;
 uniform float u_AO; // ??
 
 void main() {
@@ -61,7 +62,7 @@ void main() {
     vec3 bump = texture(u_Bump, i.v_UV).xyz * 2.0 - 1.0;
     float metallic = texture(u_Metallic, i.v_UV).r;
     float roughness = texture(u_Roughness, i.v_UV).r;
-    float ao = 1.0;
+    float ao = texture(u_Occlussion, i.v_UV).r;
     
     //albedo = pow(albedo, vec3(2.2)); // sRGB correction
     

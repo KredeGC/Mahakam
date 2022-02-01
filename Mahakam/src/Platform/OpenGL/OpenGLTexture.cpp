@@ -1,11 +1,11 @@
 #include "mhpch.h"
+#include "OpenGLBase.h"
 #include "OpenGLTexture.h"
+#include "OpenGLTextureFormats.h"
 
 #include "OpenGLShader.h"
 
-#include "Mahakam/Renderer/Mesh.h"
-
-#include "OpenGLTextureFormats.h"
+#include "Mahakam/Renderer/GL.h"
 
 #include <stb_image.h>
 
@@ -41,14 +41,14 @@ namespace Mahakam
 		switch (wrapMode)
 		{
 		case TextureWrapMode::Repeat:
-			glTextureParameteri(rendererID, axis, GL_REPEAT);
+			MH_GL_CALL(glTextureParameteri(rendererID, axis, GL_REPEAT));
 			break;
 		case TextureWrapMode::Clamp:
-			glTextureParameteri(rendererID, axis, GL_CLAMP_TO_EDGE);
+			MH_GL_CALL(glTextureParameteri(rendererID, axis, GL_CLAMP_TO_EDGE));
 			break;
 		case TextureWrapMode::ClampBorder:
-			glTextureParameterfv(rendererID, GL_TEXTURE_BORDER_COLOR, borderColor);
-			glTextureParameteri(rendererID, axis, GL_CLAMP_TO_BORDER);
+			MH_GL_CALL(glTextureParameterfv(rendererID, GL_TEXTURE_BORDER_COLOR, borderColor));
+			MH_GL_CALL(glTextureParameteri(rendererID, axis, GL_CLAMP_TO_BORDER));
 			break;
 		default:
 			MH_CORE_BREAK("Unsupported TextureWrapMode!");
@@ -61,27 +61,57 @@ namespace Mahakam
 		if (mipmaps)
 		{
 			if (filterMode == TextureFilter::Trilinear)
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+				MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR))
 			else if (filterMode == TextureFilter::Bilinear)
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+				MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST))
 			else
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+				MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST))
 		}
 		else
 		{
 			if (filterMode == TextureFilter::Trilinear)
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
 			else if (filterMode == TextureFilter::Bilinear)
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
 			else
-				glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+				MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST))
 		}
 
 		// Magnification
 		if (filterMode == TextureFilter::Bilinear)
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
 		else
-			glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST))
+	}
+
+	static uint32_t CalculateTextureByteSize(uint32_t rendererID, uint32_t bpp, bool compressed, bool mipmaps, uint32_t width, uint32_t height)
+	{
+		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(width, height))));
+		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
+
+		uint32_t size = 0;
+		for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
+		{
+			uint32_t mipSize;
+			if (compressed)
+			{
+				int compressed_size;
+				MH_GL_CALL(glGetTextureLevelParameteriv(rendererID, mip, GL_TEXTURE_COMPRESSED_IMAGE_SIZE, &compressed_size));
+
+				mipSize = compressed_size;
+			}
+			else
+			{
+				uint32_t mipWidth = (uint32_t)(width * std::pow(0.5, mip));
+				uint32_t mipHeight = (uint32_t)(height * std::pow(0.5, mip));
+
+				mipSize = mipWidth * mipHeight * bpp;
+			}
+
+			size += mipSize;
+		}
+
+		return size;
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const TextureProps& props)
@@ -89,12 +119,17 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, false);
-		dataFormat = TextureFormatToOpenGLFormat(this->props.format);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		dataFormat = TextureFormatToOpenGLBaseFormat(this->props.format);
 		formatType = TextureFormatToOpenGLType(this->props.format);
+		compressed = IsTextureFormatCompressed(this->props.format);
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
-		glTextureStorage2D(rendererID, 1, internalFormat, this->props.width, this->props.height);
+		// Create an empty texture
+		MH_GL_CALL(glCreateTextures(GL_TEXTURE_2D, 1, &rendererID));
+		//glBindTexture(GL_TEXTURE_2D, rendererID);
+		//glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, this->props.width, this->props.height, 0, dataFormat, formatType, nullptr);
+		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(props.width, props.height))));
+		MH_GL_CALL(glTextureStorage2D(rendererID, this->props.mipmaps ? mipLevels : 1, internalFormat, this->props.width, this->props.height));
 
 		// Wrap X
 		setWrapMode(rendererID, GL_TEXTURE_WRAP_S, this->props.wrapX);
@@ -106,10 +141,15 @@ namespace Mahakam
 		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
+			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
+
+		// Calculate the size
+		uint32_t bpp = TextureFormatToByteSize(this->props.format);
+		size = CalculateTextureByteSize(rendererID, bpp, false, false, this->props.width, this->props.height);
+		totalSize = CalculateTextureByteSize(rendererID, bpp, false, this->props.mipmaps, this->props.width, this->props.height);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath, bool sRGB, const TextureProps& props)
+	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath, const TextureProps& props)
 		: filepath(filepath), props(props)
 	{
 		MH_PROFILE_FUNCTION();
@@ -120,22 +160,22 @@ namespace Mahakam
 		this->props.width = w;
 		this->props.height = h;
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, sRGB);
-		dataFormat = ChannelCountToOpenGLFormat(channels);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		dataFormat = ChannelCountToOpenGLBaseFormat(channels);
 		formatType = TextureFormatToOpenGLType(this->props.format);
+		compressed = IsTextureFormatCompressed(this->props.format);
 
 		MH_CORE_ASSERT(internalFormat && dataFormat, "Format not supported!");
 
-		// TODO: sRGB correction
+		// Create and populate the texture
+		MH_GL_CALL(glCreateTextures(GL_TEXTURE_2D, 1, &rendererID));
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_2D, rendererID));
+		MH_GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, this->props.width, this->props.height, 0, dataFormat, formatType, data));
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &rendererID);
-		glBindTexture(GL_TEXTURE_2D, rendererID);
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, this->props.width, this->props.height, 0, dataFormat, formatType, data);
-
-		if (channels == 2) // Look some more into this, but keep it for now
+		if (channels == 2) // TODO: Look some more into this, but keep it for now
 		{
 			const GLint swizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_GREEN };
-			glTextureParameteriv(rendererID, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+			MH_GL_CALL(glTextureParameteriv(rendererID, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask));
 		}
 
 		// Wrap X
@@ -148,7 +188,12 @@ namespace Mahakam
 		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
+			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
+
+		// Calculate the size
+		uint32_t bpp = TextureFormatToByteSize(this->props.format);
+		size = CalculateTextureByteSize(rendererID, bpp, compressed, false, this->props.width, this->props.height);
+		totalSize = CalculateTextureByteSize(rendererID, bpp, compressed, this->props.mipmaps, this->props.width, this->props.height);
 
 		stbi_image_free(data);
 	}
@@ -157,70 +202,114 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		glDeleteTextures(1, &rendererID);
+		MH_GL_CALL(glDeleteTextures(1, &rendererID));
 	}
 
-	void OpenGLTexture2D::setData(void* data, bool mipmaps)
+	void OpenGLTexture2D::setData(void* data, uint32_t size, bool mipmaps)
 	{
 		MH_PROFILE_FUNCTION();
 
-		glTextureSubImage2D(rendererID, 0, 0, 0, props.width, props.height, dataFormat, formatType, data);
+		MH_CORE_ASSERT(!mipmaps || !compressed, "Compressed mipmaps are currently not supported!");
 
-		if (props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
+		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(props.width, props.height))));
+		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
+
+		uint32_t offset = 0;
+		for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
+		{
+			uint32_t mipWidth = (uint32_t)(props.width * std::pow(0.5, mip));
+			uint32_t mipHeight = (uint32_t)(props.height * std::pow(0.5, mip));
+
+			if (compressed)
+				MH_GL_CALL(glCompressedTextureSubImage2D(rendererID, mip, 0, 0, mipWidth, mipHeight, dataFormat, size, (char*)data + offset))
+			else
+				MH_GL_CALL(glTextureSubImage2D(rendererID, mip, 0, 0, mipWidth, mipHeight, dataFormat, formatType, (char*)data + offset));
+
+			offset += size;
+			size /= 4;
+		}
+
+		if (props.mipmaps && !mipmaps)
+			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
 	}
 
 	void OpenGLTexture2D::bind(uint32_t slot) const
 	{
-		glBindTextureUnit(slot, rendererID);
+		MH_GL_CALL(glBindTextureUnit(slot, rendererID));
 	}
 
 	void OpenGLTexture2D::readPixels(void* pixels, bool mipmaps)
 	{
-		// TODO: Make mips work
-		MH_CORE_ASSERT(!mipmaps, "Mip maps not supported!");
-
 		MH_PROFILE_FUNCTION();
 
 		uint32_t bpp = TextureFormatToByteSize(props.format);
-		uint32_t size = props.width * props.height * bpp;
 
-		glGetTextureImage(rendererID, 0, dataFormat, formatType, size, pixels);
+		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(props.width, props.height))));
+		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
+
+		uint32_t offset = 0;
+		for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
+		{
+			uint32_t mipSize;
+			if (compressed)
+			{
+				int compressed_size;
+				MH_GL_CALL(glGetTextureLevelParameteriv(rendererID, mip, GL_TEXTURE_COMPRESSED_IMAGE_SIZE, &compressed_size));
+
+				mipSize = compressed_size;
+
+				MH_GL_CALL(glGetCompressedTextureImage(rendererID, mip, mipSize, (char*)pixels + offset));
+			}
+			else
+			{
+				uint32_t mipWidth = (uint32_t)(this->props.width * std::pow(0.5, mip));
+				uint32_t mipHeight = (uint32_t)(this->props.height * std::pow(0.5, mip));
+
+				mipSize = mipWidth * mipHeight * bpp;
+				MH_GL_CALL(glGetTextureImage(rendererID, mip, dataFormat, formatType, mipSize, (char*)pixels + offset));
+			}
+
+			offset += mipSize;
+		}
 	}
 
 
-
-	static Ref<Mesh> cubeMesh;
 
 	OpenGLTextureCube::OpenGLTextureCube(const CubeTextureProps& props)
 		: props(props)
 	{
 		MH_PROFILE_FUNCTION();
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, false);
-		dataFormat = TextureFormatToOpenGLFormat(this->props.format);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		dataFormat = TextureFormatToOpenGLBaseFormat(this->props.format);
 		formatType = TextureFormatToOpenGLType(this->props.format);
+		compressed = IsTextureFormatCompressed(this->props.format);
 
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &rendererID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID);
+		MH_GL_CALL(glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &rendererID));
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID));
 
 		for (uint32_t i = 0; i < 6; ++i)
 		{
 			// note that we store each face with 16 bit floating point values
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
-				this->props.resolution, this->props.resolution, 0, dataFormat, formatType, nullptr);
+			MH_GL_CALL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
+				this->props.resolution, this->props.resolution, 0, dataFormat, formatType, nullptr));
 		}
 
 		// Wrap mode doesn't make sense on a cubemap
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 
 		// Filter mode & mipmaps
 		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
+			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
+
+		// Calculate the size
+		uint32_t bpp = TextureFormatToByteSize(this->props.format);
+		size = CalculateTextureByteSize(rendererID, bpp, false, false, this->props.resolution, this->props.resolution);
+		totalSize = 6 * CalculateTextureByteSize(rendererID, bpp, false, this->props.mipmaps, this->props.resolution, this->props.resolution);
 	}
 
 	OpenGLTextureCube::OpenGLTextureCube(const std::string& filepath, const CubeTextureProps& props)
@@ -228,61 +317,59 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		if (!cubeMesh)
-			cubeMesh = Mesh::createCube(2, true);
-
 		int w, h, channels, hdr;
 		void* data = loadImageFile(this->filepath.c_str(), &w, &h, &channels, &hdr);
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, false);
-		dataFormat = ChannelCountToOpenGLFormat(channels);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		dataFormat = ChannelCountToOpenGLBaseFormat(channels);
 		formatType = TextureFormatToOpenGLType(this->props.format);
+		compressed = IsTextureFormatCompressed(this->props.format);
 
 		uint32_t hdrID;
-		glGenTextures(1, &hdrID);
-		glBindTexture(GL_TEXTURE_2D, hdrID);
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, dataFormat, hdr ? GL_FLOAT : formatType, data);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		MH_GL_CALL(glGenTextures(1, &hdrID));
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_2D, hdrID));
+		MH_GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, dataFormat, hdr ? GL_FLOAT : formatType, data));
+		
+		MH_GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+		
+		MH_GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+		MH_GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+		MH_GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
 		stbi_image_free(data);
 
 
 		// Create framebuffer
 		uint32_t captureFBO, captureRBO;
-		glGenFramebuffers(1, &captureFBO);
-		glGenRenderbuffers(1, &captureRBO);
+		MH_GL_CALL(glGenFramebuffers(1, &captureFBO));
+		MH_GL_CALL(glGenRenderbuffers(1, &captureRBO));
 
-		glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-		glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, this->props.resolution, this->props.resolution);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, captureFBO));
+		MH_GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, captureRBO));
+		MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, this->props.resolution, this->props.resolution));
+		MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO));
 
 
 		// Create cubemap
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &rendererID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID);
+		MH_GL_CALL(glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &rendererID));
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID));
 		for (uint32_t i = 0; i < 6; ++i)
 		{
 			// note that we store each face with 16 bit floating point values
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
-				this->props.resolution, this->props.resolution, 0, dataFormat, formatType, nullptr);
+			MH_GL_CALL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
+				this->props.resolution, this->props.resolution, 0, dataFormat, formatType, nullptr));
 		}
 
 		// Wrap
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 
 		// Filter mode & mipmaps
 		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
+			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
 
 
 		// Create matrices
@@ -304,40 +391,45 @@ namespace Mahakam
 		equiToCubeShader.setUniformInt("equirectangularMap", 0);
 		equiToCubeShader.setUniformMat4("projection", captureProjection);
 
-		glBindTextureUnit(0, hdrID);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, hdrID);
+		MH_GL_CALL(glBindTextureUnit(0, hdrID));
+		MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_2D, hdrID));
 
 		GLint viewport[4];
-		glGetIntegerv(GL_VIEWPORT, viewport);
-		glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+		MH_GL_CALL(glGetIntegerv(GL_VIEWPORT, viewport));
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, captureFBO));
 
-		glViewport(0, 0, this->props.resolution, this->props.resolution); // don't forget to configure the viewport to the capture dimensions.
+		MH_GL_CALL(glViewport(0, 0, this->props.resolution, this->props.resolution));
 		for (unsigned int i = 0; i < 6; ++i)
 		{
 			equiToCubeShader.setUniformMat4("view", captureViews[i]);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, 0);
+			MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, 0));
 
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			MH_GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-			cubeMesh->bind();
-			glDrawElements(GL_TRIANGLES, cubeMesh->getIndexCount(), GL_UNSIGNED_INT, nullptr);
-			cubeMesh->unbind();
+			GL::GetInvertedCube()->bind();
+			MH_GL_CALL(glDrawElements(GL_TRIANGLES, GL::GetInvertedCube()->getIndexCount(), GL_UNSIGNED_INT, nullptr));
+			GL::GetInvertedCube()->unbind();
 		}
 
 
-		// Generate mipmaps if not convoluting
+		// Generate mipmaps
 		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
+			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+		// Calculate the size
+		uint32_t bpp = TextureFormatToByteSize(this->props.format);
+		size = CalculateTextureByteSize(rendererID, bpp, compressed, false, this->props.resolution, this->props.resolution);
+		totalSize = 6 * CalculateTextureByteSize(rendererID, bpp, compressed, this->props.mipmaps, this->props.resolution, this->props.resolution);
+
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+		MH_GL_CALL(glViewport(viewport[0], viewport[1], viewport[2], viewport[3]));
 
 
 		// Delete buffer
-		glDeleteTextures(1, &hdrID);
-		glDeleteFramebuffers(1, &captureFBO);
-		glDeleteRenderbuffers(1, &captureRBO);
+		MH_GL_CALL(glDeleteTextures(1, &hdrID));
+		MH_GL_CALL(glDeleteFramebuffers(1, &captureFBO));
+		MH_GL_CALL(glDeleteRenderbuffers(1, &captureRBO));
 	}
 
 	OpenGLTextureCube::OpenGLTextureCube(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
@@ -345,44 +437,39 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		if (!cubeMesh)
-			cubeMesh = Mesh::createCube(2, true);
-
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format, false);
-		dataFormat = TextureFormatToOpenGLFormat(this->props.format);
-		formatType = TextureFormatToOpenGLType(this->props.format);
+		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		dataFormat = TextureFormatToOpenGLBaseFormat(this->props.format); //std::static_pointer_cast<OpenGLTextureCube>(cubemap)->dataFormat;
+		formatType = TextureFormatToOpenGLType(this->props.format); //std::static_pointer_cast<OpenGLTextureCube>(cubemap)->formatType;
+		compressed = IsTextureFormatCompressed(this->props.format);
 
 		// Create framebuffer
 		uint32_t captureFBO, captureRBO;
-		glGenFramebuffers(1, &captureFBO);
-		glGenRenderbuffers(1, &captureRBO);
+		MH_GL_CALL(glGenFramebuffers(1, &captureFBO));
+		MH_GL_CALL(glGenRenderbuffers(1, &captureRBO));
 
-		glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-		glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, this->props.resolution, this->props.resolution);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, captureFBO));
+		MH_GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, captureRBO));
+		MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, this->props.resolution, this->props.resolution));
+		MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO));
 
 
 		// Create cubemap
-		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &rendererID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID);
+		MH_GL_CALL(glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &rendererID));
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID));
 		for (uint32_t i = 0; i < 6; ++i)
 		{
 			// note that we store each face with 16 bit floating point values
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
-				this->props.resolution, this->props.resolution, 0, dataFormat, formatType, nullptr);
+			MH_GL_CALL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat,
+				this->props.resolution, this->props.resolution, 0, dataFormat, formatType, nullptr));
 		}
 
 		// Wrap
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 
 		// Filter mode & mipmaps
 		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
-
-		if (this->props.mipmaps)
-			glGenerateTextureMipmap(rendererID);
 
 
 		// Create matrices
@@ -409,17 +496,17 @@ namespace Mahakam
 		equiToCubeShader.setUniformInt("environmentMap", 0);
 		equiToCubeShader.setUniformMat4("projection", captureProjection);
 
-		glBindTextureUnit(0, cubemap->getRendererID());
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->getRendererID());
+		MH_GL_CALL(glBindTextureUnit(0, cubemap->getRendererID()));
+		MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->getRendererID()));
 
 		GLint viewport[4];
-		glGetIntegerv(GL_VIEWPORT, viewport);
-		glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+		MH_GL_CALL(glGetIntegerv(GL_VIEWPORT, viewport));
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, captureFBO));
 
 		if (this->props.mipmaps && prefilter == TextureCubePrefilter::Prefilter)
 		{
-			glGenerateTextureMipmap(rendererID);
+			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
 
 			unsigned int maxMipLevels = 5;
 			for (unsigned int mip = 0; mip < maxMipLevels; ++mip)
@@ -427,68 +514,74 @@ namespace Mahakam
 				// Resize framebuffer according to mip-level size.
 				uint32_t mipWidth = (uint32_t)(this->props.resolution * std::pow(0.5, mip));
 				uint32_t mipHeight = (uint32_t)(this->props.resolution * std::pow(0.5, mip));
-				glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
-				glViewport(0, 0, mipWidth, mipHeight);
+				MH_GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, captureRBO));
+				MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight));
+				MH_GL_CALL(glViewport(0, 0, mipWidth, mipHeight));
 
 				float roughness = (float)mip / (float)(maxMipLevels - 1);
 				equiToCubeShader.setUniformFloat("roughness", roughness);
 				for (unsigned int i = 0; i < 6; ++i)
 				{
 					equiToCubeShader.setUniformMat4("view", captureViews[i]);
-					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, mip);
+					MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, mip));
 
-					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+					MH_GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-					cubeMesh->bind();
-					glDrawElements(GL_TRIANGLES, cubeMesh->getIndexCount(), GL_UNSIGNED_INT, nullptr);
-					cubeMesh->unbind();
+					GL::GetInvertedCube()->bind();
+					MH_GL_CALL(glDrawElements(GL_TRIANGLES, GL::GetInvertedCube()->getIndexCount(), GL_UNSIGNED_INT, nullptr));
+					GL::GetInvertedCube()->unbind();
 				}
 			}
 		}
 		else
 		{
-			glViewport(0, 0, this->props.resolution, this->props.resolution); // don't forget to configure the viewport to the capture dimensions.
+			MH_GL_CALL(glViewport(0, 0, this->props.resolution, this->props.resolution)); // don't forget to configure the viewport to the capture dimensions.
 			for (unsigned int i = 0; i < 6; ++i)
 			{
 				equiToCubeShader.setUniformMat4("view", captureViews[i]);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, 0);
+				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, 0));
 
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				MH_GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-				cubeMesh->bind();
-				glDrawElements(GL_TRIANGLES, cubeMesh->getIndexCount(), GL_UNSIGNED_INT, nullptr);
-				cubeMesh->unbind();
+				GL::GetInvertedCube()->bind();
+				MH_GL_CALL(glDrawElements(GL_TRIANGLES, GL::GetInvertedCube()->getIndexCount(), GL_UNSIGNED_INT, nullptr));
+				GL::GetInvertedCube()->unbind();
 			}
 		}
 
-
-		// Generate mipmaps if not convoluting
-		if (this->props.mipmaps && prefilter != TextureCubePrefilter::Prefilter)
-			glGenerateTextureMipmap(rendererID);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+		MH_GL_CALL(glViewport(viewport[0], viewport[1], viewport[2], viewport[3]));
 
 
 		// Delete buffer
-		glDeleteFramebuffers(1, &captureFBO);
-		glDeleteRenderbuffers(1, &captureRBO);
+		MH_GL_CALL(glDeleteFramebuffers(1, &captureFBO));
+		MH_GL_CALL(glDeleteRenderbuffers(1, &captureRBO));
+
+
+		// Generate mipmaps if not prefiltering
+		if (this->props.mipmaps && prefilter != TextureCubePrefilter::Prefilter)
+			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
+
+		// Calculate the size
+		uint32_t bpp = TextureFormatToByteSize(this->props.format);
+		size = CalculateTextureByteSize(rendererID, bpp, compressed, false, this->props.resolution, this->props.resolution);
+		totalSize = 6 * CalculateTextureByteSize(rendererID, bpp, compressed, this->props.mipmaps, this->props.resolution, this->props.resolution);
 	}
 
 	OpenGLTextureCube::~OpenGLTextureCube()
 	{
 		MH_PROFILE_FUNCTION();
 
-		glDeleteTextures(1, &rendererID);
+		MH_GL_CALL(glDeleteTextures(1, &rendererID));
 	}
 
-	void OpenGLTextureCube::setData(void* data, bool mipmaps)
+	void OpenGLTextureCube::setData(void* data, uint32_t size, bool mipmaps)
 	{
 		MH_PROFILE_FUNCTION();
 
-		uint32_t bpp = TextureFormatToByteSize(props.format);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID);
+		MH_CORE_ASSERT(!mipmaps || !compressed, "Compressed mipmaps are currently not supported!");
+
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID));
 
 		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(props.resolution)));
 		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
@@ -500,40 +593,84 @@ namespace Mahakam
 
 			for (uint32_t i = 0; i < 6; ++i)
 			{
-				glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mip, 0, 0,
-					mipResolution, mipResolution, dataFormat, formatType, (char*)data + offset);
+				if (compressed)
+					MH_GL_CALL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mip, 0, 0, mipResolution, mipResolution, dataFormat, size, (char*)data + offset))
+				else
+					MH_GL_CALL(glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mip, 0, 0, mipResolution, mipResolution, dataFormat, formatType, (char*)data + offset))
 
-				offset += mipResolution * mipResolution * bpp;
+				offset += size;
 			}
+
+			size /= 4;
 		}
 
 		if (props.mipmaps && !mipmaps)
-			glGenerateTextureMipmap(rendererID);
+			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
 	}
 
 	void OpenGLTextureCube::bind(uint32_t slot) const
 	{
-		glBindTextureUnit(slot, rendererID);
+		MH_GL_CALL(glBindTextureUnit(slot, rendererID));
 	}
 
 	void OpenGLTextureCube::readPixels(void* pixels, bool mipmaps)
 	{
+		// TODO: Fix to work with compressed formats
+
 		MH_PROFILE_FUNCTION();
+
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, rendererID));
 
 		uint32_t bpp = TextureFormatToByteSize(props.format);
 
-		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(props.resolution)));
+		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(props.resolution))); // Should be +1, but it DOESN'T FUCKING WORK
 		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
 
 		uint32_t offset = 0;
 		for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
 		{
-			uint32_t mipResolution = (uint32_t)(this->props.resolution * std::pow(0.5, mip));
-			uint32_t size = 6 * mipResolution * mipResolution * bpp;
+			uint32_t mipResolution = (uint32_t)(props.resolution * std::pow(0.5, mip));
+			uint32_t size = mipResolution * mipResolution * bpp;
 
-			glGetTextureImage(rendererID, mip, dataFormat, formatType, size, (char*)pixels + offset);
+			for (uint32_t i = 0; i < 6; ++i)
+			{
+				MH_GL_CALL(glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mip, dataFormat, formatType, (char*)pixels + offset));
 
-			offset += size;
+				offset += size;
+			}
 		}
+
+
+		/*MH_PROFILE_FUNCTION();
+
+		uint32_t bpp = TextureFormatToByteSize(props.format);
+
+		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(props.width, props.height))));
+		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
+
+		uint32_t offset = 0;
+		for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
+		{
+			uint32_t mipSize;
+			if (compressed)
+			{
+				int compressed_size;
+				glGetTextureLevelParameteriv(rendererID, mip, GL_TEXTURE_COMPRESSED_IMAGE_SIZE, &compressed_size);
+
+				mipSize = compressed_size;
+
+				glGetCompressedTextureImage(rendererID, mip, mipSize, (char*)pixels + offset);
+			}
+			else
+			{
+				uint32_t mipWidth = (uint32_t)(this->props.width * std::pow(0.5, mip));
+				uint32_t mipHeight = (uint32_t)(this->props.height * std::pow(0.5, mip));
+
+				mipSize = mipWidth * mipHeight * bpp;
+				glGetTextureImage(rendererID, mip, dataFormat, formatType, mipSize, (char*)pixels + offset);
+			}
+
+			offset += mipSize;
+		}*/
 	}
 }

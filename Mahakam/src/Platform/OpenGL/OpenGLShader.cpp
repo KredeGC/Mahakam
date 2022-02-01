@@ -1,4 +1,5 @@
 #include "mhpch.h"
+#include "OpenGLBase.h"
 #include "OpenGLShader.h"
 
 #include "OpenGLShaderDataTypes.h"
@@ -83,7 +84,7 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		for (auto& pair : shaderVariants)
-			glDeleteProgram(pair.second);
+			MH_GL_CALL(glDeleteProgram(pair.second));
 	}
 
 	void OpenGLShader::bind(const std::string& variant)
@@ -91,7 +92,7 @@ namespace Mahakam
 		uint32_t program = shaderVariants.at(variant);
 		rendererID = program;
 
-		glUseProgram(program);
+		MH_GL_CALL(glUseProgram(program));
 	}
 
 	void OpenGLShader::setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
@@ -102,42 +103,44 @@ namespace Mahakam
 
 	void OpenGLShader::setTexture(const std::string& name, Ref<Texture> tex)
 	{
-		glBindTextureUnit(getUniformLocation(name), tex->getRendererID());
+		int slot = getUniformLocation(name);
+		if (slot != -1)
+			MH_GL_CALL(glBindTextureUnit(slot, tex->getRendererID()));
 	}
 
 	void OpenGLShader::setUniformMat3(const std::string& name, const glm::mat3& value)
 	{
-		glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+		MH_GL_CALL(glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
 	}
 
 	void OpenGLShader::setUniformMat4(const std::string& name, const glm::mat4& value)
 	{
-		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
+		MH_GL_CALL(glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
 	}
 
 	void OpenGLShader::setUniformInt(const std::string& name, int value)
 	{
-		glUniform1i(getUniformLocation(name), value);
+		MH_GL_CALL(glUniform1i(getUniformLocation(name), value));
 	}
 
 	void OpenGLShader::setUniformFloat(const std::string& name, float value)
 	{
-		glUniform1f(getUniformLocation(name), value);
+		MH_GL_CALL(glUniform1f(getUniformLocation(name), value));
 	}
 
 	void OpenGLShader::setUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
-		glUniform2f(getUniformLocation(name), value.x, value.y);
+		MH_GL_CALL(glUniform2f(getUniformLocation(name), value.x, value.y));
 	}
 
 	void OpenGLShader::setUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
-		glUniform3f(getUniformLocation(name), value.x, value.y, value.z);
+		MH_GL_CALL(glUniform3f(getUniformLocation(name), value.x, value.y, value.z));
 	}
 
 	void OpenGLShader::setUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
-		glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w);
+		MH_GL_CALL(glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w));
 	}
 
 	uint32_t OpenGLShader::compile(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
@@ -162,21 +165,21 @@ namespace Mahakam
 			GLuint shader = glCreateShader(type);
 
 			const char* sourceC = source.c_str();
-			glShaderSource(shader, 1, &sourceC, 0);
+			MH_GL_CALL(glShaderSource(shader, 1, &sourceC, 0));
 
-			glCompileShader(shader);
+			MH_GL_CALL(glCompileShader(shader));
 
 			GLint isCompiled = 0;
-			glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+			MH_GL_CALL(glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled));
 			if (isCompiled == GL_FALSE)
 			{
 				GLint maxLength = 0;
-				glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+				MH_GL_CALL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength));
 
 				std::vector<GLchar> infoLog(maxLength);
-				glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
+				MH_GL_CALL(glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]));
 
-				glDeleteShader(shader);
+				MH_GL_CALL(glDeleteShader(shader));
 
 				MH_CORE_ERROR("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, infoLog.data());
 				MH_CORE_ASSERT(false, "Shader failed to compile!");
@@ -184,26 +187,26 @@ namespace Mahakam
 				break;
 			}
 
-			glAttachShader(program, shader);
+			MH_GL_CALL(glAttachShader(program, shader));
 			shaderIDs[index++] = shader;
 		}
 
-		glLinkProgram(program);
+		MH_GL_CALL(glLinkProgram(program));
 
 		GLint isLinked = 0;
-		glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked);
+		MH_GL_CALL(glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked));
 		if (isLinked == GL_FALSE)
 		{
 			GLint maxLength = 0;
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+			MH_GL_CALL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength));
 
 			std::vector<GLchar> infoLog(maxLength);
-			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+			MH_GL_CALL(glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]));
 
-			glDeleteProgram(program);
+			MH_GL_CALL(glDeleteProgram(program));
 
 			for (auto& id : shaderIDs)
-				glDeleteShader(id);
+				MH_GL_CALL(glDeleteShader(id));
 
 			MH_CORE_ERROR("{0}\r\n\r\n{1}", directives, infoLog.data());
 			MH_CORE_ASSERT(false, "Shader failed to link!");
@@ -212,7 +215,7 @@ namespace Mahakam
 		}
 
 		for (int i = 0; i < sources.size(); i++)
-			glDetachShader(program, shaderIDs[i]);
+			MH_GL_CALL(glDetachShader(program, shaderIDs[i]));
 
 
 		if (properties.elements.empty())
@@ -220,13 +223,13 @@ namespace Mahakam
 			MH_CORE_INFO("Loading properties for shader: {0}", name);
 
 			GLint numUniforms = 0;
-			glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms);
+			MH_GL_CALL(glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms));
 			const GLenum props[4] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION };
 
 			for (int unif = 0; unif < numUniforms; ++unif)
 			{
 				GLint values[4];
-				glGetProgramResourceiv(program, GL_UNIFORM, unif, 4, props, 4, NULL, values);
+				MH_GL_CALL(glGetProgramResourceiv(program, GL_UNIFORM, unif, 4, props, 4, NULL, values));
 
 				// Skip any uniforms that are in a block.
 				if (values[0] != -1)
@@ -235,7 +238,7 @@ namespace Mahakam
 				// Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
 				// C++11 would let you use a std::string directly.
 				std::vector<char> nameData(values[2]);
-				glGetProgramResourceName(program, GL_UNIFORM, unif, (GLsizei)nameData.size(), NULL, &nameData[0]);
+				MH_GL_CALL(glGetProgramResourceName(program, GL_UNIFORM, unif, (GLsizei)nameData.size(), NULL, &nameData[0]));
 				std::string name(nameData.begin(), nameData.end() - 1);
 
 				ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
@@ -342,6 +345,8 @@ namespace Mahakam
 
 		if (uniformID != -1)
 			uniformIDCache[name] = uniformID;
+		else
+			MH_CORE_WARN("Uniform {0} unused or optimized away", name);
 
 		return uniformID;
 	}

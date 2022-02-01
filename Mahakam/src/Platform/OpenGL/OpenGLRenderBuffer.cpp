@@ -1,4 +1,5 @@
 #include "mhpch.h"
+#include "OpenGLBase.h"
 #include "OpenGLRenderBuffer.h"
 
 #include "OpenGLTextureFormats.h"
@@ -8,16 +9,16 @@
 namespace Mahakam
 {
 	OpenGLRenderBuffer::OpenGLRenderBuffer(uint32_t width, uint32_t height, TextureFormat format)
-		: width(width), height(height)
+		: width(width), height(height), size(width * height * TextureFormatToByteSize(format))
 	{
-		internalFormat = TextureFormatToOpenGLInternalFormat(format, false);
+		internalFormat = TextureFormatToOpenGLInternalFormat(format);
 
-		glCreateRenderbuffers(1, &rendererID);
-		glNamedRenderbufferStorage(rendererID, internalFormat, width, height);
+		MH_GL_CALL(glCreateRenderbuffers(1, &rendererID));
+		MH_GL_CALL(glNamedRenderbufferStorage(rendererID, internalFormat, width, height));
 	}
 
 	OpenGLRenderBuffer::~OpenGLRenderBuffer()
 	{
-		glDeleteRenderbuffers(1, &rendererID);
+		MH_GL_CALL(glDeleteRenderbuffers(1, &rendererID));
 	}
 }

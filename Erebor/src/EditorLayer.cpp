@@ -36,6 +36,31 @@ namespace Mahakam
 			float speed = 20.0f * dt;
 			float rotationSpeed = dt;
 
+			glm::vec3 eulerAngles = transform.getEulerAngles();
+
+			// Camera rotation
+			if (Input::isKeyPressed(MH_KEY_LEFT))
+			{
+				eulerAngles.y += rotationSpeed;
+				transform.setEulerangles(eulerAngles);
+			}
+			else if (Input::isKeyPressed(MH_KEY_RIGHT))
+			{
+				eulerAngles.y -= rotationSpeed;
+				transform.setEulerangles(eulerAngles);
+			}
+
+			if (Input::isKeyPressed(MH_KEY_UP))
+			{
+				eulerAngles.x += rotationSpeed;
+				transform.setEulerangles(eulerAngles);
+			}
+			else if (Input::isKeyPressed(MH_KEY_DOWN))
+			{
+				eulerAngles.x -= rotationSpeed;
+				transform.setEulerangles(eulerAngles);
+			}
+
 			// Camera movement
 			if (Input::isKeyPressed(MH_KEY_A))
 				transform.setPosition(transform.getPosition() - glm::vec3(speed) * transform.getRight());
@@ -46,19 +71,43 @@ namespace Mahakam
 				transform.setPosition(transform.getPosition() - glm::vec3(speed) * transform.getForward());
 			else if (Input::isKeyPressed(MH_KEY_S))
 				transform.setPosition(transform.getPosition() + glm::vec3(speed) * transform.getForward());
-
-			// Camera rotation
-			if (Input::isKeyPressed(MH_KEY_LEFT))
-				transform.setRotation(transform.getRotation() * glm::quat({ 0.0f, rotationSpeed, 0.0f }));
-			else if (Input::isKeyPressed(MH_KEY_RIGHT))
-				transform.setRotation(transform.getRotation() * glm::quat({ 0.0f, -rotationSpeed, 0.0f }));
-
-			if (Input::isKeyPressed(MH_KEY_UP))
-				transform.setRotation(transform.getRotation() * glm::quat({ rotationSpeed, 0.0f, 0.0f }));
-			else if (Input::isKeyPressed(MH_KEY_DOWN))
-				transform.setRotation(transform.getRotation() * glm::quat({ -rotationSpeed, 0.0f, 0.0f }));
 		}
 	};
+
+	static Ref<Texture> loadOrCreateTexture(const std::string& cachePath, const std::string& src, bool saveMips, const TextureProps& props)
+	{
+		if (!std::filesystem::exists(cachePath))
+		{
+			Ref<Texture2D> texture = Texture2D::create(src, props);
+
+			uint32_t size = texture->getSize();
+			uint32_t totalSize = texture->getTotalSize();
+
+			// Save to cache
+			char* pixels = new char[totalSize];
+			texture->readPixels(pixels, saveMips);
+			std::ofstream stream(cachePath, std::ios::binary);
+			stream.write((char*)&size, sizeof(uint32_t));
+			stream.write(pixels, totalSize);
+
+			delete[] pixels;
+
+			return texture;
+		}
+		else
+		{
+			// Load from cache
+			std::ifstream inStream(cachePath, std::ios::binary);
+			std::stringstream ss;
+			uint32_t size = 0;
+			inStream.read((char*)&size, sizeof(uint32_t));
+			ss << inStream.rdbuf();
+			Ref<Texture> lut = Texture2D::create(props);
+			lut->setData((void*)ss.str().c_str(), size, saveMips);
+
+			return lut;
+		}
+	}
 
 	void EditorLayer::onAttach()
 	{
@@ -96,9 +145,10 @@ namespace Mahakam
 
 
 		// Setup plane
-		Ref<Texture> brickAlbedo = Texture2D::create("assets/textures/brick/brick_albedo.png", true, { TextureFormat::RGB8, TextureFilter::Point });
-		Ref<Texture> brickBump = Texture2D::create("assets/textures/brick/brick_bump.png", false, { TextureFormat::RGB8, TextureFilter::Point });
-		Ref<Texture> brickRoughness = Texture2D::create("assets/textures/brick/brick_albedo.png", false, { TextureFormat::R8, TextureFilter::Point });
+		Ref<Texture> brickAlbedo = loadOrCreateTexture("assets/textures/brick/brick_albedo.dat", "assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGBDXT1, TextureFilter::Point });
+		//Ref<Texture> brickAlbedo = Texture2D::create("assets/textures/brick/brick_albedo.png", { TextureFormat::SRGBDXT1, TextureFilter::Point });
+		Ref<Texture> brickBump = Texture2D::create("assets/textures/brick/brick_bump.png", { TextureFormat::RGB8, TextureFilter::Point });
+		Ref<Texture> brickRoughness = Texture2D::create("assets/textures/brick/brick_albedo.png", { TextureFormat::R8, TextureFilter::Point });
 		Ref<Mesh> planeMesh = Mesh::createPlane(2, 2);
 
 		Ref<Material> planeMaterial = Material::create(textureShader);
@@ -117,23 +167,26 @@ namespace Mahakam
 		SkinnedMesh backpackModel = Mesh::loadModel("assets/models/backpack.obj");
 
 		// Create backpack textures
-		Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg");
-		Ref<Texture> backpackBump = Texture2D::create("assets/textures/backpack/normal.png", false);
-		Ref<Texture> backpackMetallic = Texture2D::create("assets/textures/backpack/specular.jpg", false, TextureFormat::R8);
-		Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", false, TextureFormat::R8);
+		//Ref<Texture> backpackDiffuse = loadOrCreateTexture("assets/textures/backpack/diffuse.dat", "assets/textures/backpack/diffuse.jpg", true, TextureFormat::SRGBDXT1);
+		//Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg", TextureFormat::SRGBDXT1);
+		//Ref<Texture> backpackOcclussion = Texture2D::create("assets/textures/backpack/ao.jpg", TextureFormat::R8);
+		//Ref<Texture> backpackBump = Texture2D::create("assets/textures/backpack/normal.png");
+		//Ref<Texture> backpackMetallic = Texture2D::create("assets/textures/backpack/specular.jpg", TextureFormat::R8);
+		//Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", TextureFormat::R8);
 
-		// Create backpack material
-		Ref<Material> backpackMaterial = Material::create(textureShader);
-		backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
-		backpackMaterial->setTexture("u_Bump", 0, backpackBump);
-		backpackMaterial->setTexture("u_Metallic", 0, backpackMetallic);
-		backpackMaterial->setTexture("u_Roughness", 0, backpackRoughness);
+		//// Create backpack material
+		//Ref<Material> backpackMaterial = Material::create(textureShader);
+		//backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
+		//backpackMaterial->setTexture("u_Bump", 0, backpackBump);
+		//backpackMaterial->setTexture("u_Metallic", 0, backpackMetallic);
+		//backpackMaterial->setTexture("u_Roughness", 0, backpackRoughness);
+		//backpackMaterial->setTexture("u_Occlussion", 0, backpackOcclussion);
 
-		// Create backpack entity
-		Entity backpackEntity = activeScene->createEntity("Bacpack");
-		backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
-		backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
-		backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
+		//// Create backpack entity
+		//Entity backpackEntity = activeScene->createEntity("Bacpack");
+		//backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
+		//backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
+		//backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
 
 
 		// Setup dancing monke
