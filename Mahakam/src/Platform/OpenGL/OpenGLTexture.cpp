@@ -87,7 +87,7 @@ namespace Mahakam
 	static uint32_t CalculateTextureByteSize(uint32_t rendererID, uint32_t bpp, bool compressed, bool mipmaps, uint32_t width, uint32_t height)
 	{
 		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(width, height))));
-		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
+		uint32_t maxMipLevels = (!compressed && mipmaps) ? mipLevels : 1; // TODO: Support compressed mipmaps
 
 		uint32_t size = 0;
 		for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
@@ -191,6 +191,7 @@ namespace Mahakam
 			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
 
 		// Calculate the size
+		dataFormat = TextureFormatToOpenGLBaseFormat(this->props.format); // Should this just be this way by default? idk
 		uint32_t bpp = TextureFormatToByteSize(this->props.format);
 		size = CalculateTextureByteSize(rendererID, bpp, compressed, false, this->props.width, this->props.height);
 		totalSize = CalculateTextureByteSize(rendererID, bpp, compressed, this->props.mipmaps, this->props.width, this->props.height);

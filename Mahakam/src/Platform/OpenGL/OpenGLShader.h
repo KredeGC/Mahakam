@@ -46,7 +46,9 @@ namespace Mahakam
 		virtual void setUniformFloat4(const std::string& name, const glm::vec4& value) override;
 
 	private:
-		uint32_t compile(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives);
+		uint32_t CreateProgram(const std::unordered_map<uint32_t, std::vector<uint32_t>>& sources);
+		std::unordered_map<uint32_t, std::vector<uint32_t>> compile_spirv(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives);
+		uint32_t compile_binary(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives);
 		std::unordered_map<GLenum, std::string> parse(const std::string& source);
 		std::string sortIncludes(const std::string& source);
 		std::string readFile(const std::string& filepath);

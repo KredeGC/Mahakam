@@ -3,6 +3,7 @@
 
 #include "Components.h"
 
+#include "Mahakam/Core/AssetDatabase.h"
 #include "Mahakam/Renderer/Renderer.h"
 
 #include <fstream>
@@ -53,8 +54,10 @@ namespace Mahakam
 	Scene::Scene(const std::string& filepath)
 	{
 		skyboxTexture = TextureCube::create(filepath, { 4096, TextureFormat::RGB16F });
-		skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
-		skyboxSpecular = loadOrCreate(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
+		skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
+		skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
+		//skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
+		//skyboxSpecular = loadOrCreate(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
 
 		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
 		skyboxMaterial = Material::create(skyboxShader);

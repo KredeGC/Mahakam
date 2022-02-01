@@ -3,6 +3,9 @@
 **/bin-obj/
 **/out/
 
+Mahakam/vendor/VulkanSDK/
+Erebor/cache/
+
 Mahakam/vendor/assimp/lib/
 Mahakam/vendor/assimp/generated/
 

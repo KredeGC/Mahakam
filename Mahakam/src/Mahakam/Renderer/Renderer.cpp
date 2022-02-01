@@ -90,7 +90,7 @@ namespace Mahakam
 		brdfLut = loadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.glsl", TextureFormat::RG16F, 512, 512);
 		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.glsl", TextureFormat::R16F, 16, 16);
 
-		spotlightTexture = Texture2D::create("assets/textures/internal/spotlight.png", { TextureFormat::SRGBDXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
+		spotlightTexture = Texture2D::create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
 
 		sceneData->cameraBuffer = UniformBuffer::create(sizeof(CameraData));
 

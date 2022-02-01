@@ -22,7 +22,7 @@ layout(location = 5) in vec4 i_BoneWeights;
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
 
-uniform mat4 finalBonesMatrices[MAX_BONES];
+layout(location = 6) uniform mat4 finalBonesMatrices[MAX_BONES];
 
 void main() {
     // vec4 boneWeights = i_BoneWeights;
@@ -74,7 +74,6 @@ layout(binding = 0, location = 0) uniform sampler2D u_Albedo;
 layout(binding = 1, location = 1) uniform sampler2D u_Bump;
 layout(binding = 2, location = 2) uniform sampler2D u_Metallic;
 layout(binding = 3, location = 3) uniform sampler2D u_Roughness;
-uniform float u_AO; // ??
 
 void main() {
     // Surface values

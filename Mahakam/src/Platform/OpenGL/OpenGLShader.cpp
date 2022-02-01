@@ -4,9 +4,16 @@
 
 #include "OpenGLShaderDataTypes.h"
 
+#include <filesystem>
+#include <fstream>
+
 #include <glad/glad.h>
 
 #include <glm/gtc/type_ptr.hpp>
+
+#include <shaderc/shaderc.hpp>
+#include <spirv_cross/spirv_cross.hpp>
+#include <spirv_cross/spirv_glsl.hpp>
 
 namespace Mahakam
 {
@@ -22,17 +29,47 @@ namespace Mahakam
 		return 0;
 	}
 
+	static shaderc_shader_kind GLShaderStageToShaderC(GLenum stage)
+	{
+		switch (stage)
+		{
+		case GL_VERTEX_SHADER:
+			return shaderc_glsl_vertex_shader;
+		case GL_FRAGMENT_SHADER:
+			return shaderc_glsl_fragment_shader;
+		}
+
+		MH_CORE_BREAK("Shader stage not supported!");
+		return (shaderc_shader_kind)0;
+	}
+
+	static std::string GLShaderStageToFileExtension(GLenum stage)
+	{
+		switch (stage)
+		{
+		case GL_VERTEX_SHADER:
+			return ".vert";
+		case GL_FRAGMENT_SHADER:
+			return ".frag";
+		}
+
+		MH_CORE_BREAK("Shader stage not supported!");
+		return "";
+	}
+
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource) : name(name)
 	{
-		MH_PROFILE_FUNCTION();
+		MH_CORE_BREAK("Hot-loading of shaders is unsupported!");
+
+		/*MH_PROFILE_FUNCTION();
 
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSource;
 		sources[GL_FRAGMENT_SHADER] = fragmentSource;
 
-		uint32_t program = compile(sources, "");
+		uint32_t program = CreateProgram(sources);
 
-		shaderVariants[""] = program;
+		shaderVariants[""] = program;*/
 	}
 
 	OpenGLShader::OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& variants)
@@ -51,31 +88,17 @@ namespace Mahakam
 		// Multiple shader variants
 		for (const std::string& combinedDefines : variants)
 		{
-			std::stringstream definitions;
-
-			// Multiple definitions
-			if (combinedDefines.size() > 0)
-			{
-				std::string delim = ";";
-				size_t start = 0;
-				size_t end = combinedDefines.find(delim);
-				while (end != std::string::npos)
-				{
-					definitions << "#define " << combinedDefines.substr(start, end - start) << std::endl;
-					start = end + delim.length();
-					end = combinedDefines.find(delim, start);
-				}
-
-				definitions << "#define " << combinedDefines.substr(start, end) << std::endl;
-			}
-
 			std::string source = readFile(filepath);
 
 			auto sources = parse(source);
 
-			uint32_t program = compile(sources, definitions.str());
+#ifdef SPIR_V
+			auto compiledSources = compile_spirv(sources, combinedDefines);
 
-			shaderVariants[combinedDefines] = program;
+			shaderVariants[combinedDefines] = CreateProgram(compiledSources);
+#else
+			shaderVariants[combinedDefines] = compile_binary(sources, combinedDefines);
+#endif
 		}
 	}
 
@@ -143,81 +166,284 @@ namespace Mahakam
 		MH_GL_CALL(glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w));
 	}
 
-	uint32_t OpenGLShader::compile(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
+	uint32_t OpenGLShader::CreateProgram(const std::unordered_map<uint32_t, std::vector<uint32_t>>& sources)
 	{
-		MH_PROFILE_FUNCTION();
+		uint32_t program = glCreateProgram();
 
-		MH_CORE_ASSERT(sources.size() <= 4, "Shader source too big!");
-
-		GLuint program = glCreateProgram();
-		GLenum shaderIDs[4];
-
-		int index = 0;
-		for (auto& kv : sources)
+		std::vector<GLuint> shaderIDs;
+		for (auto&& [stage, spirv] : sources)
 		{
-			std::string original = sortIncludes(kv.second);
-			size_t firstNewline = original.find("\n") + 1;
-			std::string version = original.substr(0, firstNewline);
-			std::string body = original.substr(firstNewline, original.size());
-			std::string source = version + directives + body;
-
-			GLenum type = kv.first;
-			GLuint shader = glCreateShader(type);
-
-			const char* sourceC = source.c_str();
-			MH_GL_CALL(glShaderSource(shader, 1, &sourceC, 0));
-
-			MH_GL_CALL(glCompileShader(shader));
-
-			GLint isCompiled = 0;
-			MH_GL_CALL(glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled));
-			if (isCompiled == GL_FALSE)
-			{
-				GLint maxLength = 0;
-				MH_GL_CALL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength));
-
-				std::vector<GLchar> infoLog(maxLength);
-				MH_GL_CALL(glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]));
-
-				MH_GL_CALL(glDeleteShader(shader));
-
-				MH_CORE_ERROR("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, infoLog.data());
-				MH_CORE_ASSERT(false, "Shader failed to compile!");
-
-				break;
-			}
-
-			MH_GL_CALL(glAttachShader(program, shader));
-			shaderIDs[index++] = shader;
+			uint32_t shaderID = shaderIDs.emplace_back(glCreateShader(stage));
+			MH_GL_CALL(glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t)));
+			MH_GL_CALL(glSpecializeShader(shaderID, "main", 0, nullptr, nullptr));
+			MH_GL_CALL(glAttachShader(program, shaderID));
 		}
 
 		MH_GL_CALL(glLinkProgram(program));
 
-		GLint isLinked = 0;
-		MH_GL_CALL(glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked));
+		GLint isLinked;
+		MH_GL_CALL(glGetProgramiv(program, GL_LINK_STATUS, &isLinked));
 		if (isLinked == GL_FALSE)
 		{
-			GLint maxLength = 0;
+			GLint maxLength;
 			MH_GL_CALL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength));
 
 			std::vector<GLchar> infoLog(maxLength);
-			MH_GL_CALL(glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]));
+			MH_GL_CALL(glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data()));
+			MH_CORE_ERROR("Shader linking failed {0}", infoLog.data());
+			MH_CORE_BREAK("Error occurred while linking shader");
 
 			MH_GL_CALL(glDeleteProgram(program));
 
-			for (auto& id : shaderIDs)
+			for (auto id : shaderIDs)
 				MH_GL_CALL(glDeleteShader(id));
-
-			MH_CORE_ERROR("{0}\r\n\r\n{1}", directives, infoLog.data());
-			MH_CORE_ASSERT(false, "Shader failed to link!");
-
-			return 0;
 		}
 
-		for (int i = 0; i < sources.size(); i++)
-			MH_GL_CALL(glDetachShader(program, shaderIDs[i]));
+		for (auto id : shaderIDs)
+		{
+			MH_GL_CALL(glDetachShader(program, id));
+			MH_GL_CALL(glDeleteShader(id));
+		}
+
+		// TODO: Reflection
+
+		return program;
+	}
+
+	std::unordered_map<uint32_t, std::vector<uint32_t>> OpenGLShader::compile_spirv(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
+	{
+		std::unordered_map<uint32_t, std::vector<uint32_t>> compiledShaderStages;
+
+		// Get file-friendly name
+		std::string identifier = directives;
+		size_t start_pos = 0;
+		while ((start_pos = identifier.find(";", start_pos)) != std::string::npos) {
+			identifier.replace(start_pos, 1, "_");
+			start_pos += 1;
+		}
+
+		// Create shader compiler
+		shaderc::Compiler compiler;
+		shaderc::CompileOptions options;
+		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
+		options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+		for (auto& kv : sources)
+		{
+			const std::string filepath = "cache/shaders/" + name + identifier + GLShaderStageToFileExtension(kv.first);
+
+			if (!std::filesystem::exists(filepath))
+			{
+				// Split definitions into the form: "#define X"
+				std::stringstream definitions;
+				if (directives.size() > 0)
+				{
+					std::string delim = ";";
+					size_t start = 0;
+					size_t end = directives.find(delim);
+					while (end != std::string::npos)
+					{
+						definitions << "#define " << directives.substr(start, end - start) << std::endl;
+						start = end + delim.length();
+						end = directives.find(delim, start);
+					}
+
+					definitions << "#define " << directives.substr(start, end) << std::endl;
+				}
+
+				// Get source code with definitions
+				std::string original = sortIncludes(kv.second);
+				size_t firstNewline = original.find("\n") + 1;
+				std::string version = original.substr(0, firstNewline);
+				std::string body = original.substr(firstNewline, original.size());
+				std::string source = version + definitions.str() + body;
+
+				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, GLShaderStageToShaderC(kv.first), filepath.c_str(), options);
+				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
+				{
+					MH_CORE_ERROR("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, module.GetErrorMessage());
+					MH_CORE_BREAK("Error occurred while compiling shader!");
+				}
+
+				compiledShaderStages[kv.first] = std::vector<uint32_t>(module.cbegin(), module.cend());
+
+				// Write to shader cache
+				std::ofstream out(filepath, std::ios::out | std::ios::binary);
+				if (out.is_open())
+				{
+					auto& data = compiledShaderStages[kv.first];
+					out.write((char*)data.data(), data.size() * sizeof(uint32_t));
+					out.flush();
+					out.close();
+				}
+			}
+			else
+			{
+				std::ifstream in(filepath, std::ios::binary);
+				in.seekg(0, std::ios::end);
+				auto size = in.tellg();
+				in.seekg(0, std::ios::beg);
+
+				auto& data = compiledShaderStages[kv.first];
+				data.resize(size / sizeof(uint32_t));
+				in.read((char*)data.data(), size);
+			}
+		}
+
+		return compiledShaderStages;
+	}
+
+	uint32_t OpenGLShader::compile_binary(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
+	{
+		MH_PROFILE_FUNCTION();
+
+		std::string identifier = directives;
+		size_t start_pos = 0;
+		while ((start_pos = identifier.find(";", start_pos)) != std::string::npos) {
+			identifier.replace(start_pos, 1, "_");
+			start_pos += 1;
+		}
+
+		const std::string filepath = "cache/shaders/" + name + identifier + ".dat";
+
+		GLuint program = glCreateProgram();
+
+		if (!std::filesystem::exists(filepath))
+		{
+			// Split definitions into the form: "#define X"
+			std::stringstream definitions;
+			if (directives.size() > 0)
+			{
+				std::string delim = ";";
+				size_t start = 0;
+				size_t end = directives.find(delim);
+				while (end != std::string::npos)
+				{
+					definitions << "#define " << directives.substr(start, end - start) << std::endl;
+					start = end + delim.length();
+					end = directives.find(delim, start);
+				}
+
+				definitions << "#define " << directives.substr(start, end) << std::endl;
+			}
+
+			// Create shader stages
+			std::vector<GLuint> shaderIDs;
+			shaderIDs.reserve(sources.size());
+			for (auto& kv : sources)
+			{
+				std::string original = sortIncludes(kv.second);
+				size_t firstNewline = original.find("\n") + 1;
+				std::string version = original.substr(0, firstNewline);
+				std::string body = original.substr(firstNewline, original.size());
+				std::string source = version + definitions.str() + body;
+
+				GLenum type = kv.first;
+				GLuint shader = glCreateShader(type);
+
+				const char* sourceC = source.c_str();
+				MH_GL_CALL(glShaderSource(shader, 1, &sourceC, 0));
+
+				MH_GL_CALL(glCompileShader(shader));
+
+				GLint isCompiled = 0;
+				MH_GL_CALL(glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled));
+				if (isCompiled == GL_FALSE)
+				{
+					GLint maxLength = 0;
+					MH_GL_CALL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength));
+
+					std::vector<GLchar> infoLog(maxLength);
+					MH_GL_CALL(glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]));
+
+					MH_GL_CALL(glDeleteShader(shader));
+
+					MH_CORE_ERROR("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, infoLog.data());
+					MH_CORE_ASSERT(false, "Shader failed to compile!");
+
+					break;
+				}
+
+				MH_GL_CALL(glAttachShader(program, shader));
+				shaderIDs.push_back(shader);
+			}
+
+			MH_GL_CALL(glLinkProgram(program));
+
+			// Link shader program
+			GLint isLinked = 0;
+			MH_GL_CALL(glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked));
+			if (isLinked == GL_FALSE)
+			{
+				GLint maxLength = 0;
+				MH_GL_CALL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength));
+
+				std::vector<GLchar> infoLog(maxLength);
+				MH_GL_CALL(glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]));
+
+				MH_GL_CALL(glDeleteProgram(program));
+
+				for (auto& id : shaderIDs)
+					MH_GL_CALL(glDeleteShader(id));
+
+				MH_CORE_ERROR("{0}\r\n\r\n{1}", directives, infoLog.data());
+				MH_CORE_ASSERT(false, "Shader failed to link!");
+
+				return 0;
+			}
+
+			for (int i = 0; i < sources.size(); i++)
+				MH_GL_CALL(glDetachShader(program, shaderIDs[i]));
+
+			// Write to cache
+			int bufSize;
+			glGetProgramiv(program, GL_PROGRAM_BINARY_LENGTH, &bufSize);
+
+			char* data = new char[bufSize];
+			uint32_t format;
+
+			glGetProgramBinary(program, bufSize, nullptr, &format, data);
+
+			std::ofstream out(filepath, std::ios::out | std::ios::binary);
+			out.write((char*)&format, sizeof(uint32_t));
+			out.write(data, bufSize);
+		}
+		else
+		{
+			std::ifstream in(filepath, std::ios::binary);
+			in.seekg(0, std::ios::end);
+			uint32_t bufSize = (uint32_t)in.tellg() - sizeof(uint32_t);
+			in.seekg(0, std::ios::beg);
+
+			char* data = new char[bufSize];
+			uint32_t format;
+
+			in.read((char*)&format, sizeof(uint32_t));
+			in.read(data, bufSize);
+
+			glProgramBinary(program, format, data, bufSize);
+
+			GLint isLinked;
+			MH_GL_CALL(glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked));
+			if (isLinked == GL_FALSE)
+			{
+				GLint maxLength = 0;
+				MH_GL_CALL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength));
+
+				std::vector<GLchar> infoLog(maxLength);
+				MH_GL_CALL(glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]));
+
+				MH_GL_CALL(glDeleteProgram(program));
+
+				MH_CORE_ERROR("{0}\r\n\r\n{1}", directives, infoLog.data());
+				MH_CORE_ASSERT(false, "Shader failed to link!");
+
+				return 0;
+			}
+		}
 
 
+		// Shader reflection
 		if (properties.elements.empty())
 		{
 			MH_CORE_INFO("Loading properties for shader: {0}", name);

@@ -11,7 +11,7 @@
 #define MATRIX_MVP MATRIX_VP * MATRIX_M
 
 // IDEA: Use SSBO with offset etc. Would take up too much space :(
-uniform mat4 u_m4_M;
+layout(location = 200) uniform mat4 u_m4_M;
 
 layout (std140, binding = 0) uniform Matrices {
     mat4 u_m4_V;

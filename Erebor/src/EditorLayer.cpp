@@ -74,41 +74,6 @@ namespace Mahakam
 		}
 	};
 
-	static Ref<Texture> loadOrCreateTexture(const std::string& cachePath, const std::string& src, bool saveMips, const TextureProps& props)
-	{
-		if (!std::filesystem::exists(cachePath))
-		{
-			Ref<Texture2D> texture = Texture2D::create(src, props);
-
-			uint32_t size = texture->getSize();
-			uint32_t totalSize = texture->getTotalSize();
-
-			// Save to cache
-			char* pixels = new char[totalSize];
-			texture->readPixels(pixels, saveMips);
-			std::ofstream stream(cachePath, std::ios::binary);
-			stream.write((char*)&size, sizeof(uint32_t));
-			stream.write(pixels, totalSize);
-
-			delete[] pixels;
-
-			return texture;
-		}
-		else
-		{
-			// Load from cache
-			std::ifstream inStream(cachePath, std::ios::binary);
-			std::stringstream ss;
-			uint32_t size = 0;
-			inStream.read((char*)&size, sizeof(uint32_t));
-			ss << inStream.rdbuf();
-			Ref<Texture> lut = Texture2D::create(props);
-			lut->setData((void*)ss.str().c_str(), size, saveMips);
-
-			return lut;
-		}
-	}
-
 	void EditorLayer::onAttach()
 	{
 		// Create a new active scene
@@ -145,10 +110,9 @@ namespace Mahakam
 
 
 		// Setup plane
-		Ref<Texture> brickAlbedo = loadOrCreateTexture("assets/textures/brick/brick_albedo.dat", "assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGBDXT1, TextureFilter::Point });
-		//Ref<Texture> brickAlbedo = Texture2D::create("assets/textures/brick/brick_albedo.png", { TextureFormat::SRGBDXT1, TextureFilter::Point });
-		Ref<Texture> brickBump = Texture2D::create("assets/textures/brick/brick_bump.png", { TextureFormat::RGB8, TextureFilter::Point });
-		Ref<Texture> brickRoughness = Texture2D::create("assets/textures/brick/brick_albedo.png", { TextureFormat::R8, TextureFilter::Point });
+		Ref<Texture> brickAlbedo = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
+		Ref<Texture> brickBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_bump.png", false, { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
+		Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
 		Ref<Mesh> planeMesh = Mesh::createPlane(2, 2);
 
 		Ref<Material> planeMaterial = Material::create(textureShader);
@@ -167,26 +131,25 @@ namespace Mahakam
 		SkinnedMesh backpackModel = Mesh::loadModel("assets/models/backpack.obj");
 
 		// Create backpack textures
-		//Ref<Texture> backpackDiffuse = loadOrCreateTexture("assets/textures/backpack/diffuse.dat", "assets/textures/backpack/diffuse.jpg", true, TextureFormat::SRGBDXT1);
-		//Ref<Texture> backpackDiffuse = Texture2D::create("assets/textures/backpack/diffuse.jpg", TextureFormat::SRGBDXT1);
-		//Ref<Texture> backpackOcclussion = Texture2D::create("assets/textures/backpack/ao.jpg", TextureFormat::R8);
-		//Ref<Texture> backpackBump = Texture2D::create("assets/textures/backpack/normal.png");
-		//Ref<Texture> backpackMetallic = Texture2D::create("assets/textures/backpack/specular.jpg", TextureFormat::R8);
-		//Ref<Texture> backpackRoughness = Texture2D::create("assets/textures/backpack/roughness.jpg", TextureFormat::R8);
+		Ref<Texture> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
+		Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
+		Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
+		Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
+		Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 
-		//// Create backpack material
-		//Ref<Material> backpackMaterial = Material::create(textureShader);
-		//backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
-		//backpackMaterial->setTexture("u_Bump", 0, backpackBump);
-		//backpackMaterial->setTexture("u_Metallic", 0, backpackMetallic);
-		//backpackMaterial->setTexture("u_Roughness", 0, backpackRoughness);
-		//backpackMaterial->setTexture("u_Occlussion", 0, backpackOcclussion);
+		// Create backpack material
+		Ref<Material> backpackMaterial = Material::create(textureShader);
+		backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
+		backpackMaterial->setTexture("u_Bump", 0, backpackBump);
+		backpackMaterial->setTexture("u_Metallic", 0, backpackMetallic);
+		backpackMaterial->setTexture("u_Roughness", 0, backpackRoughness);
+		backpackMaterial->setTexture("u_Occlussion", 0, backpackOcclussion);
 
-		//// Create backpack entity
-		//Entity backpackEntity = activeScene->createEntity("Bacpack");
-		//backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
-		//backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
-		//backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
+		// Create backpack entity
+		Entity backpackEntity = activeScene->createEntity("Bacpack");
+		backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
+		backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
+		backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
 
 
 		// Setup dancing monke

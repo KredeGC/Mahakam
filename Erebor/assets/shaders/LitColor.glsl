@@ -43,10 +43,10 @@ struct v2f {
 
 layout(location = 0) in v2f i;
 
-uniform vec3 u_Color;
-uniform float u_Metallic;
-uniform float u_Roughness;
-uniform float u_AO;
+layout(location = 1) uniform vec3 u_Color;
+layout(location = 2) uniform float u_Metallic;
+layout(location = 3) uniform float u_Roughness;
+layout(location = 4) uniform float u_AO;
 
 void main() {
     // Surface values

@@ -10,6 +10,8 @@ workspace "Mahakam"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+VULKAN_SDK = os.getenv("VULKAN_SDK")
+
 IncludeDir = {}
 IncludeDir["assimp"]    = "Mahakam/vendor/assimp/include"
 IncludeDir["entt"]      = "Mahakam/vendor/entt/include"
@@ -19,7 +21,26 @@ IncludeDir["glm"]       = "Mahakam/vendor/glm"
 IncludeDir["imgui"]     = "Mahakam/vendor/imgui"
 IncludeDir["spdlog"]    = "Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"] = "Mahakam/vendor/stb_image"
+IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 IncludeDir["yaml"]      = "Mahakam/vendor/yaml-cpp/include"
+
+LinkDir = {}
+LinkDir["VulkanSDK"]    = "%{VULKAN_SDK}/Lib"
+LinkDir["VulkanSDK_Debug"] = "%{wks.location}/Mahakam/vendor/VulkanSDK/Lib"
+LinkDir["VulkanSDK_DebugDLL"] = "%{wks.location}/Mahakam/vendor/VulkanSDK/Bin"
+
+Links = {}
+Links["Vulkan"] = "%{LinkDir.VulkanSDK}/vulkan-1.lib"
+Links["VulkanUtils"] = "%{LinkDir.VulkanSDK}/VkLayer_utils.lib"
+
+Links["ShaderC_Debug"] = "%{LinkDir.VulkanSDK_Debug}/shaderc_sharedd.lib"
+Links["SPIRV_Cross_Debug"] = "%{LinkDir.VulkanSDK_Debug}/spirv-cross-cored.lib"
+Links["SPIRV_Cross_GLSL_Debug"] = "%{LinkDir.VulkanSDK_Debug}/spirv-cross-glsld.lib"
+Links["SPIRV_Tools_Debug"] = "%{LinkDir.VulkanSDK_Debug}/SPIRV-Toolsd.lib"
+
+Links["ShaderC_Release"] = "%{LinkDir.VulkanSDK}/shaderc_shared.lib"
+Links["SPIRV_Cross_Release"] = "%{LinkDir.VulkanSDK}/spirv-cross-core.lib"
+Links["SPIRV_Cross_GLSL_Release"] = "%{LinkDir.VulkanSDK}/spirv-cross-glsl.lib"
 
 group "Dependencies/Assimp"
     os.execute("cmake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
@@ -79,6 +100,7 @@ project "Mahakam"
         "%{IncludeDir.imgui}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.stb_image}",
+        "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.yaml}"
     }
     
@@ -92,7 +114,8 @@ project "Mahakam"
     }
 
     defines {
-        "_CRT_SECURE_NO_WARNINGS"
+        "_CRT_SECURE_NO_WARNINGS",
+        "GLFW_INCLUDE_NONE"
     }
     
     filter "system:windows"
@@ -100,7 +123,6 @@ project "Mahakam"
         
         defines {
             "MH_PLATFORM_WINDOWS",
-            "MH_BUILD_DLL",
             "GLFW_INCLUDE_NONE"
         }
     
@@ -109,15 +131,22 @@ project "Mahakam"
         runtime "Debug"
         symbols "on"
         
+        links {
+			"%{Links.ShaderC_Debug}",
+			"%{Links.SPIRV_Cross_Debug}",
+			"%{Links.SPIRV_Cross_GLSL_Debug}"
+		}
+        
     filter "configurations:Release"
         defines "MH_RELEASE"
         runtime "Release"
         optimize "on"
-    
-    filter "configurations:Dist"
-        defines "MH_DIST"
-        runtime "Release"
-        optimize "on"
+        
+        links {
+            "%{Links.ShaderC_Release}",
+			"%{Links.SPIRV_Cross_Release}",
+			"%{Links.SPIRV_Cross_GLSL_Release}"
+        }
 
 project "Erebor"
     location "Erebor"
@@ -169,13 +198,12 @@ project "Erebor"
         runtime "Debug"
         symbols "on"
         
+        --[[postbuildcommands {
+			"{COPYDIR} \"%{LinkDir.VulkanSDK_DebugDLL}\" \"%{cfg.targetdir}\""
+		}]]
+        
     filter "configurations:Release"
         defines "MH_RELEASE"
-        runtime "Release"
-        optimize "on"
-
-    filter "configurations:Dist"
-        defines "MH_DIST"
         runtime "Release"
         optimize "on"
 
@@ -228,10 +256,5 @@ project "Sandbox"
         
     filter "configurations:Release"
         defines "MH_RELEASE"
-        runtime "Release"
-        optimize "on"
-    
-    filter "configurations:Dist"
-        defines "MH_DIST"
         runtime "Release"
         optimize "on"

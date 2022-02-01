@@ -44,13 +44,19 @@ namespace Mahakam
 			return 3;
 		case TextureFormat::SRGBA8:
 			return 4;
-		case TextureFormat::DXT1:
+		case TextureFormat::R_BC4:
+			return 1;
+		case TextureFormat::RG_BC5:
+			return 1;
+		case TextureFormat::RGBA_BC7:
+			return 1;
+		case TextureFormat::RGB_DXT1:
 			return 3;
-		case TextureFormat::DXT5:
+		case TextureFormat::RGBA_DXT5:
 			return 4;
-		case TextureFormat::SRGBDXT1:
+		case TextureFormat::SRGB_DXT1:
 			return 3;
-		case TextureFormat::SRGBDXT5:
+		case TextureFormat::SRGB_DXT5:
 			return 4;
 		case TextureFormat::Depth16:
 			return 2;
@@ -68,10 +74,13 @@ namespace Mahakam
 	{
 		switch (format)
 		{
-		case TextureFormat::DXT1:
-		case TextureFormat::DXT5:
-		case TextureFormat::SRGBDXT1:
-		case TextureFormat::SRGBDXT5:
+		case TextureFormat::R_BC4:
+		case TextureFormat::RG_BC5:
+		case TextureFormat::RGBA_BC7:
+		case TextureFormat::RGB_DXT1:
+		case TextureFormat::RGBA_DXT5:
+		case TextureFormat::SRGB_DXT1:
+		case TextureFormat::SRGB_DXT5:
 			return true;
 		case TextureFormat::R8:
 		case TextureFormat::RG8:
@@ -147,13 +156,19 @@ namespace Mahakam
 			return GL_RGBA;
 		case TextureFormat::RGBA32F:
 			return GL_RGBA;
-		case TextureFormat::DXT1:
+		case TextureFormat::R_BC4:
+			return GL_COMPRESSED_RED_RGTC1;
+		case TextureFormat::RG_BC5:
+			return GL_COMPRESSED_RG_RGTC2;
+		case TextureFormat::RGBA_BC7:
+			return GL_COMPRESSED_RGBA_BPTC_UNORM;
+		case TextureFormat::RGB_DXT1:
 			return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-		case TextureFormat::DXT5:
+		case TextureFormat::RGBA_DXT5:
 			return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-		case TextureFormat::SRGBDXT1:
+		case TextureFormat::SRGB_DXT1:
 			return GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
-		case TextureFormat::SRGBDXT5:
+		case TextureFormat::SRGB_DXT5:
 			return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
 		case TextureFormat::RG11B10F:
 			return GL_RGB;
@@ -211,13 +226,19 @@ namespace Mahakam
 			return GL_SRGB8;
 		case TextureFormat::SRGBA8:
 			return GL_SRGB8_ALPHA8;
-		case TextureFormat::DXT1:
+		case TextureFormat::R_BC4:
+			return GL_COMPRESSED_RED_RGTC1;
+		case TextureFormat::RG_BC5:
+			return GL_COMPRESSED_RG_RGTC2;
+		case TextureFormat::RGBA_BC7:
+			return GL_COMPRESSED_RGBA_BPTC_UNORM;
+		case TextureFormat::RGB_DXT1:
 			return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-		case TextureFormat::DXT5:
+		case TextureFormat::RGBA_DXT5:
 			return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-		case TextureFormat::SRGBDXT1:
+		case TextureFormat::SRGB_DXT1:
 			return GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
-		case TextureFormat::SRGBDXT5:
+		case TextureFormat::SRGB_DXT5:
 			return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
 		case TextureFormat::Depth16:
 			return GL_DEPTH_COMPONENT16;
@@ -241,10 +262,13 @@ namespace Mahakam
 		case TextureFormat::RGBA8:
 		case TextureFormat::SRGB8:
 		case TextureFormat::SRGBA8:
-		case TextureFormat::DXT1:
-		case TextureFormat::DXT5:
-		case TextureFormat::SRGBDXT1:
-		case TextureFormat::SRGBDXT5:
+		case TextureFormat::R_BC4:
+		case TextureFormat::RG_BC5:
+		case TextureFormat::RGBA_BC7:
+		case TextureFormat::RGB_DXT1:
+		case TextureFormat::RGBA_DXT5:
+		case TextureFormat::SRGB_DXT1:
+		case TextureFormat::SRGB_DXT5:
 			return GL_UNSIGNED_BYTE;
 		case TextureFormat::R16F:
 		case TextureFormat::RG16F:
