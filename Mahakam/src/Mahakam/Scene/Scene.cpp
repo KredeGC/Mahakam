@@ -59,7 +59,7 @@ namespace Mahakam
 		//skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
 		//skyboxSpecular = loadOrCreate(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
 
-		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.glsl");
+		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.yaml");
 		skyboxMaterial = Material::create(skyboxShader);
 		skyboxMaterial->setTexture("u_Environment", 0, skyboxTexture);
 	}
@@ -129,13 +129,13 @@ namespace Mahakam
 				switch (light.getLightType())
 				{
 				case Light::LightType::Directional:
-					environment.directionalLights.push_back(Renderer::DirectionalLight{ dir, light.getColor() });
+					environment.directionalLights.push_back({ dir, light });
 					break;
 				case Light::LightType::Point:
-					environment.pointLights.push_back(Renderer::PointLight{ pos, light.getRange(), light.getColor() });
+					environment.pointLights.push_back({ pos, light });
 					break;
 				case Light::LightType::Spot:
-					environment.spotLights.push_back(Renderer::SpotLight{ pos, rot, light.getFov(), light.getRange(), light.getColor() });
+					environment.spotLights.push_back({ pos, rot, light });
 					break;
 				}
 			});

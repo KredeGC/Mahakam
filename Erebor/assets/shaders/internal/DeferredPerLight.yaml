@@ -1,0 +1,15 @@
+DIRECTIONAL:
+  Defines:
+    - DIRECTIONAL
+  Includes:
+    - assets/shaders/internal/DeferredPerLight.glsl
+POINT:
+  Defines:
+    - POINT
+  Includes:
+    - assets/shaders/internal/DeferredPerLight.glsl
+SPOT:
+  Defines:
+    - SPOT
+  Includes:
+    - assets/shaders/internal/DeferredPerLight.glsl

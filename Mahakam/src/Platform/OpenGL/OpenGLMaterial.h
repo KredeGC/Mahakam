@@ -31,8 +31,8 @@ namespace Mahakam
 
 		inline virtual Ref<Shader> getShader() const override { return shader; }
 
-		virtual void bindShader(const std::string& variant) const override { shader->bind(variant); }
-		virtual void bindShader() const override { shader->bind(variant); }
+		virtual void bindShader(const std::string& shaderPass) const override { shader->bind(shaderPass); }
+		virtual void bindShader(const std::string& shaderPass, const std::string& variant) const override { shader->bind(shaderPass, variant); }
 		virtual void bind() const override;
 
 		virtual void setTransform(const glm::mat4& modelMatrix) override;

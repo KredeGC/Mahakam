@@ -23,10 +23,14 @@ namespace Mahakam
 			glm::vec3 color;
 		private:
 			float padding02 = 0.0f;
+			glm::mat4 worldToLight;
 
 		public:
-			DirectionalLight(const glm::vec3& direction, const glm::vec3& color)
-				: direction(direction), color(color) {}
+			DirectionalLight(const glm::vec3& direction, const Light& light) :
+				direction(direction), color(light.getColor()),
+				worldToLight(glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.03f, 20.0f) * glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+					glm::vec3(0.0f, 0.0f, 0.0f),
+					glm::vec3(0.0f, 1.0f, 0.0f))) {}
 		};
 
 		struct PointLight
@@ -36,9 +40,9 @@ namespace Mahakam
 			glm::vec4 color; // w - 1.0 / (range * range)
 
 		public:
-			PointLight(const glm::vec3& position, float range, const glm::vec3& color) :
-				position(glm::vec4(position, range)),
-				color(color, 1.0f / (range * range)) {}
+			PointLight(const glm::vec3& position, const Light& light) :
+				position(glm::vec4(position, light.getRange())),
+				color(light.getColor(), 1.0f / (light.getRange() * light.getRange())) {}
 		};
 
 		struct SpotLight
@@ -49,14 +53,14 @@ namespace Mahakam
 			glm::vec4 color; // w - 1.0 / (range * range)
 
 		public:
-			SpotLight(const glm::vec3& position, const glm::quat& rotation, float fov, float range, const glm::vec3& color) :
-				worldToLight(glm::perspective(fov, 1.0f, 0.03f, range)* glm::inverse(glm::translate(glm::mat4(1.0f), position)* glm::mat4(rotation))),
-				color(color, 1.0f / (range * range))
+			SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light) :
+				worldToLight(glm::perspective(light.getFov(), 1.0f, 0.03f, light.getRange()) * glm::inverse(glm::translate(glm::mat4(1.0f), position)* glm::mat4(rotation))),
+				color(light.getColor(), 1.0f / (light.getRange() * light.getRange()))
 			{
-				float xy = glm::tan(fov / 2.0f) * range;
+				float xy = glm::tan(light.getFov() / 2.0f) * light.getRange();
 				objectToWorld = glm::translate(glm::mat4(1.0f), position)
 					* glm::mat4(rotation)
-					* glm::scale(glm::mat4(1.0f), glm::vec3(xy, xy, range));
+					* glm::scale(glm::mat4(1.0f), glm::vec3(xy, xy, light.getRange()));
 			}
 		};
 
@@ -173,6 +177,7 @@ namespace Mahakam
 
 	private:
 		static void drawOpaqueQueue();
+		static void drawShadowQueue();
 		static void drawTransparentQueue();
 
 		static void drawSkybox();

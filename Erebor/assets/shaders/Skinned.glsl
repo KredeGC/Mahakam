@@ -75,10 +75,21 @@ layout(binding = 1, location = 1) uniform sampler2D u_Bump;
 layout(binding = 2, location = 2) uniform sampler2D u_Metallic;
 layout(binding = 3, location = 3) uniform sampler2D u_Roughness;
 
+vec3 unpackNormal(vec2 xy) {
+    xy *= 2.0;
+    xy -= 1.0;
+    
+    vec3 n;
+    n.x = xy.x;
+    n.y = xy.y;
+    n.z = 1.0 - clamp(dot(n.xy, n.xy), 0.0, 1.0);
+    return normalize(n);
+}
+
 void main() {
     // Surface values
     vec3 albedo = texture(u_Albedo, i.v_UV).rgb;
-    vec3 bump = texture(u_Bump, i.v_UV).xyz * 2.0 - 1.0;
+    vec3 bump = unpackNormal(texture(u_Bump, i.v_UV).xy);
     float metallic = texture(u_Metallic, i.v_UV).r;
     float roughness = texture(u_Roughness, i.v_UV).r;
     float ao = 1.0;

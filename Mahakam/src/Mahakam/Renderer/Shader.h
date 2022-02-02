@@ -33,13 +33,15 @@ namespace Mahakam
 	public:
 		virtual ~Shader() = default;
 
-		virtual void bind(const std::string& variant = "") = 0;
+		virtual void bind(const std::string& shaderPass, const std::string& variant = "") = 0;
 
 		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) = 0;
 
 		virtual const std::string& getName() const = 0;
 
 		virtual const std::vector<ShaderElement>& getProperties() const = 0;
+
+		virtual bool HasShaderPass(const std::string& shaderPass) const = 0;
 
 		virtual void setTexture(const std::string& name, Ref<Texture> tex) = 0;
 
@@ -53,8 +55,7 @@ namespace Mahakam
 		virtual void setUniformFloat3(const std::string& name, const glm::vec3& value) = 0;
 		virtual void setUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
 
-		static Ref<Shader> create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSrouce);
-		static Ref<Shader> create(const std::string& filepath, const std::initializer_list<std::string>& defines = { "" });
+		static Ref<Shader> create(const std::string& filepath, const std::initializer_list<std::string>& keywords = {});
 	};
 
 
@@ -62,14 +63,12 @@ namespace Mahakam
 	class ShaderLibrary
 	{
 	private:
-		std::unordered_map<std::string, Ref<Shader>> shaders;
+		static std::unordered_map<std::string, Ref<Shader>> shaders;
 
 	public:
-		void add(const Ref<Shader>& shader);
-		Ref<Shader> load(const std::string& filepath);
-		Ref<Shader> load(const std::string& name, const std::string& filepath);
+		static Ref<Shader> load(const std::string& filepath, const std::initializer_list<std::string>& defines = { "" });
 
-		Ref<Shader> get(const std::string& name);
+		static Ref<Shader> get(const std::string& name);
 	};
 #pragma endregion
 }

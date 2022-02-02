@@ -19,6 +19,7 @@ namespace Mahakam
 	static Ref<Texture> brdfLut;
 	static Ref<Texture> falloffLut;
 	static Ref<Texture> spotlightTexture;
+	//static Ref<Shader> shadowShader;
 
 	static Ref<Texture> loadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height)
 	{
@@ -36,7 +37,7 @@ namespace Mahakam
 
 			framebuffer->bind();
 
-			shader->bind();
+			shader->bind("LUT");
 
 			GL::clear();
 
@@ -87,10 +88,12 @@ namespace Mahakam
 		GL::init();
 
 		// Initialize
-		brdfLut = loadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.glsl", TextureFormat::RG16F, 512, 512);
-		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.glsl", TextureFormat::R16F, 16, 16);
+		brdfLut = loadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.yaml", TextureFormat::RG16F, 512, 512);
+		falloffLut = loadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.yaml", TextureFormat::R16F, 16, 16);
 
 		spotlightTexture = Texture2D::create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
+
+		//shadowShader = Shader::create("assets/shaders/internal/Shadow.yaml");
 
 		sceneData->cameraBuffer = UniformBuffer::create(sizeof(CameraData));
 
@@ -125,7 +128,7 @@ namespace Mahakam
 		sceneData->viewportFramebuffer = FrameBuffer::create(viewportProps);
 
 		// Create lighting shader & material
-		Ref<Shader> deferredShader = Shader::create("assets/shaders/internal/DeferredPerLight.glsl", { "DIRECTIONAL", "POINT", "SPOT" });
+		Ref<Shader> deferredShader = Shader::create("assets/shaders/internal/DeferredPerLight.yaml");
 		sceneData->deferredMaterial = Material::create(deferredShader);
 		sceneData->deferredMaterial->setTexture("u_BRDFLUT", 2, brdfLut);
 		sceneData->deferredMaterial->setTexture("u_AttenuationLUT", 3, falloffLut);
@@ -137,7 +140,7 @@ namespace Mahakam
 		//sceneData->deferredMaterial->setTexture("u_GBuffer3", 8, sceneData->gBuffer->getColorTexture(4));
 
 		// Create tonemapping shader & material
-		Ref<Shader> tonemappingShader = Shader::create("assets/shaders/internal/Tonemapping.glsl");
+		Ref<Shader> tonemappingShader = Shader::create("assets/shaders/internal/Tonemapping.yaml");
 		sceneData->tonemappingMaterial = Material::create(tonemappingShader);
 		sceneData->tonemappingMaterial->setTexture("u_Albedo", 0, sceneData->hdrFrameBuffer->getColorTexture(0));
 	}
@@ -152,6 +155,7 @@ namespace Mahakam
 		brdfLut = nullptr;
 		falloffLut = nullptr;
 		spotlightTexture = nullptr;
+		//shadowShader = nullptr;
 
 		delete rendererResults;
 		delete sceneData;
@@ -244,26 +248,33 @@ namespace Mahakam
 
 		for (auto& shaderPair : renderQueue)
 		{
-			shaderPair.first->bind();
+			auto& shader = shaderPair.first;
+			//shader->bind();
 
 			for (auto& materialPair : shaderPair.second)
 			{
 				// TODO: Use a UBO instead of rebinding the uniforms each time
-				materialPair.first->bind();
+				auto& material = materialPair.first;
 
-				// TODO: Use batching at this point?
-				for (auto& meshPair : materialPair.second)
+				if (shader->HasShaderPass("GEOMETRY"))
 				{
-					meshPair.first->bind();
-					for (auto& transform : meshPair.second)
+					material->bindShader("GEOMETRY");
+					material->bind();
+
+					// TODO: Use batching at this point?
+					for (auto& meshPair : materialPair.second)
 					{
-						materialPair.first->setTransform(transform);
+						meshPair.first->bind();
+						for (auto& transform : meshPair.second)
+						{
+							material->setTransform(transform);
 
-						rendererResults->drawCalls += 1;
-						rendererResults->vertexCount += meshPair.first->getVertexCount();
-						rendererResults->triCount += meshPair.first->getIndexCount();
+							rendererResults->drawCalls += 1;
+							rendererResults->vertexCount += meshPair.first->getVertexCount();
+							rendererResults->triCount += meshPair.first->getIndexCount();
 
-						GL::drawIndexed(meshPair.first->getIndexCount());
+							GL::drawIndexed(meshPair.first->getIndexCount());
+						}
 					}
 				}
 			}
@@ -296,7 +307,7 @@ namespace Mahakam
 			{
 				const Ref<Material>& material = data.material;
 
-				material->bindShader();
+				material->bindShader("FORWARD");
 				material->bind();
 				material->setTransform(data.transform);
 				data.mesh->bind();
@@ -311,11 +322,44 @@ namespace Mahakam
 		}
 	}
 
+	void Renderer::drawShadowQueue()
+	{
+		MH_PROFILE_FUNCTION();
+
+		for (auto& shaderPair : renderQueue)
+		{
+			if (shaderPair.first->HasShaderPass("SHADOW"))
+				shaderPair.first->bind("SHADOW");
+			//else
+			//	shadowShader->bind("SHADOW");
+
+			for (auto& materialPair : shaderPair.second)
+			{
+				materialPair.first->bind();
+
+				for (auto& meshPair : materialPair.second)
+				{
+					meshPair.first->bind();
+					for (auto& transform : meshPair.second)
+					{
+						materialPair.first->setTransform(transform);
+
+						rendererResults->drawCalls += 1;
+						rendererResults->vertexCount += meshPair.first->getVertexCount();
+						rendererResults->triCount += meshPair.first->getIndexCount();
+
+						GL::drawIndexed(meshPair.first->getIndexCount());
+					}
+				}
+			}
+		}
+	}
+
 	void Renderer::drawSkybox()
 	{
 		MH_PROFILE_FUNCTION();
 
-		sceneData->environment.skyboxMaterial->getShader()->bind();
+		sceneData->environment.skyboxMaterial->bindShader("GEOMETRY");
 		sceneData->environment.skyboxMaterial->bind();
 		drawScreenQuad();
 	}
@@ -513,7 +557,7 @@ namespace Mahakam
 		GL::clear(true, false);
 
 		// HDR Tonemapping
-		sceneData->tonemappingMaterial->bindShader();
+		sceneData->tonemappingMaterial->bindShader("POSTPROCESSING");
 		sceneData->tonemappingMaterial->bind();
 
 		GL::enableZTesting(false);

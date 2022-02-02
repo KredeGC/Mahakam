@@ -15,6 +15,8 @@
 #include <spirv_cross/spirv_cross.hpp>
 #include <spirv_cross/spirv_glsl.hpp>
 
+#include <yaml-cpp/yaml.h>
+
 namespace Mahakam
 {
 	static GLenum ShaderTypeFromString(const std::string& type)
@@ -57,22 +59,8 @@ namespace Mahakam
 		return "";
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource) : name(name)
-	{
-		MH_CORE_BREAK("Hot-loading of shaders is unsupported!");
-
-		/*MH_PROFILE_FUNCTION();
-
-		std::unordered_map<GLenum, std::string> sources;
-		sources[GL_VERTEX_SHADER] = vertexSource;
-		sources[GL_FRAGMENT_SHADER] = fragmentSource;
-
-		uint32_t program = CreateProgram(sources);
-
-		shaderVariants[""] = program;*/
-	}
-
-	OpenGLShader::OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& variants)
+	OpenGLShader::OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& keywords)
+		: filepath(filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -85,43 +73,60 @@ namespace Mahakam
 
 		name = filepath.substr(lastSlash, count);
 
-		// Multiple shader variants
-		for (const std::string& combinedDefines : variants)
-		{
-			std::string source = readFile(filepath);
-
-			auto sources = parse(source);
-
-#ifdef SPIR_V
-			auto compiledSources = compile_spirv(sources, combinedDefines);
-
-			shaderVariants[combinedDefines] = CreateProgram(compiledSources);
-#else
-			shaderVariants[combinedDefines] = compile_binary(sources, combinedDefines);
-#endif
-		}
+		// Read YAML file for shader passes
+		ParseYAMLFile(filepath, keywords);
 	}
 
 	OpenGLShader::~OpenGLShader()
 	{
 		MH_PROFILE_FUNCTION();
 
-		for (auto& pair : shaderVariants)
-			MH_GL_CALL(glDeleteProgram(pair.second));
+		for (auto& pass : shaderPasses)
+		{
+			for (auto& shader : pass.second)
+			{
+				MH_GL_CALL(glDeleteProgram(shader.second));
+			}
+		}
 	}
 
-	void OpenGLShader::bind(const std::string& variant)
+	void OpenGLShader::bind(const std::string& shaderPass, const std::string& variant)
 	{
-		uint32_t program = shaderVariants.at(variant);
-		rendererID = program;
+		auto& passIter = shaderPasses.find(shaderPass);
+		if (passIter != shaderPasses.end())
+		{
+			auto& variants = passIter->second;
 
-		MH_GL_CALL(glUseProgram(program));
+			auto& variantIter = variants.find(variant);
+			if (variantIter != variants.end())
+			{
+				rendererID = variantIter->second;
+				MH_GL_CALL(glUseProgram(rendererID));
+			}
+			else
+			{
+				MH_CORE_BREAK("Attempted to use uncompiled shader variant!");
+			}
+		}
+		else
+		{
+			MH_CORE_BREAK("Attempted to use unknown shader pass!");
+		}
 	}
 
 	void OpenGLShader::setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
 	{
 		setUniformMat4("u_m4_V", viewMatrix);
 		setUniformMat4("u_m4_P", projectionMatrix);
+	}
+
+	bool OpenGLShader::HasShaderPass(const std::string& shaderPass) const
+	{
+		auto& iter = shaderPasses.find(shaderPass);
+		if (iter != shaderPasses.end())
+			return true;
+
+		return false;
 	}
 
 	void OpenGLShader::setTexture(const std::string& name, Ref<Texture> tex)
@@ -293,40 +298,16 @@ namespace Mahakam
 		return compiledShaderStages;
 	}
 
-	uint32_t OpenGLShader::compile_binary(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
+	uint32_t OpenGLShader::CompileBinary(const std::string& cachePath, const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
 	{
 		MH_PROFILE_FUNCTION();
 
-		std::string identifier = directives;
-		size_t start_pos = 0;
-		while ((start_pos = identifier.find(";", start_pos)) != std::string::npos) {
-			identifier.replace(start_pos, 1, "_");
-			start_pos += 1;
-		}
-
-		const std::string filepath = "cache/shaders/" + name + identifier + ".dat";
+		MH_CORE_ASSERT(sources.size() > 0, "At least one shader source is required to compile!");
 
 		GLuint program = glCreateProgram();
 
-		if (!std::filesystem::exists(filepath))
+		if (!std::filesystem::exists(cachePath))
 		{
-			// Split definitions into the form: "#define X"
-			std::stringstream definitions;
-			if (directives.size() > 0)
-			{
-				std::string delim = ";";
-				size_t start = 0;
-				size_t end = directives.find(delim);
-				while (end != std::string::npos)
-				{
-					definitions << "#define " << directives.substr(start, end - start) << std::endl;
-					start = end + delim.length();
-					end = directives.find(delim, start);
-				}
-
-				definitions << "#define " << directives.substr(start, end) << std::endl;
-			}
-
 			// Create shader stages
 			std::vector<GLuint> shaderIDs;
 			shaderIDs.reserve(sources.size());
@@ -336,7 +317,7 @@ namespace Mahakam
 				size_t firstNewline = original.find("\n") + 1;
 				std::string version = original.substr(0, firstNewline);
 				std::string body = original.substr(firstNewline, original.size());
-				std::string source = version + definitions.str() + body;
+				std::string source = version + directives + body;
 
 				GLenum type = kv.first;
 				GLuint shader = glCreateShader(type);
@@ -404,13 +385,13 @@ namespace Mahakam
 
 			glGetProgramBinary(program, bufSize, nullptr, &format, data);
 
-			std::ofstream out(filepath, std::ios::out | std::ios::binary);
+			std::ofstream out(cachePath, std::ios::out | std::ios::binary);
 			out.write((char*)&format, sizeof(uint32_t));
 			out.write(data, bufSize);
 		}
 		else
 		{
-			std::ifstream in(filepath, std::ios::binary);
+			std::ifstream in(cachePath, std::ios::binary);
 			in.seekg(0, std::ios::end);
 			uint32_t bufSize = (uint32_t)in.tellg() - sizeof(uint32_t);
 			in.seekg(0, std::ios::beg);
@@ -478,6 +459,116 @@ namespace Mahakam
 		return program;
 	}
 
+	void OpenGLShader::ParseYAMLFile(const std::string& filepath, const std::vector<std::string>& keywords)
+	{
+		YAML::Node rootNode;
+		try
+		{
+			rootNode = YAML::LoadFile(filepath);
+		}
+		catch (YAML::Exception e)
+		{
+			MH_CORE_BREAK(e.what());
+		}
+
+		MH_CORE_ASSERT(rootNode && rootNode.size() > 0, "Loaded empty shader file! Path may be wrong!");
+
+		std::unordered_map<std::string, std::string> keywordPermutations = ParseShaderKeywords(keywords);
+
+		for each (auto shaderPassNode in rootNode)
+		{
+			std::string shaderPassName = shaderPassNode.first.as<std::string>();
+
+			// Read shaderpass defines
+			std::stringstream shaderPassDefines;
+			auto definesNode = shaderPassNode.second["Defines"];
+			if (definesNode)
+			{
+				for (auto define : definesNode)
+					shaderPassDefines << "#define " + define.as<std::string>() + "\n";
+			}
+
+			std::string cachePath = "cache/shaders/" + name + "_" + shaderPassName;
+
+			// Read and compile include files
+			auto includesNode = shaderPassNode.second["Includes"];
+			if (includesNode)
+			{
+				// Read and parse source files
+				std::stringstream source;
+				for each (auto includeNode in includesNode)
+				{
+					std::string shaderPath = includeNode.as<std::string>();
+
+					source << readFile(shaderPath);
+				}
+
+				auto sources = ParseGLSLFile(source.str());
+
+				// Generate shaders for each shader pass * each keyword combination
+				if (keywordPermutations.size() == 0)
+				{
+					shaderPasses[shaderPassName][""] = CompileBinary(cachePath + ".dat", sources, shaderPassDefines.str());
+				}
+				else
+				{
+					for (const auto& directives : keywordPermutations)
+						shaderPasses[shaderPassName][directives.first] = CompileBinary(cachePath + directives.first + ".dat", sources, shaderPassDefines.str() + directives.second);
+				}
+			}
+		}
+	}
+
+	std::unordered_map<std::string, std::string> OpenGLShader::ParseShaderKeywords(const std::vector<std::string>& keywords)
+	{
+		const uint64_t length = keywords.size();
+		const uint64_t bits = 1ULL << length;
+
+		std::unordered_map<std::string, std::string> result;
+		for (uint64_t i = 1; i < bits; ++i)
+		{
+			std::stringstream combinedTag;
+			std::stringstream combinedDefines;
+			for (uint64_t bit = 0; bit < length; ++bit)
+			{
+				if (i & (1ULL << bit))
+				{
+					combinedTag << "_" << keywords[bit];
+					combinedDefines << "#define " << keywords[bit] << "\n";
+				}
+			}
+			result[combinedTag.str()] = combinedDefines.str();
+		}
+
+		return result;
+	}
+
+	std::unordered_map<GLenum, std::string> OpenGLShader::ParseGLSLFile(const std::string& source)
+	{
+		MH_PROFILE_FUNCTION();
+
+		std::unordered_map<GLenum, std::string> sources;
+
+		const char* typeToken = "#type";
+		size_t typeTokenLength = strlen(typeToken);
+		size_t pos = source.find(typeToken, 0);
+		while (pos != std::string::npos)
+		{
+			size_t eol = source.find_first_of("\r\n", pos);
+			MH_CORE_ASSERT(eol != std::string::npos, "Syntax error!");
+			size_t begin = pos + typeTokenLength + 1;
+			std::string type = source.substr(begin, eol - begin);
+			MH_CORE_ASSERT(ShaderTypeFromString(type), "Invalid shader type!");
+
+			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
+			pos = source.find(typeToken, nextLinePos);
+			sources[ShaderTypeFromString(type)] =
+				source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
+		}
+
+		return sources;
+	}
+
 	std::string OpenGLShader::sortIncludes(const std::string& source)
 	{
 		MH_PROFILE_FUNCTION();
@@ -510,32 +601,6 @@ namespace Mahakam
 		sourceStream << source.substr(lastPos, source.size() - lastPos);
 
 		return sourceStream.str();
-	}
-
-	std::unordered_map<GLenum, std::string> OpenGLShader::parse(const std::string& source)
-	{
-		MH_PROFILE_FUNCTION();
-
-		std::unordered_map<GLenum, std::string> sources;
-
-		const char* typeToken = "#type";
-		size_t typeTokenLength = strlen(typeToken);
-		size_t pos = source.find(typeToken, 0);
-		while (pos != std::string::npos)
-		{
-			size_t eol = source.find_first_of("\r\n", pos);
-			MH_CORE_ASSERT(eol != std::string::npos, "Syntax error!");
-			size_t begin = pos + typeTokenLength + 1;
-			std::string type = source.substr(begin, eol - begin);
-			MH_CORE_ASSERT(ShaderTypeFromString(type), "Invalid shader type!");
-
-			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
-			pos = source.find(typeToken, nextLinePos);
-			sources[ShaderTypeFromString(type)] =
-				source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
-		}
-
-		return sources;
 	}
 
 	std::string OpenGLShader::readFile(const std::string& filepath)

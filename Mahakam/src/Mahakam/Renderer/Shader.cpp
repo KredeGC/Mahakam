@@ -7,21 +7,6 @@
 
 namespace Mahakam
 {
-	Ref<Shader> Shader::create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSrouce)
-	{
-		switch (RendererAPI::getAPI())
-		{
-		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLShader>(name, vertexSource, fragmentSrouce);
-		}
-
-		MH_CORE_BREAK("Unknown renderer API!");
-
-		return nullptr;
-	}
-
 	Ref<Shader> Shader::create(const std::string& filepath, const std::initializer_list<std::string>& defines)
 	{
 		switch (RendererAPI::getAPI())
@@ -38,39 +23,26 @@ namespace Mahakam
 	}
 
 
+#pragma region ShaderLibrary
+	std::unordered_map<std::string, Ref<Shader>> ShaderLibrary::shaders;
 
-	void ShaderLibrary::add(const Ref<Shader>& shader)
+	Ref<Shader> ShaderLibrary::load(const std::string& filepath, const std::initializer_list<std::string>& defines)
 	{
-		const std::string& name = shader->getName();
+		auto& iter = shaders.find(filepath);
+		if (iter == shaders.end())
+		{
+			Ref<Shader> shader = Shader::create(filepath);
 
-		MH_CORE_ASSERT(shaders.find(name) == shaders.end(), "Shader already exists!");
+			shaders[filepath] = shader;
 
-		shaders[name] = shader;
+			return shader;
+		}
 	}
 	
-	Ref<Shader> ShaderLibrary::load(const std::string& filepath)
+	Ref<Shader> ShaderLibrary::get(const std::string& filepath)
 	{
-		auto shader = Shader::create(filepath);
-
-		add(shader);
-
-		return shader;
+		MH_CORE_ASSERT(shaders.find(filepath) != shaders.end(), "Shader doesn't exist!");
+		return shaders[filepath];
 	}
-	
-	Ref<Shader> ShaderLibrary::load(const std::string& name, const std::string& filepath)
-	{
-		auto shader = Shader::create(filepath);
-
-		MH_CORE_ASSERT(shaders.find(name) == shaders.end(), "Shader already exists!");
-
-		shaders[name] = shader;
-
-		return shader;
-	}
-	
-	Ref<Shader> ShaderLibrary::get(const std::string& name)
-	{
-		MH_CORE_ASSERT(shaders.find(name) != shaders.end(), "Shader doesn't exist!");
-		return shaders[name];
-	}
+#pragma endregion
 }

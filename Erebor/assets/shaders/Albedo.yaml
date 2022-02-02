@@ -1,0 +1,10 @@
+GEOMETRY:
+  Defines:
+    - GEOMETRY
+  Includes:
+    - assets/shaders/Albedo.glsl
+SHADOW:
+  Defines:
+    - SHADOW
+  Includes:
+    - assets/shaders/Albedo.glsl

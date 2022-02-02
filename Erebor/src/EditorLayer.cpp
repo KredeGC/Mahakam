@@ -86,9 +86,9 @@ namespace Mahakam
 
 
 		// Setup shaders
-		Ref<Shader> skinnedShader = Shader::create("assets/shaders/Skinned.glsl");
-		Ref<Shader> textureShader = Shader::create("assets/shaders/Albedo.glsl");
-		Ref<Shader> shader = Shader::create("assets/shaders/LitColor.glsl");
+		Ref<Shader> skinnedShader = Shader::create("assets/shaders/Skinned.yaml");
+		Ref<Shader> textureShader = Shader::create("assets/shaders/Albedo.yaml");
+		Ref<Shader> colorShader = Shader::create("assets/shaders/LitColor.yaml");
 
 
 		// Setup lights
@@ -128,32 +128,32 @@ namespace Mahakam
 
 
 		// Create backpack model
-		SkinnedMesh backpackModel = Mesh::loadModel("assets/models/backpack.obj");
+		//SkinnedMesh backpackModel = Mesh::loadModel("assets/models/backpack.obj");
 
-		// Create backpack textures
+		//// Create backpack textures
 		Ref<Texture> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
 		Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 		Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
 		Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 		Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 
-		// Create backpack material
-		Ref<Material> backpackMaterial = Material::create(textureShader);
-		backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
-		backpackMaterial->setTexture("u_Bump", 0, backpackBump);
-		backpackMaterial->setTexture("u_Metallic", 0, backpackMetallic);
-		backpackMaterial->setTexture("u_Roughness", 0, backpackRoughness);
-		backpackMaterial->setTexture("u_Occlussion", 0, backpackOcclussion);
+		//// Create backpack material
+		//Ref<Material> backpackMaterial = Material::create(textureShader);
+		//backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
+		//backpackMaterial->setTexture("u_Bump", 0, backpackBump);
+		//backpackMaterial->setTexture("u_Metallic", 0, backpackMetallic);
+		//backpackMaterial->setTexture("u_Roughness", 0, backpackRoughness);
+		//backpackMaterial->setTexture("u_Occlussion", 0, backpackOcclussion);
 
-		// Create backpack entity
-		Entity backpackEntity = activeScene->createEntity("Bacpack");
-		backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
-		backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
-		backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
+		//// Create backpack entity
+		//Entity backpackEntity = activeScene->createEntity("Bacpack");
+		//backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
+		//backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
+		//backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
 
 
 		// Setup dancing monke
-		/*Ref<Material> skinnedMaterial = Material::create(skinnedShader);
+		Ref<Material> skinnedMaterial = Material::create(skinnedShader);
 		skinnedMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
 		skinnedMaterial->setTexture("u_Bump", 0, backpackBump);
 		skinnedMaterial->setTexture("u_Metallic", 0, backpackMetallic);
@@ -167,7 +167,7 @@ namespace Mahakam
 		animatedEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 1.5f, 5.0f });
 		animatedEntity.getComponent<TransformComponent>().setScale({ 0.02f, 0.02f, 0.02f });
 		animatedEntity.addComponent<AnimatorComponent>(animation);
-		animatedEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();*/
+		animatedEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
 
 
 		// Setup scene camera
@@ -179,7 +179,7 @@ namespace Mahakam
 
 		// Create mesh & base material
 		Ref<Mesh> sphereMesh = Mesh::createCubeSphere(8);
-		Ref<Material> baseMaterial = Material::create(shader);
+		Ref<Material> baseMaterial = Material::create(colorShader);
 		baseMaterial->setFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 
 		// Create scene entities

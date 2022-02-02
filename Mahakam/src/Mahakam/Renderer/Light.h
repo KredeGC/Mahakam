@@ -1,5 +1,7 @@
 #pragma once
 
+#include "FrameBuffer.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -22,11 +24,21 @@ namespace Mahakam
 		float range = 10.0f;
 		float fov = glm::radians(60.0f);
 
+		bool shadowCasting = false;
+		Ref<FrameBuffer> shadowFramebuffer = nullptr;
+
 	public:
 		Light() = default;
 
 		Light(LightType lightType, const glm::vec3& color)
-			: lightType(lightType), color(color) {}
+			: lightType(lightType), color(color)
+		{
+			FrameBufferProps shadowProps;
+			shadowProps.width = 1024;
+			shadowProps.height = 1024;
+			shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, false };
+			shadowFramebuffer = FrameBuffer::create(shadowProps);
+		}
 
 		Light(LightType lightType, float range, const glm::vec3& color)
 			: lightType(lightType), range(range), color(color) {}

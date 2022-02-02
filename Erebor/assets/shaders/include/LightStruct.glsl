@@ -5,7 +5,7 @@
     struct Light {
         vec3 direction;
         vec3 color;
-        //mat4 worldToLight;
+        mat4 worldToLight;
     };
 #elif defined(POINT)
     struct Light {

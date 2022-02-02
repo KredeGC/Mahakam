@@ -387,8 +387,8 @@ namespace Mahakam
 
 
 		// Convert HDR equirectangular environment map to cubemap equivalent
-		OpenGLShader equiToCubeShader("assets/shaders/internal/Cubemap.glsl");
-		equiToCubeShader.bind();
+		OpenGLShader equiToCubeShader("assets/shaders/internal/Cubemap.yaml");
+		equiToCubeShader.bind("LUT");
 		equiToCubeShader.setUniformInt("equirectangularMap", 0);
 		equiToCubeShader.setUniformMat4("projection", captureProjection);
 
@@ -489,11 +489,11 @@ namespace Mahakam
 		// Convert HDR equirectangular environment map to cubemap equivalent
 		std::string shaderPath = "assets/shaders/internal/";
 		if (prefilter == TextureCubePrefilter::Convolute)
-			shaderPath += "CubemapBlur.glsl";
+			shaderPath += "CubemapBlur.yaml";
 		else if (prefilter == TextureCubePrefilter::Prefilter)
-			shaderPath += "CubemapSpec.glsl";
+			shaderPath += "CubemapSpec.yaml";
 		OpenGLShader equiToCubeShader(shaderPath);
-		equiToCubeShader.bind();
+		equiToCubeShader.bind("LUT");
 		equiToCubeShader.setUniformInt("environmentMap", 0);
 		equiToCubeShader.setUniformMat4("projection", captureProjection);
 
