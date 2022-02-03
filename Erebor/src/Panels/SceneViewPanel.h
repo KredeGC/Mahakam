@@ -21,10 +21,10 @@ namespace Mahakam
 	public:
 		SceneViewPanel() = default;
 
-		void setContext(Ref<Scene> scene, Ref<FrameBuffer> framebuffer);
+		void SetContext(Ref<Scene> scene, Ref<FrameBuffer> framebuffer);
 
-		void onImGuiRender();
+		void OnImGuiRender();
 
-		bool onMouseScrolled(MouseScrolledEvent& event);
+		bool OnMouseScrolled(MouseScrolledEvent& event);
 	};
 }

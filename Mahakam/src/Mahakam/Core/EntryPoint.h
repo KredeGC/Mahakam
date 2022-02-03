@@ -4,16 +4,16 @@
 
 #if defined(MH_PLATFORM_WINDOWS)
 
-extern Mahakam::Application* Mahakam::createApplication();
+extern Mahakam::Application* Mahakam::CreateApplication();
 
 int main(int argc, char** argv)
 {
-	Mahakam::Log::init();
+	Mahakam::Log::Init();
 	MH_CORE_INFO("Logging initialized");
 	MH_INFO("Logging initialized");
 
-	auto app = Mahakam::createApplication();
-	app->run();
+	auto app = Mahakam::CreateApplication();
+	app->Run();
 	delete app;
 }
 

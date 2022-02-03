@@ -12,7 +12,7 @@ namespace Mahakam
 
 		operator float() const { return time; }
 
-		float getSeconds() const { return time; }
-		float getMilliSeconds() const { return time * 1000.0f; }
+		float GetSeconds() const { return time; }
+		float GetMilliSeconds() const { return time * 1000.0f; }
 	};
 }

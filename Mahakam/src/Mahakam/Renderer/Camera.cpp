@@ -6,19 +6,19 @@ namespace Mahakam
 	Camera::Camera()
 		: projectionMatrix({ 1.0f }), nearZ(0.03f), farZ(1000.0f)
 	{
-		setPerspective(fov, ratio, nearZ, farZ);
+		SetPerspective(fov, ratio, nearZ, farZ);
 	}
 
 	Camera::Camera(ProjectionType projection, float fov, float ratio, float nearPlane, float farPlane)
 		: projectionType(projection)
 	{
 		if (projectionType == ProjectionType::Perspective)
-			setPerspective(fov, ratio, nearPlane, farPlane);
+			SetPerspective(fov, ratio, nearPlane, farPlane);
 		else
-			setOrthographic(fov, ratio, nearPlane, farPlane);
+			SetOrthographic(fov, ratio, nearPlane, farPlane);
 	}
 
-	void Camera::recalculateProjectionMatrix()
+	void Camera::RecalculateProjectionMatrix()
 	{
 		if (changed)
 		{
@@ -29,23 +29,23 @@ namespace Mahakam
 		}
 	}
 
-	void Camera::setPerspective(float fov, float ratio, float nearPlane, float farPlane)
+	void Camera::SetPerspective(float fov, float ratio, float nearPlane, float farPlane)
 	{
 		projectionType = ProjectionType::Perspective;
 		this->fov = fov;
 		this->ratio = ratio;
 		nearZ = nearPlane;
 		farZ = farPlane;
-		recalculateProjectionMatrix();
+		RecalculateProjectionMatrix();
 	}
 
-	void Camera::setOrthographic(float size, float ratio, float nearPlane, float farPlane)
+	void Camera::SetOrthographic(float size, float ratio, float nearPlane, float farPlane)
 	{
 		projectionType = ProjectionType::Orthographic;
 		this->size = size;
 		this->ratio = ratio;
 		nearZ = nearPlane;
 		farZ = farPlane;
-		recalculateProjectionMatrix();
+		RecalculateProjectionMatrix();
 	}
 }

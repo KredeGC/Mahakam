@@ -7,9 +7,9 @@
 
 namespace Mahakam
 {
-	Ref<FrameBuffer> FrameBuffer::create(const FrameBufferProps& prop)
+	Ref<FrameBuffer> FrameBuffer::Create(const FrameBufferProps& prop)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");

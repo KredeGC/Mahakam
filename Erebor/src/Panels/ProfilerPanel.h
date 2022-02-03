@@ -12,6 +12,6 @@ namespace Mahakam
 		bool open = true;
 
 	public:
-		void onImGuiRender();
+		void OnImGuiRender();
 	};
 }

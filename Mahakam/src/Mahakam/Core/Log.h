@@ -13,7 +13,7 @@ namespace Mahakam
 		static std::shared_ptr<spdlog::logger> gameLogger;
 
 	public:
-		static void init();
+		static void Init();
 
 		inline static std::shared_ptr<spdlog::logger>& getEngineLogger()
 		{

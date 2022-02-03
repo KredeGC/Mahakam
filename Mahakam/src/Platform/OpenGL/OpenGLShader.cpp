@@ -90,7 +90,7 @@ namespace Mahakam
 		}
 	}
 
-	void OpenGLShader::bind(const std::string& shaderPass, const std::string& variant)
+	void OpenGLShader::Bind(const std::string& shaderPass, const std::string& variant)
 	{
 		auto& passIter = shaderPasses.find(shaderPass);
 		if (passIter != shaderPasses.end())
@@ -114,10 +114,10 @@ namespace Mahakam
 		}
 	}
 
-	void OpenGLShader::setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
+	void OpenGLShader::SetViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
 	{
-		setUniformMat4("u_m4_V", viewMatrix);
-		setUniformMat4("u_m4_P", projectionMatrix);
+		SetUniformMat4("u_m4_V", viewMatrix);
+		SetUniformMat4("u_m4_P", projectionMatrix);
 	}
 
 	bool OpenGLShader::HasShaderPass(const std::string& shaderPass) const
@@ -129,46 +129,46 @@ namespace Mahakam
 		return false;
 	}
 
-	void OpenGLShader::setTexture(const std::string& name, Ref<Texture> tex)
+	void OpenGLShader::SetTexture(const std::string& name, Ref<Texture> tex)
 	{
-		int slot = getUniformLocation(name);
+		int slot = GetUniformLocation(name);
 		if (slot != -1)
-			MH_GL_CALL(glBindTextureUnit(slot, tex->getRendererID()));
+			MH_GL_CALL(glBindTextureUnit(slot, tex->GetRendererID()));
 	}
 
-	void OpenGLShader::setUniformMat3(const std::string& name, const glm::mat3& value)
+	void OpenGLShader::SetUniformMat3(const std::string& name, const glm::mat3& value)
 	{
-		MH_GL_CALL(glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
+		MH_GL_CALL(glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
 	}
 
-	void OpenGLShader::setUniformMat4(const std::string& name, const glm::mat4& value)
+	void OpenGLShader::SetUniformMat4(const std::string& name, const glm::mat4& value)
 	{
-		MH_GL_CALL(glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
+		MH_GL_CALL(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
 	}
 
-	void OpenGLShader::setUniformInt(const std::string& name, int value)
+	void OpenGLShader::SetUniformInt(const std::string& name, int value)
 	{
-		MH_GL_CALL(glUniform1i(getUniformLocation(name), value));
+		MH_GL_CALL(glUniform1i(GetUniformLocation(name), value));
 	}
 
-	void OpenGLShader::setUniformFloat(const std::string& name, float value)
+	void OpenGLShader::SetUniformFloat(const std::string& name, float value)
 	{
-		MH_GL_CALL(glUniform1f(getUniformLocation(name), value));
+		MH_GL_CALL(glUniform1f(GetUniformLocation(name), value));
 	}
 
-	void OpenGLShader::setUniformFloat2(const std::string& name, const glm::vec2& value)
+	void OpenGLShader::SetUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
-		MH_GL_CALL(glUniform2f(getUniformLocation(name), value.x, value.y));
+		MH_GL_CALL(glUniform2f(GetUniformLocation(name), value.x, value.y));
 	}
 
-	void OpenGLShader::setUniformFloat3(const std::string& name, const glm::vec3& value)
+	void OpenGLShader::SetUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
-		MH_GL_CALL(glUniform3f(getUniformLocation(name), value.x, value.y, value.z));
+		MH_GL_CALL(glUniform3f(GetUniformLocation(name), value.x, value.y, value.z));
 	}
 
-	void OpenGLShader::setUniformFloat4(const std::string& name, const glm::vec4& value)
+	void OpenGLShader::SetUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
-		MH_GL_CALL(glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w));
+		MH_GL_CALL(glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w));
 	}
 
 	uint32_t OpenGLShader::CreateProgram(const std::unordered_map<uint32_t, std::vector<uint32_t>>& sources)
@@ -215,7 +215,7 @@ namespace Mahakam
 		return program;
 	}
 
-	std::unordered_map<uint32_t, std::vector<uint32_t>> OpenGLShader::compile_spirv(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
+	std::unordered_map<uint32_t, std::vector<uint32_t>> OpenGLShader::CompileSPIRV(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
 	{
 		std::unordered_map<uint32_t, std::vector<uint32_t>> compiledShaderStages;
 
@@ -257,7 +257,7 @@ namespace Mahakam
 				}
 
 				// Get source code with definitions
-				std::string original = sortIncludes(kv.second);
+				std::string original = SortIncludes(kv.second);
 				size_t firstNewline = original.find("\n") + 1;
 				std::string version = original.substr(0, firstNewline);
 				std::string body = original.substr(firstNewline, original.size());
@@ -313,7 +313,7 @@ namespace Mahakam
 			shaderIDs.reserve(sources.size());
 			for (auto& kv : sources)
 			{
-				std::string original = sortIncludes(kv.second);
+				std::string original = SortIncludes(kv.second);
 				size_t firstNewline = original.find("\n") + 1;
 				std::string version = original.substr(0, firstNewline);
 				std::string body = original.substr(firstNewline, original.size());
@@ -500,7 +500,7 @@ namespace Mahakam
 				{
 					std::string shaderPath = includeNode.as<std::string>();
 
-					source << readFile(shaderPath);
+					source << ReadFile(shaderPath);
 				}
 
 				auto sources = ParseGLSLFile(source.str());
@@ -569,7 +569,7 @@ namespace Mahakam
 		return sources;
 	}
 
-	std::string OpenGLShader::sortIncludes(const std::string& source)
+	std::string OpenGLShader::SortIncludes(const std::string& source)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -593,9 +593,9 @@ namespace Mahakam
 
 			std::string includeFile = source.substr(begin, end - begin);
 
-			std::string includeSource = readFile(includeFile);
+			std::string includeSource = ReadFile(includeFile);
 
-			sourceStream << sortIncludes(includeSource);
+			sourceStream << SortIncludes(includeSource);
 		}
 
 		sourceStream << source.substr(lastPos, source.size() - lastPos);
@@ -603,7 +603,7 @@ namespace Mahakam
 		return sourceStream.str();
 	}
 
-	std::string OpenGLShader::readFile(const std::string& filepath)
+	std::string OpenGLShader::ReadFile(const std::string& filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -627,7 +627,7 @@ namespace Mahakam
 		return result;
 	}
 
-	int OpenGLShader::getUniformLocation(const std::string& name)
+	int OpenGLShader::GetUniformLocation(const std::string& name)
 	{
 		if (uniformIDCache.find(name) != uniformIDCache.end())
 			return uniformIDCache[name];

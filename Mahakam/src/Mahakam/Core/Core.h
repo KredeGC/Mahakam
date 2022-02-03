@@ -69,3 +69,4 @@ namespace Mahakam
 }
 
 #include "Log.h"
+#include "Profiler.h"

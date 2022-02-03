@@ -12,13 +12,13 @@ namespace Mahakam
 	public:
 		WindowResizeEvent(uint32_t width, uint32_t height) : width(width), height(height) {}
 
-		inline uint32_t getWidth() { return width; }
-		inline uint32_t getHeight() { return height; }
+		inline uint32_t GetWidth() { return width; }
+		inline uint32_t GetHeight() { return height; }
 
-		std::string toString() const override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << getEventName() << ": " << width << ", " << height;
+			stream << GetEventName() << ": " << width << ", " << height;
 			return stream.str();
 		}
 

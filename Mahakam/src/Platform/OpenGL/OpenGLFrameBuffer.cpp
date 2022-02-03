@@ -13,7 +13,7 @@ namespace Mahakam
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferProps& props)
 		: props(props)
 	{
-		invalidate();
+		Invalidate();
 	}
 
 	OpenGLFrameBuffer::~OpenGLFrameBuffer()
@@ -23,18 +23,18 @@ namespace Mahakam
 		MH_GL_CALL(glDeleteFramebuffers(1, &rendererID));
 	}
 
-	void OpenGLFrameBuffer::bind()
+	void OpenGLFrameBuffer::Bind()
 	{
 		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, rendererID));
 		MH_GL_CALL(glViewport(0, 0, props.width, props.height));
 	}
 
-	void OpenGLFrameBuffer::unbind()
+	void OpenGLFrameBuffer::Unbind()
 	{
 		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
-	void OpenGLFrameBuffer::blit(const Ref<FrameBuffer>& dest, bool color, bool depth)
+	void OpenGLFrameBuffer::Blit(const Ref<FrameBuffer>& dest, bool color, bool depth)
 	{
 		Ref<OpenGLFrameBuffer> fbo = std::static_pointer_cast<OpenGLFrameBuffer>(dest);
 
@@ -49,7 +49,7 @@ namespace Mahakam
 		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
-	void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height)
+	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
 	{
 		if (width == 0 || height == 0 || width > MAX_FRAMEBUFFER_SIZE || height > MAX_FRAMEBUFFER_SIZE)
 		{
@@ -60,10 +60,10 @@ namespace Mahakam
 		props.width = width;
 		props.height = height;
 
-		invalidate();
+		Invalidate();
 	}
 
-	void OpenGLFrameBuffer::readColorPixels(void* pixels, int attachmentSlot) const
+	void OpenGLFrameBuffer::ReadColorPixels(void* pixels, int attachmentSlot) const
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -79,7 +79,7 @@ namespace Mahakam
 		MH_GL_CALL(glReadPixels(0, 0, props.width, props.height, format, type, pixels));
 	}
 
-	void OpenGLFrameBuffer::invalidate()
+	void OpenGLFrameBuffer::Invalidate()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -99,11 +99,11 @@ namespace Mahakam
 		{
 			FrameBufferAttachmentProps& spec = props.colorAttachments[i];
 
-			Ref<Texture> tex = Texture2D::create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+			Ref<Texture> tex = Texture2D::Create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
 
 			colorAttachments.push_back(tex);
 
-			MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, tex->getRendererID(), 0));
+			MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, tex->GetRendererID(), 0));
 		}
 
 		// Depth buffer
@@ -117,15 +117,15 @@ namespace Mahakam
 
 			if (spec.immutable)
 			{
-				depthAttachment = RenderBuffer::create(props.width, props.height, spec.format);
+				depthAttachment = RenderBuffer::Create(props.width, props.height, spec.format);
 
-				MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depthAttachment->getRendererID()));
+				MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depthAttachment->GetRendererID()));
 			}
 			else
 			{
-				depthAttachment = Texture2D::create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+				depthAttachment = Texture2D::Create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
 
-				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, depthAttachment->getRendererID(), 0));
+				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, depthAttachment->GetRendererID(), 0));
 			}
 		}
 

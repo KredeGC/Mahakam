@@ -13,16 +13,17 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 VULKAN_SDK = os.getenv("VULKAN_SDK")
 
 IncludeDir = {}
-IncludeDir["assimp"]    = "Mahakam/vendor/assimp/include"
-IncludeDir["entt"]      = "Mahakam/vendor/entt/include"
-IncludeDir["GLFW"]      = "Mahakam/vendor/GLFW/include"
-IncludeDir["glad"]      = "Mahakam/vendor/glad/include"
-IncludeDir["glm"]       = "Mahakam/vendor/glm"
-IncludeDir["imgui"]     = "Mahakam/vendor/imgui"
-IncludeDir["spdlog"]    = "Mahakam/vendor/spdlog/include"
-IncludeDir["stb_image"] = "Mahakam/vendor/stb_image"
-IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
-IncludeDir["yaml"]      = "Mahakam/vendor/yaml-cpp/include"
+IncludeDir["assimp"]        = "Mahakam/vendor/assimp/include"
+IncludeDir["entt"]          = "Mahakam/vendor/entt/include"
+IncludeDir["GLFW"]          = "Mahakam/vendor/GLFW/include"
+IncludeDir["glad"]          = "Mahakam/vendor/glad/include"
+IncludeDir["glm"]           = "Mahakam/vendor/glm"
+IncludeDir["imgui"]         = "Mahakam/vendor/imgui"
+IncludeDir["robin_hood"]    = "Mahakam/vendor/robin_hood"
+IncludeDir["spdlog"]        = "Mahakam/vendor/spdlog/include"
+IncludeDir["stb_image"]     = "Mahakam/vendor/stb_image"
+IncludeDir["VulkanSDK"]     = "%{VULKAN_SDK}/Include"
+IncludeDir["yaml"]          = "Mahakam/vendor/yaml-cpp/include"
 
 LinkDir = {}
 LinkDir["VulkanSDK"]    = "%{VULKAN_SDK}/Lib"
@@ -98,6 +99,7 @@ project "Mahakam"
         "%{IncludeDir.glad}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.imgui}",
+        "%{IncludeDir.robin_hood}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.VulkanSDK}",

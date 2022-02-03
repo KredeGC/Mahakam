@@ -18,13 +18,13 @@ namespace Mahakam
 		MH_CORE_ASSERT(!instance, "Application instance already created!");
 		instance = this;
 
-		window = std::unique_ptr<Window>(Window::create({ name }));
-		window->setEventCallback(MH_BIND_EVENT(Application::onEvent));
+		window = std::unique_ptr<Window>(Window::Create({ name }));
+		window->SetEventCallback(MH_BIND_EVENT(Application::OnEvent));
 
-		Renderer::init(1600, 900);
+		Renderer::Init(1600, 900);
 
 		imGuiLayer = new ImGuiLayer();
-		pushOverlay(imGuiLayer);
+		PushOverlay(imGuiLayer);
 	}
 
 	Application::~Application()
@@ -34,7 +34,7 @@ namespace Mahakam
 		Renderer::Shutdown();
 	}
 
-	void Application::run()
+	void Application::Run()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -48,59 +48,59 @@ namespace Mahakam
 			if (!minimized)
 			{
 				for (Layer* layer : layerStack)
-					layer->onUpdate(timestep);
+					layer->OnUpdate(timestep);
 			}
 
-			imGuiLayer->begin();
+			imGuiLayer->Begin();
 			for (Layer* layer : layerStack)
-				layer->onImGuiRender();
-			imGuiLayer->end();
+				layer->OnImGuiRender();
+			imGuiLayer->End();
 
-			window->onUpdate();
+			window->OnUpdate();
 		}
 	}
 
-	void Application::close()
+	void Application::Close()
 	{
 		running = false;
 	}
 
-	void Application::onEvent(Event& event)
+	void Application::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
 
-		dispatcher.dispatchEvent<WindowCloseEvent>(MH_BIND_EVENT(Application::onWindowClose));
-		dispatcher.dispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(Application::onWindowResize));
+		dispatcher.DispatchEvent<WindowCloseEvent>(MH_BIND_EVENT(Application::OnWindowClose));
+		dispatcher.DispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(Application::OnWindowResize));
 
 		for (auto iter = layerStack.end(); iter != layerStack.begin();)
 		{
 			if (event.handled)
 				break;
-			(*--iter)->onEvent(event);
+			(*--iter)->OnEvent(event);
 		}
 	}
 
-	void Application::pushLayer(Layer* layer)
+	void Application::PushLayer(Layer* layer)
 	{
-		layerStack.pushLayer(layer);
-		layer->onAttach();
+		layerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
-	void Application::pushOverlay(Layer* overlay)
+	void Application::PushOverlay(Layer* overlay)
 	{
-		layerStack.pushOverlay(overlay);
-		overlay->onAttach();
+		layerStack.PushOverlay(overlay);
+		overlay->OnAttach();
 	}
 
-	bool Application::onWindowClose(WindowCloseEvent& event)
+	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
 		running = false;
 		return true;
 	}
 
-	bool Application::onWindowResize(WindowResizeEvent& event)
+	bool Application::OnWindowResize(WindowResizeEvent& event)
 	{
-		if (event.getWidth() == 0 || event.getHeight() == 0)
+		if (event.GetWidth() == 0 || event.GetHeight() == 0)
 		{
 			minimized = true;
 			return false;
@@ -108,7 +108,7 @@ namespace Mahakam
 
 		minimized = false;
 
-		Renderer::onWindowResie(event.getWidth(), event.getHeight());
+		Renderer::OnWindowResie(event.GetWidth(), event.GetHeight());
 
 		return false;
 	}

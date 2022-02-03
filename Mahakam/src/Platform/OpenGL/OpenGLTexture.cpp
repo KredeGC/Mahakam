@@ -16,7 +16,7 @@
 
 namespace Mahakam
 {
-	static void* loadImageFile(const char* filepath, int* w, int* h, int* channels, int* hdr, int desiredChannels = 0)
+	static void* LoadImageFile(const char* filepath, int* w, int* h, int* channels, int* hdr, int desiredChannels = 0)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -34,7 +34,7 @@ namespace Mahakam
 		return data;
 	}
 
-	static void setWrapMode(uint32_t rendererID, GLenum axis, TextureWrapMode wrapMode)
+	static void SetWrapMode(uint32_t rendererID, GLenum axis, TextureWrapMode wrapMode)
 	{
 		const float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
@@ -55,7 +55,7 @@ namespace Mahakam
 		}
 	}
 
-	static void setFilterMode(uint32_t rendererID, bool mipmaps, TextureFilter filterMode)
+	static void SetFilterMode(uint32_t rendererID, bool mipmaps, TextureFilter filterMode)
 	{
 		// Minification
 		if (mipmaps)
@@ -132,13 +132,13 @@ namespace Mahakam
 		MH_GL_CALL(glTextureStorage2D(rendererID, this->props.mipmaps ? mipLevels : 1, internalFormat, this->props.width, this->props.height));
 
 		// Wrap X
-		setWrapMode(rendererID, GL_TEXTURE_WRAP_S, this->props.wrapX);
+		SetWrapMode(rendererID, GL_TEXTURE_WRAP_S, this->props.wrapX);
 
 		// Wrap Y
-		setWrapMode(rendererID, GL_TEXTURE_WRAP_T, this->props.wrapY);
+		SetWrapMode(rendererID, GL_TEXTURE_WRAP_T, this->props.wrapY);
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
+		SetFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
 			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
@@ -155,7 +155,7 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		int w, h, channels, hdr;
-		void* data = loadImageFile(filepath.c_str(), &w, &h, &channels, &hdr);
+		void* data = LoadImageFile(filepath.c_str(), &w, &h, &channels, &hdr);
 
 		this->props.width = w;
 		this->props.height = h;
@@ -179,13 +179,13 @@ namespace Mahakam
 		}
 
 		// Wrap X
-		setWrapMode(rendererID, GL_TEXTURE_WRAP_S, this->props.wrapX);
+		SetWrapMode(rendererID, GL_TEXTURE_WRAP_S, this->props.wrapX);
 
 		// Wrap Y
-		setWrapMode(rendererID, GL_TEXTURE_WRAP_T, this->props.wrapY);
+		SetWrapMode(rendererID, GL_TEXTURE_WRAP_T, this->props.wrapY);
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
+		SetFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
 			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
@@ -206,7 +206,7 @@ namespace Mahakam
 		MH_GL_CALL(glDeleteTextures(1, &rendererID));
 	}
 
-	void OpenGLTexture2D::setData(void* data, uint32_t size, bool mipmaps)
+	void OpenGLTexture2D::SetData(void* data, uint32_t size, bool mipmaps)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -234,12 +234,12 @@ namespace Mahakam
 			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
 	}
 
-	void OpenGLTexture2D::bind(uint32_t slot) const
+	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
 		MH_GL_CALL(glBindTextureUnit(slot, rendererID));
 	}
 
-	void OpenGLTexture2D::readPixels(void* pixels, bool mipmaps)
+	void OpenGLTexture2D::ReadPixels(void* pixels, bool mipmaps)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -302,7 +302,7 @@ namespace Mahakam
 		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
+		SetFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
 			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
@@ -319,7 +319,7 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		int w, h, channels, hdr;
-		void* data = loadImageFile(this->filepath.c_str(), &w, &h, &channels, &hdr);
+		void* data = LoadImageFile(this->filepath.c_str(), &w, &h, &channels, &hdr);
 
 		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
 		dataFormat = ChannelCountToOpenGLBaseFormat(channels);
@@ -367,7 +367,7 @@ namespace Mahakam
 		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
+		SetFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
 			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
@@ -388,9 +388,9 @@ namespace Mahakam
 
 		// Convert HDR equirectangular environment map to cubemap equivalent
 		OpenGLShader equiToCubeShader("assets/shaders/internal/Cubemap.yaml");
-		equiToCubeShader.bind("LUT");
-		equiToCubeShader.setUniformInt("equirectangularMap", 0);
-		equiToCubeShader.setUniformMat4("projection", captureProjection);
+		equiToCubeShader.Bind("LUT");
+		equiToCubeShader.SetUniformInt("equirectangularMap", 0);
+		equiToCubeShader.SetUniformMat4("projection", captureProjection);
 
 		MH_GL_CALL(glBindTextureUnit(0, hdrID));
 		MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
@@ -403,14 +403,14 @@ namespace Mahakam
 		MH_GL_CALL(glViewport(0, 0, this->props.resolution, this->props.resolution));
 		for (unsigned int i = 0; i < 6; ++i)
 		{
-			equiToCubeShader.setUniformMat4("view", captureViews[i]);
+			equiToCubeShader.SetUniformMat4("view", captureViews[i]);
 			MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, 0));
 
 			MH_GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-			GL::GetInvertedCube()->bind();
-			MH_GL_CALL(glDrawElements(GL_TRIANGLES, GL::GetInvertedCube()->getIndexCount(), GL_UNSIGNED_INT, nullptr));
-			GL::GetInvertedCube()->unbind();
+			GL::GetInvertedCube()->Bind();
+			MH_GL_CALL(glDrawElements(GL_TRIANGLES, GL::GetInvertedCube()->GetIndexCount(), GL_UNSIGNED_INT, nullptr));
+			GL::GetInvertedCube()->Unbind();
 		}
 
 
@@ -470,7 +470,7 @@ namespace Mahakam
 		MH_GL_CALL(glTextureParameteri(rendererID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 
 		// Filter mode & mipmaps
-		setFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
+		SetFilterMode(rendererID, this->props.mipmaps, this->props.filterMode);
 
 
 		// Create matrices
@@ -493,13 +493,13 @@ namespace Mahakam
 		else if (prefilter == TextureCubePrefilter::Prefilter)
 			shaderPath += "CubemapSpec.yaml";
 		OpenGLShader equiToCubeShader(shaderPath);
-		equiToCubeShader.bind("LUT");
-		equiToCubeShader.setUniformInt("environmentMap", 0);
-		equiToCubeShader.setUniformMat4("projection", captureProjection);
+		equiToCubeShader.Bind("LUT");
+		equiToCubeShader.SetUniformInt("environmentMap", 0);
+		equiToCubeShader.SetUniformMat4("projection", captureProjection);
 
-		MH_GL_CALL(glBindTextureUnit(0, cubemap->getRendererID()));
+		MH_GL_CALL(glBindTextureUnit(0, cubemap->GetRendererID()));
 		MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
-		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->getRendererID()));
+		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->GetRendererID()));
 
 		GLint viewport[4];
 		MH_GL_CALL(glGetIntegerv(GL_VIEWPORT, viewport));
@@ -520,17 +520,17 @@ namespace Mahakam
 				MH_GL_CALL(glViewport(0, 0, mipWidth, mipHeight));
 
 				float roughness = (float)mip / (float)(maxMipLevels - 1);
-				equiToCubeShader.setUniformFloat("roughness", roughness);
+				equiToCubeShader.SetUniformFloat("roughness", roughness);
 				for (unsigned int i = 0; i < 6; ++i)
 				{
-					equiToCubeShader.setUniformMat4("view", captureViews[i]);
+					equiToCubeShader.SetUniformMat4("view", captureViews[i]);
 					MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, mip));
 
 					MH_GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-					GL::GetInvertedCube()->bind();
-					MH_GL_CALL(glDrawElements(GL_TRIANGLES, GL::GetInvertedCube()->getIndexCount(), GL_UNSIGNED_INT, nullptr));
-					GL::GetInvertedCube()->unbind();
+					GL::GetInvertedCube()->Bind();
+					MH_GL_CALL(glDrawElements(GL_TRIANGLES, GL::GetInvertedCube()->GetIndexCount(), GL_UNSIGNED_INT, nullptr));
+					GL::GetInvertedCube()->Unbind();
 				}
 			}
 		}
@@ -539,14 +539,14 @@ namespace Mahakam
 			MH_GL_CALL(glViewport(0, 0, this->props.resolution, this->props.resolution)); // don't forget to configure the viewport to the capture dimensions.
 			for (unsigned int i = 0; i < 6; ++i)
 			{
-				equiToCubeShader.setUniformMat4("view", captureViews[i]);
+				equiToCubeShader.SetUniformMat4("view", captureViews[i]);
 				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, rendererID, 0));
 
 				MH_GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-				GL::GetInvertedCube()->bind();
-				MH_GL_CALL(glDrawElements(GL_TRIANGLES, GL::GetInvertedCube()->getIndexCount(), GL_UNSIGNED_INT, nullptr));
-				GL::GetInvertedCube()->unbind();
+				GL::GetInvertedCube()->Bind();
+				MH_GL_CALL(glDrawElements(GL_TRIANGLES, GL::GetInvertedCube()->GetIndexCount(), GL_UNSIGNED_INT, nullptr));
+				GL::GetInvertedCube()->Unbind();
 			}
 		}
 
@@ -576,7 +576,7 @@ namespace Mahakam
 		MH_GL_CALL(glDeleteTextures(1, &rendererID));
 	}
 
-	void OpenGLTextureCube::setData(void* data, uint32_t size, bool mipmaps)
+	void OpenGLTextureCube::SetData(void* data, uint32_t size, bool mipmaps)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -609,12 +609,12 @@ namespace Mahakam
 			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
 	}
 
-	void OpenGLTextureCube::bind(uint32_t slot) const
+	void OpenGLTextureCube::Bind(uint32_t slot) const
 	{
 		MH_GL_CALL(glBindTextureUnit(slot, rendererID));
 	}
 
-	void OpenGLTextureCube::readPixels(void* pixels, bool mipmaps)
+	void OpenGLTextureCube::ReadPixels(void* pixels, bool mipmaps)
 	{
 		// TODO: Fix to work with compressed formats
 

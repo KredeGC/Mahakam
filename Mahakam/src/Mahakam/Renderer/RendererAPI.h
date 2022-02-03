@@ -28,29 +28,29 @@ namespace Mahakam
 		static API api;
 
 	public:
-		virtual void init() = 0;
-		virtual const char* getGraphicsVendor() = 0;
-		virtual void setViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) = 0;
+		virtual void Init() = 0;
+		virtual const char* GetGraphicsVendor() = 0;
+		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) = 0;
 
-		virtual void finishRendering() = 0;
+		virtual void FinishRendering() = 0;
 
-		virtual void setClearColor(const glm::vec4 color) = 0;
-		virtual void clear(bool color, bool depth) = 0;
+		virtual void SetClearColor(const glm::vec4 color) = 0;
+		virtual void Clear(bool color, bool depth) = 0;
 
-		virtual void enableCulling(bool enable, bool cullFront) = 0;
+		virtual void EnableCulling(bool enable, bool cullFront) = 0;
 
-		virtual void enableZWriting(bool enable) = 0;
+		virtual void EnableZWriting(bool enable) = 0;
 
-		virtual void enableZTesting(bool enable) = 0;
+		virtual void EnableZTesting(bool enable) = 0;
 
-		virtual void setFillMode(bool fill) = 0;
+		virtual void SetFillMode(bool fill) = 0;
 
-		virtual void setBlendMode(BlendMode src, BlendMode dst, bool enable) = 0;
+		virtual void SetBlendMode(BlendMode src, BlendMode dst, bool enable) = 0;
 
-		virtual void drawIndexed(uint32_t count) = 0;
+		virtual void DrawIndexed(uint32_t count) = 0;
 
-		virtual void drawInstanced(uint32_t indexCount, uint32_t count) = 0;
+		virtual void DrawInstanced(uint32_t indexCount, uint32_t count) = 0;
 
-		inline static API getAPI() { return api; }
+		inline static API GetAPI() { return api; }
 	};
 }

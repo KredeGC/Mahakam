@@ -8,7 +8,7 @@
 
 namespace Mahakam
 {
-	static bool drawVec3Control(const char* label, glm::vec3& value, float resetValue = 0.0f, float columnWidth = 100.0f)
+	static bool DrawVec3Control(const char* label, glm::vec3& value, float resetValue = 0.0f, float columnWidth = 100.0f)
 	{
 		bool changed = false;
 
@@ -85,9 +85,9 @@ namespace Mahakam
 		return changed;
 	}
 
-	void SceneHierarchyPanel::drawEntityNode(Entity entity)
+	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
-		std::string& tag = entity.getComponent<TagComponent>().tag;
+		std::string& tag = entity.GetComponent<TagComponent>().tag;
 
 		ImGuiTreeNodeFlags flags = ((entity == selectedEntity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
@@ -115,14 +115,14 @@ namespace Mahakam
 			if (selectedEntity == entity)
 				selectedEntity = {};
 
-			context->destroyEntity(entity);
+			context->DestroyEntity(entity);
 		}
 	}
 
 	template<typename T, typename Fn>
-	static void drawComponent(const char* label, Entity entity, Fn func, bool deletable = true)
+	static void DrawComponent(const char* label, Entity entity, Fn func, bool deletable = true)
 	{
-		if (entity.hasComponent<T>())
+		if (entity.HasComponent<T>())
 		{
 			bool markedForDeletion = false;
 			if (ImGui::CollapsingHeader(label, ImGuiTreeNodeFlags_DefaultOpen))
@@ -143,28 +143,28 @@ namespace Mahakam
 
 					if (ImGui::MenuItem("Reset"))
 					{
-						entity.removeComponent<T>();
-						entity.addComponent<T>();
+						entity.RemoveComponent<T>();
+						entity.AddComponent<T>();
 						ImGui::CloseCurrentPopup();
 					}
 
 					ImGui::EndPopup();
 				}
 
-				T& component = entity.getComponent<T>();
+				T& component = entity.GetComponent<T>();
 				func(component);
 			}
 
 			if (markedForDeletion)
-				entity.removeComponent<T>();
+				entity.RemoveComponent<T>();
 		}
 	}
 
-	void SceneHierarchyPanel::drawInspector(Entity entity)
+	void SceneHierarchyPanel::DrawInspector(Entity entity)
 	{
-		if (entity.hasComponent<TagComponent>())
+		if (entity.HasComponent<TagComponent>())
 		{
-			std::string& tag = entity.getComponent<TagComponent>().tag;
+			std::string& tag = entity.GetComponent<TagComponent>().tag;
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
@@ -185,13 +185,13 @@ namespace Mahakam
 		{
 			if (ImGui::MenuItem("Camera"))
 			{
-				selectedEntity.addComponent<CameraComponent>();
+				selectedEntity.AddComponent<CameraComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 
 			if (ImGui::MenuItem("Mesh"))
 			{
-				selectedEntity.addComponent<MeshComponent>();
+				selectedEntity.AddComponent<MeshComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -200,28 +200,28 @@ namespace Mahakam
 
 		ImGui::PopItemWidth();
 
-		drawComponent<TransformComponent>("Transform", entity, [](TransformComponent& transform)
+		DrawComponent<TransformComponent>("Transform", entity, [](TransformComponent& transform)
 		{
-			glm::vec3 pos = transform.getPosition();
-			if (drawVec3Control("Position", pos))
-				transform.setPosition(pos);
+			glm::vec3 pos = transform.GetPosition();
+			if (DrawVec3Control("Position", pos))
+				transform.SetPosition(pos);
 
 			// TODO: Fix
-			glm::vec3 eulerAngles = glm::degrees(transform.getEulerAngles());
-			if (drawVec3Control("Rotation", eulerAngles))
-				transform.setEulerangles(glm::radians(eulerAngles));
+			glm::vec3 eulerAngles = glm::degrees(transform.GetEulerAngles());
+			if (DrawVec3Control("Rotation", eulerAngles))
+				transform.SetEulerangles(glm::radians(eulerAngles));
 
-			glm::vec3 scale = transform.getScale();
-			if (drawVec3Control("Scale", scale, 1.0f))
-				transform.setScale(scale);
+			glm::vec3 scale = transform.GetScale();
+			if (DrawVec3Control("Scale", scale, 1.0f))
+				transform.SetScale(scale);
 		}, false);
 
-		drawComponent<CameraComponent>("Camera", entity, [](CameraComponent& cameraComponent)
+		DrawComponent<CameraComponent>("Camera", entity, [](CameraComponent& cameraComponent)
 		{
-			Camera& camera = cameraComponent.getCamera();
+			Camera& camera = cameraComponent.GetCamera();
 
 			const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
-			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.getProjectionType()];
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
 
 			if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
 			{
@@ -231,7 +231,7 @@ namespace Mahakam
 					if (ImGui::Selectable(projectionTypeStrings[i], selected))
 					{
 						currentProjectionTypeString = projectionTypeStrings[i];
-						camera.setProjectionType((Camera::ProjectionType)i);
+						camera.SetProjectionType((Camera::ProjectionType)i);
 					}
 
 					if (selected)
@@ -241,36 +241,36 @@ namespace Mahakam
 				ImGui::EndCombo();
 			}
 
-			if (camera.getProjectionType() == Camera::ProjectionType::Perspective)
+			if (camera.GetProjectionType() == Camera::ProjectionType::Perspective)
 			{
-				float fov = glm::degrees(camera.getFov());
+				float fov = glm::degrees(camera.GetFov());
 				if (ImGui::DragFloat("Field of view", &fov, 0.1f, 0.0f, 180.0f))
-					camera.setFov(glm::radians(fov));
+					camera.SetFov(glm::radians(fov));
 			}
 			else
 			{
-				float size = camera.getSize();
+				float size = camera.GetSize();
 				if (ImGui::DragFloat("Size", &size, 0.1f, 0.0f))
-					camera.setSize(size);
+					camera.SetSize(size);
 			}
 
-			float nearClip = camera.getNearPlane();
+			float nearClip = camera.GetNearPlane();
 			if (ImGui::DragFloat("Near clip-plane", &nearClip, 0.1f, 0.0f))
-				camera.setNearPlane(nearClip);
+				camera.SetNearPlane(nearClip);
 
-			float farClip = camera.getFarPlane();
+			float farClip = camera.GetFarPlane();
 			if (ImGui::DragFloat("Far clip-plane", &farClip, 0.1f, 0.0f))
-				camera.setFarPlane(farClip);
+				camera.SetFarPlane(farClip);
 
-			bool fixedAspectRatio = cameraComponent.hasFixedAspectRatio();
+			bool fixedAspectRatio = cameraComponent.HasFixedAspectRatio();
 			if (ImGui::Checkbox("Fixed aspect ratio", &fixedAspectRatio))
-				cameraComponent.setFixedAspectRatio(fixedAspectRatio);
+				cameraComponent.SetFixedAspectRatio(fixedAspectRatio);
 		});
 
-		drawComponent<MeshComponent>("Mesh", entity, [](MeshComponent& meshComponent)
+		DrawComponent<MeshComponent>("Mesh", entity, [](MeshComponent& meshComponent)
 		{
-			auto& meshes = meshComponent.getMeshes();
-			Ref<Material>& material = meshComponent.getMaterial();
+			auto& meshes = meshComponent.GetMeshes();
+			Ref<Material>& material = meshComponent.GetMaterial();
 
 			uint32_t vertexCount = 0;
 			uint32_t indexCount = 0;
@@ -278,8 +278,8 @@ namespace Mahakam
 			{
 				if (mesh)
 				{
-					vertexCount += mesh->getVertexCount();
-					indexCount += mesh->getIndexCount();
+					vertexCount += mesh->GetVertexCount();
+					indexCount += mesh->GetIndexCount();
 				}
 			}
 
@@ -294,20 +294,20 @@ namespace Mahakam
 				if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					// TODO: Temporary
-					glm::vec3 color = material->getFloat3("u_Color");
+					glm::vec3 color = material->GetFloat3("u_Color");
 					if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
-						material->setFloat3("u_Color", color);
+						material->SetFloat3("u_Color", color);
 				}
 			}
 		});
 	}
 
-	void SceneHierarchyPanel::setContext(Ref<Scene> scene)
+	void SceneHierarchyPanel::SetContext(Ref<Scene> scene)
 	{
 		context = scene;
 	}
 
-	void SceneHierarchyPanel::onImGuiRender()
+	void SceneHierarchyPanel::OnImGuiRender()
 	{
 		if (open)
 		{
@@ -317,7 +317,7 @@ namespace Mahakam
 			{
 				Entity entity(handle, context.get());
 
-				drawEntityNode(entity);
+				DrawEntityNode(entity);
 			});
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -327,7 +327,7 @@ namespace Mahakam
 			if (ImGui::BeginPopupContextWindow(0, 1, false))
 			{
 				if (ImGui::MenuItem("Create empty entity"))
-					context->createEntity();
+					context->CreateEntity();
 
 				ImGui::EndPopup();
 			}
@@ -339,7 +339,7 @@ namespace Mahakam
 
 			if (selectedEntity)
 			{
-				drawInspector(selectedEntity);
+				DrawInspector(selectedEntity);
 			}
 
 			ImGui::End();

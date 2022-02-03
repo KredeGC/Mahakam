@@ -12,7 +12,7 @@ namespace Mahakam
 		KeyEvent(int keycode) : keycode(keycode) {}
 
 	public:
-		inline int getKeyCode() const { return keycode; }
+		inline int GetKeyCode() const { return keycode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	};
@@ -26,12 +26,12 @@ namespace Mahakam
 	public:
 		KeyPressedEvent(int keycode, int repeatCount) : KeyEvent(keycode), repeatCount(repeatCount) {}
 
-		inline int getRepeatCount() const { return repeatCount; }
+		inline int GetRepeatCount() const { return repeatCount; }
 
-		std::string toString() const override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << getEventName() << ": " << keycode << " (" << repeatCount << " repeats)";
+			stream << GetEventName() << ": " << keycode << " (" << repeatCount << " repeats)";
 			return stream.str();
 		}
 
@@ -44,10 +44,10 @@ namespace Mahakam
 	public:
 		KeyReleasedEvent(int keycode) : KeyEvent(keycode) {}
 
-		std::string toString() const override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << getEventName() << ": " << keycode;
+			stream << GetEventName() << ": " << keycode;
 			return stream.str();
 		}
 
@@ -60,10 +60,10 @@ namespace Mahakam
 	public:
 		KeyTypedEvent(int keycode) : KeyEvent(keycode) {}
 
-		std::string toString() const override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << getEventName() << ": " << keycode;
+			stream << GetEventName() << ": " << keycode;
 			return stream.str();
 		}
 

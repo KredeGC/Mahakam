@@ -54,26 +54,26 @@ namespace Mahakam
 		MH_GL_CALL(glDeleteVertexArrays(1, &rendererID));
 	}
 	
-	void OpenGLVertexArray::bind() const
+	void OpenGLVertexArray::Bind() const
 	{
 		MH_GL_CALL(glBindVertexArray(rendererID));
 	}
 	
-	void OpenGLVertexArray::unbind() const
+	void OpenGLVertexArray::Unbind() const
 	{
 		MH_GL_CALL(glBindVertexArray(0));
 	}
 
-	void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& buffer, bool interleave)
+	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& buffer, bool interleave)
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_ASSERT(buffer->getLayout().getElements().size(), "Vertex buffer has no layout!");
+		MH_CORE_ASSERT(buffer->GetLayout().GetElements().size(), "Vertex buffer has no layout!");
 
 		MH_GL_CALL(glBindVertexArray(rendererID));
-		buffer->bind();
+		buffer->Bind();
 
-		const auto& layout = buffer->getLayout();
+		const auto& layout = buffer->GetLayout();
 		if (interleave)
 		{
 			for (const auto& element : layout)
@@ -83,18 +83,18 @@ namespace Mahakam
 				if (type == GL_INT)
 				{
 					MH_GL_CALL(glVertexAttribIPointer(vertexBufferIndex,
-						element.getComponentCount(),
+						element.GetComponentCount(),
 						type,
-						layout.getStride(),
+						layout.GetStride(),
 						(const void*)(uintptr_t)element.offset));
 				}
 				else
 				{
 					MH_GL_CALL(glVertexAttribPointer(vertexBufferIndex,
-						element.getComponentCount(),
+						element.GetComponentCount(),
 						type,
 						element.normalized ? GL_TRUE : GL_FALSE,
-						layout.getStride(),
+						layout.GetStride(),
 						(const void*)(uintptr_t)element.offset));
 				}
 				vertexBufferIndex++;
@@ -109,7 +109,7 @@ namespace Mahakam
 				if (type == GL_INT)
 				{
 					MH_GL_CALL(glVertexAttribIPointer(vertexBufferIndex,
-						element.getComponentCount(),
+						element.GetComponentCount(),
 						type,
 						0,
 						(const void*)(uintptr_t)(vertexCount * element.offset)));
@@ -117,7 +117,7 @@ namespace Mahakam
 				else
 				{
 					MH_GL_CALL(glVertexAttribPointer(vertexBufferIndex,
-						element.getComponentCount(),
+						element.GetComponentCount(),
 						type,
 						element.normalized ? GL_TRUE : GL_FALSE,
 						0,
@@ -130,12 +130,12 @@ namespace Mahakam
 		vertexBuffers.push_back(buffer);
 	}
 	
-	void OpenGLVertexArray::setIndexBuffer(const Ref<IndexBuffer>& buffer)
+	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& buffer)
 	{
 		MH_PROFILE_FUNCTION();
 
 		MH_GL_CALL(glBindVertexArray(rendererID));
-		buffer->bind();
+		buffer->Bind();
 		indexBuffer = buffer;
 	}
 }

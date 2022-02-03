@@ -11,7 +11,7 @@ namespace Mahakam
 		MH_CORE_ASSERT(window, "Window is nullptr!");
 	}
 	
-	void OpenGLContext::init()
+	void OpenGLContext::Init()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -20,7 +20,7 @@ namespace Mahakam
 		MH_ASSERT(status, "Could not initialize glad!");
 	}
 	
-	void OpenGLContext::swapBuffers()
+	void OpenGLContext::SwapBuffers()
 	{
 		MH_PROFILE_FUNCTION();
 

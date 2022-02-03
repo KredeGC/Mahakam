@@ -45,13 +45,13 @@ namespace Mahakam
 	class Texture : public RenderBuffer
 	{
 	public:
-		virtual uint32_t getTotalSize() const = 0;
+		virtual uint32_t GetTotalSize() const = 0;
 
-		virtual void setData(void* data, uint32_t size, bool mipmaps = false) = 0;
+		virtual void SetData(void* data, uint32_t size, bool mipmaps = false) = 0;
 
-		virtual void bind(uint32_t slot = 0) const = 0;
+		virtual void Bind(uint32_t slot = 0) const = 0;
 
-		virtual void readPixels(void* pixels, bool mipmaps = false) = 0;
+		virtual void ReadPixels(void* pixels, bool mipmaps = false) = 0;
 	};
 
 
@@ -62,8 +62,8 @@ namespace Mahakam
 		static Ref<Texture2D> black;
 		static Ref<Texture2D> bump;
 
-		static Ref<Texture2D> create(const TextureProps& props = TextureProps());
-		static Ref<Texture2D> create(const std::string& filepath, const TextureProps& props = TextureProps());
+		static Ref<Texture2D> Create(const TextureProps& props = TextureProps());
+		static Ref<Texture2D> Create(const std::string& filepath, const TextureProps& props = TextureProps());
 	};
 
 
@@ -72,7 +72,7 @@ namespace Mahakam
 	public:
 		virtual uint32_t getDepth() const = 0;
 
-		static Ref<Texture3D> create(const std::string& filepath, const TextureProps& props = TextureProps());
+		static Ref<Texture3D> Create(const std::string& filepath, const TextureProps& props = TextureProps());
 	};
 
 
@@ -84,8 +84,8 @@ namespace Mahakam
 	public:
 		static Ref<TextureCube> white;
 
-		static Ref<TextureCube> create(const CubeTextureProps& props = CubeTextureProps());
-		static Ref<TextureCube> create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps());
-		static Ref<TextureCube> create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props = CubeTextureProps());
+		static Ref<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps());
+		static Ref<TextureCube> Create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps());
+		static Ref<TextureCube> Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props = CubeTextureProps());
 	};
 }

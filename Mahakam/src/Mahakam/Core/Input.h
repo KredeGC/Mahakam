@@ -9,11 +9,11 @@ namespace Mahakam
 	class Input
 	{
 	public:
-		static bool isKeyPressed(int keycode);
+		static bool IsKeyPressed(int keycode);
 
-		static bool isMouseButtonPressed(int button);
-		static float getMouseX();
-		static float getMouseY();
-		static std::pair<float, float> getMousePos();
+		static bool IsMouseButtonPressed(int button);
+		static float GetMouseX();
+		static float GetMouseY();
+		static std::pair<float, float> GetMousePos();
 	};
 }

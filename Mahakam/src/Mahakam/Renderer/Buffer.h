@@ -52,7 +52,7 @@ namespace Mahakam
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
 			: type(type), name(name), size(ShaderDataTypeSize(type)), offset(0), normalized(normalized) {}
 
-		uint32_t getComponentCount() const
+		uint32_t GetComponentCount() const
 		{
 			switch (type)
 			{
@@ -92,29 +92,30 @@ namespace Mahakam
 		std::vector<BufferElement> elements;
 		uint32_t stride = 0;
 
-		void calculateOffsetAndStride();
-
 	public:
 		BufferLayout() {}
 
 		BufferLayout(const std::initializer_list<BufferElement>& elements) : elements(elements)
 		{
-			calculateOffsetAndStride();
+			CalculateOffsetAndStride();
 		}
 
 		BufferLayout(const std::vector<BufferElement>& elements) : elements(elements)
 		{
-			calculateOffsetAndStride();
+			CalculateOffsetAndStride();
 		}
 
-		inline const BufferElement& getElement(int index) const { return elements[index]; }
-		inline const std::vector<BufferElement>& getElements() const { return elements; }
-		inline uint32_t getStride() const { return stride; }
+		inline const BufferElement& GetElement(int index) const { return elements[index]; }
+		inline const std::vector<BufferElement>& GetElements() const { return elements; }
+		inline uint32_t GetStride() const { return stride; }
 
 		std::vector<BufferElement>::iterator begin() { return elements.begin(); }
 		std::vector<BufferElement>::iterator end() { return elements.end(); }
 		std::vector<BufferElement>::const_iterator begin() const { return elements.begin(); }
 		std::vector<BufferElement>::const_iterator end() const { return elements.end(); }
+
+	private:
+		void CalculateOffsetAndStride();
 	};
 
 
@@ -124,16 +125,16 @@ namespace Mahakam
 	public:
 		virtual ~VertexBuffer() {}
 
-		virtual void bind() const = 0;
-		virtual void unbind() const = 0;
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
 
-		virtual void setData(const char* data, uint32_t size) = 0;
+		virtual void SetData(const char* data, uint32_t size) = 0;
 
-		virtual void setLayout(const BufferLayout& layout) = 0;
-		virtual const BufferLayout& getLayout() const = 0;
+		virtual void SetLayout(const BufferLayout& layout) = 0;
+		virtual const BufferLayout& GetLayout() const = 0;
 
-		static Ref<VertexBuffer> create(const char* vertices, uint32_t size);
-		static Ref<VertexBuffer> create(uint32_t size);
+		static Ref<VertexBuffer> Create(const char* vertices, uint32_t size);
+		static Ref<VertexBuffer> Create(uint32_t size);
 	};
 #pragma endregion
 
@@ -144,12 +145,12 @@ namespace Mahakam
 	public:
 		virtual ~IndexBuffer() {}
 
-		virtual void bind() const = 0;
-		virtual void unbind() const = 0;
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
 
-		virtual uint32_t getCount() const = 0;
+		virtual uint32_t GetCount() const = 0;
 
-		static Ref<IndexBuffer> create(uint32_t* indices, uint32_t count);
+		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t count);
 	};
 #pragma endregion
 
@@ -160,12 +161,12 @@ namespace Mahakam
 	public:
 		virtual ~UniformBuffer() {}
 
-		virtual void bind(int slot = 0, int offset = 0, int size = 0) const = 0;
-		virtual void unbind(int slot = 0) const = 0;
+		virtual void Bind(int slot = 0, int offset = 0, int size = 0) const = 0;
+		virtual void Unbind(int slot = 0) const = 0;
 
-		virtual void setData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
+		virtual void SetData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
 
-		static Ref<UniformBuffer> create(uint32_t size);
+		static Ref<UniformBuffer> Create(uint32_t size);
 	};
 #pragma endregion
 
@@ -176,14 +177,14 @@ namespace Mahakam
 	public:
 		virtual ~StorageBuffer() {}
 
-		virtual void bind(int slot = 0, int offset = 0, int size = 0) const = 0;
-		virtual void unbind(int slot = 0) const = 0;
+		virtual void Bind(int slot = 0, int offset = 0, int size = 0) const = 0;
+		virtual void Unbind(int slot = 0) const = 0;
 
-		virtual uint32_t getSize() const = 0;
+		virtual uint32_t GetSize() const = 0;
 
-		virtual void setData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
+		virtual void SetData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
 
-		static Ref<StorageBuffer> create(uint32_t size);
+		static Ref<StorageBuffer> Create(uint32_t size);
 	};
 #pragma endregion
 }

@@ -35,38 +35,26 @@ namespace Mahakam
 
 		Camera(const glm::mat4& projection) : projectionMatrix(projection), nearZ(0), farZ(0) {}
 
-		void recalculateProjectionMatrix();
+		void RecalculateProjectionMatrix();
 
-		void setPerspective(float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f);
+		void SetPerspective(float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f);
 
-		void setOrthographic(float size, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f);
+		void SetOrthographic(float size, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f);
 
-		void setFov(float f) { fov = f; changed = true; }
+		void SetFov(float f) { fov = f; changed = true; }
+		void SetSize(float s) { size = s; changed = true; }
+		void SetRatio(float r) { ratio = r; changed = true; }
+		void SetNearPlane(float nearPlane) { nearZ = nearPlane; changed = true; }
+		void SetFarPlane(float farPlane) { farZ = farPlane; changed = true; }
+		void SetProjectionType(ProjectionType type) { projectionType = type; changed = true; }
+		void SetProjectionMatrix(const glm::mat4& projection) { projectionMatrix = projection; }
 
-		float getFov() const { return fov; }
-
-		void setSize(float s) { size = s; changed = true; }
-
-		float getSize() const { return size; }
-
-		void setRatio(float r) { ratio = r; changed = true; }
-
-		float getRatio() const { return ratio; }
-
-		void setNearPlane(float nearPlane) { nearZ = nearPlane; changed = true; }
-
-		float getNearPlane() const { return nearZ; }
-
-		void setFarPlane(float farPlane) { farZ = farPlane; changed = true; }
-
-		float getFarPlane() const { return farZ; }
-
-		void setProjectionType(ProjectionType type) { projectionType = type; changed = true; }
-
-		ProjectionType getProjectionType() const { return projectionType; }
-
-		void setProjectionMatrix(const glm::mat4& projection) { projectionMatrix = projection; }
-
-		const glm::mat4& getProjectionMatrix() const { return projectionMatrix; }
+		float GetFov() const { return fov; }
+		float GetSize() const { return size; }
+		float GetRatio() const { return ratio; }
+		float GetNearPlane() const { return nearZ; }
+		float GetFarPlane() const { return farZ; }
+		ProjectionType GetProjectionType() const { return projectionType; }
+		const glm::mat4& GetProjectionMatrix() const { return projectionMatrix; }
 	};
 }

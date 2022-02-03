@@ -14,97 +14,97 @@ namespace Mahakam
 		TransformComponent* transform = nullptr;
 
 	public:
-		virtual void onCreate() override
+		virtual void OnCreate() override
 		{
-			transform = &entity.getComponent<TransformComponent>();
+			transform = &entity.GetComponent<TransformComponent>();
 		}
 
-		virtual void onUpdate(Timestep dt) override
+		virtual void OnUpdate(Timestep dt) override
 		{
 			rotation += dt * 10.0f;
-			transform->setRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(rotation), 0.0f }));
+			transform->SetRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(rotation), 0.0f }));
 		}
 	};
 
 	class CameraController : public ScriptableEntity
 	{
 	public:
-		virtual void onUpdate(Timestep dt) override
+		virtual void OnUpdate(Timestep dt) override
 		{
-			auto& transform = getComponent<TransformComponent>();
+			auto& transform = GetComponent<TransformComponent>();
 
 			float speed = 20.0f * dt;
 			float rotationSpeed = dt;
 
-			glm::vec3 eulerAngles = transform.getEulerAngles();
+			glm::vec3 eulerAngles = transform.GetEulerAngles();
 
 			// Camera rotation
-			if (Input::isKeyPressed(MH_KEY_LEFT))
+			if (Input::IsKeyPressed(MH_KEY_LEFT))
 			{
 				eulerAngles.y += rotationSpeed;
-				transform.setEulerangles(eulerAngles);
+				transform.SetEulerangles(eulerAngles);
 			}
-			else if (Input::isKeyPressed(MH_KEY_RIGHT))
+			else if (Input::IsKeyPressed(MH_KEY_RIGHT))
 			{
 				eulerAngles.y -= rotationSpeed;
-				transform.setEulerangles(eulerAngles);
+				transform.SetEulerangles(eulerAngles);
 			}
 
-			if (Input::isKeyPressed(MH_KEY_UP))
+			if (Input::IsKeyPressed(MH_KEY_UP))
 			{
 				eulerAngles.x += rotationSpeed;
-				transform.setEulerangles(eulerAngles);
+				transform.SetEulerangles(eulerAngles);
 			}
-			else if (Input::isKeyPressed(MH_KEY_DOWN))
+			else if (Input::IsKeyPressed(MH_KEY_DOWN))
 			{
 				eulerAngles.x -= rotationSpeed;
-				transform.setEulerangles(eulerAngles);
+				transform.SetEulerangles(eulerAngles);
 			}
 
 			// Camera movement
-			if (Input::isKeyPressed(MH_KEY_A))
-				transform.setPosition(transform.getPosition() - glm::vec3(speed) * transform.getRight());
-			else if (Input::isKeyPressed(MH_KEY_D))
-				transform.setPosition(transform.getPosition() + glm::vec3(speed) * transform.getRight());
+			if (Input::IsKeyPressed(MH_KEY_A))
+				transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetRight());
+			else if (Input::IsKeyPressed(MH_KEY_D))
+				transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetRight());
 
-			if (Input::isKeyPressed(MH_KEY_W))
-				transform.setPosition(transform.getPosition() - glm::vec3(speed) * transform.getForward());
-			else if (Input::isKeyPressed(MH_KEY_S))
-				transform.setPosition(transform.getPosition() + glm::vec3(speed) * transform.getForward());
+			if (Input::IsKeyPressed(MH_KEY_W))
+				transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetForward());
+			else if (Input::IsKeyPressed(MH_KEY_S))
+				transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetForward());
 		}
 	};
 
-	void EditorLayer::onAttach()
+	void EditorLayer::OnAttach()
 	{
 		// Create a new active scene
-		activeScene = Scene::createScene("assets/textures/pines.hdr");
+		activeScene = Scene::CreateScene("assets/textures/pines.hdr");
 
 
 		// Setup the viewport in editor
-		sceneViewPanel.setContext(activeScene, Renderer::getFrameBuffer());
-		sceneHierarchyPanel.setContext(activeScene);
+		sceneViewPanel.SetContext(activeScene, Renderer::GetFrameBuffer());
+		sceneHierarchyPanel.SetContext(activeScene);
 
 
 		// Setup shaders
-		Ref<Shader> skinnedShader = Shader::create("assets/shaders/Skinned.yaml");
-		Ref<Shader> textureShader = Shader::create("assets/shaders/Albedo.yaml");
-		Ref<Shader> colorShader = Shader::create("assets/shaders/LitColor.yaml");
+		Ref<Shader> skinnedShader = Shader::Create("assets/shaders/Skinned.yaml");
+		Ref<Shader> textureShader = Shader::Create("assets/shaders/Albedo.yaml");
+		Ref<Shader> colorShader = Shader::Create("assets/shaders/LitColor.yaml");
 
 
 		// Setup lights
-		Entity mainLightEntity = activeScene->createEntity("Main Light");
-		mainLightEntity.addComponent<LightComponent>(Light::LightType::Directional, glm::vec3(1.0f, 1.0f, 1.0f));
-		mainLightEntity.getComponent<TransformComponent>().setRotation(glm::quat({ 0.0f, 1.7f, 0.0f }));
+		Entity mainLightEntity = activeScene->CreateEntity("Main Light");
+		mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, glm::vec3(1.0f, 1.0f, 1.0f));
+		mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ 0.0f, 1.7f, 0.0f }));
 
 		/*for (int y = 0; y < 10; y++)
 		{
 			for (int x = 0; x < 10; x++)
 			{*/
-				Entity pointLightEntity = activeScene->createEntity("Point Light");
-				pointLightEntity.addComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-				pointLightEntity.getComponent<TransformComponent>().setPosition({ 1.0f, 1.0f, -6.5f });
+				Entity pointLightEntity = activeScene->CreateEntity("Spot Light");
+				pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+				pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 1.0f, -6.5f });
 				//pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
-				pointLightEntity.getComponent<TransformComponent>().setRotation(glm::quat({ glm::radians(-155.0f), 0.0f, 0.0f }));
+				pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-155.0f), 0.0f, 0.0f }));
 		/*	}
 		}*/
 
@@ -113,18 +113,18 @@ namespace Mahakam
 		Ref<Texture> brickAlbedo = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
 		Ref<Texture> brickBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_bump.png", false, { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
 		Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		Ref<Mesh> planeMesh = Mesh::createPlane(2, 2);
+		Ref<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
 
-		Ref<Material> planeMaterial = Material::create(textureShader);
-		planeMaterial->setTexture("u_Albedo", 0, brickAlbedo);
-		planeMaterial->setTexture("u_Bump", 0, brickBump);
-		planeMaterial->setTexture("u_Metallic", 0, Texture2D::black);
-		planeMaterial->setTexture("u_Roughness", 0, brickRoughness);
+		Ref<Material> planeMaterial = Material::Create(textureShader);
+		planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
+		planeMaterial->SetTexture("u_Bump", 0, brickBump);
+		planeMaterial->SetTexture("u_Metallic", 0, Texture2D::black);
+		planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
 
-		Entity planeEntity = activeScene->createEntity("Plane");
-		planeEntity.addComponent<MeshComponent>(planeMesh, planeMaterial);
-		planeEntity.getComponent<TransformComponent>().setPosition({ 0.0f, -1.0f, 0.0f });
-		planeEntity.getComponent<TransformComponent>().setScale({ 10.0f, 10.0f, 10.0f });
+		Entity planeEntity = activeScene->CreateEntity("Plane");
+		planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
+		planeEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
+		planeEntity.GetComponent<TransformComponent>().SetScale({ 10.0f, 10.0f, 10.0f });
 
 
 		// Create backpack model
@@ -138,7 +138,7 @@ namespace Mahakam
 		Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 
 		//// Create backpack material
-		//Ref<Material> backpackMaterial = Material::create(textureShader);
+		//Ref<Material> backpackMaterial = Material::Create(textureShader);
 		//backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
 		//backpackMaterial->setTexture("u_Bump", 0, backpackBump);
 		//backpackMaterial->setTexture("u_Metallic", 0, backpackMetallic);
@@ -153,7 +153,7 @@ namespace Mahakam
 
 
 		// Setup dancing monke
-		Ref<Material> skinnedMaterial = Material::create(skinnedShader);
+		/*Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
 		skinnedMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
 		skinnedMaterial->setTexture("u_Bump", 0, backpackBump);
 		skinnedMaterial->setTexture("u_Metallic", 0, backpackMetallic);
@@ -167,20 +167,20 @@ namespace Mahakam
 		animatedEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 1.5f, 5.0f });
 		animatedEntity.getComponent<TransformComponent>().setScale({ 0.02f, 0.02f, 0.02f });
 		animatedEntity.addComponent<AnimatorComponent>(animation);
-		animatedEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
+		animatedEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();*/
 
 
 		// Setup scene camera
-		cameraEntity = activeScene->createEntity("Camera");
-		cameraEntity.addComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 1.0f, 0.01f, 100.0f);
-		cameraEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.5f, 12.5f });
-		cameraEntity.addComponent<NativeScriptComponent>().bind<CameraController>();
+		cameraEntity = activeScene->CreateEntity("Camera");
+		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 1.0f, 0.01f, 100.0f);
+		cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
+		cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 
 		// Create mesh & base material
-		Ref<Mesh> sphereMesh = Mesh::createCubeSphere(8);
-		Ref<Material> baseMaterial = Material::create(colorShader);
-		baseMaterial->setFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
+		Ref<Mesh> sphereMesh = Mesh::CreateCubeSphere(8);
+		Ref<Material> baseMaterial = Material::Create(colorShader);
+		baseMaterial->SetFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 
 		// Create scene entities
 		for (int y = 0; y < 10; y++)
@@ -188,58 +188,58 @@ namespace Mahakam
 			for (int x = 0; x < 10; x++)
 			{
 				// Setup material with texture
-				Ref<Material> material = Material::copy(baseMaterial);
-				material->setFloat("u_Metallic", y / 10.0f);
-				material->setFloat("u_Roughness", x / 10.0f);
+				Ref<Material> material = Material::Copy(baseMaterial);
+				material->SetFloat("u_Metallic", y / 10.0f);
+				material->SetFloat("u_Roughness", x / 10.0f);
 
 				// Create entity
-				Entity entity = activeScene->createEntity(std::string("Sphere ") + std::to_string(x) + std::string(",") + std::to_string(y));
-				entity.addComponent<MeshComponent>(sphereMesh, material);
-				entity.getComponent<TransformComponent>().setPosition({ x, y, 0.0f });
+				Entity entity = activeScene->CreateEntity(std::string("Sphere ") + std::to_string(x) + std::string(",") + std::to_string(y));
+				entity.AddComponent<MeshComponent>(sphereMesh, material);
+				entity.GetComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
 			}
 		}
 	}
 
-	void EditorLayer::onUpdate(Timestep dt)
+	void EditorLayer::OnUpdate(Timestep dt)
 	{
 		MH_PROFILE_FUNCTION();
 
-		activeScene->onUpdate(dt);
+		activeScene->OnUpdate(dt);
 
-		statsPanel.onUpdate(dt);
+		statsPanel.OnUpdate(dt);
 	}
 
-	void EditorLayer::onImGuiRender()
+	void EditorLayer::OnImGuiRender()
 	{
 		MH_PROFILE_FUNCTION();
 
-		dockSpace.onImGuiRender();
-		profilerPanel.onImGuiRender();
-		sceneViewPanel.onImGuiRender();
-		sceneHierarchyPanel.onImGuiRender();
-		statsPanel.onImGuiRender();
+		dockSpace.OnImGuiRender();
+		profilerPanel.OnImGuiRender();
+		sceneViewPanel.OnImGuiRender();
+		sceneHierarchyPanel.OnImGuiRender();
+		statsPanel.OnImGuiRender();
 	}
 
-	void EditorLayer::onEvent(Event& event)
+	void EditorLayer::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
-		dispatcher.dispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::onKeyPressed));
-		dispatcher.dispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(EditorLayer::onWindowResize));
-		dispatcher.dispatchEvent<MouseScrolledEvent>(MH_BIND_EVENT(EditorLayer::onMouseScrolled));
+		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::OnKeyPressed));
+		dispatcher.DispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(EditorLayer::OnWindowResize));
+		dispatcher.DispatchEvent<MouseScrolledEvent>(MH_BIND_EVENT(EditorLayer::OnMouseScrolled));
 	}
 
-	bool EditorLayer::onKeyPressed(KeyPressedEvent& event)
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
 	{
-		if (event.getKeyCode() == MH_KEY_F5)
+		if (event.GetKeyCode() == MH_KEY_F5)
 		{
 			wireframe = !wireframe;
-			Renderer::enableWireframe(wireframe);
+			Renderer::EnableWireframe(wireframe);
 		}
 
 		return false;
 	}
 
-	bool EditorLayer::onWindowResize(WindowResizeEvent& event)
+	bool EditorLayer::OnWindowResize(WindowResizeEvent& event)
 	{
 		/*uint32_t width = event.getWidth();
 		uint32_t height = event.getHeight();
@@ -249,9 +249,9 @@ namespace Mahakam
 		return false;
 	}
 
-	bool EditorLayer::onMouseScrolled(MouseScrolledEvent& event)
+	bool EditorLayer::OnMouseScrolled(MouseScrolledEvent& event)
 	{
-		sceneViewPanel.onMouseScrolled(event);
+		sceneViewPanel.OnMouseScrolled(event);
 
 		return false;
 	}

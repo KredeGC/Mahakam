@@ -29,6 +29,7 @@
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Mesh.h"
 #include "Mahakam/Renderer/Renderer.h"
+#include "Mahakam/Renderer/RenderPasses.h"
 #include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 #include "Mahakam/Renderer/VertexArray.h"

@@ -37,7 +37,7 @@ namespace Mahakam
 			shadowProps.width = 1024;
 			shadowProps.height = 1024;
 			shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, false };
-			shadowFramebuffer = FrameBuffer::create(shadowProps);
+			shadowFramebuffer = FrameBuffer::Create(shadowProps);
 		}
 
 		Light(LightType lightType, float range, const glm::vec3& color)
@@ -46,14 +46,14 @@ namespace Mahakam
 		Light(LightType lightType, float fov, float range, const glm::vec3& color)
 			: lightType(lightType), fov(fov), range(range), color(color) {}
 
-		inline void setLightType(LightType type) { lightType = type; }
-		inline void setColor(const glm::vec3& col) { color = col; }
-		inline void setFov(float fieldOfView) { fov = fieldOfView; }
-		inline void setRange(float dist) { range = dist; }
+		inline void SetLightType(LightType type) { lightType = type; }
+		inline void SetColor(const glm::vec3& col) { color = col; }
+		inline void SetFov(float fieldOfView) { fov = fieldOfView; }
+		inline void SetRange(float dist) { range = dist; }
 
-		inline LightType getLightType() const { return lightType; }
-		inline const glm::vec3& getColor() const { return color; }
-		inline float getRange() const { return range; }
-		inline float getFov() const { return fov; }
+		inline LightType GetLightType() const { return lightType; }
+		inline const glm::vec3& GetColor() const { return color; }
+		inline float GetRange() const { return range; }
+		inline float GetFov() const { return fov; }
 	};
 }

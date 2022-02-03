@@ -6,39 +6,39 @@
 
 namespace Mahakam
 {
-	bool Input::isKeyPressed(int keycode)
+	bool Input::IsKeyPressed(int keycode)
 	{
-		auto window = static_cast<GLFWwindow*>(Application::getInstance().getWindow().getNativeWindow());
+		auto window = static_cast<GLFWwindow*>(Application::GetInstance().GetWindow().GetNativeWindow());
 
 		int state = glfwGetKey(window, keycode);
 
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool Input::isMouseButtonPressed(int button)
+	bool Input::IsMouseButtonPressed(int button)
 	{
-		auto window = static_cast<GLFWwindow*>(Application::getInstance().getWindow().getNativeWindow());
+		auto window = static_cast<GLFWwindow*>(Application::GetInstance().GetWindow().GetNativeWindow());
 
 		int state = glfwGetMouseButton(window, button);
 
 		return state == GLFW_PRESS;
 	}
 	
-	float Input::getMouseX()
+	float Input::GetMouseX()
 	{
-		auto [x, y] = getMousePos();
+		auto [x, y] = GetMousePos();
 		return x;
 	}
 	
-	float Input::getMouseY()
+	float Input::GetMouseY()
 	{
-		auto [x, y] = getMousePos();
+		auto [x, y] = GetMousePos();
 		return y;
 	}
 
-	std::pair<float, float> Input::getMousePos()
+	std::pair<float, float> Input::GetMousePos()
 	{
-		auto window = static_cast<GLFWwindow*>(Application::getInstance().getWindow().getNativeWindow());
+		auto window = static_cast<GLFWwindow*>(Application::GetInstance().GetWindow().GetNativeWindow());
 
 		double xPos, yPos;
 		glfwGetCursorPos(window, &xPos, &yPos);

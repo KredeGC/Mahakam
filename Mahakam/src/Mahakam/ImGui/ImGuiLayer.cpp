@@ -58,7 +58,7 @@ namespace Mahakam
 		style[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
 	}
 
-	void ImGuiLayer::onAttach()
+	void ImGuiLayer::OnAttach()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -85,14 +85,14 @@ namespace Mahakam
 
 		setDarkTheme();
 
-		Application& app = Application::getInstance();
-		GLFWwindow* window = static_cast<GLFWwindow*>(app.getWindow().getNativeWindow());
+		Application& app = Application::GetInstance();
+		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
-	void ImGuiLayer::onDetach()
+	void ImGuiLayer::OnDetach()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -101,14 +101,14 @@ namespace Mahakam
 		ImGui::DestroyContext();
 	}
 
-	void ImGuiLayer::onEvent(Event& event)
+	void ImGuiLayer::OnEvent(Event& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		event.handled |= event.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-		event.handled |= event.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		event.handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+		event.handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
 	}
 
-	void ImGuiLayer::begin()
+	void ImGuiLayer::Begin()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -117,13 +117,13 @@ namespace Mahakam
 		ImGui::NewFrame();
 	}
 	
-	void ImGuiLayer::end()
+	void ImGuiLayer::End()
 	{
 		MH_PROFILE_FUNCTION();
 
 		ImGuiIO& io = ImGui::GetIO();
-		Application& app = Application::getInstance();
-		io.DisplaySize = ImVec2((float)app.getWindow().getWidth(), (float)app.getWindow().getHeight());
+		Application& app = Application::GetInstance();
+		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

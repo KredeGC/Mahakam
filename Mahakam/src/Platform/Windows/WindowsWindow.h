@@ -24,24 +24,25 @@ namespace Mahakam
 
 		RenderingContext* context;
 
-		virtual void init(const WindowProps& props);
-		virtual void shutdown();
-
 	public:
 		WindowsWindow(const WindowProps& props);
 		virtual ~WindowsWindow();
 
-		void onUpdate() override;
+		void OnUpdate() override;
 
-		inline unsigned int getWidth() const override { return data.width; }
-		inline unsigned int getHeight() const override { return data.height; }
+		inline unsigned int GetWidth() const override { return data.width; }
+		inline unsigned int GetHeight() const override { return data.height; }
 
-		inline void setEventCallback(const EventCallbackFn& callback) override { data.eventCallback = callback; }
-		void setVSync(bool enabled) override;
-		bool isVSync() const override;
+		inline void SetEventCallback(const EventCallbackFn& callback) override { data.eventCallback = callback; }
+		void SetVSync(bool enabled) override;
+		bool IsVSync() const override;
 
-		virtual void setCursorVisible(bool visible) override;
+		virtual void SetCursorVisible(bool visible) override;
 
-		inline virtual void* getNativeWindow() const override { return window; }
+		inline virtual void* GetNativeWindow() const override { return window; }
+
+	private:
+		virtual void Init(const WindowProps& props);
+		virtual void Shutdown();
 	};
 }

@@ -16,23 +16,23 @@ namespace Mahakam
 		OpenGLFrameBuffer(const FrameBufferProps& props);
 		virtual ~OpenGLFrameBuffer() override;
 
-		virtual void bind() override;
-		virtual void unbind() override;
+		virtual void Bind() override;
+		virtual void Unbind() override;
 
-		virtual void blit(const Ref<FrameBuffer>& dest, bool color = true, bool depth = true) override;
-		virtual void resize(uint32_t width, uint32_t height) override;
+		virtual void Blit(const Ref<FrameBuffer>& dest, bool color = true, bool depth = true) override;
+		virtual void Resize(uint32_t width, uint32_t height) override;
 
-		virtual const std::vector<Ref<RenderBuffer>>& getColorBuffers() const override { return colorAttachments; }
-		virtual Ref<RenderBuffer> getColorBuffer(int index) const override { return colorAttachments[index]; }
-		virtual Ref<Texture> getColorTexture(int index) const override { return std::static_pointer_cast<Texture>(colorAttachments[index]); }
+		virtual const std::vector<Ref<RenderBuffer>>& GetColorBuffers() const override { return colorAttachments; }
+		virtual Ref<RenderBuffer> GetColorBuffer(int index) const override { return colorAttachments[index]; }
+		virtual Ref<Texture> GetColorTexture(int index) const override { return std::static_pointer_cast<Texture>(colorAttachments[index]); }
 
-		virtual Ref<RenderBuffer> getDepthBuffer() const override { return depthAttachment; }
-		virtual Ref<Texture> getDepthTexture() const override { return std::static_pointer_cast<Texture>(depthAttachment); }
+		virtual Ref<RenderBuffer> GetDepthBuffer() const override { return depthAttachment; }
+		virtual Ref<Texture> GetDepthTexture() const override { return std::static_pointer_cast<Texture>(depthAttachment); }
 
-		virtual const FrameBufferProps& getSpecification() const override { return props; }
+		virtual const FrameBufferProps& GetSpecification() const override { return props; }
 
-		virtual void readColorPixels(void* pixels, int attachmentSlot) const;
+		virtual void ReadColorPixels(void* pixels, int attachmentSlot) const;
 
-		void invalidate();
+		void Invalidate();
 	};
 }

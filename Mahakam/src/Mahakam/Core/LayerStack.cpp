@@ -13,18 +13,18 @@ namespace Mahakam
 			delete layer;
 	}
 
-	void LayerStack::pushLayer(Layer* layer)
+	void LayerStack::PushLayer(Layer* layer)
 	{
 		layers.emplace(layers.begin() + layerInsertIndex, layer);
 		layerInsertIndex++;
 	}
 
-	void LayerStack::pushOverlay(Layer* overlay)
+	void LayerStack::PushOverlay(Layer* overlay)
 	{
 		layers.emplace_back(overlay);
 	}
 
-	void LayerStack::popLayer(Layer* layer)
+	void LayerStack::PopLayer(Layer* layer)
 	{
 		auto iter = std::find(layers.begin(), layers.end(), layer);
 		if (iter != layers.end())
@@ -34,7 +34,7 @@ namespace Mahakam
 		}
 	}
 
-	void LayerStack::popOverlay(Layer* overlay)
+	void LayerStack::PopOverlay(Layer* overlay)
 	{
 		auto iter = std::find(layers.begin(), layers.end(), overlay);
 		if (iter != layers.end())

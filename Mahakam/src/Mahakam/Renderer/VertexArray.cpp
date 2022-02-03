@@ -7,9 +7,9 @@
 
 namespace Mahakam
 {
-	Ref<VertexArray> VertexArray::create(uint32_t vertexCount)
+	Ref<VertexArray> VertexArray::Create(uint32_t vertexCount)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");

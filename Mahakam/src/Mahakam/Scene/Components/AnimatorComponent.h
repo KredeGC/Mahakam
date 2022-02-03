@@ -17,6 +17,6 @@ namespace Mahakam
 			animator.PlayAnimation(animation);
 		}
 
-		Animator& getAnimator() { return animator; }
+		Animator& GetAnimator() { return animator; }
 	};
 }

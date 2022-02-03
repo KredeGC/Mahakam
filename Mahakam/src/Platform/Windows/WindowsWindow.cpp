@@ -18,12 +18,12 @@ namespace Mahakam {
 		MH_CORE_ERROR("[GLFW Error] (Code {0}): {1}", error, message);
 	}
 
-	Window* Window::create(const WindowProps& props)
+	Window* Window::Create(const WindowProps& props)
 	{
 		return new WindowsWindow(props);
 	}
 
-	void WindowsWindow::init(const WindowProps& props)
+	void WindowsWindow::Init(const WindowProps& props)
 	{
 #ifndef MH_DEBUG
 		FreeConsole();
@@ -61,16 +61,13 @@ namespace Mahakam {
 
 
 		// Creating the window
-//#ifdef MH_DEBUG
-//		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1); // ;_;
-//#endif
 		window = glfwCreateWindow((int)data.width, (int)data.height, data.title.c_str(), nullptr, nullptr);
 		context = new OpenGLContext(window);
-		context->init();
+		context->Init();
 		glfwSetWindowUserPointer(window, &data);
 		if (pixels)
 			glfwSetWindowIcon(window, 1, icon);
-		setVSync(false);
+		SetVSync(false);
 
 
 		// Callbacks
@@ -168,7 +165,7 @@ namespace Mahakam {
 		});
 	}
 
-	void WindowsWindow::shutdown()
+	void WindowsWindow::Shutdown()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -177,23 +174,23 @@ namespace Mahakam {
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
-		init(props);
+		Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
-		shutdown();
+		Shutdown();
 	}
 
-	void WindowsWindow::onUpdate()
+	void WindowsWindow::OnUpdate()
 	{
 		MH_PROFILE_FUNCTION();
 
 		glfwPollEvents();
-		context->swapBuffers();
+		context->SwapBuffers();
 	}
 
-	void WindowsWindow::setVSync(bool enabled)
+	void WindowsWindow::SetVSync(bool enabled)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -202,12 +199,12 @@ namespace Mahakam {
 		data.vsync = enabled;
 	}
 
-	bool WindowsWindow::isVSync() const
+	bool WindowsWindow::IsVSync() const
 	{
 		return data.vsync;
 	}
 
-	void WindowsWindow::setCursorVisible(bool visible)
+	void WindowsWindow::SetCursorVisible(bool visible)
 	{
 		MH_PROFILE_FUNCTION();
 

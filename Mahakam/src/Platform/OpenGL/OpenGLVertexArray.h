@@ -18,13 +18,13 @@ namespace Mahakam
 		OpenGLVertexArray(uint32_t vertexCount);
 		virtual ~OpenGLVertexArray();
 
-		virtual void bind() const override;
-		virtual void unbind() const override;
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
 
-		virtual void addVertexBuffer(const Ref<VertexBuffer>& buffer, bool interleave) override;
-		virtual void setIndexBuffer(const Ref<IndexBuffer>& buffer) override;
+		virtual void AddVertexBuffer(const Ref<VertexBuffer>& buffer, bool interleave) override;
+		virtual void SetIndexBuffer(const Ref<IndexBuffer>& buffer) override;
 
-		virtual const std::vector<Ref<VertexBuffer>>& getVertexBuffers() const { return vertexBuffers; }
-		virtual const Ref<IndexBuffer>& getIndexBuffer() const { return indexBuffer; }
+		virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const { return vertexBuffers; }
+		virtual const Ref<IndexBuffer>& GetIndexBuffer() const { return indexBuffer; }
 	};
 }

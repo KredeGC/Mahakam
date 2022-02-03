@@ -24,18 +24,18 @@ namespace Mahakam {
 		OpenGLTexture2D(const std::string& filepath, const TextureProps& props);
 		virtual ~OpenGLTexture2D();
 
-		virtual uint32_t getWidth() const override { return props.width; }
-		virtual uint32_t getHeight() const override { return props.height; }
-		virtual uint32_t getRendererID() const override { return rendererID; }
+		virtual uint32_t GetWidth() const override { return props.width; }
+		virtual uint32_t GetHeight() const override { return props.height; }
+		virtual uint32_t GetRendererID() const override { return rendererID; }
 
-		virtual uint32_t getSize() const override { return size; }
-		virtual uint32_t getTotalSize() const override { return totalSize; }
+		virtual uint32_t GetSize() const override { return size; }
+		virtual uint32_t GetTotalSize() const override { return totalSize; }
 
-		virtual void setData(void* data, uint32_t size, bool mipmaps) override;
+		virtual void SetData(void* data, uint32_t size, bool mipmaps) override;
 
-		virtual void bind(uint32_t slot = 0) const override;
+		virtual void Bind(uint32_t slot = 0) const override;
 
-		virtual void readPixels(void* pixels, bool mipmaps) override;
+		virtual void ReadPixels(void* pixels, bool mipmaps) override;
 	};
 
 
@@ -60,17 +60,17 @@ namespace Mahakam {
 		OpenGLTextureCube(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props);
 		virtual ~OpenGLTextureCube();
 
-		virtual uint32_t getWidth() const override { return props.resolution; }
-		virtual uint32_t getHeight() const override { return props.resolution; }
-		virtual uint32_t getRendererID() const override { return rendererID; }
+		virtual uint32_t GetWidth() const override { return props.resolution; }
+		virtual uint32_t GetHeight() const override { return props.resolution; }
+		virtual uint32_t GetRendererID() const override { return rendererID; }
 
-		virtual uint32_t getSize() const override { return size; }
-		virtual uint32_t getTotalSize() const override { return totalSize; }
+		virtual uint32_t GetSize() const override { return size; }
+		virtual uint32_t GetTotalSize() const override { return totalSize; }
 
-		virtual void setData(void* data, uint32_t size, bool mipmaps) override;
+		virtual void SetData(void* data, uint32_t size, bool mipmaps) override;
 
-		virtual void bind(uint32_t slot = 0) const override;
+		virtual void Bind(uint32_t slot = 0) const override;
 
-		virtual void readPixels(void* pixels, bool mipmaps) override;
+		virtual void ReadPixels(void* pixels, bool mipmaps) override;
 	};
 }

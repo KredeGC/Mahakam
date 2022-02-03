@@ -22,28 +22,29 @@ namespace Mahakam
 		double lastFrameTime = 0.0;
 		static Application* instance;
 
-		bool onWindowClose(WindowCloseEvent& event);
-		bool onWindowResize(WindowResizeEvent& event);
-
 	public:
 		Application(const std::string& name = "Mahakam");
 		virtual ~Application();
 
-		void run();
+		void Run();
 
-		void close();
+		void Close();
 
-		void onEvent(Event& event);
+		void OnEvent(Event& event);
 
-		void pushLayer(Layer* layer);
-		void pushOverlay(Layer* overlay);
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* overlay);
 
-		inline static Application& getInstance() { return *instance; }
+		inline static Application& GetInstance() { return *instance; }
 
 		inline static bool IsRunning() { return instance->running; }
 
-		inline Window& getWindow() { return *window; }
+		inline Window& GetWindow() { return *window; }
+
+	private:
+		bool OnWindowClose(WindowCloseEvent& event);
+		bool OnWindowResize(WindowResizeEvent& event);
 	};
 
-	Application* createApplication();
+	Application* CreateApplication();
 }

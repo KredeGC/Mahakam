@@ -44,23 +44,23 @@ namespace Mahakam
 	public:
 		virtual ~FrameBuffer() = default;
 
-		virtual void bind() = 0;
-		virtual void unbind() = 0;
+		virtual void Bind() = 0;
+		virtual void Unbind() = 0;
 
-		virtual void blit(const Ref<FrameBuffer>& dest, bool color = true, bool depth = true) = 0;
-		virtual void resize(uint32_t width, uint32_t height) = 0;
+		virtual void Blit(const Ref<FrameBuffer>& dest, bool color = true, bool depth = true) = 0;
+		virtual void Resize(uint32_t width, uint32_t height) = 0;
 
-		virtual const std::vector<Ref<RenderBuffer>>& getColorBuffers() const = 0;
-		virtual Ref<RenderBuffer> getColorBuffer(int index) const = 0;
-		virtual Ref<Texture> getColorTexture(int index) const = 0;
+		virtual const std::vector<Ref<RenderBuffer>>& GetColorBuffers() const = 0;
+		virtual Ref<RenderBuffer> GetColorBuffer(int index) const = 0;
+		virtual Ref<Texture> GetColorTexture(int index) const = 0;
 
-		virtual Ref<RenderBuffer> getDepthBuffer() const = 0;
-		virtual Ref<Texture> getDepthTexture() const = 0;
+		virtual Ref<RenderBuffer> GetDepthBuffer() const = 0;
+		virtual Ref<Texture> GetDepthTexture() const = 0;
 
-		virtual const FrameBufferProps& getSpecification() const = 0;
+		virtual const FrameBufferProps& GetSpecification() const = 0;
 
-		virtual void readColorPixels(void* pixels, int attachmentSlot = 0) const = 0;
+		virtual void ReadColorPixels(void* pixels, int attachmentSlot = 0) const = 0;
 
-		static Ref<FrameBuffer> create(const FrameBufferProps& props);
+		static Ref<FrameBuffer> Create(const FrameBufferProps& props);
 	};
 }

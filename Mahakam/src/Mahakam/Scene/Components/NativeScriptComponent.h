@@ -17,7 +17,7 @@ namespace Mahakam
 		std::vector<RuntimeScript> scripts;
 
 		template<typename T>
-		void bind()
+		void Bind()
 		{
 			scripts.emplace_back(RuntimeScript{
 				[]() { return static_cast<ScriptableEntity*>(new T()); },
@@ -25,7 +25,7 @@ namespace Mahakam
 			});
 		}
 
-		void unbind(int index)
+		void Unbind(int index)
 		{
 			scripts.erase(scripts.begin() + index);
 		}

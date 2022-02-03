@@ -14,7 +14,7 @@ namespace Mahakam
 	public:
 		OpenGLContext(GLFWwindow* window);
 
-		virtual void init() override;
-		virtual void swapBuffers() override;
+		virtual void Init() override;
+		virtual void SwapBuffers() override;
 	};
 }

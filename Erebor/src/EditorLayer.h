@@ -31,13 +31,13 @@ namespace Mahakam
 		EditorLayer() : Layer("Editor"), dockSpace(), profilerPanel(),
 			sceneViewPanel(), sceneHierarchyPanel(), statsPanel() {}
 
-		virtual void onAttach() override;
-		virtual void onUpdate(Timestep dt) override;
-		virtual void onImGuiRender() override;
-		virtual void onEvent(Event& event) override;
+		virtual void OnAttach() override;
+		virtual void OnUpdate(Timestep dt) override;
+		virtual void OnImGuiRender() override;
+		virtual void OnEvent(Event& event) override;
 
-		bool onKeyPressed(KeyPressedEvent& event);
-		bool onWindowResize(WindowResizeEvent& event);
-		bool onMouseScrolled(MouseScrolledEvent& event);
+		bool OnKeyPressed(KeyPressedEvent& event);
+		bool OnWindowResize(WindowResizeEvent& event);
+		bool OnMouseScrolled(MouseScrolledEvent& event);
 	};
 }

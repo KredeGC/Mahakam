@@ -20,7 +20,42 @@ namespace Mahakam
 		glm::vec3 right;
 		glm::vec3 up;
 
-		void updateMatrix()
+	public:
+		TransformComponent()
+			: position({ 0.0f, 0.0f, 0.0f }), rotation({ 1.0f, 0.0f, 0.0f, 0.0f }), scale({ 1.0f, 1.0f, 1.0f })
+		{
+			UpdateMatrix();
+		}
+
+		TransformComponent(const TransformComponent&) = default;
+
+		TransformComponent(const glm::vec3& pos, const glm::quat& rot, const glm::vec3& scale)
+			: position(pos), rotation(rot), scale(scale)
+		{
+			UpdateMatrix();
+		}
+
+		operator glm::mat4& () { return modelMatrix; }
+		operator const glm::mat4& () const { return modelMatrix; }
+
+		inline void SetPosition(const glm::vec3 pos) { position = pos; UpdateMatrix(); }
+		inline void SetRotation(const glm::quat rot) { rotation = rot; eulerAngles = glm::eulerAngles(rotation); UpdateMatrix(); }
+		inline void SetEulerangles(const glm::vec3 euler) { eulerAngles = euler; rotation = glm::quat(eulerAngles); UpdateMatrix(); }
+		inline void SetScale(const glm::vec3 sc) { scale = sc; UpdateMatrix(); }
+
+		inline const glm::vec3& GetPosition() const { return position; }
+		inline const glm::quat& GetRotation() const { return rotation; }
+		inline const glm::vec3& GetEulerAngles() const { return eulerAngles; }
+		inline const glm::vec3& GetScale() const { return scale; }
+
+		inline const glm::vec3& GetForward() const { return forward; }
+		inline const glm::vec3& GetRight() const { return right; }
+		inline const glm::vec3& GetUp() const { return up; }
+
+		inline const glm::mat4& GetModelMatrix() const { return modelMatrix; }
+
+	private:
+		void UpdateMatrix()
 		{
 			modelMatrix = glm::translate(glm::mat4(1.0f), position)
 				* glm::mat4(rotation)
@@ -32,39 +67,5 @@ namespace Mahakam
 			right = modelMatrix * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
 			up = modelMatrix * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 		}
-
-	public:
-		TransformComponent()
-			: position({ 0.0f, 0.0f, 0.0f }), rotation({ 1.0f, 0.0f, 0.0f, 0.0f }), scale({ 1.0f, 1.0f, 1.0f })
-		{
-			updateMatrix();
-		}
-
-		TransformComponent(const TransformComponent&) = default;
-
-		TransformComponent(const glm::vec3& pos, const glm::quat& rot, const glm::vec3& scale)
-			: position(pos), rotation(rot), scale(scale)
-		{
-			updateMatrix();
-		}
-
-		operator glm::mat4& () { return modelMatrix; }
-		operator const glm::mat4& () const { return modelMatrix; }
-
-		inline void setPosition(const glm::vec3 pos) { position = pos; updateMatrix(); }
-		inline void setRotation(const glm::quat rot) { rotation = rot; eulerAngles = glm::eulerAngles(rotation); updateMatrix(); }
-		inline void setEulerangles(const glm::vec3 euler) { eulerAngles = euler; rotation = glm::quat(eulerAngles); updateMatrix(); }
-		inline void setScale(const glm::vec3 sc) { scale = sc; updateMatrix(); }
-
-		inline const glm::vec3& getPosition() const { return position; }
-		inline const glm::quat& getRotation() const { return rotation; }
-		inline const glm::vec3& getEulerAngles() const { return eulerAngles; }
-		inline const glm::vec3& getScale() const { return scale; }
-
-		inline const glm::vec3& getForward() const { return forward; }
-		inline const glm::vec3& getRight() const { return right; }
-		inline const glm::vec3& getUp() const { return up; }
-
-		inline const glm::mat4& getModelMatrix() const { return modelMatrix; }
 	};
 }

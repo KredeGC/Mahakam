@@ -7,7 +7,7 @@
 
 namespace Mahakam
 {
-	void BufferLayout::calculateOffsetAndStride()
+	void BufferLayout::CalculateOffsetAndStride()
 	{
 		uint32_t offset = 0;
 		stride = 0;
@@ -21,9 +21,9 @@ namespace Mahakam
 
 
 #pragma region VertexBuffer
-	Ref<VertexBuffer> VertexBuffer::create(const char* vertices, uint32_t size)
+	Ref<VertexBuffer> VertexBuffer::Create(const char* vertices, uint32_t size)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -36,9 +36,9 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	Ref<VertexBuffer> VertexBuffer::create(uint32_t size)
+	Ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -54,9 +54,9 @@ namespace Mahakam
 
 
 #pragma region IndexBuffer
-	Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t count)
+	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -72,9 +72,9 @@ namespace Mahakam
 
 
 #pragma region UniformBuffer
-	Ref<UniformBuffer> UniformBuffer::create(uint32_t size)
+	Ref<UniformBuffer> UniformBuffer::Create(uint32_t size)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -90,9 +90,9 @@ namespace Mahakam
 
 
 #pragma region StorageBuffer
-	Ref<StorageBuffer> StorageBuffer::create(uint32_t size)
+	Ref<StorageBuffer> StorageBuffer::Create(uint32_t size)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");

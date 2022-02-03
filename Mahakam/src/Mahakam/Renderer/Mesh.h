@@ -76,14 +76,6 @@ namespace Mahakam
 
 		Ref<VertexArray> vertexArray;
 
-		void interleaveBuffers();
-
-		void initBuffers();
-
-		static Ref<Mesh> processMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
-
-		static void processNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene);
-
 	public:
 		Mesh(uint32_t vertexCount, uint32_t indexCount);
 
@@ -95,7 +87,7 @@ namespace Mahakam
 
 		~Mesh();
 
-		void setVertices(const std::string& name, int index, const char* verts)
+		void SetVertices(const std::string& name, int index, const char* verts)
 		{
 			MH_PROFILE_FUNCTION();
 
@@ -124,35 +116,35 @@ namespace Mahakam
 
 				if (interleave)
 				{
-					interleaveBuffers();
+					InterleaveBuffers();
 
-					const Ref<VertexBuffer>& buffer = vertexArray->getVertexBuffers()[0];
+					const Ref<VertexBuffer>& buffer = vertexArray->GetVertexBuffers()[0];
 
-					uint32_t bufferSize = bufferLayout.getStride() * vertexCount;
+					uint32_t bufferSize = bufferLayout.GetStride() * vertexCount;
 
-					buffer->setData(interleavedVertices, bufferSize);
+					buffer->SetData(interleavedVertices, bufferSize);
 				}
 				else
 				{
-					const Ref<VertexBuffer>& buffer = vertexArray->getVertexBuffers()[0];
+					const Ref<VertexBuffer>& buffer = vertexArray->GetVertexBuffers()[0];
 
-					buffer->setData(verts, size);
+					buffer->SetData(verts, size);
 				}
 			}
 		}
 
-		void init(bool interleave = false)
+		void Init(bool interleave = false)
 		{
 			MH_PROFILE_FUNCTION();
 
 			this->interleave = interleave;
 
-			interleaveBuffers();
-			initBuffers();
+			InterleaveBuffers();
+			InitBuffers();
 		}
 
 		// TODO: Update the actual buffers
-		void setIndices(uint32_t* inds, unsigned int count)
+		void SetIndices(uint32_t* inds, unsigned int count)
 		{
 			MH_PROFILE_FUNCTION();
 
@@ -163,50 +155,59 @@ namespace Mahakam
 		}
 
 		template<typename T>
-		inline const T& getVertices(int slot) const { return vertices[slot].data; }
-		inline uint32_t getVertexCount() const { return vertexCount; }
+		inline const T& GetVertices(int slot) const { return vertices[slot].data; }
+		inline uint32_t GetVertexCount() const { return vertexCount; }
 
-		inline const glm::vec3& getPositions() const { return *(glm::vec3*)vertices.at(0).data; }
-		inline const glm::vec2& getTexcoords() const { return *(glm::vec2*)vertices.at(1).data; }
-		inline const glm::vec3& getNormals() const { return *(glm::vec3*)vertices.at(2).data; }
-		inline const glm::vec3& getTangents() const { return *(glm::vec3*)vertices.at(3).data; }
-		inline const glm::vec4& getColors() const { return *(glm::vec4*)vertices.at(4).data; }
+		inline const glm::vec3& GetPositions() const { return *(glm::vec3*)vertices.at(0).data; }
+		inline const glm::vec2& GetTexcoords() const { return *(glm::vec2*)vertices.at(1).data; }
+		inline const glm::vec3& GetNormals() const { return *(glm::vec3*)vertices.at(2).data; }
+		inline const glm::vec3& GetTangents() const { return *(glm::vec3*)vertices.at(3).data; }
+		inline const glm::vec4& GetColors() const { return *(glm::vec4*)vertices.at(4).data; }
 
-		inline const uint32_t* getIndices() const { return indices; }
-		inline uint32_t getIndexCount() const { return indexCount; }
+		inline const uint32_t* GetIndices() const { return indices; }
+		inline uint32_t GetIndexCount() const { return indexCount; }
 
-		inline const Ref<VertexArray>& getVertexArray() const { return vertexArray; }
+		inline const Ref<VertexArray>& GetVertexArray() const { return vertexArray; }
 
-		void bind()
+		void Bind()
 		{
-			vertexArray->bind();
+			vertexArray->Bind();
 		}
 
-		void unbind()
+		void Unbind()
 		{
-			vertexArray->unbind();
+			vertexArray->Unbind();
 		}
 
-		static Ref<Mesh> create(uint32_t vertexCount, uint32_t indexCount)
+		static Ref<Mesh> Create(uint32_t vertexCount, uint32_t indexCount)
 		{
 			return CreateRef<Mesh>(vertexCount, indexCount);
 		}
 
-		static Ref<Mesh> create(uint32_t vertexCount, const uint32_t* indices, uint32_t indexCount)
+		static Ref<Mesh> Create(uint32_t vertexCount, const uint32_t* indices, uint32_t indexCount)
 		{
 			return CreateRef<Mesh>(vertexCount, indices, indexCount);
 		}
 
-		static Ref<Mesh> create(uint32_t vertexCount,
+		static Ref<Mesh> Create(uint32_t vertexCount,
 			const uint32_t* indices, uint32_t indexCount, const std::initializer_list<void*>& verts)
 		{
 			return CreateRef<Mesh>(vertexCount, indices, indexCount, verts);
 		}
 
-		static SkinnedMesh loadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps());
-		static Ref<Mesh> createCube(int tessellation, bool reverse = false);
-		static Ref<Mesh> createPlane(int rows, int columns);
-		static Ref<Mesh> createUVSphere(int rows, int columns);
-		static Ref<Mesh> createCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
+		static SkinnedMesh LoadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps());
+		static Ref<Mesh> CreateCube(int tessellation, bool reverse = false);
+		static Ref<Mesh> CreatePlane(int rows, int columns);
+		static Ref<Mesh> CreateUVSphere(int rows, int columns);
+		static Ref<Mesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
+
+	private:
+		void InterleaveBuffers();
+
+		void InitBuffers();
+
+		static Ref<Mesh> ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
+
+		static void ProcessNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene);
 	};
 }

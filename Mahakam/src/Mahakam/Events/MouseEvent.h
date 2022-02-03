@@ -12,13 +12,13 @@ namespace Mahakam
 	public:
 		MouseMovedEvent(float x, float y) : mouseX(x), mouseY(y) {}
 
-		inline float getX() const { return mouseX; }
-		inline float getY() const { return mouseY; }
+		inline float GetX() const { return mouseX; }
+		inline float GetY() const { return mouseY; }
 
-		std::string toString() const override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << getEventName() << ": " << mouseX << ", " << mouseY;
+			stream << GetEventName() << ": " << mouseX << ", " << mouseY;
 			return stream.str();
 		}
 
@@ -35,13 +35,13 @@ namespace Mahakam
 	public:
 		MouseScrolledEvent(float x, float y) : offsetX(x), offsetY(y) {}
 
-		inline float getX() const { return offsetX; }
-		inline float getY() const { return offsetY; }
+		inline float GetX() const { return offsetX; }
+		inline float GetY() const { return offsetY; }
 
-		std::string toString() const override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << getEventName() << ": " << offsetX << ", " << offsetY;
+			stream << GetEventName() << ": " << offsetX << ", " << offsetY;
 			return stream.str();
 		}
 
@@ -58,7 +58,7 @@ namespace Mahakam
 		MouseButtonEvent(int button) : button(button) {}
 
 	public:
-		inline int getButton() const { return button; }
+		inline int GetButton() const { return button; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput);
 	};
@@ -69,12 +69,12 @@ namespace Mahakam
 	public:
 		MouseButtonPressedEvent(int button) : MouseButtonEvent(button) {}
 
-		inline int getButton() const { return button; }
+		inline int GetButton() const { return button; }
 
-		std::string toString() const override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << getEventName() << ": " << button;
+			stream << GetEventName() << ": " << button;
 			return stream.str();
 		}
 
@@ -87,12 +87,12 @@ namespace Mahakam
 	public:
 		MouseButtonReleasedEvent(int button) : MouseButtonEvent(button) {}
 
-		inline int getButton() const { return button; }
+		inline int GetButton() const { return button; }
 
-		std::string toString() const override
+		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << getEventName() << ": " << button;
+			stream << GetEventName() << ": " << button;
 			return stream.str();
 		}
 

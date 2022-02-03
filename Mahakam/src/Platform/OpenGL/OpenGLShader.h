@@ -29,32 +29,32 @@ namespace Mahakam
 		OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& defines = {});
 		virtual ~OpenGLShader();
 
-		virtual void bind(const std::string& shaderPass, const std::string& variant = "") override;
+		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") override;
 
-		virtual void setViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) override; // Remove??
+		virtual void SetViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) override; // Remove??
 
-		virtual const std::string& getName() const override { return name; }
+		virtual const std::string& GetName() const override { return name; }
 
-		virtual const std::vector<ShaderElement>& getProperties() const { return properties.elements; }
+		virtual const std::vector<ShaderElement>& GetProperties() const override { return properties.elements; }
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const override;
 
-		virtual void setTexture(const std::string& name, Ref<Texture> tex) override;
+		virtual void SetTexture(const std::string& name, Ref<Texture> tex) override;
 
-		virtual void setUniformMat3(const std::string& name, const glm::mat3& value) override;
-		virtual void setUniformMat4(const std::string& name, const glm::mat4& value) override;
+		virtual void SetUniformMat3(const std::string& name, const glm::mat3& value) override;
+		virtual void SetUniformMat4(const std::string& name, const glm::mat4& value) override;
 		 
-		virtual void setUniformInt(const std::string& name, int value) override;
+		virtual void SetUniformInt(const std::string& name, int value) override;
 		 
-		virtual void setUniformFloat(const std::string& name, float value) override;
-		virtual void setUniformFloat2(const std::string& name, const glm::vec2& value) override;
-		virtual void setUniformFloat3(const std::string& name, const glm::vec3& value) override;
-		virtual void setUniformFloat4(const std::string& name, const glm::vec4& value) override;
+		virtual void SetUniformFloat(const std::string& name, float value) override;
+		virtual void SetUniformFloat2(const std::string& name, const glm::vec2& value) override;
+		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) override;
+		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) override;
 
 	private:
 		// UNUSED
 		uint32_t CreateProgram(const std::unordered_map<uint32_t, std::vector<uint32_t>>& sources);
-		std::unordered_map<uint32_t, std::vector<uint32_t>> compile_spirv(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives);
+		std::unordered_map<uint32_t, std::vector<uint32_t>> CompileSPIRV(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives);
 		// UNUSED
 
 		uint32_t CompileBinary(const std::string& cachePath, const std::unordered_map<GLenum, std::string>& sources, const std::string& directives);
@@ -63,9 +63,9 @@ namespace Mahakam
 		std::unordered_map<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
 		std::unordered_map<GLenum, std::string> ParseGLSLFile(const std::string& source);
 
-		std::string sortIncludes(const std::string& source);
-		std::string readFile(const std::string& filepath);
+		std::string SortIncludes(const std::string& source);
+		std::string ReadFile(const std::string& filepath);
 
-		int getUniformLocation(const std::string& name);
+		int GetUniformLocation(const std::string& name);
 	};
 }

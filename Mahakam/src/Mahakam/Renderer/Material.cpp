@@ -7,9 +7,9 @@
 
 namespace Mahakam
 {
-	Ref<Material> Material::copy(Ref<Material> material)
+	Ref<Material> Material::Copy(Ref<Material> material)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -22,9 +22,9 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	Ref<Material> Material::create(Ref<Shader> shader, const std::string& variant)
+	Ref<Material> Material::Create(Ref<Shader> shader, const std::string& variant)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");

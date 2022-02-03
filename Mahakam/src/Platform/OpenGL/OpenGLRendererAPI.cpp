@@ -39,7 +39,7 @@ namespace Mahakam
 			MH_CORE_ERROR("[OpenGL Error] {0}", message);
 	}
 
-	void OpenGLRendererAPI::init()
+	void OpenGLRendererAPI::Init()
 	{
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
@@ -54,34 +54,34 @@ namespace Mahakam
 #endif
 	}
 
-	const char* OpenGLRendererAPI::getGraphicsVendor()
+	const char* OpenGLRendererAPI::GetGraphicsVendor()
 	{
 		return (const char*)glGetString(GL_RENDERER);
 	}
 
-	void OpenGLRendererAPI::setViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+	void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 	{
 		MH_GL_CALL(glViewport(x, y, w, h));
 	}
 
-	void OpenGLRendererAPI::finishRendering()
+	void OpenGLRendererAPI::FinishRendering()
 	{
 		glFinish();
 	}
 
-	void OpenGLRendererAPI::setClearColor(const glm::vec4 color)
+	void OpenGLRendererAPI::SetClearColor(const glm::vec4 color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
 	}
 
-	void OpenGLRendererAPI::clear(bool color, bool depth)
+	void OpenGLRendererAPI::Clear(bool color, bool depth)
 	{
 		glClear(
 			(color ? GL_COLOR_BUFFER_BIT : 0x00) |
 			(depth ? GL_DEPTH_BUFFER_BIT : 0x00));
 	}
 
-	void OpenGLRendererAPI::enableCulling(bool enable, bool cullFront)
+	void OpenGLRendererAPI::EnableCulling(bool enable, bool cullFront)
 	{
 		if (enable)
 		{
@@ -98,12 +98,12 @@ namespace Mahakam
 		}
 	}
 
-	void OpenGLRendererAPI::enableZWriting(bool enable)
+	void OpenGLRendererAPI::EnableZWriting(bool enable)
 	{
 		glDepthMask(enable ? GL_TRUE : GL_FALSE);
 	}
 
-	void OpenGLRendererAPI::enableZTesting(bool enable)
+	void OpenGLRendererAPI::EnableZTesting(bool enable)
 	{
 		if (enable)
 			glEnable(GL_DEPTH_TEST);
@@ -111,7 +111,7 @@ namespace Mahakam
 			glDisable(GL_DEPTH_TEST);
 	}
 
-	void OpenGLRendererAPI::setFillMode(bool fill)
+	void OpenGLRendererAPI::SetFillMode(bool fill)
 	{
 		if (fill)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -119,7 +119,7 @@ namespace Mahakam
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	void OpenGLRendererAPI::setBlendMode(BlendMode src, BlendMode dst, bool enable)
+	void OpenGLRendererAPI::SetBlendMode(BlendMode src, BlendMode dst, bool enable)
 	{
 		GLenum srcBlend = BlendModeToOpenGLBlendMode(src);
 		GLenum dstBlend = BlendModeToOpenGLBlendMode(dst);
@@ -136,12 +136,12 @@ namespace Mahakam
 		}
 	}
 
-	void OpenGLRendererAPI::drawIndexed(uint32_t count)
+	void OpenGLRendererAPI::DrawIndexed(uint32_t count)
 	{
 		MH_GL_CALL(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr));
 	}
 
-	void OpenGLRendererAPI::drawInstanced(uint32_t indexCount, uint32_t count)
+	void OpenGLRendererAPI::DrawInstanced(uint32_t indexCount, uint32_t count)
 	{
 		MH_GL_CALL(glDrawElementsInstanced(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr, count));
 	}

@@ -101,7 +101,7 @@ namespace Mahakam
             MH_CORE_ASSERT(src, "Invalid root!");
 
             dest.name = src->mName.data;
-            dest.transformation = assimpToMat4(src->mTransformation);
+            dest.transformation = AssimpToMat4(src->mTransformation);
             dest.childrenCount = src->mNumChildren;
 
             for (unsigned int i = 0; i < src->mNumChildren; i++)

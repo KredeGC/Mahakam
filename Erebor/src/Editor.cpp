@@ -13,7 +13,7 @@ namespace Mahakam
 	public:
 		Editor() : Application("Erebor")
 		{
-			pushOverlay(new EditorLayer());
+			PushOverlay(new EditorLayer());
 
 			//getWindow().setVSync(true);
 		}
@@ -24,7 +24,7 @@ namespace Mahakam
 		}
 	};
 
-	extern Application* Mahakam::createApplication()
+	extern Application* Mahakam::CreateApplication()
 	{
 		return new Editor();
 	}

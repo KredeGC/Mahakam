@@ -3,23 +3,23 @@
 
 namespace Mahakam
 {
-	void StatsPanel::onUpdate(Timestep dt)
+	void StatsPanel::OnUpdate(Timestep dt)
 	{
 		frametime = dt;
 	}
 
-	void StatsPanel::onImGuiRender()
+	void StatsPanel::OnImGuiRender()
 	{
 		if (open)
 		{
-			auto results = Renderer::getPerformanceResults();
+			auto results = Renderer::GetPerformanceResults();
 
 			ImGui::Begin("Stats", &open);
-			ImGui::Text("Graphics unit: %s", GL::getGraphicsVendor());
+			ImGui::Text("Graphics unit: %s", GL::GetGraphicsVendor());
 			ImGui::Text("Drawcalls: %d", results->drawCalls);
 			ImGui::Text("Vertex count: %d", results->vertexCount);
 			ImGui::Text("Tri count: %d", results->triCount);
-			ImGui::Text("Frametime: %d fps (%.4g ms)", (int)(1.0f / frametime), frametime.getMilliSeconds());
+			ImGui::Text("Frametime: %d fps (%.4g ms)", (int)(1.0f / frametime), frametime.GetMilliSeconds());
 			ImGui::End();
 		}
 	}

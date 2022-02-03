@@ -22,19 +22,19 @@ namespace Mahakam
 		//Window(int width, int height, const char* title);
 		virtual ~Window() {}
 
-		virtual void onUpdate() = 0;
+		virtual void OnUpdate() = 0;
 
-		virtual uint32_t getWidth() const = 0;
-		virtual uint32_t getHeight() const = 0;
+		virtual uint32_t GetWidth() const = 0;
+		virtual uint32_t GetHeight() const = 0;
 
-		virtual void setEventCallback(const EventCallbackFn& callback) = 0;
-		virtual void setVSync(bool enabled) = 0;
-		virtual bool isVSync() const = 0;
+		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+		virtual void SetVSync(bool enabled) = 0;
+		virtual bool IsVSync() const = 0;
 
-		virtual void setCursorVisible(bool visible) = 0;
+		virtual void SetCursorVisible(bool visible) = 0;
 
-		virtual void* getNativeWindow() const = 0;
+		virtual void* GetNativeWindow() const = 0;
 
-		static Window* create(const WindowProps& props = WindowProps());
+		static Window* Create(const WindowProps& props = WindowProps());
 	};
 }

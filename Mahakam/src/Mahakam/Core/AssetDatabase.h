@@ -33,14 +33,14 @@ namespace Mahakam
 
 			if (!std::filesystem::exists(filepath))
 			{
-				Ref<T> asset = T::create(src, props);
+				Ref<T> asset = T::Create(src, props);
 
-				uint32_t size = asset->getSize();
-				uint32_t totalSize = asset->getTotalSize();
+				uint32_t size = asset->GetSize();
+				uint32_t totalSize = asset->GetTotalSize();
 
 				// Save to cache
 				char* pixels = new char[totalSize];
-				asset->readPixels(pixels, saveMips);
+				asset->ReadPixels(pixels, saveMips);
 				std::ofstream stream(filepath, std::ios::binary);
 				stream.write((char*)&size, sizeof(uint32_t));
 				stream.write(pixels, totalSize);
@@ -57,8 +57,8 @@ namespace Mahakam
 				uint32_t size = 0;
 				inStream.read((char*)&size, sizeof(uint32_t));
 				ss << inStream.rdbuf();
-				Ref<T> lut = T::create(props);
-				lut->setData((void*)ss.str().c_str(), size, saveMips);
+				Ref<T> lut = T::Create(props);
+				lut->SetData((void*)ss.str().c_str(), size, saveMips);
 
 				return lut;
 			}
@@ -74,10 +74,10 @@ namespace Mahakam
 
 			if (!std::filesystem::exists(filepath))
 			{
-				Ref<T> asset = T::create(src, props);
+				Ref<T> asset = T::Create(src, props);
 
-				uint32_t size = asset->getSize();
-				uint32_t totalSize = asset->getTotalSize();
+				uint32_t size = asset->GetSize();
+				uint32_t totalSize = asset->GetTotalSize();
 
 				// Save to cache
 				char* pixels = new char[totalSize];
@@ -98,8 +98,8 @@ namespace Mahakam
 				uint32_t size = 0;
 				inStream.read((char*)&size, sizeof(uint32_t));
 				ss << inStream.rdbuf();
-				Ref<T> lut = T::create(props);
-				lut->setData((void*)ss.str().c_str(), size, saveMips);
+				Ref<T> lut = T::Create(props);
+				lut->SetData((void*)ss.str().c_str(), size, saveMips);
 
 				return lut;
 			}
@@ -113,14 +113,14 @@ namespace Mahakam
 
 			if (!std::filesystem::exists(filepath))
 			{
-				Ref<T> asset = T::create(src, prefilter, props);
+				Ref<T> asset = T::Create(src, prefilter, props);
 
-				uint32_t size = asset->getSize();
-				uint32_t totalSize = asset->getTotalSize();
+				uint32_t size = asset->GetSize();
+				uint32_t totalSize = asset->GetTotalSize();
 
 				// Save to cache
 				char* pixels = new char[totalSize];
-				asset->readPixels(pixels, saveMips);
+				asset->ReadPixels(pixels, saveMips);
 				std::ofstream stream(filepath, std::ios::binary);
 				stream.write((char*)&size, sizeof(uint32_t));
 				stream.write(pixels, totalSize);
@@ -137,8 +137,8 @@ namespace Mahakam
 				uint32_t size = 0;
 				inStream.read((char*)&size, sizeof(uint32_t));
 				ss << inStream.rdbuf();
-				Ref<T> lut = T::create(props);
-				lut->setData((void*)ss.str().c_str(), size, saveMips);
+				Ref<T> lut = T::Create(props);
+				lut->SetData((void*)ss.str().c_str(), size, saveMips);
 
 				return lut;
 			}

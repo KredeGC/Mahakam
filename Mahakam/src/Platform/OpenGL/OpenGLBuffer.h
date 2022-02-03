@@ -14,13 +14,13 @@ namespace Mahakam
 		OpenGLVertexBuffer(const char* vertices, uint32_t size);
 		virtual ~OpenGLVertexBuffer() override;
 
-		virtual void bind() const override;
-		virtual void unbind() const override;
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
 
-		virtual void setData(const char* data, uint32_t size) override;
+		virtual void SetData(const char* data, uint32_t size) override;
 
-		virtual void setLayout(const BufferLayout& layout) override;
-		virtual const BufferLayout& getLayout() const override;
+		virtual void SetLayout(const BufferLayout& layout) override;
+		virtual const BufferLayout& GetLayout() const override;
 	};
 
 
@@ -35,10 +35,10 @@ namespace Mahakam
 		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
 		virtual ~OpenGLIndexBuffer() override;
 
-		virtual void bind() const override;
-		virtual void unbind() const override;
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
 
-		virtual uint32_t getCount() const { return count; }
+		virtual uint32_t GetCount() const override { return count; }
 	};
 #pragma endregion
 
@@ -54,10 +54,10 @@ namespace Mahakam
 		OpenGLUniformBuffer(uint32_t size);
 		virtual ~OpenGLUniformBuffer() override;
 
-		virtual void bind(int slot, int offset, int size) const override;
-		virtual void unbind(int slot) const override;
+		virtual void Bind(int slot, int offset, int size) const override;
+		virtual void Unbind(int slot) const override;
 
-		virtual void setData(const void* data, uint32_t offset, uint32_t size) override;
+		virtual void SetData(const void* data, uint32_t offset, uint32_t size) override;
 	};
 #pragma endregion
 
@@ -73,12 +73,12 @@ namespace Mahakam
 		OpenGLStorageBuffer(uint32_t size);
 		virtual ~OpenGLStorageBuffer() override;
 
-		virtual void bind(int slot, int offset, int size) const override;
-		virtual void unbind(int slot) const override;
+		virtual void Bind(int slot, int offset, int size) const override;
+		virtual void Unbind(int slot) const override;
 
-		virtual uint32_t getSize() const override;
+		virtual uint32_t GetSize() const override;
 
-		virtual void setData(const void* data, uint32_t offset, uint32_t size) override;
+		virtual void SetData(const void* data, uint32_t offset, uint32_t size) override;
 	};
 #pragma endregion
 }

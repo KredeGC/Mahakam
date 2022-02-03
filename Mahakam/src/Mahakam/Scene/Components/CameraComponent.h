@@ -25,10 +25,10 @@ namespace Mahakam
 		operator Camera& () { return camera; }
 		operator const Camera& () const { return camera; }
 
-		void setFixedAspectRatio(bool fixed) { fixedAspectRatio = fixed; }
+		void SetFixedAspectRatio(bool fixed) { fixedAspectRatio = fixed; }
 
-		bool hasFixedAspectRatio() const { return fixedAspectRatio; }
+		bool HasFixedAspectRatio() const { return fixedAspectRatio; }
 
-		Camera& getCamera() { return camera; }
+		Camera& GetCamera() { return camera; }
 	};
 }

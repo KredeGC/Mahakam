@@ -12,15 +12,15 @@ namespace Mahakam
 		Ref<Scene> context;
 		Entity selectedEntity;
 
-		void drawEntityNode(Entity entity);
+		void DrawEntityNode(Entity entity);
 
-		void drawInspector(Entity entity);
+		void DrawInspector(Entity entity);
 
 	public:
 		SceneHierarchyPanel() = default;
 
-		void setContext(Ref<Scene> scene);
+		void SetContext(Ref<Scene> scene);
 
-		virtual void onImGuiRender() override;
+		virtual void OnImGuiRender() override;
 	};
 }

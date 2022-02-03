@@ -8,8 +8,12 @@
 
 #include <vector>
 
+#include <robin_hood.h>
+
 namespace Mahakam
 {
+	class RenderPass;
+
 	class Renderer
 	{
 	public:
@@ -27,8 +31,8 @@ namespace Mahakam
 
 		public:
 			DirectionalLight(const glm::vec3& direction, const Light& light) :
-				direction(direction), color(light.getColor()),
-				worldToLight(glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.03f, 20.0f) * glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+				direction(direction), color(light.GetColor()),
+				worldToLight(glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.03f, 20.0f)* glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
 					glm::vec3(0.0f, 0.0f, 0.0f),
 					glm::vec3(0.0f, 1.0f, 0.0f))) {}
 		};
@@ -41,8 +45,8 @@ namespace Mahakam
 
 		public:
 			PointLight(const glm::vec3& position, const Light& light) :
-				position(glm::vec4(position, light.getRange())),
-				color(light.getColor(), 1.0f / (light.getRange() * light.getRange())) {}
+				position(glm::vec4(position, light.GetRange())),
+				color(light.GetColor(), 1.0f / (light.GetRange() * light.GetRange())) {}
 		};
 
 		struct SpotLight
@@ -54,13 +58,13 @@ namespace Mahakam
 
 		public:
 			SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light) :
-				worldToLight(glm::perspective(light.getFov(), 1.0f, 0.03f, light.getRange()) * glm::inverse(glm::translate(glm::mat4(1.0f), position)* glm::mat4(rotation))),
-				color(light.getColor(), 1.0f / (light.getRange() * light.getRange()))
+				worldToLight(glm::perspective(light.GetFov(), 1.0f, 0.03f, light.GetRange())* glm::inverse(glm::translate(glm::mat4(1.0f), position)* glm::mat4(rotation))),
+				color(light.GetColor(), 1.0f / (light.GetRange() * light.GetRange()))
 			{
-				float xy = glm::tan(light.getFov() / 2.0f) * light.getRange();
+				float xy = glm::tan(light.GetFov() / 2.0f) * light.GetRange();
 				objectToWorld = glm::translate(glm::mat4(1.0f), position)
 					* glm::mat4(rotation)
-					* glm::scale(glm::mat4(1.0f), glm::vec3(xy, xy, light.getRange()));
+					* glm::scale(glm::mat4(1.0f), glm::vec3(xy, xy, light.GetRange()));
 			}
 		};
 
@@ -79,40 +83,6 @@ namespace Mahakam
 			uint32_t drawCalls = 0;
 			uint32_t vertexCount = 0;
 			uint32_t triCount = 0;
-		};
-
-	private:
-		struct SceneData
-		{
-			bool wireframe = false;
-
-			// Environment data, provided by scene
-			EnvironmentData environment;
-
-			// Render camera matrices
-			Ref<UniformBuffer> cameraBuffer;
-
-			// Deferred lighting
-			Ref<FrameBuffer> gBuffer;
-			Ref<FrameBuffer> hdrFrameBuffer;
-			Ref<FrameBuffer> viewportFramebuffer;
-
-			// Lighting buffers
-			Ref<StorageBuffer> directionalLightBuffer;
-			Ref<StorageBuffer> pointLightBuffer;
-			Ref<StorageBuffer> spotLightBuffer;
-
-			// Materials
-			Ref<Material> deferredMaterial;
-			Ref<Material> tonemappingMaterial;
-		};
-
-		struct MeshData
-		{
-			float depth;
-			Ref<Mesh> mesh;
-			Ref<Material> material;
-			glm::mat4 transform;
 		};
 
 		struct CameraData
@@ -137,56 +107,96 @@ namespace Mahakam
 			float padding01 = 0.0f;
 
 		public:
+			CameraData() = default;
+
 			CameraData(const Camera& camera, const glm::mat4& transform) :
 				u_m4_V(glm::inverse(transform)),
-				u_m4_P(camera.getProjectionMatrix()),
+				u_m4_P(camera.GetProjectionMatrix()),
 				u_m4_IV(transform),
-				u_m4_IP(glm::inverse(camera.getProjectionMatrix())),
+				u_m4_IP(glm::inverse(camera.GetProjectionMatrix())),
 				u_m4_VP(u_m4_P* u_m4_V),
 				u_m4_IVP(u_m4_IV* u_m4_IP),
 				u_CameraPos(transform[3]) {}
 		};
 
-		static RendererResults* rendererResults;
-		static SceneData* sceneData;
+		struct SceneData
+		{
+			bool wireframe = false;
 
-		static std::unordered_map<Ref<Shader>, // Sort by shader
-			std::unordered_map<Ref<Material>, // Sort by material
-			std::unordered_map<Ref<Mesh>, // Sort by mesh
-			std::vector<glm::mat4>>>> renderQueue; // List of transforms for this mesh
+			// Render queue
+			// 64 bit render queue ID
+			// 2 bit - Geometry(0), AlphaTest(1), Transparent(2), Fullscreen(3)
+			// If Opaque:
+			//  15 bits - Shader index
+			//  15 bits - Material index
+			//  16 bits - Mesh index
+			//  16 bits - Transform index
+			// If Transparent:
+			//  32 bits - Depth
+			std::vector<uint64_t> renderQueue;
 
-		static std::vector<MeshData> transparentQueue;
+			robin_hood::unordered_map<Ref<Shader>, uint64_t> shaderRefLookup;
+			robin_hood::unordered_map<Ref<Material>, uint64_t> materialRefLookup;
+			robin_hood::unordered_map<Ref<Mesh>, uint64_t> meshRefLookup;
 
-	public:
-		static void init(uint32_t width, uint32_t height);
-		static void Shutdown();
-		static void onWindowResie(uint32_t width, uint32_t height);
+			robin_hood::unordered_map<uint64_t, Ref<Shader>> shaderIDLookup;
+			robin_hood::unordered_map<uint64_t, Ref<Material>> materialIDLookup;
+			robin_hood::unordered_map<uint64_t, Ref<Mesh>> meshIDLookup;
+			robin_hood::unordered_map<uint64_t, glm::mat4> transformIDLookup;
 
-		static void beginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
-		static void endScene();
+			// Environment data, provided by scene
+			EnvironmentData environment;
 
-		static void enableWireframe(bool enable);
+			// Render camera matrices
+			CameraData cameraData;
+			Ref<UniformBuffer> cameraBuffer;
 
-		static void submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
-		static void submitTransparent(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
-
-		inline static Ref<FrameBuffer> getGBuffer() { return sceneData->gBuffer; }
-		inline static Ref<FrameBuffer> getFrameBuffer() { return sceneData->viewportFramebuffer; }
-
-		inline static const RendererResults* getPerformanceResults() { return rendererResults; }
+			// Lighting buffers
+			Ref<StorageBuffer> directionalLightBuffer;
+			Ref<StorageBuffer> pointLightBuffer;
+			Ref<StorageBuffer> spotLightBuffer;
+		};
 
 	private:
-		static void drawOpaqueQueue();
-		static void drawShadowQueue();
-		static void drawTransparentQueue();
+		struct MeshData
+		{
+			float depth;
+			Ref<Mesh> mesh;
+			Ref<Material> material;
+			glm::mat4 transform;
+		};
 
-		static void drawSkybox();
-		static void drawScreenQuad();
-		static void drawInstancedSphere(uint32_t amount);
-		static void drawInstancedPyramid(uint32_t amount);
+		static RendererResults* rendererResults;
+		static SceneData* sceneData;
+		static std::vector<RenderPass*> renderPasses;
+		static Ref<FrameBuffer> viewportFramebuffer;
 
-		static void renderGeometryPass();
-		static void renderLightingPass();
-		static void renderFinalPass();
+	public:
+		static void Init(uint32_t width, uint32_t height);
+		static void Shutdown();
+		static void OnWindowResie(uint32_t width, uint32_t height);
+
+		static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
+		static void EndScene();
+
+		static void EnableWireframe(bool enable);
+
+		static void Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
+
+		static void DrawSkybox();
+		static void DrawScreenQuad();
+		static void DrawInstancedSphere(uint32_t amount);
+		static void DrawInstancedPyramid(uint32_t amount);
+
+		inline static Ref<FrameBuffer> GetFrameBuffer() { return viewportFramebuffer; }
+
+		inline static void AddPerformanceResult(uint32_t vertexCount, uint32_t indexCount)
+		{
+			rendererResults->drawCalls++;
+			rendererResults->vertexCount += vertexCount;
+			rendererResults->triCount += indexCount;
+		}
+
+		inline static const RendererResults* GetPerformanceResults() { return rendererResults; }
 	};
 }

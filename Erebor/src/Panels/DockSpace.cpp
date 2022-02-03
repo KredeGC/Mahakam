@@ -3,7 +3,7 @@
 
 namespace Mahakam
 {
-	void DockSpace::onImGuiRender()
+	void DockSpace::OnImGuiRender()
 	{
 		// Render dockspace
 		ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None; // ImGuiDockNodeFlags_None

@@ -11,18 +11,18 @@
 
 namespace Mahakam
 {
-	static Ref<TextureCube> loadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, TextureCubePrefilter prefilter, const CubeTextureProps& props)
+	static Ref<TextureCube> LoadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 	{
 		if (!std::filesystem::exists(cachePath))
 		{
-			Ref<TextureCube> texture = TextureCube::create(src, prefilter, props);
+			Ref<TextureCube> texture = TextureCube::Create(src, prefilter, props);
 
-			uint32_t size = texture->getSize();
-			uint32_t totalSize = texture->getTotalSize();
+			uint32_t size = texture->GetSize();
+			uint32_t totalSize = texture->GetTotalSize();
 
 			// Save to cache
 			char* pixels = new char[totalSize];
-			texture->readPixels(pixels, saveMips);
+			texture->ReadPixels(pixels, saveMips);
 			std::ofstream stream(cachePath, std::ios::binary);
 			stream.write((char*)&size, sizeof(uint32_t));
 			stream.write(pixels, totalSize);
@@ -39,8 +39,8 @@ namespace Mahakam
 			uint32_t size = 0;
 			stream.read((char*)&size, sizeof(uint32_t));
 			ss << stream.rdbuf();
-			Ref<TextureCube> texture = TextureCube::create(props);
-			texture->setData((void*)ss.str().c_str(), size, saveMips);
+			Ref<TextureCube> texture = TextureCube::Create(props);
+			texture->SetData((void*)ss.str().c_str(), size, saveMips);
 
 			stream.close();
 
@@ -53,15 +53,15 @@ namespace Mahakam
 
 	Scene::Scene(const std::string& filepath)
 	{
-		skyboxTexture = TextureCube::create(filepath, { 4096, TextureFormat::RGB16F });
+		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RGB16F });
 		skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
 		skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
 		//skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
 		//skyboxSpecular = loadOrCreate(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
 
-		Ref<Shader> skyboxShader = Shader::create("assets/shaders/Skybox.yaml");
-		skyboxMaterial = Material::create(skyboxShader);
-		skyboxMaterial->setTexture("u_Environment", 0, skyboxTexture);
+		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
+		skyboxMaterial = Material::Create(skyboxShader);
+		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
 	}
 
 	Scene::Scene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
@@ -69,7 +69,7 @@ namespace Mahakam
 
 	Scene::~Scene() {}
 
-	void Scene::onUpdate(Timestep ts)
+	void Scene::OnUpdate(Timestep ts)
 	{
 		// Update scripts.... REMOVE
 		registry.view<NativeScriptComponent>().each([=](auto entity, auto& scriptComponent)
@@ -81,10 +81,10 @@ namespace Mahakam
 				{
 					runtime.script = runtime.instantiateScript();
 					runtime.script->entity = Entity{ entity, this };
-					runtime.script->onCreate();
+					runtime.script->OnCreate();
 				}
 
-				runtime.script->onUpdate(ts);
+				runtime.script->OnUpdate(ts);
 			}
 		});
 
@@ -93,18 +93,18 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::onUpdate - AnimatorComponent");
 
-			registry.view<AnimatorComponent, MeshComponent>().each([=](auto entity, auto& animatorComponent, auto& meshComponent)
+			registry.view<AnimatorComponent, MeshComponent>().each([=](auto entity, AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
 			{
-				auto& animator = animatorComponent.getAnimator();
+				auto& animator = animatorComponent.GetAnimator();
 
 				animator.UpdateAnimation(ts);
 
-				auto& materials = meshComponent.getMaterials();
+				auto& materials = meshComponent.GetMaterials();
 				auto& transforms = animator.GetFinalBoneMatrices();
 
 				for (auto& material : materials)
 					for (int j = 0; j < transforms.size(); ++j)
-						material->setMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
+						material->SetMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
 			});
 		}
 
@@ -119,14 +119,14 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::onUpdate - LightComponent");
 
-			registry.view<LightComponent, TransformComponent>().each([&](auto entity, auto& lightComponent, auto& transformComponent)
+			registry.view<LightComponent, TransformComponent>().each([&](auto entity, LightComponent& lightComponent, TransformComponent& transformComponent)
 			{
-				glm::vec3 pos = transformComponent.getPosition();
-				glm::quat rot = transformComponent.getRotation();
+				glm::vec3 pos = transformComponent.GetPosition();
+				glm::quat rot = transformComponent.GetRotation();
 				glm::vec3 dir = rot * glm::vec3(0.0f, 0.0f, 1.0f);
-				Light& light = lightComponent.getLight();
+				Light& light = lightComponent.GetLight();
 
-				switch (light.getLightType())
+				switch (light.GetLightType())
 				{
 				case Light::LightType::Directional:
 					environment.directionalLights.push_back({ dir, light });
@@ -153,7 +153,7 @@ namespace Mahakam
 				auto [transform, camera] = cameras.get<TransformComponent, CameraComponent>(entity);
 
 				// Recalculate all projection matrices, if they've changed
-				camera.getCamera().recalculateProjectionMatrix();
+				camera.GetCamera().RecalculateProjectionMatrix();
 
 				mainCamera = &camera;
 				mainTransform = &transform;
@@ -166,26 +166,26 @@ namespace Mahakam
 
 			if (mainCamera && mainTransform)
 			{
-				Renderer::beginScene(*mainCamera, *mainTransform, environment);
+				Renderer::BeginScene(*mainCamera, *mainTransform, environment);
 
 				auto meshes = registry.view<TransformComponent, MeshComponent>();
 				for (auto& entity : meshes)
 				{
 					auto [transform, meshComponent] = meshes.get<TransformComponent, MeshComponent>(entity);
 
-					auto& meshes = meshComponent.getMeshes();
-					auto& materials = meshComponent.getMaterials();
+					auto& meshes = meshComponent.GetMeshes();
+					auto& materials = meshComponent.GetMaterials();
 					int materialCount = (int)materials.size() - 1;
-					for (int i = 0; i < meshComponent.getMeshCount(); i++)
-						Renderer::submit(transform, meshes[i], materials[i < materialCount ? i : materialCount]);
+					for (int i = 0; i < meshComponent.GetMeshCount(); i++)
+						Renderer::Submit(transform, meshes[i], materials[i < materialCount ? i : materialCount]);
 				}
 
-				Renderer::endScene();
+				Renderer::EndScene();
 			}
 		}
 	}
 
-	void Scene::onViewportResize(uint32_t width, uint32_t height)
+	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
 		viewportRatio = (float)width / (float)height;
 
@@ -194,33 +194,33 @@ namespace Mahakam
 		{
 			CameraComponent& cameraComponent = cameras.get<CameraComponent>(entity);
 
-			if (!cameraComponent.hasFixedAspectRatio())
+			if (!cameraComponent.HasFixedAspectRatio())
 			{
-				cameraComponent.getCamera().setRatio(viewportRatio);
+				cameraComponent.GetCamera().SetRatio(viewportRatio);
 			}
 		}
 	}
 
-	Entity Scene::createEntity(const std::string& name)
+	Entity Scene::CreateEntity(const std::string& name)
 	{
 		Entity entity(registry.create(), this);
-		entity.addComponent<TransformComponent>();
-		auto& tag = entity.addComponent<TagComponent>();
+		entity.AddComponent<TransformComponent>();
+		auto& tag = entity.AddComponent<TagComponent>();
 		tag.tag = name.empty() ? "Entity" : name;
 		return entity;
 	}
 
-	void Scene::destroyEntity(Entity entity)
+	void Scene::DestroyEntity(Entity entity)
 	{
 		registry.destroy(entity);
 	}
 
-	Ref<Scene> Scene::createScene(const std::string& filepath)
+	Ref<Scene> Scene::CreateScene(const std::string& filepath)
 	{
 		return std::make_shared<Scene>(filepath);
 	}
 
-	Ref<Scene> Scene::createScene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
+	Ref<Scene> Scene::CreateScene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
 	{
 		return std::make_shared<Scene>(irradianceMap, specularMap);
 	}

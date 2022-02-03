@@ -12,15 +12,15 @@ namespace Mahakam
 		std::string debugName;
 
 	public:
-		Layer(const std::string& name = "Layer");
-		virtual ~Layer();
+		Layer(const std::string& name = "Layer") : debugName(name) {}
+		virtual ~Layer() {}
 
-		virtual void onAttach() {}
-		virtual void onDetach() {}
-		virtual void onUpdate(Timestep dt) {}
-		virtual void onImGuiRender() {}
-		virtual void onEvent(Event& event) {}
+		virtual void OnAttach() {}
+		virtual void OnDetach() {}
+		virtual void OnUpdate(Timestep dt) {}
+		virtual void OnImGuiRender() {}
+		virtual void OnEvent(Event& event) {}
 
-		inline const std::string& getName() const { return debugName; }
+		inline const std::string& GetName() const { return debugName; }
 	};
 }

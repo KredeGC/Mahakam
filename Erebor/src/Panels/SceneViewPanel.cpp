@@ -3,7 +3,7 @@
 
 namespace Mahakam
 {
-	void SceneViewPanel::onImGuiRender()
+	void SceneViewPanel::OnImGuiRender()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -19,15 +19,15 @@ namespace Mahakam
 				viewportSize.x = size.x;
 				viewportSize.y = size.y;
 
-				activeScene->onViewportResize((uint32_t)size.x, (uint32_t)size.y);
+				activeScene->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
 			}
-			ImGui::Image((void*)(uintptr_t)viewportFramebuffer->getColorBuffer(0)->getRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image((void*)(uintptr_t)viewportFramebuffer->GetColorBuffer(0)->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}
 	}
 
-	bool SceneViewPanel::onMouseScrolled(MouseScrolledEvent& event)
+	bool SceneViewPanel::OnMouseScrolled(MouseScrolledEvent& event)
 	{
 		if (focused && hovered)
 		{
@@ -38,7 +38,7 @@ namespace Mahakam
 		return false;
 	}
 
-	void SceneViewPanel::setContext(Ref<Scene> scene, Ref<FrameBuffer> framebuffer)
+	void SceneViewPanel::SetContext(Ref<Scene> scene, Ref<FrameBuffer> framebuffer)
 	{
 		activeScene = scene;
 		viewportFramebuffer = framebuffer;

@@ -33,12 +33,12 @@ namespace Mahakam
 			this->skinnedMesh.materials.push_back(material);
 		}
 
-		inline size_t getMeshCount() const { return skinnedMesh.meshes.size(); }
+		inline size_t GetMeshCount() const { return skinnedMesh.meshes.size(); }
 
-		inline Ref<Mesh> getMesh() { return skinnedMesh.meshes[0]; }
-		inline const std::vector<Ref<Mesh>>& getMeshes() { return skinnedMesh.meshes; }
+		inline Ref<Mesh> GetMesh() { return skinnedMesh.meshes[0]; }
+		inline const std::vector<Ref<Mesh>>& GetMeshes() { return skinnedMesh.meshes; }
 
-		inline Ref<Material> getMaterial() { return skinnedMesh.materials[0]; }
-		inline const std::vector<Ref<Material>>& getMaterials() { return skinnedMesh.materials; }
+		inline Ref<Material> GetMaterial() { return skinnedMesh.materials[0]; }
+		inline const std::vector<Ref<Material>>& GetMaterials() { return skinnedMesh.materials; }
 	};
 }

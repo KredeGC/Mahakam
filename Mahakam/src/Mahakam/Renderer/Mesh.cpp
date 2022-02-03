@@ -7,7 +7,7 @@ namespace Mahakam
 	static Mesh* staticPyramid = nullptr;
 	static Mesh* staticCubemapMesh = nullptr;
 
-	static glm::vec3 calculateCubeSphereVertex(const glm::vec3& v)
+	static glm::vec3 CalculateCubeSphereVertex(const glm::vec3& v)
 	{
 		float x2 = v.x * v.x;
 		float y2 = v.y * v.y;
@@ -19,7 +19,7 @@ namespace Mahakam
 		return s;
 	}
 
-	static glm::vec2 calculateEquirectangularUVs(const glm::vec3& v)
+	static glm::vec2 CalculateEquirectangularUVs(const glm::vec3& v)
 	{
 		const glm::vec2 invAtan = glm::vec2(0.1591, 0.3183);
 		glm::vec2 uv = glm::vec2(glm::atan(v.z, v.x), glm::asin(v.y));
@@ -28,7 +28,70 @@ namespace Mahakam
 		return uv;
 	}
 
-	void Mesh::interleaveBuffers()
+	Mesh::Mesh(uint32_t vertexCount, uint32_t indexCount)
+		: vertexCount(vertexCount), indexCount(indexCount), indices(0) {}
+
+	Mesh::Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount)
+		: vertexCount(vertexCount), indices(new uint32_t[indexCount]), indexCount(indexCount)
+	{
+		memcpy(indices, triangles, indexCount * sizeof(uint32_t));
+	}
+
+	Mesh::Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount, const std::initializer_list<void*>& verts)
+		: vertexCount(vertexCount), indices(new uint32_t[indexCount]), indexCount(indexCount)
+	{
+		int offset = 0;
+		int index = 0;
+		for (auto& vert : verts)
+		{
+			const BufferElement& element = bufferElements[index];
+			uint32_t size = vertexCount * element.size;
+
+			Vertex vertex
+			{
+				new char[size],
+				size,
+				element.name
+			};
+
+			memcpy(vertex.data, vert, size);
+
+			vertices[index] = vertex;
+			offset += size;
+			index++;
+		}
+
+		memcpy(indices, triangles, indexCount * sizeof(uint32_t));
+
+		Init();
+	}
+
+	Mesh::Mesh(const Mesh& mesh)
+		: vertexCount(mesh.vertexCount), bufferLayout(mesh.bufferLayout), indexCount(mesh.indexCount), vertexArray(mesh.vertexArray)
+	{
+		uint32_t size = vertexCount * bufferLayout.GetStride();
+
+		interleavedVertices = new char[size];
+		indices = new uint32_t[indexCount];
+
+		for (auto& kv : vertices)
+			memcpy(&kv, &mesh.vertices.at(kv.first), vertexCount * bufferLayout.GetElement(kv.first).size);
+		memcpy(indices, mesh.indices, indexCount * sizeof(uint32_t));
+
+		memcpy(interleavedVertices, mesh.interleavedVertices, size);
+	}
+
+	Mesh::~Mesh()
+	{
+		MH_PROFILE_FUNCTION();
+
+		for (auto& kv : vertices)
+			delete[] kv.second.data;
+
+		delete[] interleavedVertices;
+	}
+
+	void Mesh::InterleaveBuffers()
 	{
 		std::vector<BufferElement> elements;
 
@@ -74,19 +137,19 @@ namespace Mahakam
 		}
 	}
 
-	void Mesh::initBuffers()
+	void Mesh::InitBuffers()
 	{
-		vertexArray = VertexArray::create(vertexCount);
+		vertexArray = VertexArray::Create(vertexCount);
 
-		Ref<VertexBuffer> vertexBuffer = VertexBuffer::create(interleavedVertices, bufferLayout.getStride() * vertexCount);
-		vertexBuffer->setLayout(bufferLayout);
-		vertexArray->addVertexBuffer(vertexBuffer, interleave);
+		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(interleavedVertices, bufferLayout.GetStride() * vertexCount);
+		vertexBuffer->SetLayout(bufferLayout);
+		vertexArray->AddVertexBuffer(vertexBuffer, interleave);
 
-		Ref<IndexBuffer> indexBuffer = IndexBuffer::create(indices, indexCount);
-		vertexArray->setIndexBuffer(indexBuffer);
+		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, indexCount);
+		vertexArray->SetIndexBuffer(indexBuffer);
 	}
 
-	Ref<Mesh> Mesh::processMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
+	Ref<Mesh> Mesh::ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -150,7 +213,7 @@ namespace Mahakam
 				{
 					BoneInfo newBoneInfo;
 					newBoneInfo.id = skinnedMesh.boneCount;
-					newBoneInfo.offset = assimpToMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
+					newBoneInfo.offset = AssimpToMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
 					skinnedMesh.boneInfo[boneName] = newBoneInfo;
 					boneID = skinnedMesh.boneCount;
 					skinnedMesh.boneCount++;
@@ -193,23 +256,23 @@ namespace Mahakam
 			}
 		}
 
-		Ref<Mesh> m = Mesh::create(vertexCount, indices, indexCount);
+		Ref<Mesh> m = Mesh::Create(vertexCount, indices, indexCount);
 		if (mesh->HasPositions())
-			m->setVertices("i_Pos", 0, (const char*)positions);
+			m->SetVertices("i_Pos", 0, (const char*)positions);
 		if (mesh->HasTextureCoords(0))
-			m->setVertices("i_UV", 1, (const char*)texcoords);
+			m->SetVertices("i_UV", 1, (const char*)texcoords);
 		if (mesh->HasNormals())
-			m->setVertices("i_Normal", 2, (const char*)normals);
+			m->SetVertices("i_Normal", 2, (const char*)normals);
 		if (mesh->HasTangentsAndBitangents())
-			m->setVertices("i_Tangent", 3, (const char*)tangents);
+			m->SetVertices("i_Tangent", 3, (const char*)tangents);
 		if (mesh->HasVertexColors(0))
-			m->setVertices("i_Color", 4, (const char*)colors);
+			m->SetVertices("i_Color", 4, (const char*)colors);
 		if (mesh->HasBones())
 		{
-			m->setVertices("i_BoneIDs", 5, (const char*)boneIDs);
-			m->setVertices("i_BoneWeights", 6, (const char*)boneWeights);
+			m->SetVertices("i_BoneIDs", 5, (const char*)boneIDs);
+			m->SetVertices("i_BoneWeights", 6, (const char*)boneWeights);
 		}
-		m->init();
+		m->Init();
 
 		delete[] positions;
 		delete[] texcoords;
@@ -224,7 +287,7 @@ namespace Mahakam
 		return m;
 	}
 
-	void Mesh::processNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene)
+	void Mesh::ProcessNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -232,79 +295,16 @@ namespace Mahakam
 		for (uint32_t i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			skinnedMesh.meshes.push_back(processMesh(skinnedMesh, mesh, scene));
+			skinnedMesh.meshes.push_back(ProcessMesh(skinnedMesh, mesh, scene));
 		}
 
 		// Go through any child nodes
 		for (uint32_t i = 0; i < node->mNumChildren; i++)
-			processNode(skinnedMesh, node->mChildren[i], scene);
-	}
-
-	Mesh::Mesh(uint32_t vertexCount, uint32_t indexCount)
-		: vertexCount(vertexCount), indexCount(indexCount), indices(0) {}
-
-	Mesh::Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount)
-		: vertexCount(vertexCount), indices(new uint32_t[indexCount]), indexCount(indexCount)
-	{
-		memcpy(indices, triangles, indexCount * sizeof(uint32_t));
-	}
-
-	Mesh::Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount, const std::initializer_list<void*>& verts)
-		: vertexCount(vertexCount), indices(new uint32_t[indexCount]), indexCount(indexCount)
-	{
-		int offset = 0;
-		int index = 0;
-		for (auto& vert : verts)
-		{
-			const BufferElement& element = bufferElements[index];
-			uint32_t size = vertexCount * element.size;
-
-			Vertex vertex
-			{
-				new char[size],
-				size,
-				element.name
-			};
-
-			memcpy(vertex.data, vert, size);
-
-			vertices[index] = vertex;
-			offset += size;
-			index++;
-		}
-
-		memcpy(indices, triangles, indexCount * sizeof(uint32_t));
-
-		init();
-	}
-
-	Mesh::Mesh(const Mesh& mesh)
-		: vertexCount(mesh.vertexCount), bufferLayout(mesh.bufferLayout), indexCount(mesh.indexCount), vertexArray(mesh.vertexArray)
-	{
-		uint32_t size = vertexCount * bufferLayout.getStride();
-
-		interleavedVertices = new char[size];
-		indices = new uint32_t[indexCount];
-
-		for (auto& kv : vertices)
-			memcpy(&kv, &mesh.vertices.at(kv.first), vertexCount * bufferLayout.getElement(kv.first).size);
-		memcpy(indices, mesh.indices, indexCount * sizeof(uint32_t));
-
-		memcpy(interleavedVertices, mesh.interleavedVertices, size);
-	}
-
-	Mesh::~Mesh()
-	{
-		MH_PROFILE_FUNCTION();
-
-		for (auto& kv : vertices)
-			delete[] kv.second.data;
-
-		delete[] interleavedVertices;
+			ProcessNode(skinnedMesh, node->mChildren[i], scene);
 	}
 
 	
-	SkinnedMesh Mesh::loadModel(const std::string& filepath, const SkinnedMeshProps& props)
+	SkinnedMesh Mesh::LoadModel(const std::string& filepath, const SkinnedMeshProps& props)
 	{
 		// TODO: Use SkinnedMeshProps to determine if we should load textures and create materials, or use the provided materials
 
@@ -328,12 +328,12 @@ namespace Mahakam
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 			MH_CORE_WARN("Could not load model \"{0}\": {1}", filepath, importer.GetErrorString());
 		else
-			processNode(skinnedMesh, scene->mRootNode, scene);
+			ProcessNode(skinnedMesh, scene->mRootNode, scene);
 
 		return skinnedMesh;
 	}
 
-	Ref<Mesh> Mesh::createCube(int tessellation, bool reverse)
+	Ref<Mesh> Mesh::CreateCube(int tessellation, bool reverse)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -420,7 +420,7 @@ namespace Mahakam
 			{ ShaderDataType::Float3, "i_Normal" }
 		};
 
-		Ref<Mesh> mesh = Mesh::create(vertexCount, indices, indexCount, { positions, uvs, normals });
+		Ref<Mesh> mesh = Mesh::Create(vertexCount, indices, indexCount, { positions, uvs, normals });
 
 		delete[] positions;
 		delete[] uvs;
@@ -430,7 +430,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Ref<Mesh> Mesh::createPlane(int rows, int columns)
+	Ref<Mesh> Mesh::CreatePlane(int rows, int columns)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -486,7 +486,7 @@ namespace Mahakam
 			{ ShaderDataType::Float3, "i_Normal" }
 		};
 
-		Ref<Mesh> mesh = Mesh::create(vertexCount, indices, indexCount, { positions, uvs, normals });
+		Ref<Mesh> mesh = Mesh::Create(vertexCount, indices, indexCount, { positions, uvs, normals });
 
 		delete[] positions;
 		delete[] uvs;
@@ -496,7 +496,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Ref<Mesh> Mesh::createUVSphere(int rows, int columns)
+	Ref<Mesh> Mesh::CreateUVSphere(int rows, int columns)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -567,7 +567,7 @@ namespace Mahakam
 			{ ShaderDataType::Float3, "i_Normal" }
 		};
 
-		Ref<Mesh> mesh = Mesh::create(vertexCount, indices, indexCount, { positions, uvs, normals });
+		Ref<Mesh> mesh = Mesh::Create(vertexCount, indices, indexCount, { positions, uvs, normals });
 
 		delete[] positions;
 		delete[] uvs;
@@ -577,7 +577,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Ref<Mesh> Mesh::createCubeSphere(int tessellation, bool reverse, bool equirectangular)
+	Ref<Mesh> Mesh::CreateCubeSphere(int tessellation, bool reverse, bool equirectangular)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -618,11 +618,11 @@ namespace Mahakam
 						+ (percent.x - 0.5f) * 2.0f * axisA
 						+ (percent.y - 0.5f) * 2.0f * axisB;
 
-					glm::vec3 pointOnSphere = calculateCubeSphereVertex(pointOnCube);
+					glm::vec3 pointOnSphere = CalculateCubeSphereVertex(pointOnCube);
 
 					positions[index] = pointOnSphere * 0.5f;
 					if (equirectangular)
-						uvs[index] = calculateEquirectangularUVs(pointOnSphere);
+						uvs[index] = CalculateEquirectangularUVs(pointOnSphere);
 					else
 						uvs[index] = percent;
 					normals[index] = pointOnSphere;
@@ -665,7 +665,7 @@ namespace Mahakam
 			{ ShaderDataType::Float3, "i_Normal" }
 		};
 
-		Ref<Mesh> mesh = Mesh::create(vertexCount, indices, indexCount, { positions, uvs, normals });
+		Ref<Mesh> mesh = Mesh::Create(vertexCount, indices, indexCount, { positions, uvs, normals });
 
 		delete[] positions;
 		delete[] uvs;

@@ -12,9 +12,9 @@ namespace Mahakam
 	Ref<Texture2D> Texture2D::bump;
 	Ref<TextureCube> TextureCube::white;
 
-	Ref<Texture2D> Texture2D::create(const TextureProps& props)
+	Ref<Texture2D> Texture2D::Create(const TextureProps& props)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -27,9 +27,9 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	Ref<Texture2D> Texture2D::create(const std::string& filepath, const TextureProps& props)
+	Ref<Texture2D> Texture2D::Create(const std::string& filepath, const TextureProps& props)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -43,9 +43,9 @@ namespace Mahakam
 	}
 
 
-	Ref<TextureCube> TextureCube::create(const CubeTextureProps& props)
+	Ref<TextureCube> TextureCube::Create(const CubeTextureProps& props)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -58,9 +58,9 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	Ref<TextureCube> TextureCube::create(const std::string& filepath, const CubeTextureProps& props)
+	Ref<TextureCube> TextureCube::Create(const std::string& filepath, const CubeTextureProps& props)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
@@ -73,9 +73,9 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	Ref<TextureCube> TextureCube::create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
+	Ref<TextureCube> TextureCube::Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 	{
-		switch (RendererAPI::getAPI())
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");

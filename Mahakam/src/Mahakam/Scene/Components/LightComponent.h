@@ -21,6 +21,8 @@ namespace Mahakam
 		LightComponent(Light::LightType lightType, float fov, float range, const glm::vec3& color)
 			: light(lightType, fov, range, color) {}
 
-		Light& getLight() { return light; }
+		operator const Light& () const { return light; }
+
+		Light& GetLight() { return light; }
 	};
 }

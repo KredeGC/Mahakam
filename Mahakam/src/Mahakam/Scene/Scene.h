@@ -33,27 +33,27 @@ namespace Mahakam
 		Scene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
 		~Scene();
 
-		void onUpdate(Timestep ts);
+		void OnUpdate(Timestep ts);
 
-		void onViewportResize(uint32_t width, uint32_t height);
+		void OnViewportResize(uint32_t width, uint32_t height);
 
-		Entity createEntity(const std::string& name = "Entity");
-		void destroyEntity(Entity entity);
+		Entity CreateEntity(const std::string& name = "Entity");
+		void DestroyEntity(Entity entity);
 
-		static Ref<Scene> createScene(const std::string& filepath);
-		static Ref<Scene> createScene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
+		static Ref<Scene> CreateScene(const std::string& filepath);
+		static Ref<Scene> CreateScene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
 
 	private:
 		template<typename T>
-		void onComponentAdded(Entity entity, T& component)
+		void OnComponentAdded(Entity entity, T& component)
 		{
 			//static_assert(false);
 		}
 
 		template<>
-		void onComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
+		void OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
 		{
-			component.getCamera().setRatio(viewportRatio);
+			component.GetCamera().SetRatio(viewportRatio);
 		}
 	};
 }

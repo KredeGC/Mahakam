@@ -12,24 +12,24 @@ namespace Mahakam
 	Ref<Mesh> GL::staticSphereMesh = nullptr;
 	Ref<Mesh> GL::staticCubemapMesh = nullptr;
 
-	void GL::init()
+	void GL::Init()
 	{
-		rendererAPI->init();
+		rendererAPI->Init();
 
 		staticScreenQuad = CreateScreenQuad();
 		staticPyramid = CreatePyramid();
-		staticSphereMesh = Mesh::createCubeSphere(5, true);
-		staticCubemapMesh = Mesh::createCube(2, true);
+		staticSphereMesh = Mesh::CreateCubeSphere(5, true);
+		staticCubemapMesh = Mesh::CreateCube(2, true);
 
 		uint8_t whiteData = 255;
 
-		Texture2D::white = Texture2D::create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		Texture2D::white->setData(&whiteData, 1);
+		Texture2D::white = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		Texture2D::white->SetData(&whiteData, 1);
 
 		uint8_t blackData = 0;
 
-		Texture2D::black = Texture2D::create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		Texture2D::black->setData(&blackData, 1);
+		Texture2D::black = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		Texture2D::black->SetData(&blackData, 1);
 
 		uint8_t bumpData[3]
 		{
@@ -38,8 +38,8 @@ namespace Mahakam
 			255
 		};
 
-		Texture2D::bump = Texture2D::create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		Texture2D::bump->setData(&bumpData, 3);
+		Texture2D::bump = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		Texture2D::bump->SetData(&bumpData, 3);
 	}
 
 	void GL::Shutdown()
@@ -86,7 +86,7 @@ namespace Mahakam
 			{ ShaderDataType::Float2, "i_UV" }
 		};
 
-		return Mesh::create(4, indices, 6, { positions, uvs });
+		return Mesh::Create(4, indices, 6, { positions, uvs });
 	}
 
 	Ref<Mesh> GL::CreatePyramid()
@@ -134,6 +134,6 @@ namespace Mahakam
 			{ ShaderDataType::Float3, "i_Pos" }
 		};
 
-		return Mesh::create(vertexCount, indices, indexCount, { positions });
+		return Mesh::Create(vertexCount, indices, indexCount, { positions });
 	}
 }

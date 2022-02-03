@@ -34,15 +34,15 @@ namespace Mahakam
 		~Profiler()
 		{
 			if (!stopped)
-				stop();
+				Stop();
 		}
 #endif
 
-		void stop();
+		void Stop();
 
-		static void addResult(const char* name, std::chrono::time_point<std::chrono::steady_clock> startTime, std::chrono::time_point<std::chrono::steady_clock> endTime);
+		static void AddResult(const char* name, std::chrono::time_point<std::chrono::steady_clock> startTime, std::chrono::time_point<std::chrono::steady_clock> endTime);
 
-		static void clearResults() { results.clear(); }
-		static const std::vector<ProfileResult>& getResults() { return results; }
+		static void ClearResults() { results.clear(); }
+		static const std::vector<ProfileResult>& GetResults() { return results; }
 	};
 }

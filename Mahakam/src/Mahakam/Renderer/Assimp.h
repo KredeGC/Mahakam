@@ -8,7 +8,7 @@
 
 namespace Mahakam
 {
-	static inline glm::mat4 assimpToMat4(const aiMatrix4x4& from)
+	static inline glm::mat4 AssimpToMat4(const aiMatrix4x4& from)
 	{
 		glm::mat4 to;
 		//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column

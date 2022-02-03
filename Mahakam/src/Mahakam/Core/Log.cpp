@@ -7,7 +7,7 @@ namespace Mahakam
 	std::shared_ptr<spdlog::logger> Log::engineLogger;
 	std::shared_ptr<spdlog::logger> Log::gameLogger;
 
-	void Log::init()
+	void Log::Init()
 	{
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 

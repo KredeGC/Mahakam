@@ -15,8 +15,8 @@ namespace Mahakam
 	public:
 		StatsPanel() = default;
 
-		void onUpdate(Timestep dt);
+		void OnUpdate(Timestep dt);
 
-		void onImGuiRender();
+		void OnImGuiRender();
 	};
 }

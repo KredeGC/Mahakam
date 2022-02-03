@@ -3,13 +3,13 @@
 
 namespace Mahakam
 {
-	void ProfilerPanel::onImGuiRender()
+	void ProfilerPanel::OnImGuiRender()
 	{
 		if (open)
 		{
 			ImGui::Begin("Profiler", &open);
 
-			for (auto& result : Profiler::getResults())
+			for (auto& result : Profiler::GetResults())
 			{
 				char label[256];
 				strcpy(label, "%.3fms  ");
@@ -19,7 +19,7 @@ namespace Mahakam
 
 			ImGui::End();
 
-			Profiler::clearResults();
+			Profiler::ClearResults();
 		}
 	}
 }

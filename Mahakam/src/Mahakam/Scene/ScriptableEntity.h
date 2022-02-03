@@ -11,9 +11,9 @@ namespace Mahakam
 		friend class Scene;
 
 	protected:
-		virtual void onCreate() {}
-		virtual void onDestroy() {}
-		virtual void onUpdate(Timestep ts) {}
+		virtual void OnCreate() {}
+		virtual void OnDestroy() {}
+		virtual void OnUpdate(Timestep ts) {}
 
 	public:
 		virtual ~ScriptableEntity() = default;
@@ -21,6 +21,6 @@ namespace Mahakam
 		Entity entity;
 
 		template<typename T>
-		T& getComponent() const { return entity.getComponent<T>(); }
+		T& GetComponent() const { return entity.GetComponent<T>(); }
 	};
 }
