@@ -28,4 +28,11 @@ namespace Mahakam
 	{
 		return new Editor();
 	}
+
+	extern void Mahakam::InitRenderPasses(std::vector<RenderPass*>& renderPasses, uint32_t width, uint32_t height)
+	{
+		renderPasses.emplace_back(new GeometryRenderPass(width, height));
+		renderPasses.emplace_back(new LightingRenderPass(width, height));
+		renderPasses.emplace_back(new TonemappingRenderPass(width, height));
+	}
 }

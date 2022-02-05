@@ -26,15 +26,12 @@ namespace Mahakam
 		forwardFramebuffer->Resize(width, height);
 	}
 
-	void ForwardRenderPass::Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src)
+	bool ForwardRenderPass::Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		if (sceneData->wireframe)
-		{
-			src->Blit(forwardFramebuffer, true, false);
-			return;
-		}
+			return false;
 
 		src->Blit(forwardFramebuffer);
 
@@ -93,5 +90,7 @@ namespace Mahakam
 		GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
 
 		forwardFramebuffer->Unbind();
+
+		return true;
 	}
 }

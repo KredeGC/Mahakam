@@ -1,12 +1,12 @@
 #include "mhpch.h"
 #include "Mesh.h"
 
+#include "RendererAPI.h"
+
+#include "Platform/OpenGL/OpenGLMesh.h"
+
 namespace Mahakam
 {
-	static Mesh* staticScreenQuad = nullptr;
-	static Mesh* staticPyramid = nullptr;
-	static Mesh* staticCubemapMesh = nullptr;
-
 	static glm::vec3 CalculateCubeSphereVertex(const glm::vec3& v)
 	{
 		float x2 = v.x * v.x;
@@ -28,281 +28,46 @@ namespace Mahakam
 		return uv;
 	}
 
-	Mesh::Mesh(uint32_t vertexCount, uint32_t indexCount)
-		: vertexCount(vertexCount), indexCount(indexCount), indices(0) {}
-
-	Mesh::Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount)
-		: vertexCount(vertexCount), indices(new uint32_t[indexCount]), indexCount(indexCount)
+	Mesh::Bounds Mesh::CalculateBounds(const glm::vec3* positions, uint32_t vertexCount)
 	{
-		memcpy(indices, triangles, indexCount * sizeof(uint32_t));
+		glm::vec3 min = positions[0];
+		glm::vec3 max = positions[0];
+
+		for (uint32_t i = 1; i < vertexCount; i++)
+		{
+			const glm::vec3& pos = positions[i];
+			if (pos.x < min.x)
+				min.x = pos.x;
+			if (pos.y < min.y)
+				min.y = pos.y;
+			if (pos.z < min.z)
+				min.z = pos.z;
+
+			if (pos.x > max.x)
+				max.x = pos.x;
+			if (pos.y > max.y)
+				max.y = pos.y;
+			if (pos.z > max.z)
+				max.z = pos.z;
+		}
+
+		return { min, max };
 	}
 
-	Mesh::Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount, const std::initializer_list<void*>& verts)
-		: vertexCount(vertexCount), indices(new uint32_t[indexCount]), indexCount(indexCount)
+	Ref<Mesh> Mesh::Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	{
-		int offset = 0;
-		int index = 0;
-		for (auto& vert : verts)
+		switch (RendererAPI::GetAPI())
 		{
-			const BufferElement& element = bufferElements[index];
-			uint32_t size = vertexCount * element.size;
-
-			Vertex vertex
-			{
-				new char[size],
-				size,
-				element.name
-			};
-
-			memcpy(vertex.data, vert, size);
-
-			vertices[index] = vertex;
-			offset += size;
-			index++;
+		case RendererAPI::API::None:
+			MH_CORE_BREAK("Renderer API not supported!");
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLMesh>(vertexCount, indexCount, verts, indices);
 		}
 
-		memcpy(indices, triangles, indexCount * sizeof(uint32_t));
+		MH_CORE_BREAK("Unknown renderer API!");
 
-		Init();
+		return nullptr;
 	}
-
-	Mesh::Mesh(const Mesh& mesh)
-		: vertexCount(mesh.vertexCount), bufferLayout(mesh.bufferLayout), indexCount(mesh.indexCount), vertexArray(mesh.vertexArray)
-	{
-		uint32_t size = vertexCount * bufferLayout.GetStride();
-
-		interleavedVertices = new char[size];
-		indices = new uint32_t[indexCount];
-
-		for (auto& kv : vertices)
-			memcpy(&kv, &mesh.vertices.at(kv.first), vertexCount * bufferLayout.GetElement(kv.first).size);
-		memcpy(indices, mesh.indices, indexCount * sizeof(uint32_t));
-
-		memcpy(interleavedVertices, mesh.interleavedVertices, size);
-	}
-
-	Mesh::~Mesh()
-	{
-		MH_PROFILE_FUNCTION();
-
-		for (auto& kv : vertices)
-			delete[] kv.second.data;
-
-		delete[] interleavedVertices;
-	}
-
-	void Mesh::InterleaveBuffers()
-	{
-		std::vector<BufferElement> elements;
-
-		uint32_t size = 0;
-		for (auto& vert : vertices)
-		{
-			size += vert.second.size;
-			elements.push_back(bufferElements[vert.first]);
-		}
-
-		bufferLayout = BufferLayout(elements);
-
-		if (interleavedVertices)
-			delete[] interleavedVertices;
-		interleavedVertices = new char[size];
-
-		if (interleave)
-		{
-			uint32_t dstOffset = 0;
-			for (uint32_t i = 0; i < vertexCount; i++)
-			{
-				uint32_t srcOffset = 0;
-				for (auto& vert : vertices)
-				{
-					uint32_t size = bufferElements[srcOffset++].size;
-					char* src = vert.second.data + i * size;
-					char* dst = interleavedVertices + dstOffset;
-
-					memcpy(dst, src, size);
-					dstOffset += size;
-				}
-			}
-		}
-		else
-		{
-			uint32_t dstOffset = 0;
-			for (auto& vert : vertices)
-			{
-				uint32_t size = vert.second.size;
-				memcpy(interleavedVertices + dstOffset, (void*)vert.second.data, size);
-				dstOffset += size;
-			}
-		}
-	}
-
-	void Mesh::InitBuffers()
-	{
-		vertexArray = VertexArray::Create(vertexCount);
-
-		Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(interleavedVertices, bufferLayout.GetStride() * vertexCount);
-		vertexBuffer->SetLayout(bufferLayout);
-		vertexArray->AddVertexBuffer(vertexBuffer, interleave);
-
-		Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, indexCount);
-		vertexArray->SetIndexBuffer(indexBuffer);
-	}
-
-	Ref<Mesh> Mesh::ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
-	{
-		MH_PROFILE_FUNCTION();
-
-		unsigned int numFaces = mesh->mNumFaces;
-
-		uint32_t vertexCount = mesh->mNumVertices;
-
-		uint32_t indexCount = 0;
-		for (unsigned int i = 0; i < numFaces; i++)
-			indexCount += mesh->mFaces[i].mNumIndices;
-
-		glm::vec3* positions = new glm::vec3[mesh->mNumVertices];
-		glm::vec2* texcoords = new glm::vec2[mesh->mNumVertices];
-		glm::vec3* normals = new glm::vec3[mesh->mNumVertices];
-		glm::vec3* tangents = new glm::vec3[mesh->mNumVertices];
-		glm::vec4* colors = new glm::vec4[mesh->mNumVertices];
-		glm::ivec4* boneIDs = new glm::ivec4[mesh->mNumVertices];
-		glm::vec4* boneWeights = new glm::vec4[mesh->mNumVertices];
-
-		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
-		{
-			boneIDs[i] = glm::ivec4(-1, -1, -1, -1);
-			boneWeights[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-		}
-
-		uint32_t* indices = new uint32_t[indexCount];
-
-		// Extract vertex values
-		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
-		{
-			if (mesh->HasPositions())
-				memcpy(positions + i, mesh->mVertices + i, sizeof(glm::vec3));
-			if (mesh->HasTextureCoords(0))
-				memcpy(texcoords + i, mesh->mTextureCoords[0] + i, sizeof(glm::vec2));
-			if (mesh->HasNormals())
-				memcpy(normals + i, mesh->mNormals + i, sizeof(glm::vec3));
-			if (mesh->HasTangentsAndBitangents())
-				memcpy(tangents + i, mesh->mTangents + i, sizeof(glm::vec3));
-			if (mesh->HasVertexColors(0))
-				memcpy(colors + i, mesh->mColors[0] + i, sizeof(glm::vec4));
-		}
-
-		// Extract indices
-		uint32_t indexOffset = 0;
-		for (uint32_t i = 0; i < mesh->mNumFaces; i++)
-		{
-			aiFace face = mesh->mFaces[i];
-			memcpy(indices + indexOffset, face.mIndices, sizeof(uint32_t) * face.mNumIndices);
-
-			indexOffset += face.mNumIndices;
-		}
-
-		// Extract bone information
-		if (mesh->HasBones())
-		{
-			for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
-			{
-				int boneID = -1;
-				std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-				if (skinnedMesh.boneInfo.find(boneName) == skinnedMesh.boneInfo.end())
-				{
-					BoneInfo newBoneInfo;
-					newBoneInfo.id = skinnedMesh.boneCount;
-					newBoneInfo.offset = AssimpToMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
-					skinnedMesh.boneInfo[boneName] = newBoneInfo;
-					boneID = skinnedMesh.boneCount;
-					skinnedMesh.boneCount++;
-				}
-				else
-				{
-					boneID = skinnedMesh.boneInfo[boneName].id;
-				}
-
-				MH_CORE_ASSERT(boneID != -1, "Invalid bone!");
-				auto weights = mesh->mBones[boneIndex]->mWeights;
-				int numWeights = mesh->mBones[boneIndex]->mNumWeights;
-
-				for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
-				{
-					uint32_t vertexId = weights[weightIndex].mVertexId;
-					float weight = weights[weightIndex].mWeight;
-					MH_CORE_ASSERT(vertexId <= vertexCount, "Invalid vertex index!");
-					//SetVertexBoneData(vertices[vertexId], boneID, weight);
-
-					for (int i = 0; i < 4; ++i)
-					{
-						if (boneIDs[vertexId][i] < 0)
-						{
-							boneWeights[vertexId][i] = weight;
-							boneIDs[vertexId][i] = boneID;
-							break;
-						}
-					}
-				}
-			}
-
-			// Normalize bone weights, because FBX is a bitch
-			for (unsigned int vertIndex = 0; vertIndex < mesh->mNumVertices; ++vertIndex)
-			{
-				glm::vec4& weight = boneWeights[vertIndex];
-				float length = weight.x + weight.y + weight.z + weight.w;
-
-				boneWeights[vertIndex] = weight / length;
-			}
-		}
-
-		Ref<Mesh> m = Mesh::Create(vertexCount, indices, indexCount);
-		if (mesh->HasPositions())
-			m->SetVertices("i_Pos", 0, (const char*)positions);
-		if (mesh->HasTextureCoords(0))
-			m->SetVertices("i_UV", 1, (const char*)texcoords);
-		if (mesh->HasNormals())
-			m->SetVertices("i_Normal", 2, (const char*)normals);
-		if (mesh->HasTangentsAndBitangents())
-			m->SetVertices("i_Tangent", 3, (const char*)tangents);
-		if (mesh->HasVertexColors(0))
-			m->SetVertices("i_Color", 4, (const char*)colors);
-		if (mesh->HasBones())
-		{
-			m->SetVertices("i_BoneIDs", 5, (const char*)boneIDs);
-			m->SetVertices("i_BoneWeights", 6, (const char*)boneWeights);
-		}
-		m->Init();
-
-		delete[] positions;
-		delete[] texcoords;
-		delete[] normals;
-		delete[] tangents;
-		delete[] colors;
-		delete[] boneIDs;
-		delete[] boneWeights;
-
-		delete[] indices;
-
-		return m;
-	}
-
-	void Mesh::ProcessNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene)
-	{
-		MH_PROFILE_FUNCTION();
-
-		// Go through each mesh in this node
-		for (uint32_t i = 0; i < node->mNumMeshes; i++)
-		{
-			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			skinnedMesh.meshes.push_back(ProcessMesh(skinnedMesh, mesh, scene));
-		}
-
-		// Go through any child nodes
-		for (uint32_t i = 0; i < node->mNumChildren; i++)
-			ProcessNode(skinnedMesh, node->mChildren[i], scene);
-	}
-
 	
 	SkinnedMesh Mesh::LoadModel(const std::string& filepath, const SkinnedMeshProps& props)
 	{
@@ -330,6 +95,8 @@ namespace Mahakam
 		else
 			ProcessNode(skinnedMesh, scene->mRootNode, scene);
 
+		//skinnedMesh.RecalculateBounds();
+
 		return skinnedMesh;
 	}
 
@@ -349,8 +116,6 @@ namespace Mahakam
 			{  0.0f, -1.0f,  0.0f },
 			{  0.0f,  0.0f, -1.0f }
 		};
-
-		std::vector<Vertex> vertexAttributes;
 
 		glm::vec3* positions = new glm::vec3[vertexCount];
 		glm::vec2* uvs = new glm::vec2[vertexCount];
@@ -411,16 +176,13 @@ namespace Mahakam
 			}
 		}
 
-		//glm::vec3 pos = positions[0];
+		// Interleave vertices
+		InterleavedStruct interleavedVertices;
+		interleavedVertices.positions = positions;
+		interleavedVertices.texcoords = uvs;
+		interleavedVertices.normals = normals;
 
-		BufferLayout layout
-		{
-			{ ShaderDataType::Float3, "i_Pos" },
-			{ ShaderDataType::Float2, "i_UV" },
-			{ ShaderDataType::Float3, "i_Normal" }
-		};
-
-		Ref<Mesh> mesh = Mesh::Create(vertexCount, indices, indexCount, { positions, uvs, normals });
+		Ref<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -479,14 +241,13 @@ namespace Mahakam
 			}
 		}
 
-		BufferLayout layout
-		{
-			{ ShaderDataType::Float3, "i_Pos" },
-			{ ShaderDataType::Float2, "i_UV" },
-			{ ShaderDataType::Float3, "i_Normal" }
-		};
+		// Interleave vertices
+		InterleavedStruct interleavedVertices;
+		interleavedVertices.positions = positions;
+		interleavedVertices.texcoords = uvs;
+		interleavedVertices.normals = normals;
 
-		Ref<Mesh> mesh = Mesh::Create(vertexCount, indices, indexCount, { positions, uvs, normals });
+		Ref<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -560,14 +321,13 @@ namespace Mahakam
 			}
 		}
 
-		BufferLayout layout
-		{
-			{ ShaderDataType::Float3, "i_Pos" },
-			{ ShaderDataType::Float2, "i_UV" },
-			{ ShaderDataType::Float3, "i_Normal" }
-		};
+		// Interleave vertices
+		InterleavedStruct interleavedVertices;
+		interleavedVertices.positions = positions;
+		interleavedVertices.texcoords = uvs;
+		interleavedVertices.normals = normals;
 
-		Ref<Mesh> mesh = Mesh::Create(vertexCount, indices, indexCount, { positions, uvs, normals });
+		Ref<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -658,14 +418,13 @@ namespace Mahakam
 			}
 		}
 
-		BufferLayout layout
-		{
-			{ ShaderDataType::Float3, "i_Pos" },
-			{ ShaderDataType::Float2, "i_UV" },
-			{ ShaderDataType::Float3, "i_Normal" }
-		};
+		// Interleave vertices
+		InterleavedStruct interleavedVertices;
+		interleavedVertices.positions = positions;
+		interleavedVertices.texcoords = uvs;
+		interleavedVertices.normals = normals;
 
-		Ref<Mesh> mesh = Mesh::Create(vertexCount, indices, indexCount, { positions, uvs, normals });
+		Ref<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -673,5 +432,161 @@ namespace Mahakam
 		delete[] indices;
 
 		return mesh;
+	}
+
+	Ref<Mesh> Mesh::ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
+	{
+		MH_PROFILE_FUNCTION();
+
+		unsigned int numFaces = mesh->mNumFaces;
+
+		uint32_t vertexCount = mesh->mNumVertices;
+
+		uint32_t indexCount = 0;
+		for (unsigned int i = 0; i < numFaces; i++)
+			indexCount += mesh->mFaces[i].mNumIndices;
+
+		glm::vec3* positions = new glm::vec3[mesh->mNumVertices];
+		glm::vec2* texcoords = new glm::vec2[mesh->mNumVertices];
+		glm::vec3* normals = new glm::vec3[mesh->mNumVertices];
+		glm::vec3* tangents = new glm::vec3[mesh->mNumVertices];
+		glm::vec4* colors = new glm::vec4[mesh->mNumVertices];
+		glm::ivec4* boneIDs = new glm::ivec4[mesh->mNumVertices];
+		glm::vec4* boneWeights = new glm::vec4[mesh->mNumVertices];
+
+		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
+		{
+			boneIDs[i] = glm::ivec4(-1, -1, -1, -1);
+			boneWeights[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		}
+
+		uint32_t* indices = new uint32_t[indexCount];
+
+		// Extract vertex values
+		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
+		{
+			if (mesh->HasPositions())
+				memcpy(positions + i, mesh->mVertices + i, sizeof(glm::vec3));
+			if (mesh->HasTextureCoords(0))
+				memcpy(texcoords + i, mesh->mTextureCoords[0] + i, sizeof(glm::vec2));
+			if (mesh->HasNormals())
+				memcpy(normals + i, mesh->mNormals + i, sizeof(glm::vec3));
+			if (mesh->HasTangentsAndBitangents())
+				memcpy(tangents + i, mesh->mTangents + i, sizeof(glm::vec3));
+			if (mesh->HasVertexColors(0))
+				memcpy(colors + i, mesh->mColors[0] + i, sizeof(glm::vec4));
+		}
+
+		// Extract indices
+		uint32_t indexOffset = 0;
+		for (uint32_t i = 0; i < mesh->mNumFaces; i++)
+		{
+			aiFace face = mesh->mFaces[i];
+			memcpy(indices + indexOffset, face.mIndices, sizeof(uint32_t) * face.mNumIndices);
+
+			indexOffset += face.mNumIndices;
+		}
+
+		// Extract bone information
+		if (mesh->HasBones())
+		{
+			for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
+			{
+				int boneID = -1;
+				std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+				if (skinnedMesh.boneInfo.find(boneName) == skinnedMesh.boneInfo.end())
+				{
+					BoneInfo newBoneInfo;
+					newBoneInfo.id = skinnedMesh.boneCount;
+					newBoneInfo.offset = AssimpToMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
+					skinnedMesh.boneInfo[boneName] = newBoneInfo;
+					boneID = skinnedMesh.boneCount;
+					skinnedMesh.boneCount++;
+				}
+				else
+				{
+					boneID = skinnedMesh.boneInfo[boneName].id;
+				}
+
+				MH_CORE_ASSERT(boneID != -1, "Invalid bone!");
+				auto weights = mesh->mBones[boneIndex]->mWeights;
+				int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+				for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+				{
+					uint32_t vertexId = weights[weightIndex].mVertexId;
+					float weight = weights[weightIndex].mWeight;
+					MH_CORE_ASSERT(vertexId <= vertexCount, "Invalid vertex index!");
+
+					for (int i = 0; i < 4; ++i)
+					{
+						if (boneIDs[vertexId][i] < 0)
+						{
+							boneWeights[vertexId][i] = weight;
+							boneIDs[vertexId][i] = boneID;
+							break;
+						}
+					}
+				}
+			}
+
+			// Normalize bone weights, because FBX is a bitch
+			for (unsigned int vertIndex = 0; vertIndex < mesh->mNumVertices; ++vertIndex)
+			{
+				glm::vec4& weight = boneWeights[vertIndex];
+				float length = weight.x + weight.y + weight.z + weight.w;
+
+				boneWeights[vertIndex] = weight / length;
+			}
+		}
+
+		// Interleave vertices
+		InterleavedStruct interleavedVertices;
+
+		if (mesh->HasPositions())
+			interleavedVertices.positions = positions;
+		if (mesh->HasTextureCoords(0))
+			interleavedVertices.texcoords = texcoords;
+		if (mesh->HasNormals())
+			interleavedVertices.normals = normals;
+		if (mesh->HasTangentsAndBitangents())
+			interleavedVertices.tangents = tangents;
+		if (mesh->HasVertexColors(0))
+			interleavedVertices.colors = colors;
+		if (mesh->HasBones())
+		{
+			interleavedVertices.boneIDs = boneIDs;
+			interleavedVertices.boneWeights = boneWeights;
+		}
+
+		Ref<Mesh> m = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+
+		delete[] positions;
+		delete[] texcoords;
+		delete[] normals;
+		delete[] tangents;
+		delete[] colors;
+		delete[] boneIDs;
+		delete[] boneWeights;
+
+		delete[] indices;
+
+		return m;
+	}
+
+	void Mesh::ProcessNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene)
+	{
+		MH_PROFILE_FUNCTION();
+
+		// Go through each mesh in this node
+		for (uint32_t i = 0; i < node->mNumMeshes; i++)
+		{
+			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+			skinnedMesh.meshes.push_back(ProcessMesh(skinnedMesh, mesh, scene));
+		}
+
+		// Go through any child nodes
+		for (uint32_t i = 0; i < node->mNumChildren; i++)
+			ProcessNode(skinnedMesh, node->mChildren[i], scene);
 	}
 }

@@ -17,15 +17,11 @@ namespace Mahakam
 	private:
 		Ref<Scene> activeScene;
 
-		Entity cameraEntity;
-
 		DockSpace dockSpace;
 		ProfilerPanel profilerPanel;
 		SceneViewPanel sceneViewPanel;
 		SceneHierarchyPanel sceneHierarchyPanel;
 		StatsPanel statsPanel;
-
-		bool wireframe = false;
 
 	public:
 		EditorLayer() : Layer("Editor"), dockSpace(), profilerPanel(),

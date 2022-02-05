@@ -122,6 +122,7 @@ namespace Mahakam
 		struct SceneData
 		{
 			bool wireframe = false;
+			bool boundingBox = false;
 
 			// Render queue
 			// 64 bit render queue ID
@@ -158,18 +159,12 @@ namespace Mahakam
 		};
 
 	private:
-		struct MeshData
-		{
-			float depth;
-			Ref<Mesh> mesh;
-			Ref<Material> material;
-			glm::mat4 transform;
-		};
-
 		static RendererResults* rendererResults;
 		static SceneData* sceneData;
 		static std::vector<RenderPass*> renderPasses;
+
 		static Ref<FrameBuffer> viewportFramebuffer;
+		static Ref<Material> whiteMaterial;
 
 	public:
 		static void Init(uint32_t width, uint32_t height);
@@ -179,7 +174,8 @@ namespace Mahakam
 		static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
 		static void EndScene();
 
-		static void EnableWireframe(bool enable);
+		static void Renderer::EnableWireframe(bool enable) { sceneData->wireframe = enable; }
+		static void Renderer::EnableBoundingBox(bool enable) { sceneData->boundingBox = enable; }
 
 		static void Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
 
@@ -187,6 +183,9 @@ namespace Mahakam
 		static void DrawScreenQuad();
 		static void DrawInstancedSphere(uint32_t amount);
 		static void DrawInstancedPyramid(uint32_t amount);
+
+		inline static bool HasWireframeEnabled() { return sceneData->wireframe; }
+		inline static bool HasBoundingBoxEnabled() { return sceneData->boundingBox; }
 
 		inline static Ref<FrameBuffer> GetFrameBuffer() { return viewportFramebuffer; }
 
@@ -199,4 +198,6 @@ namespace Mahakam
 
 		inline static const RendererResults* GetPerformanceResults() { return rendererResults; }
 	};
+
+	void InitRenderPasses(std::vector<RenderPass*>& renderPasses, uint32_t width, uint32_t height);
 }

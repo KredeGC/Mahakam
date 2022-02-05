@@ -127,9 +127,6 @@ namespace Mahakam
 		planeEntity.GetComponent<TransformComponent>().SetScale({ 10.0f, 10.0f, 10.0f });
 
 
-		// Create backpack model
-		//SkinnedMesh backpackModel = Mesh::loadModel("assets/models/backpack.obj");
-
 		//// Create backpack textures
 		Ref<Texture> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
 		Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
@@ -137,41 +134,44 @@ namespace Mahakam
 		Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 		Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 
-		//// Create backpack material
-		//Ref<Material> backpackMaterial = Material::Create(textureShader);
-		//backpackMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
-		//backpackMaterial->setTexture("u_Bump", 0, backpackBump);
-		//backpackMaterial->setTexture("u_Metallic", 0, backpackMetallic);
-		//backpackMaterial->setTexture("u_Roughness", 0, backpackRoughness);
-		//backpackMaterial->setTexture("u_Occlussion", 0, backpackOcclussion);
+		// Create backpack model
+		SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
 
-		//// Create backpack entity
-		//Entity backpackEntity = activeScene->createEntity("Bacpack");
-		//backpackEntity.addComponent<MeshComponent>(backpackModel, backpackMaterial);
-		//backpackEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 4.0f, 5.0f });
-		//backpackEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();
+		//// Create backpack material
+		Ref<Material> backpackMaterial = Material::Create(textureShader);
+		backpackMaterial->SetTexture("u_Albedo", 0, backpackDiffuse);
+		backpackMaterial->SetTexture("u_Bump", 0, backpackBump);
+		backpackMaterial->SetTexture("u_Metallic", 0, backpackMetallic);
+		backpackMaterial->SetTexture("u_Roughness", 0, backpackRoughness);
+		backpackMaterial->SetTexture("u_Occlussion", 0, backpackOcclussion);
+
+		// Create backpack entity
+		Entity backpackEntity = activeScene->CreateEntity("Bacpack");
+		backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
+		backpackEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.0f, 5.0f });
+		backpackEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();
 
 
 		// Setup dancing monke
 		/*Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
-		skinnedMaterial->setTexture("u_Albedo", 0, backpackDiffuse);
-		skinnedMaterial->setTexture("u_Bump", 0, backpackBump);
-		skinnedMaterial->setTexture("u_Metallic", 0, backpackMetallic);
-		skinnedMaterial->setTexture("u_Roughness", 0, backpackRoughness);
+		skinnedMaterial->SetTexture("u_Albedo", 0, backpackDiffuse);
+		skinnedMaterial->SetTexture("u_Bump", 0, backpackBump);
+		skinnedMaterial->SetTexture("u_Metallic", 0, backpackMetallic);
+		skinnedMaterial->SetTexture("u_Roughness", 0, backpackRoughness);
 
-		SkinnedMesh skinnedModel = Mesh::loadModel("assets/models/Defeated.fbx");
+		SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/Defeated.fbx");
 		Ref<Animation> animation = Animation::load("assets/models/Defeated.fbx", skinnedModel);
 
-		Entity animatedEntity = activeScene->createEntity("Animated");
-		animatedEntity.addComponent<MeshComponent>(skinnedModel, skinnedMaterial);
-		animatedEntity.getComponent<TransformComponent>().setPosition({ 4.5f, 1.5f, 5.0f });
-		animatedEntity.getComponent<TransformComponent>().setScale({ 0.02f, 0.02f, 0.02f });
-		animatedEntity.addComponent<AnimatorComponent>(animation);
-		animatedEntity.addComponent<NativeScriptComponent>().bind<RotateScript>();*/
+		Entity animatedEntity = activeScene->CreateEntity("Animated");
+		animatedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
+		animatedEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 1.5f, 5.0f });
+		animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
+		animatedEntity.AddComponent<AnimatorComponent>(animation);
+		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();*/
 
 
 		// Setup scene camera
-		cameraEntity = activeScene->CreateEntity("Camera");
+		Entity cameraEntity = activeScene->CreateEntity("Camera");
 		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 1.0f, 0.01f, 100.0f);
 		cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
 		cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
@@ -231,10 +231,10 @@ namespace Mahakam
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
 	{
 		if (event.GetKeyCode() == MH_KEY_F5)
-		{
-			wireframe = !wireframe;
-			Renderer::EnableWireframe(wireframe);
-		}
+			Renderer::EnableWireframe(!Renderer::HasWireframeEnabled());
+
+		if (event.GetKeyCode() == MH_KEY_F7)
+			Renderer::EnableBoundingBox(!Renderer::HasBoundingBoxEnabled());
 
 		return false;
 	}

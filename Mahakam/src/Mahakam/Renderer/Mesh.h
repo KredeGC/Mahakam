@@ -1,31 +1,15 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
-#include "Buffer.h"
-#include "VertexArray.h"
 #include "Material.h"
 
 #include "Assimp.h"
 
-#include <map>
+#include <robin_hood.h>
 
 namespace Mahakam
 {
-	class Mesh;
-
-	struct BoneInfo
-	{
-		int id;
-		glm::mat4 offset;
-	};
-
-	struct SkinnedMesh
-	{
-		std::vector<Ref<Mesh>> meshes;
-		std::vector<Ref<Material>> materials;
-		std::map<std::string, BoneInfo> boneInfo;
-		int boneCount = 0;
-	};
+	struct SkinnedMesh;
 
 	// TODO: Use this prop struct when loading a model
 	struct SkinnedMeshProps
@@ -44,156 +28,82 @@ namespace Mahakam
 	class Mesh
 	{
 	public:
-		struct Vertex
+		struct InterleavedStruct
 		{
-			char* data;
-			uint32_t size;
-			std::string name;
+			glm::vec3* positions = nullptr;
+			glm::vec2* texcoords = nullptr;
+			glm::vec3* normals = nullptr;
+			glm::vec3* tangents = nullptr;
+			glm::vec4* colors = nullptr;
+			glm::ivec4* boneIDs = nullptr;
+			glm::vec4* boneWeights = nullptr;
+
+			operator void** () { return (void**)this; }
 		};
 
-	private:
-		char* interleavedVertices = 0;
-		uint32_t vertexCount = 0;
+		struct Bounds
+		{
+			glm::vec3 min;
+			glm::vec3 max;
 
-		std::unordered_map<int, Vertex> vertices;
+			glm::vec3 positions[8];
 
-		uint32_t* indices = 0;
-		unsigned int indexCount = 0;
+			Bounds() = default;
 
-		bool interleave = true;
+			Bounds(const glm::vec3& min, const glm::vec3& max)
+				: min(min), max(max)
+			{
+				positions[0] = min;
+				positions[1] = { min.x, max.y, min.z };
+				positions[2] = { min.x, min.y, max.z };
+				positions[3] = { min.x, max.y, max.z };
 
-		BufferElement bufferElements[7]{
-			{ ShaderDataType::Float3,	"i_Pos" },
-			{ ShaderDataType::Float2,	"i_UV" },
-			{ ShaderDataType::Float3,	"i_Normal" },
-			{ ShaderDataType::Float3,	"i_Tangent" },
-			{ ShaderDataType::Float4,	"i_Color" },
-			{ ShaderDataType::Int4,		"i_BoneIDs" },
-			{ ShaderDataType::Float4,	"i_BoneWeights" }
+				positions[4] = { max.x, min.y, min.z };
+				positions[5] = { max.x, max.y, min.z };
+				positions[6] = { max.x, min.y, max.z };
+				positions[7] = max;
+			}
 		};
 
-		BufferLayout bufferLayout;
-
-		Ref<VertexArray> vertexArray;
+		static constexpr uint32_t BUFFER_ELEMENTS_SIZE = 7U;
+		static constexpr ShaderDataType BUFFER_ELEMENTS[BUFFER_ELEMENTS_SIZE]{
+			ShaderDataType::Float3, // Pos
+			ShaderDataType::Float2, // UV
+			ShaderDataType::Float3, // Normal
+			ShaderDataType::Float3, // Tangent
+			ShaderDataType::Float4, // Color
+			ShaderDataType::Int4,   // BoneIDs
+			ShaderDataType::Float4  // BoneWeights
+		};
 
 	public:
-		Mesh(uint32_t vertexCount, uint32_t indexCount);
+		virtual ~Mesh() = default;
 
-		Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount);
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
 
-		Mesh(uint32_t vertexCount, const uint32_t* triangles, uint32_t indexCount, const std::initializer_list<void*>& verts);
+		virtual void RecalculateBounds() = 0;
+		virtual void RecalculateNormals() = 0;
+		virtual void RecalculateTangents() = 0;
 
-		Mesh(const Mesh& mesh);
+		virtual void SetVertices(int slot, const void* data) = 0;
 
-		~Mesh();
+		virtual const Bounds& GetBounds() const = 0;
 
-		void SetVertices(const std::string& name, int index, const char* verts)
-		{
-			MH_PROFILE_FUNCTION();
+		virtual uint32_t GetVertexCount() const = 0;
 
-			uint32_t elementSize = bufferElements[index].size;
-			uint32_t size = elementSize * vertexCount;
+		virtual const glm::vec3* GetPositions() const = 0;
+		virtual const glm::vec2* GetTexcoords() const = 0;
+		virtual const glm::vec3* GetNormals() const = 0;
+		virtual const glm::vec3* GetTangents() const = 0;
+		virtual const glm::vec4* GetColors() const = 0;
 
-			auto& iter = vertices.find(index);
-			if (iter == vertices.end())
-			{
-				// The buffer doesn't exist
-				Vertex vertex
-				{
-					new char[size],
-					size,
-					name
-				};
+		virtual const uint32_t* GetIndices() const = 0;
+		virtual uint32_t GetIndexCount() const = 0;
 
-				memcpy(vertex.data, verts, size);
+		static Bounds CalculateBounds(const glm::vec3* positions, uint32_t vertexCount);
 
-				vertices[index] = vertex;
-			}
-			else
-			{
-				// The buffer already exists
-				memcpy(vertices[index].data, verts, size);
-
-				if (interleave)
-				{
-					InterleaveBuffers();
-
-					const Ref<VertexBuffer>& buffer = vertexArray->GetVertexBuffers()[0];
-
-					uint32_t bufferSize = bufferLayout.GetStride() * vertexCount;
-
-					buffer->SetData(interleavedVertices, bufferSize);
-				}
-				else
-				{
-					const Ref<VertexBuffer>& buffer = vertexArray->GetVertexBuffers()[0];
-
-					buffer->SetData(verts, size);
-				}
-			}
-		}
-
-		void Init(bool interleave = false)
-		{
-			MH_PROFILE_FUNCTION();
-
-			this->interleave = interleave;
-
-			InterleaveBuffers();
-			InitBuffers();
-		}
-
-		// TODO: Update the actual buffers
-		void SetIndices(uint32_t* inds, unsigned int count)
-		{
-			MH_PROFILE_FUNCTION();
-
-			// TODO: Update VAO if necessary
-			indices = inds;
-			indexCount = count;
-			// vertexArray::getIndexBuffer()->setData(...);
-		}
-
-		template<typename T>
-		inline const T& GetVertices(int slot) const { return vertices[slot].data; }
-		inline uint32_t GetVertexCount() const { return vertexCount; }
-
-		inline const glm::vec3& GetPositions() const { return *(glm::vec3*)vertices.at(0).data; }
-		inline const glm::vec2& GetTexcoords() const { return *(glm::vec2*)vertices.at(1).data; }
-		inline const glm::vec3& GetNormals() const { return *(glm::vec3*)vertices.at(2).data; }
-		inline const glm::vec3& GetTangents() const { return *(glm::vec3*)vertices.at(3).data; }
-		inline const glm::vec4& GetColors() const { return *(glm::vec4*)vertices.at(4).data; }
-
-		inline const uint32_t* GetIndices() const { return indices; }
-		inline uint32_t GetIndexCount() const { return indexCount; }
-
-		inline const Ref<VertexArray>& GetVertexArray() const { return vertexArray; }
-
-		void Bind()
-		{
-			vertexArray->Bind();
-		}
-
-		void Unbind()
-		{
-			vertexArray->Unbind();
-		}
-
-		static Ref<Mesh> Create(uint32_t vertexCount, uint32_t indexCount)
-		{
-			return CreateRef<Mesh>(vertexCount, indexCount);
-		}
-
-		static Ref<Mesh> Create(uint32_t vertexCount, const uint32_t* indices, uint32_t indexCount)
-		{
-			return CreateRef<Mesh>(vertexCount, indices, indexCount);
-		}
-
-		static Ref<Mesh> Create(uint32_t vertexCount,
-			const uint32_t* indices, uint32_t indexCount, const std::initializer_list<void*>& verts)
-		{
-			return CreateRef<Mesh>(vertexCount, indices, indexCount, verts);
-		}
+		static Ref<Mesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
 
 		static SkinnedMesh LoadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps());
 		static Ref<Mesh> CreateCube(int tessellation, bool reverse = false);
@@ -202,12 +112,56 @@ namespace Mahakam
 		static Ref<Mesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
 
 	private:
-		void InterleaveBuffers();
-
-		void InitBuffers();
-
 		static Ref<Mesh> ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
 
 		static void ProcessNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene);
+	};
+
+	struct BoneInfo
+	{
+		int id;
+		glm::mat4 offset;
+	};
+
+	struct SkinnedMesh
+	{
+		std::vector<Ref<Mesh>> meshes;
+		std::vector<Ref<Material>> materials;
+		robin_hood::unordered_map<std::string, BoneInfo> boneInfo;
+		int boneCount = 0;
+
+		Mesh::Bounds bounds;
+
+		SkinnedMesh() = default;
+
+		SkinnedMesh(const std::vector<Ref<Mesh>>& meshes, const std::vector<Ref<Material>>& materials, const robin_hood::unordered_map<std::string, BoneInfo>& boneInfo, int boneCount = 0)
+			: meshes(meshes), materials(materials), boneInfo(boneInfo), boneCount(boneCount)
+		{
+			//RecalculateBounds();
+		}
+
+		SkinnedMesh(Ref<Mesh> mesh, Ref<Material> material)
+		{
+			meshes.push_back(mesh);
+			materials.push_back(material);
+
+			//RecalculateBounds();
+		}
+
+		//void RecalculateBounds()
+		//{
+		//	glm::vec3* positions = new glm::vec3[meshes.size() * 2];
+		//	for (size_t i = 0; i < meshes.size(); i++)
+		//	{
+		//		auto& buffer = meshes[i]->GetBounds().positions;
+
+		//		positions[i * 2] = buffer[0]; // Min
+		//		positions[i * 2 + 1] = buffer[7]; // Max
+		//	}
+
+		//	bounds = Mesh::CalculateBounds(positions, (uint32_t)meshes.size() * 2);
+
+		//	delete[] positions;
+		//}
 	};
 }

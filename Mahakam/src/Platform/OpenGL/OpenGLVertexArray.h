@@ -16,7 +16,7 @@ namespace Mahakam
 
 	public:
 		OpenGLVertexArray(uint32_t vertexCount);
-		virtual ~OpenGLVertexArray();
+		virtual ~OpenGLVertexArray() override;
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;

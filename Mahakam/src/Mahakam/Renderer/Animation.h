@@ -5,8 +5,7 @@
 #include "Bone.h"
 #include "Mesh.h"
 
-#include <map>
-#include <unordered_map>
+#include <robin_hood.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <assimp/scene.h>
@@ -60,7 +59,7 @@ namespace Mahakam
 
         inline const AssimpNodeData& GetRootNode() { return m_RootNode; }
 
-        inline const std::map<std::string, BoneInfo>& GetBoneIDMap()
+        inline const robin_hood::unordered_map<std::string, BoneInfo>& GetBoneIDMap()
         {
             return m_BoneInfoMap;
         }
@@ -71,7 +70,7 @@ namespace Mahakam
         }
 
     private:
-        void ReadMissingBones(const aiAnimation* animation, std::map<std::string, BoneInfo>& boneInfoMap, int& boneCount)
+        void ReadMissingBones(const aiAnimation* animation, robin_hood::unordered_map<std::string, BoneInfo>& boneInfoMap, int& boneCount)
         {
             int size = animation->mNumChannels;
 
@@ -116,6 +115,6 @@ namespace Mahakam
         int m_TicksPerSecond;
         std::unordered_map<std::string, Bone> m_Bones;
         AssimpNodeData m_RootNode;
-        std::map<std::string, BoneInfo> m_BoneInfoMap;
+        robin_hood::unordered_map<std::string, BoneInfo> m_BoneInfoMap;
     };
 }

@@ -9,16 +9,17 @@
 #include <sstream>
 #include <fstream>
 
-// TEMPORARY
-#include <glad/glad.h>
-
 
 namespace Mahakam
 {
+	extern void InitRenderPasses(std::vector<RenderPass*>& renderPasses, uint32_t width, uint32_t height);
+
 	Renderer::RendererResults* Renderer::rendererResults = new Renderer::RendererResults;
 	Renderer::SceneData* Renderer::sceneData = new Renderer::SceneData;
 	std::vector<RenderPass*> Renderer::renderPasses;
+
 	Ref<FrameBuffer> Renderer::viewportFramebuffer;
+	Ref<Material> Renderer::whiteMaterial;
 
 	void Renderer::Init(uint32_t width, uint32_t height)
 	{
@@ -30,11 +31,14 @@ namespace Mahakam
 		sceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
 
 		// Initialize render passes
-		renderPasses.emplace_back(new GeometryRenderPass(width, height));
-		renderPasses.emplace_back(new LightingRenderPass(width, height));
-		renderPasses.emplace_back(new TonemappingRenderPass(width, height));
+		InitRenderPasses(renderPasses, width, height);
 
 		viewportFramebuffer = renderPasses[renderPasses.size() - 1]->GetFrameBuffer();
+
+		// Initialize default material
+		Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.yaml");
+		whiteMaterial = Material::Create(unlitColorShader);
+		whiteMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
 	}
 
 	void Renderer::Shutdown()
@@ -45,6 +49,7 @@ namespace Mahakam
 			delete renderPass;
 
 		viewportFramebuffer = nullptr;
+		whiteMaterial = nullptr;
 
 		delete rendererResults;
 		delete sceneData;
@@ -93,9 +98,64 @@ namespace Mahakam
 			return 0;
 		});
 
+		// Render each render pass
+		Ref<FrameBuffer> prevBuffer = nullptr;
 		for (uint32_t i = 0; i < renderPasses.size(); i++)
 		{
-			renderPasses[i]->Render(sceneData, i > 0 ? renderPasses[i - 1UL]->GetFrameBuffer() : nullptr);
+			if (renderPasses[i]->Render(sceneData, prevBuffer))
+				prevBuffer = renderPasses[i]->GetFrameBuffer();
+		}
+
+		// Render bounding boxes
+		if (sceneData->boundingBox)
+		{
+			viewportFramebuffer->Bind();
+			GL::SetFillMode(false);
+
+			whiteMaterial->BindShader("GEOMETRY");
+			whiteMaterial->Bind();
+
+			for (uint64_t drawID : sceneData->renderQueue)
+			{
+				const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
+				Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+
+				const uint64_t transformID = drawID & 0xFFFFULL;
+				glm::mat4& transform = sceneData->transformIDLookup[transformID];
+
+				auto& bounds = mesh->GetBounds();
+
+				glm::vec3 positions[8] = {
+					glm::vec3{ transform * glm::vec4{ bounds.positions[0], 1.0f } },
+					glm::vec3{ transform * glm::vec4{ bounds.positions[1], 1.0f } },
+					glm::vec3{ transform * glm::vec4{ bounds.positions[2], 1.0f } },
+					glm::vec3{ transform * glm::vec4{ bounds.positions[3], 1.0f } },
+					glm::vec3{ transform * glm::vec4{ bounds.positions[4], 1.0f } },
+					glm::vec3{ transform * glm::vec4{ bounds.positions[5], 1.0f } },
+					glm::vec3{ transform * glm::vec4{ bounds.positions[6], 1.0f } },
+					glm::vec3{ transform * glm::vec4{ bounds.positions[7], 1.0f } }
+				};
+
+				Mesh::Bounds transformedBounds = Mesh::CalculateBounds(positions, 8);
+
+				glm::vec3 scale = transformedBounds.max - transformedBounds.min;
+				glm::vec3 center = transformedBounds.min + scale / 2.0f;
+
+				glm::mat4 wireTransform = glm::translate(glm::mat4(1.0f), center)
+					* glm::scale(glm::mat4(1.0f), scale);
+
+				auto wireMesh = GL::GetCube();
+				wireMesh->Bind();
+
+				whiteMaterial->SetTransform(wireTransform);
+
+				Renderer::AddPerformanceResult(wireMesh->GetVertexCount(), wireMesh->GetIndexCount());
+
+				GL::DrawIndexed(wireMesh->GetIndexCount());
+			}
+
+			GL::SetFillMode(true);
+			viewportFramebuffer->Unbind();
 		}
 
 		// Normalize results
@@ -114,13 +174,10 @@ namespace Mahakam
 		sceneData->transformIDLookup.clear();
 	}
 
-	void Renderer::EnableWireframe(bool enable)
-	{
-		sceneData->wireframe = enable;
-	}
-
 	void Renderer::Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
 	{
+		// TODO: View frustum culling using the mesh->GetBounds() method
+
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
 		Ref<Shader> shader = material->GetShader();

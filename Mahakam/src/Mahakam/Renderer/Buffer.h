@@ -41,11 +41,11 @@ namespace Mahakam
 
 	struct BufferElement
 	{
-		ShaderDataType type;
-		std::string name;
-		uint32_t size;
-		uint32_t offset;
-		bool normalized;
+		ShaderDataType type = ShaderDataType::None;
+		std::string name = "";
+		uint32_t size = 0;
+		uint32_t offset = 0;
+		bool normalized = false;
 
 		BufferElement() {}
 

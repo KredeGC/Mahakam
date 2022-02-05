@@ -32,14 +32,14 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	void TonemappingRenderPass::Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src)
+	bool TonemappingRenderPass::Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		if (sceneData->wireframe)
 		{
-			src->Blit(viewportFramebuffer, true, false);
-			return;
+			src->Blit(viewportFramebuffer);
+			return false;
 		}
 
 		if (updateTextures)
@@ -62,5 +62,7 @@ namespace Mahakam
 		GL::EnableZTesting(true);
 
 		viewportFramebuffer->Unbind();
+
+		return true;
 	}
 }

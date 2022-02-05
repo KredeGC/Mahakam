@@ -15,6 +15,7 @@ namespace Mahakam
 		static Ref<Mesh> staticPyramid;
 		static Ref<Mesh> staticSphereMesh;
 		static Ref<Mesh> staticCubemapMesh;
+		static Ref<Mesh> staticCube;
 
 	public:
 		static void Init();
@@ -25,6 +26,7 @@ namespace Mahakam
 		inline static Ref<Mesh> GetInvertedPyramid() { return staticPyramid; }
 		inline static Ref<Mesh> GetInvertedSphere() { return staticSphereMesh; }
 		inline static Ref<Mesh> GetInvertedCube() { return staticCubemapMesh; }
+		inline static Ref<Mesh> GetCube() { return staticCube; }
 
 		inline static const char* GetGraphicsVendor() { return rendererAPI->GetGraphicsVendor(); }
 

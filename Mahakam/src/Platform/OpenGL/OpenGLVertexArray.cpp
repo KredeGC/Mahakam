@@ -53,12 +53,12 @@ namespace Mahakam
 
 		MH_GL_CALL(glDeleteVertexArrays(1, &rendererID));
 	}
-	
+
 	void OpenGLVertexArray::Bind() const
 	{
 		MH_GL_CALL(glBindVertexArray(rendererID));
 	}
-	
+
 	void OpenGLVertexArray::Unbind() const
 	{
 		MH_GL_CALL(glBindVertexArray(0));
@@ -74,35 +74,9 @@ namespace Mahakam
 		buffer->Bind();
 
 		const auto& layout = buffer->GetLayout();
-		if (interleave)
+		for (const auto& element : layout)
 		{
-			for (const auto& element : layout)
-			{
-				MH_GL_CALL(glEnableVertexAttribArray(vertexBufferIndex));
-				GLenum type = ShaderDataTypeToOpenGLBaseType(element.type);
-				if (type == GL_INT)
-				{
-					MH_GL_CALL(glVertexAttribIPointer(vertexBufferIndex,
-						element.GetComponentCount(),
-						type,
-						layout.GetStride(),
-						(const void*)(uintptr_t)element.offset));
-				}
-				else
-				{
-					MH_GL_CALL(glVertexAttribPointer(vertexBufferIndex,
-						element.GetComponentCount(),
-						type,
-						element.normalized ? GL_TRUE : GL_FALSE,
-						layout.GetStride(),
-						(const void*)(uintptr_t)element.offset));
-				}
-				vertexBufferIndex++;
-			}
-		}
-		else
-		{
-			for (const auto& element : layout)
+			if (element.type != ShaderDataType::None)
 			{
 				MH_GL_CALL(glEnableVertexAttribArray(vertexBufferIndex));
 				GLenum type = ShaderDataTypeToOpenGLBaseType(element.type);
@@ -123,13 +97,13 @@ namespace Mahakam
 						0,
 						(const void*)(uintptr_t)(vertexCount * element.offset)));
 				}
-				vertexBufferIndex++;
 			}
+			vertexBufferIndex++;
 		}
 
 		vertexBuffers.push_back(buffer);
 	}
-	
+
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& buffer)
 	{
 		MH_PROFILE_FUNCTION();

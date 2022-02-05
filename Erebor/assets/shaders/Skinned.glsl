@@ -16,8 +16,8 @@ layout(location = 0) in vec3 i_Pos;
 layout(location = 1) in vec2 i_UV;
 layout(location = 2) in vec3 i_Normal;
 layout(location = 3) in vec3 i_Tangent;
-layout(location = 4) in ivec4 i_BoneIDs;
-layout(location = 5) in vec4 i_BoneWeights;
+layout(location = 5) in ivec4 i_BoneIDs;
+layout(location = 6) in vec4 i_BoneWeights;
 
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;

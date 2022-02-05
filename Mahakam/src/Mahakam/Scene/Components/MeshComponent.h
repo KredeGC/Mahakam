@@ -22,16 +22,10 @@ namespace Mahakam
 			this->skinnedMesh.materials.push_back(material);
 		}
 
-		MeshComponent(Ref<Mesh> mesh)
-		{
-			this->skinnedMesh.meshes.push_back(mesh);
-		}
-
 		MeshComponent(Ref<Mesh> mesh, Ref<Material> material)
-		{
-			this->skinnedMesh.meshes.push_back(mesh);
-			this->skinnedMesh.materials.push_back(material);
-		}
+			: skinnedMesh(mesh, material) {}
+
+		inline const Mesh::Bounds& GetBounds() const { return skinnedMesh.bounds; }
 
 		inline size_t GetMeshCount() const { return skinnedMesh.meshes.size(); }
 

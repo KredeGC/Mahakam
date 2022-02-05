@@ -11,6 +11,7 @@ namespace Mahakam
 	Ref<Mesh> GL::staticPyramid = nullptr;
 	Ref<Mesh> GL::staticSphereMesh = nullptr;
 	Ref<Mesh> GL::staticCubemapMesh = nullptr;
+	Ref<Mesh> GL::staticCube = nullptr;
 
 	void GL::Init()
 	{
@@ -20,6 +21,7 @@ namespace Mahakam
 		staticPyramid = CreatePyramid();
 		staticSphereMesh = Mesh::CreateCubeSphere(5, true);
 		staticCubemapMesh = Mesh::CreateCube(2, true);
+		staticCube = Mesh::CreateCube(2);
 
 		uint8_t whiteData = 255;
 
@@ -50,6 +52,7 @@ namespace Mahakam
 		staticPyramid = nullptr;
 		staticSphereMesh = nullptr;
 		staticCubemapMesh = nullptr;
+		staticCube = nullptr;
 
 		Texture2D::white = nullptr;
 		Texture2D::black = nullptr;
@@ -80,13 +83,20 @@ namespace Mahakam
 			0, 3, 1
 		};
 
-		BufferLayout layout
+		// Interleave vertices
+		Mesh::InterleavedStruct interleavedVertices;
+		interleavedVertices.positions = positions;
+		interleavedVertices.texcoords = uvs;
+
+		return Mesh::Create(4, 6, interleavedVertices, indices);
+
+		/*BufferLayout layout
 		{
 			{ ShaderDataType::Float3, "i_Pos" },
 			{ ShaderDataType::Float2, "i_UV" }
 		};
 
-		return Mesh::Create(4, indices, 6, { positions, uvs });
+		return Mesh::Create(4, indices, 6, { positions, uvs });*/
 	}
 
 	Ref<Mesh> GL::CreatePyramid()
@@ -129,11 +139,17 @@ namespace Mahakam
 		indices[16] = 3;
 		indices[17] = 4;
 
-		BufferLayout layout
+		// Interleave vertices
+		Mesh::InterleavedStruct interleavedVertices;
+		interleavedVertices.positions = positions;
+
+		return Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+
+		/*BufferLayout layout
 		{
 			{ ShaderDataType::Float3, "i_Pos" }
 		};
 
-		return Mesh::Create(vertexCount, indices, indexCount, { positions });
+		return Mesh::Create(vertexCount, indices, indexCount, { positions });*/
 	}
 }

@@ -51,14 +51,14 @@ namespace Mahakam
 		hdrFrameBuffer->Resize(width, height);
 	}
 
-	void LightingRenderPass::Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src)
+	bool LightingRenderPass::Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		if (sceneData->wireframe)
 		{
-			src->Blit(hdrFrameBuffer, true, false);
-			return;
+			src->Blit(hdrFrameBuffer);
+			return false;
 		}
 
 		if (updateTextures)
@@ -109,6 +109,8 @@ namespace Mahakam
 		Renderer::DrawSkybox();
 
 		hdrFrameBuffer->Unbind();
+
+		return true;
 	}
 
 	void LightingRenderPass::RenderDirectionalLights(Renderer::SceneData* sceneData)
