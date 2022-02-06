@@ -8,9 +8,7 @@ namespace Mahakam
 	{
 	private:
 		Ref<FrameBuffer> viewportFramebuffer = nullptr;
-		Ref<Material> tonemappingMaterial = nullptr;
-
-		bool updateTextures = true;
+		Ref<Shader> tonemappingShader = nullptr;
 
 	public:
 		TonemappingRenderPass(uint32_t width, uint32_t height);

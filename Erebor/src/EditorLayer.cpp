@@ -127,8 +127,8 @@ namespace Mahakam
 		planeEntity.GetComponent<TransformComponent>().SetScale({ 10.0f, 10.0f, 10.0f });
 
 
-		//// Create backpack textures
-		Ref<Texture> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
+		// Create backpack textures
+		Ref<Texture2D> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
 		Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 		Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
 		Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
@@ -137,7 +137,7 @@ namespace Mahakam
 		// Create backpack model
 		SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
 
-		//// Create backpack material
+		// Create backpack material
 		Ref<Material> backpackMaterial = Material::Create(textureShader);
 		backpackMaterial->SetTexture("u_Albedo", 0, backpackDiffuse);
 		backpackMaterial->SetTexture("u_Bump", 0, backpackBump);
@@ -241,11 +241,6 @@ namespace Mahakam
 
 	bool EditorLayer::OnWindowResize(WindowResizeEvent& event)
 	{
-		/*uint32_t width = event.getWidth();
-		uint32_t height = event.getHeight();
-		if (width > 0 && height > 0)
-			viewportFramebuffer->resize(width, height);*/
-
 		return false;
 	}
 

@@ -21,4 +21,15 @@ namespace Mahakam
 	{
 		MH_GL_CALL(glDeleteRenderbuffers(1, &rendererID));
 	}
+
+	void OpenGLRenderBuffer::Resize(uint32_t width, uint32_t height)
+	{
+		this->width = width;
+		this->height = height;
+
+		MH_GL_CALL(glDeleteRenderbuffers(1, &rendererID));
+
+		MH_GL_CALL(glCreateRenderbuffers(1, &rendererID));
+		MH_GL_CALL(glNamedRenderbufferStorage(rendererID, internalFormat, width, height));
+	}
 }

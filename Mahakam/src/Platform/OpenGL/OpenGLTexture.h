@@ -31,11 +31,16 @@ namespace Mahakam {
 		virtual uint32_t GetSize() const override { return size; }
 		virtual uint32_t GetTotalSize() const override { return totalSize; }
 
+		virtual void Resize(uint32_t width, uint32_t height) override;
+
 		virtual void SetData(void* data, uint32_t size, bool mipmaps) override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
 
 		virtual void ReadPixels(void* pixels, bool mipmaps) override;
+
+	private:
+		void Init();
 	};
 
 
@@ -66,6 +71,8 @@ namespace Mahakam {
 
 		virtual uint32_t GetSize() const override { return size; }
 		virtual uint32_t GetTotalSize() const override { return totalSize; }
+
+		virtual void Resize(uint32_t width, uint32_t height) override;
 
 		virtual void SetData(void* data, uint32_t size, bool mipmaps) override;
 

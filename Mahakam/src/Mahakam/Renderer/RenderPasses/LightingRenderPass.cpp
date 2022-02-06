@@ -26,12 +26,8 @@ namespace Mahakam
 
 		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
 
-		// Create lighting shader & material
-		Ref<Shader> deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.yaml");
-		deferredMaterial = Material::Create(deferredShader);
-		deferredMaterial->SetTexture("u_BRDFLUT", 2, brdfLut);
-		deferredMaterial->SetTexture("u_AttenuationLUT", 3, falloffLut);
-		deferredMaterial->SetTexture("u_LightCookie", 8, spotlightTexture);
+		// Create lighting shader
+		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.yaml");
 	}
 
 	LightingRenderPass::~LightingRenderPass()
@@ -39,15 +35,13 @@ namespace Mahakam
 		brdfLut = nullptr;
 		falloffLut = nullptr;
 		spotlightTexture = nullptr;
+		deferredShader = nullptr;
 
 		hdrFrameBuffer = nullptr;
-		deferredMaterial = nullptr;
 	}
 
 	void LightingRenderPass::OnWindowResize(uint32_t width, uint32_t height)
 	{
-		updateTextures = true;
-
 		hdrFrameBuffer->Resize(width, height);
 	}
 
@@ -61,19 +55,16 @@ namespace Mahakam
 			return false;
 		}
 
-		if (updateTextures)
-		{
-			updateTextures = false;
-			deferredMaterial->SetTexture("u_GBuffer0", 4, src->GetColorTexture(0));
-			deferredMaterial->SetTexture("u_GBuffer1", 5, src->GetColorTexture(1));
-			deferredMaterial->SetTexture("u_GBuffer2", 6, src->GetColorTexture(3));
-			deferredMaterial->SetTexture("u_Depth", 7, src->GetDepthTexture());
-		}
+		deferredShader->Bind("DIRECTIONAL");
+		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
+		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
+		deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(3));
+		deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
 
-		if (deferredMaterial->GetTexture("u_IrradianceMap") != sceneData->environment.irradianceMap)
-			deferredMaterial->SetTexture("u_IrradianceMap", 0, sceneData->environment.irradianceMap);
-		if (deferredMaterial->GetTexture("u_SpecularMap") != sceneData->environment.specularMap)
-			deferredMaterial->SetTexture("u_SpecularMap", 1, sceneData->environment.specularMap);
+		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
+
+		deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.irradianceMap);
+		deferredShader->SetTexture("u_SpecularMap", sceneData->environment.specularMap);
 
 		// Blit depth buffer from gBuffer
 		src->Blit(hdrFrameBuffer, false, true);
@@ -138,8 +129,6 @@ namespace Mahakam
 			sceneData->directionalLightBuffer->SetData(&amount, 0, sizeof(int));
 		}
 
-		deferredMaterial->BindShader("DIRECTIONAL");
-		deferredMaterial->Bind();
 		sceneData->directionalLightBuffer->Bind(1);
 
 		Renderer::DrawScreenQuad();
@@ -161,8 +150,8 @@ namespace Mahakam
 
 			sceneData->pointLightBuffer->SetData(&sceneData->environment.pointLights[0], 0, bufferSize);
 
-			deferredMaterial->BindShader("POINT");
-			deferredMaterial->Bind();
+			deferredShader->Bind("POINT");
+			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
 			sceneData->pointLightBuffer->Bind(1);
 
 			Renderer::DrawInstancedSphere(amount);
@@ -185,8 +174,9 @@ namespace Mahakam
 
 			sceneData->spotLightBuffer->SetData(&sceneData->environment.spotLights[0], 0, bufferSize);
 
-			deferredMaterial->BindShader("SPOT");
-			deferredMaterial->Bind();
+			deferredShader->Bind("SPOT");
+			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
+			deferredShader->SetTexture("u_LightCookie", spotlightTexture);
 			sceneData->spotLightBuffer->Bind(1);
 
 			Renderer::DrawInstancedPyramid(amount);

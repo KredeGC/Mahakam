@@ -7,11 +7,6 @@ namespace Mahakam
 {
 	GeometryRenderPass::GeometryRenderPass(uint32_t width, uint32_t height)
 	{
-		// Create white material
-		Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.yaml");
-		whiteMaterial = Material::Create(unlitColorShader);
-		whiteMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
-
 		// Create gbuffer
 		FrameBufferProps gProps;
 		gProps.width = width;

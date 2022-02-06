@@ -164,7 +164,7 @@ namespace Mahakam
 		static std::vector<RenderPass*> renderPasses;
 
 		static Ref<FrameBuffer> viewportFramebuffer;
-		static Ref<Material> whiteMaterial;
+		static Ref<Material> unlitMaterial;
 
 	public:
 		static void Init(uint32_t width, uint32_t height);

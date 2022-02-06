@@ -15,20 +15,17 @@ namespace Mahakam
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
-		Ref<Shader> tonemappingShader = Shader::Create("assets/shaders/internal/Tonemapping.yaml");
-		tonemappingMaterial = Material::Create(tonemappingShader);
+		tonemappingShader = Shader::Create("assets/shaders/internal/Tonemapping.yaml");
 	}
 
 	TonemappingRenderPass::~TonemappingRenderPass()
 	{
 		viewportFramebuffer = nullptr;
-		tonemappingMaterial = nullptr;
+		tonemappingShader = nullptr;
 	}
 
 	void TonemappingRenderPass::OnWindowResize(uint32_t width, uint32_t height)
 	{
-		updateTextures = true;
-
 		viewportFramebuffer->Resize(width, height);
 	}
 
@@ -42,9 +39,6 @@ namespace Mahakam
 			return false;
 		}
 
-		if (updateTextures)
-			tonemappingMaterial->SetTexture("u_Albedo", 0, src->GetColorTexture(0));
-
 		src->Blit(viewportFramebuffer, false, true);
 
 		viewportFramebuffer->Bind();
@@ -52,8 +46,8 @@ namespace Mahakam
 		GL::Clear(true, false);
 
 		// HDR Tonemapping
-		tonemappingMaterial->BindShader("POSTPROCESSING");
-		tonemappingMaterial->Bind();
+		tonemappingShader->Bind("POSTPROCESSING");
+		tonemappingShader->SetTexture("u_Albedo", src->GetColorTexture(0));
 
 		GL::EnableZTesting(false);
 		GL::EnableZWriting(false);

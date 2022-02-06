@@ -43,10 +43,10 @@ namespace Mahakam
 
 		if (color)
 			MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_COLOR_BUFFER_BIT, GL_NEAREST))
-		if (depth)
-			MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST))
+			if (depth)
+				MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST))
 
-		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+				MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
 	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
@@ -85,10 +85,37 @@ namespace Mahakam
 
 		if (rendererID)
 		{
-			colorAttachments.clear();
-			depthAttachment = 0;
+			//colorAttachments.clear();
+			//depthAttachment = 0;
 
-			MH_GL_CALL(glDeleteFramebuffers(1, &rendererID));
+			//MH_GL_CALL(glDeleteFramebuffers(1, &rendererID));
+
+			MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, rendererID));
+
+			for (int i = 0; i < colorAttachments.size(); i++)
+			{
+				colorAttachments[i]->Resize(props.width, props.height);
+				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorAttachments[i]->GetRendererID(), 0));
+			}
+
+			if (!props.dontUseDepth && depthAttachment)
+			{
+				depthAttachment->Resize(props.width, props.height);
+
+				uint32_t attachment = TextureFormatToOpenGLAttachment(props.depthAttachment.format);
+
+				if (props.depthAttachment.immutable)
+					MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depthAttachment->GetRendererID()))
+				else
+					MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, depthAttachment->GetRendererID(), 0))
+			}
+
+			// Check framebuffer
+			MH_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "FrameBuffer is incomplete!");
+
+			MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+			return;
 		}
 
 		MH_GL_CALL(glCreateFramebuffers(1, &rendererID));

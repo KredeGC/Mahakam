@@ -7,7 +7,7 @@ namespace Mahakam
 	class OpenGLFrameBuffer : public FrameBuffer
 	{
 	private:
-		uint32_t rendererID;
+		uint32_t rendererID = 0;
 		FrameBufferProps props;
 		std::vector<Ref<RenderBuffer>> colorAttachments;
 		Ref<RenderBuffer> depthAttachment = 0;

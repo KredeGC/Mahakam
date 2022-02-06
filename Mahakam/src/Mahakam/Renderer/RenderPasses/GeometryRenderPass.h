@@ -9,8 +9,6 @@ namespace Mahakam
 	private:
 		Ref<FrameBuffer> gBuffer = nullptr;
 
-		Ref<Material> whiteMaterial = nullptr;
-
 	public:
 		GeometryRenderPass(uint32_t width, uint32_t height);
 		virtual ~GeometryRenderPass() override;

@@ -12,9 +12,7 @@ namespace Mahakam
 		Ref<Texture> spotlightTexture;
 
 		Ref<FrameBuffer> hdrFrameBuffer;
-		Ref<Material> deferredMaterial;
-
-		bool updateTextures = true;
+		Ref<Shader> deferredShader;
 
 	public:
 		LightingRenderPass(uint32_t width, uint32_t height);

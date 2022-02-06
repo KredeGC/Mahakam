@@ -70,7 +70,7 @@ namespace Mahakam
 	class Texture3D : public Texture
 	{
 	public:
-		virtual uint32_t getDepth() const = 0;
+		virtual uint32_t GetDepth() const = 0;
 
 		static Ref<Texture3D> Create(const std::string& filepath, const TextureProps& props = TextureProps());
 	};

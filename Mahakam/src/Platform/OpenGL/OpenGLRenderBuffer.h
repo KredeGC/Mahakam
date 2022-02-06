@@ -23,5 +23,7 @@ namespace Mahakam
 		virtual uint32_t GetRendererID() const { return rendererID; }
 
 		virtual uint32_t GetSize() const override { return size; }
+
+		virtual void Resize(uint32_t width, uint32_t height) override;
 	};
 }

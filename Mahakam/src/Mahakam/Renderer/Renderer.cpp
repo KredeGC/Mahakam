@@ -19,7 +19,7 @@ namespace Mahakam
 	std::vector<RenderPass*> Renderer::renderPasses;
 
 	Ref<FrameBuffer> Renderer::viewportFramebuffer;
-	Ref<Material> Renderer::whiteMaterial;
+	Ref<Material> Renderer::unlitMaterial;
 
 	void Renderer::Init(uint32_t width, uint32_t height)
 	{
@@ -37,8 +37,8 @@ namespace Mahakam
 
 		// Initialize default material
 		Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.yaml");
-		whiteMaterial = Material::Create(unlitColorShader);
-		whiteMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
+		unlitMaterial = Material::Create(unlitColorShader);
+		unlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
 	}
 
 	void Renderer::Shutdown()
@@ -49,7 +49,7 @@ namespace Mahakam
 			delete renderPass;
 
 		viewportFramebuffer = nullptr;
-		whiteMaterial = nullptr;
+		unlitMaterial = nullptr;
 
 		delete rendererResults;
 		delete sceneData;
@@ -112,8 +112,8 @@ namespace Mahakam
 			viewportFramebuffer->Bind();
 			GL::SetFillMode(false);
 
-			whiteMaterial->BindShader("GEOMETRY");
-			whiteMaterial->Bind();
+			unlitMaterial->BindShader("GEOMETRY");
+			unlitMaterial->Bind();
 
 			for (uint64_t drawID : sceneData->renderQueue)
 			{
@@ -147,7 +147,7 @@ namespace Mahakam
 				auto wireMesh = GL::GetCube();
 				wireMesh->Bind();
 
-				whiteMaterial->SetTransform(wireTransform);
+				unlitMaterial->SetTransform(wireTransform);
 
 				Renderer::AddPerformanceResult(wireMesh->GetVertexCount(), wireMesh->GetIndexCount());
 

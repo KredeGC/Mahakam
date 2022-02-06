@@ -17,6 +17,8 @@ namespace Mahakam
 
 		virtual uint32_t GetSize() const = 0;
 
+		virtual void Resize(uint32_t width, uint32_t height) = 0;
+
 		static Ref<RenderBuffer> Create(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
 	};
 }
