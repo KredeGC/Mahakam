@@ -1,6 +1,4 @@
 #pragma once
-#include "VertexArray.h"
-
 #include <glm/glm.hpp>
 
 namespace Mahakam

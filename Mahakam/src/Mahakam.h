@@ -32,7 +32,6 @@
 #include "Mahakam/Renderer/RenderPasses.h"
 #include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
-#include "Mahakam/Renderer/VertexArray.h"
 
 // Layers
 #include "Mahakam/ImGui/ImGuiLayer.h"
