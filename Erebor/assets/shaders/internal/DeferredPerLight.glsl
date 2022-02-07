@@ -62,11 +62,11 @@ void main() {
         vec2 screenUV = i.v_ScreenPos.xy;
     #endif
     
-    // Surface values
     #ifdef DEBUG
         screenUV *= 2.0;
     #endif
     
+    // Surface values
     vec4 gBuffer0 = texture(u_GBuffer0, screenUV);
     vec4 gBuffer1 = texture(u_GBuffer1, screenUV);
     vec4 gBuffer2 = texture(u_GBuffer2, screenUV);

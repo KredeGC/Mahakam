@@ -106,6 +106,7 @@ namespace Mahakam
 	{
 		bool wireframe = false;
 		bool boundingBox = false;
+		bool gBuffer = false;
 
 		// Render queue
 		// 64 bit render queue ID

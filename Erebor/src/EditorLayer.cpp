@@ -235,6 +235,9 @@ namespace Mahakam
 		if (event.GetKeyCode() == MH_KEY_F5)
 			Renderer::EnableWireframe(!Renderer::HasWireframeEnabled());
 
+		if (event.GetKeyCode() == MH_KEY_F6)
+			Renderer::EnableGBuffer(!Renderer::HasGBufferEnabled());
+
 		if (event.GetKeyCode() == MH_KEY_F7)
 			Renderer::EnableBoundingBox(!Renderer::HasBoundingBoxEnabled());
 

@@ -2,7 +2,7 @@
 
 #include "Mahakam/Renderer/Shader.h"
 
-#include <unordered_map>
+#include <robin_hood.h>
 
 #include <glm/glm.hpp>
 
@@ -17,12 +17,12 @@ namespace Mahakam
 		std::string filepath;
 		std::string name;
 
-		std::unordered_map<std::string, // Render passes
-			std::unordered_map<std::string, // Shader variants
+		robin_hood::unordered_map<std::string, // Render passes
+			robin_hood::unordered_map<std::string, // Shader variants
 			uint32_t>> shaderPasses;
 
 		//std::unordered_map<std::string, uint32_t> shaderVariants;
-		std::unordered_map<std::string, int> uniformIDCache;
+		robin_hood::unordered_map<std::string, int> uniformIDCache;
 		ShaderProps properties;
 
 	public:
@@ -53,15 +53,15 @@ namespace Mahakam
 
 	private:
 		// UNUSED
-		uint32_t CreateProgram(const std::unordered_map<uint32_t, std::vector<uint32_t>>& sources);
-		std::unordered_map<uint32_t, std::vector<uint32_t>> CompileSPIRV(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives);
+		uint32_t CreateProgram(const robin_hood::unordered_map<uint32_t, std::vector<uint32_t>>& sources);
+		robin_hood::unordered_map<uint32_t, std::vector<uint32_t>> CompileSPIRV(const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives);
 		// UNUSED
 
-		uint32_t CompileBinary(const std::string& cachePath, const std::unordered_map<GLenum, std::string>& sources, const std::string& directives);
+		uint32_t CompileBinary(const std::string& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives);
 
 		void ParseYAMLFile(const std::string& filepath, const std::vector<std::string>& keywords);
-		std::unordered_map<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
-		std::unordered_map<GLenum, std::string> ParseGLSLFile(const std::string& source);
+		robin_hood::unordered_map<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
+		robin_hood::unordered_map<GLenum, std::string> ParseGLSLFile(const std::string& source);
 
 		std::string SortIncludes(const std::string& source);
 		std::string ReadFile(const std::string& filepath);

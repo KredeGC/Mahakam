@@ -73,8 +73,11 @@ namespace Mahakam
 
 		name = filepath.substr(lastSlash, count);
 
+		std::vector<std::string> features = keywords;
+		features.emplace_back("");
+
 		// Read YAML file for shader passes
-		ParseYAMLFile(filepath, keywords);
+		ParseYAMLFile(filepath, features);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -171,7 +174,7 @@ namespace Mahakam
 		MH_GL_CALL(glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w));
 	}
 
-	uint32_t OpenGLShader::CreateProgram(const std::unordered_map<uint32_t, std::vector<uint32_t>>& sources)
+	uint32_t OpenGLShader::CreateProgram(const robin_hood::unordered_map<uint32_t, std::vector<uint32_t>>& sources)
 	{
 		uint32_t program = glCreateProgram();
 
@@ -215,9 +218,9 @@ namespace Mahakam
 		return program;
 	}
 
-	std::unordered_map<uint32_t, std::vector<uint32_t>> OpenGLShader::CompileSPIRV(const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
+	robin_hood::unordered_map<uint32_t, std::vector<uint32_t>> OpenGLShader::CompileSPIRV(const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives)
 	{
-		std::unordered_map<uint32_t, std::vector<uint32_t>> compiledShaderStages;
+		robin_hood::unordered_map<uint32_t, std::vector<uint32_t>> compiledShaderStages;
 
 		// Get file-friendly name
 		std::string identifier = directives;
@@ -298,7 +301,7 @@ namespace Mahakam
 		return compiledShaderStages;
 	}
 
-	uint32_t OpenGLShader::CompileBinary(const std::string& cachePath, const std::unordered_map<GLenum, std::string>& sources, const std::string& directives)
+	uint32_t OpenGLShader::CompileBinary(const std::string& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -473,7 +476,7 @@ namespace Mahakam
 
 		MH_CORE_ASSERT(rootNode && rootNode.size() > 0, "Loaded empty shader file! Path may be wrong!");
 
-		std::unordered_map<std::string, std::string> keywordPermutations = ParseShaderKeywords(keywords);
+		robin_hood::unordered_map<std::string, std::string> keywordPermutations = ParseShaderKeywords(keywords);
 
 		for each (auto shaderPassNode in rootNode)
 		{
@@ -506,34 +509,27 @@ namespace Mahakam
 				auto sources = ParseGLSLFile(source.str());
 
 				// Generate shaders for each shader pass * each keyword combination
-				if (keywordPermutations.size() == 0)
-				{
-					shaderPasses[shaderPassName][""] = CompileBinary(cachePath + ".dat", sources, shaderPassDefines.str());
-				}
-				else
-				{
-					for (const auto& directives : keywordPermutations)
-						shaderPasses[shaderPassName][directives.first] = CompileBinary(cachePath + directives.first + ".dat", sources, shaderPassDefines.str() + directives.second);
-				}
+				for (const auto& directives : keywordPermutations)
+					shaderPasses[shaderPassName][directives.first] = CompileBinary(cachePath + directives.first + ".dat", sources, shaderPassDefines.str() + directives.second);
 			}
 		}
 	}
 
-	std::unordered_map<std::string, std::string> OpenGLShader::ParseShaderKeywords(const std::vector<std::string>& keywords)
+	robin_hood::unordered_map<std::string, std::string> OpenGLShader::ParseShaderKeywords(const std::vector<std::string>& keywords)
 	{
 		const uint64_t length = keywords.size();
 		const uint64_t bits = 1ULL << length;
 
-		std::unordered_map<std::string, std::string> result;
+		robin_hood::unordered_map<std::string, std::string> result;
 		for (uint64_t i = 1; i < bits; ++i)
 		{
 			std::stringstream combinedTag;
 			std::stringstream combinedDefines;
 			for (uint64_t bit = 0; bit < length; ++bit)
 			{
-				if (i & (1ULL << bit))
+				if (i & (1ULL << bit) && !keywords[bit].empty())
 				{
-					combinedTag << "_" << keywords[bit];
+					combinedTag << keywords[bit];
 					combinedDefines << "#define " << keywords[bit] << "\n";
 				}
 			}
@@ -543,11 +539,11 @@ namespace Mahakam
 		return result;
 	}
 
-	std::unordered_map<GLenum, std::string> OpenGLShader::ParseGLSLFile(const std::string& source)
+	robin_hood::unordered_map<GLenum, std::string> OpenGLShader::ParseGLSLFile(const std::string& source)
 	{
 		MH_PROFILE_FUNCTION();
 
-		std::unordered_map<GLenum, std::string> sources;
+		robin_hood::unordered_map<GLenum, std::string> sources;
 
 		const char* typeToken = "#type";
 		size_t typeTokenLength = strlen(typeToken);

@@ -28,7 +28,7 @@ namespace Mahakam
 		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
 
 		// Create lighting shader
-		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.yaml");
+		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.yaml", { "DEBUG" });
 	}
 
 	LightingRenderPass::~LightingRenderPass()
@@ -56,7 +56,10 @@ namespace Mahakam
 			return false;
 		}
 
-		deferredShader->Bind("DIRECTIONAL");
+		if (sceneData->gBuffer)
+			deferredShader->Bind("DIRECTIONAL", "DEBUG");
+		else
+			deferredShader->Bind("DIRECTIONAL");
 		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
 		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
 		deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(3));
@@ -98,7 +101,8 @@ namespace Mahakam
 		GL::EnableZTesting(true);
 
 		// Render skybox
-		Renderer::DrawSkybox();
+		if (!sceneData->gBuffer)
+			Renderer::DrawSkybox();
 
 		hdrFrameBuffer->Unbind();
 
@@ -151,7 +155,10 @@ namespace Mahakam
 
 			sceneData->pointLightBuffer->SetData(&sceneData->environment.pointLights[0], 0, bufferSize);
 
-			deferredShader->Bind("POINT");
+			if (sceneData->gBuffer)
+				deferredShader->Bind("POINT", "DEBUG");
+			else
+				deferredShader->Bind("POINT");
 			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
 			sceneData->pointLightBuffer->Bind(1);
 
@@ -175,7 +182,10 @@ namespace Mahakam
 
 			sceneData->spotLightBuffer->SetData(&sceneData->environment.spotLights[0], 0, bufferSize);
 
-			deferredShader->Bind("SPOT");
+			if (sceneData->gBuffer)
+				deferredShader->Bind("SPOT", "DEBUG");
+			else
+				deferredShader->Bind("SPOT");
 			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
 			deferredShader->SetTexture("u_LightCookie", spotlightTexture);
 			sceneData->spotLightBuffer->Bind(1);

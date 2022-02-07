@@ -40,6 +40,7 @@ namespace Mahakam
 
 		static void Renderer::EnableWireframe(bool enable) { sceneData->wireframe = enable; }
 		static void Renderer::EnableBoundingBox(bool enable) { sceneData->boundingBox = enable; }
+		static void Renderer::EnableGBuffer(bool enable) { sceneData->gBuffer = enable; }
 
 		static void Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
 
@@ -50,6 +51,7 @@ namespace Mahakam
 
 		inline static bool HasWireframeEnabled() { return sceneData->wireframe; }
 		inline static bool HasBoundingBoxEnabled() { return sceneData->boundingBox; }
+		inline static bool HasGBufferEnabled() { return sceneData->gBuffer; }
 
 		inline static Ref<FrameBuffer> GetFrameBuffer() { return rendererData->viewportFramebuffer; }
 
