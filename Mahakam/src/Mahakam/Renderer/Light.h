@@ -1,12 +1,12 @@
 #pragma once
 
-#include "FrameBuffer.h"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 namespace Mahakam
 {
+	class FrameBuffer;
+
 	class Light
 	{
 	public:
@@ -30,21 +30,11 @@ namespace Mahakam
 	public:
 		Light() = default;
 
-		Light(LightType lightType, const glm::vec3& color)
-			: lightType(lightType), color(color)
-		{
-			FrameBufferProps shadowProps;
-			shadowProps.width = 1024;
-			shadowProps.height = 1024;
-			shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, false };
-			shadowFramebuffer = FrameBuffer::Create(shadowProps);
-		}
+		Light(LightType lightType, const glm::vec3& color);
 
-		Light(LightType lightType, float range, const glm::vec3& color)
-			: lightType(lightType), range(range), color(color) {}
+		Light(LightType lightType, float range, const glm::vec3& color);
 
-		Light(LightType lightType, float fov, float range, const glm::vec3& color)
-			: lightType(lightType), fov(fov), range(range), color(color) {}
+		Light(LightType lightType, float fov, float range, const glm::vec3& color);
 
 		inline void SetLightType(LightType type) { lightType = type; }
 		inline void SetColor(const glm::vec3& col) { color = col; }

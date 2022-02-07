@@ -81,7 +81,7 @@ namespace Mahakam
 
 
 		// Setup the viewport in editor
-		sceneViewPanel.SetContext(activeScene, Renderer::GetFrameBuffer());
+		sceneViewPanel.SetScene(activeScene);
 		sceneHierarchyPanel.SetContext(activeScene);
 
 
@@ -89,6 +89,13 @@ namespace Mahakam
 		Ref<Shader> skinnedShader = Shader::Create("assets/shaders/Skinned.yaml");
 		Ref<Shader> textureShader = Shader::Create("assets/shaders/Albedo.yaml");
 		Ref<Shader> colorShader = Shader::Create("assets/shaders/LitColor.yaml");
+
+
+		// Setup scene camera
+		Entity cameraEntity = activeScene->CreateEntity("Camera");
+		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 1.0f, 0.01f, 100.0f);
+		cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
+		cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 
 		// Setup lights
@@ -170,13 +177,6 @@ namespace Mahakam
 		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();*/
 
 
-		// Setup scene camera
-		Entity cameraEntity = activeScene->CreateEntity("Camera");
-		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 1.0f, 0.01f, 100.0f);
-		cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
-		cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-
-
 		// Create mesh & base material
 		Ref<Mesh> sphereMesh = Mesh::CreateCubeSphere(8);
 		Ref<Material> baseMaterial = Material::Create(colorShader);
@@ -205,6 +205,8 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		activeScene->OnUpdate(dt);
+
+		sceneViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer());
 
 		statsPanel.OnUpdate(dt);
 	}

@@ -10,12 +10,12 @@ namespace Mahakam
 		Ref<FrameBuffer> gBuffer = nullptr;
 
 	public:
-		GeometryRenderPass(uint32_t width, uint32_t height);
+		virtual void Init(uint32_t width, uint32_t height) override;
 		virtual ~GeometryRenderPass() override;
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 
-		virtual bool Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src) override;
+		virtual bool Render(SceneData* sceneData, Ref<FrameBuffer>& src) override;
 
 		virtual Ref<FrameBuffer> GetFrameBuffer() { return gBuffer; }
 	};

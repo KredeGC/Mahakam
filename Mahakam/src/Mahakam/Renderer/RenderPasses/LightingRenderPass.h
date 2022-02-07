@@ -15,19 +15,19 @@ namespace Mahakam
 		Ref<Shader> deferredShader;
 
 	public:
-		LightingRenderPass(uint32_t width, uint32_t height);
+		virtual void Init(uint32_t width, uint32_t height) override;
 		virtual ~LightingRenderPass() override;
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 
-		virtual bool Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src) override;
+		virtual bool Render(SceneData* sceneData, Ref<FrameBuffer>& src) override;
 
 		virtual Ref<FrameBuffer> GetFrameBuffer() { return hdrFrameBuffer; }
 
 	private:
-		void RenderDirectionalLights(Renderer::SceneData* sceneData);
-		void RenderPointLights(Renderer::SceneData* sceneData);
-		void RenderSpotLights(Renderer::SceneData* sceneData);
+		void RenderDirectionalLights(SceneData* sceneData);
+		void RenderPointLights(SceneData* sceneData);
+		void RenderSpotLights(SceneData* sceneData);
 
 		Ref<Texture> LoadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height);
 	};

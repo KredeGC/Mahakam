@@ -2,10 +2,11 @@
 #include "GeometryRenderPass.h"
 
 #include "Mahakam/Renderer/GL.h"
+#include "Mahakam/Renderer/Renderer.h"
 
 namespace Mahakam
 {
-	GeometryRenderPass::GeometryRenderPass(uint32_t width, uint32_t height)
+	void GeometryRenderPass::Init(uint32_t width, uint32_t height)
 	{
 		// Create gbuffer
 		FrameBufferProps gProps;
@@ -32,7 +33,7 @@ namespace Mahakam
 		gBuffer->Resize(width, height);
 	}
 
-	bool GeometryRenderPass::Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src)
+	bool GeometryRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

@@ -108,7 +108,7 @@ namespace Mahakam
 			});
 		}
 
-		Renderer::EnvironmentData environment
+		EnvironmentData environment
 		{
 			skyboxMaterial,
 			skyboxIrradiance,

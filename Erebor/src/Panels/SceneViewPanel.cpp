@@ -21,7 +21,8 @@ namespace Mahakam
 
 				activeScene->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
 			}
-			ImGui::Image((void*)(uintptr_t)viewportFramebuffer->GetColorBuffer(0)->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
+			if (viewportFramebuffer)
+				ImGui::Image((void*)(uintptr_t)viewportFramebuffer->GetColorBuffer(0)->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}
@@ -38,9 +39,13 @@ namespace Mahakam
 		return false;
 	}
 
-	void SceneViewPanel::SetContext(Ref<Scene> scene, Ref<FrameBuffer> framebuffer)
+	void SceneViewPanel::SetScene(Ref<Scene> scene)
 	{
 		activeScene = scene;
+	}
+
+	void SceneViewPanel::SetFrameBuffer(Ref<FrameBuffer> framebuffer)
+	{
 		viewportFramebuffer = framebuffer;
 	}
 }

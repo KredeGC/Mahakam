@@ -2,10 +2,11 @@
 #include "TonemappingRenderPass.h"
 
 #include "Mahakam/Renderer/GL.h"
+#include "Mahakam/Renderer/Renderer.h"
 
 namespace Mahakam
 {
-	TonemappingRenderPass::TonemappingRenderPass(uint32_t width, uint32_t height)
+	void TonemappingRenderPass::Init(uint32_t width, uint32_t height)
 	{
 		// Create viewport framebuffer
 		FrameBufferProps viewportProps;
@@ -29,7 +30,7 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool TonemappingRenderPass::Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src)
+	bool TonemappingRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

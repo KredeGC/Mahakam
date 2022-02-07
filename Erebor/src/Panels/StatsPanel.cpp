@@ -12,13 +12,13 @@ namespace Mahakam
 	{
 		if (open)
 		{
-			auto results = Renderer::GetPerformanceResults();
+			auto& results = Renderer::GetPerformanceResults();
 
 			ImGui::Begin("Stats", &open);
 			ImGui::Text("Graphics unit: %s", GL::GetGraphicsVendor());
-			ImGui::Text("Drawcalls: %d", results->drawCalls);
-			ImGui::Text("Vertex count: %d", results->vertexCount);
-			ImGui::Text("Tri count: %d", results->triCount);
+			ImGui::Text("Drawcalls: %d", results.drawCalls);
+			ImGui::Text("Vertex count: %d", results.vertexCount);
+			ImGui::Text("Tri count: %d", results.triCount);
 			ImGui::Text("Frametime: %d fps (%.4g ms)", (int)(1.0f / frametime), frametime.GetMilliSeconds());
 			ImGui::End();
 		}

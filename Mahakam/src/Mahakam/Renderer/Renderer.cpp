@@ -3,6 +3,10 @@
 
 #include "GL.h"
 
+#include "Camera.h"
+#include "Mesh.h"
+#include "Light.h"
+
 #include "RenderPasses.h"
 
 #include <filesystem>
@@ -12,54 +16,48 @@
 
 namespace Mahakam
 {
-	extern void InitRenderPasses(std::vector<RenderPass*>& renderPasses, uint32_t width, uint32_t height);
-
-	Renderer::RendererResults* Renderer::rendererResults = new Renderer::RendererResults;
-	Renderer::SceneData* Renderer::sceneData = new Renderer::SceneData;
-	std::vector<RenderPass*> Renderer::renderPasses;
-
-	Ref<FrameBuffer> Renderer::viewportFramebuffer;
-	Ref<Material> Renderer::unlitMaterial;
+	Renderer::RendererData* Renderer::rendererData = new Renderer::RendererData;
+	SceneData* Renderer::sceneData = new SceneData;
 
 	void Renderer::Init(uint32_t width, uint32_t height)
 	{
 		MH_PROFILE_FUNCTION();
+
+		rendererData->width = width;
+		rendererData->height = height;
 
 		GL::Init();
 
 		// Initialize camera buffer
 		sceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
 
-		// Initialize render passes
-		InitRenderPasses(renderPasses, width, height);
-
-		viewportFramebuffer = renderPasses[renderPasses.size() - 1]->GetFrameBuffer();
-
 		// Initialize default material
 		Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.yaml");
-		unlitMaterial = Material::Create(unlitColorShader);
-		unlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
+		rendererData->unlitMaterial = Material::Create(unlitColorShader);
+		rendererData->unlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
 	}
 
 	void Renderer::Shutdown()
 	{
 		GL::Shutdown();
 
-		for (auto& renderPass : renderPasses)
+		for (auto& renderPass : rendererData->initializedRenderPasses)
 			delete renderPass;
 
-		viewportFramebuffer = nullptr;
-		unlitMaterial = nullptr;
+		rendererData->viewportFramebuffer = nullptr;
+		rendererData->unlitMaterial = nullptr;
 
-		delete rendererResults;
 		delete sceneData;
 	}
 
 	void Renderer::OnWindowResie(uint32_t width, uint32_t height)
 	{
+		rendererData->width = width;
+		rendererData->height = height;
+
 		GL::SetViewport(0, 0, width, height);
 
-		for (auto& renderPass : renderPasses)
+		for (auto& renderPass : rendererData->initializedRenderPasses)
 			renderPass->OnWindowResize(width, height);
 	}
 
@@ -74,9 +72,19 @@ namespace Mahakam
 
 		sceneData->cameraBuffer->SetData(&sceneData->cameraData, 0, sizeof(CameraData));
 
-		rendererResults->drawCalls = 0;
-		rendererResults->vertexCount = 0;
-		rendererResults->triCount = 0;
+		// Get render passes from selected camera
+		rendererData->renderPasses = cam.GetRenderPasses();
+
+		for (auto& renderPass : rendererData->renderPasses)
+		{
+			if (rendererData->initializedRenderPasses.insert(renderPass).second)
+				renderPass->Init(rendererData->width, rendererData->height);
+		}
+
+		// Setup results
+		rendererData->rendererResults.drawCalls = 0;
+		rendererData->rendererResults.vertexCount = 0;
+		rendererData->rendererResults.triCount = 0;
 	}
 
 	void Renderer::EndScene()
@@ -100,20 +108,22 @@ namespace Mahakam
 
 		// Render each render pass
 		Ref<FrameBuffer> prevBuffer = nullptr;
-		for (uint32_t i = 0; i < renderPasses.size(); i++)
+		for (uint32_t i = 0; i < rendererData->renderPasses.size(); i++)
 		{
-			if (renderPasses[i]->Render(sceneData, prevBuffer))
-				prevBuffer = renderPasses[i]->GetFrameBuffer();
+			if (rendererData->renderPasses[i]->Render(sceneData, prevBuffer))
+				prevBuffer = rendererData->renderPasses[i]->GetFrameBuffer();
 		}
+
+		rendererData->viewportFramebuffer = prevBuffer;
 
 		// Render bounding boxes
 		if (sceneData->boundingBox)
 		{
-			viewportFramebuffer->Bind();
+			rendererData->viewportFramebuffer->Bind();
 			GL::SetFillMode(false);
 
-			unlitMaterial->BindShader("GEOMETRY");
-			unlitMaterial->Bind();
+			rendererData->unlitMaterial->BindShader("GEOMETRY");
+			rendererData->unlitMaterial->Bind();
 
 			for (uint64_t drawID : sceneData->renderQueue)
 			{
@@ -147,7 +157,7 @@ namespace Mahakam
 				auto wireMesh = GL::GetCube();
 				wireMesh->Bind();
 
-				unlitMaterial->SetTransform(wireTransform);
+				rendererData->unlitMaterial->SetTransform(wireTransform);
 
 				Renderer::AddPerformanceResult(wireMesh->GetVertexCount(), wireMesh->GetIndexCount());
 
@@ -155,11 +165,11 @@ namespace Mahakam
 			}
 
 			GL::SetFillMode(true);
-			viewportFramebuffer->Unbind();
+			rendererData->viewportFramebuffer->Unbind();
 		}
 
 		// Normalize results
-		rendererResults->triCount /= 3;
+		rendererData->rendererResults.triCount /= 3;
 
 		// Clear render queues
 		sceneData->renderQueue.clear();
@@ -266,9 +276,7 @@ namespace Mahakam
 
 	void Renderer::DrawScreenQuad()
 	{
-		rendererResults->drawCalls += 1;
-		rendererResults->vertexCount += 4;
-		rendererResults->triCount += 6;
+		AddPerformanceResult(4, 6);
 
 		GL::DrawScreenQuad();
 	}
@@ -277,9 +285,7 @@ namespace Mahakam
 	{
 		Ref<Mesh> invertedSphere = GL::GetInvertedSphere();
 
-		rendererResults->drawCalls += 1;
-		rendererResults->vertexCount += amount * invertedSphere->GetVertexCount();
-		rendererResults->triCount += amount * invertedSphere->GetIndexCount();
+		AddPerformanceResult(amount * invertedSphere->GetVertexCount(), amount * invertedSphere->GetIndexCount());
 
 		invertedSphere->Bind();
 
@@ -290,9 +296,7 @@ namespace Mahakam
 	{
 		Ref<Mesh> invertedPyramid = GL::GetInvertedPyramid();
 
-		rendererResults->drawCalls += 1;
-		rendererResults->vertexCount += amount * invertedPyramid->GetVertexCount();
-		rendererResults->triCount += amount * invertedPyramid->GetIndexCount();
+		AddPerformanceResult(amount * invertedPyramid->GetVertexCount(), amount * invertedPyramid->GetIndexCount());
 
 		invertedPyramid->Bind();
 

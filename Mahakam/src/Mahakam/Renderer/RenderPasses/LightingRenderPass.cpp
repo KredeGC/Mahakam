@@ -2,6 +2,7 @@
 #include "LightingRenderPass.h"
 
 #include "Mahakam/Renderer/GL.h"
+#include "Mahakam/Renderer/Renderer.h"
 
 #include "Mahakam/Renderer/Texture.h"
 
@@ -11,7 +12,7 @@
 
 namespace Mahakam
 {
-	LightingRenderPass::LightingRenderPass(uint32_t width, uint32_t height)
+	void LightingRenderPass::Init(uint32_t width, uint32_t height)
 	{
 		brdfLut = LoadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.yaml", TextureFormat::RG16F, 512, 512);
 		falloffLut = LoadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.yaml", TextureFormat::R16F, 16, 16);
@@ -45,7 +46,7 @@ namespace Mahakam
 		hdrFrameBuffer->Resize(width, height);
 	}
 
-	bool LightingRenderPass::Render(Renderer::SceneData* sceneData, Ref<FrameBuffer>& src)
+	bool LightingRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -104,7 +105,7 @@ namespace Mahakam
 		return true;
 	}
 
-	void LightingRenderPass::RenderDirectionalLights(Renderer::SceneData* sceneData)
+	void LightingRenderPass::RenderDirectionalLights(SceneData* sceneData)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -113,7 +114,7 @@ namespace Mahakam
 
 		if (amount > 0)
 		{
-			uint32_t lightSize = sizeof(Renderer::DirectionalLight);
+			uint32_t lightSize = sizeof(DirectionalLight);
 			uint32_t bufferSize = amountSize + amount * lightSize;
 
 			if (!sceneData->directionalLightBuffer || sceneData->directionalLightBuffer->GetSize() != bufferSize)
@@ -134,7 +135,7 @@ namespace Mahakam
 		Renderer::DrawScreenQuad();
 	}
 
-	void LightingRenderPass::RenderPointLights(Renderer::SceneData* sceneData)
+	void LightingRenderPass::RenderPointLights(SceneData* sceneData)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -142,7 +143,7 @@ namespace Mahakam
 
 		if (amount > 0)
 		{
-			uint32_t lightSize = sizeof(Renderer::PointLight);
+			uint32_t lightSize = sizeof(PointLight);
 			uint32_t bufferSize = amount * lightSize;
 
 			if (!sceneData->pointLightBuffer || sceneData->pointLightBuffer->GetSize() != bufferSize)
@@ -158,7 +159,7 @@ namespace Mahakam
 		}
 	}
 
-	void LightingRenderPass::RenderSpotLights(Renderer::SceneData* sceneData)
+	void LightingRenderPass::RenderSpotLights(SceneData* sceneData)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -166,7 +167,7 @@ namespace Mahakam
 
 		if (amount > 0)
 		{
-			uint32_t lightSize = sizeof(Renderer::SpotLight);
+			uint32_t lightSize = sizeof(SpotLight);
 			uint32_t bufferSize = amount * lightSize;
 
 			if (!sceneData->spotLightBuffer || sceneData->spotLightBuffer->GetSize() != bufferSize)
