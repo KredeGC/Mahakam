@@ -19,7 +19,7 @@ namespace Mahakam
 			ImGui::Text("Drawcalls: %d", results.drawCalls);
 			ImGui::Text("Vertex count: %d", results.vertexCount);
 			ImGui::Text("Tri count: %d", results.triCount);
-			ImGui::Text("Frametime: %d fps (%.4g ms)", (int)(1.0f / frametime), frametime.GetMilliSeconds());
+			ImGui::Text("Frametime: %.3d fps (%.3f ms)", (int)(1.0f / frametime), frametime.GetMilliSeconds());
 			ImGui::End();
 		}
 	}

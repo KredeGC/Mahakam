@@ -91,20 +91,8 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		// Sort render queue
-		std::qsort(sceneData->renderQueue.data(),
-			sceneData->renderQueue.size(),
-			sizeof(decltype(sceneData->renderQueue)::value_type),
-			[](const void* x, const void* y) {
-			const uint64_t arg1 = *static_cast<const uint64_t*>(x);
-			const uint64_t arg2 = *static_cast<const uint64_t*>(y);
-
-			const auto cmp = arg1 - arg2;
-
-			if (cmp < 0) return -1;
-			if (cmp > 0) return 1;
-			return 0;
-		});
+		// Sort the render queue
+		std::sort(sceneData->renderQueue.begin(), sceneData->renderQueue.end());
 
 		// Render each render pass
 		Ref<FrameBuffer> prevBuffer = nullptr;

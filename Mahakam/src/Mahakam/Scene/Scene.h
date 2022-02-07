@@ -26,7 +26,7 @@ namespace Mahakam
 
 		entt::registry registry;
 
-		float viewportRatio;
+		float viewportRatio = 1.0f;
 
 	public:
 		Scene(const std::string& filepath);

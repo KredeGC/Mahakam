@@ -71,27 +71,33 @@ namespace Mahakam
 
 	void Scene::OnUpdate(Timestep ts)
 	{
-		// Update scripts.... REMOVE
-		registry.view<NativeScriptComponent>().each([=](auto entity, auto& scriptComponent)
-		{
-			// TODO: onScenePlay
-			for (auto& runtime : scriptComponent.scripts)
-			{
-				if (!runtime.script)
-				{
-					runtime.script = runtime.instantiateScript();
-					runtime.script->entity = Entity{ entity, this };
-					runtime.script->OnCreate();
-				}
+		MH_PROFILE_FUNCTION();
 
-				runtime.script->OnUpdate(ts);
-			}
-		});
+		// Update scripts.... REMOVE
+		{
+			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - NativeScriptComponent");
+
+			registry.view<NativeScriptComponent>().each([=](auto entity, auto& scriptComponent)
+			{
+				// TODO: onScenePlay
+				for (auto& runtime : scriptComponent.scripts)
+				{
+					if (!runtime.script)
+					{
+						runtime.script = runtime.instantiateScript();
+						runtime.script->entity = Entity{ entity, this };
+						runtime.script->OnCreate();
+					}
+
+					runtime.script->OnUpdate(ts);
+				}
+			});
+		}
 
 
 		// Update animators
 		{
-			MH_PROFILE_SCOPE("Scene::onUpdate - AnimatorComponent");
+			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - AnimatorComponent");
 
 			registry.view<AnimatorComponent, MeshComponent>().each([=](auto entity, AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
 			{
@@ -117,7 +123,7 @@ namespace Mahakam
 
 		// Setup scene lights
 		{
-			MH_PROFILE_SCOPE("Scene::onUpdate - LightComponent");
+			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - LightComponent");
 
 			registry.view<LightComponent, TransformComponent>().each([&](auto entity, LightComponent& lightComponent, TransformComponent& transformComponent)
 			{
@@ -145,7 +151,7 @@ namespace Mahakam
 		CameraComponent* mainCamera = nullptr;
 		TransformComponent* mainTransform = nullptr;
 		{
-			MH_PROFILE_SCOPE("Scene::onUpdate - CameraComponent");
+			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - CameraComponent");
 
 			auto cameras = registry.view<TransformComponent, CameraComponent>();
 			for (auto& entity : cameras)
@@ -162,7 +168,7 @@ namespace Mahakam
 
 		// Render each entity with a mesh
 		{
-			MH_PROFILE_SCOPE("Scene::onUpdate - Render loop");
+			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Render loop");
 
 			if (mainCamera && mainTransform)
 			{

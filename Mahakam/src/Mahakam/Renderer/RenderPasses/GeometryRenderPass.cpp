@@ -52,7 +52,7 @@ namespace Mahakam
 		for (uint64_t drawID : sceneData->renderQueue)
 		{
 			const uint64_t passMask = (drawID >> 62ULL);
-			if (passMask == 0) // Opaque
+			if (passMask == 0ULL) // Opaque
 			{
 				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
 				if (shaderID != lastShaderID)

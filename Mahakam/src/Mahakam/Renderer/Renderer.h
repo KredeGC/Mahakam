@@ -38,9 +38,9 @@ namespace Mahakam
 		static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
 		static void EndScene();
 
-		static void Renderer::EnableWireframe(bool enable) { sceneData->wireframe = enable; }
-		static void Renderer::EnableBoundingBox(bool enable) { sceneData->boundingBox = enable; }
-		static void Renderer::EnableGBuffer(bool enable) { sceneData->gBuffer = enable; }
+		static void EnableWireframe(bool enable) { sceneData->wireframe = enable; }
+		static void EnableBoundingBox(bool enable) { sceneData->boundingBox = enable; }
+		static void EnableGBuffer(bool enable) { sceneData->gBuffer = enable; }
 
 		static void Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
 
