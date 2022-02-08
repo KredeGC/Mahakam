@@ -36,6 +36,9 @@ namespace Mahakam
 			float speed = 20.0f * dt;
 			float rotationSpeed = dt;
 
+			if (Input::IsKeyPressed(MH_KEY_LEFT_SHIFT))
+				speed *= 0.01f;
+
 			glm::vec3 eulerAngles = transform.GetEulerAngles();
 
 			// Camera rotation
@@ -101,17 +104,17 @@ namespace Mahakam
 		// Setup lights
 		Entity mainLightEntity = activeScene->CreateEntity("Main Light");
 		mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, glm::vec3(1.0f, 1.0f, 1.0f));
-		mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ 0.0f, 1.7f, 0.0f }));
+		mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ 0.0f, -1.2f, 0.0f }));
 
 		/*for (int y = 0; y < 10; y++)
 		{
 			for (int x = 0; x < 10; x++)
 			{*/
-				Entity pointLightEntity = activeScene->CreateEntity("Spot Light");
-				pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-				pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 1.0f, -6.5f });
-				//pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
-				pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-155.0f), 0.0f, 0.0f }));
+				//Entity pointLightEntity = activeScene->CreateEntity("Spot Light");
+				//pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+				//pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 1.0f, -6.5f });
+				////pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
+				//pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-155.0f), 0.0f, 0.0f }));
 		/*	}
 		}*/
 
@@ -135,28 +138,28 @@ namespace Mahakam
 
 
 		// Create backpack textures
-		Ref<Texture2D> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
-		Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
-		Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
-		Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
-		Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
+		//Ref<Texture2D> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
+		//Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
+		//Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
+		//Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
+		//Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 
-		// Create backpack model
-		SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
+		//// Create backpack model
+		//SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
 
-		// Create backpack material
-		Ref<Material> backpackMaterial = Material::Create(textureShader);
-		backpackMaterial->SetTexture("u_Albedo", 0, backpackDiffuse);
-		backpackMaterial->SetTexture("u_Bump", 0, backpackBump);
-		backpackMaterial->SetTexture("u_Metallic", 0, backpackMetallic);
-		backpackMaterial->SetTexture("u_Roughness", 0, backpackRoughness);
-		backpackMaterial->SetTexture("u_Occlussion", 0, backpackOcclussion);
+		//// Create backpack material
+		//Ref<Material> backpackMaterial = Material::Create(textureShader);
+		//backpackMaterial->SetTexture("u_Albedo", 0, backpackDiffuse);
+		//backpackMaterial->SetTexture("u_Bump", 0, backpackBump);
+		//backpackMaterial->SetTexture("u_Metallic", 0, backpackMetallic);
+		//backpackMaterial->SetTexture("u_Roughness", 0, backpackRoughness);
+		//backpackMaterial->SetTexture("u_Occlussion", 0, backpackOcclussion);
 
-		// Create backpack entity
-		Entity backpackEntity = activeScene->CreateEntity("Bacpack");
-		backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
-		backpackEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.0f, 5.0f });
-		backpackEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();
+		//// Create backpack entity
+		//Entity backpackEntity = activeScene->CreateEntity("Bacpack");
+		//backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
+		//backpackEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.0f, 5.0f });
+		//backpackEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();
 
 
 		// Setup dancing monke

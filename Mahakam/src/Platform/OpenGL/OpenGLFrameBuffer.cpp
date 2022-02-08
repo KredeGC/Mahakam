@@ -85,11 +85,6 @@ namespace Mahakam
 
 		if (rendererID)
 		{
-			//colorAttachments.clear();
-			//depthAttachment = 0;
-
-			//MH_GL_CALL(glDeleteFramebuffers(1, &rendererID));
-
 			MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, rendererID));
 
 			for (int i = 0; i < colorAttachments.size(); i++)
@@ -169,6 +164,7 @@ namespace Mahakam
 		else if (colorAttachments.empty())
 		{
 			MH_GL_CALL(glDrawBuffer(GL_NONE));
+			MH_GL_CALL(glReadBuffer(GL_NONE));
 		}
 
 		// Check framebuffer

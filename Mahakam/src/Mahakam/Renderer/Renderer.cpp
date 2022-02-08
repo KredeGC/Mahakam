@@ -290,45 +290,4 @@ namespace Mahakam
 
 		GL::DrawInstanced(invertedPyramid->GetIndexCount(), amount);
 	}
-
-	//void Renderer::drawTransparentQueue()
-	//{
-	//	MH_PROFILE_FUNCTION();
-
-	//	if (transparentQueue.size() > 0)
-	//	{
-	//		// Sort transparent queue
-	//		std::qsort(transparentQueue.data(),
-	//			transparentQueue.size(),
-	//			sizeof(decltype(transparentQueue)::value_type),
-	//			[](const void* x, const void* y) {
-	//			const MeshData arg1 = *static_cast<const MeshData*>(x);
-	//			const MeshData arg2 = *static_cast<const MeshData*>(y);
-
-	//			const auto cmp = arg1.depth - arg2.depth;
-
-	//			if (cmp < 0) return -1;
-	//			if (cmp > 0) return 1;
-	//			return 0;
-	//		});
-
-	//		GL::setBlendMode(RendererAPI::BlendMode::SrcAlpha, RendererAPI::BlendMode::OneMinusSrcAlpha, true);
-	//		for (auto& data : transparentQueue)
-	//		{
-	//			const Ref<Material>& material = data.material;
-
-	//			material->bindShader("FORWARD");
-	//			material->bind();
-	//			material->setTransform(data.transform);
-	//			data.mesh->bind();
-
-	//			rendererResults->drawCalls += 1;
-	//			rendererResults->vertexCount += data.mesh->getVertexCount();
-	//			rendererResults->triCount += data.mesh->getIndexCount();
-
-	//			GL::drawIndexed(data.mesh->getIndexCount());
-	//		}
-	//		GL::setBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
-	//	}
-	//}
 }

@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include <glm/gtx/quaternion.hpp>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
@@ -31,10 +33,12 @@ namespace Mahakam
 		glm::vec3 color;
 	private:
 		float padding02 = 0.0f;
+	public:
 		glm::mat4 worldToLight;
+		glm::vec4 offset;
 
 	public:
-		DirectionalLight(const glm::vec3& direction, const Light& light);
+		DirectionalLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);
 	};
 
 	struct PointLight
@@ -42,6 +46,8 @@ namespace Mahakam
 	public:
 		glm::vec4 position; // w - range
 		glm::vec4 color; // w - 1.0 / (range * range)
+		glm::mat4 worldToLight;
+		glm::vec4 offset;
 
 	public:
 		PointLight(const glm::vec3& position, const Light& light);
@@ -53,6 +59,7 @@ namespace Mahakam
 		glm::mat4 objectToWorld;
 		glm::mat4 worldToLight;
 		glm::vec4 color; // w - 1.0 / (range * range)
+		glm::vec4 offset;
 
 	public:
 		SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);
@@ -100,6 +107,8 @@ namespace Mahakam
 		CameraData() = default;
 
 		CameraData(const Camera& camera, const glm::mat4& transform);
+
+		CameraData(const glm::mat4& projectionMatrix, const glm::mat4& transform);
 	};
 
 	struct SceneData

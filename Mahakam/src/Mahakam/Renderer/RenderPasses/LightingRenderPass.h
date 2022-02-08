@@ -7,12 +7,19 @@ namespace Mahakam
 	class LightingRenderPass : public RenderPass
 	{
 	private:
-		Ref<Texture> brdfLut;
-		Ref<Texture> falloffLut;
-		Ref<Texture> spotlightTexture;
+		Ref<Texture> brdfLut = nullptr;
+		Ref<Texture> falloffLut = nullptr;
+		Ref<Texture> spotlightTexture = nullptr;
 
-		Ref<FrameBuffer> hdrFrameBuffer;
-		Ref<Shader> deferredShader;
+		Ref<FrameBuffer> hdrFrameBuffer = nullptr;
+		Ref<Shader> deferredShader = nullptr;
+
+		Ref<FrameBuffer> shadowFramebuffer = nullptr;
+		Ref<Shader> shadowShader = nullptr;
+
+		Ref<UniformBuffer> shadowMatrixBuffer = nullptr;
+
+		uint32_t shadowOffset;
 
 	public:
 		virtual void Init(uint32_t width, uint32_t height) override;
@@ -25,6 +32,8 @@ namespace Mahakam
 		virtual Ref<FrameBuffer> GetFrameBuffer() { return hdrFrameBuffer; }
 
 	private:
+		void RenderDirectionalShadows(SceneData* sceneData);
+
 		void RenderDirectionalLights(SceneData* sceneData);
 		void RenderPointLights(SceneData* sceneData);
 		void RenderSpotLights(SceneData* sceneData);

@@ -53,6 +53,7 @@ namespace Mahakam
 
 	Scene::Scene(const std::string& filepath)
 	{
+		// Idea:: Use RG11B10f instead, should halve memory usage
 		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RGB16F });
 		skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
 		skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
@@ -114,77 +115,71 @@ namespace Mahakam
 			});
 		}
 
-		EnvironmentData environment
-		{
-			skyboxMaterial,
-			skyboxIrradiance,
-			skyboxSpecular
-		};
-
-		// Setup scene lights
-		{
-			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - LightComponent");
-
-			registry.view<LightComponent, TransformComponent>().each([&](auto entity, LightComponent& lightComponent, TransformComponent& transformComponent)
-			{
-				glm::vec3 pos = transformComponent.GetPosition();
-				glm::quat rot = transformComponent.GetRotation();
-				glm::vec3 dir = rot * glm::vec3(0.0f, 0.0f, 1.0f);
-				Light& light = lightComponent.GetLight();
-
-				switch (light.GetLightType())
-				{
-				case Light::LightType::Directional:
-					environment.directionalLights.push_back({ dir, light });
-					break;
-				case Light::LightType::Point:
-					environment.pointLights.push_back({ pos, light });
-					break;
-				case Light::LightType::Spot:
-					environment.spotLights.push_back({ pos, rot, light });
-					break;
-				}
-			});
-		}
-
 		// Get the rendering camera
 		CameraComponent* mainCamera = nullptr;
 		TransformComponent* mainTransform = nullptr;
 		{
 			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - CameraComponent");
 
-			auto cameras = registry.view<TransformComponent, CameraComponent>();
-			for (auto& entity : cameras)
+			registry.view<TransformComponent, CameraComponent>().each([&](auto entity, TransformComponent& transformComponent, CameraComponent& cameraComponent)
 			{
-				auto [transform, camera] = cameras.get<TransformComponent, CameraComponent>(entity);
-
 				// Recalculate all projection matrices, if they've changed
-				camera.GetCamera().RecalculateProjectionMatrix();
+				cameraComponent.GetCamera().RecalculateProjectionMatrix();
 
-				mainCamera = &camera;
-				mainTransform = &transform;
-			}
+				mainCamera = &cameraComponent;
+				mainTransform = &transformComponent;
+			});
 		}
 
-		// Render each entity with a mesh
+		// Only prepare scene if we actually have something to render to
+		if (mainCamera && mainTransform)
 		{
-			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Render loop");
-
-			if (mainCamera && mainTransform)
+			EnvironmentData environment
 			{
+				skyboxMaterial,
+				skyboxIrradiance,
+				skyboxSpecular
+			};
+
+			// Setup scene lights
+			{
+				MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - LightComponent");
+
+				registry.view<TransformComponent, LightComponent>().each([&](auto entity, TransformComponent& transformComponent, LightComponent& lightComponent)
+				{
+					glm::vec3 pos = transformComponent.GetPosition();
+					glm::quat rot = transformComponent.GetRotation();
+					glm::vec3 dir = rot * glm::vec3(0.0f, 0.0f, 1.0f);
+					Light& light = lightComponent.GetLight();
+
+					switch (light.GetLightType())
+					{
+					case Light::LightType::Directional:
+						environment.directionalLights.push_back({ mainTransform->GetPosition(), rot, light });
+						break;
+					case Light::LightType::Point:
+						environment.pointLights.push_back({ pos, light });
+						break;
+					case Light::LightType::Spot:
+						environment.spotLights.push_back({ pos, rot, light });
+						break;
+					}
+				});
+			}
+
+			// Render each entity with a mesh
+			{
+				MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Render loop");
 				Renderer::BeginScene(*mainCamera, *mainTransform, environment);
 
-				auto meshes = registry.view<TransformComponent, MeshComponent>();
-				for (auto& entity : meshes)
+				registry.view<TransformComponent, MeshComponent>().each([&](auto entity, TransformComponent& transformComponent, MeshComponent& meshComponent)
 				{
-					auto [transform, meshComponent] = meshes.get<TransformComponent, MeshComponent>(entity);
-
 					auto& meshes = meshComponent.GetMeshes();
 					auto& materials = meshComponent.GetMaterials();
 					int materialCount = (int)materials.size() - 1;
 					for (int i = 0; i < meshComponent.GetMeshCount(); i++)
-						Renderer::Submit(transform, meshes[i], materials[i < materialCount ? i : materialCount]);
-				}
+						Renderer::Submit(transformComponent, meshes[i], materials[i < materialCount ? i : materialCount]);
+				});
 
 				Renderer::EndScene();
 			}

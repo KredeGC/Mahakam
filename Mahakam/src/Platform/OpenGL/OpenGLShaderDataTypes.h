@@ -74,6 +74,8 @@ namespace Mahakam
 			return ShaderDataType::Sampler2D;
 		case GL_SAMPLER_CUBE:
 			return ShaderDataType::SamplerCube;
+		case GL_SAMPLER_2D_SHADOW:
+			return ShaderDataType::Sampler2D;
 		}
 
 		MH_CORE_BREAK("Unknown OpenGL data type provided!");

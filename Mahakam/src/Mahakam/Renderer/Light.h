@@ -25,16 +25,15 @@ namespace Mahakam
 		float fov = glm::radians(60.0f);
 
 		bool shadowCasting = false;
-		Ref<FrameBuffer> shadowFramebuffer = nullptr;
 
 	public:
 		Light() = default;
 
-		Light(LightType lightType, const glm::vec3& color);
+		Light(LightType lightType, const glm::vec3& color, bool shadowCasting = false);
 
-		Light(LightType lightType, float range, const glm::vec3& color);
+		Light(LightType lightType, float range, const glm::vec3& color, bool shadowCasting = false);
 
-		Light(LightType lightType, float fov, float range, const glm::vec3& color);
+		Light(LightType lightType, float fov, float range, const glm::vec3& color, bool shadowCasting = false);
 
 		inline void SetLightType(LightType type) { lightType = type; }
 		inline void SetColor(const glm::vec3& col) { color = col; }
@@ -45,5 +44,6 @@ namespace Mahakam
 		inline const glm::vec3& GetColor() const { return color; }
 		inline float GetRange() const { return range; }
 		inline float GetFov() const { return fov; }
+		inline bool IsShadowCasting() const { return shadowCasting; }
 	};
 }

@@ -6,18 +6,21 @@
         vec3 direction;
         vec3 color;
         mat4 worldToLight;
+        vec4 offset;
     };
 #elif defined(POINT)
     struct Light {
         vec4 position; // xyz - pos, w - range
         vec4 color; // xyz - pos, w - 1.0 / (range * range)
-        //mat4 worldToLight;
+        mat4 worldToLight;
+        vec4 offset;
     };
 #elif defined(SPOT)
     struct Light {
         mat4 objectToWorld;
         mat4 worldToLight;
         vec4 color; // xyz - color, w - 1.0 / (range * range)
+        vec4 offset;
     };
 #endif
 

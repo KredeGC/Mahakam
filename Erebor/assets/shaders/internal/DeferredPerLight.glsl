@@ -97,6 +97,10 @@ void main() {
 
     o_Color = vec4(color, 1.0);
     
+    // TEST SHADOWS
+    //o_Color = vec4(CalculateShadowAttenuation(lights[0], worldPos));
+    //o_Color = vec4(CalculateShadowAttenuation(lights[0], worldPos, worldNormal));
+    
     #ifdef DEBUG
         #ifdef DIRECTIONAL
             gBuffer0 = texture(u_GBuffer0, screenUV - vec2(1.0, 1.0));

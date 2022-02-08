@@ -67,6 +67,13 @@ namespace Mahakam
 	};
 
 
+	class Texture2DArray : public Texture
+	{
+	public:
+		static Ref<Texture2DArray> Create(const TextureProps& props = TextureProps());
+	};
+
+
 	class Texture3D : public Texture
 	{
 	public:

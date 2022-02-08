@@ -141,37 +141,51 @@ namespace Mahakam
 
 	void OpenGLShader::SetUniformMat3(const std::string& name, const glm::mat3& value)
 	{
-		MH_GL_CALL(glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
+		int slot = GetUniformLocation(name);
+		if (slot != -1)
+			MH_GL_CALL(glUniformMatrix3fv(slot, 1, GL_FALSE, glm::value_ptr(value)));
 	}
 
 	void OpenGLShader::SetUniformMat4(const std::string& name, const glm::mat4& value)
 	{
-		MH_GL_CALL(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)));
+		int slot = GetUniformLocation(name);
+		if (slot != -1)
+			MH_GL_CALL(glUniformMatrix4fv(slot, 1, GL_FALSE, glm::value_ptr(value)));
 	}
 
 	void OpenGLShader::SetUniformInt(const std::string& name, int value)
 	{
-		MH_GL_CALL(glUniform1i(GetUniformLocation(name), value));
+		int slot = GetUniformLocation(name);
+		if (slot != -1)
+			MH_GL_CALL(glUniform1i(slot, value));
 	}
 
 	void OpenGLShader::SetUniformFloat(const std::string& name, float value)
 	{
-		MH_GL_CALL(glUniform1f(GetUniformLocation(name), value));
+		int slot = GetUniformLocation(name);
+		if (slot != -1)
+			MH_GL_CALL(glUniform1f(slot, value));
 	}
 
 	void OpenGLShader::SetUniformFloat2(const std::string& name, const glm::vec2& value)
 	{
-		MH_GL_CALL(glUniform2f(GetUniformLocation(name), value.x, value.y));
+		int slot = GetUniformLocation(name);
+		if (slot != -1)
+			MH_GL_CALL(glUniform2f(slot, value.x, value.y));
 	}
 
 	void OpenGLShader::SetUniformFloat3(const std::string& name, const glm::vec3& value)
 	{
-		MH_GL_CALL(glUniform3f(GetUniformLocation(name), value.x, value.y, value.z));
+		int slot = GetUniformLocation(name);
+		if (slot != -1)
+			MH_GL_CALL(glUniform3f(slot, value.x, value.y, value.z));
 	}
 
 	void OpenGLShader::SetUniformFloat4(const std::string& name, const glm::vec4& value)
 	{
-		MH_GL_CALL(glUniform4f(GetUniformLocation(name), value.x, value.y, value.z, value.w));
+		int slot = GetUniformLocation(name);
+		if (slot != -1)
+			MH_GL_CALL(glUniform4f(slot, value.x, value.y, value.z, value.w));
 	}
 
 	uint32_t OpenGLShader::CreateProgram(const robin_hood::unordered_map<uint32_t, std::vector<uint32_t>>& sources)

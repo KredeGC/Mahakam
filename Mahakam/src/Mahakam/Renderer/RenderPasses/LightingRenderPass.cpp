@@ -29,6 +29,18 @@ namespace Mahakam
 
 		// Create lighting shader
 		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.yaml", { "DEBUG" });
+
+		// Create shadow map
+		FrameBufferProps shadowProps;
+		shadowProps.width = 8192; // 8192
+		shadowProps.height = 8192;
+		shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
+		shadowFramebuffer = FrameBuffer::Create(shadowProps);
+
+		// Create default shadow shader
+		shadowShader = Shader::Create("assets/shaders/internal/Shadow.yaml");
+
+		shadowMatrixBuffer = UniformBuffer::Create(sizeof(glm::mat4));
 	}
 
 	LightingRenderPass::~LightingRenderPass()
@@ -36,9 +48,12 @@ namespace Mahakam
 		brdfLut = nullptr;
 		falloffLut = nullptr;
 		spotlightTexture = nullptr;
-		deferredShader = nullptr;
 
 		hdrFrameBuffer = nullptr;
+		deferredShader = nullptr;
+
+		shadowFramebuffer = nullptr;
+		shadowShader = nullptr;
 	}
 
 	void LightingRenderPass::OnWindowResize(uint32_t width, uint32_t height)
@@ -56,6 +71,19 @@ namespace Mahakam
 			return false;
 		}
 
+		shadowOffset = 0;
+
+		// Render shadow maps
+		shadowFramebuffer->Bind();
+
+		GL::Clear(false, true);
+
+		RenderDirectionalShadows(sceneData);
+
+		shadowFramebuffer->Unbind();
+
+
+		// Initialize shader variables
 		if (sceneData->gBuffer)
 			deferredShader->Bind("DIRECTIONAL", "DEBUG");
 		else
@@ -66,9 +94,11 @@ namespace Mahakam
 		deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
 
 		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
+		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
 
 		deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.irradianceMap);
 		deferredShader->SetTexture("u_SpecularMap", sceneData->environment.specularMap);
+
 
 		// Blit depth buffer from gBuffer
 		src->Blit(hdrFrameBuffer, false, true);
@@ -107,6 +137,89 @@ namespace Mahakam
 		hdrFrameBuffer->Unbind();
 
 		return true;
+	}
+
+	void LightingRenderPass::RenderDirectionalShadows(SceneData* sceneData)
+	{
+		uint32_t amount = (uint32_t)sceneData->environment.directionalLights.size();
+		for (uint32_t i = 0; i < amount; i++)
+		{
+			DirectionalLight& light = sceneData->environment.directionalLights[i];
+
+			uint32_t size = 1024;
+			uint32_t ratio = shadowFramebuffer->GetSpecification().width / size;
+
+			uint32_t x = shadowOffset % ratio;
+			uint32_t y = shadowOffset / ratio;
+
+			GL::SetViewport(x, y, size, size);
+
+			shadowOffset++;
+
+			float texelSize = 1.0f / (float)size;
+
+			light.offset = { x, y, size, size };
+
+			light.worldToLight[3][0] -= glm::mod(light.worldToLight[3][0], 2.0f * texelSize);
+			light.worldToLight[3][1] -= glm::mod(light.worldToLight[3][1], 2.0f * texelSize);
+			light.worldToLight[3][2] -= glm::mod(light.worldToLight[3][2], 2.0f * texelSize);
+
+			shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
+			shadowMatrixBuffer->Bind(1);
+
+			// Render all objects in queue
+			uint64_t lastShaderID = ~0;
+			uint64_t lastMaterialID = ~0;
+			uint64_t lastMeshID = ~0;
+			shadowShader->Bind("SHADOW");
+			for (uint64_t drawID : sceneData->renderQueue)
+			{
+				const uint64_t passMask = (drawID >> 62ULL);
+				if (passMask == 0ULL) // Opaque
+				{
+					const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
+					if (shaderID != lastShaderID)
+					{
+						Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+						if (shader->HasShaderPass("SHADOW"))
+						{
+							lastShaderID = shaderID;
+							shader->Bind("SHADOW");
+						}
+						else if (lastShaderID != ~0)
+						{
+							lastShaderID = ~0;
+							shader->Bind("SHADOW");
+						}
+					}
+
+					const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
+					Ref<Material>& material = sceneData->materialIDLookup[materialID];
+					if (materialID != lastMaterialID && lastShaderID != ~0)
+					{
+						lastMaterialID = materialID;
+						material->Bind();
+					}
+
+					const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
+					Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+					if (meshID != lastMeshID)
+					{
+						lastMeshID = meshID;
+						mesh->Bind();
+					}
+
+					const uint64_t transformID = drawID & 0xFFFFULL;
+					glm::mat4& transform = sceneData->transformIDLookup[transformID];
+
+					material->SetTransform(transform);
+
+					Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+
+					GL::DrawIndexed(mesh->GetIndexCount());
+				}
+			}
+		}
 	}
 
 	void LightingRenderPass::RenderDirectionalLights(SceneData* sceneData)

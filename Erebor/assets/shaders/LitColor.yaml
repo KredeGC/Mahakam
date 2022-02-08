@@ -3,8 +3,3 @@ GEOMETRY:
     - GEOMETRY
   Includes:
     - assets/shaders/LitColor.glsl
-SHADOW:
-  Defines:
-    - SHADOW
-  Includes:
-    - assets/shaders/LitColor.glsl

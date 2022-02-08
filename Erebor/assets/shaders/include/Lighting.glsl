@@ -12,6 +12,7 @@ layout(binding = 1, location = 1) uniform samplerCube u_SpecularMap;
 layout(binding = 2, location = 2) uniform sampler2D u_BRDFLUT;
 layout(binding = 3, location = 3) uniform sampler2D u_AttenuationLUT;
 layout(binding = 8, location = 8) uniform sampler2D u_LightCookie;
+layout(binding = 9, location = 9) uniform sampler2D u_ShadowMap;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -69,6 +70,66 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
     clipSpaceLocation.w = 1.0;
     vec4 homogenousLocation = MATRIX_IVP * clipSpaceLocation;
     return homogenousLocation.xyz / homogenousLocation.w;
+}
+
+
+float SampleShadowMap(vec2 projCoords, float depth) {
+    vec2 textureSize = textureSize(u_ShadowMap, 0);
+    vec2 texelSize = 1.0 / textureSize;
+    
+    vec2 f = fract(projCoords * textureSize);
+    projCoords += (0.5 - f) * texelSize;
+    
+    float tl = depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
+    float tr = depth > texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, 0.0)).r ? 0.0 : 1.0;
+    float bl = depth > texture2D(u_ShadowMap, projCoords + vec2(0.0, texelSize.y)).r ? 0.0 : 1.0;
+    float br = depth > texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, texelSize.y)).r ? 0.0 : 1.0;
+    
+    float tA = mix(tl, tr, f.x);
+    float tB = mix(bl, br, f.x);
+    return mix(tA, tB, f.y);
+}
+
+float SamplePCFShadow(vec3 projCoords, vec3 lightDir, vec3 normal) {
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    
+    // return SampleShadowMap(projCoords.xy, projCoords.z - bias);
+    
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
+    for (float x = -1.5; x <= 1.5; x++) {
+        for (float y = -1.5; y <= 1.5; y++) {
+            shadow += SampleShadowMap(projCoords.xy + vec2(x, y) * texelSize, projCoords.z - bias);
+        }
+    }
+    
+    return shadow / 16.0;
+}
+
+float CalculateShadowAttenuation(Light light, vec3 worldPos, vec3 normal) {
+    #if defined(DIRECTIONAL)
+        vec3 lightDir = normalize(-light.direction);
+    #elif defined(POINT)
+        vec3 lightDir = normalize(light.position.xyz - worldPos);
+    #else
+        vec3 lightDir = normalize(light.objectToWorld[3].xyz - worldPos);
+    #endif
+    
+    vec4 lightSpacePos = light.worldToLight * vec4(worldPos, 1.0);
+    
+    vec3 coords = lightSpacePos.xyz / lightSpacePos.w;
+    coords = coords * 0.5 + 0.5;
+    
+    vec2 textureSize = textureSize(u_ShadowMap, 0);
+    vec2 ratio = light.offset.zw / textureSize;
+    coords.xy = coords.xy * ratio + light.offset.xy;
+    
+    float shadow = SamplePCFShadow(coords, lightDir, normal);
+    
+    if (abs(lightSpacePos.z) > 1.0 || abs(lightSpacePos.x) > 1.0 || abs(lightSpacePos.y) > 1.0)
+        shadow = 1.0;
+    
+    return shadow;
 }
 
 
@@ -155,11 +216,12 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             // calculate per-light radiance
             vec3 L = normalize(-light.direction);
             vec3 H = normalize(V + L);
-            vec3 radiance = light.color;
+            float shadowAttenuation = CalculateShadowAttenuation(light, worldPos, N);
+            vec3 radiance = light.color * shadowAttenuation;
 
             // Cook-Torrance BRDF
-            float NDF = DistributionGGX(N, H, roughness);   
-            float G   = GeometrySmith(N, V, L, roughness);      
+            float NDF = DistributionGGX(N, H, roughness);
+            float G   = GeometrySmith(N, V, L, roughness);
             vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
             
             vec3 numerator    = NDF * G * F; 
@@ -172,13 +234,13 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             // be above 1.0 (unless the surface emits light); to preserve this
             // relationship the diffuse component (kD) should equal 1.0 - kS.
             vec3 kD = 1.0 - kS;
-            // multiply kD by the inverse metalness such that only non-metals 
+            // multiply kD by the inverse metalness such that only non-metals
             // have diffuse lighting, or a linear blend if partly metal (pure metals
             // have no diffuse light).
-            kD *= 1.0 - metallic;	  
+            kD *= 1.0 - metallic;
 
             // scale light by NdotL
-            float NdotL = max(dot(N, L), 0.0);        
+            float NdotL = max(dot(N, L), 0.0);
 
             // add to outgoing radiance Lo
             Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
