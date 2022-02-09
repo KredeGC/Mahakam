@@ -113,7 +113,7 @@ namespace Mahakam
 				Entity pointLightEntity = activeScene->CreateEntity("Spot Light");
 				pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 				pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
-				//pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
+				//pointLightEntity.GetComponent<TransformComponent>().SetPosition({ x, y, 1.0f });
 				pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-150.0f), glm::radians(180.0f), 0.0f }));
 		/*	}
 		}*/

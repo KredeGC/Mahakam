@@ -103,8 +103,15 @@ void main() {
     //     o_Color = vec4(0.0);
     // #endif
     
+    // float LinearizeDepth(float depth) {
+    //     const float near_plane = 0.001;
+    //     const float far_plane = 10.0;
+    //     float z = depth * 2.0 - 1.0; // Back to NDC 
+    //     return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));
+    // }
+    
     // #if defined(DIRECTIONAL)
-    //     o_Color = vec4(texture2D(u_ShadowMap, screenUV).r * 2.0 - 1.0);
+    //     o_Color = vec4(LinearizeDepth(texture2D(u_ShadowMap, screenUV).r));
     // #else
     //     o_Color = vec4(0.0);
     // #endif

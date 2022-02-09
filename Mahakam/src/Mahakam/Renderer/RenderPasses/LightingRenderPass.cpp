@@ -71,7 +71,8 @@ namespace Mahakam
 			return false;
 		}
 
-		shadowOffset = 0;
+		shadowMapOffset = { 0.0f, 0.0f };
+		shadowMapMargin = { 0.0f, 0.0f };
 
 		// Render shadow maps
 		shadowFramebuffer->Bind();
@@ -202,6 +203,10 @@ namespace Mahakam
 		uint32_t amount = (uint32_t)sceneData->environment.directionalLights.size();
 		if (amount > 0)
 		{
+			// Choose size and offset of shadow texture
+			constexpr uint32_t size = 2048;
+			constexpr uint32_t ratio = shadowMapSize / size;
+
 			// Setup and bind default shadow shader
 			uint64_t lastShaderID = ~0;
 			uint64_t lastMaterialID = ~0;
@@ -216,16 +221,25 @@ namespace Mahakam
 				if (light.offset.z == 0.0f)
 					continue;
 
-				// Choose size and offset of shadow texture
-				constexpr uint32_t size = 1024;
-				const uint32_t ratio = shadowFramebuffer->GetSpecification().width / size;
+				if (shadowMapOffset.x + size > shadowMapSize)
+				{
+					shadowMapOffset.y += size;
 
-				uint32_t x = shadowOffset % ratio;
-				uint32_t y = shadowOffset / ratio;
+					if (shadowMapOffset.y > shadowMapMargin.y)
+						shadowMapMargin.x = 0;
 
-				GL::SetViewport(x * size, y * size, size, size);
+					shadowMapOffset.x = shadowMapMargin.x;
+				}
 
-				light.offset = { x / (float)ratio, y / (float)ratio, 1.0f / (float)ratio, light.offset.w };
+				uint32_t x = shadowMapOffset.x;
+				uint32_t y = shadowMapOffset.y;
+
+				/*uint32_t x = shadowOffset % ratio;
+				uint32_t y = shadowOffset / ratio;*/
+
+				GL::SetViewport(x, y, size, size);
+
+				light.offset = { x, y, 1.0f / (float)ratio, light.offset.w };
 
 				// Avoid edge swimming by snapping to nearest texel
 				float texelSize = 1.0f / (float)size;
@@ -238,11 +252,19 @@ namespace Mahakam
 				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 				shadowMatrixBuffer->Bind(1);
 
-				shadowOffset++;
+				shadowMapOffset.x += size;
+
+				//shadowOffset++;
 
 				// Render all objects in queue
 				RenderShadowGeometry(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
 			}
+
+			shadowMapMargin.x = shadowMapOffset.x;
+			shadowMapMargin.y = shadowMapOffset.y + size;
+
+			/*shadowMapOffset.x = 0;
+			shadowMapOffset.y += shadowMaxSize;*/
 		}
 	}
 
@@ -253,6 +275,10 @@ namespace Mahakam
 		uint32_t amount = (uint32_t)sceneData->environment.spotLights.size();
 		if (amount > 0)
 		{
+			// Choose size and offset of shadow texture
+			constexpr uint32_t size = 512;
+			constexpr uint32_t ratio = shadowMapSize / size;
+
 			// Setup and bind default shadow shader
 			uint64_t lastShaderID = ~0;
 			uint64_t lastMaterialID = ~0;
@@ -267,22 +293,28 @@ namespace Mahakam
 				if (light.offset.z == 0.0f)
 					continue;
 
-				// Choose size and offset of shadow texture
-				constexpr uint32_t size = 1024;
-				const uint32_t ratio = shadowFramebuffer->GetSpecification().width / size;
+				if (shadowMapOffset.x + size > shadowMapSize)
+				{
+					shadowMapOffset.y += size;
 
-				uint32_t x = shadowOffset % ratio;
-				uint32_t y = shadowOffset / ratio;
+					if (shadowMapOffset.y >= shadowMapMargin.y)
+						shadowMapMargin.x = 0;
 
-				GL::SetViewport(x * size, y * size, size, size);
+					shadowMapOffset.x = shadowMapMargin.x;
+				}
 
-				light.offset = { x / (float)ratio, y / (float)ratio, 1.0f / (float)ratio, light.offset.w };
+				uint32_t x = shadowMapOffset.x;
+				uint32_t y = shadowMapOffset.y;
+
+				GL::SetViewport(x, y, size, size);
+
+				light.offset = { x / (ratio * (float)size), y / (ratio * (float)size), 1.0f / (float)ratio, light.offset.w };
 
 				// Bind worldToLight matrix
 				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 				shadowMatrixBuffer->Bind(1);
 
-				shadowOffset++;
+				shadowMapOffset.x += size;
 
 				// Render all objects in queue
 				RenderShadowGeometry(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);

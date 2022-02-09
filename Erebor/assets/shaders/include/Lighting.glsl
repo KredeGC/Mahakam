@@ -112,6 +112,9 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
     }
 
     float CalculateShadowAttenuation(Light light, vec3 worldPos, vec3 normal) {
+        if (light.offset.z == 0.0)
+            return 1.0;
+        
         #if defined(DIRECTIONAL)
             vec3 lightDir = normalize(-light.direction);
             // float bias = max(light.offset.w * (1.0 - dot(normal, lightDir)), light.offset.w * 0.1);
@@ -150,7 +153,7 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
         
         // Sample shadow map and compare
         float shadow = SamplePCFShadow(projCoords, depth);
-        if (light.offset.z == 0.0 || depth > 1.0 || abs(lightSpacePos.x) > 1.0 || abs(lightSpacePos.y) > 1.0)
+        if (depth > 1.0 || abs(lightSpacePos.x) > 1.0 || abs(lightSpacePos.y) > 1.0)
             shadow = 1.0;
         
         return shadow;

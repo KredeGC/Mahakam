@@ -19,8 +19,10 @@ namespace Mahakam
 
 		Ref<UniformBuffer> shadowMatrixBuffer = nullptr;
 
-		uint32_t shadowOffset;
-		uint32_t shadowMapSize = 8192;
+		glm::ivec2 shadowMapOffset = { 0.0f, 0.0f };
+		glm::ivec2 shadowMapMargin = { 0.0f, 0.0f };
+		static constexpr uint32_t shadowMaxSize = 2048;
+		static constexpr uint32_t shadowMapSize = 8192;
 
 	public:
 		virtual void Init(uint32_t width, uint32_t height) override;
