@@ -32,8 +32,8 @@ namespace Mahakam
 
 		// Create shadow map
 		FrameBufferProps shadowProps;
-		shadowProps.width = 8192; // 8192
-		shadowProps.height = 8192;
+		shadowProps.width = shadowMapSize;
+		shadowProps.height = shadowMapSize;
 		shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
 		shadowFramebuffer = FrameBuffer::Create(shadowProps);
 
@@ -78,7 +78,11 @@ namespace Mahakam
 
 		GL::Clear(false, true);
 
+		// Directional shadows
 		RenderDirectionalShadows(sceneData);
+
+		// Spot shadows
+		RenderSpotShadows(sceneData);
 
 		shadowFramebuffer->Unbind();
 
@@ -139,85 +143,149 @@ namespace Mahakam
 		return true;
 	}
 
+	void LightingRenderPass::RenderShadowGeometry(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
+	{
+		for (uint64_t drawID : sceneData->renderQueue)
+		{
+			// Choose a shader
+			const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
+			if (shaderID != *lastShaderID)
+			{
+				Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+				if (shader->HasShaderPass("SHADOW"))
+				{
+					*lastShaderID = shaderID;
+					shader->Bind("SHADOW");
+				}
+				else if (*lastShaderID != ~0)
+				{
+					*lastShaderID = ~0;
+					shadowShader->Bind("SHADOW");
+				}
+			}
+
+			// Choose a material
+			const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
+			Ref<Material>& material = sceneData->materialIDLookup[materialID];
+			if (materialID != *lastMaterialID && *lastShaderID != ~0)
+			{
+				*lastMaterialID = materialID;
+				material->Bind();
+			}
+
+			// Choose a mesh
+			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
+			Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+			if (meshID != *lastMeshID)
+			{
+				*lastMeshID = meshID;
+				mesh->Bind();
+			}
+
+			// Choose a transform
+			const uint64_t transformID = drawID & 0xFFFFULL;
+			glm::mat4& transform = sceneData->transformIDLookup[transformID];
+
+			// Render to depth map
+			material->SetTransform(transform);
+
+			Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+
+			GL::DrawIndexed(mesh->GetIndexCount());
+		}
+	}
+
 	void LightingRenderPass::RenderDirectionalShadows(SceneData* sceneData)
 	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
 		uint32_t amount = (uint32_t)sceneData->environment.directionalLights.size();
-		for (uint32_t i = 0; i < amount; i++)
+		if (amount > 0)
 		{
-			DirectionalLight& light = sceneData->environment.directionalLights[i];
-
-			uint32_t size = 1024;
-			uint32_t ratio = shadowFramebuffer->GetSpecification().width / size;
-
-			uint32_t x = shadowOffset % ratio;
-			uint32_t y = shadowOffset / ratio;
-
-			GL::SetViewport(x, y, size, size);
-
-			shadowOffset++;
-
-			float texelSize = 1.0f / (float)size;
-
-			light.offset = { x, y, size, size };
-
-			light.worldToLight[3][0] -= glm::mod(light.worldToLight[3][0], 2.0f * texelSize);
-			light.worldToLight[3][1] -= glm::mod(light.worldToLight[3][1], 2.0f * texelSize);
-			light.worldToLight[3][2] -= glm::mod(light.worldToLight[3][2], 2.0f * texelSize);
-
-			shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
-			shadowMatrixBuffer->Bind(1);
-
-			// Render all objects in queue
+			// Setup and bind default shadow shader
 			uint64_t lastShaderID = ~0;
 			uint64_t lastMaterialID = ~0;
 			uint64_t lastMeshID = ~0;
 			shadowShader->Bind("SHADOW");
-			for (uint64_t drawID : sceneData->renderQueue)
+
+			for (uint32_t i = 0; i < amount; i++)
 			{
-				const uint64_t passMask = (drawID >> 62ULL);
-				if (passMask == 0ULL) // Opaque
-				{
-					const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
-					if (shaderID != lastShaderID)
-					{
-						Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
-						if (shader->HasShaderPass("SHADOW"))
-						{
-							lastShaderID = shaderID;
-							shader->Bind("SHADOW");
-						}
-						else if (lastShaderID != ~0)
-						{
-							lastShaderID = ~0;
-							shader->Bind("SHADOW");
-						}
-					}
+				DirectionalLight& light = sceneData->environment.directionalLights[i];
 
-					const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-					Ref<Material>& material = sceneData->materialIDLookup[materialID];
-					if (materialID != lastMaterialID && lastShaderID != ~0)
-					{
-						lastMaterialID = materialID;
-						material->Bind();
-					}
+				// Check if light is disabled
+				if (light.offset.z == 0.0f)
+					continue;
 
-					const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-					Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
-					if (meshID != lastMeshID)
-					{
-						lastMeshID = meshID;
-						mesh->Bind();
-					}
+				// Choose size and offset of shadow texture
+				constexpr uint32_t size = 1024;
+				const uint32_t ratio = shadowFramebuffer->GetSpecification().width / size;
 
-					const uint64_t transformID = drawID & 0xFFFFULL;
-					glm::mat4& transform = sceneData->transformIDLookup[transformID];
+				uint32_t x = shadowOffset % ratio;
+				uint32_t y = shadowOffset / ratio;
 
-					material->SetTransform(transform);
+				GL::SetViewport(x * size, y * size, size, size);
 
-					Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+				light.offset = { x / (float)ratio, y / (float)ratio, 1.0f / (float)ratio, light.offset.w };
 
-					GL::DrawIndexed(mesh->GetIndexCount());
-				}
+				// Avoid edge swimming by snapping to nearest texel
+				float texelSize = 1.0f / (float)size;
+
+				light.worldToLight[3][0] -= glm::mod(light.worldToLight[3][0], 2.0f * texelSize);
+				light.worldToLight[3][1] -= glm::mod(light.worldToLight[3][1], 2.0f * texelSize);
+				light.worldToLight[3][2] -= glm::mod(light.worldToLight[3][2], 2.0f * texelSize);
+
+				// Bind worldToLight matrix
+				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
+				shadowMatrixBuffer->Bind(1);
+
+				shadowOffset++;
+
+				// Render all objects in queue
+				RenderShadowGeometry(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
+			}
+		}
+	}
+
+	void LightingRenderPass::RenderSpotShadows(SceneData* sceneData)
+	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
+		uint32_t amount = (uint32_t)sceneData->environment.spotLights.size();
+		if (amount > 0)
+		{
+			// Setup and bind default shadow shader
+			uint64_t lastShaderID = ~0;
+			uint64_t lastMaterialID = ~0;
+			uint64_t lastMeshID = ~0;
+			shadowShader->Bind("SHADOW");
+
+			for (uint32_t i = 0; i < amount; i++)
+			{
+				SpotLight& light = sceneData->environment.spotLights[i];
+
+				// Check if light is disabled
+				if (light.offset.z == 0.0f)
+					continue;
+
+				// Choose size and offset of shadow texture
+				constexpr uint32_t size = 1024;
+				const uint32_t ratio = shadowFramebuffer->GetSpecification().width / size;
+
+				uint32_t x = shadowOffset % ratio;
+				uint32_t y = shadowOffset / ratio;
+
+				GL::SetViewport(x * size, y * size, size, size);
+
+				light.offset = { x / (float)ratio, y / (float)ratio, 1.0f / (float)ratio, light.offset.w };
+
+				// Bind worldToLight matrix
+				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
+				shadowMatrixBuffer->Bind(1);
+
+				shadowOffset++;
+
+				// Render all objects in queue
+				RenderShadowGeometry(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
 			}
 		}
 	}

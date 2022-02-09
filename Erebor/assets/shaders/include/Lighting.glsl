@@ -73,64 +73,89 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
 }
 
 
-float SampleShadowMap(vec2 projCoords, float depth) {
-    vec2 textureSize = textureSize(u_ShadowMap, 0);
-    vec2 texelSize = 1.0 / textureSize;
-    
-    vec2 f = fract(projCoords * textureSize);
-    projCoords += (0.5 - f) * texelSize;
-    
-    float tl = depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
-    float tr = depth > texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, 0.0)).r ? 0.0 : 1.0;
-    float bl = depth > texture2D(u_ShadowMap, projCoords + vec2(0.0, texelSize.y)).r ? 0.0 : 1.0;
-    float br = depth > texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, texelSize.y)).r ? 0.0 : 1.0;
-    
-    float tA = mix(tl, tr, f.x);
-    float tB = mix(bl, br, f.x);
-    return mix(tA, tB, f.y);
-}
-
-float SamplePCFShadow(vec3 projCoords, vec3 lightDir, vec3 normal) {
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-    
-    // return SampleShadowMap(projCoords.xy, projCoords.z - bias);
-    
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
-    for (float x = -1.5; x <= 1.5; x++) {
-        for (float y = -1.5; y <= 1.5; y++) {
-            shadow += SampleShadowMap(projCoords.xy + vec2(x, y) * texelSize, projCoords.z - bias);
-        }
+#if defined(DIRECTIONAL) || defined(SPOT)
+    float SampleShadowMap(vec2 projCoords, float depth) {
+        #if defined(BILINEAR_SHADOWS)
+            vec2 textureSize = textureSize(u_ShadowMap, 0);
+            vec2 texelSize = 1.0 / textureSize;
+            
+            vec2 f = fract(projCoords * textureSize);
+            projCoords += (0.5 - f) * texelSize;
+            
+            float tl = depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
+            float tr = depth > texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, 0.0)).r ? 0.0 : 1.0;
+            float bl = depth > texture2D(u_ShadowMap, projCoords + vec2(0.0, texelSize.y)).r ? 0.0 : 1.0;
+            float br = depth > texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, texelSize.y)).r ? 0.0 : 1.0;
+            
+            float tA = mix(tl, tr, f.x);
+            float tB = mix(bl, br, f.x);
+            return mix(tA, tB, f.y);
+        #else
+            return depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
+        #endif
     }
-    
-    return shadow / 16.0;
-}
 
-float CalculateShadowAttenuation(Light light, vec3 worldPos, vec3 normal) {
-    #if defined(DIRECTIONAL)
-        vec3 lightDir = normalize(-light.direction);
-    #elif defined(POINT)
-        vec3 lightDir = normalize(light.position.xyz - worldPos);
-    #else
-        vec3 lightDir = normalize(light.objectToWorld[3].xyz - worldPos);
-    #endif
-    
-    vec4 lightSpacePos = light.worldToLight * vec4(worldPos, 1.0);
-    
-    vec3 coords = lightSpacePos.xyz / lightSpacePos.w;
-    coords = coords * 0.5 + 0.5;
-    
-    vec2 textureSize = textureSize(u_ShadowMap, 0);
-    vec2 ratio = light.offset.zw / textureSize;
-    coords.xy = coords.xy * ratio + light.offset.xy;
-    
-    float shadow = SamplePCFShadow(coords, lightDir, normal);
-    
-    if (abs(lightSpacePos.z) > 1.0 || abs(lightSpacePos.x) > 1.0 || abs(lightSpacePos.y) > 1.0)
-        shadow = 1.0;
-    
-    return shadow;
-}
+    float SamplePCFShadow(vec2 projCoords, float depth) {
+        #if defined(PCF_SHADOWS)
+            float shadow = 0.0;
+            vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    shadow += SampleShadowMap(projCoords.xy + vec2(x, y) * texelSize, depth);
+                }
+            }
+            
+            return shadow / 9.0;
+        #else
+            return SampleShadowMap(projCoords.xy, depth);
+        #endif
+    }
+
+    float CalculateShadowAttenuation(Light light, vec3 worldPos, vec3 normal) {
+        #if defined(DIRECTIONAL)
+            vec3 lightDir = normalize(-light.direction);
+            // float bias = max(light.offset.w * (1.0 - dot(normal, lightDir)), light.offset.w * 0.1);
+            
+            float bias = light.offset.w;
+            
+            float texelSize = 0.5 * light.offset.z;
+            vec3 normalBias = normal * texelSize * 1.4142136;
+        #elif defined(SPOT)
+            vec3 lightDir = normalize(light.objectToWorld[3].xyz - worldPos);
+            
+            // vec3 spotDir = mat3(light.objectToWorld) * vec3(0.0, 0.0, 1.0);
+            // float distanceToLightPlane = dot(lightDir, spotDir);
+            
+            float bias = light.offset.w;
+            
+            vec3 normalBias = vec3(0.0);
+        #endif
+        
+        // Transform worldPos into lightspace
+        vec4 lightSpacePos = light.worldToLight * vec4(worldPos + normalBias, 1.0);
+        lightSpacePos.xy /= lightSpacePos.w;
+        
+        // Offset xy into the depth texture atlas
+        vec2 projCoords = lightSpacePos.xy * 0.5 + 0.5;
+        float textureSize = textureSize(u_ShadowMap, 0).x;
+        projCoords = projCoords * light.offset.z + light.offset.xy;
+        
+        // Calculate the comparative depth from lightSpacePos
+        // lightSpacePos.z = min(lightSpacePos.z, lightSpacePos.w);
+        float depth = (lightSpacePos.z - bias) / lightSpacePos.w;
+        
+        #if defined(DIRECTIONAL)
+            depth = depth * 0.5 + 0.5;
+        #endif
+        
+        // Sample shadow map and compare
+        float shadow = SamplePCFShadow(projCoords, depth);
+        if (light.offset.z == 0.0 || depth > 1.0 || abs(lightSpacePos.x) > 1.0 || abs(lightSpacePos.y) > 1.0)
+            shadow = 1.0;
+        
+        return shadow;
+    }
+#endif
 
 
 vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, vec3 worldPos, vec3 worldNormal) {
@@ -173,8 +198,11 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             vec3 cookie = texture(u_LightCookie, uvCookie.xy / uvCookie.w * 0.5 + vec2(0.5, 0.5), -8.0).rgb;
             float attenuation = uvCookie.w > 0.0 ? 1.0 : 0.0;
             
+            float shadowAttenuation = CalculateShadowAttenuation(light, worldPos, N);
+            
             float normalizedDist = max(distSqr * rcpRangeSqr, 0.00001);
             attenuation *= texture(u_AttenuationLUT, normalizedDist.rr).r;
+            attenuation *= shadowAttenuation;
             
             if (normalizedDist > 1.0 || dot(cookie, cookie) <= 0.0) // Find something that saves more performance?
                 discard;

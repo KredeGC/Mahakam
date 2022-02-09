@@ -35,7 +35,7 @@ namespace Mahakam
 		float padding02 = 0.0f;
 	public:
 		glm::mat4 worldToLight;
-		glm::vec4 offset;
+		glm::vec4 offset = { 0.0f, 0.0f, 0.0f, 0.0f }; // xy - offset, z - size, w - bias
 
 	public:
 		DirectionalLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);
@@ -46,8 +46,6 @@ namespace Mahakam
 	public:
 		glm::vec4 position; // w - range
 		glm::vec4 color; // w - 1.0 / (range * range)
-		glm::mat4 worldToLight;
-		glm::vec4 offset;
 
 	public:
 		PointLight(const glm::vec3& position, const Light& light);
@@ -57,9 +55,9 @@ namespace Mahakam
 	{
 	public:
 		glm::mat4 objectToWorld;
-		glm::mat4 worldToLight;
 		glm::vec4 color; // w - 1.0 / (range * range)
-		glm::vec4 offset;
+		glm::mat4 worldToLight;
+		glm::vec4 offset = { 0.0f, 0.0f, 0.0f, 0.0f }; // xy - offset, z - size, w - bias
 
 	public:
 		SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);

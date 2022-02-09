@@ -97,9 +97,17 @@ void main() {
 
     o_Color = vec4(color, 1.0);
     
-    // TEST SHADOWS
-    //o_Color = vec4(CalculateShadowAttenuation(lights[0], worldPos));
-    //o_Color = vec4(CalculateShadowAttenuation(lights[0], worldPos, worldNormal));
+    // #if defined(DIRECTIONAL) || defined(SPOT)
+    //     o_Color = vec4(CalculateShadowAttenuation(lights[0], worldPos, worldNormal));
+    // #else
+    //     o_Color = vec4(0.0);
+    // #endif
+    
+    // #if defined(DIRECTIONAL)
+    //     o_Color = vec4(texture2D(u_ShadowMap, screenUV).r * 2.0 - 1.0);
+    // #else
+    //     o_Color = vec4(0.0);
+    // #endif
     
     #ifdef DEBUG
         #ifdef DIRECTIONAL

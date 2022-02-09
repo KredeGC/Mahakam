@@ -20,6 +20,7 @@ namespace Mahakam
 		Ref<UniformBuffer> shadowMatrixBuffer = nullptr;
 
 		uint32_t shadowOffset;
+		uint32_t shadowMapSize = 8192;
 
 	public:
 		virtual void Init(uint32_t width, uint32_t height) override;
@@ -32,7 +33,10 @@ namespace Mahakam
 		virtual Ref<FrameBuffer> GetFrameBuffer() { return hdrFrameBuffer; }
 
 	private:
+		void RenderShadowGeometry(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
+
 		void RenderDirectionalShadows(SceneData* sceneData);
+		void RenderSpotShadows(SceneData* sceneData);
 
 		void RenderDirectionalLights(SceneData* sceneData);
 		void RenderPointLights(SceneData* sceneData);

@@ -103,18 +103,18 @@ namespace Mahakam
 
 		// Setup lights
 		Entity mainLightEntity = activeScene->CreateEntity("Main Light");
-		mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, glm::vec3(1.0f, 1.0f, 1.0f));
-		mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ 0.0f, -1.2f, 0.0f }));
+		mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, glm::vec3(1.0f, 1.0f, 1.0f), true);
+		mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ -0.7f, -3.0f, 0.0f }));
 
 		/*for (int y = 0; y < 10; y++)
 		{
 			for (int x = 0; x < 10; x++)
 			{*/
-				//Entity pointLightEntity = activeScene->CreateEntity("Spot Light");
-				//pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-				//pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 1.0f, -6.5f });
-				////pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
-				//pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-155.0f), 0.0f, 0.0f }));
+				Entity pointLightEntity = activeScene->CreateEntity("Spot Light");
+				pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
+				pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
+				//pointLightEntity.getComponent<TransformComponent>().setPosition({ x, y, 1.0f });
+				pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-150.0f), glm::radians(180.0f), 0.0f }));
 		/*	}
 		}*/
 
@@ -127,7 +127,8 @@ namespace Mahakam
 
 		Ref<Material> planeMaterial = Material::Create(textureShader);
 		planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
-		planeMaterial->SetTexture("u_Bump", 0, brickBump);
+		//planeMaterial->SetTexture("u_Bump", 0, brickBump);
+		planeMaterial->SetTexture("u_Bump", 0, Texture2D::bump);
 		planeMaterial->SetTexture("u_Metallic", 0, Texture2D::black);
 		planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
 

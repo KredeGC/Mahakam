@@ -12,14 +12,14 @@ namespace Mahakam
 	public:
 		LightComponent() = default;
 
-		LightComponent(Light::LightType lightType, const glm::vec3& color)
-			: light(lightType, color) {}
+		LightComponent(Light::LightType lightType, const glm::vec3& color, bool shadowCasting = false) // Directional
+			: light(lightType, color, shadowCasting) {}
 
-		LightComponent(Light::LightType lightType, float range, const glm::vec3& color)
+		LightComponent(Light::LightType lightType, float range, const glm::vec3& color) // Point
 			: light(lightType, range, color) {}
 
-		LightComponent(Light::LightType lightType, float fov, float range, const glm::vec3& color)
-			: light(lightType, fov, range, color) {}
+		LightComponent(Light::LightType lightType, float fov, float range, const glm::vec3& color, bool shadowCasting = false) // Spot
+			: light(lightType, fov, range, color, shadowCasting) {}
 
 		operator const Light& () const { return light; }
 

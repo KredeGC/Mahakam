@@ -12,6 +12,9 @@ namespace Mahakam
 	{
 		worldToLight = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -20.0f, 20.0f)
 			* glm::inverse(glm::translate(glm::mat4(1.0f), position) * glm::mat4(rotation));
+
+		offset.z = light.IsShadowCasting();
+		offset.w = light.GetBias();
 	}
 
 	PointLight::PointLight(const glm::vec3& position, const Light& light) :
@@ -19,13 +22,16 @@ namespace Mahakam
 		color(light.GetColor(), 1.0f / (light.GetRange() * light.GetRange())) {}
 
 	SpotLight::SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light) :
-		worldToLight(glm::perspective(light.GetFov(), 1.0f, 0.03f, light.GetRange()) * glm::inverse(glm::translate(glm::mat4(1.0f), position) * glm::mat4(rotation))),
+		worldToLight(glm::perspective(light.GetFov(), 1.0f, 0.001f, light.GetRange()) * glm::inverse(glm::translate(glm::mat4(1.0f), position) * glm::mat4(rotation))),
 		color(light.GetColor(), 1.0f / (light.GetRange() * light.GetRange()))
 	{
 		float xy = glm::tan(light.GetFov() / 2.0f) * light.GetRange();
 		objectToWorld = glm::translate(glm::mat4(1.0f), position)
 			* glm::mat4(rotation)
 			* glm::scale(glm::mat4(1.0f), glm::vec3(xy, xy, light.GetRange()));
+
+		offset.z = light.IsShadowCasting();
+		offset.w = light.GetBias();
 	}
 
 	CameraData::CameraData(const Camera& camera, const glm::mat4& transform) :

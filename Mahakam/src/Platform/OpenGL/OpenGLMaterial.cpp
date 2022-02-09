@@ -97,7 +97,7 @@ namespace Mahakam
 		if (texIter != textures.end())
 			return texIter->second;
 
-		MH_CORE_WARN("Material ({0}) has no texture named {0}", GetShader()->GetName(), name);
+		MH_CORE_WARN("Material ({0}) has no texture named {1}", GetShader()->GetName(), name);
 
 		return nullptr;
 	}
@@ -108,7 +108,7 @@ namespace Mahakam
 		if (matIter != mat3s.end())
 			return matIter->second;
 
-		MH_CORE_WARN("Material ({0}) has no mat3 named {0}", GetShader()->GetName(), name);
+		MH_CORE_WARN("Material ({0}) has no mat3 named {1}", GetShader()->GetName(), name);
 
 		return glm::mat3(1.0f);
 	}
@@ -119,7 +119,7 @@ namespace Mahakam
 		if (matIter != mat4s.end())
 			return matIter->second;
 
-		MH_CORE_WARN("Material ({0}) has no mat4 named {0}", GetShader()->GetName(), name);
+		MH_CORE_WARN("Material ({0}) has no mat4 named {1}", GetShader()->GetName(), name);
 
 		return glm::mat4(1.0f);
 	}
@@ -130,7 +130,7 @@ namespace Mahakam
 		if (intIter != ints.end())
 			return intIter->second;
 
-		MH_CORE_WARN("Material ({0}) has no int named {0}", GetShader()->GetName(), name);
+		MH_CORE_WARN("Material ({0}) has no int named {1}", GetShader()->GetName(), name);
 
 		return 0;
 	}
@@ -141,7 +141,7 @@ namespace Mahakam
 		if (floatIter != floats.end())
 			return floatIter->second;
 
-		MH_CORE_WARN("Material ({0}) has no float named {0}", GetShader()->GetName(), name);
+		MH_CORE_WARN("Material ({0}) has no float named {1}", GetShader()->GetName(), name);
 
 		return 0.0f;
 	}
@@ -152,7 +152,7 @@ namespace Mahakam
 		if (floatIter != float2s.end())
 			return floatIter->second;
 
-		MH_CORE_WARN("Material ({0}) has no float2 named {0}", GetShader()->GetName(), name);
+		MH_CORE_WARN("Material ({0}) has no float2 named {1}", GetShader()->GetName(), name);
 
 		return glm::vec2(0.0f);
 	}
@@ -163,7 +163,7 @@ namespace Mahakam
 		if (floatIter != float3s.end())
 			return floatIter->second;
 
-		MH_CORE_WARN("Material ({0}) has no float3 named {0}", GetShader()->GetName(), name);
+		MH_CORE_WARN("Material ({0}) has no float3 named {1}", GetShader()->GetName(), name);
 
 		return glm::vec3(0.0f);
 	}
@@ -174,7 +174,7 @@ namespace Mahakam
 		if (floatIter != float4s.end())
 			return floatIter->second;
 
-		MH_CORE_WARN("Material ({0}) has no float4 named {0}", GetShader()->GetName(), name);
+		MH_CORE_WARN("Material ({0}) has no float4 named {1}", GetShader()->GetName(), name);
 
 		return glm::vec4(0.0f);
 	}

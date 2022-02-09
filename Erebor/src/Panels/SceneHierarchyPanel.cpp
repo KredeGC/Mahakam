@@ -300,6 +300,50 @@ namespace Mahakam
 				}
 			}
 		});
+
+		DrawComponent<LightComponent>("Light", entity, [](LightComponent& lightComponent)
+		{
+			Light& light = lightComponent.GetLight();
+
+			const char* projectionTypeStrings[] = { "Directional", "Point", "Spot"};
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)light.GetLightType()];
+
+			if (ImGui::BeginCombo("Light Type", currentProjectionTypeString))
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					bool selected = currentProjectionTypeString == projectionTypeStrings[i];
+					if (ImGui::Selectable(projectionTypeStrings[i], selected))
+					{
+						currentProjectionTypeString = projectionTypeStrings[i];
+						light.SetLightType((Light::LightType)i);
+					}
+
+					if (selected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+
+			if (light.GetLightType() == Light::LightType::Point || light.GetLightType() == Light::LightType::Spot)
+			{
+				float range = light.GetRange();
+				if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f, 180.0f))
+					light.SetRange(range);
+			}
+
+			if (light.GetLightType() == Light::LightType::Spot)
+			{
+				float fov = glm::degrees(light.GetFov());
+				if (ImGui::DragFloat("Field of view", &fov, 0.1f, 0.0f, 180.0f))
+					light.SetFov(glm::radians(fov));
+			}
+
+			bool hasShadows = light.IsShadowCasting();
+			if (ImGui::Checkbox("Shadow casting", &hasShadows))
+				light.SetShadowCasting(hasShadows);
+		});
 	}
 
 	void SceneHierarchyPanel::SetContext(Ref<Scene> scene)
