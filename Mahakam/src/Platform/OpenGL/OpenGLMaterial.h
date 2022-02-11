@@ -4,6 +4,8 @@
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Texture.h"
 
+#include <robin_hood.h>
+
 namespace Mahakam
 {
 	class OpenGLMaterial : public Material
@@ -13,21 +15,23 @@ namespace Mahakam
 
 		std::string variant = "";
 
-		std::unordered_map<std::string, Ref<Texture>> textures;
-
-		std::unordered_map<std::string, glm::mat3> mat3s;
-		std::unordered_map<std::string, glm::mat4> mat4s;
-
-		std::unordered_map<std::string, uint32_t> ints;
-
-		std::unordered_map<std::string, float> floats;
-		std::unordered_map<std::string, glm::vec2> float2s;
-		std::unordered_map<std::string, glm::vec3> float3s;
-		std::unordered_map<std::string, glm::vec4> float4s;
+		robin_hood::unordered_map<std::string, Ref<Texture>> textures;
+		
+		robin_hood::unordered_map<std::string, glm::mat3> mat3s;
+		robin_hood::unordered_map<std::string, glm::mat4> mat4s;
+		
+		robin_hood::unordered_map<std::string, int32_t> ints;
+		
+		robin_hood::unordered_map<std::string, float> floats;
+		robin_hood::unordered_map<std::string, glm::vec2> float2s;
+		robin_hood::unordered_map<std::string, glm::vec3> float3s;
+		robin_hood::unordered_map<std::string, glm::vec4> float4s;
 
 	public:
 		OpenGLMaterial(const Ref<Shader>& shader, const std::string& variant = "");
 		OpenGLMaterial(const Ref<Material>& material);
+
+		virtual uint64_t Hash() const override;
 
 		inline virtual Ref<Shader> GetShader() const override { return shader; }
 

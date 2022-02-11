@@ -8,8 +8,6 @@ DIRECTIONAL:
 POINT:
   Defines:
     - POINT
-    - BILINEAR_SHADOWS
-    - PCF_SHADOWS
   Includes:
     - assets/shaders/internal/DeferredPerLight.glsl
 SPOT:

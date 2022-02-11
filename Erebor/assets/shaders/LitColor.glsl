@@ -9,7 +9,6 @@ layout(location = 2) in vec3 i_Normal;
 struct v2f {
     vec3 v_WorldPos;
     vec3 v_WorldNormal;
-    vec3 v_ViewDir;
     vec2 v_UV;
 };
 
@@ -20,7 +19,6 @@ void main() {
     o.v_WorldPos = (MATRIX_M * vec4(i_Pos, 1.0)).xyz;
     o.v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
     o.v_UV = i_UV;
-    o.v_ViewDir = getViewDir(o.v_WorldPos);
 }
 
 
@@ -37,7 +35,6 @@ layout(location = 3) out vec4 o_Normal;
 struct v2f {
     vec3 v_WorldPos;
     vec3 v_WorldNormal;
-    vec3 v_ViewDir;
     vec2 v_UV;
 };
 

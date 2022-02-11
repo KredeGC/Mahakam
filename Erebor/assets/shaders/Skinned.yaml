@@ -3,3 +3,8 @@ GEOMETRY:
     - GEOMETRY
   Includes:
     - assets/shaders/Skinned.glsl
+SHADOW:
+  Defines:
+    - SHADOW
+  Includes:
+    - assets/shaders/Skinned.glsl

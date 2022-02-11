@@ -51,16 +51,16 @@ namespace Mahakam
 		Frustum frustum(sceneData->cameraData.u_m4_VP);
 
 		// Render all objects in queue
-		uint64_t lastShaderID = ~0;
-		uint64_t lastMaterialID = ~0;
-		uint64_t lastMeshID = ~0;
+		uint16_t lastShaderID = ~0;
+		uint16_t lastMaterialID = ~0;
+		uint16_t lastMeshID = ~0;
 		for (uint64_t drawID : sceneData->renderQueue)
 		{
-			const uint64_t passMask = (drawID >> 62ULL);
+			const uint16_t passMask = (drawID >> 62ULL);
 			if (passMask == 0ULL) // Opaque
 			{
 				// Choose a shader
-				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
+				const uint16_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
 				if (shaderID != lastShaderID)
 				{
 					Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
@@ -71,7 +71,7 @@ namespace Mahakam
 				}
 
 				// Choose a material
-				const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
+				const uint16_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
 				Ref<Material>& material = sceneData->materialIDLookup[materialID];
 				if (materialID != lastMaterialID)
 				{
@@ -80,7 +80,7 @@ namespace Mahakam
 				}
 
 				// Choose a mesh
-				const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
+				const uint16_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
 				Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
 				if (meshID != lastMeshID)
 				{
@@ -89,7 +89,7 @@ namespace Mahakam
 				}
 
 				// Choose a transform
-				const uint64_t transformID = drawID & 0xFFFFULL;
+				const uint16_t transformID = drawID & 0xFFFFULL;
 				glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
 				// Perform AABB test

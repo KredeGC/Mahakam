@@ -57,6 +57,85 @@ namespace Mahakam
 		float3s(std::static_pointer_cast<OpenGLMaterial>(material)->float3s),
 		float4s(std::static_pointer_cast<OpenGLMaterial>(material)->float4s) {}
 
+	uint64_t OpenGLMaterial::Hash() const
+	{
+		uint64_t hash = 2166136261ULL;
+
+		for (auto& kv : textures)
+		{
+			unsigned char bytes[sizeof(Texture*)];
+			memcpy(bytes, &kv.second, sizeof(Texture*));
+
+			for (uint64_t i = 0; i < sizeof(Texture*); ++i)
+				hash = (hash * 16777619ULL) ^ bytes[i];
+		}
+
+		for (auto& kv : mat3s)
+		{
+			unsigned char bytes[sizeof(glm::mat3)];
+			memcpy(bytes, &kv.second, sizeof(glm::mat3));
+
+			for (uint64_t i = 0; i < sizeof(glm::mat3); ++i)
+				hash = (hash * 16777619ULL) ^ bytes[i];
+		}
+
+		for (auto& kv : mat4s)
+		{
+			unsigned char bytes[sizeof(glm::mat4)];
+			memcpy(bytes, &kv.second, sizeof(glm::mat4));
+
+			for (uint64_t i = 0; i < sizeof(glm::mat4); ++i)
+				hash = (hash * 16777619ULL) ^ bytes[i];
+		}
+
+		for (auto& kv : ints)
+		{
+			unsigned char bytes[sizeof(int32_t)];
+			memcpy(bytes, &kv.second, sizeof(int32_t));
+
+			for (uint64_t i = 0; i < sizeof(int32_t); ++i)
+				hash = (hash * 16777619ULL) ^ bytes[i];
+		}
+
+		for (auto& kv : floats)
+		{
+			unsigned char bytes[sizeof(float)];
+			memcpy(bytes, &kv.second, sizeof(float));
+
+			for (uint64_t i = 0; i < sizeof(float); ++i)
+				hash = (hash * 16777619ULL) ^ bytes[i];
+		}
+
+		for (auto& kv : float2s)
+		{
+			unsigned char bytes[sizeof(glm::vec2)];
+			memcpy(bytes, &kv.second, sizeof(glm::vec2));
+
+			for (uint64_t i = 0; i < sizeof(glm::vec2); ++i)
+				hash = (hash * 16777619ULL) ^ bytes[i];
+		}
+
+		for (auto& kv : float3s)
+		{
+			unsigned char bytes[sizeof(glm::vec3)];
+			memcpy(bytes, &kv.second, sizeof(glm::vec3));
+
+			for (uint64_t i = 0; i < sizeof(glm::vec3); ++i)
+				hash = (hash * 16777619ULL) ^ bytes[i];
+		}
+
+		for (auto& kv : float4s)
+		{
+			unsigned char bytes[sizeof(glm::vec4)];
+			memcpy(bytes, &kv.second, sizeof(glm::vec4));
+
+			for (uint64_t i = 0; i < sizeof(glm::vec4); ++i)
+				hash = (hash * 16777619ULL) ^ bytes[i];
+		}
+
+		return hash;
+	}
+
 	void OpenGLMaterial::Bind() const
 	{
 		//shader->bind();

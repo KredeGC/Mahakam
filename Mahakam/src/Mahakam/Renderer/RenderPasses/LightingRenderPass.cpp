@@ -197,19 +197,28 @@ namespace Mahakam
 
 			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
 			{
-				const unsigned char* shaderBytes = reinterpret_cast<const unsigned char*>(shader.get());
-				for (uint64_t i = 0; i < sizeof(Material); ++i)
+				// Hash shader
+				unsigned char shaderBytes[sizeof(Shader*)];
+				memcpy(shaderBytes, shader.get(), sizeof(Shader*));
+				for (uint64_t i = 0; i < sizeof(Shader*); ++i)
 					hash = (hash * 16777619ULL) ^ shaderBytes[i];
 
-				const unsigned char* materialBytes = reinterpret_cast<const unsigned char*>(material.get());
-				for (uint64_t i = 0; i < sizeof(Material); ++i)
+				// Hash material
+				uint64_t materialHash = material->Hash();
+				unsigned char materialBytes[sizeof(uint64_t)];
+				memcpy(materialBytes, &materialHash, sizeof(uint64_t));
+				for (uint64_t i = 0; i < sizeof(uint64_t); ++i)
 					hash = (hash * 16777619ULL) ^ materialBytes[i];
 
-				const unsigned char* meshBytes = reinterpret_cast<const unsigned char*>(mesh.get());
-				for (uint64_t i = 0; i < sizeof(Mesh); ++i)
+				// Hash mesh
+				unsigned char meshBytes[sizeof(Mesh*)];
+				memcpy(meshBytes, mesh.get(), sizeof(Mesh*));
+				for (uint64_t i = 0; i < sizeof(Mesh*); ++i)
 					hash = (hash * 16777619ULL) ^ meshBytes[i];
 
-				const unsigned char* transformBytes = reinterpret_cast<const unsigned char*>(&transform);
+				// Hash transform
+				unsigned char transformBytes[sizeof(glm::mat4)];
+				memcpy(transformBytes, &transform, sizeof(glm::mat4));
 				for (uint64_t i = 0; i < sizeof(glm::mat4); ++i)
 					hash = (hash * 16777619ULL) ^ transformBytes[i];
 			}
@@ -323,11 +332,10 @@ namespace Mahakam
 				light.worldToLight[3][1] -= glm::mod(light.worldToLight[3][1], 2.0f * texelSize);
 				light.worldToLight[3][2] -= glm::mod(light.worldToLight[3][2], 2.0f * texelSize);
 
-				// TODO: Calculate a hash based on objects in frustum
+				// Calculate hash
 				Frustum frustum(light.worldToLight);
 
 				uint64_t hash = light.Hash();
-
 				uint64_t frustumHash = PrePassShadowGeometry(sceneData, frustum);
 
 				const unsigned char* p = reinterpret_cast<const unsigned char*>(&frustumHash);

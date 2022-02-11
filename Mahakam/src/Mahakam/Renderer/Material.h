@@ -12,6 +12,8 @@ namespace Mahakam
 	public:
 		virtual ~Material() = default;
 
+		virtual uint64_t Hash() const = 0;
+
 		virtual Ref<Shader> GetShader() const = 0;
 
 		virtual void BindShader(const std::string& shaderPass) const = 0;
