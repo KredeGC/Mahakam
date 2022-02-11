@@ -2,6 +2,8 @@
 
 #include "RenderPass.h"
 
+#include <robin_hood.h>
+
 namespace Mahakam
 {
 	class LightingRenderPass : public RenderPass
@@ -19,9 +21,10 @@ namespace Mahakam
 
 		Ref<UniformBuffer> shadowMatrixBuffer = nullptr;
 
+		robin_hood::unordered_map<uint64_t, DirectionalLight> lightHashes;
+
 		glm::ivec2 shadowMapOffset = { 0.0f, 0.0f };
 		glm::ivec2 shadowMapMargin = { 0.0f, 0.0f };
-		static constexpr uint32_t shadowMaxSize = 2048;
 		static constexpr uint32_t shadowMapSize = 8192;
 
 	public:
@@ -37,8 +40,8 @@ namespace Mahakam
 	private:
 		void RenderShadowGeometry(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 
-		void RenderDirectionalShadows(SceneData* sceneData);
-		void RenderSpotShadows(SceneData* sceneData);
+		void RenderDirectionalShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
+		void RenderSpotShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 
 		void RenderDirectionalLights(SceneData* sceneData);
 		void RenderPointLights(SceneData* sceneData);

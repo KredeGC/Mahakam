@@ -71,75 +71,94 @@ namespace Mahakam
 			return false;
 		}
 
-		shadowMapOffset = { 0.0f, 0.0f };
-		shadowMapMargin = { 0.0f, 0.0f };
-
 		// Render shadow maps
-		shadowFramebuffer->Bind();
+		{
+			MH_PROFILE_RENDERING_SCOPE("Mahakam::LightingRenderPass::Render - Shadow maps");
 
-		GL::Clear(false, true);
+			shadowMapOffset = { 0.0f, 0.0f };
+			shadowMapMargin = { 0.0f, 0.0f };
 
-		// Directional shadows
-		RenderDirectionalShadows(sceneData);
+			shadowFramebuffer->Bind();
 
-		// Spot shadows
-		RenderSpotShadows(sceneData);
+			GL::Clear(false, true);
 
-		shadowFramebuffer->Unbind();
+			// Setup and bind shadow shader
+			uint64_t lastShaderID = ~0;
+			uint64_t lastMaterialID = ~0;
+			uint64_t lastMeshID = ~0;
+			shadowShader->Bind("SHADOW");
 
+			// Directional shadows
+			RenderDirectionalShadows(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
 
-		// Initialize shader variables
-		if (sceneData->gBuffer)
-			deferredShader->Bind("DIRECTIONAL", "DEBUG");
-		else
-			deferredShader->Bind("DIRECTIONAL");
-		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
-		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
-		deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(3));
-		deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
+			// Spot shadows
+			RenderSpotShadows(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
 
-		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
-		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
-
-		deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.irradianceMap);
-		deferredShader->SetTexture("u_SpecularMap", sceneData->environment.specularMap);
+			shadowFramebuffer->Unbind();
+		}
 
 
-		// Blit depth buffer from gBuffer
-		src->Blit(hdrFrameBuffer, false, true);
+		// Initialize deferred shader variables
+		{
+			MH_PROFILE_RENDERING_SCOPE("Mahakam::LightingRenderPass::Render - Setup");
 
-		// Bind and clear lighting buffer
-		hdrFrameBuffer->Bind();
-		GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
-		GL::Clear(true, false);
+			if (sceneData->gBuffer)
+				deferredShader->Bind("DIRECTIONAL", "DEBUG");
+			else
+				deferredShader->Bind("DIRECTIONAL");
+			deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
+			deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
+			deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(3));
+			deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
 
-		// Ambient lighting and don't write or read depth
-		GL::EnableZWriting(false);
-		GL::EnableZTesting(false);
+			deferredShader->SetTexture("u_BRDFLUT", brdfLut);
+			deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
 
-		// Directional lights + ambient
-		RenderDirectionalLights(sceneData);
+			deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.irradianceMap);
+			deferredShader->SetTexture("u_SpecularMap", sceneData->environment.specularMap);
+		}
 
-		// Render additional lights with additive blend mode
-		GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, true);
-		// TODO: Implement GL_GEQUAL with z-testing
-		// GL::enableZTesting(true);
 
-		// Point lights
-		RenderPointLights(sceneData);
+		// Render lights to final buffer
+		{
+			MH_PROFILE_RENDERING_SCOPE("Mahakam::LightingRenderPass::Render - Deferred lighting");
 
-		// Spot lights
-		RenderSpotLights(sceneData);
+			// Blit depth buffer from gBuffer
+			src->Blit(hdrFrameBuffer, false, true);
 
-		// Disable blending
-		GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
-		GL::EnableZTesting(true);
+			// Bind and clear lighting buffer
+			hdrFrameBuffer->Bind();
+			GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
+			GL::Clear(true, false);
 
-		// Render skybox
-		if (!sceneData->gBuffer)
-			Renderer::DrawSkybox();
+			// Don't write or read depth
+			GL::EnableZWriting(false);
+			GL::EnableZTesting(false);
 
-		hdrFrameBuffer->Unbind();
+			// Directional lights + ambient
+			RenderDirectionalLights(sceneData);
+
+			// Render additional lights with additive blend mode
+			GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, true);
+			// TODO: Implement GL_GEQUAL with z-testing
+			// GL::enableZTesting(true);
+
+			// Point lights
+			RenderPointLights(sceneData);
+
+			// Spot lights
+			RenderSpotLights(sceneData);
+
+			// Disable blending
+			GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
+			GL::EnableZTesting(true);
+
+			// Render skybox
+			if (!sceneData->gBuffer)
+				Renderer::DrawSkybox();
+
+			hdrFrameBuffer->Unbind();
+		}
 
 		return true;
 	}
@@ -196,7 +215,7 @@ namespace Mahakam
 		}
 	}
 
-	void LightingRenderPass::RenderDirectionalShadows(SceneData* sceneData)
+	void LightingRenderPass::RenderDirectionalShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -206,12 +225,6 @@ namespace Mahakam
 			// Choose size and offset of shadow texture
 			constexpr uint32_t size = 2048;
 			constexpr uint32_t ratio = shadowMapSize / size;
-
-			// Setup and bind default shadow shader
-			uint64_t lastShaderID = ~0;
-			uint64_t lastMaterialID = ~0;
-			uint64_t lastMeshID = ~0;
-			shadowShader->Bind("SHADOW");
 
 			for (uint32_t i = 0; i < amount; i++)
 			{
@@ -234,9 +247,6 @@ namespace Mahakam
 				uint32_t x = shadowMapOffset.x;
 				uint32_t y = shadowMapOffset.y;
 
-				/*uint32_t x = shadowOffset % ratio;
-				uint32_t y = shadowOffset / ratio;*/
-
 				GL::SetViewport(x, y, size, size);
 
 				light.offset = { x, y, 1.0f / (float)ratio, light.offset.w };
@@ -254,21 +264,16 @@ namespace Mahakam
 
 				shadowMapOffset.x += size;
 
-				//shadowOffset++;
-
 				// Render all objects in queue
-				RenderShadowGeometry(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
+				RenderShadowGeometry(sceneData, lastShaderID, lastMaterialID, lastMeshID);
 			}
 
 			shadowMapMargin.x = shadowMapOffset.x;
 			shadowMapMargin.y = shadowMapOffset.y + size;
-
-			/*shadowMapOffset.x = 0;
-			shadowMapOffset.y += shadowMaxSize;*/
 		}
 	}
 
-	void LightingRenderPass::RenderSpotShadows(SceneData* sceneData)
+	void LightingRenderPass::RenderSpotShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -278,12 +283,6 @@ namespace Mahakam
 			// Choose size and offset of shadow texture
 			constexpr uint32_t size = 512;
 			constexpr uint32_t ratio = shadowMapSize / size;
-
-			// Setup and bind default shadow shader
-			uint64_t lastShaderID = ~0;
-			uint64_t lastMaterialID = ~0;
-			uint64_t lastMeshID = ~0;
-			shadowShader->Bind("SHADOW");
 
 			for (uint32_t i = 0; i < amount; i++)
 			{
@@ -317,7 +316,7 @@ namespace Mahakam
 				shadowMapOffset.x += size;
 
 				// Render all objects in queue
-				RenderShadowGeometry(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
+				RenderShadowGeometry(sceneData, lastShaderID, lastMaterialID, lastMeshID);
 			}
 		}
 	}
