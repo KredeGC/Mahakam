@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "LightingRenderPass.h"
 
+#include "Mahakam/Core/Frustum.h"
+
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Renderer.h"
 
@@ -71,6 +73,9 @@ namespace Mahakam
 			return false;
 		}
 
+		// Create view projection frustum
+		Frustum cameraFrustum(sceneData->cameraData.u_m4_VP);
+
 		// Render shadow maps
 		{
 			MH_PROFILE_RENDERING_SCOPE("Mahakam::LightingRenderPass::Render - Shadow maps");
@@ -79,8 +84,6 @@ namespace Mahakam
 			shadowMapMargin = { 0.0f, 0.0f };
 
 			shadowFramebuffer->Bind();
-
-			GL::Clear(false, true);
 
 			// Setup and bind shadow shader
 			uint64_t lastShaderID = ~0;
@@ -92,7 +95,7 @@ namespace Mahakam
 			RenderDirectionalShadows(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
 
 			// Spot shadows
-			RenderSpotShadows(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
+			RenderSpotShadows(sceneData, cameraFrustum, &lastShaderID, &lastMaterialID, &lastMeshID);
 
 			shadowFramebuffer->Unbind();
 		}
@@ -122,6 +125,8 @@ namespace Mahakam
 		// Render lights to final buffer
 		{
 			MH_PROFILE_RENDERING_SCOPE("Mahakam::LightingRenderPass::Render - Deferred lighting");
+
+			GL::SetViewport(0, 0, hdrFrameBuffer->GetSpecification().width, hdrFrameBuffer->GetSpecification().height);
 
 			// Blit depth buffer from gBuffer
 			src->Blit(hdrFrameBuffer, false, true);
@@ -163,8 +168,62 @@ namespace Mahakam
 		return true;
 	}
 
-	void LightingRenderPass::RenderShadowGeometry(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
+	uint64_t LightingRenderPass::PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum)
 	{
+		MH_PROFILE_FUNCTION();
+
+		uint64_t hash = 2166136261ULL;
+
+		for (uint64_t drawID : sceneData->renderQueue)
+		{
+			// Choose a shader
+			const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
+			Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+
+			// Choose a material
+			const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
+			Ref<Material>& material = sceneData->materialIDLookup[materialID];
+
+			// Choose a mesh
+			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
+			Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+
+			// Choose a transform
+			const uint64_t transformID = drawID & 0xFFFFULL;
+			glm::mat4& transform = sceneData->transformIDLookup[transformID];
+
+			// Perform AABB test
+			Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
+
+			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
+			{
+				const unsigned char* shaderBytes = reinterpret_cast<const unsigned char*>(shader.get());
+				for (uint64_t i = 0; i < sizeof(Material); ++i)
+					hash = (hash * 16777619ULL) ^ shaderBytes[i];
+
+				const unsigned char* materialBytes = reinterpret_cast<const unsigned char*>(material.get());
+				for (uint64_t i = 0; i < sizeof(Material); ++i)
+					hash = (hash * 16777619ULL) ^ materialBytes[i];
+
+				const unsigned char* meshBytes = reinterpret_cast<const unsigned char*>(mesh.get());
+				for (uint64_t i = 0; i < sizeof(Mesh); ++i)
+					hash = (hash * 16777619ULL) ^ meshBytes[i];
+
+				const unsigned char* transformBytes = reinterpret_cast<const unsigned char*>(&transform);
+				for (uint64_t i = 0; i < sizeof(glm::mat4); ++i)
+					hash = (hash * 16777619ULL) ^ transformBytes[i];
+			}
+		}
+
+		return hash;
+	}
+
+	void LightingRenderPass::RenderShadowGeometry(SceneData* sceneData, const Frustum& frustum, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
+	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
+		GL::Clear(false, true);
+
 		for (uint64_t drawID : sceneData->renderQueue)
 		{
 			// Choose a shader
@@ -206,12 +265,18 @@ namespace Mahakam
 			const uint64_t transformID = drawID & 0xFFFFULL;
 			glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
-			// Render to depth map
-			material->SetTransform(transform);
+			// Perform AABB test
+			Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
 
-			Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
+			{
+				// Render to depth map
+				material->SetTransform(transform);
 
-			GL::DrawIndexed(mesh->GetIndexCount());
+				Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+
+				GL::DrawIndexed(mesh->GetIndexCount());
+			}
 		}
 	}
 
@@ -234,6 +299,7 @@ namespace Mahakam
 				if (light.offset.z == 0.0f)
 					continue;
 
+				// Update current shadow map offset
 				if (shadowMapOffset.x + size > shadowMapSize)
 				{
 					shadowMapOffset.y += size;
@@ -244,12 +310,11 @@ namespace Mahakam
 					shadowMapOffset.x = shadowMapMargin.x;
 				}
 
-				uint32_t x = shadowMapOffset.x;
-				uint32_t y = shadowMapOffset.y;
+				glm::ivec2 currentOffset = shadowMapOffset;
 
-				GL::SetViewport(x, y, size, size);
+				shadowMapOffset.x += size;
 
-				light.offset = { x, y, 1.0f / (float)ratio, light.offset.w };
+				light.offset = { currentOffset.x / (ratio * (float)size), currentOffset.y / (ratio * (float)size), 1.0f / (float)ratio, light.offset.w };
 
 				// Avoid edge swimming by snapping to nearest texel
 				float texelSize = 1.0f / (float)size;
@@ -258,14 +323,30 @@ namespace Mahakam
 				light.worldToLight[3][1] -= glm::mod(light.worldToLight[3][1], 2.0f * texelSize);
 				light.worldToLight[3][2] -= glm::mod(light.worldToLight[3][2], 2.0f * texelSize);
 
+				// TODO: Calculate a hash based on objects in frustum
+				Frustum frustum(light.worldToLight);
+
+				uint64_t hash = light.Hash();
+
+				uint64_t frustumHash = PrePassShadowGeometry(sceneData, frustum);
+
+				const unsigned char* p = reinterpret_cast<const unsigned char*>(&frustumHash);
+				for (uint64_t i = 0; i < sizeof(uint64_t); ++i)
+					hash = (hash * 16777619ULL) ^ p[i];
+
+				auto& iter = lightHashes.find(currentOffset);
+				if (iter != lightHashes.end() && iter->second == hash) // If the hashes match, skip rendering
+					continue;
+				lightHashes[currentOffset] = hash;
+
 				// Bind worldToLight matrix
 				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 				shadowMatrixBuffer->Bind(1);
 
-				shadowMapOffset.x += size;
-
 				// Render all objects in queue
-				RenderShadowGeometry(sceneData, lastShaderID, lastMaterialID, lastMeshID);
+				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
+
+				RenderShadowGeometry(sceneData, frustum, lastShaderID, lastMaterialID, lastMeshID);
 			}
 
 			shadowMapMargin.x = shadowMapOffset.x;
@@ -273,7 +354,7 @@ namespace Mahakam
 		}
 	}
 
-	void LightingRenderPass::RenderSpotShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
+	void LightingRenderPass::RenderSpotShadows(SceneData* sceneData, const Frustum& cameraFrustum, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -292,31 +373,53 @@ namespace Mahakam
 				if (light.offset.z == 0.0f)
 					continue;
 
+				// Perform AABB test
+				Mesh::Bounds transformedBounds = Mesh::TransformBounds(GL::GetInvertedPyramid()->GetBounds(), light.objectToWorld);
+
+				if (!cameraFrustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
+					continue;
+
+				// Update current shadow map offset
 				if (shadowMapOffset.x + size > shadowMapSize)
 				{
 					shadowMapOffset.y += size;
 
-					if (shadowMapOffset.y >= shadowMapMargin.y)
+					if (shadowMapOffset.y > shadowMapMargin.y)
 						shadowMapMargin.x = 0;
 
 					shadowMapOffset.x = shadowMapMargin.x;
 				}
 
-				uint32_t x = shadowMapOffset.x;
-				uint32_t y = shadowMapOffset.y;
+				glm::ivec2 currentOffset = shadowMapOffset;
 
-				GL::SetViewport(x, y, size, size);
+				shadowMapOffset.x += size;
 
-				light.offset = { x / (ratio * (float)size), y / (ratio * (float)size), 1.0f / (float)ratio, light.offset.w };
+				light.offset = { currentOffset.x / (ratio * (float)size), currentOffset.y / (ratio * (float)size), 1.0f / (float)ratio, light.offset.w };
+
+				// TODO: Calculate a hash based on objects in frustum
+				Frustum frustum(light.worldToLight);
+
+				uint64_t hash = light.Hash();
+
+				uint64_t frustumHash = PrePassShadowGeometry(sceneData, frustum);
+
+				const unsigned char* p = reinterpret_cast<const unsigned char*>(&frustumHash);
+				for (uint64_t i = 0; i < sizeof(uint64_t); ++i)
+					hash = (hash * 16777619ULL) ^ p[i];
+
+				auto& iter = lightHashes.find(currentOffset);
+				if (iter != lightHashes.end() && iter->second == hash) // If the hashes match, skip rendering
+					continue;
+				lightHashes[currentOffset] = hash;
 
 				// Bind worldToLight matrix
 				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 				shadowMatrixBuffer->Bind(1);
 
-				shadowMapOffset.x += size;
-
 				// Render all objects in queue
-				RenderShadowGeometry(sceneData, lastShaderID, lastMaterialID, lastMeshID);
+				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
+
+				RenderShadowGeometry(sceneData, frustum, lastShaderID, lastMaterialID, lastMeshID);
 			}
 		}
 	}

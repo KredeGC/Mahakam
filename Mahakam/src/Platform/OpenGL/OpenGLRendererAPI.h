@@ -8,10 +8,13 @@ namespace Mahakam
 {
 	class OpenGLRendererAPI : public RendererAPI
 	{
+	private:
+		bool scissorEnabled = false;
+
 	public:
 		virtual void Init() override;
 		virtual const char* GetGraphicsVendor() override;
-		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) override;
+		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor) override;
 
 		virtual void FinishRendering() override;
 

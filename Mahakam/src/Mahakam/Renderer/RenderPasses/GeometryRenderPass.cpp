@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "GeometryRenderPass.h"
 
+#include "Mahakam/Core/Frustum.h"
+
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Renderer.h"
 
@@ -45,6 +47,9 @@ namespace Mahakam
 
 		sceneData->cameraBuffer->Bind(0);
 
+		// Create view projection frustum
+		Frustum frustum(sceneData->cameraData.u_m4_VP);
+
 		// Render all objects in queue
 		uint64_t lastShaderID = ~0;
 		uint64_t lastMaterialID = ~0;
@@ -54,6 +59,7 @@ namespace Mahakam
 			const uint64_t passMask = (drawID >> 62ULL);
 			if (passMask == 0ULL) // Opaque
 			{
+				// Choose a shader
 				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
 				if (shaderID != lastShaderID)
 				{
@@ -64,6 +70,7 @@ namespace Mahakam
 					shader->Bind("GEOMETRY"); // TODO: Some way of doing keyword support. Maybe baked into the ID?
 				}
 
+				// Choose a material
 				const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
 				Ref<Material>& material = sceneData->materialIDLookup[materialID];
 				if (materialID != lastMaterialID)
@@ -72,6 +79,7 @@ namespace Mahakam
 					material->Bind();
 				}
 
+				// Choose a mesh
 				const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
 				Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
 				if (meshID != lastMeshID)
@@ -80,14 +88,21 @@ namespace Mahakam
 					mesh->Bind();
 				}
 
+				// Choose a transform
 				const uint64_t transformID = drawID & 0xFFFFULL;
 				glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
-				material->SetTransform(transform);
+				// Perform AABB test
+				Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
 
-				Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+				if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
+				{
+					material->SetTransform(transform);
 
-				GL::DrawIndexed(mesh->GetIndexCount());
+					Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+
+					GL::DrawIndexed(mesh->GetIndexCount());
+				}
 			}
 		}
 

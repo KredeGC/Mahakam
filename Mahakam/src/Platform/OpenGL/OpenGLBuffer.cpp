@@ -35,8 +35,6 @@ namespace Mahakam
 
 	void OpenGLUniformBuffer::SetData(const void* data, uint32_t offset, uint32_t size)
 	{
-		MH_PROFILE_FUNCTION();
-
 		MH_GL_CALL(glNamedBufferSubData(rendererID, offset, size, data));
 
 		/*glBindBuffer(GL_UNIFORM_BUFFER, rendererID);
@@ -85,8 +83,6 @@ namespace Mahakam
 	
 	void OpenGLStorageBuffer::SetData(const void* data, uint32_t offset, uint32_t size)
 	{
-		MH_PROFILE_FUNCTION();
-
 		MH_GL_CALL(glNamedBufferSubData(rendererID, offset, size, data));
 
 		/*void* ptr = glMapNamedBufferRange(rendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);

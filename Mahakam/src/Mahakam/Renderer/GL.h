@@ -30,7 +30,7 @@ namespace Mahakam
 
 		inline static const char* GetGraphicsVendor() { return rendererAPI->GetGraphicsVendor(); }
 
-		inline static void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h) { rendererAPI->SetViewport(x, y, w, h); }
+		inline static void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor = false) { rendererAPI->SetViewport(x, y, w, h, scissor); }
 
 		inline static void FinishRendering() { rendererAPI->FinishRendering(); }
 

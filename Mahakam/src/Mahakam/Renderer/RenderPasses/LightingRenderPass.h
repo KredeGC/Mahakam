@@ -2,10 +2,13 @@
 
 #include "RenderPass.h"
 
+#include <glm/gtx/hash.hpp>
 #include <robin_hood.h>
 
 namespace Mahakam
 {
+	class Frustum;
+
 	class LightingRenderPass : public RenderPass
 	{
 	private:
@@ -21,7 +24,7 @@ namespace Mahakam
 
 		Ref<UniformBuffer> shadowMatrixBuffer = nullptr;
 
-		robin_hood::unordered_map<uint64_t, DirectionalLight> lightHashes;
+		robin_hood::unordered_map<glm::ivec2, uint64_t> lightHashes;
 
 		glm::ivec2 shadowMapOffset = { 0.0f, 0.0f };
 		glm::ivec2 shadowMapMargin = { 0.0f, 0.0f };
@@ -38,10 +41,11 @@ namespace Mahakam
 		virtual Ref<FrameBuffer> GetFrameBuffer() { return hdrFrameBuffer; }
 
 	private:
-		void RenderShadowGeometry(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
+		uint64_t PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum);
+		void RenderShadowGeometry(SceneData* sceneData, const Frustum& frustum, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 
 		void RenderDirectionalShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
-		void RenderSpotShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
+		void RenderSpotShadows(SceneData* sceneData, const Frustum& cameraFrustum, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 
 		void RenderDirectionalLights(SceneData* sceneData);
 		void RenderPointLights(SceneData* sceneData);

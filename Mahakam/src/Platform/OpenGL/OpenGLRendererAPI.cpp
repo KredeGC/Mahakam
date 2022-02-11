@@ -59,9 +59,21 @@ namespace Mahakam
 		return (const char*)glGetString(GL_RENDERER);
 	}
 
-	void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+	void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor)
 	{
 		MH_GL_CALL(glViewport(x, y, w, h));
+
+		if (scissor != scissorEnabled)
+		{
+			scissorEnabled = scissor;
+			if (scissor)
+				glEnable(GL_SCISSOR_TEST);
+			else
+				glDisable(GL_SCISSOR_TEST);
+		}
+
+		if (scissor)
+			glScissor(x, y, w, h);
 	}
 
 	void OpenGLRendererAPI::FinishRendering()

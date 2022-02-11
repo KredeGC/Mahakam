@@ -2,6 +2,8 @@
 
 #include "Mahakam/Renderer/Camera.h"
 
+#include "Mahakam/Renderer/RenderPasses.h"
+
 namespace Mahakam
 {
 	struct TransformComponent;

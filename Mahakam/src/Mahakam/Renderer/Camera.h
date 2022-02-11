@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RenderPasses.h"
+#include "RenderPasses/RenderPass.h"
 
 #include <glm/glm.hpp>
 

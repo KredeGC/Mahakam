@@ -102,6 +102,7 @@ namespace Mahakam
 		virtual uint32_t GetIndexCount() const = 0;
 
 		static Bounds CalculateBounds(const glm::vec3* positions, uint32_t vertexCount);
+		static Bounds TransformBounds(const Bounds& bounds, const glm::mat4& transform);
 
 		static Ref<Mesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
 

@@ -39,6 +39,8 @@ namespace Mahakam
 
 	public:
 		DirectionalLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);
+
+		uint64_t Hash();
 	};
 
 	struct PointLight
@@ -49,6 +51,8 @@ namespace Mahakam
 
 	public:
 		PointLight(const glm::vec3& position, const Light& light);
+
+		uint64_t Hash();
 	};
 
 	struct SpotLight
@@ -61,6 +65,8 @@ namespace Mahakam
 
 	public:
 		SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);
+
+		uint64_t Hash();
 	};
 
 	struct EnvironmentData

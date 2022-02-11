@@ -17,9 +17,33 @@ namespace Mahakam
 		offset.w = light.GetBias();
 	}
 
+	uint64_t DirectionalLight::Hash()
+	{
+		const unsigned char* p = reinterpret_cast<const unsigned char*>(this);
+		uint64_t h = 2166136261ULL;
+
+		for (uint64_t i = 0; i < sizeof(DirectionalLight); ++i)
+			h = (h * 16777619ULL) ^ p[i];
+
+		return h;
+	}
+
+
 	PointLight::PointLight(const glm::vec3& position, const Light& light) :
 		position(glm::vec4(position, light.GetRange())),
 		color(light.GetColor(), 1.0f / (light.GetRange() * light.GetRange())) {}
+
+	uint64_t PointLight::Hash()
+	{
+		const unsigned char* p = reinterpret_cast<const unsigned char*>(this);
+		uint64_t h = 2166136261ULL;
+
+		for (uint64_t i = 0; i < sizeof(PointLight); ++i)
+			h = (h * 16777619ULL) ^ p[i];
+
+		return h;
+	}
+
 
 	SpotLight::SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light) :
 		worldToLight(glm::perspective(light.GetFov(), 1.0f, 0.001f, light.GetRange()) * glm::inverse(glm::translate(glm::mat4(1.0f), position) * glm::mat4(rotation))),
@@ -32,6 +56,17 @@ namespace Mahakam
 
 		offset.z = light.IsShadowCasting();
 		offset.w = light.GetBias();
+	}
+
+	uint64_t SpotLight::Hash()
+	{
+		const unsigned char* p = reinterpret_cast<const unsigned char*>(this);
+		uint64_t h = 2166136261ULL;
+
+		for (uint64_t i = 0; i < sizeof(SpotLight); ++i)
+			h = (h * 16777619ULL) ^ p[i];
+
+		return h;
 	}
 
 	CameraData::CameraData(const Camera& camera, const glm::mat4& transform) :

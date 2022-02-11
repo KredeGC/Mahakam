@@ -54,6 +54,22 @@ namespace Mahakam
 		return { min, max };
 	}
 
+	Mesh::Bounds Mesh::TransformBounds(const Bounds& bounds, const glm::mat4& transform)
+	{
+		glm::vec3 positions[8] = {
+			glm::vec3{ transform * glm::vec4{ bounds.positions[0], 1.0f } },
+			glm::vec3{ transform * glm::vec4{ bounds.positions[1], 1.0f } },
+			glm::vec3{ transform * glm::vec4{ bounds.positions[2], 1.0f } },
+			glm::vec3{ transform * glm::vec4{ bounds.positions[3], 1.0f } },
+			glm::vec3{ transform * glm::vec4{ bounds.positions[4], 1.0f } },
+			glm::vec3{ transform * glm::vec4{ bounds.positions[5], 1.0f } },
+			glm::vec3{ transform * glm::vec4{ bounds.positions[6], 1.0f } },
+			glm::vec3{ transform * glm::vec4{ bounds.positions[7], 1.0f } }
+		};
+
+		return Mesh::CalculateBounds(positions, 8);
+	}
+
 	Ref<Mesh> Mesh::Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	{
 		switch (RendererAPI::GetAPI())
