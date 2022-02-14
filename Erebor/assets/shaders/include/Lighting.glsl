@@ -72,6 +72,60 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
     return homogenousLocation.xyz / homogenousLocation.w;
 }
 
+// vec3 depthToViewSpace(vec2 uv, float depth) {
+//     vec4 clipSpaceLocation;
+//     clipSpaceLocation.xy = uv * 2.0 - 1.0;
+//     clipSpaceLocation.z = depth * 2.0 - 1.0;
+//     clipSpaceLocation.w = 1.0;
+//     vec4 homogenousLocation = MATRIX_IP * clipSpaceLocation;
+//     return homogenousLocation.xyz / homogenousLocation.w;
+// }
+
+// #if defined(DIRECTIONAL)
+//     vec2 RaymarchReflections(vec2 startUV, float viewspaceDepth, vec3 viewDir, vec3 worldNormal) {
+//         const vec3 reflDir = normalize(reflect(viewDir, worldNormal));
+        
+//         vec4 reflClipDir = MATRIX_VP * reflDir;
+//         reflClipDir.xyz / reflClipDir.w;
+//         vec2 endUV = reflClipDir.xy * 0.5 + 0.5;
+        
+//         const vec2 textureSize = textureSize(u_GBuffer0, 0);
+//         const vec2 texelSize = 1.0 / textureSize;
+        
+//         startUV *= textureSize;
+//         endUV *= textureSize;
+        
+//         const float deltaX = endUV.x - startUV.x;
+//         const float deltaY = endUV.y - startUV.y;
+        
+//         const float scaleX = sqrt(1.0 + pow(deltaY / deltaX, 2.0));
+//         const float scaleY = sqrt(1.0 + pow(deltaX / deltaY, 2.0));
+        
+//         const vec2 stepX = deltaX > 0.0 ? vec2(1.0, 0.0) : vec2(-1.0, 0.0);
+//         const vec2 stepY = deltaY > 0.0 ? vec2(0.0, 1.0) : vec2(0.0, -1.0);
+        
+//         vec2 deltaUV = startUV;
+//         vec3 pos = depthToViewSpace(startUV * texelSize, viewspaceDepth);
+        
+//         for (int i = 0; i < 50; i++) {
+//             float useX = xPos < yPos ? 1.0 : 0.0;
+            
+//             deltaUV += mix(stepX * scaleX, stepY * scaleY, useX);
+            
+//             pos += reflClipDir;
+            
+//             vec2 uv = pos.xy;
+            
+//             float testDepth = texture(u_Depth, uv).r;
+//             //vec3 worldPos = depthToViewSpace(uv, depth);
+            
+//             if (depth < 0.0) {
+                
+//             }
+//         }
+//     }
+// #endif
+
 
 #if defined(DIRECTIONAL) || defined(SPOT)
     float SampleShadowMap(vec2 projCoords, float depth) {

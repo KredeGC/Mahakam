@@ -178,22 +178,22 @@ namespace Mahakam
 		{
 			// Choose a shader
 			const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
-			Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+			const Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
 
 			// Choose a material
 			const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-			Ref<Material>& material = sceneData->materialIDLookup[materialID];
+			const Ref<Material>& material = sceneData->materialIDLookup[materialID];
 
 			// Choose a mesh
 			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-			Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+			const Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
 
 			// Choose a transform
 			const uint64_t transformID = drawID & 0xFFFFULL;
-			glm::mat4& transform = sceneData->transformIDLookup[transformID];
+			const glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
 			// Perform AABB test
-			Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
+			const Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
 
 			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
 			{
@@ -299,6 +299,7 @@ namespace Mahakam
 			// Choose size and offset of shadow texture
 			constexpr uint32_t size = 2048;
 			constexpr uint32_t ratio = shadowMapSize / size;
+			constexpr float texelSize = 2.0f / (float)size;
 
 			for (uint32_t i = 0; i < amount; i++)
 			{
@@ -319,18 +320,16 @@ namespace Mahakam
 					shadowMapOffset.x = shadowMapMargin.x;
 				}
 
-				glm::ivec2 currentOffset = shadowMapOffset;
+				const glm::ivec2 currentOffset = shadowMapOffset;
 
 				shadowMapOffset.x += size;
 
 				light.offset = { currentOffset.x / (ratio * (float)size), currentOffset.y / (ratio * (float)size), 1.0f / (float)ratio, light.offset.w };
 
 				// Avoid edge swimming by snapping to nearest texel
-				float texelSize = 1.0f / (float)size;
-
-				light.worldToLight[3][0] -= glm::mod(light.worldToLight[3][0], 2.0f * texelSize);
-				light.worldToLight[3][1] -= glm::mod(light.worldToLight[3][1], 2.0f * texelSize);
-				light.worldToLight[3][2] -= glm::mod(light.worldToLight[3][2], 2.0f * texelSize);
+				light.worldToLight[3][0] -= glm::mod(light.worldToLight[3][0], texelSize);
+				light.worldToLight[3][1] -= glm::mod(light.worldToLight[3][1], texelSize);
+				light.worldToLight[3][2] -= glm::mod(light.worldToLight[3][2], texelSize);
 
 				// Calculate hash
 				Frustum frustum(light.worldToLight);
@@ -398,7 +397,7 @@ namespace Mahakam
 					shadowMapOffset.x = shadowMapMargin.x;
 				}
 
-				glm::ivec2 currentOffset = shadowMapOffset;
+				const glm::ivec2 currentOffset = shadowMapOffset;
 
 				shadowMapOffset.x += size;
 

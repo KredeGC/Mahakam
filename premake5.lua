@@ -111,8 +111,7 @@ project "Mahakam"
         "glad",
         "ImGui",
         "assimp",
-        "yaml-cpp",
-        "opengl32.lib"
+        "yaml-cpp"
     }
 
     defines {
@@ -124,8 +123,18 @@ project "Mahakam"
         systemversion "latest"
         
         defines {
-            "MH_PLATFORM_WINDOWS",
-            "GLFW_INCLUDE_NONE"
+            "MH_PLATFORM_WINDOWS"
+        }
+        
+        links {
+            "opengl32.lib"
+        }
+
+    filter "system:linux"
+        systemversion "latest"
+        
+        defines {
+            "MH_PLATFORM_LINUX"
         }
     
     filter "configurations:Debug"
@@ -177,6 +186,7 @@ project "Erebor"
         "%{IncludeDir.entt}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.imgui}",
+        "%{IncludeDir.robin_hood}",
         "%{IncludeDir.glm}"
     }
 
@@ -185,7 +195,8 @@ project "Erebor"
     }
 
     defines {
-        "_CRT_SECURE_NO_WARNINGS"
+        "_CRT_SECURE_NO_WARNINGS",
+		"GLFW_INCLUDE_NONE"
     }
 
     filter "system:windows"
@@ -193,6 +204,13 @@ project "Erebor"
         
         defines {
             "MH_PLATFORM_WINDOWS"
+        }
+
+    filter "system:linux"
+        systemversion "latest"
+        
+        defines {
+            "MH_PLATFORM_LINUX"
         }
 
     filter "configurations:Debug"

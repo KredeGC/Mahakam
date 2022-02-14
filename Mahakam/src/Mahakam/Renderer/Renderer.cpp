@@ -113,37 +113,24 @@ namespace Mahakam
 			rendererData->unlitMaterial->BindShader("GEOMETRY");
 			rendererData->unlitMaterial->Bind();
 
+			auto wireMesh = GL::GetCube();
+			wireMesh->Bind();
+
 			for (uint64_t drawID : sceneData->renderQueue)
 			{
 				const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
 				Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
 
 				const uint64_t transformID = drawID & 0xFFFFULL;
-				glm::mat4& transform = sceneData->transformIDLookup[transformID];
+				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
-				auto& bounds = mesh->GetBounds();
+				const Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
 
-				glm::vec3 positions[8] = {
-					glm::vec3{ transform * glm::vec4{ bounds.positions[0], 1.0f } },
-					glm::vec3{ transform * glm::vec4{ bounds.positions[1], 1.0f } },
-					glm::vec3{ transform * glm::vec4{ bounds.positions[2], 1.0f } },
-					glm::vec3{ transform * glm::vec4{ bounds.positions[3], 1.0f } },
-					glm::vec3{ transform * glm::vec4{ bounds.positions[4], 1.0f } },
-					glm::vec3{ transform * glm::vec4{ bounds.positions[5], 1.0f } },
-					glm::vec3{ transform * glm::vec4{ bounds.positions[6], 1.0f } },
-					glm::vec3{ transform * glm::vec4{ bounds.positions[7], 1.0f } }
-				};
+				const glm::vec3 scale = transformedBounds.max - transformedBounds.min;
+				const glm::vec3 center = transformedBounds.min + scale / 2.0f;
 
-				Mesh::Bounds transformedBounds = Mesh::CalculateBounds(positions, 8);
-
-				glm::vec3 scale = transformedBounds.max - transformedBounds.min;
-				glm::vec3 center = transformedBounds.min + scale / 2.0f;
-
-				glm::mat4 wireTransform = glm::translate(glm::mat4(1.0f), center)
+				const glm::mat4 wireTransform = glm::translate(glm::mat4(1.0f), center)
 					* glm::scale(glm::mat4(1.0f), scale);
-
-				auto wireMesh = GL::GetCube();
-				wireMesh->Bind();
 
 				rendererData->unlitMaterial->SetTransform(wireTransform);
 
@@ -174,8 +161,6 @@ namespace Mahakam
 
 	void Renderer::Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
 	{
-		// TODO: View frustum culling using the mesh->GetBounds() method
-
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
 		Ref<Shader> shader = material->GetShader();

@@ -9,12 +9,21 @@
 #define MH_ENABLE_RENDER_PROFILING // Enable render profiling in debug builds
 #endif // MH_DEBUG
 
+//#define MH_ENABLE_RENDER_PROFILING // Enable render profiling in all builds
 #define MH_ENABLE_PROFILING // Enable profiling in all builds
 
 
 #ifdef MH_ENABLE_ASSERT
-#define MH_CORE_BREAK(...) { MH_CORE_ERROR("Assertion failed: {0}", __VA_ARGS__); __debugbreak(); }
-#define MH_BREAK(...) { MH_ERROR("Assertion failed: {0}", __VA_ARGS__); __debugbreak(); }
+#if defined(MH_PLATFORM_WINDOWS)
+#define MH_BREAKPOINT() __debugbreak()
+#elif defined(MH_PLATFORM_LINUX)
+#define MH_BREAKPOINT() raise(SIGTRAP)
+#else
+#define MH_BREAKPOINT()
+#endif
+
+#define MH_CORE_BREAK(...) { MH_CORE_ERROR("Assertion failed: {0}", __VA_ARGS__); MH_BREAKPOINT(); }
+#define MH_BREAK(...) { MH_ERROR("Assertion failed: {0}", __VA_ARGS__); MH_BREAKPOINT(); }
 
 #define MH_CORE_ASSERT(x, ...) { if(!(x)) { MH_CORE_BREAK(__VA_ARGS__) } }
 #define MH_ASSERT(x, ...) { if(!(x)) { MH_BREAK(__VA_ARGS__) } }

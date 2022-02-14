@@ -59,44 +59,46 @@ namespace Mahakam
 			const uint16_t passMask = (drawID >> 62ULL);
 			if (passMask == 0ULL) // Opaque
 			{
-				// Choose a shader
-				const uint16_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
-				if (shaderID != lastShaderID)
-				{
-					Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
-					if (!shader->HasShaderPass("GEOMETRY"))
-						continue;
-					lastShaderID = shaderID;
-					shader->Bind("GEOMETRY"); // TODO: Some way of doing keyword support. Maybe baked into the ID?
-				}
-
-				// Choose a material
-				const uint16_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-				Ref<Material>& material = sceneData->materialIDLookup[materialID];
-				if (materialID != lastMaterialID)
-				{
-					lastMaterialID = materialID;
-					material->Bind();
-				}
-
 				// Choose a mesh
 				const uint16_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-				Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
-				if (meshID != lastMeshID)
-				{
-					lastMeshID = meshID;
-					mesh->Bind();
-				}
+				const Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
 
 				// Choose a transform
 				const uint16_t transformID = drawID & 0xFFFFULL;
-				glm::mat4& transform = sceneData->transformIDLookup[transformID];
+				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
 				// Perform AABB test
-				Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
+				const Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
 
 				if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
 				{
+					// Choose a shader
+					const uint16_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
+					if (shaderID != lastShaderID)
+					{
+						const Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+						if (!shader->HasShaderPass("GEOMETRY"))
+							continue;
+						lastShaderID = shaderID;
+						shader->Bind("GEOMETRY"); // TODO: Some way of doing keyword support. Maybe baked into the drawID?
+					}
+
+					// Choose a material
+					const uint16_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
+					const Ref<Material>& material = sceneData->materialIDLookup[materialID];
+					if (materialID != lastMaterialID)
+					{
+						lastMaterialID = materialID;
+						material->Bind();
+					}
+
+					// Choose a mesh
+					if (meshID != lastMeshID)
+					{
+						lastMeshID = meshID;
+						mesh->Bind();
+					}
+
 					material->SetTransform(transform);
 
 					Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());

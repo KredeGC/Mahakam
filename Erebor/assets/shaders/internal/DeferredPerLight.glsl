@@ -119,14 +119,15 @@ void main() {
     #ifdef DEBUG
         #ifdef DIRECTIONAL
             gBuffer0 = texture(u_GBuffer0, screenUV - vec2(1.0, 1.0));
-            gBuffer1 = texture(u_GBuffer1, screenUV - vec2(1.0, 0.0));
+            gBuffer1 = texture(u_GBuffer1, screenUV - vec2(1.0, 0.0)).barg;
             gBuffer2 = texture(u_GBuffer2, screenUV - vec2(0.0, 1.0));
             
             o_Color = vec4(0.0);
             o_Color += screenUV.x > 1.0 && screenUV.y > 1.0 ? gBuffer0 : vec4(0.0);
             o_Color += screenUV.x > 1.0 && screenUV.y < 1.0 ? gBuffer1 : vec4(0.0);
             o_Color += screenUV.x < 1.0 && screenUV.y > 1.0 ? gBuffer2 : vec4(0.0);
-            o_Color += screenUV.x < 1.0 && screenUV.y < 1.0 ? vec4(color, 1.0) : vec4(0.0);
+            //o_Color += screenUV.x < 1.0 && screenUV.y < 1.0 ? vec4(color, 1.0) : vec4(0.0);
+            o_Color += screenUV.x < 1.0 && screenUV.y < 1.0 ? vec4(CalculateShadowAttenuation(lights[0], worldPos, worldNormal)) : vec4(0.0);
         #else
             o_Color = vec4(0.0);
         #endif

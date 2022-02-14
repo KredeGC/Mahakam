@@ -2,7 +2,7 @@
 
 #include "Application.h"
 
-#if defined(MH_PLATFORM_WINDOWS)
+#if defined(MH_PLATFORM_WINDOWS) || defined(MH_PLATFORM_LINUX)
 
 extern Mahakam::Application* Mahakam::CreateApplication();
 

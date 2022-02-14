@@ -8,6 +8,7 @@ Erebor/cache/
 
 Mahakam/vendor/assimp/lib/
 Mahakam/vendor/assimp/generated/
+Mahakam/vendor/assimp/CMakeCache.txt
 
 Mahakam/vendor/assimp/code/assimp.dir/
 Mahakam/vendor/assimp/code/Debug/
@@ -17,8 +18,10 @@ Mahakam/vendor/assimp/contrib/zlib/zlibstatic.dir/
 Mahakam/vendor/assimp/contrib/zlib/Debug/
 Mahakam/vendor/assimp/contrib/zlib/Release/
 
-# Hazel files
+# Mahakam files
 *.log
+*.user
+Makefile
 
 # Visual Studio files and folder
 .vs/
