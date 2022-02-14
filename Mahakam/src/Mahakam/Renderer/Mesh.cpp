@@ -84,7 +84,7 @@ namespace Mahakam
 
 		return nullptr;
 	}
-	
+
 	SkinnedMesh Mesh::LoadModel(const std::string& filepath, const SkinnedMeshProps& props)
 	{
 		// TODO: Use SkinnedMeshProps to determine if we should load textures and create materials, or use the provided materials
@@ -218,6 +218,7 @@ namespace Mahakam
 		glm::vec3* positions = new glm::vec3[vertexCount];
 		glm::vec2* uvs = new glm::vec2[vertexCount];
 		glm::vec3* normals = new glm::vec3[vertexCount];
+		glm::vec3* tangents = new glm::vec3[vertexCount];
 
 		uint32_t* indices = new uint32_t[indexCount];
 
@@ -239,6 +240,7 @@ namespace Mahakam
 				positions[index] = pointOnCube;
 				uvs[index] = percent;
 				normals[index] = { 0.0f, 1.0f, 0.0f };
+				tangents[index] = { -1.0f, 0.0f, 0.0f }; // Positive or negative?
 
 				if (x != rows - 1 && y != columns - 1)
 				{
@@ -262,12 +264,14 @@ namespace Mahakam
 		interleavedVertices.positions = positions;
 		interleavedVertices.texcoords = uvs;
 		interleavedVertices.normals = normals;
+		interleavedVertices.tangents = tangents;
 
 		Ref<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
 		delete[] normals;
+		delete[] tangents;
 		delete[] indices;
 
 		return mesh;

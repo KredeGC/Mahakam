@@ -41,8 +41,8 @@ namespace Mahakam
 		virtual Ref<FrameBuffer> GetFrameBuffer() { return hdrFrameBuffer; }
 
 	private:
-		uint64_t PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum);
-		void RenderShadowGeometry(SceneData* sceneData, const Frustum& frustum, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
+		uint64_t PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum, std::vector<uint64_t>& renderQueue);
+		void RenderShadowGeometry(SceneData* sceneData, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 
 		void RenderDirectionalShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 		void RenderSpotShadows(SceneData* sceneData, const Frustum& cameraFrustum, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);

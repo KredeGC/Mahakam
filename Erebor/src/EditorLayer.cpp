@@ -139,11 +139,11 @@ namespace Mahakam
 
 
 		// Create backpack textures
-		Ref<Texture2D> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
-		Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
-		Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
-		Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
-		Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
+		//Ref<Texture2D> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
+		//Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
+		//Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
+		//Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
+		//Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 
 		//// Create backpack model
 		//SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
@@ -164,7 +164,7 @@ namespace Mahakam
 
 
 		// Setup dancing monke
-		Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
+		/*Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
 		skinnedMaterial->SetTexture("u_Albedo", 0, backpackDiffuse);
 		skinnedMaterial->SetTexture("u_Bump", 0, backpackBump);
 		skinnedMaterial->SetTexture("u_Metallic", 0, backpackMetallic);
@@ -178,7 +178,7 @@ namespace Mahakam
 		animatedEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 1.5f, 5.0f });
 		animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
 		animatedEntity.AddComponent<AnimatorComponent>(animation);
-		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();
+		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();*/
 
 
 		// Create mesh & base material
