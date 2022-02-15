@@ -164,7 +164,7 @@ namespace Mahakam
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
 		Ref<Shader> shader = material->GetShader();
-		auto& shaderIter = sceneData->shaderRefLookup.find(shader);
+		auto shaderIter = sceneData->shaderRefLookup.find(shader);
 		if (shaderIter == sceneData->shaderRefLookup.end())
 		{
 			shaderID = sceneData->shaderRefLookup.size();
@@ -178,7 +178,7 @@ namespace Mahakam
 
 		// Add material if it doesn't exist
 		uint64_t materialID;
-		auto& matIter = sceneData->materialRefLookup.find(material);
+		auto matIter = sceneData->materialRefLookup.find(material);
 		if (matIter == sceneData->materialRefLookup.end())
 		{
 			materialID = sceneData->materialRefLookup.size();
@@ -192,7 +192,7 @@ namespace Mahakam
 
 		// Add mesh if it doesn't exist
 		uint64_t meshID;
-		auto& meshIter = sceneData->meshRefLookup.find(mesh);
+		auto meshIter = sceneData->meshRefLookup.find(mesh);
 		if (meshIter == sceneData->meshRefLookup.end())
 		{
 			meshID = sceneData->meshRefLookup.size();

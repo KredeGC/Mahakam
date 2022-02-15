@@ -16,7 +16,7 @@ namespace Mahakam
 
 	private:
 		const char* name;
-		std::chrono::time_point<std::chrono::steady_clock> startPoint;
+		std::chrono::steady_clock::time_point startPoint;
 		bool stopped;
 		bool flushRenderer;
 		static std::vector<ProfileResult> results;
@@ -26,7 +26,7 @@ namespace Mahakam
 			: name(name), stopped(false), flushRenderer(flushRenderer)
 		{
 #ifdef MH_ENABLE_PROFILING
-			startPoint = std::chrono::high_resolution_clock::now();
+			startPoint = std::chrono::steady_clock::now();
 #endif
 		}
 

@@ -180,6 +180,21 @@ project "Erebor"
         defines {
             "MH_PLATFORM_LINUX"
         }
+        
+        links {
+			"GLFW",
+			"Glad",
+			"ImGui",
+			"Xrandr",
+			"Xi",
+			"GLU",
+			"GL",
+			"X11",
+			"dl",
+			"pthread",
+			"stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
+			"yaml-cpp",
+		}
 
     filter "configurations:Debug"
         defines "MH_DEBUG"

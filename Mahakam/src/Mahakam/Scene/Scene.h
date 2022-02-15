@@ -49,11 +49,11 @@ namespace Mahakam
 		{
 			//static_assert(false);
 		}
-
-		template<>
-		void OnComponentAdded<CameraComponent>(const Entity& entity, CameraComponent& component)
-		{
-			component.GetCamera().SetRatio(viewportRatio);
-		}
 	};
+
+	template<>
+	void Scene::OnComponentAdded<CameraComponent>(const Entity& entity, CameraComponent& component)
+	{
+		component.GetCamera().SetRatio(viewportRatio);
+	}
 }

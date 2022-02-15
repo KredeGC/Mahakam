@@ -22,7 +22,7 @@ namespace Mahakam
 	void Profiler::Stop()
 	{
 #ifdef MH_ENABLE_PROFILING
-		auto endPoint = std::chrono::high_resolution_clock::now();
+		auto endPoint = std::chrono::steady_clock::now();
 
 		AddResult(name, startPoint, endPoint);
 
@@ -33,7 +33,7 @@ namespace Mahakam
 		{
 			GL::FinishRendering();
 
-			auto renderPoint = std::chrono::high_resolution_clock::now();
+			auto renderPoint = std::chrono::steady_clock::now();
 
 			AddResult("Waiting on GPU", endPoint, renderPoint);
 		}

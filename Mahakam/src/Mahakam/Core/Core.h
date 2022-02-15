@@ -17,7 +17,8 @@
 #if defined(MH_PLATFORM_WINDOWS)
 #define MH_BREAKPOINT() __debugbreak()
 #elif defined(MH_PLATFORM_LINUX)
-#define MH_BREAKPOINT() raise(SIGTRAP)
+#include <csignal>
+#define MH_BREAKPOINT() std::raise(SIGTRAP)
 #else
 #define MH_BREAKPOINT()
 #endif

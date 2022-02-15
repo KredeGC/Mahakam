@@ -77,12 +77,12 @@ namespace Mahakam
 
 	void OpenGLShader::Bind(const std::string& shaderPass, const std::string& variant)
 	{
-		auto& passIter = shaderPasses.find(shaderPass);
+		auto passIter = shaderPasses.find(shaderPass);
 		if (passIter != shaderPasses.end())
 		{
 			auto& variants = passIter->second;
 
-			auto& variantIter = variants.find(variant);
+			auto variantIter = variants.find(variant);
 			if (variantIter != variants.end())
 			{
 				rendererID = variantIter->second;
@@ -107,7 +107,7 @@ namespace Mahakam
 
 	bool OpenGLShader::HasShaderPass(const std::string& shaderPass) const
 	{
-		auto& iter = shaderPasses.find(shaderPass);
+		auto iter = shaderPasses.find(shaderPass);
 		if (iter != shaderPasses.end())
 			return true;
 

@@ -33,7 +33,7 @@ namespace Mahakam
 		Hope that was helpful! :)*/
 
 
-		Animator::Animator()
+		Animator()
 			: m_CurrentTime(0.0f)
 		{
 			m_FinalBoneMatrices.reserve(100);
@@ -42,7 +42,7 @@ namespace Mahakam
 				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 		}
 
-		Animator::Animator(Animation* currentAnimation)
+		Animator(Animation* currentAnimation)
 			: m_CurrentTime(0.0f), m_CurrentAnimation(currentAnimation)
 		{
 			m_FinalBoneMatrices.reserve(100);
@@ -51,7 +51,7 @@ namespace Mahakam
 				m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 		}
 
-		void Animator::UpdateAnimation(float dt)
+		void UpdateAnimation(float dt)
 		{
 			m_DeltaTime = dt;
 			if (m_CurrentAnimation)
@@ -62,13 +62,13 @@ namespace Mahakam
 			}
 		}
 
-		void Animator::PlayAnimation(Ref<Animation> animation)
+		void PlayAnimation(Ref<Animation> animation)
 		{
 			m_CurrentAnimation = animation;
 			m_CurrentTime = 0.0f;
 		}
 
-		void Animator::CalculateBoneTransform(const AssimpNodeData* node, const glm::mat4& parentTransform)
+		void CalculateBoneTransform(const AssimpNodeData* node, const glm::mat4& parentTransform)
 		{
 			std::string nodeName = node->name;
 			glm::mat4 nodeTransform = node->transformation;
