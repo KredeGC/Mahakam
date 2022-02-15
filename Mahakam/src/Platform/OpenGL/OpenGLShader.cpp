@@ -11,10 +11,6 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include <shaderc/shaderc.hpp>
-#include <spirv_cross/spirv_cross.hpp>
-#include <spirv_cross/spirv_glsl.hpp>
-
 #include <yaml-cpp/yaml.h>
 
 namespace Mahakam
@@ -29,20 +25,6 @@ namespace Mahakam
 		MH_CORE_ASSERT(false, "Unknown shader type!");
 
 		return 0;
-	}
-
-	static shaderc_shader_kind GLShaderStageToShaderC(GLenum stage)
-	{
-		switch (stage)
-		{
-		case GL_VERTEX_SHADER:
-			return shaderc_glsl_vertex_shader;
-		case GL_FRAGMENT_SHADER:
-			return shaderc_glsl_fragment_shader;
-		}
-
-		MH_CORE_BREAK("Shader stage not supported!");
-		return (shaderc_shader_kind)0;
 	}
 
 	static std::string GLShaderStageToFileExtension(GLenum stage)
@@ -186,133 +168,6 @@ namespace Mahakam
 		int slot = GetUniformLocation(name);
 		if (slot != -1)
 			MH_GL_CALL(glUniform4f(slot, value.x, value.y, value.z, value.w));
-	}
-
-	uint32_t OpenGLShader::CreateProgram(const robin_hood::unordered_map<uint32_t, std::vector<uint32_t>>& sources)
-	{
-		uint32_t program = glCreateProgram();
-
-		std::vector<GLuint> shaderIDs;
-		for (auto&& [stage, spirv] : sources)
-		{
-			uint32_t shaderID = shaderIDs.emplace_back(glCreateShader(stage));
-			MH_GL_CALL(glShaderBinary(1, &shaderID, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t)));
-			MH_GL_CALL(glSpecializeShader(shaderID, "main", 0, nullptr, nullptr));
-			MH_GL_CALL(glAttachShader(program, shaderID));
-		}
-
-		MH_GL_CALL(glLinkProgram(program));
-
-		GLint isLinked;
-		MH_GL_CALL(glGetProgramiv(program, GL_LINK_STATUS, &isLinked));
-		if (isLinked == GL_FALSE)
-		{
-			GLint maxLength;
-			MH_GL_CALL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength));
-
-			std::vector<GLchar> infoLog(maxLength);
-			MH_GL_CALL(glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data()));
-			MH_CORE_ERROR("Shader linking failed {0}", infoLog.data());
-			MH_CORE_BREAK("Error occurred while linking shader");
-
-			MH_GL_CALL(glDeleteProgram(program));
-
-			for (auto id : shaderIDs)
-				MH_GL_CALL(glDeleteShader(id));
-		}
-
-		for (auto id : shaderIDs)
-		{
-			MH_GL_CALL(glDetachShader(program, id));
-			MH_GL_CALL(glDeleteShader(id));
-		}
-
-		// TODO: Reflection
-
-		return program;
-	}
-
-	robin_hood::unordered_map<uint32_t, std::vector<uint32_t>> OpenGLShader::CompileSPIRV(const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives)
-	{
-		robin_hood::unordered_map<uint32_t, std::vector<uint32_t>> compiledShaderStages;
-
-		// Get file-friendly name
-		std::string identifier = directives;
-		size_t start_pos = 0;
-		while ((start_pos = identifier.find(";", start_pos)) != std::string::npos) {
-			identifier.replace(start_pos, 1, "_");
-			start_pos += 1;
-		}
-
-		// Create shader compiler
-		shaderc::Compiler compiler;
-		shaderc::CompileOptions options;
-		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-		options.SetOptimizationLevel(shaderc_optimization_level_performance);
-
-		for (auto& kv : sources)
-		{
-			const std::string filepath = "cache/shaders/" + name + identifier + GLShaderStageToFileExtension(kv.first);
-
-			if (!std::filesystem::exists(filepath))
-			{
-				// Split definitions into the form: "#define X"
-				std::stringstream definitions;
-				if (directives.size() > 0)
-				{
-					std::string delim = ";";
-					size_t start = 0;
-					size_t end = directives.find(delim);
-					while (end != std::string::npos)
-					{
-						definitions << "#define " << directives.substr(start, end - start) << std::endl;
-						start = end + delim.length();
-						end = directives.find(delim, start);
-					}
-
-					definitions << "#define " << directives.substr(start, end) << std::endl;
-				}
-
-				// Get source code with definitions
-				std::string original = SortIncludes(kv.second);
-				size_t firstNewline = original.find("\n") + 1;
-				std::string version = original.substr(0, firstNewline);
-				std::string body = original.substr(firstNewline, original.size());
-				std::string source = version + definitions.str() + body;
-
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, GLShaderStageToShaderC(kv.first), filepath.c_str(), options);
-				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
-				{
-					MH_CORE_ERROR("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, module.GetErrorMessage());
-					MH_CORE_BREAK("Error occurred while compiling shader!");
-				}
-
-				compiledShaderStages[kv.first] = std::vector<uint32_t>(module.cbegin(), module.cend());
-
-				// Write to shader cache
-				std::ofstream out(filepath, std::ios::out | std::ios::binary);
-				if (out.is_open())
-				{
-					auto& data = compiledShaderStages[kv.first];
-					out.write((char*)data.data(), data.size() * sizeof(uint32_t));
-					out.flush();
-					out.close();
-				}
-			}
-			else
-			{
-				std::ifstream in(filepath, std::ios::binary);
-				in.seekg(0, std::ios::end);
-				auto size = in.tellg();
-				in.seekg(0, std::ios::beg);
-
-				auto& data = compiledShaderStages[kv.first];
-				data.resize(size / sizeof(uint32_t));
-				in.read((char*)data.data(), size);
-			}
-		}
-
-		return compiledShaderStages;
 	}
 
 	uint32_t OpenGLShader::CompileBinary(const std::string& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives)

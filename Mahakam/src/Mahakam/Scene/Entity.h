@@ -1,13 +1,13 @@
 #pragma once
 
+#include "Scene.h"
+
 #include "Mahakam/Core/Core.h"
 
 #include <entt/entt.hpp>
 
 namespace Mahakam
 {
-	class Scene;
-
 	class Entity
 	{
 	private:

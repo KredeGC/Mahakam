@@ -22,26 +22,7 @@ IncludeDir["imgui"]         = "Mahakam/vendor/imgui"
 IncludeDir["robin_hood"]    = "Mahakam/vendor/robin_hood"
 IncludeDir["spdlog"]        = "Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"]     = "Mahakam/vendor/stb_image"
-IncludeDir["VulkanSDK"]     = "%{VULKAN_SDK}/Include"
 IncludeDir["yaml"]          = "Mahakam/vendor/yaml-cpp/include"
-
-LinkDir = {}
-LinkDir["VulkanSDK"]    = "%{VULKAN_SDK}/Lib"
-LinkDir["VulkanSDK_Debug"] = "%{wks.location}/Mahakam/vendor/VulkanSDK/Lib"
-LinkDir["VulkanSDK_DebugDLL"] = "%{wks.location}/Mahakam/vendor/VulkanSDK/Bin"
-
-Links = {}
-Links["Vulkan"] = "%{LinkDir.VulkanSDK}/vulkan-1.lib"
-Links["VulkanUtils"] = "%{LinkDir.VulkanSDK}/VkLayer_utils.lib"
-
-Links["ShaderC_Debug"] = "%{LinkDir.VulkanSDK_Debug}/shaderc_sharedd.lib"
-Links["SPIRV_Cross_Debug"] = "%{LinkDir.VulkanSDK_Debug}/spirv-cross-cored.lib"
-Links["SPIRV_Cross_GLSL_Debug"] = "%{LinkDir.VulkanSDK_Debug}/spirv-cross-glsld.lib"
-Links["SPIRV_Tools_Debug"] = "%{LinkDir.VulkanSDK_Debug}/SPIRV-Toolsd.lib"
-
-Links["ShaderC_Release"] = "%{LinkDir.VulkanSDK}/shaderc_shared.lib"
-Links["SPIRV_Cross_Release"] = "%{LinkDir.VulkanSDK}/spirv-cross-core.lib"
-Links["SPIRV_Cross_GLSL_Release"] = "%{LinkDir.VulkanSDK}/spirv-cross-glsl.lib"
 
 group "Dependencies/Assimp"
     os.execute("cmake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
@@ -102,7 +83,6 @@ project "Mahakam"
         "%{IncludeDir.robin_hood}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.stb_image}",
-        "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.yaml}"
     }
     
@@ -142,22 +122,10 @@ project "Mahakam"
         runtime "Debug"
         symbols "on"
         
-        links {
-			"%{Links.ShaderC_Debug}",
-			"%{Links.SPIRV_Cross_Debug}",
-			"%{Links.SPIRV_Cross_GLSL_Debug}"
-		}
-        
     filter "configurations:Release"
         defines "MH_RELEASE"
         runtime "Release"
         optimize "on"
-        
-        links {
-            "%{Links.ShaderC_Release}",
-			"%{Links.SPIRV_Cross_Release}",
-			"%{Links.SPIRV_Cross_GLSL_Release}"
-        }
 
 project "Erebor"
     location "Erebor"

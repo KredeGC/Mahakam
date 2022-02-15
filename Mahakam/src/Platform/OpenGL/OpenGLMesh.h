@@ -38,7 +38,7 @@ namespace Mahakam
 		virtual const Bounds& GetBounds() const override { return bounds; }
 
 		template<typename T>
-		inline const T& GetVertices(int slot) const { return vertices[slot].data; }
+		inline const T& GetVertices(int slot) const { return vertices.at(slot); }
 		inline uint32_t GetVertexCount() const override { return vertexCount; }
 
 		inline const glm::vec3* GetPositions() const override { return (glm::vec3*)vertices.at(0); }

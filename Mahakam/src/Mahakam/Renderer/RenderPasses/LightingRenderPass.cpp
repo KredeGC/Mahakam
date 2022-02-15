@@ -343,7 +343,7 @@ namespace Mahakam
 				for (uint64_t i = 0; i < sizeof(uint64_t); ++i)
 					hash = (hash * 16777619ULL) ^ p[i];
 
-				auto& iter = lightHashes.find(currentOffset);
+				auto iter = lightHashes.find(currentOffset);
 				if (iter != lightHashes.end() && iter->second == hash) // If the hashes match, skip rendering
 					continue;
 				lightHashes[currentOffset] = hash;
@@ -418,7 +418,7 @@ namespace Mahakam
 				for (uint64_t i = 0; i < sizeof(uint64_t); ++i)
 					hash = (hash * 16777619ULL) ^ p[i];
 
-				auto& iter = lightHashes.find(currentOffset);
+				auto iter = lightHashes.find(currentOffset);
 				if (iter != lightHashes.end() && iter->second == hash) // If the hashes match, skip rendering
 					continue;
 				lightHashes[currentOffset] = hash;

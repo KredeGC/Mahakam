@@ -52,11 +52,6 @@ namespace Mahakam
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) override;
 
 	private:
-		// UNUSED
-		uint32_t CreateProgram(const robin_hood::unordered_map<uint32_t, std::vector<uint32_t>>& sources);
-		robin_hood::unordered_map<uint32_t, std::vector<uint32_t>> CompileSPIRV(const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives);
-		// UNUSED
-
 		uint32_t CompileBinary(const std::string& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives);
 
 		void ParseYAMLFile(const std::string& filepath, const std::vector<std::string>& keywords);

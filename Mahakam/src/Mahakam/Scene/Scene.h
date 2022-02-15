@@ -7,12 +7,12 @@
 
 #include "Components/CameraComponent.h"
 
-#include "Entity.h"
-
 #include <entt/entt.hpp>
 
 namespace Mahakam
 {
+	class Entity;
+
 	class Scene
 	{
 	private:
@@ -45,13 +45,13 @@ namespace Mahakam
 
 	private:
 		template<typename T>
-		void OnComponentAdded(Entity entity, T& component)
+		void OnComponentAdded(const Entity& entity, T& component)
 		{
 			//static_assert(false);
 		}
 
 		template<>
-		void OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
+		void OnComponentAdded<CameraComponent>(const Entity& entity, CameraComponent& component)
 		{
 			component.GetCamera().SetRatio(viewportRatio);
 		}

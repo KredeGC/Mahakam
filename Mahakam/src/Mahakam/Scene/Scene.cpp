@@ -6,6 +6,8 @@
 #include "Mahakam/Core/AssetDatabase.h"
 #include "Mahakam/Renderer/Renderer.h"
 
+#include "Entity.h"
+
 #include <fstream>
 #include <filesystem>
 

@@ -172,7 +172,7 @@ namespace Mahakam
 
 	Ref<Texture> OpenGLMaterial::GetTexture(const std::string& name) const
 	{
-		auto& texIter = textures.find(name);
+		auto texIter = textures.find(name);
 		if (texIter != textures.end())
 			return texIter->second;
 
@@ -183,7 +183,7 @@ namespace Mahakam
 
 	const glm::mat3 OpenGLMaterial::GetMat3(const std::string& name) const
 	{
-		auto& matIter = mat3s.find(name);
+		auto matIter = mat3s.find(name);
 		if (matIter != mat3s.end())
 			return matIter->second;
 
@@ -194,7 +194,7 @@ namespace Mahakam
 
 	const glm::mat4 OpenGLMaterial::GetMat4(const std::string& name) const
 	{
-		auto& matIter = mat4s.find(name);
+		auto matIter = mat4s.find(name);
 		if (matIter != mat4s.end())
 			return matIter->second;
 
@@ -205,7 +205,7 @@ namespace Mahakam
 
 	int32_t OpenGLMaterial::GetInt(const std::string& name) const
 	{
-		auto& intIter = ints.find(name);
+		auto intIter = ints.find(name);
 		if (intIter != ints.end())
 			return intIter->second;
 
@@ -216,7 +216,7 @@ namespace Mahakam
 
 	float OpenGLMaterial::GetFloat(const std::string& name) const
 	{
-		auto& floatIter = floats.find(name);
+		auto floatIter = floats.find(name);
 		if (floatIter != floats.end())
 			return floatIter->second;
 
@@ -227,7 +227,7 @@ namespace Mahakam
 
 	const glm::vec2 OpenGLMaterial::GetFloat2(const std::string& name) const
 	{
-		auto& floatIter = float2s.find(name);
+		auto floatIter = float2s.find(name);
 		if (floatIter != float2s.end())
 			return floatIter->second;
 
@@ -238,7 +238,7 @@ namespace Mahakam
 
 	const glm::vec3 OpenGLMaterial::GetFloat3(const std::string& name) const
 	{
-		auto& floatIter = float3s.find(name);
+		auto floatIter = float3s.find(name);
 		if (floatIter != float3s.end())
 			return floatIter->second;
 
@@ -249,7 +249,7 @@ namespace Mahakam
 
 	const glm::vec4 OpenGLMaterial::GetFloat4(const std::string& name) const
 	{
-		auto& floatIter = float4s.find(name);
+		auto floatIter = float4s.find(name);
 		if (floatIter != float4s.end())
 			return floatIter->second;
 

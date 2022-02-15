@@ -219,7 +219,7 @@ namespace Mahakam
 		uint32_t elementSize = ShaderDataTypeSize(BUFFER_ELEMENTS[slot]);
 		uint32_t size = elementSize * vertexCount;
 
-		auto& iter = vertices.find(slot);
+		auto iter = vertices.find(slot);
 		if (iter == vertices.end())
 		{
 			// The buffer doesn't exist
@@ -244,7 +244,7 @@ namespace Mahakam
 		uint32_t sizes[BUFFER_ELEMENTS_SIZE]{ 0 };
 		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
-			auto& iter = vertices.find(i);
+			auto iter = vertices.find(i);
 			if (iter != vertices.end())
 			{
 				totalSize += vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
