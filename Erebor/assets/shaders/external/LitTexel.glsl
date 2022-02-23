@@ -33,6 +33,8 @@ void main() {
 #type fragment
 #version 450 core
 #include "assets/shaders/include/Matrix.glsl"
+#include "assets/shaders/include/Normal.glsl"
+#include "assets/shaders/external/include/Texel.glsl"
 
 struct v2f {
     vec3 v_WorldPos;
@@ -56,56 +58,10 @@ layout(binding = 2, location = 2) uniform sampler2D u_Metallic;
 layout(binding = 3, location = 3) uniform sampler2D u_Roughness;
 layout(binding = 4, location = 4) uniform sampler2D u_Occlussion;
 
-vec3 unpackNormal(vec2 xy) {
-    xy *= 2.0;
-    xy -= 1.0;
-    
-    vec3 n;
-    n.x = xy.x;
-    n.y = xy.y;
-    n.z = 1.0 - clamp(dot(n.xy, n.xy), 0.0, 1.0);
-    return normalize(n);
-}
-
-vec3 snapWorldPos(vec2 originalUV, vec4 texelSize, vec3 originalWorldPos) {
-    // 1.) Calculate how much the texture UV coords need to
-    //     shift to be at the center of the nearest texel.
-    vec2 centerUV = floor(originalUV * texelSize.zw) * texelSize.xy + (texelSize.xy * 0.5);
-    vec2 dUV = (centerUV - originalUV);
-
-    // 2a.) Calculate how much the texture coords vary over fragment space.
-    //      This essentially defines a 2x2 matrix that gets
-    //      texture space (UV) deltas from fragment space (ST) deltas
-    // Note: I call fragment space (S,T) to disambiguate.
-    vec2 dUVdS = dFdx(originalUV);
-    vec2 dUVdT = dFdy(originalUV);
-
-    // 2b.) Invert the fragment from texture matrix
-    mat2 dSTdUV = transpose(mat2(dUVdT[1], -dUVdT[0], -dUVdS[1], dUVdS[0]) * (1.0 / (dUVdS[0] * dUVdT[1] - dUVdT[0] * dUVdS[1])));
-
-
-    // 2c.) Convert the UV delta to a fragment space delta
-    vec2 dST = dSTdUV * dUV;
-    
-    // 3a.) Calculate how much the world coords vary over fragment space.
-    vec3 dXYZdS = dFdx(originalWorldPos);
-    vec3 dXYZdT = dFdy(originalWorldPos);
-
-    // 3b.) Finally, convert our fragment space delta to a world space delta
-    // And be sure to clamp it to SOMETHING in case the derivative calc went insane
-    // Here I clamp it to -1 to 1 unit in unity, which should be orders of magnitude greater
-    // than the size of any texel.
-    vec3 dXYZ = dXYZdS * dST.x + dXYZdT * dST.y;
-
-    dXYZ = clamp(dXYZ, -1.0, 1.0);
-    
-    return dXYZ;
-}
-
 void main() {
     // Surface values
     vec3 albedo = texture(u_Albedo, i.v_UV).rgb;
-    vec3 bump = unpackNormal(texture(u_Bump, i.v_UV).xy);
+    vec3 bump = UnpackNormal(texture(u_Bump, i.v_UV).xy);
     float metallic = texture(u_Metallic, i.v_UV).r;
     float roughness = texture(u_Roughness, i.v_UV).r;
     float ao = texture(u_Occlussion, i.v_UV).r;
@@ -115,8 +71,9 @@ void main() {
     vec3 normal = normalize(tbn * bump);
     
     // Calculate per texel position snap
-    vec4 texelSize = vec4(1.0 / 128.0, 1.0 / 128.0, 128.0, 128.0);
-    vec3 deltaPos = clamp(snapWorldPos(i.v_UV, texelSize, i.v_WorldPos), vec3(-0.5), vec3(0.5)) + 0.5; // Compress to 50 cm
+    vec2 texSize = textureSize(u_Albedo, 0);
+    vec4 texelSize = vec4(1.0 / texSize, texSize);
+    vec3 deltaPos = SnapDeltaPos(i.v_UV, texelSize, i.v_WorldPos) + 0.5; // Compress to 50 cm
     
     o_Albedo = vec4(albedo, ao);
     o_Specular = vec4(0.0, 0.0, metallic, roughness);

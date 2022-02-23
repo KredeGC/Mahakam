@@ -2,4 +2,4 @@ GEOMETRY:
   Defines:
     - GEOMETRY
   Includes:
-    - assets/shaders/Albedo.glsl
+    - assets/shaders/default/LitColor.glsl

@@ -93,9 +93,10 @@ namespace Mahakam
 
 
 		// Setup shaders
-		Ref<Shader> skinnedShader = Shader::Create("assets/shaders/Skinned.yaml");
-		//Ref<Shader> textureShader = Shader::Create("assets/shaders/Albedo.yaml");
-		//Ref<Shader> colorShader = Shader::Create("assets/shaders/LitColor.yaml");
+		//Ref<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.yaml");
+		//Ref<Shader> textureShader = Shader::Create("assets/shaders/default/Albedo.yaml");
+		//Ref<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.yaml");
+		Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/SkinnedTexel.yaml");
 		Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.yaml");
 		Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.yaml");
 
@@ -172,10 +173,10 @@ namespace Mahakam
 
 		// Setup dancing monke
 		/*Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
-		skinnedMaterial->SetTexture("u_Albedo", 0, backpackDiffuse);
-		skinnedMaterial->SetTexture("u_Bump", 0, backpackBump);
-		skinnedMaterial->SetTexture("u_Metallic", 0, backpackMetallic);
-		skinnedMaterial->SetTexture("u_Roughness", 0, backpackRoughness);
+		skinnedMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
+		skinnedMaterial->SetTexture("u_Bump", 0, Texture2D::bump);
+		skinnedMaterial->SetTexture("u_Metallic", 0, Texture2D::black);
+		skinnedMaterial->SetTexture("u_Roughness", 0, brickRoughness);
 
 		SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/Defeated.fbx");
 		Ref<Animation> animation = Animation::load("assets/models/Defeated.fbx", skinnedModel);

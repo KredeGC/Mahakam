@@ -65,6 +65,8 @@ void main() {
 #type fragment
 #version 450 core
 #include "assets/shaders/include/Matrix.glsl"
+#include "assets/shaders/include/Normal.glsl"
+#include "assets/shaders/external/include/Texel.glsl"
 
 #if defined(GEOMETRY)
     struct v2f {
@@ -80,45 +82,37 @@ void main() {
 
 layout(location = 0) out vec4 o_Albedo;
 layout(location = 1) out vec4 o_Specular;
-layout(location = 2) out vec4 o_Pos;
+layout(location = 2) out vec4 o_Emission;
 layout(location = 3) out vec4 o_Normal;
+layout(location = 4) out vec4 o_DeltaPos;
 
 layout(binding = 0, location = 0) uniform sampler2D u_Albedo;
 layout(binding = 1, location = 1) uniform sampler2D u_Bump;
 layout(binding = 2, location = 2) uniform sampler2D u_Metallic;
 layout(binding = 3, location = 3) uniform sampler2D u_Roughness;
 
-vec3 unpackNormal(vec2 xy) {
-    xy *= 2.0;
-    xy -= 1.0;
-    
-    vec3 n;
-    n.x = xy.x;
-    n.y = xy.y;
-    n.z = 1.0 - clamp(dot(n.xy, n.xy), 0.0, 1.0);
-    return normalize(n);
-}
-
 void main() {
 #if defined(GEOMETRY)
     // Surface values
     vec3 albedo = texture(u_Albedo, i.v_UV).rgb;
-    vec3 bump = unpackNormal(texture(u_Bump, i.v_UV).xy);
+    vec3 bump = UnpackNormal(texture(u_Bump, i.v_UV).xy);
     float metallic = texture(u_Metallic, i.v_UV).r;
     float roughness = texture(u_Roughness, i.v_UV).r;
     float ao = 1.0;
-    
-    //albedo = pow(albedo, vec3(2.2)); // sRGB correction
-    
-    //vec3 normal = normalize(i.v_WorldNormal);
     
     mat3 tbn = mat3(normalize(i.v_WorldTangent), normalize(i.v_WorldBinormal), normalize(i.v_WorldNormal));
     
     vec3 normal = normalize(tbn * bump);
     
+    // Calculate per texel position snap
+    vec2 texSize = textureSize(u_Albedo, 0);
+    vec4 texelSize = vec4(1.0 / texSize, texSize);
+    vec3 deltaPos = SnapDeltaPos(i.v_UV, texelSize, i.v_WorldPos) + 0.5; // Compress to 50 cm
+    
     o_Albedo = vec4(albedo, ao);
     o_Specular = vec4(0.0, 0.0, metallic, roughness);
-    o_Pos = vec4(i.v_WorldPos, 1.0);
+    o_Emission = vec4(i.v_WorldPos, 1.0);
     o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
+    o_DeltaPos = vec4(deltaPos, 0.0);
 #endif
 }
