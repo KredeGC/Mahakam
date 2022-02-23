@@ -51,8 +51,10 @@ layout(location = 0) out vec4 o_Color;
 
 layout(binding = 4, location = 4) uniform sampler2D u_GBuffer0;
 layout(binding = 5, location = 5) uniform sampler2D u_GBuffer1;
-layout(binding = 6, location = 6) uniform sampler2D u_GBuffer3;
-layout(binding = 7, location = 7) uniform sampler2D u_Depth;
+layout(binding = 6, location = 6) uniform sampler2D u_GBuffer2;
+layout(binding = 7, location = 7) uniform sampler2D u_GBuffer3;
+layout(binding = 8, location = 8) uniform sampler2D u_GBuffer4;
+layout(binding = 9, location = 9) uniform sampler2D u_Depth;
 
 void main() {
     #if defined(POINT) || defined(SPOT)
@@ -69,6 +71,7 @@ void main() {
     vec4 gBuffer0 = texture(u_GBuffer0, screenUV);
     vec4 gBuffer1 = texture(u_GBuffer1, screenUV);
     vec4 gBuffer3 = texture(u_GBuffer3, screenUV);
+    vec4 gBuffer4 = texture(u_GBuffer4, screenUV);
     float depth = texture(u_Depth, screenUV).r;
     
     // GBuffer0
@@ -84,6 +87,10 @@ void main() {
     
     // Depth Buffer
     vec3 worldPos = depthToWorldSpace(screenUV, depth);
+    
+    // GBuffer4
+    vec3 worldPosOffset = gBuffer4.xyz - 0.5;
+    worldPos += worldPosOffset;
     
     vec3 viewDir = getViewDir(worldPos);
     

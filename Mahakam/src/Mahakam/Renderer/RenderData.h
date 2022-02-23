@@ -108,11 +108,14 @@ namespace Mahakam
 		float padding01 = 0.0f;
 
 	public:
+		glm::vec4 u_ScreenParams;
+
+	public:
 		CameraData() = default;
 
-		CameraData(const Camera& camera, const glm::mat4& transform);
+		CameraData(const Camera& camera, const glm::vec2& screenSize, const glm::mat4& transform);
 
-		CameraData(const glm::mat4& projectionMatrix, const glm::mat4& transform);
+		CameraData(const glm::mat4& projectionMatrix, const glm::vec2& screenSize, const glm::mat4& transform);
 	};
 
 	struct SceneData

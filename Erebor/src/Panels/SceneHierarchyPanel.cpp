@@ -270,7 +270,7 @@ namespace Mahakam
 		DrawComponent<MeshComponent>("Mesh", entity, [](MeshComponent& meshComponent)
 		{
 			auto& meshes = meshComponent.GetMeshes();
-			Ref<Material>& material = meshComponent.GetMaterial();
+			Ref<Material> material = meshComponent.GetMaterial();
 
 			uint32_t vertexCount = 0;
 			uint32_t indexCount = 0;

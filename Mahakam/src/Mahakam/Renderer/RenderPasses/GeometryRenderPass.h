@@ -6,7 +6,7 @@ namespace Mahakam
 {
 	class GeometryRenderPass : public RenderPass
 	{
-	private:
+	protected:
 		Ref<FrameBuffer> gBuffer = nullptr;
 
 	public:

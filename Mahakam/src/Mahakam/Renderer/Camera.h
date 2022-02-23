@@ -33,7 +33,8 @@ namespace Mahakam
 	public:
 		Camera();
 
-		Camera(ProjectionType projection, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f,
+		// TODO: Use Ref and CreateRef with the different RenderPasses
+		Camera(ProjectionType projection, float fov, float nearPlane = 0.03f, float farPlane = 1000.0f,
 			const std::initializer_list<RenderPass*>& renderpasses = {});
 
 		Camera(const glm::mat4& projection, const std::initializer_list<RenderPass*>& renderpasses = {})
@@ -41,9 +42,9 @@ namespace Mahakam
 
 		void RecalculateProjectionMatrix();
 
-		void SetPerspective(float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f);
+		void SetPerspective(float fov, float nearPlane = 0.03f, float farPlane = 1000.0f);
 
-		void SetOrthographic(float size, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f);
+		void SetOrthographic(float size, float nearPlane = 0.03f, float farPlane = 1000.0f);
 
 		void SetRenderPasses(const std::vector<RenderPass*>& renderpasses);
 

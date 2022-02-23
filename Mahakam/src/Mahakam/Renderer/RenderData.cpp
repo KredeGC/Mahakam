@@ -69,21 +69,23 @@ namespace Mahakam
 		return h;
 	}
 
-	CameraData::CameraData(const Camera& camera, const glm::mat4& transform) :
+	CameraData::CameraData(const Camera& camera, const glm::vec2& screenSize, const glm::mat4& transform) :
 		u_m4_V(glm::inverse(transform)),
 		u_m4_P(camera.GetProjectionMatrix()),
 		u_m4_IV(transform),
 		u_m4_IP(glm::inverse(camera.GetProjectionMatrix())),
 		u_m4_VP(u_m4_P * u_m4_V),
 		u_m4_IVP(u_m4_IV * u_m4_IP),
-		u_CameraPos(transform[3]) {}
+		u_CameraPos(transform[3]),
+		u_ScreenParams(screenSize.x, screenSize.y, 1.0f / screenSize.x, 1.0f / screenSize.y) {}
 
-	CameraData::CameraData(const glm::mat4& projectionMatrix, const glm::mat4& transform) :
+	CameraData::CameraData(const glm::mat4& projectionMatrix, const glm::vec2& screenSize, const glm::mat4& transform) :
 		u_m4_V(glm::inverse(transform)),
 		u_m4_P(projectionMatrix),
 		u_m4_IV(transform),
 		u_m4_IP(glm::inverse(projectionMatrix)),
 		u_m4_VP(u_m4_P* u_m4_V),
 		u_m4_IVP(u_m4_IV* u_m4_IP),
-		u_CameraPos(transform[3]) {}
+		u_CameraPos(transform[3]),
+		u_ScreenParams(screenSize.x, screenSize.y, 1.0f / screenSize.x, 1.0f / screenSize.y) {}
 }

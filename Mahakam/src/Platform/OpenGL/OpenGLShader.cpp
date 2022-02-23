@@ -347,7 +347,7 @@ namespace Mahakam
 
 		robin_hood::unordered_map<std::string, std::string> keywordPermutations = ParseShaderKeywords(keywords);
 
-		for each (auto shaderPassNode in rootNode)
+		for (auto shaderPassNode : rootNode)
 		{
 			std::string shaderPassName = shaderPassNode.first.as<std::string>();
 
@@ -368,7 +368,7 @@ namespace Mahakam
 			{
 				// Read and parse source files
 				std::stringstream source;
-				for each (auto includeNode in includesNode)
+				for (auto includeNode : includesNode)
 				{
 					std::string shaderPath = includeNode.as<std::string>();
 

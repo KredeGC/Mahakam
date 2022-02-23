@@ -26,6 +26,7 @@ namespace Mahakam
 		lightingProps.width = width;
 		lightingProps.height = height;
 		lightingProps.colorAttachments = { TextureFormat::RG11B10F };
+		//lightingProps.depthAttachment = { TextureFormat::Depth24 };
 
 		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
 
@@ -77,95 +78,102 @@ namespace Mahakam
 		Frustum cameraFrustum(sceneData->cameraData.u_m4_VP);
 
 		// Render shadow maps
-		{
-			MH_PROFILE_RENDERING_SCOPE("Mahakam::LightingRenderPass::Render - Shadow maps");
-
-			shadowMapOffset = { 0.0f, 0.0f };
-			shadowMapMargin = { 0.0f, 0.0f };
-
-			shadowFramebuffer->Bind();
-
-			// Setup and bind shadow shader
-			uint64_t lastShaderID = ~0;
-			uint64_t lastMaterialID = ~0;
-			uint64_t lastMeshID = ~0;
-			shadowShader->Bind("SHADOW");
-
-			// Directional shadows
-			RenderDirectionalShadows(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
-
-			// Spot shadows
-			RenderSpotShadows(sceneData, cameraFrustum, &lastShaderID, &lastMaterialID, &lastMeshID);
-
-			shadowFramebuffer->Unbind();
-		}
-
+		RenderShadowMaps(sceneData, cameraFrustum);
 
 		// Initialize deferred shader variables
-		{
-			MH_PROFILE_RENDERING_SCOPE("Mahakam::LightingRenderPass::Render - Setup");
-
-			if (sceneData->gBuffer)
-				deferredShader->Bind("DIRECTIONAL", "DEBUG");
-			else
-				deferredShader->Bind("DIRECTIONAL");
-			deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
-			deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
-			deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(3));
-			deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
-
-			deferredShader->SetTexture("u_BRDFLUT", brdfLut);
-			deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
-
-			deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.irradianceMap);
-			deferredShader->SetTexture("u_SpecularMap", sceneData->environment.specularMap);
-		}
-
+		SetupTextures(sceneData, src);
 
 		// Render lights to final buffer
-		{
-			MH_PROFILE_RENDERING_SCOPE("Mahakam::LightingRenderPass::Render - Deferred lighting");
-
-			GL::SetViewport(0, 0, hdrFrameBuffer->GetSpecification().width, hdrFrameBuffer->GetSpecification().height);
-
-			// Blit depth buffer from gBuffer
-			src->Blit(hdrFrameBuffer, false, true);
-
-			// Bind and clear lighting buffer
-			hdrFrameBuffer->Bind();
-			GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
-			GL::Clear(true, false);
-
-			// Don't write or read depth
-			GL::EnableZWriting(false);
-			GL::EnableZTesting(false);
-
-			// Directional lights + ambient
-			RenderDirectionalLights(sceneData);
-
-			// Render additional lights with additive blend mode
-			GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, true);
-			// TODO: Implement GL_GEQUAL with z-testing
-			// GL::enableZTesting(true);
-
-			// Point lights
-			RenderPointLights(sceneData);
-
-			// Spot lights
-			RenderSpotLights(sceneData);
-
-			// Disable blending
-			GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
-			GL::EnableZTesting(true);
-
-			// Render skybox
-			if (!sceneData->gBuffer)
-				Renderer::DrawSkybox();
-
-			hdrFrameBuffer->Unbind();
-		}
+		RenderLighting(sceneData, src);
 
 		return true;
+	}
+
+	void LightingRenderPass::RenderShadowMaps(SceneData* sceneData, const Frustum& frustum)
+	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
+		shadowMapOffset = { 0.0f, 0.0f };
+		shadowMapMargin = { 0.0f, 0.0f };
+
+		shadowFramebuffer->Bind();
+
+		// Setup and bind shadow shader
+		uint64_t lastShaderID = ~0;
+		uint64_t lastMaterialID = ~0;
+		uint64_t lastMeshID = ~0;
+		shadowShader->Bind("SHADOW");
+
+		// Directional shadows
+		RenderDirectionalShadows(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
+
+		// Spot shadows
+		RenderSpotShadows(sceneData, frustum, &lastShaderID, &lastMaterialID, &lastMeshID);
+
+		shadowFramebuffer->Unbind();
+	}
+
+	void LightingRenderPass::SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src)
+	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
+		if (sceneData->gBuffer)
+			deferredShader->Bind("DIRECTIONAL", "DEBUG");
+		else
+			deferredShader->Bind("DIRECTIONAL");
+		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
+		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
+		deferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3));
+		deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
+
+		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
+		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
+
+		deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.irradianceMap);
+		deferredShader->SetTexture("u_SpecularMap", sceneData->environment.specularMap);
+	}
+
+	void LightingRenderPass::RenderLighting(SceneData* sceneData, Ref<FrameBuffer> src)
+	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
+		GL::SetViewport(0, 0, hdrFrameBuffer->GetSpecification().width, hdrFrameBuffer->GetSpecification().height);
+
+		// Blit depth buffer from gBuffer
+		src->Blit(hdrFrameBuffer, false, true);
+
+		// Bind and clear lighting buffer
+		hdrFrameBuffer->Bind();
+		GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
+		GL::Clear(true, false);
+
+		// Don't write or read depth
+		GL::EnableZWriting(false);
+		GL::EnableZTesting(false);
+
+		// Directional lights + ambient
+		RenderDirectionalLights(sceneData);
+
+		// Render additional lights with additive blend mode
+		GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, true);
+		// TODO: Implement GL_GEQUAL with z-testing
+		// GL::enableZTesting(true);
+
+		// Point lights
+		RenderPointLights(sceneData);
+
+		// Spot lights
+		RenderSpotLights(sceneData);
+
+		// Disable blending
+		GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
+		GL::EnableZTesting(true);
+
+		// Render skybox
+		if (!sceneData->gBuffer)
+			Renderer::DrawSkybox();
+
+		hdrFrameBuffer->Unbind();
 	}
 
 	uint64_t LightingRenderPass::PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum, std::vector<uint64_t>& renderQueue)

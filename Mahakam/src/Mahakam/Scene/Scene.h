@@ -52,7 +52,7 @@ namespace Mahakam
 	};
 
 	template<>
-	void Scene::OnComponentAdded<CameraComponent>(const Entity& entity, CameraComponent& component)
+	inline void Scene::OnComponentAdded<CameraComponent>(const Entity& entity, CameraComponent& component)
 	{
 		component.GetCamera().SetRatio(viewportRatio);
 	}

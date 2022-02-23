@@ -11,7 +11,7 @@ namespace Mahakam
 
 	class LightingRenderPass : public RenderPass
 	{
-	private:
+	protected:
 		Ref<Texture> brdfLut = nullptr;
 		Ref<Texture> falloffLut = nullptr;
 		Ref<Texture> spotlightTexture = nullptr;
@@ -40,17 +40,21 @@ namespace Mahakam
 
 		virtual Ref<FrameBuffer> GetFrameBuffer() { return hdrFrameBuffer; }
 
-	private:
-		uint64_t PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum, std::vector<uint64_t>& renderQueue);
-		void RenderShadowGeometry(SceneData* sceneData, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
+	protected:
+		virtual void RenderShadowMaps(SceneData* sceneData, const Frustum& frustum);
+		virtual void SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src);
+		virtual void RenderLighting(SceneData* sceneData, Ref<FrameBuffer> src);
 
-		void RenderDirectionalShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
-		void RenderSpotShadows(SceneData* sceneData, const Frustum& cameraFrustum, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
+		virtual uint64_t PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum, std::vector<uint64_t>& renderQueue);
+		virtual void RenderShadowGeometry(SceneData* sceneData, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 
-		void RenderDirectionalLights(SceneData* sceneData);
-		void RenderPointLights(SceneData* sceneData);
-		void RenderSpotLights(SceneData* sceneData);
+		virtual void RenderDirectionalShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
+		virtual void RenderSpotShadows(SceneData* sceneData, const Frustum& cameraFrustum, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 
-		Ref<Texture> LoadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height);
+		virtual void RenderDirectionalLights(SceneData* sceneData);
+		virtual void RenderPointLights(SceneData* sceneData);
+		virtual void RenderSpotLights(SceneData* sceneData);
+
+		virtual Ref<Texture> LoadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height);
 	};
 }

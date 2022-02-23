@@ -68,7 +68,7 @@ namespace Mahakam
 		sceneData->environment = environment;
 
 		// Setup camera matrices
-		sceneData->cameraData = CameraData(cam, transform);
+		sceneData->cameraData = CameraData(cam, glm::vec2(rendererData->width, rendererData->height), transform);
 
 		sceneData->cameraBuffer->SetData(&sceneData->cameraData, 0, sizeof(CameraData));
 

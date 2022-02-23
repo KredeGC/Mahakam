@@ -19,9 +19,9 @@ namespace Mahakam
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent& camera) = default;
 
-		CameraComponent(Camera::ProjectionType projection, float fov, float ratio, float nearPlane = 0.03f, float farPlane = 1000.0f,
+		CameraComponent(Camera::ProjectionType projection, float fov, float nearPlane = 0.03f, float farPlane = 1000.0f,
 			const std::initializer_list<RenderPass*>& renderpasses = { new GeometryRenderPass(), new LightingRenderPass(), new TonemappingRenderPass() })
-			: camera(projection, fov, ratio, nearPlane, farPlane, renderpasses) {}
+			: camera(projection, fov, nearPlane, farPlane, renderpasses) {}
 
 		operator Camera& () { return camera; }
 		operator const Camera& () const { return camera; }

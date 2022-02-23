@@ -19,7 +19,6 @@ namespace Mahakam
 			TextureFormat::RGBA8, // RG - Unused, B - Metallic, A - Roughness
 			TextureFormat::RG11B10F, // RGB - Emission (not affected by light)
 			TextureFormat::RGB10A2 }; // RGB - World normal, A - Unused
-			//TextureFormat::RG11B10F }; // RGB - World position offset
 		gProps.depthAttachment = TextureFormat::Depth24; // Mutable
 
 		gBuffer = FrameBuffer::Create(gProps);

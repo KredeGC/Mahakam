@@ -1,6 +1,10 @@
 #include "ebpch.h"
 #include "EditorLayer.h"
 
+#include "RenderPasses/TexelGeometryPass.h"
+#include "RenderPasses/TexelLightingPass.h"
+#include "RenderPasses/PixelationPass.h"
+
 #include <fstream>
 #include <filesystem>
 
@@ -90,13 +94,16 @@ namespace Mahakam
 
 		// Setup shaders
 		Ref<Shader> skinnedShader = Shader::Create("assets/shaders/Skinned.yaml");
-		Ref<Shader> textureShader = Shader::Create("assets/shaders/Albedo.yaml");
-		Ref<Shader> colorShader = Shader::Create("assets/shaders/LitColor.yaml");
+		//Ref<Shader> textureShader = Shader::Create("assets/shaders/Albedo.yaml");
+		//Ref<Shader> colorShader = Shader::Create("assets/shaders/LitColor.yaml");
+		Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.yaml");
+		Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.yaml");
 
 
 		// Setup scene camera
-		Entity cameraEntity = activeScene->CreateEntity("Camera");
-		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 1.0f, 0.01f, 100.0f);
+		Entity cameraEntity = activeScene->CreateEntity("Main Camera");
+		//cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
+		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f, std::initializer_list<RenderPass*>{ new TexelGeometryPass(), new TexelLightingPass(), new PixelationPass(), new TonemappingRenderPass() });
 		cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
 		cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 

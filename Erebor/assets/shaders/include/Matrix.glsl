@@ -8,6 +8,7 @@
 #define MATRIX_IP u_m4_IP
 #define MATRIX_VP u_m4_VP
 #define MATRIX_IVP u_m4_IVP
+#define MATRIX_MV MATRIX_V * MATRIX_P
 #define MATRIX_MVP MATRIX_VP * MATRIX_M
 
 // IDEA: Use SSBO with offset etc. Would take up too much space :(
@@ -24,6 +25,8 @@ layout (std140, binding = 0) uniform Matrices {
     mat4 u_m4_IVP;
     
     vec3 u_CameraPos;
+    
+    vec4 u_ScreenParams;
 };
 
 vec3 getViewDir(vec3 worldPos) {

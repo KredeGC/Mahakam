@@ -11,8 +11,8 @@ layout(binding = 0, location = 0) uniform samplerCube u_IrradianceMap;
 layout(binding = 1, location = 1) uniform samplerCube u_SpecularMap;
 layout(binding = 2, location = 2) uniform sampler2D u_BRDFLUT;
 layout(binding = 3, location = 3) uniform sampler2D u_AttenuationLUT;
-layout(binding = 8, location = 8) uniform sampler2D u_LightCookie;
-layout(binding = 9, location = 9) uniform sampler2D u_ShadowMap;
+layout(binding = 10, location = 10) uniform sampler2D u_LightCookie;
+layout(binding = 11, location = 11) uniform sampler2D u_ShadowMap;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {

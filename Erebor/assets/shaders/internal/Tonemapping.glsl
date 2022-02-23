@@ -28,7 +28,7 @@ layout(location = 0) in v2f i;
 
 layout(location = 0) out vec4 o_Color;
 
-layout(binding = 0) uniform sampler2D u_Albedo;
+layout(binding = 0, location = 0) uniform sampler2D u_Albedo;
 
 // Needs gamma correction
 vec3 reinhard(vec3 x) {
