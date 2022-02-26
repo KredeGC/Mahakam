@@ -119,8 +119,10 @@ namespace Mahakam
 		{
 			if (verts[i])
 			{
-				vertices[i] = verts[i];
-				size += vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
+				const uint32_t elementSize = vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
+				vertices[i] = new char[elementSize];
+				memcpy(vertices[i], verts[i], elementSize);
+				size += elementSize;
 			}
 		}
 

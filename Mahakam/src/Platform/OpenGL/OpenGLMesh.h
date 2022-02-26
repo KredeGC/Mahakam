@@ -10,7 +10,7 @@ namespace Mahakam
 		uint32_t rendererID;
 
 		char* interleavedVertices = 0;
-		std::unordered_map<int, void*> vertices;
+		std::unordered_map<int, void*> vertices; // TODO: Find some way to use robin_hood
 
 		uint32_t* indices = 0;
 
@@ -37,15 +37,10 @@ namespace Mahakam
 
 		virtual const Bounds& GetBounds() const override { return bounds; }
 
-		template<typename T>
-		inline const T& GetVertices(int slot) const { return vertices.at(slot); }
 		inline uint32_t GetVertexCount() const override { return vertexCount; }
 
-		inline const glm::vec3* GetPositions() const override { return (glm::vec3*)vertices.at(0); }
-		inline const glm::vec2* GetTexcoords() const override { return (glm::vec2*)vertices.at(1); }
-		inline const glm::vec3* GetNormals() const override { return (glm::vec3*)vertices.at(2); }
-		inline const glm::vec3* GetTangents() const override { return (glm::vec3*)vertices.at(3); }
-		inline const glm::vec4* GetColors() const override { return (glm::vec4*)vertices.at(4); }
+		inline virtual bool HasVertices(int index) const override { return vertices.find(index) != vertices.end(); }
+		inline virtual const void* GetVertices(int index) const override { auto it = vertices.find(index); return it != vertices.end() ? it->second : nullptr; }
 
 		inline const uint32_t* GetIndices() const override { return indices; }
 		inline uint32_t GetIndexCount() const override { return indexCount; }

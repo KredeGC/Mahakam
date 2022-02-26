@@ -92,11 +92,16 @@ namespace Mahakam
 
 		virtual uint32_t GetVertexCount() const = 0;
 
-		virtual const glm::vec3* GetPositions() const = 0;
-		virtual const glm::vec2* GetTexcoords() const = 0;
-		virtual const glm::vec3* GetNormals() const = 0;
-		virtual const glm::vec3* GetTangents() const = 0;
-		virtual const glm::vec4* GetColors() const = 0;
+		virtual bool HasVertices(int index) const = 0;
+		virtual const void* GetVertices(int index) const = 0;
+
+		const glm::vec3* GetPositions() const { return (glm::vec3*)GetVertices(0); }
+		const glm::vec2* GetTexcoords() const { return (glm::vec2*)GetVertices(1); }
+		const glm::vec3* GetNormals() const { return (glm::vec3*)GetVertices(2); }
+		const glm::vec3* GetTangents() const { return (glm::vec3*)GetVertices(3); }
+		const glm::vec4* GetColors() const { return (glm::vec4*)GetVertices(4); }
+		const glm::ivec4* GetBoneIDs() const { return (glm::ivec4*)GetVertices(5); }
+		const glm::vec4* GetBoneWeights() const { return (glm::vec4*)GetVertices(6); }
 
 		virtual const uint32_t* GetIndices() const = 0;
 		virtual uint32_t GetIndexCount() const = 0;
@@ -131,7 +136,7 @@ namespace Mahakam
 		robin_hood::unordered_map<std::string, BoneInfo> boneInfo;
 		int boneCount = 0;
 
-		Mesh::Bounds bounds;
+		//Mesh::Bounds bounds;
 
 		SkinnedMesh() = default;
 

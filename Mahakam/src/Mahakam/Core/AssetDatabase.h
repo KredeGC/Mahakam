@@ -2,6 +2,7 @@
 #include "Core.h"
 
 #include "Mahakam/Renderer/Texture.h"
+#include "Mahakam/Renderer/Mesh.h"
 
 #include <filesystem>
 #include <string>
@@ -20,6 +21,98 @@ namespace Mahakam
 				std::filesystem::create_directories(cacheDirectory);
 
 			return "cache/" + src + ".dat";
+		}
+
+		static void* SerializeMesh(Ref<Mesh> src, uint32_t& size)
+		{
+			const uint32_t vertexCount = src->GetVertexCount();
+			const uint32_t indexCount = src->GetIndexCount();
+
+			// Determine size
+			size = 7 * sizeof(uint32_t); // Add the sizeof uint32 as amount
+			size += src->HasVertices(0) ? vertexCount * sizeof(glm::vec3) : 0;
+			size += src->HasVertices(1) ? vertexCount * sizeof(glm::vec2) : 0;
+			size += src->HasVertices(2) ? vertexCount * sizeof(glm::vec3) : 0;
+			size += src->HasVertices(3) ? vertexCount * sizeof(glm::vec3) : 0;
+			size += src->HasVertices(4) ? vertexCount * sizeof(glm::vec4) : 0;
+			size += src->HasVertices(5) ? vertexCount * sizeof(glm::ivec4) : 0;
+			size += src->HasVertices(6) ? vertexCount * sizeof(glm::vec4) : 0;
+
+			size += src->GetIndexCount() * sizeof(uint32_t);
+
+			size += 2 * sizeof(glm::vec3);
+
+			// Populate with vertex data
+			char* data = new char[size];
+
+			uint32_t offset = 0;
+
+			for (uint32_t i = 0; i < Mesh::BUFFER_ELEMENTS_SIZE; i++)
+			{
+				if (!src->HasVertices(i))
+				{
+					const uint32_t elementSize = 0;
+					memcpy(data + offset, &elementSize, sizeof(uint32_t));
+					offset += sizeof(uint32_t);
+				}
+				else
+				{
+
+					uint32_t elementSize = vertexCount;
+					switch (i)
+					{
+					case 0:
+					case 2:
+					case 3:
+						elementSize *= sizeof(glm::vec3);
+						break;
+					case 1:
+						elementSize *= sizeof(glm::vec2);
+						break;
+					case 4:
+					case 6:
+						elementSize *= sizeof(glm::vec4);
+						break;
+					case 5:
+						elementSize *= sizeof(glm::ivec4);
+						break;
+					}
+
+					memcpy(data + offset, &elementSize, sizeof(uint32_t));
+					memcpy(data + offset + sizeof(uint32_t), src->GetVertices(i), elementSize);
+					offset += elementSize + sizeof(uint32_t);
+				}
+			}
+
+			// Populate index data
+			memcpy(data + offset, src->GetIndices(), indexCount * sizeof(uint32_t));
+			offset += indexCount * sizeof(uint32_t);
+
+			// Populate bounds
+			memcpy(data + offset, &src->GetBounds(), 2 * sizeof(glm::vec3));
+
+			return data;
+		}
+
+		static Ref<Mesh> DeserializeMesh(char* data, uint32_t size)
+		{
+			// TODO: Fix the rest of this mess
+			Mesh::InterleavedStruct interleavedVertices;
+
+			uint32_t offset = 0;
+
+			uint32_t posSize = 0;
+			memcpy(&posSize, data + offset, sizeof(uint32_t));
+			offset += sizeof(uint32_t);
+			if (posSize > 0)
+			{
+				posSize /= sizeof(glm::vec3);
+				interleavedVertices.positions = new glm::vec3[posSize];
+				memcpy(interleavedVertices.positions, data + offset, posSize);
+				offset += posSize;
+			}
+
+			return nullptr;
 		}
 
 	public:
@@ -141,6 +234,61 @@ namespace Mahakam
 				lut->SetData((void*)ss.str().c_str(), size, saveMips);
 
 				return lut;
+			}
+		}
+
+		template<typename T, typename = typename std::enable_if<std::is_same<T, SkinnedMesh>::value, void>::type>
+		static auto CreateOrLoadAsset(const std::string& src, const SkinnedMeshProps& props = SkinnedMeshProps(), typename std::enable_if<std::is_same<T, SkinnedMesh>::value, void>::type* dummy = nullptr)
+		{
+			const std::string filepath = CreateDirectories(src);
+
+			if (!std::filesystem::exists(filepath))
+			{
+				auto skinnedMesh = Mesh::LoadModel(src, props);
+
+				std::ofstream stream(filepath, std::ios::binary);
+
+				uint32_t meshCount = (uint32_t)skinnedMesh.meshes.size();
+				uint32_t boneCount = (uint32_t)skinnedMesh.boneCount;
+
+				stream.write((char*)&meshCount, sizeof(uint32_t));
+				for (uint32_t i = 0; i < meshCount; i++)
+				{
+					uint32_t meshDataSize = 0;
+					void* meshData = SerializeMesh(skinnedMesh.meshes[i], meshDataSize);
+
+					stream.write((char*)&meshDataSize, sizeof(uint32_t));
+					stream.write((const char*)meshData, meshDataSize);
+
+					delete[] meshData;
+				}
+
+				return skinnedMesh;
+			}
+			else
+			{
+				SkinnedMesh skinnedMesh;
+
+				std::ifstream stream(filepath, std::ios::binary);
+
+				uint32_t meshCount = 0;
+				uint32_t boneCount = 0;
+
+				stream.read((char*)&meshCount, sizeof(uint32_t));
+				for (uint32_t i = 0; i < meshCount; i++)
+				{
+					uint32_t meshDataSize = 0;
+					stream.read((char*)&meshDataSize, sizeof(uint32_t));
+
+					char* meshData = new char[meshDataSize];
+					stream.read(meshData, meshDataSize);
+
+					Ref<Mesh> mesh = DeserializeMesh(meshData, meshDataSize);
+
+					delete[] meshData;
+				}
+
+				return skinnedMesh;
 			}
 		}
 	};

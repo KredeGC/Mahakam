@@ -25,8 +25,6 @@ namespace Mahakam
 		MeshComponent(Ref<Mesh> mesh, Ref<Material> material)
 			: skinnedMesh(mesh, material) {}
 
-		inline const Mesh::Bounds& GetBounds() const { return skinnedMesh.bounds; }
-
 		inline size_t GetMeshCount() const { return skinnedMesh.meshes.size(); }
 
 		inline Ref<Mesh> GetMesh() { return skinnedMesh.meshes[0]; }

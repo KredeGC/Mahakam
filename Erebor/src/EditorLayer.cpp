@@ -78,6 +78,11 @@ namespace Mahakam
 				transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetForward());
 			else if (Input::IsKeyPressed(MH_KEY_S))
 				transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetForward());
+
+			if (Input::IsKeyPressed(MH_KEY_Q))
+				transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetUp());
+			else if (Input::IsKeyPressed(MH_KEY_E))
+				transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetUp());
 		}
 	};
 
@@ -96,7 +101,7 @@ namespace Mahakam
 		//Ref<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.yaml");
 		//Ref<Shader> textureShader = Shader::Create("assets/shaders/default/Albedo.yaml");
 		//Ref<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.yaml");
-		Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/SkinnedTexel.yaml");
+		Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/DitheredSkinned.yaml");
 		Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.yaml");
 		Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.yaml");
 
@@ -172,11 +177,12 @@ namespace Mahakam
 
 
 		// Setup dancing monke
-		/*Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
-		skinnedMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
-		skinnedMaterial->SetTexture("u_Bump", 0, Texture2D::bump);
-		skinnedMaterial->SetTexture("u_Metallic", 0, Texture2D::black);
-		skinnedMaterial->SetTexture("u_Roughness", 0, brickRoughness);
+		Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
+		skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
+		skinnedMaterial->SetFloat("u_Metallic", 1.0f);
+		skinnedMaterial->SetFloat("u_Roughness", 0.4f);
+
+		SkinnedMesh testSkinnedModel = AssetDatabase::CreateOrLoadAsset<SkinnedMesh>("assets/models/Defeated.fbx");
 
 		SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/Defeated.fbx");
 		Ref<Animation> animation = Animation::load("assets/models/Defeated.fbx", skinnedModel);
@@ -186,7 +192,7 @@ namespace Mahakam
 		animatedEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 1.5f, 5.0f });
 		animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
 		animatedEntity.AddComponent<AnimatorComponent>(animation);
-		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();*/
+		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();
 
 
 		// Create mesh & base material
