@@ -1,7 +1,7 @@
 #include "mhpch.h"
 #include "OpenGLBase.h"
 #include "OpenGLShader.h"
-
+#include "OpenGLUtility.h"
 #include "OpenGLShaderDataTypes.h"
 
 #include <filesystem>
@@ -22,7 +22,7 @@ namespace Mahakam
 		else if (type == "fragment" || type == "pixel")
 			return GL_FRAGMENT_SHADER;
 
-		MH_CORE_ASSERT(false, "Unknown shader type!");
+		MH_CORE_BREAK("Unknown shader type!");
 
 		return 0;
 	}
@@ -99,12 +99,6 @@ namespace Mahakam
 		}
 	}
 
-	void OpenGLShader::SetViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
-	{
-		SetUniformMat4("u_m4_V", viewMatrix);
-		SetUniformMat4("u_m4_P", projectionMatrix);
-	}
-
 	bool OpenGLShader::HasShaderPass(const std::string& shaderPass) const
 	{
 		auto iter = shaderPasses.find(shaderPass);
@@ -172,7 +166,7 @@ namespace Mahakam
 
 	uint32_t OpenGLShader::CompileBinary(const std::string& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives)
 	{
-		MH_PROFILE_FUNCTION();
+		MH_PROFILE_RENDERING_FUNCTION();
 
 		MH_CORE_ASSERT(sources.size() > 0, "At least one shader source is required to compile!");
 
@@ -185,7 +179,7 @@ namespace Mahakam
 			shaderIDs.reserve(sources.size());
 			for (auto& kv : sources)
 			{
-				std::string original = SortIncludes(kv.second);
+				std::string original = OpenGLUtility::SortIncludes(kv.second);
 				size_t firstNewline = original.find("\n") + 1;
 				std::string version = original.substr(0, firstNewline);
 				std::string body = original.substr(firstNewline, original.size());
@@ -212,7 +206,7 @@ namespace Mahakam
 					MH_GL_CALL(glDeleteShader(shader));
 
 					MH_CORE_ERROR("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, infoLog.data());
-					MH_CORE_ASSERT(false, "Shader failed to compile!");
+					MH_CORE_BREAK("Shader failed to compile!");
 
 					break;
 				}
@@ -240,7 +234,7 @@ namespace Mahakam
 					MH_GL_CALL(glDeleteShader(id));
 
 				MH_CORE_ERROR("{0}\r\n\r\n{1}", directives, infoLog.data());
-				MH_CORE_ASSERT(false, "Shader failed to link!");
+				MH_CORE_BREAK("Shader failed to link!");
 
 				return 0;
 			}
@@ -289,7 +283,7 @@ namespace Mahakam
 				MH_GL_CALL(glDeleteProgram(program));
 
 				MH_CORE_ERROR("{0}\r\n\r\n{1}", directives, infoLog.data());
-				MH_CORE_ASSERT(false, "Shader failed to link!");
+				MH_CORE_BREAK("Shader failed to link!");
 
 				return 0;
 			}
@@ -372,7 +366,7 @@ namespace Mahakam
 				{
 					std::string shaderPath = includeNode.as<std::string>();
 
-					source << ReadFile(shaderPath);
+					source << OpenGLUtility::ReadFile(shaderPath);
 				}
 
 				auto sources = ParseGLSLFile(source.str());
@@ -432,64 +426,6 @@ namespace Mahakam
 		}
 
 		return sources;
-	}
-
-	std::string OpenGLShader::SortIncludes(const std::string& source)
-	{
-		MH_PROFILE_FUNCTION();
-
-		std::stringstream sourceStream;
-
-		const char* typeToken = "#include \"";
-		size_t typeTokenLength = strlen(typeToken);
-		size_t lastPos = 0;
-		size_t pos = source.find(typeToken, 0);
-		while (pos != std::string::npos)
-		{
-			sourceStream << source.substr(lastPos, pos - lastPos);
-
-			size_t end = source.find("\"", pos + typeTokenLength);
-			size_t begin = pos + typeTokenLength;
-
-			lastPos = end + 1;
-
-			pos = source.find(typeToken, end);
-
-
-			std::string includeFile = source.substr(begin, end - begin);
-
-			std::string includeSource = ReadFile(includeFile);
-
-			sourceStream << SortIncludes(includeSource);
-		}
-
-		sourceStream << source.substr(lastPos, source.size() - lastPos);
-
-		return sourceStream.str();
-	}
-
-	std::string OpenGLShader::ReadFile(const std::string& filepath)
-	{
-		MH_PROFILE_FUNCTION();
-
-		std::string result;
-		std::ifstream stream(filepath, std::ios::in | std::ios::binary);
-		if (stream)
-		{
-			stream.seekg(0, std::ios::end);
-			result.resize(stream.tellg());
-
-			stream.seekg(0, std::ios::beg);
-			stream.read(&result[0], result.size());
-
-			stream.close();
-		}
-		else
-		{
-			MH_CORE_WARN("Could not open file {0}", filepath);
-		}
-
-		return result;
 	}
 
 	int OpenGLShader::GetUniformLocation(const std::string& name)

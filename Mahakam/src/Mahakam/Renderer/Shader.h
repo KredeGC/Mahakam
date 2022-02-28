@@ -35,8 +35,6 @@ namespace Mahakam
 
 		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") = 0;
 
-		virtual void SetViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) = 0;
-
 		virtual const std::string& GetName() const = 0;
 
 		virtual const std::vector<ShaderElement>& GetProperties() const = 0;

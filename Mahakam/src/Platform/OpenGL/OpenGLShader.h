@@ -31,8 +31,6 @@ namespace Mahakam
 
 		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") override;
 
-		virtual void SetViewProjection(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) override; // Remove??
-
 		virtual const std::string& GetName() const override { return name; }
 
 		virtual const std::vector<ShaderElement>& GetProperties() const override { return properties.elements; }
@@ -57,9 +55,6 @@ namespace Mahakam
 		void ParseYAMLFile(const std::string& filepath, const std::vector<std::string>& keywords);
 		robin_hood::unordered_map<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
 		robin_hood::unordered_map<GLenum, std::string> ParseGLSLFile(const std::string& source);
-
-		std::string SortIncludes(const std::string& source);
-		std::string ReadFile(const std::string& filepath);
 
 		int GetUniformLocation(const std::string& name);
 	};
