@@ -1,5 +1,6 @@
 #pragma once
 #include "Core.h"
+#include "Utility.h"
 
 #include "Mahakam/Renderer/Texture.h"
 #include "Mahakam/Renderer/Mesh.h"
@@ -12,17 +13,6 @@ namespace Mahakam
 	class AssetDatabase
 	{
 	private:
-		static std::string CreateDirectories(const std::string& src)
-		{
-			auto lastDir = src.rfind('/');
-			const std::string cacheDirectory = "cache/" + src.substr(0, lastDir) + "/";
-
-			if (!std::filesystem::exists(cacheDirectory))
-				std::filesystem::create_directories(cacheDirectory);
-
-			return "cache/" + src + ".dat";
-		}
-
 		static void* SerializeMesh(Ref<Mesh> src, uint32_t& size)
 		{
 			const uint32_t vertexCount = src->GetVertexCount();
@@ -122,9 +112,9 @@ namespace Mahakam
 		{
 			MH_CORE_ASSERT(props.width && props.height, "Width and height must be specified when loading or saving assets!");
 
-			const std::string filepath = CreateDirectories(src);
+			const std::string cachepath = FileUtility::GetResourcePath(src);
 
-			if (!std::filesystem::exists(filepath))
+			if (!FileUtility::Exists(cachepath))
 			{
 				Ref<T> asset = T::Create(src, props);
 
@@ -134,7 +124,7 @@ namespace Mahakam
 				// Save to cache
 				char* pixels = new char[totalSize];
 				asset->ReadPixels(pixels, saveMips);
-				std::ofstream stream(filepath, std::ios::binary);
+				std::ofstream stream(cachepath, std::ios::binary);
 				stream.write((char*)&size, sizeof(uint32_t));
 				stream.write(pixels, totalSize);
 
@@ -145,7 +135,7 @@ namespace Mahakam
 			else
 			{
 				// Load from cache
-				std::ifstream inStream(filepath, std::ios::binary);
+				std::ifstream inStream(cachepath, std::ios::binary);
 				std::stringstream ss;
 				uint32_t size = 0;
 				inStream.read((char*)&size, sizeof(uint32_t));
@@ -163,9 +153,9 @@ namespace Mahakam
 		{
 			MH_CORE_ASSERT(props.resolution, "Resolution must be specified when loading or saving assets!");
 
-			const std::string filepath = CreateDirectories(src);
+			const std::string cachepath = FileUtility::GetResourcePath(src);
 
-			if (!std::filesystem::exists(filepath))
+			if (!FileUtility::Exists(cachepath))
 			{
 				Ref<T> asset = T::Create(src, props);
 
@@ -175,7 +165,7 @@ namespace Mahakam
 				// Save to cache
 				char* pixels = new char[totalSize];
 				asset->readPixels(pixels, saveMips);
-				std::ofstream stream(filepath, std::ios::binary);
+				std::ofstream stream(cachepath, std::ios::binary);
 				stream.write((char*)&size, sizeof(uint32_t));
 				stream.write(pixels, totalSize);
 
@@ -186,7 +176,7 @@ namespace Mahakam
 			else
 			{
 				// Load from cache
-				std::ifstream inStream(filepath, std::ios::binary);
+				std::ifstream inStream(cachepath, std::ios::binary);
 				std::stringstream ss;
 				uint32_t size = 0;
 				inStream.read((char*)&size, sizeof(uint32_t));
@@ -204,7 +194,9 @@ namespace Mahakam
 		{
 			MH_CORE_ASSERT(props.resolution, "Resolution must be specified when loading or saving assets!");
 
-			if (!std::filesystem::exists(filepath))
+			const std::string cachepath = FileUtility::GetResourcePath(filepath);
+
+			if (!FileUtility::Exists(cachepath))
 			{
 				Ref<T> asset = T::Create(src, prefilter, props);
 
@@ -214,7 +206,7 @@ namespace Mahakam
 				// Save to cache
 				char* pixels = new char[totalSize];
 				asset->ReadPixels(pixels, saveMips);
-				std::ofstream stream(filepath, std::ios::binary);
+				std::ofstream stream(cachepath, std::ios::binary);
 				stream.write((char*)&size, sizeof(uint32_t));
 				stream.write(pixels, totalSize);
 
@@ -225,7 +217,7 @@ namespace Mahakam
 			else
 			{
 				// Load from cache
-				std::ifstream inStream(filepath, std::ios::binary);
+				std::ifstream inStream(cachepath, std::ios::binary);
 				std::stringstream ss;
 				uint32_t size = 0;
 				inStream.read((char*)&size, sizeof(uint32_t));
@@ -240,13 +232,13 @@ namespace Mahakam
 		template<typename T, typename = typename std::enable_if<std::is_same<T, SkinnedMesh>::value, void>::type>
 		static auto CreateOrLoadAsset(const std::string& src, const SkinnedMeshProps& props = SkinnedMeshProps(), typename std::enable_if<std::is_same<T, SkinnedMesh>::value, void>::type* dummy = nullptr)
 		{
-			const std::string filepath = CreateDirectories(src);
+			const std::string cachepath = FileUtility::GetResourcePath(src);
 
-			if (!std::filesystem::exists(filepath))
+			if (!FileUtility::Exists(cachepath))
 			{
 				auto skinnedMesh = Mesh::LoadModel(src, props);
 
-				std::ofstream stream(filepath, std::ios::binary);
+				std::ofstream stream(cachepath, std::ios::binary);
 
 				uint32_t meshCount = (uint32_t)skinnedMesh.meshes.size();
 				uint32_t boneCount = (uint32_t)skinnedMesh.boneCount;
@@ -269,7 +261,7 @@ namespace Mahakam
 			{
 				SkinnedMesh skinnedMesh;
 
-				std::ifstream stream(filepath, std::ios::binary);
+				std::ifstream stream(cachepath, std::ios::binary);
 
 				uint32_t meshCount = 0;
 				uint32_t boneCount = 0;

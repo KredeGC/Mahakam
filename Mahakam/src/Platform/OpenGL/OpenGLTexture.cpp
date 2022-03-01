@@ -391,8 +391,8 @@ namespace Mahakam
 		// Filter mode & mipmaps
 		SetFilterMode(GL_TEXTURE_CUBE_MAP, this->props.mipmaps, this->props.filterMode);
 
-		if (this->props.mipmaps)
-			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
+		/*if (this->props.mipmaps)
+			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));*/
 
 
 		// Create matrices
@@ -415,8 +415,8 @@ namespace Mahakam
 		equiToCubeShader.SetUniformMat4("projection", captureProjection);
 
 		MH_GL_CALL(glBindTextureUnit(0, hdrID));
-		MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
-		MH_GL_CALL(glBindTexture(GL_TEXTURE_2D, hdrID));
+		//MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
+		//MH_GL_CALL(glBindTexture(GL_TEXTURE_2D, hdrID));
 
 		GLint viewport[4];
 		MH_GL_CALL(glGetIntegerv(GL_VIEWPORT, viewport));
@@ -494,6 +494,10 @@ namespace Mahakam
 		// Filter mode & mipmaps
 		SetFilterMode(GL_TEXTURE_CUBE_MAP, this->props.mipmaps, this->props.filterMode);
 
+		// Generate mips before prefiltering
+		if (this->props.mipmaps && prefilter == TextureCubePrefilter::Prefilter)
+			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
+
 
 		// Create matrices
 		glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -520,8 +524,8 @@ namespace Mahakam
 		equiToCubeShader.SetUniformMat4("projection", captureProjection);
 
 		MH_GL_CALL(glBindTextureUnit(0, cubemap->GetRendererID()));
-		MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
-		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->GetRendererID()));
+		//MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
+		//MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->GetRendererID()));
 
 		GLint viewport[4];
 		MH_GL_CALL(glGetIntegerv(GL_VIEWPORT, viewport));
@@ -529,8 +533,6 @@ namespace Mahakam
 
 		if (this->props.mipmaps && prefilter == TextureCubePrefilter::Prefilter)
 		{
-			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
-
 			unsigned int maxMipLevels = 5;
 			for (unsigned int mip = 0; mip < maxMipLevels; ++mip)
 			{

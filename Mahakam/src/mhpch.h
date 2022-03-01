@@ -14,6 +14,7 @@
 
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Profiler.h"
+#include "Mahakam/Core/Utility.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>

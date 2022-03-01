@@ -2,6 +2,7 @@
 #include "OpenGLBase.h"
 #include "OpenGLComputeShader.h"
 #include "OpenGLUtility.h"
+#include "Mahakam/Core/Utility.h"
 
 #include <filesystem>
 #include <fstream>
@@ -22,7 +23,8 @@ namespace Mahakam
 
 		name = filepath.substr(lastSlash, count);
 
-		const std::string cachePath = "cache/compute/" + name + ".dat";
+		//const std::string cachePath = "cache/compute/" + name + ".dat";
+		const std::string cachePath = FileUtility::GetCachePath(filepath);
 
 		std::string src = OpenGLUtility::ReadFile(filepath);
 
@@ -60,7 +62,11 @@ namespace Mahakam
 
 		GLuint program = glCreateProgram();
 
-		if (!std::filesystem::exists(cachePath))
+#if MH_DEBUG
+		if (true)
+#else
+		if (!FileUtility::Exists(cachePath))
+#endif
 		{
 			// Create shader stages
 			GLuint shader = glCreateShader(GL_COMPUTE_SHADER);

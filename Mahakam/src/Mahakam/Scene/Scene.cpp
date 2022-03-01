@@ -3,6 +3,7 @@
 
 #include "Components.h"
 
+#include "Mahakam/Core/Utility.h"
 #include "Mahakam/Core/AssetDatabase.h"
 #include "Mahakam/Renderer/Renderer.h"
 
@@ -15,7 +16,7 @@ namespace Mahakam
 {
 	static Ref<TextureCube> LoadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 	{
-		if (!std::filesystem::exists(cachePath))
+		if (!FileUtility::Exists(cachePath))
 		{
 			Ref<TextureCube> texture = TextureCube::Create(src, prefilter, props);
 
@@ -59,8 +60,6 @@ namespace Mahakam
 		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RGB16F });
 		skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
 		skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
-		//skyboxIrradiance = loadOrCreate(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
-		//skyboxSpecular = loadOrCreate(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
 
 		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
 		skyboxMaterial = Material::Create(skyboxShader);

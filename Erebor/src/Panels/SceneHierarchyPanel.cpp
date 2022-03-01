@@ -327,7 +327,7 @@ namespace Mahakam
 			}
 
 			float range = light.GetRange();
-			if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f))
+			if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f, std::numeric_limits<float>::infinity()))
 				light.SetRange(range);
 
 			if (light.GetLightType() == Light::LightType::Spot)

@@ -3,6 +3,7 @@
 #include "OpenGLShader.h"
 #include "OpenGLUtility.h"
 #include "OpenGLShaderDataTypes.h"
+#include "Mahakam/Core/Utility.h"
 
 #include <filesystem>
 #include <fstream>
@@ -172,7 +173,11 @@ namespace Mahakam
 
 		GLuint program = glCreateProgram();
 
-		if (!std::filesystem::exists(cachePath))
+#if MH_DEBUG
+		if (true)
+#else
+		if (!FileUtility::Exists(cachePath))
+#endif
 		{
 			// Create shader stages
 			std::vector<GLuint> shaderIDs;
@@ -354,7 +359,7 @@ namespace Mahakam
 					shaderPassDefines << "#define " + define.as<std::string>() + "\n";
 			}
 
-			std::string cachePath = "cache/shaders/" + name + "_" + shaderPassName;
+			const std::string partialPath = filepath + "_" + shaderPassName;
 
 			// Read and compile include files
 			auto includesNode = shaderPassNode.second["Includes"];
@@ -373,7 +378,7 @@ namespace Mahakam
 
 				// Generate shaders for each shader pass * each keyword combination
 				for (const auto& directives : keywordPermutations)
-					shaderPasses[shaderPassName][directives.first] = CompileBinary(cachePath + directives.first + ".dat", sources, shaderPassDefines.str() + directives.second);
+					shaderPasses[shaderPassName][directives.first] = CompileBinary(FileUtility::GetCachePath(partialPath + directives.first), sources, shaderPassDefines.str() + directives.second);
 			}
 		}
 	}
