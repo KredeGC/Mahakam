@@ -21,8 +21,8 @@ namespace Mahakam
 
 				activeScene->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
 			}
-			if (viewportFramebuffer)
-				ImGui::Image((void*)(uintptr_t)viewportFramebuffer->GetColorBuffer(0)->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
+			if (viewportTexture)
+				ImGui::Image((void*)(uintptr_t)viewportTexture->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}
@@ -44,8 +44,8 @@ namespace Mahakam
 		activeScene = scene;
 	}
 
-	void SceneViewPanel::SetFrameBuffer(Ref<FrameBuffer> framebuffer)
+	void SceneViewPanel::SetFrameBuffer(Ref<Texture> tex)
 	{
-		viewportFramebuffer = framebuffer;
+		viewportTexture = tex;
 	}
 }

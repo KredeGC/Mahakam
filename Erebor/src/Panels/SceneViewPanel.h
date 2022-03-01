@@ -14,7 +14,7 @@ namespace Mahakam
 		bool hovered = false;
 
 		Ref<Scene> activeScene;
-		Ref<FrameBuffer> viewportFramebuffer;
+		Ref<Texture> viewportTexture;
 
 		glm::vec2 viewportSize = { 0.0f, 0.0f };
 
@@ -23,7 +23,7 @@ namespace Mahakam
 
 		void SetScene(Ref<Scene> scene);
 
-		void SetFrameBuffer(Ref<FrameBuffer> framebuffer);
+		void SetFrameBuffer(Ref<Texture> tex);
 
 		void OnImGuiRender();
 

@@ -23,6 +23,10 @@ namespace Mahakam
 		SceneHierarchyPanel sceneHierarchyPanel;
 		StatsPanel statsPanel;
 
+		Ref<Texture> debugComputeTexture;
+		Ref<ComputeShader> debugComputeShader;
+		uint32_t width = 128, height = 128;
+
 	public:
 		EditorLayer() : Layer("Editor"), dockSpace(), profilerPanel(),
 			sceneViewPanel(), sceneHierarchyPanel(), statsPanel() {}

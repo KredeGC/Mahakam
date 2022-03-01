@@ -10,8 +10,8 @@
 
 namespace Mahakam
 {
-	OpenGLComputeShader::OpenGLComputeShader(const std::string& filepath, uint32_t x, uint32_t y, uint32_t z)
-		: filepath(filepath), x(x), y(y), z(z)
+	OpenGLComputeShader::OpenGLComputeShader(const std::string& filepath)
+		: filepath(filepath)
 	{
 		// Naming
 		auto lastSlash = filepath.find_last_of("/\\");
@@ -22,9 +22,13 @@ namespace Mahakam
 
 		name = filepath.substr(lastSlash, count);
 
-		std::string cachePath = "cache/compute/" + name + ".dat";
+		const std::string cachePath = "cache/compute/" + name + ".dat";
 
-		CompileBinary(cachePath, filepath);
+		std::string src = OpenGLUtility::ReadFile(filepath);
+
+		src = OpenGLUtility::SortIncludes(src);
+
+		CompileBinary(cachePath, src);
 	}
 
 	OpenGLComputeShader::~OpenGLComputeShader()
@@ -37,7 +41,7 @@ namespace Mahakam
 		MH_GL_CALL(glUseProgram(rendererID));
 	}
 
-	void OpenGLComputeShader::Dispatch()
+	void OpenGLComputeShader::Dispatch(uint32_t x, uint32_t y, uint32_t z)
 	{
 		MH_GL_CALL(glDispatchCompute(x, y, z));
 		MH_GL_CALL(glMemoryBarrier(GL_ALL_BARRIER_BITS));

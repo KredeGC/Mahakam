@@ -97,6 +97,11 @@ namespace Mahakam
 		sceneHierarchyPanel.SetContext(activeScene);
 
 
+		// Test compute shader
+		debugComputeTexture = Texture2D::Create({ width, height, TextureFormat::RGBA32F, TextureFilter::Bilinear, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+		debugComputeShader = ComputeShader::Create("assets/compute/UV.glsl");
+
+
 		// Setup shaders
 		//Ref<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.yaml");
 		//Ref<Shader> textureShader = Shader::Create("assets/shaders/default/Albedo.yaml");
@@ -116,7 +121,7 @@ namespace Mahakam
 
 		// Setup lights
 		Entity mainLightEntity = activeScene->CreateEntity("Main Light");
-		mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, glm::vec3(1.0f, 1.0f, 1.0f), true);
+		mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, 20.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 		mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ -0.7f, -3.0f, 0.0f }));
 
 		/*for (int y = 0; y < 10; y++)
@@ -220,18 +225,24 @@ namespace Mahakam
 
 	void EditorLayer::OnUpdate(Timestep dt)
 	{
-		MH_PROFILE_FUNCTION();
+		MH_PROFILE_RENDERING_FUNCTION();
 
 		activeScene->OnUpdate(dt);
 
-		sceneViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer());
+		sceneViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
+
+		/*debugComputeShader->Bind();
+		debugComputeTexture->BindImage(0, false, true);
+		debugComputeShader->Dispatch(std::ceil(width / 8), std::ceil(height / 4), 1);
+
+		sceneViewPanel.SetFrameBuffer(debugComputeTexture);*/
 
 		statsPanel.OnUpdate(dt);
 	}
 
 	void EditorLayer::OnImGuiRender()
 	{
-		MH_PROFILE_FUNCTION();
+		MH_PROFILE_RENDERING_FUNCTION();
 
 		dockSpace.OnImGuiRender();
 		profilerPanel.OnImGuiRender();
@@ -264,6 +275,11 @@ namespace Mahakam
 
 	bool EditorLayer::OnWindowResize(WindowResizeEvent& event)
 	{
+		width = event.GetWidth();
+		height = event.GetHeight();
+
+		debugComputeTexture->Resize(width, height);
+
 		return false;
 	}
 

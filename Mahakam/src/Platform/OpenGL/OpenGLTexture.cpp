@@ -215,6 +215,13 @@ namespace Mahakam
 		MH_GL_CALL(glBindTextureUnit(slot, rendererID));
 	}
 
+	void OpenGLTexture2D::BindImage(uint32_t slot, bool read, bool write) const
+	{
+		uint32_t readWrite = (read && write) ? GL_READ_WRITE : (write ? GL_WRITE_ONLY : GL_READ_ONLY);
+
+		glBindImageTexture(slot, rendererID, 0, GL_FALSE, 0, readWrite, internalFormat);
+	}
+
 	void OpenGLTexture2D::ReadPixels(void* pixels, bool mipmaps)
 	{
 		MH_PROFILE_FUNCTION();
@@ -632,6 +639,13 @@ namespace Mahakam
 	void OpenGLTextureCube::Bind(uint32_t slot) const
 	{
 		MH_GL_CALL(glBindTextureUnit(slot, rendererID));
+	}
+
+	void OpenGLTextureCube::BindImage(uint32_t slot, bool read, bool write) const
+	{
+		uint32_t readWrite = (read && write) ? GL_READ_WRITE : (write ? GL_WRITE_ONLY : GL_READ_ONLY);
+
+		glBindImageTexture(slot, rendererID, 0, GL_FALSE, 0, readWrite, internalFormat);
 	}
 
 	void OpenGLTextureCube::ReadPixels(void* pixels, bool mipmaps)

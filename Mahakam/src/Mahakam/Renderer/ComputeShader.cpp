@@ -7,14 +7,14 @@
 
 namespace Mahakam
 {
-	Ref<ComputeShader> ComputeShader::Create(const std::string& filepath, uint32_t x, uint32_t y, uint32_t z)
+	Ref<ComputeShader> ComputeShader::Create(const std::string& filepath)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLComputeShader>(filepath, x, y, z);
+			return CreateRef<OpenGLComputeShader>(filepath);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

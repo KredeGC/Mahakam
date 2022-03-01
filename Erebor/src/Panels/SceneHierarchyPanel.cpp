@@ -326,12 +326,9 @@ namespace Mahakam
 				ImGui::EndCombo();
 			}
 
-			if (light.GetLightType() == Light::LightType::Point || light.GetLightType() == Light::LightType::Spot)
-			{
-				float range = light.GetRange();
-				if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f, 180.0f))
-					light.SetRange(range);
-			}
+			float range = light.GetRange();
+			if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f))
+				light.SetRange(range);
 
 			if (light.GetLightType() == Light::LightType::Spot)
 			{

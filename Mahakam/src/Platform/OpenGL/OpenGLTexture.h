@@ -37,6 +37,8 @@ namespace Mahakam {
 
 		virtual void Bind(uint32_t slot = 0) const override;
 
+		virtual void BindImage(uint32_t slot = 0, bool read = true, bool write = true) const override;
+
 		virtual void ReadPixels(void* pixels, bool mipmaps) override;
 
 	private:
@@ -77,6 +79,8 @@ namespace Mahakam {
 		virtual void SetData(void* data, uint32_t size, bool mipmaps) override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
+
+		virtual void BindImage(uint32_t slot = 0, bool read = true, bool write = true) const override;
 
 		virtual void ReadPixels(void* pixels, bool mipmaps) override;
 	};

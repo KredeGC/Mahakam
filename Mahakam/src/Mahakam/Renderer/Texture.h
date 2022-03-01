@@ -51,6 +51,8 @@ namespace Mahakam
 
 		virtual void Bind(uint32_t slot = 0) const = 0;
 
+		virtual void BindImage(uint32_t slot = 0, bool read = true, bool write = true) const = 0;
+
 		virtual void ReadPixels(void* pixels, bool mipmaps = false) = 0;
 	};
 

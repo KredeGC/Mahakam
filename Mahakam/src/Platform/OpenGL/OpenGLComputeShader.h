@@ -12,17 +12,16 @@ namespace Mahakam
 		uint32_t rendererID;
 		std::string filepath;
 		std::string name;
-		uint32_t x, y, z;
 
 		robin_hood::unordered_map<std::string, int> uniformIDCache;
 
 	public:
-		OpenGLComputeShader(const std::string& filepath, uint32_t x, uint32_t y, uint32_t z);
+		OpenGLComputeShader(const std::string& filepath);
 		virtual ~OpenGLComputeShader();
 
 		virtual void Bind() const;
 
-		virtual void Dispatch();
+		virtual void Dispatch(uint32_t x, uint32_t y, uint32_t z);
 
 		virtual void SetTexture(const std::string & name, Ref<Texture> tex);
 

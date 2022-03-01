@@ -10,7 +10,7 @@ namespace Mahakam
 		direction(rotation * glm::vec3(0.0f, 0.0f, -1.0f)),
 		color(light.GetColor())
 	{
-		worldToLight = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, -20.0f, 20.0f)
+		worldToLight = glm::ortho(-light.GetRange(), light.GetRange(), -light.GetRange(), light.GetRange(), -light.GetRange(), light.GetRange())
 			* glm::inverse(glm::translate(glm::mat4(1.0f), position) * glm::mat4(rotation));
 
 		offset.z = light.IsShadowCasting();
