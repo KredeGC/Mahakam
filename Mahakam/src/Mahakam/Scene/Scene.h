@@ -30,7 +30,7 @@ namespace Mahakam
 
 	public:
 		Scene(const std::string& filepath);
-		Scene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
+		Scene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
 		~Scene();
 
 		void OnUpdate(Timestep ts);
@@ -41,7 +41,7 @@ namespace Mahakam
 		void DestroyEntity(Entity entity);
 
 		static Ref<Scene> CreateScene(const std::string& filepath);
-		static Ref<Scene> CreateScene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
+		static Ref<Scene> CreateScene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
 
 	private:
 		template<typename T>

@@ -280,7 +280,7 @@ namespace Mahakam
 		case TextureFormat::RGB32F:
 		case TextureFormat::RGBA32F:
 		case TextureFormat::RG11B10F:
-			return GL_FLOAT;
+			return GL_UNSIGNED_INT_10F_11F_11F_REV; // Might need ARB_vertex_type_10f_11f_11f_rev?
 		case TextureFormat::RGB10A2:
 			return GL_UNSIGNED_INT_10_10_10_2;
 		case TextureFormat::Depth16:

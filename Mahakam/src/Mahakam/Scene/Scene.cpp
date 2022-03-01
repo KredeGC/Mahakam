@@ -57,17 +57,22 @@ namespace Mahakam
 	Scene::Scene(const std::string& filepath)
 	{
 		// Idea:: Use RG11B10f instead, should halve memory usage
-		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RGB16F });
-		skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RGB16F, false });
-		skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RGB16F, true });
+		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F });
+		skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
+		skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
 
 		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
 		skyboxMaterial = Material::Create(skyboxShader);
 		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
 	}
 
-	Scene::Scene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
-		: skyboxIrradiance(irradianceMap), skyboxSpecular(specularMap) {}
+	Scene::Scene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
+		: skyboxTexture(skybox), skyboxIrradiance(irradianceMap), skyboxSpecular(specularMap)
+	{
+		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
+		skyboxMaterial = Material::Create(skyboxShader);
+		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
+	}
 
 	Scene::~Scene() {}
 
@@ -222,8 +227,8 @@ namespace Mahakam
 		return std::make_shared<Scene>(filepath);
 	}
 
-	Ref<Scene> Scene::CreateScene(const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
+	Ref<Scene> Scene::CreateScene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
 	{
-		return std::make_shared<Scene>(irradianceMap, specularMap);
+		return std::make_shared<Scene>(skybox, irradianceMap, specularMap);
 	}
 }
