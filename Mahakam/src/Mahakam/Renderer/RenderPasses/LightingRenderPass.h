@@ -41,6 +41,10 @@ namespace Mahakam
 		virtual Ref<FrameBuffer> GetFrameBuffer() { return hdrFrameBuffer; }
 
 	protected:
+		virtual void SetupBRDF();
+		virtual void SetupFrameBuffer(uint32_t width, uint32_t height);
+		virtual void SetupShaders();
+
 		virtual void RenderShadowMaps(SceneData* sceneData, const Frustum& frustum);
 		virtual void SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src);
 		virtual void RenderLighting(SceneData* sceneData, Ref<FrameBuffer> src);

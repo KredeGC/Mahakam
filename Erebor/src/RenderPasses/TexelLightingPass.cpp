@@ -8,13 +8,8 @@
 
 namespace Mahakam
 {
-	void TexelLightingPass::Init(uint32_t width, uint32_t height)
+	void TexelLightingPass::SetupFrameBuffer(uint32_t width, uint32_t height)
 	{
-		brdfLut = LoadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.yaml", TextureFormat::RG16F, 512, 512);
-		falloffLut = LoadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.yaml", TextureFormat::R16F, 16, 16);
-
-		spotlightTexture = Texture2D::Create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
-
 		// Create HDR lighting framebuffer
 		FrameBufferProps lightingProps;
 		lightingProps.width = width;
@@ -23,21 +18,15 @@ namespace Mahakam
 		lightingProps.depthAttachment = { TextureFormat::Depth24 };
 
 		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
+	}
 
+	void TexelLightingPass::SetupShaders()
+	{
 		// Create lighting shader
 		deferredShader = Shader::Create("assets/shaders/external/DeferredTexel.yaml", { "DEBUG" });
 
-		// Create shadow map
-		FrameBufferProps shadowProps;
-		shadowProps.width = shadowMapSize;
-		shadowProps.height = shadowMapSize;
-		shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
-		shadowFramebuffer = FrameBuffer::Create(shadowProps);
-
 		// Create default shadow shader
 		shadowShader = Shader::Create("assets/shaders/internal/Shadow.yaml");
-
-		shadowMatrixBuffer = UniformBuffer::Create(sizeof(glm::mat4));
 	}
 
 	void TexelLightingPass::SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src)

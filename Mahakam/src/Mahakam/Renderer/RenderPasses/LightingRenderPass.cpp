@@ -2,6 +2,7 @@
 #include "LightingRenderPass.h"
 
 #include "Mahakam/Core/Frustum.h"
+#include "Mahakam/Core/Utility.h"
 
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Renderer.h"
@@ -16,22 +17,9 @@ namespace Mahakam
 {
 	void LightingRenderPass::Init(uint32_t width, uint32_t height)
 	{
-		brdfLut = LoadOrCreateLUTTexture("assets/textures/brdf.dat", "assets/shaders/internal/BRDF.yaml", TextureFormat::RG16F, 512, 512);
-		falloffLut = LoadOrCreateLUTTexture("assets/textures/falloff.dat", "assets/shaders/internal/Falloff.yaml", TextureFormat::R16F, 16, 16);
-
-		spotlightTexture = Texture2D::Create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
-
-		// Create HDR lighting framebuffer
-		FrameBufferProps lightingProps;
-		lightingProps.width = width;
-		lightingProps.height = height;
-		lightingProps.colorAttachments = { TextureFormat::RG11B10F };
-		//lightingProps.depthAttachment = { TextureFormat::Depth24 };
-
-		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
-
-		// Create lighting shader
-		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.yaml", { "DEBUG" });
+		SetupBRDF();
+		SetupFrameBuffer(width, height);
+		SetupShaders();
 
 		// Create shadow map
 		FrameBufferProps shadowProps;
@@ -39,9 +27,6 @@ namespace Mahakam
 		shadowProps.height = shadowMapSize;
 		shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
 		shadowFramebuffer = FrameBuffer::Create(shadowProps);
-
-		// Create default shadow shader
-		shadowShader = Shader::Create("assets/shaders/internal/Shadow.yaml");
 
 		shadowMatrixBuffer = UniformBuffer::Create(sizeof(glm::mat4));
 	}
@@ -87,6 +72,38 @@ namespace Mahakam
 		RenderLighting(sceneData, src);
 
 		return true;
+	}
+
+	void LightingRenderPass::SetupBRDF()
+	{
+		// Create BRDF and falloff maps
+		FileUtility::CreateDirectories("res/internal/");
+
+		brdfLut = LoadOrCreateLUTTexture("res/internal/brdf.dat", "assets/shaders/internal/BRDF.yaml", TextureFormat::RG16F, 512, 512);
+		falloffLut = LoadOrCreateLUTTexture("res/internal/falloff.dat", "assets/shaders/internal/Falloff.yaml", TextureFormat::R8, 16, 16);
+
+		spotlightTexture = Texture2D::Create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
+	}
+
+	void LightingRenderPass::SetupFrameBuffer(uint32_t width, uint32_t height)
+	{
+		// Create HDR lighting framebuffer
+		FrameBufferProps lightingProps;
+		lightingProps.width = width;
+		lightingProps.height = height;
+		lightingProps.colorAttachments = { TextureFormat::RG11B10F };
+		//lightingProps.depthAttachment = { TextureFormat::Depth24 };
+
+		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
+	}
+
+	void LightingRenderPass::SetupShaders()
+	{
+		// Create lighting shader
+		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.yaml", { "DEBUG" });
+
+		// Create default shadow shader
+		shadowShader = Shader::Create("assets/shaders/internal/Shadow.yaml");
 	}
 
 	void LightingRenderPass::RenderShadowMaps(SceneData* sceneData, const Frustum& frustum)
@@ -534,7 +551,7 @@ namespace Mahakam
 
 	Ref<Texture> LightingRenderPass::LoadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height)
 	{
-		if (!std::filesystem::exists(cachePath))
+		if (!FileUtility::Exists(cachePath))
 		{
 			// Setup LUT shader and framebuffer for capturing
 			FrameBufferProps framebufferProps;
