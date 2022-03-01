@@ -1,11 +1,8 @@
 #pragma once
 
+#include "Mahakam/Core/Core.h"
+
 #include <glm/glm.hpp>
-
-#include <glm/gtx/quaternion.hpp>
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
 
 #include <vector>
 

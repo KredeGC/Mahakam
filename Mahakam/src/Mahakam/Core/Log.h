@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 
@@ -15,12 +14,12 @@ namespace Mahakam
 	public:
 		static void Init();
 
-		inline static std::shared_ptr<spdlog::logger>& getEngineLogger()
+		inline static std::shared_ptr<spdlog::logger>& GetEngineLogger()
 		{
 			return engineLogger;
 		}
 
-		inline static std::shared_ptr<spdlog::logger>& getGameLogger()
+		inline static std::shared_ptr<spdlog::logger>& GetGameLogger()
 		{
 			return gameLogger;
 		}
@@ -28,15 +27,15 @@ namespace Mahakam
 }
 
 // Core log macros
-#define MH_CORE_TRACE(...)    ::Mahakam::Log::getEngineLogger()->trace(__VA_ARGS__)
-#define MH_CORE_INFO(...)     ::Mahakam::Log::getEngineLogger()->info(__VA_ARGS__)
-#define MH_CORE_WARN(...)     ::Mahakam::Log::getEngineLogger()->warn(__VA_ARGS__)
-#define MH_CORE_ERROR(...)    ::Mahakam::Log::getEngineLogger()->error(__VA_ARGS__)
-#define MH_CORE_FATAL(...)    ::Mahakam::Log::getEngineLogger()->fatal(__VA_ARGS__)
+#define MH_CORE_TRACE(...)    ::Mahakam::Log::GetEngineLogger()->trace(__VA_ARGS__)
+#define MH_CORE_INFO(...)     ::Mahakam::Log::GetEngineLogger()->info(__VA_ARGS__)
+#define MH_CORE_WARN(...)     ::Mahakam::Log::GetEngineLogger()->warn(__VA_ARGS__)
+#define MH_CORE_ERROR(...)    ::Mahakam::Log::GetEngineLogger()->error(__VA_ARGS__)
+#define MH_CORE_FATAL(...)    ::Mahakam::Log::GetEngineLogger()->critical(__VA_ARGS__)
 
 // Game log macros
-#define MH_TRACE(...)	      ::Mahakam::Log::getGameLogger()->trace(__VA_ARGS__)
-#define MH_INFO(...)	      ::Mahakam::Log::getGameLogger()->info(__VA_ARGS__)
-#define MH_WARN(...)	      ::Mahakam::Log::getGameLogger()->warn(__VA_ARGS__)
-#define MH_ERROR(...)	      ::Mahakam::Log::getGameLogger()->error(__VA_ARGS__)
-#define MH_FATAL(...)	      ::Mahakam::Log::getGameLogger()->fatal(__VA_ARGS__) 
+#define MH_TRACE(...)	      ::Mahakam::Log::GetGameLogger()->trace(__VA_ARGS__)
+#define MH_INFO(...)	      ::Mahakam::Log::GetGameLogger()->info(__VA_ARGS__)
+#define MH_WARN(...)	      ::Mahakam::Log::GetGameLogger()->warn(__VA_ARGS__)
+#define MH_ERROR(...)	      ::Mahakam::Log::GetGameLogger()->error(__VA_ARGS__)
+#define MH_FATAL(...)	      ::Mahakam::Log::GetGameLogger()->critical(__VA_ARGS__) 

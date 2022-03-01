@@ -28,18 +28,20 @@ namespace Mahakam
 		WindowsWindow(const WindowProps& props);
 		virtual ~WindowsWindow();
 
-		void OnUpdate() override;
+		virtual void OnUpdate() override;
 
-		inline unsigned int GetWidth() const override { return data.width; }
-		inline unsigned int GetHeight() const override { return data.height; }
+		virtual inline double GetTime() override { return glfwGetTime(); }
 
-		inline void SetEventCallback(const EventCallbackFn& callback) override { data.eventCallback = callback; }
-		void SetVSync(bool enabled) override;
-		bool IsVSync() const override;
+		virtual inline unsigned int GetWidth() const override { return data.width; }
+		virtual inline unsigned int GetHeight() const override { return data.height; }
+
+		virtual inline void SetEventCallback(const EventCallbackFn& callback) override { data.eventCallback = callback; }
+		virtual void SetVSync(bool enabled) override;
+		virtual inline bool IsVSync() const override { return data.vsync; }
 
 		virtual void SetCursorVisible(bool visible) override;
 
-		inline virtual void* GetNativeWindow() const override { return window; }
+		virtual inline void* GetNativeWindow() const override { return window; }
 
 	private:
 		virtual void Init(const WindowProps& props);

@@ -14,7 +14,7 @@ namespace Mahakam
 	class Application
 	{
 	private:
-		std::unique_ptr<Window> window;
+		Scope<Window> window;
 		ImGuiLayer* imGuiLayer;
 		bool running = true;
 		bool minimized = false;
@@ -23,7 +23,7 @@ namespace Mahakam
 		static Application* instance;
 
 	public:
-		Application(const std::string& name = "Mahakam");
+		Application(const WindowProps& props = WindowProps());
 		virtual ~Application();
 
 		void Run();
@@ -38,6 +38,7 @@ namespace Mahakam
 		inline static Application& GetInstance() { return *instance; }
 
 		inline static bool IsRunning() { return instance->running; }
+		inline static bool IsMinimized() { return instance->minimized; }
 
 		inline Window& GetWindow() { return *window; }
 

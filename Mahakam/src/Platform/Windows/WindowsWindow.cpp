@@ -18,9 +18,9 @@ namespace Mahakam {
 		MH_CORE_ERROR("[GLFW Error] (Code {0}): {1}", error, message);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	Scope<Window> Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return CreateScope<WindowsWindow>(props);
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
@@ -56,7 +56,7 @@ namespace Mahakam {
 		// Loading the window icon
 		stbi_set_flip_vertically_on_load(0);
 		int width, height;
-		unsigned char* pixels = stbi_load("assets/textures/internal/icon.png", &width, &height, 0, 4); // Free?
+		unsigned char* pixels = stbi_load(props.iconpath.c_str(), &width, &height, 0, 4);
 		GLFWimage* icon = new GLFWimage
 		{
 			width,
@@ -202,11 +202,6 @@ namespace Mahakam {
 		glfwSwapInterval(enabled ? 1 : 0);
 
 		data.vsync = enabled;
-	}
-
-	bool WindowsWindow::IsVSync() const
-	{
-		return data.vsync;
 	}
 
 	void WindowsWindow::SetCursorVisible(bool visible)

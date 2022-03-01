@@ -4,6 +4,11 @@
 #include "Light.h"
 #include "Camera.h"
 
+#include <glm/gtx/quaternion.hpp>
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
+
 namespace Mahakam
 {
 	DirectionalLight::DirectionalLight(const glm::vec3& position, const glm::quat& rotation, const Light& light) :

@@ -8,10 +8,11 @@ namespace Mahakam
 	struct WindowProps
 	{
 		std::string title;
+		std::string iconpath;
 		uint32_t width, height;
 
-		WindowProps(const std::string& title = "Mahakam", uint32_t width = 1600, uint32_t height = 900)
-			: title(title), width(width), height(height) {}
+		WindowProps(const std::string& title = "Mahakam", const std::string& iconpath = "", uint32_t width = 1600, uint32_t height = 900)
+			: title(title), iconpath(iconpath), width(width), height(height) {}
 	};
 
 	class Window
@@ -19,10 +20,11 @@ namespace Mahakam
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
 
-		//Window(int width, int height, const char* title);
 		virtual ~Window() {}
 
 		virtual void OnUpdate() = 0;
+
+		virtual double GetTime() = 0;
 
 		virtual uint32_t GetWidth() const = 0;
 		virtual uint32_t GetHeight() const = 0;
@@ -35,6 +37,6 @@ namespace Mahakam
 
 		virtual void* GetNativeWindow() const = 0;
 
-		static Window* Create(const WindowProps& props = WindowProps());
+		static Scope<Window> Create(const WindowProps& props = WindowProps());
 	};
 }

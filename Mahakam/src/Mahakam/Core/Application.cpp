@@ -5,23 +5,19 @@
 
 #include "Mahakam/Renderer/Renderer.h"
 
-
-// TEMPORARY
-#include <GLFW/glfw3.h>
-
 namespace Mahakam
 {
 	Application* Application::instance = nullptr;
 
-	Application::Application(const std::string& name)
+	Application::Application(const WindowProps& props)
 	{
 		MH_CORE_ASSERT(!instance, "Application instance already created!");
 		instance = this;
 
-		window = std::unique_ptr<Window>(Window::Create({ name }));
+		window = Window::Create(props);
 		window->SetEventCallback(MH_BIND_EVENT(Application::OnEvent));
 
-		Renderer::Init(1600, 900);
+		Renderer::Init(props.width, props.height);
 
 		imGuiLayer = new ImGuiLayer();
 		PushOverlay(imGuiLayer);
@@ -40,8 +36,7 @@ namespace Mahakam
 
 		while (running)
 		{
-			// TEMPORARY
-			double time = glfwGetTime();
+			double time = window->GetTime();
 			Timestep timestep = (float)(time - lastFrameTime);
 			lastFrameTime = time;
 

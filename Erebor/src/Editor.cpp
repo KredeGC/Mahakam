@@ -11,7 +11,7 @@ namespace Mahakam
 	class Editor : public Application
 	{
 	public:
-		Editor() : Application("Erebor")
+		Editor() : Application({ "Erebor", "assets/textures/internal/icon.png" })
 		{
 			PushOverlay(new EditorLayer());
 
