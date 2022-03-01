@@ -110,7 +110,7 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		// Create VAO
-		MH_GL_CALL(glCreateVertexArrays(1, &rendererID));
+		MH_GL_CALL(glGenVertexArrays(1, &rendererID));
 		MH_GL_CALL(glBindVertexArray(rendererID));
 
 		// Setup vertices
@@ -130,12 +130,12 @@ namespace Mahakam
 		InterleaveBuffers();
 
 		// Create vertex buffer
-		MH_GL_CALL(glCreateBuffers(1, &vertexBufferID));
+		MH_GL_CALL(glGenBuffers(1, &vertexBufferID));
 		MH_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID));
 		MH_GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, interleavedVertices, GL_STATIC_DRAW));
 
 		// Create index buffer
-		MH_GL_CALL(glCreateBuffers(1, &indexBufferID));
+		MH_GL_CALL(glGenBuffers(1, &indexBufferID));
 		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID));
 		MH_GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(uint32_t), this->indices, GL_STATIC_DRAW));
 

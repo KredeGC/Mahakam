@@ -357,8 +357,8 @@ namespace Mahakam
 				lightHashes[currentOffset] = hash;
 
 				// Bind worldToLight matrix
-				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 				shadowMatrixBuffer->Bind(1);
+				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
@@ -432,8 +432,8 @@ namespace Mahakam
 				lightHashes[currentOffset] = hash;
 
 				// Bind worldToLight matrix
-				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 				shadowMatrixBuffer->Bind(1);
+				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
@@ -458,6 +458,7 @@ namespace Mahakam
 			if (!sceneData->directionalLightBuffer || sceneData->directionalLightBuffer->GetSize() != bufferSize)
 				sceneData->directionalLightBuffer = StorageBuffer::Create(bufferSize);
 
+			sceneData->directionalLightBuffer->Bind(1);
 			sceneData->directionalLightBuffer->SetData(&amount, 0, sizeof(int));
 			sceneData->directionalLightBuffer->SetData(&sceneData->environment.directionalLights[0], amountSize, amount * lightSize);
 		}
@@ -465,10 +466,11 @@ namespace Mahakam
 		{
 			sceneData->directionalLightBuffer = StorageBuffer::Create(amountSize);
 
+			sceneData->directionalLightBuffer->Bind(1);
 			sceneData->directionalLightBuffer->SetData(&amount, 0, sizeof(int));
 		}
 
-		sceneData->directionalLightBuffer->Bind(1);
+		//sceneData->directionalLightBuffer->Bind(1);
 
 		Renderer::DrawScreenQuad();
 	}
@@ -487,6 +489,7 @@ namespace Mahakam
 			if (!sceneData->pointLightBuffer || sceneData->pointLightBuffer->GetSize() != bufferSize)
 				sceneData->pointLightBuffer = StorageBuffer::Create(bufferSize);
 
+			sceneData->pointLightBuffer->Bind(1);
 			sceneData->pointLightBuffer->SetData(&sceneData->environment.pointLights[0], 0, bufferSize);
 
 			if (sceneData->gBuffer)
@@ -494,7 +497,7 @@ namespace Mahakam
 			else
 				deferredShader->Bind("POINT");
 			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
-			sceneData->pointLightBuffer->Bind(1);
+			//sceneData->pointLightBuffer->Bind(1);
 
 			Renderer::DrawInstancedSphere(amount);
 		}
@@ -514,6 +517,7 @@ namespace Mahakam
 			if (!sceneData->spotLightBuffer || sceneData->spotLightBuffer->GetSize() != bufferSize)
 				sceneData->spotLightBuffer = StorageBuffer::Create(bufferSize);
 
+			sceneData->spotLightBuffer->Bind(1);
 			sceneData->spotLightBuffer->SetData(&sceneData->environment.spotLights[0], 0, bufferSize);
 
 			if (sceneData->gBuffer)
@@ -522,7 +526,7 @@ namespace Mahakam
 				deferredShader->Bind("SPOT");
 			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
 			deferredShader->SetTexture("u_LightCookie", spotlightTexture);
-			sceneData->spotLightBuffer->Bind(1);
+			//sceneData->spotLightBuffer->Bind(1);
 
 			Renderer::DrawInstancedPyramid(amount);
 		}

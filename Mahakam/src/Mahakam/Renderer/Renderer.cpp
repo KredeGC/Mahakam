@@ -70,6 +70,7 @@ namespace Mahakam
 		// Setup camera matrices
 		sceneData->cameraData = CameraData(cam, glm::vec2(rendererData->width, rendererData->height), transform);
 
+		sceneData->cameraBuffer->Bind(0);
 		sceneData->cameraBuffer->SetData(&sceneData->cameraData, 0, sizeof(CameraData));
 
 		// Get render passes from selected camera
