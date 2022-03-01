@@ -35,12 +35,12 @@ namespace Mahakam {
 		data.width = props.width;
 		data.height = props.height;
 
-		MH_CORE_INFO("Creating Windows window {0} ({1}, {2})", props.title, props.width, props.height);
+		MH_CORE_INFO("Creating GLFW window {0} ({1}, {2})", props.title, props.width, props.height);
 
 		if (!glfwInitialized)
 		{
 			int success = glfwInit();
-			MH_ASSERT(success, "Could not initialize GLFW!");
+			MH_CORE_ASSERT(success, "Could not initialize GLFW!");
 
 			glfwSetErrorCallback(GLFWErrorCallback);
 
@@ -48,8 +48,8 @@ namespace Mahakam {
 		}
 
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 

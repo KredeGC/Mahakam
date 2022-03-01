@@ -120,7 +120,7 @@ namespace Mahakam
 		template<typename T, typename = typename std::enable_if<std::is_same<T, Texture2D>::value, void>::type>
 		static auto CreateOrLoadAsset(const std::string& src, bool saveMips, const TextureProps& props, typename std::enable_if<std::is_same<T, Texture2D>::value, void>::type* dummy = nullptr)
 		{
-			MH_CORE_ASSERT(props.width > 0 && props.height, "Width and height must be specified when loading or saving assets!");
+			MH_CORE_ASSERT(props.width && props.height, "Width and height must be specified when loading or saving assets!");
 
 			const std::string filepath = CreateDirectories(src);
 

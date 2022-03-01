@@ -13,8 +13,9 @@ namespace Mahakam
 	{
 		internalFormat = TextureFormatToOpenGLInternalFormat(format);
 
-		MH_GL_CALL(glCreateRenderbuffers(1, &rendererID));
-		MH_GL_CALL(glNamedRenderbufferStorage(rendererID, internalFormat, width, height));
+		MH_GL_CALL(glGenRenderbuffers(1, &rendererID));
+		MH_GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, rendererID));
+		MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height));
 	}
 
 	OpenGLRenderBuffer::~OpenGLRenderBuffer()
@@ -29,7 +30,8 @@ namespace Mahakam
 
 		MH_GL_CALL(glDeleteRenderbuffers(1, &rendererID));
 
-		MH_GL_CALL(glCreateRenderbuffers(1, &rendererID));
-		MH_GL_CALL(glNamedRenderbufferStorage(rendererID, internalFormat, width, height));
+		MH_GL_CALL(glGenRenderbuffers(1, &rendererID));
+		MH_GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, rendererID));
+		MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height));
 	}
 }

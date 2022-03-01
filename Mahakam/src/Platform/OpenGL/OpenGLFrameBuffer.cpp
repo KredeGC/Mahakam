@@ -42,11 +42,11 @@ namespace Mahakam
 		MH_GL_CALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID));
 
 		if (color)
-			MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_COLOR_BUFFER_BIT, GL_NEAREST))
-			if (depth)
-				MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST))
+			MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+		if (depth)
+			MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST));
 
-				MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
 	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
@@ -113,7 +113,7 @@ namespace Mahakam
 			return;
 		}
 
-		MH_GL_CALL(glCreateFramebuffers(1, &rendererID));
+		MH_GL_CALL(glGenFramebuffers(1, &rendererID));
 		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, rendererID));
 
 		// Color buffers

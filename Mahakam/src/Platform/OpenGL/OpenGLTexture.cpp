@@ -242,7 +242,7 @@ namespace Mahakam
 
 				mipSize = compressed_size;
 
-				MH_GL_CALL(glGetCompressedTexImage(rendererID, mip, (char*)pixels + offset));
+				MH_GL_CALL(glGetCompressedTexImage(GL_TEXTURE_2D, mip, (char*)pixels + offset));
 			}
 			else
 			{
@@ -392,7 +392,7 @@ namespace Mahakam
 		SetFilterMode(GL_TEXTURE_CUBE_MAP, this->props.mipmaps, this->props.filterMode);
 
 		if (this->props.mipmaps)
-			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
+			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
 
 
 		// Create matrices
@@ -529,7 +529,7 @@ namespace Mahakam
 
 		if (this->props.mipmaps && prefilter == TextureCubePrefilter::Prefilter)
 		{
-			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
+			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
 
 			unsigned int maxMipLevels = 5;
 			for (unsigned int mip = 0; mip < maxMipLevels; ++mip)
@@ -633,7 +633,7 @@ namespace Mahakam
 		}
 
 		if (props.mipmaps && !mipmaps)
-			MH_GL_CALL(glGenerateTextureMipmap(rendererID));
+			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
 	}
 
 	void OpenGLTextureCube::Bind(uint32_t slot) const

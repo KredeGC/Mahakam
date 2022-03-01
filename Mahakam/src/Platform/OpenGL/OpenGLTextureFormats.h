@@ -161,7 +161,7 @@ namespace Mahakam
 		case TextureFormat::RG_BC5:
 			return GL_COMPRESSED_RG_RGTC2;
 		case TextureFormat::RGBA_BC7:
-			return GL_COMPRESSED_RGBA_BPTC_UNORM;
+			return GL_COMPRESSED_RGBA_BPTC_UNORM_ARB;
 		case TextureFormat::RGB_DXT1:
 			return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
 		case TextureFormat::RGBA_DXT5:
@@ -231,7 +231,7 @@ namespace Mahakam
 		case TextureFormat::RG_BC5:
 			return GL_COMPRESSED_RG_RGTC2;
 		case TextureFormat::RGBA_BC7:
-			return GL_COMPRESSED_RGBA_BPTC_UNORM;
+			return GL_COMPRESSED_RGBA_BPTC_UNORM_ARB;
 		case TextureFormat::RGB_DXT1:
 			return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
 		case TextureFormat::RGBA_DXT5:
