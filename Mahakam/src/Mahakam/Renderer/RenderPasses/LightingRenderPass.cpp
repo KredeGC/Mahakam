@@ -467,6 +467,9 @@ namespace Mahakam
 		uint32_t amountSize = 16;
 		uint32_t amount = (uint32_t)sceneData->environment.directionalLights.size();
 
+		if (sceneData->directionalLightBuffer)
+			sceneData->directionalLightBuffer->Bind(1);
+
 		if (amount > 0)
 		{
 			uint32_t lightSize = sizeof(DirectionalLight);
@@ -475,7 +478,6 @@ namespace Mahakam
 			if (!sceneData->directionalLightBuffer || sceneData->directionalLightBuffer->GetSize() != bufferSize)
 				sceneData->directionalLightBuffer = StorageBuffer::Create(bufferSize);
 
-			sceneData->directionalLightBuffer->Bind(1);
 			sceneData->directionalLightBuffer->SetData(&amount, 0, sizeof(int));
 			sceneData->directionalLightBuffer->SetData(&sceneData->environment.directionalLights[0], amountSize, amount * lightSize);
 		}
@@ -483,11 +485,8 @@ namespace Mahakam
 		{
 			sceneData->directionalLightBuffer = StorageBuffer::Create(amountSize);
 
-			sceneData->directionalLightBuffer->Bind(1);
 			sceneData->directionalLightBuffer->SetData(&amount, 0, sizeof(int));
 		}
-
-		//sceneData->directionalLightBuffer->Bind(1);
 
 		Renderer::DrawScreenQuad();
 	}
@@ -514,7 +513,6 @@ namespace Mahakam
 			else
 				deferredShader->Bind("POINT");
 			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
-			//sceneData->pointLightBuffer->Bind(1);
 
 			Renderer::DrawInstancedSphere(amount);
 		}
@@ -543,7 +541,6 @@ namespace Mahakam
 				deferredShader->Bind("SPOT");
 			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
 			deferredShader->SetTexture("u_LightCookie", spotlightTexture);
-			//sceneData->spotLightBuffer->Bind(1);
 
 			Renderer::DrawInstancedPyramid(amount);
 		}

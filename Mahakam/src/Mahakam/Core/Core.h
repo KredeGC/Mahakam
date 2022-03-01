@@ -4,13 +4,14 @@
 
 
 #ifdef MH_DEBUG
+#define MH_ENABLE_PROFILING // Enable profiling in debug builds
 #define MH_ENABLE_ASSERT // Enable asserts in debug builds
 #define MH_ENABLE_GL_ERRORS // Enable render API errors in debug builds
 #define MH_ENABLE_RENDER_PROFILING // Enable render profiling in debug builds
 #endif // MH_DEBUG
 
 //#define MH_ENABLE_RENDER_PROFILING // Enable render profiling in all builds
-#define MH_ENABLE_PROFILING // Enable profiling in all builds
+//#define MH_ENABLE_PROFILING // Enable profiling in all builds
 
 
 #ifdef MH_ENABLE_ASSERT

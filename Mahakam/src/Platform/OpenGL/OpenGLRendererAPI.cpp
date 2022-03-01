@@ -80,7 +80,7 @@ namespace Mahakam
 
 	void OpenGLRendererAPI::FinishRendering()
 	{
-		glFinish();
+		MH_GL_CALL(glFinish());
 	}
 
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4 color)

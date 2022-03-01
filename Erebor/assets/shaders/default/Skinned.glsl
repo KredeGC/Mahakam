@@ -84,29 +84,24 @@ layout(location = 1) out vec4 o_Specular;
 layout(location = 2) out vec4 o_Pos;
 layout(location = 3) out vec4 o_Normal;
 
-layout(binding = 0, location = 0) uniform sampler2D u_Albedo;
-layout(binding = 1, location = 1) uniform sampler2D u_Bump;
-layout(binding = 2, location = 2) uniform sampler2D u_Metallic;
-layout(binding = 3, location = 3) uniform sampler2D u_Roughness;
+layout(location = 0) uniform vec3 u_Color;
+layout(location = 1) uniform float u_Metallic;
+layout(location = 2) uniform float u_Roughness;
 
 void main() {
 #if defined(GEOMETRY)
     // Surface values
-    vec3 albedo = texture(u_Albedo, i.v_UV).rgb;
-    vec3 bump = UnpackNormal(texture(u_Bump, i.v_UV).xy);
-    float metallic = texture(u_Metallic, i.v_UV).r;
-    float roughness = texture(u_Roughness, i.v_UV).r;
-    float ao = 1.0;
+    vec3 albedo = u_Color;
+    float metallic = u_Metallic;
+    float roughness = u_Roughness;
     
-    //albedo = pow(albedo, vec3(2.2)); // sRGB correction
+    vec3 normal = normalize(i.v_WorldNormal);
     
-    //vec3 normal = normalize(i.v_WorldNormal);
+    //mat3 tbn = mat3(normalize(i.v_WorldTangent), normalize(i.v_WorldBinormal), normalize(i.v_WorldNormal));
     
-    mat3 tbn = mat3(normalize(i.v_WorldTangent), normalize(i.v_WorldBinormal), normalize(i.v_WorldNormal));
+    //vec3 normal = normalize(tbn * bump);
     
-    vec3 normal = normalize(tbn * bump);
-    
-    o_Albedo = vec4(albedo, ao);
+    o_Albedo = vec4(albedo, 1.0);
     o_Specular = vec4(0.0, 0.0, metallic, roughness);
     o_Pos = vec4(i.v_WorldPos, 1.0);
     o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
