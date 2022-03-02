@@ -66,7 +66,7 @@ namespace Mahakam
 		if (true)
 #else
 		if (!FileUtility::Exists(cachePath))
-#endif
+#endif // MH_DEBUG
 		{
 			// Create shader stages
 			GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
@@ -89,7 +89,7 @@ namespace Mahakam
 				MH_GL_CALL(glDeleteShader(shader));
 
 				MH_CORE_ERROR("{0}\r\n\r\n{1}", src, infoLog.data());
-				MH_CORE_BREAK("Shader failed to compile!");
+				MH_CORE_BREAK("ComputeShader failed to compile!");
 
 				return;
 			}
@@ -114,7 +114,7 @@ namespace Mahakam
 				MH_GL_CALL(glDeleteShader(shader));
 
 				MH_CORE_ERROR("{0}\r\n\r\n{1}", src, infoLog.data());
-				MH_CORE_BREAK("Shader failed to link!");
+				MH_CORE_BREAK("ComputeShader failed to link!");
 
 				return;
 			}
@@ -164,7 +164,7 @@ namespace Mahakam
 				MH_GL_CALL(glDeleteProgram(program));
 
 				MH_CORE_ERROR("{0}\r\n\r\n{1}", src, infoLog.data());
-				MH_CORE_BREAK("Shader failed to link!");
+				MH_CORE_BREAK("ComputeShader failed to link!");
 
 				return;
 			}

@@ -1,7 +1,7 @@
 #pragma once
-
-#include "mhpch.h"
 #include "Mahakam/Core/Core.h"
+
+#include <string>
 
 namespace Mahakam
 {
@@ -67,7 +67,7 @@ namespace Mahakam
 		{
 			if (event.GetEventType() == T::GetStaticType())
 			{
-				event.handled = func(*(T*)&event);
+				event.handled |= func(static_cast<T&>(event));
 				return true;
 			}
 			return false;

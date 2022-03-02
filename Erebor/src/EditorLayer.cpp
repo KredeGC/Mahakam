@@ -114,7 +114,13 @@ namespace Mahakam
 		// Setup scene camera
 		Entity cameraEntity = activeScene->CreateEntity("Main Camera");
 		//cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
-		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f, std::initializer_list<RenderPass*>{ new TexelGeometryPass(), new TexelLightingPass(), new PixelationPass(), new TonemappingRenderPass() });
+		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f, std::initializer_list<RenderPass*>{
+			new TexelGeometryPass(),
+			new TexelLightingPass(),
+			new PixelationPass(),
+			new ParticleRenderPass(),
+			new TonemappingRenderPass()
+		});
 		cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
 		cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
@@ -154,6 +160,12 @@ namespace Mahakam
 		planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
 		planeEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
 		planeEntity.GetComponent<TransformComponent>().SetScale({ 10.0f, 10.0f, 10.0f });
+
+
+		// Create particle system
+		Entity particleEntity = activeScene->CreateEntity("Particle System");
+		particleEntity.AddComponent<ParticleSystemComponent>();
+		particleEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
 		// Create backpack textures
@@ -201,7 +213,7 @@ namespace Mahakam
 
 
 		// Create mesh & base material
-		Ref<Mesh> sphereMesh = Mesh::CreateCubeSphere(8);
+		Ref<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
 		Ref<Material> baseMaterial = Material::Create(colorShader);
 		baseMaterial->SetFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 

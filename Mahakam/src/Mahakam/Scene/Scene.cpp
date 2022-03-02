@@ -101,7 +101,6 @@ namespace Mahakam
 			});
 		}
 
-
 		// Update animators
 		{
 			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - AnimatorComponent");
@@ -173,19 +172,47 @@ namespace Mahakam
 				});
 			}
 
-			// Render each entity with a mesh
+			// Update particle systems
+			/*auto particleView = registry.view<TransformComponent, ParticleSystemComponent>();
+			{
+				MH_PROFILE_RENDERING_SCOPE("Mahakam::Scene::OnUpdate - ParticleSystemComponent");
+
+				particleView.each([=](auto entity, TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
+				{
+					auto& particles = particleComponent.GetParticleSystem();
+
+					particles.Simulate(ts, transform, Renderer);
+				});
+			}*/
+
+			// Begin the render loop
 			{
 				MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Render loop");
 				Renderer::BeginScene(*mainCamera, *mainTransform, environment);
 
-				registry.view<TransformComponent, MeshComponent>().each([&](auto entity, TransformComponent& transformComponent, MeshComponent& meshComponent)
+				// Render each entity with a mesh
 				{
-					auto& meshes = meshComponent.GetMeshes();
-					auto& materials = meshComponent.GetMaterials();
-					int materialCount = (int)materials.size() - 1;
-					for (int i = 0; i < meshComponent.GetMeshCount(); i++)
-						Renderer::Submit(transformComponent, meshes[i], materials[i < materialCount ? i : materialCount]);
-				});
+					MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Submit");
+
+					registry.view<TransformComponent, MeshComponent>().each([&](auto entity, TransformComponent& transformComponent, MeshComponent& meshComponent)
+					{
+						auto& meshes = meshComponent.GetMeshes();
+						auto& materials = meshComponent.GetMaterials();
+						int materialCount = (int)materials.size() - 1;
+						for (int i = 0; i < meshComponent.GetMeshCount(); i++)
+							Renderer::Submit(transformComponent, meshes[i], materials[i < materialCount ? i : materialCount]);
+					});
+				}
+
+				// Render particle systems
+				{
+					MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - SubmitParticles");
+
+					registry.view<TransformComponent, ParticleSystemComponent>().each([=](auto entity, TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
+					{
+						Renderer::SubmitParticles(transformComponent, particleComponent);
+					});
+				}
 
 				Renderer::EndScene();
 			}

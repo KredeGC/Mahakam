@@ -2,7 +2,6 @@
 
 #include "Buffer.h"
 #include "FrameBuffer.h"
-
 #include "RenderData.h"
 
 #include <vector>
@@ -21,6 +20,7 @@ namespace Mahakam
 			std::vector<RenderPass*> renderPasses;
 			robin_hood::unordered_set<RenderPass*> initializedRenderPasses;
 
+			Ref<FrameBuffer> gBuffer;
 			Ref<FrameBuffer> viewportFramebuffer;
 			Ref<Material> unlitMaterial;
 			uint32_t width;
@@ -43,6 +43,7 @@ namespace Mahakam
 		static void EnableGBuffer(bool enable) { sceneData->gBuffer = enable; }
 
 		static void Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
+		static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles);
 
 		static void DrawSkybox();
 		static void DrawScreenQuad();
@@ -53,6 +54,7 @@ namespace Mahakam
 		inline static bool HasBoundingBoxEnabled() { return sceneData->boundingBox; }
 		inline static bool HasGBufferEnabled() { return sceneData->gBuffer; }
 
+		inline static Ref<FrameBuffer> GetGBuffer() { return rendererData->gBuffer; }
 		inline static Ref<FrameBuffer> GetFrameBuffer() { return rendererData->viewportFramebuffer; }
 
 		inline static void AddPerformanceResult(uint32_t vertexCount, uint32_t indexCount)

@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "Light.h"
+#include "ParticleSystem.h"
 
 #include "RenderPasses.h"
 
@@ -94,8 +95,11 @@ namespace Mahakam
 
 		// Sort the render queue
 		std::sort(sceneData->renderQueue.begin(), sceneData->renderQueue.end());
+		std::sort(sceneData->particleQueue.begin(), sceneData->particleQueue.end());
 
 		// Render each render pass
+		rendererData->gBuffer = rendererData->renderPasses[0]->GetFrameBuffer();
+
 		Ref<FrameBuffer> prevBuffer = nullptr;
 		for (uint32_t i = 0; i < rendererData->renderPasses.size(); i++)
 		{
@@ -237,6 +241,25 @@ namespace Mahakam
 		}
 
 		sceneData->renderQueue.push_back(drawID);
+	}
+
+	void Renderer::SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles)
+	{
+		uint64_t particleID = sceneData->particleIDLookup.size();
+		sceneData->particleIDLookup[particleID] = particles;
+
+		uint64_t transformID = sceneData->transformIDLookup.size();
+		sceneData->transformIDLookup[transformID] = transform;
+
+		float depth = (sceneData->cameraData.u_m4_VP * transform[3]).z;
+
+		uint64_t depthInt = (uint64_t)(depth * ((1ULL << 31ULL) - 1ULL));
+
+		uint64_t drawID = ((depthInt & 0xFFFFFFFFULL) << 32ULL);
+		drawID |= ((particleID & 0xFFFFULL) << 16ULL);
+		drawID |= (transformID & 0xFFFFULL);
+
+		sceneData->particleQueue.push_back(drawID);
 	}
 
 	void Renderer::DrawSkybox()

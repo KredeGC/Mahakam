@@ -2,6 +2,8 @@
 
 #include "Mahakam/Core/Core.h"
 
+#include "ParticleSystem.h"
+
 #include <glm/glm.hpp>
 
 #include <vector>
@@ -121,16 +123,19 @@ namespace Mahakam
 		bool boundingBox = false;
 		bool gBuffer = false;
 
-		// Render queue
-		// 64 bit render queue ID
-		// 2 bit - Geometry(0), AlphaTest(1), Transparent(2), Fullscreen(3)
+		float deltaTime;
+
+		// Render queue ID
+		// 2 bits - Geometry(0), AlphaTest(1), Transparent(2), Fullscreen(3)
 		// If Opaque:
 		//  15 bits - Shader index
 		//  15 bits - Material index
 		//  16 bits - Mesh index
 		//  16 bits - Transform index
 		// If Transparent:
-		//  32 bits - Depth
+		//  30 bits - Depth
+		//  16 bits - Mesh index
+		//  16 bits - Transform index
 		std::vector<uint64_t> renderQueue;
 
 		robin_hood::unordered_map<Ref<Shader>, uint64_t> shaderRefLookup;
@@ -141,6 +146,14 @@ namespace Mahakam
 		robin_hood::unordered_map<uint64_t, Ref<Material>> materialIDLookup;
 		robin_hood::unordered_map<uint64_t, Ref<Mesh>> meshIDLookup;
 		robin_hood::unordered_map<uint64_t, glm::mat4> transformIDLookup;
+
+		// Particle queue ID
+		// 32 bits - Depth
+		// 16 bits - ParticleSystem index
+		// 16 bits - Transform index
+		std::vector<uint64_t> particleQueue;
+
+		robin_hood::unordered_map<uint64_t, ParticleSystem> particleIDLookup;
 
 		// Environment data, provided by scene
 		EnvironmentData environment;

@@ -54,10 +54,7 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		if (sceneData->wireframe)
-		{
-			src->Blit(hdrFrameBuffer);
 			return false;
-		}
 
 		// Create view projection frustum
 		Frustum cameraFrustum(sceneData->cameraData.u_m4_VP);
