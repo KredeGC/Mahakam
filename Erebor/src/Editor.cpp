@@ -24,7 +24,7 @@ namespace Mahakam
 		}
 	};
 
-	extern Application* Mahakam::CreateApplication()
+	extern Application* CreateApplication()
 	{
 		return new Editor();
 	}

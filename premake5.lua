@@ -183,17 +183,19 @@ project "Erebor"
         
         links {
 			"GLFW",
-			"Glad",
+			"glad",
 			"ImGui",
 			"Xrandr",
 			"Xi",
-			"GLU",
+			--"GLU",
 			"GL",
 			"X11",
 			"dl",
 			"pthread",
 			"stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
 			"yaml-cpp",
+            "assimp",
+            "zlibstatic"
 		}
 
     filter "configurations:Debug"
