@@ -86,6 +86,10 @@ project "Mahakam"
         "%{IncludeDir.yaml}"
     }
     
+    libdirs {
+        "Mahakam/vendor/assimp/lib/%{cfg.buildcfg}"
+    }
+    
     links {
         "GLFW",
         "glad",
@@ -156,6 +160,10 @@ project "Erebor"
         "%{IncludeDir.imgui}",
         "%{IncludeDir.robin_hood}",
         "%{IncludeDir.glm}"
+    }
+    
+    libdirs {
+        "Mahakam/vendor/assimp/lib/%{cfg.buildcfg}"
     }
 
     links {

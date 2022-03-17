@@ -1,6 +1,5 @@
 project "assimp"
 	kind "StaticLib"
-    --location "code"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "on"
@@ -9,22 +8,8 @@ project "assimp"
 	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
 
 	defines {
-        "ASSIMP_BUILD_NO_M3D_IMPORTER",
-        "ASSIMP_BUILD_NO_M3D_EXPORTER",
-        "WIN32_LEAN_AND_MEAN",
-        "UNICODE",
-        "_UNICODE",
-        "ASSIMP_BUILD_NO_C4D_IMPORTER",
-        "MINIZ_USE_UNALIGNED_LOADS_AND_STORES=0",
-        "ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC=1",
-        "RAPIDJSON_HAS_STDSTRING=1",
-        "RAPIDJSON_NOMEMBERITERATORCLASS",
-        "ASSIMP_BUILD_DLL_EXPORT",
-        "_SCL_SECURE_NO_WARNINGS",
-        "_CRT_SECURE_NO_WARNINGS",
-        "OPENDDLPARSER_BUILD",
-        
-        "ASSIMP_BUILD_NO_OWN_ZLIB",
+		-- "SWIG",
+		"ASSIMP_BUILD_NO_OWN_ZLIB",
   
 		"ASSIMP_BUILD_NO_X_IMPORTER",
 		"ASSIMP_BUILD_NO_3DS_IMPORTER",
@@ -103,7 +88,7 @@ project "assimp"
 		"ASSIMP_BUILD_NO_SPLITBYBONECOUNT_PROCESS",
 		"ASSIMP_BUILD_NO_DEBONE_PROCESS",
 		"ASSIMP_BUILD_NO_EMBEDTEXTURES_PROCESS",
-		"ASSIMP_BUILD_NO_GLOBALSCALE_PROCESS"
+		"ASSIMP_BUILD_NO_GLOBALSCALE_PROCESS",
 	}
   
 	files {
@@ -128,111 +113,18 @@ project "assimp"
 		"contrib/pugixml/src",
 		"contrib/rapidjson/include",
 	}
-    
-    links {
-        "zlibstatic"
-    }
 
 	filter "system:linux"
 		pic "on"
 		systemversion "latest"
-        
-        defines {
-            "_LINUX"
-        }
 
 	filter "system:windows"
 		systemversion "latest"
-        
-        defines {
-            "_WINDOWS"
-        }
 
     filter "configurations:Debug"
         runtime "Debug"
         symbols "on"
-        
-        defines {
-            "_DEBUG", -- Is this auto?
-            "CMAKE_INTDIR=\"Debug\""
-        }
 
     filter "configurations:Release"
         runtime "Release"
         optimize "on"
-        
-        defines {
-            "NDEBUG", -- Is this auto-generated?
-            "CMAKE_INTDIR=\"Release\""
-        }
-
-project "zlibstatic"
-	kind "StaticLib"
-    location "contrib/zlib"
-	language "C++"
-	cppdialect "C++17"
-	staticruntime "on"
-
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
-
-	defines {
-        "ASSIMP_BUILD_NO_M3D_IMPORTER",
-        "ASSIMP_BUILD_NO_M3D_EXPORTER",
-        "WIN32_LEAN_AND_MEAN",
-        "UNICODE",
-        "_UNICODE",
-        "NO_FSEEKO",
-        "_CRT_SECURE_NO_DEPRECATE",
-        "_CRT_NONSTDC_NO_DEPRECATE"
-	}
-  
-	files {
-		"include/**",
-		"code/**",
-		"contrib/zip/**",
-		"contrib/pugixml/**",
-		"contrib/zlib/**.cpp",
-		"contrib/zlib/**.c",
-		"contrib/zlib/**.h",
-		"contrib/zlib/**.hpp"
-	}
-  
-	includedirs {
-		"include",
-        "",
-        "code",
-        "contrib/zlib"
-	}
-
-	filter "system:linux"
-		pic "on"
-		systemversion "latest"
-        
-        defines {
-            "_LINUX"
-        }
-
-	filter "system:windows"
-		systemversion "latest"
-        
-        defines {
-            "_WINDOWS"
-        }
-
-    filter "configurations:Debug"
-        runtime "Debug"
-        symbols "on"
-        
-        defines {
-            "CMAKE_INTDIR=\"Debug\""
-        }
-
-    filter "configurations:Release"
-        runtime "Release"
-        optimize "on"
-        
-        defines {
-            "NDEBUG",
-            "CMAKE_INTDIR=\"Release\""
-        }
