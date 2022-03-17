@@ -1,11 +1,11 @@
 workspace "Mahakam"
     architecture "x64"
-    startproject "Sandbox"
+    startproject "Erebor"
     
     configurations {
         "Debug",
-        "Release",
-        "Dist"
+        "DebugOptimized",
+        "Release"
     }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -26,20 +26,20 @@ IncludeDir["yaml"]          = "Mahakam/vendor/yaml-cpp/include"
 
 group "Dependencies/Assimp"
     os.execute("cmake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
-    --os.execute("cmake --build \"Mahakam/vendor/assimp/\"")
+    os.execute("cmake --build \"Mahakam/vendor/assimp/\" --config release")
     
-    externalproject "assimp"
-        location "Mahakam/vendor/assimp/code"
-        kind "StaticLib"
-        language "C++"
-        cppdialect "C++17"
-        uuid "A8CB2FE6-9AD5-3CE2-8D32-B7DFAF8EC735"
+    -- externalproject "assimp"
+    --     location "Mahakam/vendor/assimp/code"
+    --     kind "StaticLib"
+    --     language "C++"
+    --     cppdialect "C++17"
+    --     uuid "A8CB2FE6-9AD5-3CE2-8D32-B7DFAF8EC735"
     
-    externalproject "zlibstatic"
-        location "Mahakam/vendor/assimp/contrib/zlib"
-        kind "StaticLib"
-        language "C"
-        uuid "A1367BDB-5B32-37E6-9FEA-6F7654E7330B"
+    -- externalproject "zlibstatic"
+    --     location "Mahakam/vendor/assimp/contrib/zlib"
+    --     kind "StaticLib"
+    --     language "C"
+    --     uuid "A1367BDB-5B32-37E6-9FEA-6F7654E7330B"
         
 
 group "Dependencies"
@@ -86,15 +86,10 @@ project "Mahakam"
         "%{IncludeDir.yaml}"
     }
     
-    libdirs {
-        "Mahakam/vendor/assimp/lib/%{cfg.buildcfg}"
-    }
-    
     links {
         "GLFW",
         "glad",
         "ImGui",
-        "assimp",
         "yaml-cpp"
     }
 
@@ -125,11 +120,34 @@ project "Mahakam"
         defines "MH_DEBUG"
         runtime "Debug"
         symbols "on"
+    
+        libdirs { "./Mahakam/vendor/assimp/lib/Debug" }
+        links { "assimp-vc142-mtd" }
+    
+        libdirs { "./Mahakam/vendor/assimp/contrib/zlib/Debug" }
+        links { "zlibstaticd" }
+        
+    filter "configurations:DebugOptimized"
+        defines "MH_DEBUG"
+        runtime "Release"
+        optimize "on"
+    
+        libdirs { "./Mahakam/vendor/assimp/lib/Release" }
+        links { "assimp-vc142-mt" }
+    
+        libdirs { "./Mahakam/vendor/assimp/contrib/zlib/Release" }
+        links { "zlibstatic" }
         
     filter "configurations:Release"
         defines "MH_RELEASE"
         runtime "Release"
         optimize "on"
+    
+        libdirs { "./Mahakam/vendor/assimp/lib/Release" }
+        links { "assimp-vc142-mt" }
+    
+        libdirs { "./Mahakam/vendor/assimp/contrib/zlib/Release" }
+        links { "zlibstatic" }
 
 project "Erebor"
     location "Erebor"
@@ -210,64 +228,31 @@ project "Erebor"
         defines "MH_DEBUG"
         runtime "Debug"
         symbols "on"
+    
+        libdirs { "./Mahakam/vendor/assimp/lib/Debug" }
+        links { "assimp-vc142-mtd" }
+    
+        libdirs { "./Mahakam/vendor/assimp/contrib/zlib/Debug" }
+        links { "zlibstaticd" }
         
-        --[[postbuildcommands {
-			"{COPYDIR} \"%{LinkDir.VulkanSDK_DebugDLL}\" \"%{cfg.targetdir}\""
-		}]]
-        
-    filter "configurations:Release"
-        defines "MH_RELEASE"
-        runtime "Release"
-        optimize "on"
-
-project "Sandbox"
-    location "Sandbox"
-    kind "ConsoleApp"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "on"
-    
-    targetdir ("bin/"..outputdir.."/%{prj.name}")
-    objdir ("bin-obj/"..outputdir.."/%{prj.name}")
-    
-    files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.hpp",
-        "%{prj.name}/src/**.cpp",
-        "%{prj.name}/src/**.c"
-    }
-    
-    includedirs {
-        "%{prj.name}/src",
-        "Mahakam/src",
-        "%{IncludeDir.assimp}",
-        "%{IncludeDir.entt}",
-        "%{IncludeDir.spdlog}",
-        "%{IncludeDir.imgui}",
-        "%{IncludeDir.glm}"
-    }
-    
-    links {
-        "Mahakam"
-    }
-
-    defines {
-        "_CRT_SECURE_NO_WARNINGS"
-    }
-    
-    filter "system:windows"
-        systemversion "latest"
-        
-        defines {
-            "MH_PLATFORM_WINDOWS"
-        }
-    
-    filter "configurations:Debug"
+    filter "configurations:DebugOptimized"
         defines "MH_DEBUG"
-        runtime "Debug"
-        symbols "on"
+        runtime "Release"
+        optimize "on"
+    
+        libdirs { "./Mahakam/vendor/assimp/lib/Release" }
+        links { "assimp-vc142-mt" }
+    
+        libdirs { "./Mahakam/vendor/assimp/contrib/zlib/Release" }
+        links { "zlibstatic" }
         
     filter "configurations:Release"
         defines "MH_RELEASE"
         runtime "Release"
         optimize "on"
+    
+        libdirs { "./Mahakam/vendor/assimp/lib/Release" }
+        links { "assimp-vc142-mt" }
+    
+        libdirs { "./Mahakam/vendor/assimp/contrib/zlib/Release" }
+        links { "zlibstatic" }
