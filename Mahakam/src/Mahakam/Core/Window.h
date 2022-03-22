@@ -3,6 +3,8 @@
 #include "Core.h"
 #include "Mahakam/Events/Event.h"
 
+#include "Mahakam/Renderer/RenderingContext.h"
+
 namespace Mahakam
 {
 	struct WindowProps
@@ -36,6 +38,10 @@ namespace Mahakam
 		virtual void SetCursorVisible(bool visible) = 0;
 
 		virtual void* GetNativeWindow() const = 0;
+
+		virtual void* GetProcess() const = 0;
+
+		virtual RenderingContext* GetContext() const = 0;
 
 		static Scope<Window> Create(const WindowProps& props = WindowProps());
 	};

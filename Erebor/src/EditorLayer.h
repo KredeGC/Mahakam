@@ -32,6 +32,7 @@ namespace Mahakam
 			sceneViewPanel(), sceneHierarchyPanel(), statsPanel() {}
 
 		virtual void OnAttach() override;
+		virtual void OnDetach() override;
 		virtual void OnUpdate(Timestep dt) override;
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& event) override;

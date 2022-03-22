@@ -86,6 +86,8 @@ namespace Mahakam
 		}
 	};
 
+	static SharedLibrary* lib;
+
 	void EditorLayer::OnAttach()
 	{
 		// Create a new active scene
@@ -233,11 +235,28 @@ namespace Mahakam
 				entity.GetComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
 			}
 		}
+
+
+		lib = new SharedLibrary("runtime/Sandbox.dll");
+
+		void (*initPtr)(Application*, Scene*) = lib->GetFunction<void, Application*, Scene*>("Init");
+
+		initPtr(&Application::GetInstance(), activeScene.get());
+	}
+
+	void EditorLayer::OnDetach()
+	{
+		delete lib;
 	}
 
 	void EditorLayer::OnUpdate(Timestep dt)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
+		
+
+		auto updatePtr = lib->GetFunction<void, Scene*, Timestep>("Update");
+
+		updatePtr(activeScene.get(), dt);
 
 		activeScene->OnUpdate(dt);
 

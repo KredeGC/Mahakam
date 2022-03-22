@@ -41,7 +41,7 @@ SET(CMAKE_POLICY_DEFAULT_CMP0092 NEW)
 CMAKE_MINIMUM_REQUIRED( VERSION 3.10 )
 
 cmake_policy(SET CMP0091 NEW)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+# set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL$<$<CONFIG:Debug>:Debug>")
 
 # Disabled importers: m3d for 5.1
 ADD_DEFINITIONS( -DASSIMP_BUILD_NO_M3D_IMPORTER)
@@ -62,6 +62,10 @@ ENDIF()
 PROJECT(Assimp VERSION 5.1.4)
 
 # All supported options ###############################################
+
+ADD_DEFINITIONS( -DASSIMP_BUILD_NO_M3D_IMPORTER)
+ADD_DEFINITIONS( -DASSIMP_BUILD_NO_M3D_EXPORTER)
+ADD_DEFINITIONS( -DASSIMP_BUILD_NO_PBRT_EXPORTER)
 
 OPTION( BUILD_SHARED_LIBS
   "Build package with shared libraries."
@@ -93,7 +97,7 @@ OPTION( ASSIMP_BUILD_ZLIB
 )
 OPTION( ASSIMP_BUILD_ASSIMP_TOOLS
   "If the supplementary tools for Assimp are built in addition to the library."
-  ON
+  OFF
 )
 OPTION ( ASSIMP_BUILD_SAMPLES
   "If the official samples are built as well (needs Glut)."
@@ -101,7 +105,7 @@ OPTION ( ASSIMP_BUILD_SAMPLES
 )
 OPTION ( ASSIMP_BUILD_TESTS
   "If the test suite for Assimp is built in addition to the library."
-  ON
+  OFF
 )
 OPTION ( ASSIMP_COVERALLS
   "Enable this to measure test coverage."
@@ -129,7 +133,7 @@ OPTION ( ASSIMP_BUILD_DOCS
 )
 OPTION( ASSIMP_INJECT_DEBUG_POSTFIX
   "Inject debug postfix in .a/.so/.dll lib names"
-  ON
+  OFF
 )
 
 OPTION ( ASSIMP_IGNORE_GIT_HASH

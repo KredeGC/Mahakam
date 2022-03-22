@@ -1,6 +1,7 @@
 #pragma once
 #include "Mahakam/Core/Core.h"
 
+#include <sstream>
 #include <string>
 
 namespace Mahakam

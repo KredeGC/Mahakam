@@ -26,6 +26,7 @@ IncludeDir["yaml"]          = "Mahakam/vendor/yaml-cpp/include"
 
 group "Dependencies/Assimp"
     os.execute("cmake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
+    os.execute("cmake --build \"Mahakam/vendor/assimp/\" --config debug")
     os.execute("cmake --build \"Mahakam/vendor/assimp/\" --config release")
     
     -- externalproject "assimp"
@@ -55,7 +56,7 @@ project "Mahakam"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
     
     targetdir ("bin/"..outputdir.."/%{prj.name}")
     objdir ("bin-obj/"..outputdir.."/%{prj.name}")
@@ -154,7 +155,7 @@ project "Erebor"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
 
     targetdir ("bin/"..outputdir.."/%{prj.name}")
     objdir ("bin-obj/"..outputdir.."/%{prj.name}")
@@ -198,6 +199,116 @@ project "Erebor"
         
         defines {
             "MH_PLATFORM_WINDOWS"
+        }
+
+    filter "system:linux"
+        systemversion "latest"
+        
+        defines {
+            "MH_PLATFORM_LINUX"
+        }
+        
+        links {
+			"GLFW",
+			"glad",
+			"ImGui",
+			"Xrandr",
+			"Xi",
+			--"GLU",
+			"GL",
+			"X11",
+			"dl",
+			"pthread",
+			"stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
+			"yaml-cpp",
+            "assimp",
+            "zlibstatic"
+		}
+
+    filter "configurations:Debug"
+        defines "MH_DEBUG"
+        runtime "Debug"
+        symbols "on"
+    
+        libdirs { "./Mahakam/vendor/assimp/lib/Debug" }
+        links { "assimp-vc142-mtd" }
+    
+        libdirs { "./Mahakam/vendor/assimp/contrib/zlib/Debug" }
+        links { "zlibstaticd" }
+        
+    filter "configurations:DebugOptimized"
+        defines "MH_DEBUG"
+        runtime "Release"
+        optimize "on"
+    
+        libdirs { "./Mahakam/vendor/assimp/lib/Release" }
+        links { "assimp-vc142-mt" }
+    
+        libdirs { "./Mahakam/vendor/assimp/contrib/zlib/Release" }
+        links { "zlibstatic" }
+        
+    filter "configurations:Release"
+        defines "MH_RELEASE"
+        runtime "Release"
+        optimize "on"
+    
+        libdirs { "./Mahakam/vendor/assimp/lib/Release" }
+        links { "assimp-vc142-mt" }
+    
+        libdirs { "./Mahakam/vendor/assimp/contrib/zlib/Release" }
+        links { "zlibstatic" }
+
+project "Sandbox"
+    location "Sandbox"
+    kind "SharedLib"
+    language "C++"
+    cppdialect "C++17"
+    staticruntime "off"
+
+    targetdir ("bin/"..outputdir.."/%{prj.name}")
+    objdir ("bin-obj/"..outputdir.."/%{prj.name}")
+    
+    pchheader "sbpch.h"
+    pchsource "Sandbox/src/sbpch.cpp"
+
+    files {
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/src/**.hpp",
+        "%{prj.name}/src/**.cpp",
+        "%{prj.name}/src/**.c"
+    }
+
+    includedirs {
+        "%{prj.name}/src",
+        "Mahakam/src",
+        "%{IncludeDir.assimp}",
+        "%{IncludeDir.entt}",
+        "%{IncludeDir.spdlog}",
+        "%{IncludeDir.imgui}",
+        "%{IncludeDir.robin_hood}",
+        "%{IncludeDir.glm}"
+    }
+
+    links {
+        "Mahakam"
+    }
+
+    defines {
+        "_CRT_SECURE_NO_WARNINGS",
+		"GLFW_INCLUDE_NONE"
+    }
+    
+    postbuildcommands {
+        --"{MKDIR} \"../bin/"..outputdir.."/Erebor/runtime\"",
+        "{COPYDIR} \"../bin/"..outputdir.."/%{prj.name}/\" \"../bin/"..outputdir.."/Erebor/runtime/\""
+    }
+
+    filter "system:windows"
+        systemversion "latest"
+        
+        defines {
+            "MH_PLATFORM_WINDOWS",
+            "WIN_EXPORT"
         }
 
     filter "system:linux"

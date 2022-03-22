@@ -10,11 +10,13 @@ namespace Mahakam
 	{
 	private:
 		GLFWwindow* window;
+		void* procAddress;
 
 	public:
-		OpenGLContext(GLFWwindow* window);
+		OpenGLContext(void* window, void* proc);
 
 		virtual void Init() override;
+		virtual void Reload() override;
 		virtual void SwapBuffers() override;
 	};
 }

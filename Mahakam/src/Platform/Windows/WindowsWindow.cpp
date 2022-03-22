@@ -67,7 +67,7 @@ namespace Mahakam {
 
 		// Creating the window
 		window = glfwCreateWindow((int)data.width, (int)data.height, data.title.c_str(), nullptr, nullptr);
-		context = new OpenGLContext(window);
+		context = RenderingContext::Create(window, glfwGetProcAddress);
 		context->Init();
 		glfwSetWindowUserPointer(window, &data);
 		if (pixels)

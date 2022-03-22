@@ -16,23 +16,16 @@ namespace Mahakam
 #elif defined(MH_PLATFORM_LINUX)
 		handle = dlopen(filepath, RTLD_NOW);
 #endif
+
+		MH_CORE_ASSERT(handle, "Failed to open shared library!");
 	}
 
 	SharedLibrary::~SharedLibrary()
 	{
 #if defined(MH_PLATFORM_WINDOWS)
-		MH_ASSERT(FreeLibrary(handle), "Failed to close shared library!");
+		MH_CORE_ASSERT(FreeLibrary(handle), "Failed to close shared library!");
 #elif defined(MH_PLATFORM_LINUX)
-		MH_ASSERT(dlclose(handle), "Failed to close shared library!");
-#endif
-	}
-
-	void* SharedLibrary::GetFunction(const char* name)
-	{
-#if defined(MH_PLATFORM_WINDOWS)
-		return GetProcAddress(handle, name);
-#elif defined(MH_PLATFORM_LINUX)
-		return dlsym(myso, name);
+		MH_CORE_ASSERT(dlclose(handle), "Failed to close shared library!");
 #endif
 	}
 }
