@@ -3,12 +3,16 @@
 
 #include "RendererAPI.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include "Platform/OpenGL/OpenGLComputeShader.h"
 
 namespace Mahakam
 {
 	Ref<ComputeShader> ComputeShader::Create(const std::string& filepath)
 	{
+		MH_OVERRIDE_FUNC(computeShaderCreate, filepath);
+
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:

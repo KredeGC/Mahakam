@@ -54,9 +54,23 @@
 #define MH_PROFILE_RENDERING_FUNCTION()
 #endif // MH_ENABLE_PROFILING
 
+// Returns the bitness of x
 #define BIT(x) (1 << x)
 
+// Returns a non-capturing lambda which calls fn
 #define MH_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+
+// Defines a typdef function pointer and initializes it as a static variable
+#define MH_SHARED_FUNC(returnType, shorthand, name, ...) typedef returnType(*shorthand)(__VA_ARGS__); \
+	inline static shorthand name = nullptr;
+
+// Calls the SharedLibrary function and returns the result
+#if MH_DEBUG
+#define MH_OVERRIDE_FUNC(name, ...) if (SharedLibrary::name != nullptr) \
+	return SharedLibrary::name(__VA_ARGS__);
+#else
+#define MH_OVERRIDE_FUNC(name, ...)
+#endif
 
 namespace Mahakam
 {
@@ -76,6 +90,15 @@ namespace Mahakam
 	constexpr Ref<T> CreateRef(Args&& ... args)
 	{
 		return std::make_shared<T>(std::forward<Args>(args)...);
+	}
+
+	template<typename T>
+	using WeakRef = std::weak_ptr<T>;
+
+	template<typename T>
+	constexpr WeakRef<T> CreateWeakRef(const Ref<T>& ref)
+	{
+		return WeakRef<T>(ref);
 	}
 }
 

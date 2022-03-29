@@ -3,12 +3,19 @@
 
 #include "RendererAPI.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include "Platform/OpenGL/OpenGLRenderBuffer.h"
 
 namespace Mahakam
 {
 	Ref<RenderBuffer> RenderBuffer::Create(uint32_t width, uint32_t height, TextureFormat format)
 	{
+#if MH_DEBUG
+		if (SharedLibrary::renderBufferCreate != nullptr)
+			return SharedLibrary::renderBufferCreate(width, height, format);
+#endif
+
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:

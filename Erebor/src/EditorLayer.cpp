@@ -237,11 +237,21 @@ namespace Mahakam
 		}
 
 
+		//lib = new SharedLibrary("runtime/Sandbox.dll");
+
+		//void (*initPtr)(Application*, Scene*) = lib->GetFunction<void, Application*, Scene*>("Init");
+		//auto initPtr = lib->GetFunction<void, Application*, Scene*, Ref<Texture2D>(*)(const std::string&, const TextureProps&)>("Init");
+
+		//initPtr(&Application::GetInstance(), activeScene.get());
+		//initPtr(&Application::GetInstance(), activeScene.get(), Texture2D::Create);
+
+
+
 		lib = new SharedLibrary("runtime/Sandbox.dll");
 
-		void (*initPtr)(Application*, Scene*) = lib->GetFunction<void, Application*, Scene*>("Init");
+		auto runPtr = lib->GetFunction<void, Scene*>("Run");
 
-		initPtr(&Application::GetInstance(), activeScene.get());
+		runPtr(activeScene.get());
 	}
 
 	void EditorLayer::OnDetach()

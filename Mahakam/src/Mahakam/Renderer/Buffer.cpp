@@ -3,6 +3,8 @@
 
 #include "RendererAPI.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include "Platform/OpenGL/OpenGLBuffer.h"
 
 namespace Mahakam
@@ -10,6 +12,8 @@ namespace Mahakam
 #pragma region UniformBuffer
 	Ref<UniformBuffer> UniformBuffer::Create(uint32_t size)
 	{
+		MH_OVERRIDE_FUNC(uniformBufferCreate, size);
+
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -28,6 +32,8 @@ namespace Mahakam
 #pragma region StorageBuffer
 	Ref<StorageBuffer> StorageBuffer::Create(uint32_t size)
 	{
+		MH_OVERRIDE_FUNC(storageBufferCreate, size);
+
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
