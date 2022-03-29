@@ -3,12 +3,16 @@
 
 #include "RendererAPI.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include "Platform/OpenGL/OpenGLMaterial.h"
 
 namespace Mahakam
 {
 	Ref<Material> Material::Copy(Ref<Material> material)
 	{
+		MH_OVERRIDE_FUNC(materialCopy, material);
+
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -24,6 +28,8 @@ namespace Mahakam
 
 	Ref<Material> Material::Create(Ref<Shader> shader, const std::string& variant)
 	{
+		MH_OVERRIDE_FUNC(materialCreate, shader, variant);
+
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:

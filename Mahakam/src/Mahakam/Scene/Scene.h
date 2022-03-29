@@ -40,6 +40,12 @@ namespace Mahakam
 		Entity CreateEntity(const std::string& name = "Entity");
 		void DestroyEntity(Entity entity);
 
+		template<typename ... Args, typename Fn>
+		void ForEach(Fn func)
+		{
+			return registry.view<Args...>().each(func);
+		}
+
 		static Ref<Scene> CreateScene(const std::string& filepath);
 		static Ref<Scene> CreateScene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
 

@@ -8,21 +8,15 @@ namespace Mahakam
 	class Log
 	{
 	private:
-		static std::shared_ptr<spdlog::logger> engineLogger;
-		static std::shared_ptr<spdlog::logger> gameLogger;
+		static Ref<spdlog::logger> engineLogger;
+		static Ref<spdlog::logger> gameLogger;
 
 	public:
 		static void Init();
 
-		inline static std::shared_ptr<spdlog::logger>& GetEngineLogger()
-		{
-			return engineLogger;
-		}
+		static Ref<spdlog::logger>& GetEngineLogger();
 
-		inline static std::shared_ptr<spdlog::logger>& GetGameLogger()
-		{
-			return gameLogger;
-		}
+		static Ref<spdlog::logger>& GetGameLogger();
 	};
 }
 

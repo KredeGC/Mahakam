@@ -2,10 +2,12 @@
 #include "Log.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
+#include "SharedLibrary.h"
+
 namespace Mahakam
 {
-	std::shared_ptr<spdlog::logger> Log::engineLogger;
-	std::shared_ptr<spdlog::logger> Log::gameLogger;
+	Ref<spdlog::logger> Log::engineLogger;
+	Ref<spdlog::logger> Log::gameLogger;
 
 	void Log::Init()
 	{
@@ -16,5 +18,19 @@ namespace Mahakam
 
 		gameLogger = spdlog::stdout_color_mt("Game");
 		gameLogger->set_level(spdlog::level::trace);
+	}
+
+	Ref<spdlog::logger>& Log::GetEngineLogger()
+	{
+		MH_OVERRIDE_FUNC(engineLogger);
+
+		return engineLogger;
+	}
+
+	Ref<spdlog::logger>& Log::GetGameLogger()
+	{
+		MH_OVERRIDE_FUNC(gameLogger);
+
+		return gameLogger;
 	}
 }

@@ -51,6 +51,13 @@ namespace Mahakam
 
 		int i = 0;
 
+		// Log
+		MH_EXPORT_FUNC(EngineLogger, Log::GetEngineLogger);
+		MH_EXPORT_FUNC(GameLogger, Log::GetGameLogger);
+
+		// Animation
+		MH_EXPORT_FUNC(AnimationLoad, Animation::Load);
+
 		// UniformBuffer
 		MH_EXPORT_FUNC(UniformBufferCreate, UniformBuffer::Create);
 
@@ -63,8 +70,25 @@ namespace Mahakam
 		// FrameBuffer
 		MH_EXPORT_FUNC(FrameBufferCreate, FrameBuffer::Create);
 
+		// Material
+		MH_EXPORT_FUNC(MaterialCopy, Material::Copy);
+		MH_EXPORT_FUNC(MaterialCreate, Material::Create);
+
+		// Mesh
+		MH_EXPORT_FUNC(MeshCreate, Mesh::Create);
+		MH_EXPORT_FUNC(MeshLoad, Mesh::LoadModel);
+
+		// Profiler
+		MH_EXPORT_FUNC(ProfilerCreate, Profiler::Create);
+		MH_EXPORT_FUNC(ProfilerAddResult, Profiler::AddResult);
+		MH_EXPORT_FUNC(ProfilerClear, Profiler::ClearResults);
+		MH_EXPORT_FUNC(ProfilerGetResults, Profiler::GetResults);
+
 		// RenderBuffer
 		MH_EXPORT_FUNC(RenderBufferCreate, RenderBuffer::Create);
+
+		// Shader
+		MH_EXPORT_FUNC(ShaderCreate, Shader::Create);
 
 		// Texture2D
 		MH_EXPORT_FUNC(Texture2DCreateProps, Texture2D::Create);
@@ -86,6 +110,13 @@ namespace Mahakam
 
 		int i = 0;
 
+		// Log
+		MH_IMPORT_FUNC(EngineLogger, engineLogger);
+		MH_IMPORT_FUNC(GameLogger, gameLogger);
+
+		// Animation
+		MH_IMPORT_FUNC(AnimationLoad, animationLoad);
+
 		// UniformBuffer
 		MH_IMPORT_FUNC(UniformBufferCreate, uniformBufferCreate);
 
@@ -93,13 +124,30 @@ namespace Mahakam
 		MH_IMPORT_FUNC(StorageBufferCreate, storageBufferCreate);
 
 		// ComputeShader
-		MH_EXPORT_FUNC(ComputeShaderCreate, computeShaderCreate);
+		MH_IMPORT_FUNC(ComputeShaderCreate, computeShaderCreate);
 
 		// FrameBuffer
-		MH_EXPORT_FUNC(FrameBufferCreate, framebufferCreate);
+		MH_IMPORT_FUNC(FrameBufferCreate, framebufferCreate);
+
+		// Material
+		MH_IMPORT_FUNC(MaterialCopy, materialCopy);
+		MH_IMPORT_FUNC(MaterialCreate, materialCreate);
+
+		// Mesh
+		MH_IMPORT_FUNC(MeshCreate, meshCreate);
+		MH_IMPORT_FUNC(MeshLoad, meshLoad);
+
+		// Profiler
+		MH_IMPORT_FUNC(ProfilerCreate, profilerCreate);
+		MH_IMPORT_FUNC(ProfilerAddResult, profilerAddResult);
+		MH_IMPORT_FUNC(ProfilerClear, profilerClear);
+		MH_IMPORT_FUNC(ProfilerGetResults, profilerResults);
 
 		// RenderBuffer
 		MH_IMPORT_FUNC(RenderBufferCreate, renderBufferCreate);
+
+		// Shader
+		MH_IMPORT_FUNC(ShaderCreate, shaderCreate);
 
 		// Texture2D
 		MH_IMPORT_FUNC(Texture2DCreateProps, tex2DCreateProps);

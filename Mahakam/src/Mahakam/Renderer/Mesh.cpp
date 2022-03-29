@@ -3,6 +3,8 @@
 
 #include "RendererAPI.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include "Platform/OpenGL/OpenGLMesh.h"
 
 namespace Mahakam
@@ -72,6 +74,8 @@ namespace Mahakam
 
 	Ref<Mesh> Mesh::Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	{
+		MH_OVERRIDE_FUNC(meshCreate, vertexCount, indexCount, verts, indices);
+
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -87,6 +91,8 @@ namespace Mahakam
 
 	SkinnedMesh Mesh::LoadModel(const std::string& filepath, const SkinnedMeshProps& props)
 	{
+		MH_OVERRIDE_FUNC(meshLoad, filepath, props);
+
 		// TODO: Use SkinnedMeshProps to determine if we should load textures and create materials, or use the provided materials
 
 		MH_PROFILE_FUNCTION();

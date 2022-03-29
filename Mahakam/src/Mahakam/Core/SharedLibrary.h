@@ -1,10 +1,14 @@
 #pragma once
 #include "Core.h"
 
+#include "Mahakam/Renderer/Animation.h"
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/ComputeShader.h"
 #include "Mahakam/Renderer/FrameBuffer.h"
+#include "Mahakam/Renderer/Material.h"
+#include "Mahakam/Renderer/Mesh.h"
 #include "Mahakam/Renderer/RenderBuffer.h"
+#include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 
 namespace Mahakam
@@ -12,6 +16,13 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
+		// Log
+		MH_SHARED_FUNC(Ref<spdlog::logger>&, EngineLogger, engineLogger);
+		MH_SHARED_FUNC(Ref<spdlog::logger>&, GameLogger, gameLogger);
+
+		// Animation
+		MH_SHARED_FUNC(Ref<Animation>, AnimationLoad, animationLoad, const std::string&, SkinnedMesh&);
+
 		// UniformBuffer
 		MH_SHARED_FUNC(Ref<UniformBuffer>, UniformBufferCreate, uniformBufferCreate, uint32_t);
 
@@ -24,8 +35,29 @@ namespace Mahakam
 		// FrameBuffer
 		MH_SHARED_FUNC(Ref<FrameBuffer>, FrameBufferCreate, framebufferCreate, const FrameBufferProps&);
 
+		// TODO: GL
+
+		// Material
+		MH_SHARED_FUNC(Ref<Material>, MaterialCopy, materialCopy, Ref<Material>);
+		MH_SHARED_FUNC(Ref<Material>, MaterialCreate, materialCreate, Ref<Shader>, const std::string&);
+
+		// Mesh
+		MH_SHARED_FUNC(Ref<Mesh>, MeshCreate, meshCreate, uint32_t, uint32_t, void* verts[Mesh::BUFFER_ELEMENTS_SIZE], const uint32_t*);
+		MH_SHARED_FUNC(SkinnedMesh, MeshLoad, meshLoad, const std::string&, const SkinnedMeshProps&);
+
+		// Profiler
+		MH_SHARED_FUNC(Profiler, ProfilerCreate, profilerCreate, const char*, bool);
+		MH_SHARED_FUNC(void, ProfilerAddResult, profilerAddResult, const char*, std::chrono::time_point<std::chrono::steady_clock>, std::chrono::time_point<std::chrono::steady_clock>);
+		MH_SHARED_FUNC(void, ProfilerClear, profilerClear);
+		MH_SHARED_FUNC(const std::vector<Profiler::ProfileResult>&, ProfilerGetResults, profilerResults);
+
 		// RenderBuffer
 		MH_SHARED_FUNC(Ref<RenderBuffer>, RenderBufferCreate, renderBufferCreate, uint32_t, uint32_t, TextureFormat);
+
+		// TODO: Renderer
+
+		// Shader
+		MH_SHARED_FUNC(Ref<Shader>, ShaderCreate, shaderCreate, const std::string&, const std::initializer_list<std::string>&);
 
 		// Texture2D
 		MH_SHARED_FUNC(Ref<Texture2D>, Texture2DCreateProps, tex2DCreateProps, const TextureProps&);
@@ -36,7 +68,7 @@ namespace Mahakam
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateFilepath, texCubeCreateFilepath, const std::string&, const CubeTextureProps&);
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreatePrefilter, texCubeCreatePrefilter, Ref<TextureCube>, TextureCubePrefilter, const CubeTextureProps&);
 
-		static constexpr int NUM_FUNC_PTRS = 10;
+		static constexpr int NUM_FUNC_PTRS = 22;
 
 	private:
 		const char* filepath = nullptr;

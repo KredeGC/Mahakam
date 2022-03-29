@@ -64,10 +64,7 @@ namespace Mahakam
             return m_BoneInfoMap;
         }
 
-        static Ref<Animation> load(const std::string& filepath, SkinnedMesh& skinnedMesh)
-        {
-            return CreateRef<Animation>(filepath, skinnedMesh);
-        }
+        static Ref<Animation> Load(const std::string& filepath, SkinnedMesh& skinnedMesh);
 
     private:
         void ReadMissingBones(const aiAnimation* animation, robin_hood::unordered_map<std::string, BoneInfo>& boneInfoMap, int& boneCount)

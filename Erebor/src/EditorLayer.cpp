@@ -204,7 +204,7 @@ namespace Mahakam
 		SkinnedMesh testSkinnedModel = AssetDatabase::CreateOrLoadAsset<SkinnedMesh>("assets/models/Defeated.fbx");
 
 		SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/Defeated.fbx");
-		Ref<Animation> animation = Animation::load("assets/models/Defeated.fbx", skinnedModel);
+		Ref<Animation> animation = Animation::Load("assets/models/Defeated.fbx", skinnedModel);
 
 		Entity animatedEntity = activeScene->CreateEntity("Animated");
 		animatedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
