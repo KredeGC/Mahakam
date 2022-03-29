@@ -65,7 +65,7 @@
 	inline static shorthand name = nullptr;
 
 // Calls the SharedLibrary function and returns the result
-#if MH_DEBUG
+#if MH_DEBUG || MH_RELEASE
 #define MH_OVERRIDE_FUNC(name, ...) if (SharedLibrary::name != nullptr) \
 	return SharedLibrary::name(__VA_ARGS__);
 #else
