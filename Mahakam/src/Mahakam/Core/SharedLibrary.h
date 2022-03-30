@@ -16,57 +16,57 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
-		// Log
-		MH_SHARED_FUNC(Ref<spdlog::logger>&, EngineLogger, engineLogger);
-		MH_SHARED_FUNC(Ref<spdlog::logger>&, GameLogger, gameLogger);
-
 		// Animation
-		MH_SHARED_FUNC(Ref<Animation>, AnimationLoad, animationLoad, const std::string&, SkinnedMesh&);
+		MH_SHARED_FUNC(Ref<Animation>, AnimationLoad, const std::string&, SkinnedMesh&);
 
 		// UniformBuffer
-		MH_SHARED_FUNC(Ref<UniformBuffer>, UniformBufferCreate, uniformBufferCreate, uint32_t);
+		MH_SHARED_FUNC(Ref<UniformBuffer>, UniformBufferCreate, uint32_t);
 
 		// StorageBuffer
-		MH_SHARED_FUNC(Ref<StorageBuffer>, StorageBufferCreate, storageBufferCreate, uint32_t);
+		MH_SHARED_FUNC(Ref<StorageBuffer>, StorageBufferCreate, uint32_t);
 
 		// ComputeShader
-		MH_SHARED_FUNC(Ref<ComputeShader>, ComputeShaderCreate, computeShaderCreate, const std::string&);
+		MH_SHARED_FUNC(Ref<ComputeShader>, ComputeShaderCreate, const std::string&);
 
 		// FrameBuffer
-		MH_SHARED_FUNC(Ref<FrameBuffer>, FrameBufferCreate, framebufferCreate, const FrameBufferProps&);
+		MH_SHARED_FUNC(Ref<FrameBuffer>, FrameBufferCreate, const FrameBufferProps&);
 
 		// TODO: GL
 
+		// Log
+		MH_SHARED_FUNC(Ref<spdlog::logger>&, EngineLogger);
+		MH_SHARED_FUNC(Ref<spdlog::logger>&, GameLogger);
+
 		// Material
-		MH_SHARED_FUNC(Ref<Material>, MaterialCopy, materialCopy, Ref<Material>);
-		MH_SHARED_FUNC(Ref<Material>, MaterialCreate, materialCreate, Ref<Shader>, const std::string&);
+		MH_SHARED_FUNC(Ref<Material>, MaterialCopy, Ref<Material>);
+		MH_SHARED_FUNC(Ref<Material>, MaterialCreate, Ref<Shader>, const std::string&);
 
 		// Mesh
-		MH_SHARED_FUNC(Ref<Mesh>, MeshCreate, meshCreate, uint32_t, uint32_t, void* verts[Mesh::BUFFER_ELEMENTS_SIZE], const uint32_t*);
-		MH_SHARED_FUNC(SkinnedMesh, MeshLoad, meshLoad, const std::string&, const SkinnedMeshProps&);
+		MH_SHARED_FUNC(Ref<Mesh>, MeshCreate, uint32_t, uint32_t, void* verts[Mesh::BUFFER_ELEMENTS_SIZE], const uint32_t*);
+		MH_SHARED_FUNC(SkinnedMesh, MeshLoad, const std::string&, const SkinnedMeshProps&);
 
 		// Profiler
-		MH_SHARED_FUNC(Profiler, ProfilerCreate, profilerCreate, const char*, bool);
-		MH_SHARED_FUNC(void, ProfilerAddResult, profilerAddResult, const char*, std::chrono::time_point<std::chrono::steady_clock>, std::chrono::time_point<std::chrono::steady_clock>);
-		MH_SHARED_FUNC(void, ProfilerClear, profilerClear);
-		MH_SHARED_FUNC(const std::vector<Profiler::ProfileResult>&, ProfilerGetResults, profilerResults);
+		MH_SHARED_FUNC(Profiler, ProfilerCreate, const char*, bool);
+		MH_SHARED_FUNC(void, ProfilerAddResult, const char*, std::chrono::time_point<std::chrono::steady_clock>, std::chrono::time_point<std::chrono::steady_clock>);
+		MH_SHARED_FUNC(void, ProfilerClear);
+		MH_SHARED_FUNC(const std::vector<Profiler::ProfileResult>&, ProfilerGetResults);
 
 		// RenderBuffer
-		MH_SHARED_FUNC(Ref<RenderBuffer>, RenderBufferCreate, renderBufferCreate, uint32_t, uint32_t, TextureFormat);
+		MH_SHARED_FUNC(Ref<RenderBuffer>, RenderBufferCreate, uint32_t, uint32_t, TextureFormat);
 
 		// TODO: Renderer
 
 		// Shader
-		MH_SHARED_FUNC(Ref<Shader>, ShaderCreate, shaderCreate, const std::string&, const std::initializer_list<std::string>&);
+		MH_SHARED_FUNC(Ref<Shader>, ShaderCreate, const std::string&, const std::initializer_list<std::string>&);
 
 		// Texture2D
-		MH_SHARED_FUNC(Ref<Texture2D>, Texture2DCreateProps, tex2DCreateProps, const TextureProps&);
-		MH_SHARED_FUNC(Ref<Texture2D>, Texture2DCreateFilepath, tex2DCreateFilepath, const std::string&, const TextureProps&);
+		MH_SHARED_FUNC(Ref<Texture2D>, Texture2DCreateProps, const TextureProps&);
+		MH_SHARED_FUNC(Ref<Texture2D>, Texture2DCreateFilepath, const std::string&, const TextureProps&);
 
 		// TextureCube
-		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateProps, texCubeCreateProps, const CubeTextureProps&);
-		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateFilepath, texCubeCreateFilepath, const std::string&, const CubeTextureProps&);
-		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreatePrefilter, texCubeCreatePrefilter, Ref<TextureCube>, TextureCubePrefilter, const CubeTextureProps&);
+		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateProps, const CubeTextureProps&);
+		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateFilepath, const std::string&, const CubeTextureProps&);
+		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreatePrefilter, Ref<TextureCube>, TextureCubePrefilter, const CubeTextureProps&);
 
 		static constexpr int NUM_FUNC_PTRS = 22;
 

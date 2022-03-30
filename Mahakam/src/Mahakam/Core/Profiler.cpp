@@ -33,14 +33,14 @@ namespace Mahakam
 
 	Profiler Profiler::Create(const char* name, bool flushRenderer)
 	{
-		MH_OVERRIDE_FUNC(profilerCreate, name, flushRenderer);
+		MH_OVERRIDE_FUNC(ProfilerCreate, name, flushRenderer);
 
 		return Profiler(name, flushRenderer);
 	}
 
 	void Profiler::AddResult(const char* name, std::chrono::time_point<std::chrono::steady_clock> startTime, std::chrono::time_point<std::chrono::steady_clock> endTime)
 	{
-		MH_OVERRIDE_FUNC(profilerAddResult, name, startTime, endTime);
+		MH_OVERRIDE_FUNC(ProfilerAddResult, name, startTime, endTime);
 
 #ifdef MH_ENABLE_PROFILING
 		uint64_t start = std::chrono::time_point_cast<std::chrono::microseconds>(startTime).time_since_epoch().count();
@@ -54,14 +54,14 @@ namespace Mahakam
 
 	void Profiler::ClearResults()
 	{
-		MH_OVERRIDE_FUNC(profilerClear);
+		MH_OVERRIDE_FUNC(ProfilerClear);
 
 		results.clear();
 	}
 
 	const std::vector<Profiler::ProfileResult>& Profiler::GetResults()
 	{
-		MH_OVERRIDE_FUNC(profilerResults);
+		MH_OVERRIDE_FUNC(ProfilerGetResults);
 
 		return results;
 	}

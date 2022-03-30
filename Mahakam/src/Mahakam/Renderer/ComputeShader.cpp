@@ -11,7 +11,7 @@ namespace Mahakam
 {
 	Ref<ComputeShader> ComputeShader::Create(const std::string& filepath)
 	{
-		MH_OVERRIDE_FUNC(computeShaderCreate, filepath);
+		MH_OVERRIDE_FUNC(ComputeShaderCreate, filepath);
 
 		switch (RendererAPI::GetAPI())
 		{

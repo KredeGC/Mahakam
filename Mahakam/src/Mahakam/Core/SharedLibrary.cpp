@@ -2,7 +2,7 @@
 #include "SharedLibrary.h"
 
 #define MH_EXPORT_FUNC(signature, func) funcPointers[i++] = static_cast<signature>(func);
-#define MH_IMPORT_FUNC(signature, variable) variable = static_cast<signature>(ptrs[i++]);
+#define MH_IMPORT_FUNC(signature) sh_##signature = static_cast<signature>(ptrs[i++]);
 
 namespace Mahakam
 {
@@ -51,10 +51,6 @@ namespace Mahakam
 
 		int i = 0;
 
-		// Log
-		MH_EXPORT_FUNC(EngineLogger, Log::GetEngineLogger);
-		MH_EXPORT_FUNC(GameLogger, Log::GetGameLogger);
-
 		// Animation
 		MH_EXPORT_FUNC(AnimationLoad, Animation::Load);
 
@@ -69,6 +65,10 @@ namespace Mahakam
 
 		// FrameBuffer
 		MH_EXPORT_FUNC(FrameBufferCreate, FrameBuffer::Create);
+
+		// Log
+		MH_EXPORT_FUNC(EngineLogger, Log::GetEngineLogger);
+		MH_EXPORT_FUNC(GameLogger, Log::GetGameLogger);
 
 		// Material
 		MH_EXPORT_FUNC(MaterialCopy, Material::Copy);
@@ -110,53 +110,53 @@ namespace Mahakam
 
 		int i = 0;
 
-		// Log
-		MH_IMPORT_FUNC(EngineLogger, engineLogger);
-		MH_IMPORT_FUNC(GameLogger, gameLogger);
-
 		// Animation
-		MH_IMPORT_FUNC(AnimationLoad, animationLoad);
+		MH_IMPORT_FUNC(AnimationLoad);
 
 		// UniformBuffer
-		MH_IMPORT_FUNC(UniformBufferCreate, uniformBufferCreate);
+		MH_IMPORT_FUNC(UniformBufferCreate);
 
 		// StorageBuffer
-		MH_IMPORT_FUNC(StorageBufferCreate, storageBufferCreate);
+		MH_IMPORT_FUNC(StorageBufferCreate);
 
 		// ComputeShader
-		MH_IMPORT_FUNC(ComputeShaderCreate, computeShaderCreate);
+		MH_IMPORT_FUNC(ComputeShaderCreate);
 
 		// FrameBuffer
-		MH_IMPORT_FUNC(FrameBufferCreate, framebufferCreate);
+		MH_IMPORT_FUNC(FrameBufferCreate);
+
+		// Log
+		MH_IMPORT_FUNC(EngineLogger);
+		MH_IMPORT_FUNC(GameLogger);
 
 		// Material
-		MH_IMPORT_FUNC(MaterialCopy, materialCopy);
-		MH_IMPORT_FUNC(MaterialCreate, materialCreate);
+		MH_IMPORT_FUNC(MaterialCopy);
+		MH_IMPORT_FUNC(MaterialCreate);
 
 		// Mesh
-		MH_IMPORT_FUNC(MeshCreate, meshCreate);
-		MH_IMPORT_FUNC(MeshLoad, meshLoad);
+		MH_IMPORT_FUNC(MeshCreate);
+		MH_IMPORT_FUNC(MeshLoad);
 
 		// Profiler
-		MH_IMPORT_FUNC(ProfilerCreate, profilerCreate);
-		MH_IMPORT_FUNC(ProfilerAddResult, profilerAddResult);
-		MH_IMPORT_FUNC(ProfilerClear, profilerClear);
-		MH_IMPORT_FUNC(ProfilerGetResults, profilerResults);
+		MH_IMPORT_FUNC(ProfilerCreate);
+		MH_IMPORT_FUNC(ProfilerAddResult);
+		MH_IMPORT_FUNC(ProfilerClear);
+		MH_IMPORT_FUNC(ProfilerGetResults);
 
 		// RenderBuffer
-		MH_IMPORT_FUNC(RenderBufferCreate, renderBufferCreate);
+		MH_IMPORT_FUNC(RenderBufferCreate);
 
 		// Shader
-		MH_IMPORT_FUNC(ShaderCreate, shaderCreate);
+		MH_IMPORT_FUNC(ShaderCreate);
 
 		// Texture2D
-		MH_IMPORT_FUNC(Texture2DCreateProps, tex2DCreateProps);
-		MH_IMPORT_FUNC(Texture2DCreateFilepath, tex2DCreateFilepath);
+		MH_IMPORT_FUNC(Texture2DCreateProps);
+		MH_IMPORT_FUNC(Texture2DCreateFilepath);
 
 		// TextureCube
-		MH_IMPORT_FUNC(TextureCubeCreateProps, texCubeCreateProps);
-		MH_IMPORT_FUNC(TextureCubeCreateFilepath, texCubeCreateFilepath);
-		MH_IMPORT_FUNC(TextureCubeCreatePrefilter, texCubeCreatePrefilter);
+		MH_IMPORT_FUNC(TextureCubeCreateProps);
+		MH_IMPORT_FUNC(TextureCubeCreateFilepath);
+		MH_IMPORT_FUNC(TextureCubeCreatePrefilter);
 
 		MH_CORE_ASSERT(i == NUM_FUNC_PTRS, "SharedLibrary function count mismatch. Change NUM_FUNC_PTRS to reflect the new count");
 	}

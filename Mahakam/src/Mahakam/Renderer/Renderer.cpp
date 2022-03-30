@@ -42,9 +42,6 @@ namespace Mahakam
 	{
 		GL::Shutdown();
 
-		for (auto& renderPass : rendererData->initializedRenderPasses)
-			delete renderPass;
-
 		rendererData->viewportFramebuffer = nullptr;
 		rendererData->unlitMaterial = nullptr;
 
@@ -58,8 +55,16 @@ namespace Mahakam
 
 		GL::SetViewport(0, 0, width, height);
 
-		for (auto& renderPass : rendererData->initializedRenderPasses)
+		for (auto& renderPass : rendererData->renderPasses)
 			renderPass->OnWindowResize(width, height);
+	}
+
+	void Renderer::SetRenderPasses(const std::vector<Ref<RenderPass>>& renderPasses)
+	{
+		rendererData->renderPasses = renderPasses;
+
+		for (auto& renderPass : rendererData->renderPasses)
+			renderPass->Init(rendererData->width, rendererData->height);
 	}
 
 	void Renderer::BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
@@ -73,15 +78,6 @@ namespace Mahakam
 
 		sceneData->cameraBuffer->Bind(0);
 		sceneData->cameraBuffer->SetData(&sceneData->cameraData, 0, sizeof(CameraData));
-
-		// Get render passes from selected camera
-		rendererData->renderPasses = cam.GetRenderPasses();
-
-		for (auto& renderPass : rendererData->renderPasses)
-		{
-			if (rendererData->initializedRenderPasses.insert(renderPass).second)
-				renderPass->Init(rendererData->width, rendererData->height);
-		}
 
 		// Setup results
 		rendererData->rendererResults.drawCalls = 0;

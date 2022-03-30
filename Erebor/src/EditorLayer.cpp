@@ -90,6 +90,21 @@ namespace Mahakam
 
 	void EditorLayer::OnAttach()
 	{
+		// Setup render passes for the default renderer
+		Renderer::SetRenderPasses({
+			CreateRef<GeometryRenderPass>(),
+			CreateRef<LightingRenderPass>(),
+			CreateRef<ParticleRenderPass>(),
+			CreateRef<TonemappingRenderPass>() });
+
+		// Setup render passes for pixel renderer
+		/*Renderer::SetRenderPasses({
+			CreateRef<TexelGeometryPass>(),
+			CreateRef<TexelLightingPass>(),
+			CreateRef<PixelationPass>(),
+			CreateRef<ParticleRenderPass>(),
+			CreateRef<TonemappingRenderPass>() });*/
+
 		// Create a new active scene
 		activeScene = Scene::CreateScene("assets/textures/pines.hdr");
 
@@ -116,13 +131,7 @@ namespace Mahakam
 		// Setup scene camera
 		Entity cameraEntity = activeScene->CreateEntity("Main Camera");
 		//cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
-		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f, std::initializer_list<RenderPass*>{
-			new TexelGeometryPass(),
-			new TexelLightingPass(),
-			new PixelationPass(),
-			new ParticleRenderPass(),
-			new TonemappingRenderPass()
-		});
+		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
 		cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
 		cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
@@ -136,11 +145,11 @@ namespace Mahakam
 		{
 			for (int x = 0; x < 10; x++)
 			{*/
-				Entity pointLightEntity = activeScene->CreateEntity("Spot Light");
-				pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
-				pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
-				//pointLightEntity.GetComponent<TransformComponent>().SetPosition({ x, y, 1.0f });
-				pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-150.0f), glm::radians(180.0f), 0.0f }));
+		Entity pointLightEntity = activeScene->CreateEntity("Spot Light");
+		pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
+		pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
+		//pointLightEntity.GetComponent<TransformComponent>().SetPosition({ x, y, 1.0f });
+		pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-150.0f), glm::radians(180.0f), 0.0f }));
 		/*	}
 		}*/
 
@@ -214,38 +223,6 @@ namespace Mahakam
 		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();*/
 
 
-		// Create mesh & base material
-		Ref<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
-		Ref<Material> baseMaterial = Material::Create(colorShader);
-		baseMaterial->SetFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
-
-		// Create scene entities
-		for (int y = 0; y < 10; y++)
-		{
-			for (int x = 0; x < 10; x++)
-			{
-				// Setup material with texture
-				Ref<Material> material = Material::Copy(baseMaterial);
-				material->SetFloat("u_Metallic", y / 10.0f);
-				material->SetFloat("u_Roughness", x / 10.0f);
-
-				// Create entity
-				Entity entity = activeScene->CreateEntity(std::string("Sphere ") + std::to_string(x) + std::string(",") + std::to_string(y));
-				entity.AddComponent<MeshComponent>(sphereMesh, material);
-				entity.GetComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
-			}
-		}
-
-
-		//lib = new SharedLibrary("runtime/Sandbox.dll");
-
-		//void (*initPtr)(Application*, Scene*) = lib->GetFunction<void, Application*, Scene*>("Init");
-		//auto initPtr = lib->GetFunction<void, Application*, Scene*, Ref<Texture2D>(*)(const std::string&, const TextureProps&)>("Init");
-
-		//initPtr(&Application::GetInstance(), activeScene.get());
-		//initPtr(&Application::GetInstance(), activeScene.get(), Texture2D::Create);
-
-
 
 		lib = new SharedLibrary("runtime/Sandbox.dll");
 
@@ -262,7 +239,7 @@ namespace Mahakam
 	void EditorLayer::OnUpdate(Timestep dt)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
-		
+
 		// Call shared library update
 		auto updatePtr = lib->GetFunction<void, Scene*, Timestep>("Update");
 

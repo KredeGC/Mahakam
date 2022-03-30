@@ -31,7 +31,7 @@ namespace Mahakam
 		static constexpr uint32_t shadowMapSize = 8192;
 
 	public:
-		virtual void Init(uint32_t width, uint32_t height) override;
+		virtual bool Init(uint32_t width, uint32_t height) override;
 		virtual ~LightingRenderPass() override;
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;

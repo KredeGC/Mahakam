@@ -11,10 +11,7 @@ namespace Mahakam
 {
 	Ref<RenderBuffer> RenderBuffer::Create(uint32_t width, uint32_t height, TextureFormat format)
 	{
-#if MH_DEBUG
-		if (SharedLibrary::renderBufferCreate != nullptr)
-			return SharedLibrary::renderBufferCreate(width, height, format);
-#endif
+		MH_OVERRIDE_FUNC(RenderBufferCreate, width, height, format);
 
 		switch (RendererAPI::GetAPI())
 		{

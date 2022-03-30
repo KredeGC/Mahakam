@@ -15,8 +15,11 @@
 
 namespace Mahakam
 {
-	void LightingRenderPass::Init(uint32_t width, uint32_t height)
+	bool LightingRenderPass::Init(uint32_t width, uint32_t height)
 	{
+		if (RenderPass::Init(width, height))
+			return true;
+
 		SetupBRDF();
 		SetupFrameBuffer(width, height);
 		SetupShaders();
@@ -29,6 +32,8 @@ namespace Mahakam
 		shadowFramebuffer = FrameBuffer::Create(shadowProps);
 
 		shadowMatrixBuffer = UniformBuffer::Create(sizeof(glm::mat4));
+
+		return true;
 	}
 
 	LightingRenderPass::~LightingRenderPass()

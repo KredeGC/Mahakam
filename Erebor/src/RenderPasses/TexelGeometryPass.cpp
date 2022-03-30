@@ -3,8 +3,11 @@
 
 namespace Mahakam
 {
-	void TexelGeometryPass::Init(uint32_t width, uint32_t height)
+	bool TexelGeometryPass::Init(uint32_t width, uint32_t height)
 	{
+		if (RenderPass::Init(width, height))
+			return true;
+
 		// Create gbuffer
 		FrameBufferProps gProps;
 		gProps.width = width;
@@ -18,5 +21,7 @@ namespace Mahakam
 		gProps.depthAttachment = TextureFormat::Depth24; // Mutable
 
 		gBuffer = FrameBuffer::Create(gProps);
+
+		return true;
 	}
 }

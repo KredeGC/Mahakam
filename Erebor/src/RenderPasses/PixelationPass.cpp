@@ -6,8 +6,11 @@
 
 namespace Mahakam
 {
-	void PixelationPass::Init(uint32_t width, uint32_t height)
+	bool PixelationPass::Init(uint32_t width, uint32_t height)
 	{
+		if (RenderPass::Init(width, height))
+			return true;
+
 		// Create viewport framebuffer
 		FrameBufferProps viewportProps;
 		viewportProps.width = width;
@@ -17,6 +20,8 @@ namespace Mahakam
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
 		pixelationShader = Shader::Create("assets/shaders/external/Pixelation.yaml");
+
+		return true;
 	}
 
 	PixelationPass::~PixelationPass()

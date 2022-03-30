@@ -9,8 +9,8 @@ namespace Mahakam
 		SetPerspective(fov, nearZ, farZ);
 	}
 
-	Camera::Camera(ProjectionType projection, float fov, float nearPlane, float farPlane, const std::initializer_list<RenderPass*>& renderpasses)
-		: projectionType(projection), renderpasses(renderpasses)
+	Camera::Camera(ProjectionType projection, float fov, float nearPlane, float farPlane)
+		: projectionType(projection)
 	{
 		if (projectionType == ProjectionType::Perspective)
 			SetPerspective(fov, nearPlane, farPlane);
@@ -47,16 +47,5 @@ namespace Mahakam
 		nearZ = nearPlane;
 		farZ = farPlane;
 		RecalculateProjectionMatrix();
-	}
-
-	void Camera::SetRenderPasses(const std::vector<RenderPass*>& renderpasses)
-	{
-		if (!this->renderpasses.empty())
-		{
-			for (auto& pass : renderpasses)
-				delete pass;
-		}
-
-		this->renderpasses = renderpasses;
 	}
 }

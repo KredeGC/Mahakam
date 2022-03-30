@@ -12,7 +12,7 @@ namespace Mahakam
 #pragma region UniformBuffer
 	Ref<UniformBuffer> UniformBuffer::Create(uint32_t size)
 	{
-		MH_OVERRIDE_FUNC(uniformBufferCreate, size);
+		MH_OVERRIDE_FUNC(UniformBufferCreate, size);
 
 		switch (RendererAPI::GetAPI())
 		{
@@ -32,7 +32,7 @@ namespace Mahakam
 #pragma region StorageBuffer
 	Ref<StorageBuffer> StorageBuffer::Create(uint32_t size)
 	{
-		MH_OVERRIDE_FUNC(storageBufferCreate, size);
+		MH_OVERRIDE_FUNC(StorageBufferCreate, size);
 
 		switch (RendererAPI::GetAPI())
 		{

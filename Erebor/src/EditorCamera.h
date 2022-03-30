@@ -32,11 +32,7 @@ namespace Mahakam
 
 	public:
 		EditorCamera()
-			: camera(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.03f, 1000.0f, {
-			new GeometryRenderPass(),
-			new LightingRenderPass(),
-			new ParticleRenderPass(),
-			new TonemappingRenderPass() })
+			: camera(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.03f, 1000.0f)
 		{
 			UpdateRotationMatrix();
 

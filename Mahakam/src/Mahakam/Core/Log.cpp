@@ -22,14 +22,14 @@ namespace Mahakam
 
 	Ref<spdlog::logger>& Log::GetEngineLogger()
 	{
-		MH_OVERRIDE_FUNC(engineLogger);
+		MH_OVERRIDE_FUNC(EngineLogger);
 
 		return engineLogger;
 	}
 
 	Ref<spdlog::logger>& Log::GetGameLogger()
 	{
-		MH_OVERRIDE_FUNC(gameLogger);
+		MH_OVERRIDE_FUNC(GameLogger);
 
 		return gameLogger;
 	}

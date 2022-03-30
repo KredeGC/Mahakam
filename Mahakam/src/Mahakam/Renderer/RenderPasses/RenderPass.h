@@ -12,8 +12,20 @@ namespace Mahakam
 {
 	class RenderPass
 	{
+	private:
+		bool m_Initialized = false;
+
 	public:
-		virtual void Init(uint32_t width, uint32_t height) = 0;
+		inline virtual bool Init(uint32_t width, uint32_t height)
+		{
+			if (m_Initialized)
+				return true;
+
+			m_Initialized = true;
+
+			return false;
+		}
+
 		virtual ~RenderPass() = default;
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) {}
@@ -21,5 +33,7 @@ namespace Mahakam
 		virtual bool Render(SceneData* sceneData, Ref<FrameBuffer>& src) = 0;
 
 		virtual Ref<FrameBuffer> GetFrameBuffer() = 0;
+
+		bool IsInitialized() const { return m_Initialized; }
 	};
 }

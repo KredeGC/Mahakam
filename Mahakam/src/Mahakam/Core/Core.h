@@ -61,16 +61,12 @@
 #define MH_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 // Defines a typdef function pointer and initializes it as a static variable
-#define MH_SHARED_FUNC(returnType, shorthand, name, ...) typedef returnType(*shorthand)(__VA_ARGS__); \
-	inline static shorthand name = nullptr;
+#define MH_SHARED_FUNC(returnType, type, ...) typedef returnType(*type)(__VA_ARGS__); \
+	inline static type sh_##type = nullptr;
 
 // Calls the SharedLibrary function and returns the result
-#if MH_DEBUG || MH_RELEASE
-#define MH_OVERRIDE_FUNC(name, ...) if (SharedLibrary::name != nullptr) \
-	return SharedLibrary::name(__VA_ARGS__);
-#else
-#define MH_OVERRIDE_FUNC(name, ...)
-#endif
+#define MH_OVERRIDE_FUNC(signature, ...) if (SharedLibrary::sh_##signature != nullptr) \
+	return SharedLibrary::sh_##signature(__VA_ARGS__);
 
 namespace Mahakam
 {

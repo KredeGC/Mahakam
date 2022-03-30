@@ -6,8 +6,11 @@
 
 namespace Mahakam
 {
-	void ParticleRenderPass::Init(uint32_t width, uint32_t height)
+	bool ParticleRenderPass::Init(uint32_t width, uint32_t height)
 	{
+		if (RenderPass::Init(width, height))
+			return true;
+
 		// Create viewport framebuffer
 		FrameBufferProps viewportProps;
 		viewportProps.width = width;
@@ -17,6 +20,8 @@ namespace Mahakam
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
 		particleCompute = ComputeShader::Create("assets/compute/Particles.glsl");
+
+		return true;
 	}
 
 	ParticleRenderPass::~ParticleRenderPass()

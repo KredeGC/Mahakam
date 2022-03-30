@@ -17,8 +17,7 @@ namespace Mahakam
 		struct RendererData
 		{
 			RendererResults rendererResults;
-			std::vector<RenderPass*> renderPasses;
-			robin_hood::unordered_set<RenderPass*> initializedRenderPasses;
+			std::vector<Ref<RenderPass>> renderPasses;
 
 			Ref<FrameBuffer> gBuffer;
 			Ref<FrameBuffer> viewportFramebuffer;
@@ -34,6 +33,8 @@ namespace Mahakam
 		static void Init(uint32_t width, uint32_t height);
 		static void Shutdown();
 		static void OnWindowResie(uint32_t width, uint32_t height);
+
+		static void SetRenderPasses(const std::vector<Ref<RenderPass>>& renderPasses);
 
 		static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
 		static void EndScene();

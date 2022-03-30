@@ -7,7 +7,7 @@ namespace Mahakam
 {
     Ref<Animation> Animation::Load(const std::string& filepath, SkinnedMesh& skinnedMesh)
     {
-        MH_OVERRIDE_FUNC(animationLoad, filepath, skinnedMesh);
+        MH_OVERRIDE_FUNC(AnimationLoad, filepath, skinnedMesh);
 
         return CreateRef<Animation>(filepath, skinnedMesh);
     }

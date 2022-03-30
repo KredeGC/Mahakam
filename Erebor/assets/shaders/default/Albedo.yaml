@@ -1,5 +1,0 @@
-GEOMETRY:
-  Defines:
-    - GEOMETRY
-  Includes:
-    - assets/shaders/default/Albedo.glsl

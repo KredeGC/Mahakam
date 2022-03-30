@@ -17,7 +17,7 @@ namespace Mahakam
 
 	Ref<Texture2D> Texture2D::Create(const TextureProps& props)
 	{
-		MH_OVERRIDE_FUNC(tex2DCreateProps, props);
+		MH_OVERRIDE_FUNC(Texture2DCreateProps, props);
 
 		switch (RendererAPI::GetAPI())
 		{
@@ -34,7 +34,7 @@ namespace Mahakam
 
 	Ref<Texture2D> Texture2D::Create(const std::string& filepath, const TextureProps& props)
 	{
-		MH_OVERRIDE_FUNC(tex2DCreateFilepath, filepath, props);
+		MH_OVERRIDE_FUNC(Texture2DCreateFilepath, filepath, props);
 
 		switch (RendererAPI::GetAPI())
 		{
@@ -52,7 +52,7 @@ namespace Mahakam
 
 	Ref<TextureCube> TextureCube::Create(const CubeTextureProps& props)
 	{
-		MH_OVERRIDE_FUNC(texCubeCreateProps, props);
+		MH_OVERRIDE_FUNC(TextureCubeCreateProps, props);
 
 		switch (RendererAPI::GetAPI())
 		{
@@ -69,7 +69,7 @@ namespace Mahakam
 
 	Ref<TextureCube> TextureCube::Create(const std::string& filepath, const CubeTextureProps& props)
 	{
-		MH_OVERRIDE_FUNC(texCubeCreateFilepath, filepath, props);
+		MH_OVERRIDE_FUNC(TextureCubeCreateFilepath, filepath, props);
 
 		switch (RendererAPI::GetAPI())
 		{
@@ -86,7 +86,7 @@ namespace Mahakam
 
 	Ref<TextureCube> TextureCube::Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 	{
-		MH_OVERRIDE_FUNC(texCubeCreatePrefilter, cubemap, prefilter, props);
+		MH_OVERRIDE_FUNC(TextureCubeCreatePrefilter, cubemap, prefilter, props);
 
 		switch (RendererAPI::GetAPI())
 		{

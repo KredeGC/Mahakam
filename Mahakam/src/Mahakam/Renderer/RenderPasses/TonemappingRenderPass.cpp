@@ -6,8 +6,11 @@
 
 namespace Mahakam
 {
-	void TonemappingRenderPass::Init(uint32_t width, uint32_t height)
+	bool TonemappingRenderPass::Init(uint32_t width, uint32_t height)
 	{
+		if (RenderPass::Init(width, height))
+			return true;
+
 		// Create viewport framebuffer
 		FrameBufferProps viewportProps;
 		viewportProps.width = width;
@@ -17,6 +20,8 @@ namespace Mahakam
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
 		tonemappingShader = Shader::Create("assets/shaders/internal/Tonemapping.yaml");
+
+		return true;
 	}
 
 	TonemappingRenderPass::~TonemappingRenderPass()
