@@ -14,7 +14,7 @@ namespace Mahakam
 		{
 			auto& results = Renderer::GetPerformanceResults();
 
-			ImGui::Begin("Stats", &open);
+			ImGui::Begin("Performance Stats", &open);
 			ImGui::Text("Graphics unit: %s", GL::GetGraphicsVendor());
 			ImGui::Text("Drawcalls: %d", results.drawCalls);
 			ImGui::Text("Vertex count: %d", results.vertexCount);

@@ -65,7 +65,7 @@ namespace Mahakam
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Disabled until ALT can be overriden
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -103,9 +103,12 @@ namespace Mahakam
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
-		ImGuiIO& io = ImGui::GetIO();
-		event.handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-		event.handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		if (blockEvents)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			event.handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			event.handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		}
 	}
 
 	void ImGuiLayer::Begin()
@@ -116,7 +119,7 @@ namespace Mahakam
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 	}
-	
+
 	void ImGuiLayer::End()
 	{
 		MH_PROFILE_FUNCTION();

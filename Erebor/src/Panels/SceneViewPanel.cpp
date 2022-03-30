@@ -3,6 +3,12 @@
 
 namespace Mahakam
 {
+	void SceneViewPanel::OnUpdate(Timestep dt)
+	{
+		if (open)
+			editorCamera.OnUpdate(dt, focused, hovered);
+	}
+
 	void SceneViewPanel::OnImGuiRender()
 	{
 		MH_PROFILE_FUNCTION();
@@ -10,16 +16,17 @@ namespace Mahakam
 		if (open)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			ImGui::Begin("Viewport", &open);
+			ImGui::Begin("Scene View", &open);
 			focused = ImGui::IsWindowFocused();
 			hovered = ImGui::IsWindowHovered();
+			Application::GetInstance().GetImGuiLayer()->BlockEvents(!focused && !hovered);
 			ImVec2 size = ImGui::GetContentRegionAvail();
 			if (size.x != viewportSize.x || size.y != viewportSize.y)
 			{
 				viewportSize.x = size.x;
 				viewportSize.y = size.y;
 
-				activeScene->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
+				editorCamera.GetCamera().SetRatio(viewportSize.x / viewportSize.y);
 			}
 			if (viewportTexture)
 				ImGui::Image((void*)(uintptr_t)viewportTexture->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
@@ -28,24 +35,12 @@ namespace Mahakam
 		}
 	}
 
-	bool SceneViewPanel::OnMouseScrolled(MouseScrolledEvent& event)
+	void SceneViewPanel::OnEvent(Event& event)
 	{
-		if (focused && hovered)
+		if (hovered)
 		{
-			MH_CORE_TRACE("Scrolled!");
-			return true;
+			EventDispatcher dispatcher(event);
+			dispatcher.DispatchEvent<MouseScrolledEvent>(MH_BIND_EVENT(editorCamera.OnMouseScroll));
 		}
-
-		return false;
-	}
-
-	void SceneViewPanel::SetScene(Ref<Scene> scene)
-	{
-		activeScene = scene;
-	}
-
-	void SceneViewPanel::SetFrameBuffer(Ref<Texture> tex)
-	{
-		viewportTexture = tex;
 	}
 }

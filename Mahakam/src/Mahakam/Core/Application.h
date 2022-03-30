@@ -40,6 +40,8 @@ namespace Mahakam
 		inline static bool IsRunning() { return instance->running; }
 		inline static bool IsMinimized() { return instance->minimized; }
 
+		inline ImGuiLayer* GetImGuiLayer() { return imGuiLayer; }
+
 		inline Window& GetWindow() { return *window; }
 
 	private:

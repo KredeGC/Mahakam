@@ -41,14 +41,14 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	// Create skinned shader & material
 	Ref<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.yaml");
 	Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
-	skinnedMaterial->SetFloat3("u_Color", { 0.9f, 0.05f, 0.05f });
+	skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
 	skinnedMaterial->SetFloat("u_Metallic", 1.0f);
-	skinnedMaterial->SetFloat("u_Roughness", 0.9f);
+	skinnedMaterial->SetFloat("u_Roughness", 0.4f);
 
 
 	// Create skinned entity
-	SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/Defeated.fbx");
-	Ref<Animation> animation = Animation::Load("assets/models/Defeated.fbx", skinnedModel);
+	SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/clap.fbx");
+	Ref<Animation> animation = Animation::Load("assets/models/clap.fbx", skinnedModel);
 
 	Entity animatedEntity = scene->CreateEntity("DLL Animated");
 	animatedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);

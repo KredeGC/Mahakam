@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EditorCamera.h"
+
 #include <Mahakam.h>
 
 #include <imgui.h>
@@ -13,7 +15,7 @@ namespace Mahakam
 		bool focused = false;
 		bool hovered = false;
 
-		Ref<Scene> activeScene;
+		EditorCamera editorCamera;
 		Ref<Texture> viewportTexture;
 
 		glm::vec2 viewportSize = { 0.0f, 0.0f };
@@ -21,12 +23,14 @@ namespace Mahakam
 	public:
 		SceneViewPanel() = default;
 
-		void SetScene(Ref<Scene> scene);
-
-		void SetFrameBuffer(Ref<Texture> tex);
+		void OnUpdate(Timestep dt);
 
 		void OnImGuiRender();
 
-		bool OnMouseScrolled(MouseScrolledEvent& event);
+		void OnEvent(Event& event);
+
+		void SetFrameBuffer(Ref<Texture> tex) { viewportTexture = tex; }
+
+		EditorCamera& GetCamera() { return editorCamera; }
 	};
 }

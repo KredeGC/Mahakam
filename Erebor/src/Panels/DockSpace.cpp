@@ -3,11 +3,11 @@
 
 namespace Mahakam
 {
-	void DockSpace::OnImGuiRender()
+	void DockSpace::Begin()
 	{
 		// Render dockspace
-		ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None; // ImGuiDockNodeFlags_None
-		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+		ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos(viewport->GetWorkPos());
@@ -35,6 +35,52 @@ namespace Mahakam
 		}
 		style.WindowMinSize.x = minWidth;
 
+		// File bar
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
+				// which we can't undo at the moment without finer window depth/z control.
+				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);1
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+				{ }
+
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+				{ }
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+				{ }
+
+				if (ImGui::MenuItem("Exit"))
+					Application::GetInstance().Close();
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("View"))
+			{
+				if (ImGui::MenuItem("Scene View"))
+				{ }
+
+				if (ImGui::MenuItem("Game View"))
+				{ }
+
+				if (ImGui::MenuItem("Performance Stats"))
+				{ }
+
+				if (ImGui::MenuItem("Profiler"))
+				{ }
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
+	}
+
+	void DockSpace::End()
+	{
 		ImGui::End();
 	}
 }

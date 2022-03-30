@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Panels/DockSpace.h"
+#include "Panels/GameViewPanel.h"
 #include "Panels/ProfilerPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/SceneViewPanel.h"
 #include "Panels/StatsPanel.h"
+#include "EditorCamera.h"
 
 #include <Mahakam.h>
 
@@ -18,6 +20,7 @@ namespace Mahakam
 		Ref<Scene> activeScene;
 
 		DockSpace dockSpace;
+		GameViewPanel gameViewPanel;
 		ProfilerPanel profilerPanel;
 		SceneViewPanel sceneViewPanel;
 		SceneHierarchyPanel sceneHierarchyPanel;
@@ -28,7 +31,7 @@ namespace Mahakam
 		uint32_t width = 128, height = 128;
 
 	public:
-		EditorLayer() : Layer("Editor"), dockSpace(), profilerPanel(),
+		EditorLayer() : Layer("Editor"), dockSpace(), gameViewPanel(), profilerPanel(),
 			sceneViewPanel(), sceneHierarchyPanel(), statsPanel() {}
 
 		virtual void OnAttach() override;
@@ -39,6 +42,5 @@ namespace Mahakam
 
 		bool OnKeyPressed(KeyPressedEvent& event);
 		bool OnWindowResize(WindowResizeEvent& event);
-		bool OnMouseScrolled(MouseScrolledEvent& event);
 	};
 }

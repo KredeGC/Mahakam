@@ -95,7 +95,7 @@ namespace Mahakam
 
 
 		// Setup the viewport in editor
-		sceneViewPanel.SetScene(activeScene);
+		gameViewPanel.SetScene(activeScene);
 		sceneHierarchyPanel.SetContext(activeScene);
 
 
@@ -196,7 +196,7 @@ namespace Mahakam
 
 
 		// Setup dancing monke
-		Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
+		/*Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
 		skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
 		skinnedMaterial->SetFloat("u_Metallic", 1.0f);
 		skinnedMaterial->SetFloat("u_Roughness", 0.4f);
@@ -211,7 +211,7 @@ namespace Mahakam
 		animatedEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 1.5f, 5.0f });
 		animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
 		animatedEntity.AddComponent<AnimatorComponent>(animation);
-		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();
+		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();*/
 
 
 		// Create mesh & base material
@@ -263,15 +263,25 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 		
-
+		// Call shared library update
 		auto updatePtr = lib->GetFunction<void, Scene*, Timestep>("Update");
 
 		updatePtr(activeScene.get(), dt);
 
+#if MH_RUNTIME
+		// Only used during runtime
 		activeScene->OnUpdate(dt);
-
+		gameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
+#else
+		// Only used in editor
+		activeScene->OnUpdate(dt, true); // TEMPORARY OR SOMETHING?
+		sceneViewPanel.OnUpdate(dt);
+		activeScene->OnRender(sceneViewPanel.GetCamera(), sceneViewPanel.GetCamera().GetModelMatrix());
 		sceneViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
+		gameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0)); // TEMPORARY UNTIL PLAY IS IMPL
+#endif
 
+		// Test compute shader
 		/*debugComputeShader->Bind();
 		debugComputeTexture->BindImage(0, false, true);
 		debugComputeShader->Dispatch(std::ceil(width / 8), std::ceil(height / 4), 1);
@@ -285,11 +295,15 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		dockSpace.OnImGuiRender();
+		dockSpace.Begin();
+
+		gameViewPanel.OnImGuiRender();
 		profilerPanel.OnImGuiRender();
 		sceneViewPanel.OnImGuiRender();
 		sceneHierarchyPanel.OnImGuiRender();
 		statsPanel.OnImGuiRender();
+
+		dockSpace.End();
 	}
 
 	void EditorLayer::OnEvent(Event& event)
@@ -297,7 +311,8 @@ namespace Mahakam
 		EventDispatcher dispatcher(event);
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::OnKeyPressed));
 		dispatcher.DispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(EditorLayer::OnWindowResize));
-		dispatcher.DispatchEvent<MouseScrolledEvent>(MH_BIND_EVENT(EditorLayer::OnMouseScrolled));
+
+		sceneViewPanel.OnEvent(event);
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
@@ -320,13 +335,6 @@ namespace Mahakam
 		height = event.GetHeight();
 
 		debugComputeTexture->Resize(width, height);
-
-		return false;
-	}
-
-	bool EditorLayer::OnMouseScrolled(MouseScrolledEvent& event)
-	{
-		sceneViewPanel.OnMouseScrolled(event);
 
 		return false;
 	}

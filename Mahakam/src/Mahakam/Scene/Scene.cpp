@@ -76,7 +76,7 @@ namespace Mahakam
 
 	Scene::~Scene() {}
 
-	void Scene::OnUpdate(Timestep ts)
+	void Scene::OnUpdate(Timestep ts, bool dontRender)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -112,10 +112,10 @@ namespace Mahakam
 				animator.UpdateAnimation(ts);
 
 				auto& materials = meshComponent.GetMaterials();
-				auto& transforms = animator.GetFinalBoneMatrices();
+				auto transforms = animator.GetFinalBoneMatrices();
 
 				for (auto& material : materials)
-					for (int j = 0; j < transforms.size(); ++j)
+					for (int j = 0; j < Animator::MAX_BONES; ++j)
 						material->SetMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
 			});
 		}
@@ -128,99 +128,104 @@ namespace Mahakam
 
 			registry.view<TransformComponent, CameraComponent>().each([&](auto entity, TransformComponent& transformComponent, CameraComponent& cameraComponent)
 			{
-				// Recalculate all projection matrices, if they've changed
-				cameraComponent.GetCamera().RecalculateProjectionMatrix();
-
 				mainCamera = &cameraComponent;
 				mainTransform = &transformComponent;
 			});
 		}
 
 		// Only prepare scene if we actually have something to render to
-		if (mainCamera && mainTransform)
+		if (!dontRender && mainCamera && mainTransform)
+			OnRender(*mainCamera, *mainTransform);
+	}
+
+	void Scene::OnRender(Camera& camera, const glm::mat4& cameraTransform)
+	{
+		// Recalculate all projection matrices, if they've changed
+		camera.RecalculateProjectionMatrix();
+
+		EnvironmentData environment
 		{
-			EnvironmentData environment
-			{
-				skyboxMaterial,
-				skyboxIrradiance,
-				skyboxSpecular
-			};
+			skyboxMaterial,
+			skyboxIrradiance,
+			skyboxSpecular
+		};
 
-			// Setup scene lights
-			{
-				MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - LightComponent");
+		// Setup scene lights
+		{
+			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - LightComponent");
 
-				registry.view<TransformComponent, LightComponent>().each([&](auto entity, TransformComponent& transformComponent, LightComponent& lightComponent)
+			registry.view<TransformComponent, LightComponent>().each([&](auto entity, TransformComponent& transformComponent, LightComponent& lightComponent)
+			{
+				glm::vec3 pos = transformComponent.GetPosition();
+				glm::quat rot = transformComponent.GetRotation();
+				glm::vec3 dir = rot * glm::vec3(0.0f, 0.0f, 1.0f);
+				Light& light = lightComponent.GetLight();
+
+				switch (light.GetLightType())
 				{
-					glm::vec3 pos = transformComponent.GetPosition();
-					glm::quat rot = transformComponent.GetRotation();
-					glm::vec3 dir = rot * glm::vec3(0.0f, 0.0f, 1.0f);
-					Light& light = lightComponent.GetLight();
+				case Light::LightType::Directional:
+					environment.directionalLights.push_back({ glm::vec3{ cameraTransform[3] }, rot, light });
+					break;
+				case Light::LightType::Point:
+					environment.pointLights.push_back({ pos, light });
+					break;
+				case Light::LightType::Spot:
+					environment.spotLights.push_back({ pos, rot, light });
+					break;
+				}
+			});
+		}
 
-					switch (light.GetLightType())
-					{
-					case Light::LightType::Directional:
-						environment.directionalLights.push_back({ mainTransform->GetPosition(), rot, light });
-						break;
-					case Light::LightType::Point:
-						environment.pointLights.push_back({ pos, light });
-						break;
-					case Light::LightType::Spot:
-						environment.spotLights.push_back({ pos, rot, light });
-						break;
-					}
+		// Update particle systems
+		/*auto particleView = registry.view<TransformComponent, ParticleSystemComponent>();
+		{
+			MH_PROFILE_RENDERING_SCOPE("Mahakam::Scene::OnUpdate - ParticleSystemComponent");
+
+			particleView.each([=](auto entity, TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
+			{
+				auto& particles = particleComponent.GetParticleSystem();
+
+				particles.Simulate(ts, transform, Renderer);
+			});
+		}*/
+
+		// Begin the render loop
+		{
+			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Render loop");
+			Renderer::BeginScene(camera, cameraTransform, environment);
+
+			// Render each entity with a mesh
+			{
+				MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Submit");
+
+				registry.view<TransformComponent, MeshComponent>().each([&](auto entity, TransformComponent& transformComponent, MeshComponent& meshComponent)
+				{
+					auto& meshes = meshComponent.GetMeshes();
+					auto& materials = meshComponent.GetMaterials();
+					int materialCount = (int)materials.size() - 1;
+					for (int i = 0; i < meshComponent.GetMeshCount(); i++)
+						Renderer::Submit(transformComponent, meshes[i], materials[i < materialCount ? i : materialCount]);
 				});
 			}
 
-			// Update particle systems
-			/*auto particleView = registry.view<TransformComponent, ParticleSystemComponent>();
+			// Render particle systems
 			{
-				MH_PROFILE_RENDERING_SCOPE("Mahakam::Scene::OnUpdate - ParticleSystemComponent");
+				MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - SubmitParticles");
 
-				particleView.each([=](auto entity, TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
+				registry.view<TransformComponent, ParticleSystemComponent>().each([=](auto entity, TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
 				{
-					auto& particles = particleComponent.GetParticleSystem();
-
-					particles.Simulate(ts, transform, Renderer);
+					Renderer::SubmitParticles(transformComponent, particleComponent);
 				});
-			}*/
-
-			// Begin the render loop
-			{
-				MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Render loop");
-				Renderer::BeginScene(*mainCamera, *mainTransform, environment);
-
-				// Render each entity with a mesh
-				{
-					MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Submit");
-
-					registry.view<TransformComponent, MeshComponent>().each([&](auto entity, TransformComponent& transformComponent, MeshComponent& meshComponent)
-					{
-						auto& meshes = meshComponent.GetMeshes();
-						auto& materials = meshComponent.GetMaterials();
-						int materialCount = (int)materials.size() - 1;
-						for (int i = 0; i < meshComponent.GetMeshCount(); i++)
-							Renderer::Submit(transformComponent, meshes[i], materials[i < materialCount ? i : materialCount]);
-					});
-				}
-
-				// Render particle systems
-				{
-					MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - SubmitParticles");
-
-					registry.view<TransformComponent, ParticleSystemComponent>().each([=](auto entity, TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
-					{
-						Renderer::SubmitParticles(transformComponent, particleComponent);
-					});
-				}
-
-				Renderer::EndScene();
 			}
+
+			Renderer::EndScene();
 		}
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
+		// In editor this is caleld by SceneViewPanel / GameViewPanel
+		// In release this is called by EditorLayer.OnWindowResize
 		viewportRatio = (float)width / (float)height;
 
 		auto cameras = registry.view<CameraComponent>();

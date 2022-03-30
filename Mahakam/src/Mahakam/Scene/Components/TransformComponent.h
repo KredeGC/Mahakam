@@ -61,7 +61,7 @@ namespace Mahakam
 				* glm::mat4(rotation)
 				* glm::scale(glm::mat4(1.0f), scale);
 
-			glm::eulerAngles(rotation);
+			//glm::eulerAngles(rotation); // Unused?
 
 			forward = modelMatrix * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
 			right = modelMatrix * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);

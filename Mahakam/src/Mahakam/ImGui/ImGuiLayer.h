@@ -12,6 +12,8 @@ namespace Mahakam {
 	private:
 		float m_Time = 0;
 
+		bool blockEvents = false;
+
 	public:
 		ImGuiLayer();
 		~ImGuiLayer();
@@ -19,6 +21,8 @@ namespace Mahakam {
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
 		virtual void OnEvent(Event& event) override;
+
+		void BlockEvents(bool block) { blockEvents = block; }
 
 		void Begin();
 		void End();

@@ -33,7 +33,8 @@ namespace Mahakam
 		Scene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
 		~Scene();
 
-		void OnUpdate(Timestep ts);
+		void OnUpdate(Timestep ts, bool dontRender = false);
+		void OnRender(Camera& camera, const glm::mat4& cameraTransform);
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 

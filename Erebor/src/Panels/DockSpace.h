@@ -11,6 +11,7 @@ namespace Mahakam
 	public:
 		DockSpace() {}
 
-		void OnImGuiRender();
+		void Begin();
+		void End();
 	};
 }
