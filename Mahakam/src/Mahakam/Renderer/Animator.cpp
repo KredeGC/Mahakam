@@ -18,6 +18,8 @@ namespace Mahakam
 
 	void Animator::PlayAnimation(Ref<Animation> animation)
 	{
+		MH_PROFILE_FUNCTION();
+
 		m_CurrentAnimation = animation;
 		m_CurrentTime = 0.0f;
 		m_BoneHierarchy = m_CurrentAnimation->GetBoneHierarchy();

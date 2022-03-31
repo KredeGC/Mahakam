@@ -6,6 +6,8 @@ namespace Mahakam
 	OpenGLMaterial::OpenGLMaterial(const Ref<Shader>& shader, const std::string& variant)
 		: shader(std::static_pointer_cast<OpenGLShader>(shader)), variant(variant)
 	{
+		MH_PROFILE_FUNCTION();
+
 		auto& defaultProps = shader->GetProperties();
 
 		for (auto& prop : defaultProps)

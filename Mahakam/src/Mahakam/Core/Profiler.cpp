@@ -5,6 +5,8 @@
 
 #include "Mahakam/Renderer/GL.h"
 
+#include "Instrumentor.h"
+
 namespace Mahakam
 {
 	std::vector<Profiler::ProfileResult> Profiler::results;
@@ -12,11 +14,9 @@ namespace Mahakam
 	void Profiler::Stop()
 	{
 #ifdef MH_ENABLE_PROFILING
-		auto endPoint = std::chrono::steady_clock::now();
-
-		AddResult(name, startPoint, endPoint);
-
 		stopped = true;
+
+		auto endPoint = std::chrono::steady_clock::now();
 
 #ifdef MH_ENABLE_RENDER_PROFILING
 		if (flushRenderer)
@@ -25,8 +25,15 @@ namespace Mahakam
 
 			auto renderPoint = std::chrono::steady_clock::now();
 
+			AddResult(name, startPoint, renderPoint);
 			AddResult("Waiting on GPU", endPoint, renderPoint);
 		}
+		else
+		{
+			AddResult(name, startPoint, endPoint);
+		}
+#else
+		AddResult(name, startPoint, endPoint);
 #endif
 #endif
 	}
@@ -43,12 +50,14 @@ namespace Mahakam
 		MH_OVERRIDE_FUNC(ProfilerAddResult, name, startTime, endTime);
 
 #ifdef MH_ENABLE_PROFILING
-		uint64_t start = std::chrono::time_point_cast<std::chrono::microseconds>(startTime).time_since_epoch().count();
-		uint64_t end = std::chrono::time_point_cast<std::chrono::microseconds>(endTime).time_since_epoch().count();
+		auto start = std::chrono::time_point_cast<std::chrono::microseconds>(startTime).time_since_epoch();
+		auto end = std::chrono::time_point_cast<std::chrono::microseconds>(endTime).time_since_epoch();
 
-		float duration = (end - start) * 0.001f;
+		auto duration = end - start;
 
-		results.push_back({ name, duration });
+		results.push_back({ name, start, duration, std::this_thread::get_id() });
+
+		Instrumentor::Get().WriteProfile({ name, start, duration, std::this_thread::get_id() });
 #endif
 	}
 

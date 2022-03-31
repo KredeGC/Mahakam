@@ -46,12 +46,18 @@
 
 #define MH_PROFILE_RENDERING_SCOPE(name) MH_PROFILE_SCOPE_LINE(name, __LINE__, true)
 #define MH_PROFILE_RENDERING_FUNCTION() MH_PROFILE_RENDERING_SCOPE(__FUNCTION__)
+
+#define MH_PROFILE_BEGIN_SESSION(name, filepath) ::Mahakam::Instrumentor::Get().BeginSession(name, filepath)
+#define MH_PROFILE_END_SESSION() ::Mahakam::Instrumentor::Get().EndSession()
 #else // MH_ENABLE_PROFILING
 #define MH_PROFILE_SCOPE(name)
 #define MH_PROFILE_FUNCTION()
 
 #define MH_PROFILE_RENDERING_SCOPE(name)
 #define MH_PROFILE_RENDERING_FUNCTION()
+
+#define MH_PROFILE_BEGIN_SESSION(name, filepath)
+#define MH_PROFILE_END_SESSION()
 #endif // MH_ENABLE_PROFILING
 
 // Returns the bitness of x
@@ -100,3 +106,4 @@ namespace Mahakam
 
 #include "Log.h"
 #include "Profiler.h"
+#include "Instrumentor.h"

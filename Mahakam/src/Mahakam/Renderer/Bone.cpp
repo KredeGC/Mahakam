@@ -6,6 +6,8 @@ namespace Mahakam
 	Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)
 		: m_Name(name), m_ID(ID), m_LocalTransform(1.0f)
 	{
+		MH_PROFILE_FUNCTION();
+
 		m_NumPositions = channel->mNumPositionKeys;
 
 		for (int positionIndex = 0; positionIndex < m_NumPositions; ++positionIndex)

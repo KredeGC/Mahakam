@@ -25,11 +25,11 @@ namespace Mahakam {
 
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+		MH_PROFILE_FUNCTION();
+
 #ifndef MH_DEBUG
 		FreeConsole();
 #endif
-
-		MH_PROFILE_FUNCTION();
 
 		data.title = props.title;
 		data.width = props.width;

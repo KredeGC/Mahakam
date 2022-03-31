@@ -56,6 +56,8 @@ namespace Mahakam
 
 	Scene::Scene(const std::string& filepath)
 	{
+		MH_PROFILE_FUNCTION();
+
 		// Idea:: Use RG11B10f instead, should halve memory usage
 		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F });
 		skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
@@ -69,6 +71,8 @@ namespace Mahakam
 	Scene::Scene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
 		: skyboxTexture(skybox), skyboxIrradiance(irradianceMap), skyboxSpecular(specularMap)
 	{
+		MH_PROFILE_FUNCTION();
+
 		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
 		skyboxMaterial = Material::Create(skyboxShader);
 		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);

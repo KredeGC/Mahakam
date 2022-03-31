@@ -15,6 +15,8 @@ namespace Mahakam
 
 	void GL::Init()
 	{
+		MH_PROFILE_FUNCTION();
+
 		rendererAPI->Init();
 
 		staticScreenQuad = CreateScreenQuad();

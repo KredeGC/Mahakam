@@ -14,6 +14,8 @@ namespace Mahakam
 
     Animation::Animation(const std::string& filepath, SkinnedMesh& skinnedMesh)
     {
+        MH_PROFILE_FUNCTION();
+
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate);
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -40,6 +42,8 @@ namespace Mahakam
 
     void Animation::ReadMissingBones(const aiAnimation* animation, robin_hood::unordered_map<std::string, BoneInfo>& boneInfoMap, int& boneCount)
     {
+        MH_PROFILE_FUNCTION();
+
         int size = animation->mNumChannels;
 
         // Reading channels(bones engaged in an animation and their keyframes)
@@ -63,6 +67,8 @@ namespace Mahakam
 
     void Animation::ReadHierarchyData(int parentIndex, const aiNode* src)
     {
+        MH_PROFILE_FUNCTION();
+
         MH_CORE_ASSERT(src, "Invalid root bone!");
 
         int index = (int)m_BoneHierarchy.size();

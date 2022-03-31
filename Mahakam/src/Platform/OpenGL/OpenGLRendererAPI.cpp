@@ -43,6 +43,8 @@ namespace Mahakam
 
 	void OpenGLRendererAPI::Init()
 	{
+		MH_PROFILE_FUNCTION();
+
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 

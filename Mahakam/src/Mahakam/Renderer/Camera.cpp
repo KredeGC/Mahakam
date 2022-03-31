@@ -6,12 +6,16 @@ namespace Mahakam
 	Camera::Camera()
 		: projectionMatrix({ 1.0f }), nearZ(0.03f), farZ(1000.0f)
 	{
+		MH_PROFILE_FUNCTION();
+
 		SetPerspective(fov, nearZ, farZ);
 	}
 
 	Camera::Camera(ProjectionType projection, float fov, float nearPlane, float farPlane)
 		: projectionType(projection)
 	{
+		MH_PROFILE_FUNCTION();
+
 		if (projectionType == ProjectionType::Perspective)
 			SetPerspective(fov, nearPlane, farPlane);
 		else

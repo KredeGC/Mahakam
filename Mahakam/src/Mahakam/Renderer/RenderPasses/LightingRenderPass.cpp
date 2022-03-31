@@ -20,6 +20,8 @@ namespace Mahakam
 		if (RenderPass::Init(width, height))
 			return true;
 
+		MH_PROFILE_RENDERING_FUNCTION();
+
 		SetupBRDF();
 		SetupFrameBuffer(width, height);
 		SetupShaders();
@@ -38,6 +40,8 @@ namespace Mahakam
 
 	LightingRenderPass::~LightingRenderPass()
 	{
+		MH_PROFILE_FUNCTION();
+
 		brdfLut = nullptr;
 		falloffLut = nullptr;
 		spotlightTexture = nullptr;
@@ -78,6 +82,8 @@ namespace Mahakam
 
 	void LightingRenderPass::SetupBRDF()
 	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
 		// Create BRDF and falloff maps
 		FileUtility::CreateDirectories("res/internal/");
 
@@ -89,6 +95,8 @@ namespace Mahakam
 
 	void LightingRenderPass::SetupFrameBuffer(uint32_t width, uint32_t height)
 	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
 		// Create HDR lighting framebuffer
 		FrameBufferProps lightingProps;
 		lightingProps.width = width;
@@ -101,6 +109,8 @@ namespace Mahakam
 
 	void LightingRenderPass::SetupShaders()
 	{
+		MH_PROFILE_RENDERING_FUNCTION();
+
 		// Create lighting shader
 		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.yaml", { "DEBUG" });
 

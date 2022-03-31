@@ -13,6 +13,8 @@ namespace Mahakam
 		if (RenderPass::Init(width, height))
 			return true;
 
+		MH_PROFILE_RENDERING_FUNCTION();
+
 		// Create gbuffer
 		FrameBufferProps gProps;
 		gProps.width = width;
@@ -31,6 +33,8 @@ namespace Mahakam
 
 	GeometryRenderPass::~GeometryRenderPass()
 	{
+		MH_PROFILE_FUNCTION();
+
 		gBuffer = nullptr;
 	}
 

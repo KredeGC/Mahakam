@@ -9,12 +9,30 @@ namespace Mahakam
 		{
 			ImGui::Begin("Profiler", &open);
 
+			if (!recording)
+			{
+				if (ImGui::Button("Record"))
+				{
+					recording = true;
+					uint64_t time = std::chrono::steady_clock::now().time_since_epoch().count();
+					MH_PROFILE_BEGIN_SESSION("runtime", std::string("Profiling-Record-") + std::to_string(time) + ".json");
+				}
+			}
+			else
+			{
+				if (ImGui::Button("Stop"))
+				{
+					recording = false;
+					MH_PROFILE_END_SESSION();
+				}
+			}
+
 			for (auto& result : Profiler::GetResults())
 			{
-				char label[256];
-				strcpy(label, "%.3fms  ");
-				strcat(label, result.name);
-				ImGui::Text(label, result.duration);
+				std::string viewName = "%.3fms  " + result.name;
+				float milliseconds = result.elapsedTime.count() * 0.001f;
+
+				ImGui::Text(viewName.c_str(), milliseconds);
 			}
 
 			ImGui::End();

@@ -10,6 +10,7 @@ namespace Mahakam
 	{
 	private:
 		bool open = true;
+		bool recording = false;
 
 	public:
 		void OnImGuiRender();

@@ -11,6 +11,8 @@ namespace Mahakam
 		if (RenderPass::Init(width, height))
 			return true;
 
+		MH_PROFILE_RENDERING_FUNCTION();
+
 		// Create viewport framebuffer
 		FrameBufferProps viewportProps;
 		viewportProps.width = width;
@@ -26,6 +28,8 @@ namespace Mahakam
 
 	TonemappingRenderPass::~TonemappingRenderPass()
 	{
+		MH_PROFILE_FUNCTION();
+
 		viewportFramebuffer = nullptr;
 		tonemappingShader = nullptr;
 	}

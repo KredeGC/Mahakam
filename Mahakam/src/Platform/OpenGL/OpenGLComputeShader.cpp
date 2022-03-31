@@ -14,6 +14,8 @@ namespace Mahakam
 	OpenGLComputeShader::OpenGLComputeShader(const std::string& filepath)
 		: filepath(filepath)
 	{
+		MH_PROFILE_FUNCTION();
+
 		// Naming
 		auto lastSlash = filepath.find_last_of("/\\");
 		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;

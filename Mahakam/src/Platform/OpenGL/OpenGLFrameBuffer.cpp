@@ -13,6 +13,8 @@ namespace Mahakam
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferProps& props)
 		: props(props)
 	{
+		MH_PROFILE_FUNCTION();
+
 		Invalidate();
 	}
 
