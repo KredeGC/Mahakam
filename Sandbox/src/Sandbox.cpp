@@ -14,8 +14,6 @@ public:
 		: rotation(0.0f) {}
 };
 
-	float rotation = 0.0f;
-
 EXTERN_EXPORTED void Load(void** funcPtrs)
 {
 	SharedLibrary::ImportFuncPointers(funcPtrs);

@@ -75,8 +75,6 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/contrib/zlib/cmake_install.cmake")
   include("C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/cmake_install.cmake")
-  include("C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/tools/assimp_cmd/cmake_install.cmake")
-  include("C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/test/cmake_install.cmake")
 
 endif()
 
