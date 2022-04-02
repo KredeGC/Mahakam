@@ -244,6 +244,8 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
+		UpdateRuntimeLibrary();
+
 		// Call shared library update
 		auto updatePtr = lib->GetFunction<void, Scene*, Timestep>("Update");
 
@@ -294,6 +296,72 @@ namespace Mahakam
 		dispatcher.DispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(EditorLayer::OnWindowResize));
 
 		sceneViewPanel.OnEvent(event);
+	}
+
+	void EditorLayer::CopyRuntime(std::istream& binaryStream, size_t binaryLength)
+	{
+		// Copy new runtime
+		std::vector<char> binaryBuffer;
+		binaryBuffer.reserve(binaryLength);
+		std::copy(std::istreambuf_iterator<char>(binaryStream),
+			std::istreambuf_iterator<char>(),
+			std::back_inserter(binaryBuffer));
+
+		std::ofstream copyOut("runtime/Sandbox-runtime.dll", std::ios_base::binary);
+		copyOut.write(binaryBuffer.data(), binaryLength);
+		copyOut.close();
+	}
+
+	void EditorLayer::UpdateRuntimeLibrary()
+	{
+		if (std::filesystem::exists("runtime/Sandbox.dll"))
+		{
+			std::ifstream binaryStream("runtime/Sandbox.dll", std::ios_base::binary);
+
+			binaryStream.seekg(0, std::ios_base::end);
+			size_t binaryLength = binaryStream.tellg();
+			binaryStream.seekg(0, std::ios_base::beg);
+
+			if (std::filesystem::exists("runtime/Sandbox-runtime.dll"))
+			{
+				std::ifstream runtimeStream("runtime/Sandbox-runtime.dll", std::ios_base::binary);
+
+				runtimeStream.seekg(0, std::ios_base::end);
+				size_t runtimeLength = runtimeStream.tellg();
+				runtimeStream.seekg(0, std::ios_base::beg);
+
+				if (binaryLength != runtimeLength)
+				{
+					MH_CORE_TRACE("Reloading runtime code");
+
+					// Unload old scene and runtime
+					activeScene = nullptr;
+					delete lib;
+
+					// Copy new runtime
+					CopyRuntime(binaryStream, binaryLength);
+
+					// Create new scene
+					activeScene = Scene::CreateScene("assets/textures/pines.hdr");
+					gameViewPanel.SetScene(activeScene);
+					sceneHierarchyPanel.SetContext(activeScene);
+
+					// Load new runtime
+					lib = new SharedLibrary("runtime/Sandbox-runtime.dll");
+
+					auto runPtr = lib->GetFunction<void, Scene*>("Run");
+
+					runPtr(activeScene.get());
+				}
+			}
+			else
+			{
+				MH_CORE_TRACE("Copying runtime code");
+
+				// Copy new runtime
+				CopyRuntime(binaryStream, binaryLength);
+			}
+		}
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)

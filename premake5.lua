@@ -252,7 +252,7 @@ project "Sandbox"
     defines { "_CRT_SECURE_NO_WARNINGS" }
     
     postbuildcommands {
-        "{COPYDIR} \"../bin/%{outputdir}/%{prj.name}/\" \"../bin/%{outputdir}/Erebor/runtime/\""
+        "{COPYDIR} \"../bin/%{outputdir}/%{prj.name}/\" \"../Erebor/runtime/\""
     }
 
     filter "system:windows"

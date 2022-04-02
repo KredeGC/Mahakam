@@ -40,6 +40,10 @@ namespace Mahakam
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& event) override;
 
+	private:
+		void CopyRuntime(std::istream& binaryStream, size_t binaryLength);
+		void UpdateRuntimeLibrary();
+
 		bool OnKeyPressed(KeyPressedEvent& event);
 		bool OnWindowResize(WindowResizeEvent& event);
 	};

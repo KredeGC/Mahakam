@@ -11,8 +11,6 @@ namespace Mahakam
 {
 	class RenderPass;
 
-	// IDEA: Use singleton pattern to create the object, each static method then calls GetInstance, which is overriden in SharedLibrary
-
 	class Renderer
 	{
 	private:

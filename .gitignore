@@ -3,9 +3,9 @@
 **/bin-obj/
 **/out/
 
-Mahakam/vendor/VulkanSDK/
 Erebor/cache/
 Erebor/profiling/
+Erebor/runtime/
 
 Mahakam/vendor/assimp/lib/
 Mahakam/vendor/assimp/generated/
