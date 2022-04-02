@@ -12,6 +12,8 @@ namespace Mahakam
 	public:
 		AnimatorComponent() = default;
 
+		AnimatorComponent(const AnimatorComponent&) = default;
+
 		AnimatorComponent(Ref<Animation> animation)
 		{
 			animator.PlayAnimation(animation);

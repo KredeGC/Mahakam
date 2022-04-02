@@ -85,7 +85,7 @@ namespace Mahakam
 		return changed;
 	}
 
-	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
+	void SceneHierarchyPanel::DrawEntityNode(Entity entity, Ref<Scene> context)
 	{
 		std::string& tag = entity.GetComponent<TagComponent>().tag;
 
@@ -343,9 +343,9 @@ namespace Mahakam
 		});
 	}
 
-	void SceneHierarchyPanel::SetContext(Ref<Scene> scene)
+	void SceneHierarchyPanel::SetContext(WeakRef<Scene> scene)
 	{
-		context = scene;
+		this->scene = scene;
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
@@ -354,33 +354,36 @@ namespace Mahakam
 		{
 			ImGui::Begin("Scene Hierarchy", &open);
 
-			context->registry.each([&](auto handle)
+			if (auto context = scene.lock())
 			{
-				Entity entity(handle, context.get());
+				context->registry.each([&](auto handle)
+				{
+					Entity entity(handle, context.get());
 
-				DrawEntityNode(entity);
-			});
+					DrawEntityNode(entity, context);
+				});
 
-			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-				selectedEntity = {};
+				if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+					selectedEntity = {};
 
-			// Blank space menu
-			if (ImGui::BeginPopupContextWindow(0, 1, false))
-			{
-				if (ImGui::MenuItem("Create empty entity"))
-					context->CreateEntity();
+				// Blank space menu
+				if (ImGui::BeginPopupContextWindow(0, 1, false))
+				{
+					if (ImGui::MenuItem("Create empty entity"))
+						context->CreateEntity();
 
-				ImGui::EndPopup();
-			}
+					ImGui::EndPopup();
+				}
 
-			ImGui::End();
+				ImGui::End();
 
 
-			ImGui::Begin("Inspector");
+				ImGui::Begin("Inspector");
 
-			if (selectedEntity)
-			{
-				DrawInspector(selectedEntity);
+				if (selectedEntity)
+				{
+					DrawInspector(selectedEntity);
+				}
 			}
 
 			ImGui::End();

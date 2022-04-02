@@ -9,18 +9,19 @@ namespace Mahakam
 	private:
 		bool open = true;
 
-		Ref<Scene> context;
+		WeakRef<Scene> scene;
 		Entity selectedEntity;
-
-		void DrawEntityNode(Entity entity);
-
-		void DrawInspector(Entity entity);
 
 	public:
 		SceneHierarchyPanel() = default;
 
-		void SetContext(Ref<Scene> scene);
+		void SetContext(WeakRef<Scene> scene);
 
 		virtual void OnImGuiRender() override;
+
+	private:
+		void DrawEntityNode(Entity entity, Ref<Scene> context);
+
+		void DrawInspector(Entity entity);
 	};
 }

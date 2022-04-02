@@ -11,6 +11,8 @@ namespace Mahakam
 {
 	class RenderPass;
 
+	// IDEA: Use singleton pattern to create the object, each static method then calls GetInstance, which is overriden in SharedLibrary
+
 	class Renderer
 	{
 	private:
@@ -26,45 +28,82 @@ namespace Mahakam
 			uint32_t height;
 		};
 
-		static RendererData* rendererData;
-		static SceneData* sceneData;
+		RendererData rendererData;
+		SceneData sceneData;
+
+		static Renderer* s_Instance;
 
 	public:
-		static void Init(uint32_t width, uint32_t height);
-		static void Shutdown();
-		static void OnWindowResie(uint32_t width, uint32_t height);
+		Renderer(uint32_t width, uint32_t height);
+		~Renderer();
 
-		static void SetRenderPasses(const std::vector<Ref<RenderPass>>& renderPasses);
+		static Renderer* GetInstance();
 
-		static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
-		static void EndScene();
+		static void OnWindowResize(uint32_t width, uint32_t height);
 
-		static void EnableWireframe(bool enable) { sceneData->wireframe = enable; }
-		static void EnableBoundingBox(bool enable) { sceneData->boundingBox = enable; }
-		static void EnableGBuffer(bool enable) { sceneData->gBuffer = enable; }
+		inline static void Init(uint32_t width, uint32_t height) { s_Instance = new Renderer(width, height); }
+		inline static void Shutdown() { delete s_Instance; }
+		
+		inline static void SetRenderPasses(const std::vector<Ref<RenderPass>>& renderPasses) { GetInstance()->SetRenderPassesImpl(renderPasses); }
+		
+		inline static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment) { GetInstance()->BeginSceneImpl(cam, transform, environment); }
+		inline static void EndScene() { GetInstance()->EndSceneImpl(); }
+		
+		inline static void Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material) { GetInstance()->SubmitImpl(transform, mesh, material); }
+		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { GetInstance()->SubmitParticlesImpl(transform, particles); }
+		
+		inline static void DrawSkybox() { GetInstance()->DrawSkyboxImpl(); }
+		inline static void DrawScreenQuad() { GetInstance()->DrawScreenQuadImpl(); }
+		inline static void DrawInstancedSphere(uint32_t amount) { GetInstance()->DrawInstancedSphereImpl(amount); }
+		inline static void DrawInstancedPyramid(uint32_t amount) { GetInstance()->DrawInstancedPyramidImpl(amount); }
 
-		static void Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
-		static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles);
+		inline static void EnableWireframe(bool enable) { GetInstance()->EnableWireframeImpl(enable); }
+		inline static void EnableBoundingBox(bool enable) { GetInstance()->EnableBoundingBoxImpl(enable); }
+		inline static void EnableGBuffer(bool enable) { GetInstance()->EnableGBufferImpl(enable); }
 
-		static void DrawSkybox();
-		static void DrawScreenQuad();
-		static void DrawInstancedSphere(uint32_t amount);
-		static void DrawInstancedPyramid(uint32_t amount);
+		inline static bool HasWireframeEnabled() { return GetInstance()->HasWireframeEnabledImpl(); }
+		inline static bool HasBoundingBoxEnabled() { return GetInstance()->HasBoundingBoxEnabledImpl(); }
+		inline static bool HasGBufferEnabled() { return GetInstance()->HasGBufferEnabledImpl(); }
 
-		inline static bool HasWireframeEnabled() { return sceneData->wireframe; }
-		inline static bool HasBoundingBoxEnabled() { return sceneData->boundingBox; }
-		inline static bool HasGBufferEnabled() { return sceneData->gBuffer; }
+		inline static Ref<FrameBuffer> GetGBuffer() { return GetInstance()->GetGBufferImpl(); }
+		inline static Ref<FrameBuffer> GetFrameBuffer() { return GetInstance()->GetFrameBufferImpl(); }
 
-		inline static Ref<FrameBuffer> GetGBuffer() { return rendererData->gBuffer; }
-		inline static Ref<FrameBuffer> GetFrameBuffer() { return rendererData->viewportFramebuffer; }
+		inline static void AddPerformanceResult(uint32_t vertexCount, uint32_t indexCount) { GetInstance()->AddPerformanceResultImpl(vertexCount, indexCount); }
 
-		inline static void AddPerformanceResult(uint32_t vertexCount, uint32_t indexCount)
+		inline static const RendererResults& GetPerformanceResults() { return GetInstance()->GetPerformanceResultsImpl(); }
+
+	private:
+		void SetRenderPassesImpl(const std::vector<Ref<RenderPass>>& renderPasses);
+
+		void BeginSceneImpl(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
+		void EndSceneImpl();
+
+		void SubmitImpl(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
+		void SubmitParticlesImpl(const glm::mat4& transform, const ParticleSystem& particles);
+
+		void DrawSkyboxImpl();
+		void DrawScreenQuadImpl();
+		void DrawInstancedSphereImpl(uint32_t amount);
+		void DrawInstancedPyramidImpl(uint32_t amount);
+
+		inline void EnableWireframeImpl(bool enable) { sceneData.wireframe = enable; }
+		inline void EnableBoundingBoxImpl(bool enable) { sceneData.boundingBox = enable; }
+		inline void EnableGBufferImpl(bool enable) { sceneData.gBuffer = enable; }
+
+		inline bool HasWireframeEnabledImpl() { return sceneData.wireframe; }
+		inline bool HasBoundingBoxEnabledImpl() { return sceneData.boundingBox; }
+		inline bool HasGBufferEnabledImpl() { return sceneData.gBuffer; }
+
+		inline Ref<FrameBuffer> GetGBufferImpl() { return rendererData.gBuffer; }
+		inline Ref<FrameBuffer> GetFrameBufferImpl() { return rendererData.viewportFramebuffer; }
+
+		inline void AddPerformanceResultImpl(uint32_t vertexCount, uint32_t indexCount)
 		{
-			rendererData->rendererResults.drawCalls++;
-			rendererData->rendererResults.vertexCount += vertexCount;
-			rendererData->rendererResults.triCount += indexCount;
+			rendererData.rendererResults.drawCalls++;
+			rendererData.rendererResults.vertexCount += vertexCount;
+			rendererData.rendererResults.triCount += indexCount;
 		}
 
-		inline static const RendererResults& GetPerformanceResults() { return rendererData->rendererResults; }
+		inline const RendererResults& GetPerformanceResultsImpl() { return rendererData.rendererResults; }
 	};
 }

@@ -5,9 +5,11 @@
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/ComputeShader.h"
 #include "Mahakam/Renderer/FrameBuffer.h"
+#include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Mesh.h"
 #include "Mahakam/Renderer/RenderBuffer.h"
+#include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 
@@ -31,7 +33,8 @@ namespace Mahakam
 		// FrameBuffer
 		MH_SHARED_FUNC(Ref<FrameBuffer>, FrameBufferCreate, const FrameBufferProps&);
 
-		// TODO: GL
+		// GL
+		MH_SHARED_FUNC(GL*, GLGetInstance);
 
 		// Log
 		MH_SHARED_FUNC(Ref<spdlog::logger>&, EngineLogger);
@@ -54,7 +57,8 @@ namespace Mahakam
 		// RenderBuffer
 		MH_SHARED_FUNC(Ref<RenderBuffer>, RenderBufferCreate, uint32_t, uint32_t, TextureFormat);
 
-		// TODO: Renderer
+		// Renderer
+		MH_SHARED_FUNC(Renderer*, RendererGetInstance);
 
 		// Shader
 		MH_SHARED_FUNC(Ref<Shader>, ShaderCreate, const std::string&, const std::initializer_list<std::string>&);
@@ -68,7 +72,7 @@ namespace Mahakam
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateFilepath, const std::string&, const CubeTextureProps&);
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreatePrefilter, Ref<TextureCube>, TextureCubePrefilter, const CubeTextureProps&);
 
-		static constexpr int NUM_FUNC_PTRS = 22;
+		static constexpr int NUM_FUNC_PTRS = 24;
 
 	private:
 		const char* filepath = nullptr;

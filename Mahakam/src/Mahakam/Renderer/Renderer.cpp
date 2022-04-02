@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "Renderer.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include "GL.h"
 
 #include "Camera.h"
@@ -17,113 +19,119 @@
 
 namespace Mahakam
 {
-	Renderer::RendererData* Renderer::rendererData = new Renderer::RendererData;
-	SceneData* Renderer::sceneData = new SceneData;
+	Renderer* Renderer::s_Instance = nullptr;
 
-	void Renderer::Init(uint32_t width, uint32_t height)
+	Renderer::Renderer(uint32_t width, uint32_t height)
 	{
 		MH_PROFILE_FUNCTION();
 
-		rendererData->width = width;
-		rendererData->height = height;
+		rendererData.width = width;
+		rendererData.height = height;
 
 		GL::Init();
 
 		// Initialize camera buffer
-		sceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
+		sceneData.cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
 
 		// Initialize default material
 		Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.yaml");
-		rendererData->unlitMaterial = Material::Create(unlitColorShader);
-		rendererData->unlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
+		rendererData.unlitMaterial = Material::Create(unlitColorShader);
+		rendererData.unlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
 	}
 
-	void Renderer::Shutdown()
+	Renderer::~Renderer()
 	{
 		GL::Shutdown();
 
-		rendererData->viewportFramebuffer = nullptr;
-		rendererData->unlitMaterial = nullptr;
-
-		delete sceneData;
+		rendererData.viewportFramebuffer = nullptr;
+		rendererData.unlitMaterial = nullptr;
 	}
 
-	void Renderer::OnWindowResie(uint32_t width, uint32_t height)
+	Renderer* Renderer::GetInstance()
 	{
-		rendererData->width = width;
-		rendererData->height = height;
+		MH_OVERRIDE_FUNC(RendererGetInstance);
+
+		return s_Instance;
+	}
+
+	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
+	{
+		auto instance = GetInstance();
+
+		instance->rendererData.width = width;
+		instance->rendererData.height = height;
 
 		GL::SetViewport(0, 0, width, height);
 
-		for (auto& renderPass : rendererData->renderPasses)
+		for (auto& renderPass : instance->rendererData.renderPasses)
 			renderPass->OnWindowResize(width, height);
 	}
 
-	void Renderer::SetRenderPasses(const std::vector<Ref<RenderPass>>& renderPasses)
+	void Renderer::SetRenderPassesImpl(const std::vector<Ref<RenderPass>>& renderPasses)
 	{
-		rendererData->renderPasses = renderPasses;
+		rendererData.renderPasses = renderPasses;
 
-		for (auto& renderPass : rendererData->renderPasses)
-			renderPass->Init(rendererData->width, rendererData->height);
+		for (auto& renderPass : rendererData.renderPasses)
+			renderPass->Init(rendererData.width, rendererData.height);
 	}
 
-	void Renderer::BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
+	void Renderer::BeginSceneImpl(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
 	{
 		MH_PROFILE_FUNCTION();
 
-		sceneData->environment = environment;
+		sceneData.environment = environment;
 
 		// Setup camera matrices
-		sceneData->cameraData = CameraData(cam, glm::vec2(rendererData->width, rendererData->height), transform);
+		sceneData.cameraData = CameraData(cam, glm::vec2(rendererData.width, rendererData.height), transform);
 
-		sceneData->cameraBuffer->Bind(0);
-		sceneData->cameraBuffer->SetData(&sceneData->cameraData, 0, sizeof(CameraData));
+		sceneData.cameraBuffer->Bind(0);
+		sceneData.cameraBuffer->SetData(&sceneData.cameraData, 0, sizeof(CameraData));
 
 		// Setup results
-		rendererData->rendererResults.drawCalls = 0;
-		rendererData->rendererResults.vertexCount = 0;
-		rendererData->rendererResults.triCount = 0;
+		rendererData.rendererResults.drawCalls = 0;
+		rendererData.rendererResults.vertexCount = 0;
+		rendererData.rendererResults.triCount = 0;
 	}
 
-	void Renderer::EndScene()
+	void Renderer::EndSceneImpl()
 	{
 		MH_PROFILE_FUNCTION();
 
 		// Sort the render queue
-		std::sort(sceneData->renderQueue.begin(), sceneData->renderQueue.end());
-		std::sort(sceneData->particleQueue.begin(), sceneData->particleQueue.end());
+		std::sort(sceneData.renderQueue.begin(), sceneData.renderQueue.end());
+		std::sort(sceneData.particleQueue.begin(), sceneData.particleQueue.end());
 
 		// Render each render pass
-		rendererData->gBuffer = rendererData->renderPasses[0]->GetFrameBuffer();
+		rendererData.gBuffer = rendererData.renderPasses[0]->GetFrameBuffer();
 
 		Ref<FrameBuffer> prevBuffer = nullptr;
-		for (uint32_t i = 0; i < rendererData->renderPasses.size(); i++)
+		for (uint32_t i = 0; i < rendererData.renderPasses.size(); i++)
 		{
-			if (rendererData->renderPasses[i]->Render(sceneData, prevBuffer))
-				prevBuffer = rendererData->renderPasses[i]->GetFrameBuffer();
+			if (rendererData.renderPasses[i]->Render(&sceneData, prevBuffer))
+				prevBuffer = rendererData.renderPasses[i]->GetFrameBuffer();
 		}
 
-		rendererData->viewportFramebuffer = prevBuffer;
+		rendererData.viewportFramebuffer = prevBuffer;
 
 		// Render bounding boxes
-		if (sceneData->boundingBox)
+		if (sceneData.boundingBox)
 		{
-			rendererData->viewportFramebuffer->Bind();
+			rendererData.viewportFramebuffer->Bind();
 			GL::SetFillMode(false);
 
-			rendererData->unlitMaterial->BindShader("GEOMETRY");
-			rendererData->unlitMaterial->Bind();
+			rendererData.unlitMaterial->BindShader("GEOMETRY");
+			rendererData.unlitMaterial->Bind();
 
 			auto wireMesh = GL::GetCube();
 			wireMesh->Bind();
 
-			for (uint64_t drawID : sceneData->renderQueue)
+			for (uint64_t drawID : sceneData.renderQueue)
 			{
 				const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-				Ref<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+				Ref<Mesh>& mesh = sceneData.meshIDLookup[meshID];
 
 				const uint64_t transformID = drawID & 0xFFFFULL;
-				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
+				const glm::mat4& transform = sceneData.transformIDLookup[transformID];
 
 				const Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
 
@@ -133,7 +141,7 @@ namespace Mahakam
 				const glm::mat4 wireTransform = glm::translate(glm::mat4(1.0f), center)
 					* glm::scale(glm::mat4(1.0f), scale);
 
-				rendererData->unlitMaterial->SetTransform(wireTransform);
+				rendererData.unlitMaterial->SetTransform(wireTransform);
 
 				Renderer::AddPerformanceResult(wireMesh->GetVertexCount(), wireMesh->GetIndexCount());
 
@@ -141,36 +149,36 @@ namespace Mahakam
 			}
 
 			GL::SetFillMode(true);
-			rendererData->viewportFramebuffer->Unbind();
+			rendererData.viewportFramebuffer->Unbind();
 		}
 
 		// Normalize results
-		rendererData->rendererResults.triCount /= 3;
+		rendererData.rendererResults.triCount /= 3;
 
 		// Clear render queues
-		sceneData->renderQueue.clear();
+		sceneData.renderQueue.clear();
 
-		sceneData->shaderRefLookup.clear();
-		sceneData->materialRefLookup.clear();
-		sceneData->meshRefLookup.clear();
+		sceneData.shaderRefLookup.clear();
+		sceneData.materialRefLookup.clear();
+		sceneData.meshRefLookup.clear();
 
-		sceneData->shaderIDLookup.clear();
-		sceneData->materialIDLookup.clear();
-		sceneData->meshIDLookup.clear();
-		sceneData->transformIDLookup.clear();
+		sceneData.shaderIDLookup.clear();
+		sceneData.materialIDLookup.clear();
+		sceneData.meshIDLookup.clear();
+		sceneData.transformIDLookup.clear();
 	}
 
-	void Renderer::Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
+	void Renderer::SubmitImpl(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
 	{
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
 		Ref<Shader> shader = material->GetShader();
-		auto shaderIter = sceneData->shaderRefLookup.find(shader);
-		if (shaderIter == sceneData->shaderRefLookup.end())
+		auto shaderIter = sceneData.shaderRefLookup.find(shader);
+		if (shaderIter == sceneData.shaderRefLookup.end())
 		{
-			shaderID = sceneData->shaderRefLookup.size();
-			sceneData->shaderRefLookup[shader] = shaderID;
-			sceneData->shaderIDLookup[shaderID] = shader;
+			shaderID = sceneData.shaderRefLookup.size();
+			sceneData.shaderRefLookup[shader] = shaderID;
+			sceneData.shaderIDLookup[shaderID] = shader;
 		}
 		else
 		{
@@ -179,12 +187,12 @@ namespace Mahakam
 
 		// Add material if it doesn't exist
 		uint64_t materialID;
-		auto matIter = sceneData->materialRefLookup.find(material);
-		if (matIter == sceneData->materialRefLookup.end())
+		auto matIter = sceneData.materialRefLookup.find(material);
+		if (matIter == sceneData.materialRefLookup.end())
 		{
-			materialID = sceneData->materialRefLookup.size();
-			sceneData->materialRefLookup[material] = materialID;
-			sceneData->materialIDLookup[materialID] = material;
+			materialID = sceneData.materialRefLookup.size();
+			sceneData.materialRefLookup[material] = materialID;
+			sceneData.materialIDLookup[materialID] = material;
 		}
 		else
 		{
@@ -193,12 +201,12 @@ namespace Mahakam
 
 		// Add mesh if it doesn't exist
 		uint64_t meshID;
-		auto meshIter = sceneData->meshRefLookup.find(mesh);
-		if (meshIter == sceneData->meshRefLookup.end())
+		auto meshIter = sceneData.meshRefLookup.find(mesh);
+		if (meshIter == sceneData.meshRefLookup.end())
 		{
-			meshID = sceneData->meshRefLookup.size();
-			sceneData->meshRefLookup[mesh] = meshID;
-			sceneData->meshIDLookup[meshID] = mesh;
+			meshID = sceneData.meshRefLookup.size();
+			sceneData.meshRefLookup[mesh] = meshID;
+			sceneData.meshIDLookup[meshID] = mesh;
 		}
 		else
 		{
@@ -206,8 +214,8 @@ namespace Mahakam
 		}
 
 		// Add transform
-		uint64_t transformID = sceneData->transformIDLookup.size();
-		sceneData->transformIDLookup[transformID] = transform;
+		uint64_t transformID = sceneData.transformIDLookup.size();
+		sceneData.transformIDLookup[transformID] = transform;
 
 		uint64_t drawID = 0;
 
@@ -229,25 +237,25 @@ namespace Mahakam
 		{
 			drawID |= (2ULL << 62ULL);
 
-			float depth = (sceneData->cameraData.u_m4_VP * transform[3]).z;
+			float depth = (sceneData.cameraData.u_m4_VP * transform[3]).z;
 
 			uint64_t depthInt = (uint64_t)(depth * ((1ULL << 31ULL) - 1ULL));
 
 			drawID |= ((depthInt & 0xFFFFFFFFULL) << 30ULL);
 		}
 
-		sceneData->renderQueue.push_back(drawID);
+		sceneData.renderQueue.push_back(drawID);
 	}
 
-	void Renderer::SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles)
+	void Renderer::SubmitParticlesImpl(const glm::mat4& transform, const ParticleSystem& particles)
 	{
-		uint64_t particleID = sceneData->particleIDLookup.size();
-		sceneData->particleIDLookup[particleID] = particles;
+		uint64_t particleID = sceneData.particleIDLookup.size();
+		sceneData.particleIDLookup[particleID] = particles;
 
-		uint64_t transformID = sceneData->transformIDLookup.size();
-		sceneData->transformIDLookup[transformID] = transform;
+		uint64_t transformID = sceneData.transformIDLookup.size();
+		sceneData.transformIDLookup[transformID] = transform;
 
-		float depth = (sceneData->cameraData.u_m4_VP * transform[3]).z;
+		float depth = (sceneData.cameraData.u_m4_VP * transform[3]).z;
 
 		uint64_t depthInt = (uint64_t)(depth * ((1ULL << 31ULL) - 1ULL));
 
@@ -255,26 +263,26 @@ namespace Mahakam
 		drawID |= ((particleID & 0xFFFFULL) << 16ULL);
 		drawID |= (transformID & 0xFFFFULL);
 
-		sceneData->particleQueue.push_back(drawID);
+		sceneData.particleQueue.push_back(drawID);
 	}
 
-	void Renderer::DrawSkybox()
+	void Renderer::DrawSkyboxImpl()
 	{
 		MH_PROFILE_FUNCTION();
 
-		sceneData->environment.skyboxMaterial->BindShader("GEOMETRY");
-		sceneData->environment.skyboxMaterial->Bind();
+		sceneData.environment.skyboxMaterial->BindShader("GEOMETRY");
+		sceneData.environment.skyboxMaterial->Bind();
 		DrawScreenQuad();
 	}
 
-	void Renderer::DrawScreenQuad()
+	void Renderer::DrawScreenQuadImpl()
 	{
 		AddPerformanceResult(4, 6);
 
 		GL::DrawScreenQuad();
 	}
 
-	void Renderer::DrawInstancedSphere(uint32_t amount)
+	void Renderer::DrawInstancedSphereImpl(uint32_t amount)
 	{
 		Ref<Mesh> invertedSphere = GL::GetInvertedSphere();
 
@@ -285,7 +293,7 @@ namespace Mahakam
 		GL::DrawInstanced(invertedSphere->GetIndexCount(), amount);
 	}
 
-	void Renderer::DrawInstancedPyramid(uint32_t amount)
+	void Renderer::DrawInstancedPyramidImpl(uint32_t amount)
 	{
 		Ref<Mesh> invertedPyramid = GL::GetInvertedPyramid();
 

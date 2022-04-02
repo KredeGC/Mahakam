@@ -1,22 +1,19 @@
 #include "mhpch.h"
 #include "GL.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
 
 namespace Mahakam
 {
-	RendererAPI* GL::rendererAPI = new OpenGLRendererAPI();
+	GL* GL::s_Instance = nullptr;
 
-	Ref<Mesh> GL::staticScreenQuad = nullptr;
-	Ref<Mesh> GL::staticPyramid = nullptr;
-	Ref<Mesh> GL::staticSphereMesh = nullptr;
-	Ref<Mesh> GL::staticCubemapMesh = nullptr;
-	Ref<Mesh> GL::staticCube = nullptr;
-
-	void GL::Init()
+	GL::GL()
 	{
 		MH_PROFILE_FUNCTION();
 
+		rendererAPI = new OpenGLRendererAPI;
 		rendererAPI->Init();
 
 		staticScreenQuad = CreateScreenQuad();
@@ -46,7 +43,7 @@ namespace Mahakam
 		Texture2D::bump->SetData(&bumpData, 3);
 	}
 
-	void GL::Shutdown()
+	GL::~GL()
 	{
 		//rendererAPI->Shutdown();
 
@@ -60,6 +57,13 @@ namespace Mahakam
 		Texture2D::black = nullptr;
 		Texture2D::bump = nullptr;
 		TextureCube::white = nullptr;
+	}
+
+	GL* GL::GetInstance()
+	{
+		MH_OVERRIDE_FUNC(GLGetInstance);
+
+		return s_Instance;
 	}
 
 	Ref<Mesh> GL::CreateScreenQuad()
@@ -91,14 +95,6 @@ namespace Mahakam
 		interleavedVertices.texcoords = uvs;
 
 		return Mesh::Create(4, 6, interleavedVertices, indices);
-
-		/*BufferLayout layout
-		{
-			{ ShaderDataType::Float3, "i_Pos" },
-			{ ShaderDataType::Float2, "i_UV" }
-		};
-
-		return Mesh::Create(4, indices, 6, { positions, uvs });*/
 	}
 
 	Ref<Mesh> GL::CreatePyramid()
@@ -146,12 +142,5 @@ namespace Mahakam
 		interleavedVertices.positions = positions;
 
 		return Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
-
-		/*BufferLayout layout
-		{
-			{ ShaderDataType::Float3, "i_Pos" }
-		};
-
-		return Mesh::Create(vertexCount, indices, indexCount, { positions });*/
 	}
 }

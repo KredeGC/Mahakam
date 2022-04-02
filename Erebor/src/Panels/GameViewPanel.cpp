@@ -19,7 +19,8 @@ namespace Mahakam
 				viewportSize.x = size.x;
 				viewportSize.y = size.y;
 
-				activeScene->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
+				if (auto context = activeScene.lock())
+					context->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
 			}
 			if (viewportTexture)
 				ImGui::Image((void*)(uintptr_t)viewportTexture->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
@@ -39,7 +40,7 @@ namespace Mahakam
 		return false;
 	}
 
-	void GameViewPanel::SetScene(Ref<Scene> scene)
+	void GameViewPanel::SetScene(WeakRef<Scene> scene)
 	{
 		activeScene = scene;
 	}

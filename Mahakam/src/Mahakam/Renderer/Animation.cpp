@@ -19,7 +19,7 @@ namespace Mahakam
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate);
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-            MH_CORE_WARN("Could not load model \"{0}\": {1}", filepath, importer.GetErrorString());
+            MH_CORE_WARN("Could not load animation \"{0}\": {1}", filepath, importer.GetErrorString());
         else
         {
             auto animation = scene->mAnimations[0];

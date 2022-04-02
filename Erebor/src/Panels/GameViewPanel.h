@@ -13,7 +13,7 @@ namespace Mahakam
 		bool focused = false;
 		bool hovered = false;
 
-		Ref<Scene> activeScene;
+		WeakRef<Scene> activeScene;
 		Ref<Texture> viewportTexture;
 
 		glm::vec2 viewportSize = { 0.0f, 0.0f };
@@ -21,7 +21,7 @@ namespace Mahakam
 	public:
 		GameViewPanel() = default;
 
-		void SetScene(Ref<Scene> scene);
+		void SetScene(WeakRef<Scene> scene);
 
 		void SetFrameBuffer(Ref<Texture> tex);
 

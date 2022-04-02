@@ -16,9 +16,9 @@ namespace Mahakam
 		float m_CurrentTime;
 
 	public:
-		Animator() : m_CurrentTime(0.0f) { }
+		Animator() = default;
 
-		Animator(Animation* currentAnimation)
+		Animator(Ref<Animation> currentAnimation)
 			: m_CurrentTime(0.0f), m_CurrentAnimation(currentAnimation), m_BoneHierarchy(m_CurrentAnimation->GetBoneHierarchy()) { }
 
 		void UpdateAnimation(float dt);

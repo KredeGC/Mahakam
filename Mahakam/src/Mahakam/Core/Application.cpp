@@ -103,7 +103,7 @@ namespace Mahakam
 
 		minimized = false;
 
-		Renderer::OnWindowResie(event.GetWidth(), event.GetHeight());
+		Renderer::OnWindowResize(event.GetWidth(), event.GetHeight());
 
 		return false;
 	}

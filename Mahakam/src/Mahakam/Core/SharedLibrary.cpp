@@ -72,6 +72,9 @@ namespace Mahakam
 		// FrameBuffer
 		MH_EXPORT_FUNC(FrameBufferCreate, FrameBuffer::Create);
 
+		// GL
+		MH_EXPORT_FUNC(GLGetInstance, GL::GetInstance);
+
 		// Log
 		MH_EXPORT_FUNC(EngineLogger, Log::GetEngineLogger);
 		MH_EXPORT_FUNC(GameLogger, Log::GetGameLogger);
@@ -92,6 +95,9 @@ namespace Mahakam
 
 		// RenderBuffer
 		MH_EXPORT_FUNC(RenderBufferCreate, RenderBuffer::Create);
+
+		// Renderer
+		MH_EXPORT_FUNC(RendererGetInstance, Renderer::GetInstance);
 
 		// Shader
 		MH_EXPORT_FUNC(ShaderCreate, Shader::Create);
@@ -133,6 +139,9 @@ namespace Mahakam
 		// FrameBuffer
 		MH_IMPORT_FUNC(FrameBufferCreate);
 
+		// GL
+		MH_IMPORT_FUNC(GLGetInstance);
+
 		// Log
 		MH_IMPORT_FUNC(EngineLogger);
 		MH_IMPORT_FUNC(GameLogger);
@@ -153,6 +162,9 @@ namespace Mahakam
 
 		// RenderBuffer
 		MH_IMPORT_FUNC(RenderBufferCreate);
+
+		// Renderer
+		MH_IMPORT_FUNC(RendererGetInstance);
 
 		// Shader
 		MH_IMPORT_FUNC(ShaderCreate);

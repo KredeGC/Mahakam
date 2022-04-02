@@ -171,6 +171,7 @@ namespace Mahakam
 		planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
 		planeEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
 		planeEntity.GetComponent<TransformComponent>().SetScale({ 10.0f, 10.0f, 10.0f });
+		//planeEntity.AddComponent<AnimatorComponent>(); // TEMP
 
 
 		// Create particle system
@@ -233,6 +234,9 @@ namespace Mahakam
 
 	void EditorLayer::OnDetach()
 	{
+		// IMPORTANT: Unload the scene before unloading the runtime
+		activeScene = nullptr;
+
 		delete lib;
 	}
 

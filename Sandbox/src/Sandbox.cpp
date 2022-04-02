@@ -18,6 +18,13 @@ EXTERN_EXPORTED void Load(void** funcPtrs)
 {
 	SharedLibrary::ImportFuncPointers(funcPtrs);
 
+	// Setup render passes for the default renderer
+	/*Renderer::SetRenderPasses({
+		CreateRef<GeometryRenderPass>(),
+		CreateRef<LightingRenderPass>(),
+		CreateRef<ParticleRenderPass>(),
+		CreateRef<TonemappingRenderPass>() });*/
+
 	Ref<Texture2D> testTex = Texture2D::Create("assets/textures/brick/brick_albedo.png", { TextureFormat::SRGB_DXT1, TextureFilter::Trilinear });
 	testTex->GetRendererID();
 

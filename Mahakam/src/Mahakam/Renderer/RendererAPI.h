@@ -22,6 +22,7 @@ namespace Mahakam
 			DstColor,
 			DstAlpha
 		};
+
 	private:
 		static API api;
 
