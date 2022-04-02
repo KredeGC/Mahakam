@@ -15,7 +15,7 @@ namespace Mahakam
 				{
 					recording = true;
 					uint64_t time = std::chrono::steady_clock::now().time_since_epoch().count();
-					MH_PROFILE_BEGIN_SESSION("record", std::string("Profiling-Record-") + std::to_string(time) + ".json");
+					MH_PROFILE_BEGIN_SESSION("record", std::string("profiling/Record-") + std::to_string(time) + ".json");
 				}
 			}
 			else

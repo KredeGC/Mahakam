@@ -2,6 +2,8 @@
 
 #include "Application.h"
 
+#include "Utility.h"
+
 #if defined(MH_PLATFORM_WINDOWS) || defined(MH_PLATFORM_LINUX)
 
 extern Mahakam::Application* Mahakam::CreateApplication();
@@ -12,13 +14,15 @@ int main(int argc, char** argv)
 	MH_CORE_INFO("Logging initialized");
 	MH_INFO("Logging initialized");
 
-	MH_PROFILE_BEGIN_SESSION("startup", "Profiling-Startup.json");
+	Mahakam::FileUtility::CreateDirectories("profiling/");
+
+	MH_PROFILE_BEGIN_SESSION("startup", "profiling/Startup.json");
 	auto app = Mahakam::CreateApplication();
 	MH_PROFILE_END_SESSION();
 
 	app->Run();
 
-	MH_PROFILE_BEGIN_SESSION("shutdown", "Profiling-Shutdown.json");
+	MH_PROFILE_BEGIN_SESSION("shutdown", "profiling/Shutdown.json");
 	delete app;
 	MH_PROFILE_END_SESSION();
 }
