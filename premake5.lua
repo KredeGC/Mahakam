@@ -17,6 +17,7 @@ IncludeDir["GLFW"]          = "Mahakam/vendor/GLFW/include"
 IncludeDir["glad"]          = "Mahakam/vendor/glad/include"
 IncludeDir["glm"]           = "Mahakam/vendor/glm"
 IncludeDir["imgui"]         = "Mahakam/vendor/imgui"
+IncludeDir["imguizmo"]      = "Mahakam/vendor/imguizmo"
 IncludeDir["robin_hood"]    = "Mahakam/vendor/robin_hood"
 IncludeDir["spdlog"]        = "Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"]     = "Mahakam/vendor/stb_image"
@@ -26,6 +27,7 @@ LinuxLinks = {
     "GLFW",
     "glad",
     "ImGui",
+    "ImGuizmo",
     "Xrandr",
     "Xi",
     --"GLU",
@@ -46,6 +48,7 @@ VendorIncludes = {
     "%{IncludeDir.entt}",
     "%{IncludeDir.glm}",
     "%{IncludeDir.imgui}",
+    "%{IncludeDir.imguizmo}",
     "%{IncludeDir.robin_hood}",
     "%{IncludeDir.spdlog}"
 }
@@ -58,6 +61,7 @@ os.execute("cmake --build \"Mahakam/vendor/assimp/\" --config release")
 group "Dependencies"
     include "Mahakam/vendor/GLFW"
     include "Mahakam/vendor/imgui"
+    include "Mahakam/vendor/imguizmo"
     include "Mahakam/vendor/glad"
     include "Mahakam/vendor/yaml-cpp"
 group ""
@@ -94,6 +98,7 @@ project "Mahakam"
         "%{IncludeDir.glad}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.imgui}",
+        "%{IncludeDir.imguizmo}",
         "%{IncludeDir.robin_hood}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.stb_image}",
@@ -104,6 +109,7 @@ project "Mahakam"
         "GLFW",
         "glad",
         "ImGui",
+        "ImGuizmo",
         "yaml-cpp"
     }
 
