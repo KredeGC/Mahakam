@@ -10,7 +10,6 @@ namespace Mahakam
 		bool open = true;
 
 		WeakRef<Scene> scene;
-		Entity selectedEntity;
 
 	public:
 		SceneHierarchyPanel() = default;

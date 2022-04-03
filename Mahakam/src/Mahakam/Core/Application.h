@@ -35,6 +35,9 @@ namespace Mahakam
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		void PopLayer(Layer* layer);
+		void PopOverlay(Layer* layer);
+
 		inline static Application& GetInstance() { return *instance; }
 
 		inline static bool IsRunning() { return instance->running; }

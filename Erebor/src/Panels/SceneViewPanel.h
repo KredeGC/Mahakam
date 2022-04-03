@@ -20,6 +20,8 @@ namespace Mahakam
 
 		glm::vec2 viewportSize = { 0.0f, 0.0f };
 
+		int m_GizmoType = -1;
+
 	public:
 		SceneViewPanel() = default;
 
@@ -28,6 +30,7 @@ namespace Mahakam
 		void OnImGuiRender();
 
 		void OnEvent(Event& event);
+		bool OnKeyPressed(KeyPressedEvent& event);
 
 		void SetFrameBuffer(Ref<Texture> tex) { viewportTexture = tex; }
 

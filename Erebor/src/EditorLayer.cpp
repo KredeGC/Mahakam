@@ -106,12 +106,12 @@ namespace Mahakam
 			CreateRef<TonemappingRenderPass>() });*/
 
 		// Create a new active scene
-		activeScene = Scene::CreateScene("assets/textures/pines.hdr");
+		s_ActiveScene = Scene::CreateScene("assets/textures/pines.hdr");
 
 
 		// Setup the viewport in editor
-		gameViewPanel.SetScene(activeScene);
-		sceneHierarchyPanel.SetContext(activeScene);
+		gameViewPanel.SetScene(s_ActiveScene);
+		sceneHierarchyPanel.SetContext(s_ActiveScene);
 
 
 		// Test compute shader
@@ -129,7 +129,7 @@ namespace Mahakam
 
 
 		// Setup scene camera
-		Entity cameraEntity = activeScene->CreateEntity("Main Camera");
+		Entity cameraEntity = s_ActiveScene->CreateEntity("Main Camera");
 		//cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
 		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
 		cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
@@ -137,7 +137,7 @@ namespace Mahakam
 
 
 		// Setup lights
-		Entity mainLightEntity = activeScene->CreateEntity("Main Light");
+		Entity mainLightEntity = s_ActiveScene->CreateEntity("Main Light");
 		mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, 20.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 		mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ -0.7f, -3.0f, 0.0f }));
 
@@ -145,7 +145,7 @@ namespace Mahakam
 		{
 			for (int x = 0; x < 10; x++)
 			{*/
-		Entity pointLightEntity = activeScene->CreateEntity("Spot Light");
+		Entity pointLightEntity = s_ActiveScene->CreateEntity("Spot Light");
 		pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 		pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
 		//pointLightEntity.GetComponent<TransformComponent>().SetPosition({ x, y, 1.0f });
@@ -167,7 +167,7 @@ namespace Mahakam
 		planeMaterial->SetTexture("u_Metallic", 0, Texture2D::black);
 		planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
 
-		Entity planeEntity = activeScene->CreateEntity("Plane");
+		Entity planeEntity = s_ActiveScene->CreateEntity("Plane");
 		planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
 		planeEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
 		planeEntity.GetComponent<TransformComponent>().SetScale({ 10.0f, 10.0f, 10.0f });
@@ -175,7 +175,7 @@ namespace Mahakam
 
 
 		// Create particle system
-		Entity particleEntity = activeScene->CreateEntity("Particle System");
+		Entity particleEntity = s_ActiveScene->CreateEntity("Particle System");
 		particleEntity.AddComponent<ParticleSystemComponent>();
 		particleEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
@@ -229,13 +229,13 @@ namespace Mahakam
 
 		auto runPtr = lib->GetFunction<void, Scene*>("Run");
 
-		runPtr(activeScene.get());
+		runPtr(s_ActiveScene.get());
 	}
 
 	void EditorLayer::OnDetach()
 	{
 		// IMPORTANT: Unload the scene before unloading the runtime
-		activeScene = nullptr;
+		s_ActiveScene = nullptr;
 
 		delete lib;
 	}
@@ -249,7 +249,7 @@ namespace Mahakam
 		// Call shared library update
 		auto updatePtr = lib->GetFunction<void, Scene*, Timestep>("Update");
 
-		updatePtr(activeScene.get(), dt);
+		updatePtr(s_ActiveScene.get(), dt);
 
 #if MH_RUNTIME
 		// Only used during runtime
@@ -257,9 +257,9 @@ namespace Mahakam
 		gameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
 #else
 		// Only used in editor
-		activeScene->OnUpdate(dt, true); // TEMPORARY OR SOMETHING?
+		s_ActiveScene->OnUpdate(dt, true); // TEMPORARY OR SOMETHING?
 		sceneViewPanel.OnUpdate(dt);
-		activeScene->OnRender(sceneViewPanel.GetCamera(), sceneViewPanel.GetCamera().GetModelMatrix());
+		s_ActiveScene->OnRender(sceneViewPanel.GetCamera(), sceneViewPanel.GetCamera().GetModelMatrix());
 		sceneViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
 		gameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0)); // TEMPORARY UNTIL PLAY IS IMPL
 #endif
@@ -335,23 +335,23 @@ namespace Mahakam
 					MH_CORE_TRACE("Reloading runtime code");
 
 					// Unload old scene and runtime
-					activeScene = nullptr;
+					s_ActiveScene = nullptr;
 					delete lib;
 
 					// Copy new runtime
 					CopyRuntime(binaryStream, binaryLength);
 
 					// Create new scene
-					activeScene = Scene::CreateScene("assets/textures/pines.hdr");
-					gameViewPanel.SetScene(activeScene);
-					sceneHierarchyPanel.SetContext(activeScene);
+					s_ActiveScene = Scene::CreateScene("assets/textures/pines.hdr");
+					gameViewPanel.SetScene(s_ActiveScene);
+					sceneHierarchyPanel.SetContext(s_ActiveScene);
 
 					// Load new runtime
 					lib = new SharedLibrary("runtime/Sandbox-runtime.dll");
 
 					auto runPtr = lib->GetFunction<void, Scene*>("Run");
 
-					runPtr(activeScene.get());
+					runPtr(s_ActiveScene.get());
 				}
 			}
 			else

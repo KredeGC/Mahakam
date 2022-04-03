@@ -1,12 +1,14 @@
 #include "mhpch.h"
 #include "ImGuiLayer.h"
 
+#include "Mahakam/Core/Application.h"
+
 #include <imgui.h>
 
 #include <backends/imgui_impl_glfw.cpp>
 #include <backends/imgui_impl_opengl3.cpp>
 
-#include "Mahakam/Core/Application.h"
+#include <ImGuizmo.h>
 
 
 // TEMPORARY
@@ -118,6 +120,8 @@ namespace Mahakam
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiLayer::End()

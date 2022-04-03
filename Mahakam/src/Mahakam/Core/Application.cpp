@@ -87,6 +87,22 @@ namespace Mahakam
 		overlay->OnAttach();
 	}
 
+	void Application::PopLayer(Layer* layer)
+	{
+		layer->OnDetach();
+		layerStack.PopLayer(layer);
+
+		delete layer;
+	}
+
+	void Application::PopOverlay(Layer* overlay)
+	{
+		overlay->OnDetach();
+		layerStack.PopOverlay(overlay);
+
+		delete overlay;
+	}
+
 	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
 		running = false;

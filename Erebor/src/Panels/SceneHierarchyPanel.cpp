@@ -1,6 +1,8 @@
 #include "ebpch.h"
 #include "SceneHierarchyPanel.h"
 
+#include "EditorLayer.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -89,12 +91,12 @@ namespace Mahakam
 	{
 		std::string& tag = entity.GetComponent<TagComponent>().tag;
 
-		ImGuiTreeNodeFlags flags = ((entity == selectedEntity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+		ImGuiTreeNodeFlags flags = ((entity == EditorLayer::GetSelectedEntity()) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 
 		if (ImGui::IsItemClicked())
-			selectedEntity = entity;
+			EditorLayer::SetSelectedEntity(entity);
 
 		bool markedAsDeleted = false;
 		if (ImGui::BeginPopupContextItem())
@@ -112,8 +114,8 @@ namespace Mahakam
 
 		if (markedAsDeleted)
 		{
-			if (selectedEntity == entity)
-				selectedEntity = {};
+			if (EditorLayer::GetSelectedEntity() == entity)
+				EditorLayer::SetSelectedEntity({});
 
 			context->DestroyEntity(entity);
 		}
@@ -185,13 +187,13 @@ namespace Mahakam
 		{
 			if (ImGui::MenuItem("Camera"))
 			{
-				selectedEntity.AddComponent<CameraComponent>();
+				EditorLayer::GetSelectedEntity().AddComponent<CameraComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 
 			if (ImGui::MenuItem("Mesh"))
 			{
-				selectedEntity.AddComponent<MeshComponent>();
+				EditorLayer::GetSelectedEntity().AddComponent<MeshComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -364,7 +366,7 @@ namespace Mahakam
 				});
 
 				if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-					selectedEntity = {};
+					EditorLayer::SetSelectedEntity({});
 
 				// Blank space menu
 				if (ImGui::BeginPopupContextWindow(0, 1, false))
@@ -380,9 +382,9 @@ namespace Mahakam
 
 				ImGui::Begin("Inspector");
 
-				if (selectedEntity)
+				if (EditorLayer::GetSelectedEntity())
 				{
-					DrawInspector(selectedEntity);
+					DrawInspector(EditorLayer::GetSelectedEntity());
 				}
 			}
 

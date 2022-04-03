@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include <glm/glm.hpp>
+
 namespace Mahakam
 {
 	struct ShaderElement

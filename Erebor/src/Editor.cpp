@@ -1,28 +1,24 @@
 #include "ebpch.h"
-#include <Mahakam.h>
+#include "Editor.h"
 #include <Mahakam/Core/EntryPoint.h>
 
 #include <imgui.h>
 
-#include "EditorLayer.h"
-
 namespace Mahakam
 {
-	class Editor : public Application
+	Editor::Editor() : Application({ "Erebor", "assets/textures/internal/icon.png" })
 	{
-	public:
-		Editor() : Application({ "Erebor", "assets/textures/internal/icon.png" })
-		{
-			PushOverlay(new EditorLayer());
+		m_EditorLayer = new EditorLayer();
 
-			//getWindow().setVSync(true);
-		}
+		PushOverlay(m_EditorLayer);
 
-		~Editor()
-		{
+		//getWindow().setVSync(true);
+	}
 
-		}
-	};
+	Editor::~Editor()
+	{
+		PopOverlay(m_EditorLayer);
+	}
 
 	extern Application* CreateApplication()
 	{

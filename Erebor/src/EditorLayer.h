@@ -17,7 +17,9 @@ namespace Mahakam
 	class EditorLayer : public Layer
 	{
 	private:
-		Ref<Scene> activeScene;
+		inline static Entity s_SelectedEntity;
+
+		inline static Ref<Scene> s_ActiveScene;
 
 		DockSpace dockSpace;
 		GameViewPanel gameViewPanel;
@@ -39,6 +41,11 @@ namespace Mahakam
 		virtual void OnUpdate(Timestep dt) override;
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& event) override;
+
+		inline static void SetSelectedEntity(Entity entity) { s_SelectedEntity = entity; }
+		inline static Entity GetSelectedEntity() { return s_SelectedEntity; }
+
+		inline static Ref<Scene> GetActiveScene() { return s_ActiveScene; }
 
 	private:
 		void CopyRuntime(std::istream& binaryStream, size_t binaryLength);
