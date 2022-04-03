@@ -36,10 +36,12 @@ namespace Mahakam
 		virtual inline unsigned int GetHeight() const override { return data.height; }
 
 		virtual inline void SetEventCallback(const EventCallbackFn& callback) override { data.eventCallback = callback; }
+
 		virtual void SetVSync(bool enabled) override;
 		virtual inline bool IsVSync() const override { return data.vsync; }
 
 		virtual void SetCursorVisible(bool visible) override;
+		virtual bool IsCursorVisible() const override { return data.cursorVisible; }
 
 		virtual inline void* GetNativeWindow() const override { return window; }
 

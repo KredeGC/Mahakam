@@ -1,10 +1,17 @@
 #include "ebpch.h"
 #include "EditorCamera.h"
 
+#include "EditorLayer.h"
+
 namespace Mahakam
 {
 	void EditorCamera::OnUpdate(Timestep dt, bool focus, bool hover)
 	{
+		hovered = hover;
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		bool noCapture = !io.WantCaptureKeyboard;
 		bool altHeld = Input::IsKeyPressed(MH_KEY_LEFT_ALT);
 
 		float zoomDelta = 0.0f;
@@ -16,26 +23,27 @@ namespace Mahakam
 		oldMouseX = mouseX;
 		oldMouseY = mouseY;
 
-		if (focus && Input::IsKeyPressed(MH_KEY_F)) // Focus on something
+		if (focus && altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_LEFT)) // Orbit around target
 		{
-			// TODO: Focus on selected entity in hierarchy
+			controlling = true;
+			Application::GetInstance().GetWindow().SetCursorVisible(false);
 
-			target = { 0.0f, 0.0f, 0.0f };
-			zoom = glm::length(target - position);
-		}
-		else if (focus && altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_LEFT)) // Orbit around target
-		{
 			eulerAngles.y -= glm::radians(deltaX * dragSpeed);
 			eulerAngles.x -= glm::radians(deltaY * dragSpeed);
+
+			rotation = glm::quat(eulerAngles);
 
 			UpdateRotationMatrix();
 		}
-		else if (focus && !altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_RIGHT)) // FPS Rotate
+		else if (noCapture && hover && !altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_RIGHT)) // FPS Rotate
 		{
-			// TODO: Lock and hide cursor
+			controlling = true;
+			Application::GetInstance().GetWindow().SetCursorVisible(false);
 
 			eulerAngles.y -= glm::radians(deltaX * dragSpeed);
 			eulerAngles.x -= glm::radians(deltaY * dragSpeed);
+
+			rotation = glm::quat(eulerAngles);
 
 			UpdateRotationMatrix();
 
@@ -59,24 +67,56 @@ namespace Mahakam
 			else if (Input::IsKeyPressed(MH_KEY_E))
 				target += speed * dt * up;
 		}
-		else if (focus && altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_RIGHT)) // Right zoom
+		else if (noCapture && hover && altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_RIGHT)) // Right zoom
 		{
 			float speed = GetZoomSpeed();
 
 			zoomDelta -= deltaX * speed;
 			zoomDelta += deltaY * speed;
 		}
-		else if (focus && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_MIDDLE)) // Panning
+		else if (noCapture && hover && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_MIDDLE)) // Panning
 		{
 			float speed = GetZoomSpeed();
 
 			target += deltaY * speed * up - deltaX * speed * right;
+		}
+		else if (!Application::GetInstance().GetWindow().IsCursorVisible())
+		{
+			controlling = false;
+			Application::GetInstance().GetWindow().SetCursorVisible(true);
 		}
 
 		zoom = glm::max(zoom + zoomDelta, 0.0f);
 		position = target - forward * zoom;
 
 		UpdateModelMatrix();
+	}
+
+	bool EditorCamera::OnKeyPressed(KeyPressedEvent& event)
+	{
+		if (!hovered || event.GetRepeatCount() > 0)
+			return false;
+
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.WantCaptureKeyboard)
+			return false;
+
+		switch (event.GetKeyCode())
+		{
+		case MH_KEY_F:
+			Entity selectedEntity = EditorLayer::GetSelectedEntity();
+
+			if (selectedEntity)
+			{
+				TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
+
+				target = transform.GetPosition();
+				zoom = glm::length(target - position);
+			}
+			break;
+		}
+
+		return false;
 	}
 
 	bool EditorCamera::OnMouseScroll(MouseScrolledEvent& event)
@@ -103,7 +143,7 @@ namespace Mahakam
 
 	void EditorCamera::UpdateRotationMatrix()
 	{
-		rotationMatrix = glm::mat4(glm::quat(eulerAngles));
+		rotationMatrix = glm::mat4(rotation);
 
 		forward = rotationMatrix * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
 		right = rotationMatrix * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);

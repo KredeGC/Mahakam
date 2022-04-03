@@ -35,8 +35,6 @@ namespace Mahakam {
 		data.width = props.width;
 		data.height = props.height;
 
-		MH_CORE_INFO("Creating GLFW window {0} ({1}, {2})", props.title, props.width, props.height);
-
 		if (!glfwInitialized)
 		{
 			int success = glfwInit();
@@ -45,7 +43,15 @@ namespace Mahakam {
 			glfwSetErrorCallback(GLFWErrorCallback);
 
 			glfwInitialized = true;
+
+			int major, minor, rev;
+
+			glfwGetVersion(&major, &minor, &rev);
+
+			MH_CORE_INFO("Initialized GLFW version {0}.{1}.{2}", major, minor, rev);
 		}
+
+		MH_CORE_INFO("Creating GLFW window {0} ({1}, {2})", props.title, props.width, props.height);
 
 
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -67,13 +73,14 @@ namespace Mahakam {
 
 		// Creating the window
 		window = glfwCreateWindow((int)data.width, (int)data.height, data.title.c_str(), nullptr, nullptr);
-		context = RenderingContext::Create(window, glfwGetProcAddress);
+		context = RenderingContext::Create(window, (void*)glfwGetProcAddress);
 		context->Init();
 		glfwSetWindowUserPointer(window, &data);
 		if (pixels)
 			glfwSetWindowIcon(window, 1, icon);
 		SetVSync(false);
 
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 		// Callbacks
 		glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)

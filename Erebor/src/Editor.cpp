@@ -12,7 +12,7 @@ namespace Mahakam
 
 		PushOverlay(m_EditorLayer);
 
-		//getWindow().setVSync(true);
+		//GetWindow().SetVSync(true);
 	}
 
 	Editor::~Editor()

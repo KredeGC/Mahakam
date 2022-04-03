@@ -20,6 +20,8 @@ namespace Mahakam
 
 		glm::vec2 viewportSize = { 0.0f, 0.0f };
 
+		glm::vec2 m_ViewportBounds[2];
+
 		int m_GizmoType = -1;
 
 	public:
