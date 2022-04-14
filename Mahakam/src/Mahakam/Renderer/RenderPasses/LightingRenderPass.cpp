@@ -338,7 +338,7 @@ namespace Mahakam
 		if (amount > 0)
 		{
 			// Choose size and offset of shadow texture
-			constexpr uint32_t size = 2048;
+			constexpr uint32_t size = 4096;
 			constexpr uint32_t ratio = shadowMapSize / size;
 			constexpr float texelSize = 2.0f / (float)size;
 

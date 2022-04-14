@@ -128,12 +128,30 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
 
 
 #if defined(DIRECTIONAL) || defined(SPOT)
-    float SampleShadowMap(vec2 projCoords, float depth) {
+    #define FILTER_SIZE 1
+    #define FILTER_SQUARE 9
+    
+    float SampleShadowDirect(vec2 projCoords, vec2 texSize, vec2 texelSize) {
         #if defined(BILINEAR_SHADOWS)
-            vec2 textureSize = textureSize(u_ShadowMap, 0);
-            vec2 texelSize = 1.0 / textureSize;
+            vec2 f = fract(projCoords * texSize);
+            projCoords += (0.5 - f) * texelSize;
             
-            vec2 f = fract(projCoords * textureSize);
+            float tl = texture2D(u_ShadowMap, projCoords).r;
+            float tr = texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, 0.0)).r;
+            float bl = texture2D(u_ShadowMap, projCoords + vec2(0.0, texelSize.y)).r;
+            float br = texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, texelSize.y)).r;
+            
+            float tA = mix(tl, tr, f.x);
+            float tB = mix(bl, br, f.x);
+            return mix(tA, tB, f.y);
+        #else
+            return depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
+        #endif
+    }
+    
+    float SampleShadowMap(vec2 projCoords, float depth, vec2 texSize, vec2 texelSize) {
+        #if defined(BILINEAR_SHADOWS)
+            vec2 f = fract(projCoords * texSize);
             projCoords += (0.5 - f) * texelSize;
             
             float tl = depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
@@ -148,18 +166,66 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
             return depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
         #endif
     }
+    
+    float rand3dTo1d(vec3 value, vec3 dotDir = vec3(12.9898, 78.233, 37.719)) {
+        vec3 smallValue = cos(value);
+        float random = dot(smallValue, dotDir);
+        random = fract(sin(random) * 143758.5453);
+        return random;
+    }
+    
+    vec2 rand3dTo2d(vec3 value) {
+        return vec2(
+            rand3dTo1d(value, vec3(12.989, 78.233, 37.719)),
+            rand3dTo1d(value, vec3(39.346, 11.135, 83.155))
+        );
+    }
+    
+    float EstimatePenumbra(float lightSize, float depth, vec2 projCoords, vec2 texSize, vec2 texelSize) {
+        float avgDepth = 0.0;
+        
+        for (int x = -FILTER_SIZE; x <= FILTER_SIZE; x++) {
+            for (int y = -FILTER_SIZE; y <= FILTER_SIZE; y++) {
+                avgDepth += SampleShadowDirect(projCoords.xy + lightSize * vec2(x, y) * texelSize, texSize, texelSize).r;
+            }
+        }
+        
+        avgDepth /= FILTER_SQUARE;
+        
+        return max((depth - avgDepth) * lightSize / avgDepth, 0.0);
+    }
 
-    float SamplePCFShadow(vec2 projCoords, float depth) {
-        #if defined(PCF_SHADOWS)
+    float SamplePCFShadow(vec2 projCoords, float depth, vec3 worldPos) {
+        #if defined(PCSS_SHADOWS)
+            const float lightSize = 4.0;
+            vec2 texSize = textureSize(u_ShadowMap, 0);
+            vec2 texelSize = 1.0 / texSize;
+            
+            float penumbra = EstimatePenumbra(lightSize, depth, projCoords, texSize, texelSize);
+            
             float shadow = 0.0;
-            vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
-            for (int x = -1; x <= 1; x++) {
-                for (int y = -1; y <= 1; y++) {
-                    shadow += SampleShadowMap(projCoords.xy + vec2(x, y) * texelSize, depth);
+            for (int x = -FILTER_SIZE; x <= FILTER_SIZE; x++) {
+                for (int y = -FILTER_SIZE; y <= FILTER_SIZE; y++) {
+                    vec2 offset = vec2(x, y) * texelSize * penumbra;
+                    vec2 randOffset = (rand3dTo2d(worldPos) * 2.0 - 1.0) * texelSize * penumbra * 0.1;
+                    shadow += SampleShadowMap(projCoords.xy + offset + randOffset, depth, texSize, texelSize);
                 }
             }
             
-            return shadow / 9.0;
+            return shadow / FILTER_SQUARE;
+        #elif defined(PCF_SHADOWS)
+            float shadow = 0.0;
+            vec2 texSize = textureSize(u_ShadowMap, 0);
+            vec2 texelSize = 1.0 / texSize;
+            for (int x = -FILTER_SIZE; x <= FILTER_SIZE; x++) {
+                for (int y = -FILTER_SIZE; y <= FILTER_SIZE; y++) {
+                    vec2 offset = vec2(x, y) * texelSize;
+                    vec2 randOffset = (rand3dTo2d(worldPos) * 2.0 - 1.0) * texelSize * 0.15;
+                    shadow += SampleShadowMap(projCoords.xy + offset + randOffset, depth, texSize, texelSize);
+                }
+            }
+            
+            return shadow / FILTER_SQUARE;
         #else
             return SampleShadowMap(projCoords.xy, depth);
         #endif
@@ -206,7 +272,7 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
         #endif
         
         // Sample shadow map and compare
-        float shadow = SamplePCFShadow(projCoords, depth);
+        float shadow = SamplePCFShadow(projCoords, depth, worldPos);
         if (depth > 1.0 || abs(lightSpacePos.x) > 1.0 || abs(lightSpacePos.y) > 1.0)
             shadow = 1.0;
         

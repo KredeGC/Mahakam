@@ -166,7 +166,7 @@ namespace Mahakam
 		Entity planeEntity = s_ActiveScene->CreateEntity("Plane");
 		planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
 		planeEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
-		planeEntity.GetComponent<TransformComponent>().SetScale({ 10.0f, 10.0f, 10.0f });
+		planeEntity.GetComponent<TransformComponent>().SetScale({ 30.0f, 30.0f, 30.0f });
 		//planeEntity.AddComponent<AnimatorComponent>(); // TEMP
 
 
