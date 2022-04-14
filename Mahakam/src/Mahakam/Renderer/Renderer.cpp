@@ -303,4 +303,24 @@ namespace Mahakam
 
 		GL::DrawInstanced(invertedPyramid->GetIndexCount(), amount);
 	}
+
+
+	void Renderer::AddFrameBufferImpl(const std::string& name, WeakRef<FrameBuffer> frameBuffer)
+	{
+		rendererData.frameBuffers[name] = frameBuffer;
+	}
+
+	const robin_hood::unordered_map<std::string, WeakRef<FrameBuffer>>& Renderer::GetFrameBuffersImpl()
+	{
+		auto iter = rendererData.frameBuffers.begin();
+		while (iter != rendererData.frameBuffers.end())
+		{
+			if (iter->second.expired())
+				iter = rendererData.frameBuffers.erase(iter);
+			else
+				iter++;
+		}
+
+		return rendererData.frameBuffers;
+	}
 }

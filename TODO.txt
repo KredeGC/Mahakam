@@ -1,0 +1,9 @@
+Frame debugger:
+Needs to be enabled and haults default rendering.
+Each call to GL:: also keeps track of the state of the renderer.
+
+Shader properties:
+Shaders will have a PROPERTIES field at the top, indicating which uniforms can be modified.
+Will require a rewrite of all shaders to include this field. bummer.
+
+Finish porting to OGL 3.3, using the old-school buffer binding...

@@ -17,6 +17,7 @@ namespace Mahakam
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
+			break;
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLFrameBuffer>(prop);
 		}

@@ -1,5 +1,6 @@
-GEOMETRY:
-  Defines:
-    - GEOMETRY
-  Includes:
-    - assets/shaders/internal/UnlitColor.glsl
+Passes:
+  GEOMETRY:
+    Defines:
+      - GEOMETRY
+    Includes:
+      - assets/shaders/internal/UnlitColor.glsl

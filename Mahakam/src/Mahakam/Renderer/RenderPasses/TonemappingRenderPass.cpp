@@ -21,6 +21,8 @@ namespace Mahakam
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
+		Renderer::AddFrameBuffer("Tonemapping", viewportFramebuffer);
+
 		tonemappingShader = Shader::Create("assets/shaders/internal/Tonemapping.yaml");
 
 		return true;

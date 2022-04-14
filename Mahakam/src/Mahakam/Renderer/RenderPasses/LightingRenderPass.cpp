@@ -33,6 +33,8 @@ namespace Mahakam
 		shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
 		shadowFramebuffer = FrameBuffer::Create(shadowProps);
 
+		Renderer::AddFrameBuffer("Shadow Atlas", shadowFramebuffer);
+
 		shadowMatrixBuffer = UniformBuffer::Create(sizeof(glm::mat4));
 
 		return true;
@@ -105,6 +107,8 @@ namespace Mahakam
 		//lightingProps.depthAttachment = { TextureFormat::Depth24 };
 
 		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
+
+		Renderer::AddFrameBuffer("Lighting", hdrFrameBuffer);
 	}
 
 	void LightingRenderPass::SetupShaders()

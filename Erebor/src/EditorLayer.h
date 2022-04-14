@@ -3,6 +3,7 @@
 #include "Panels/DockSpace.h"
 #include "Panels/GameViewPanel.h"
 #include "Panels/ProfilerPanel.h"
+#include "Panels/RenderPassPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/SceneViewPanel.h"
 #include "Panels/StatsPanel.h"
@@ -24,6 +25,7 @@ namespace Mahakam
 		DockSpace dockSpace;
 		GameViewPanel gameViewPanel;
 		ProfilerPanel profilerPanel;
+		RenderPassPanel renderPassPanel;
 		SceneViewPanel sceneViewPanel;
 		SceneHierarchyPanel sceneHierarchyPanel;
 		StatsPanel statsPanel;
@@ -34,7 +36,7 @@ namespace Mahakam
 
 	public:
 		EditorLayer() : Layer("Editor"), dockSpace(), gameViewPanel(), profilerPanel(),
-			sceneViewPanel(), sceneHierarchyPanel(), statsPanel() {}
+			renderPassPanel(), sceneViewPanel(), sceneHierarchyPanel(), statsPanel() {}
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;

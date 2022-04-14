@@ -1,3 +1,4 @@
-GEOMETRY:
-  Includes:
-    - assets/shaders/Skybox.glsl
+Passes:
+  GEOMETRY:
+    Includes:
+      - assets/shaders/Skybox.glsl

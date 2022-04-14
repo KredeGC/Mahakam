@@ -1,3 +1,4 @@
-LUT:
-  Includes:
-    - assets/shaders/internal/Cubemap.glsl
+Passes:
+  LUT:
+    Includes:
+      - assets/shaders/internal/Cubemap.glsl

@@ -21,6 +21,8 @@ namespace Mahakam
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
+		Renderer::AddFrameBuffer("Particle", viewportFramebuffer);
+
 		particleCompute = ComputeShader::Create("assets/compute/Particles.glsl");
 
 		return true;

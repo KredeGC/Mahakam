@@ -1,5 +1,6 @@
-SHADOW:
-  Defines:
-    - SHADOW
-  Includes:
-    - assets/shaders/internal/Shadow.glsl
+Passes:
+  SHADOW:
+    Defines:
+      - SHADOW
+    Includes:
+      - assets/shaders/internal/Shadow.glsl

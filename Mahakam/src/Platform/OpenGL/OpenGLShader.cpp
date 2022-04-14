@@ -346,7 +346,16 @@ namespace Mahakam
 
 		robin_hood::unordered_map<std::string, std::string> keywordPermutations = ParseShaderKeywords(keywords);
 
-		for (auto shaderPassNode : rootNode)
+		auto propertiesNode = rootNode["Properties"];
+
+		for (auto propertyNode : propertiesNode)
+		{
+			MH_CORE_TRACE("{0}: {1}", propertyNode.first, propertyNode.second);
+		}
+
+		auto passesNode = rootNode["Passes"];
+
+		for (auto shaderPassNode : passesNode)
 		{
 			std::string shaderPassName = shaderPassNode.first.as<std::string>();
 

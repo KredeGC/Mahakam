@@ -1,10 +1,6 @@
 #include "ebpch.h"
 #include "EditorLayer.h"
 
-#include "RenderPasses/TexelGeometryPass.h"
-#include "RenderPasses/TexelLightingPass.h"
-#include "RenderPasses/PixelationPass.h"
-
 #include <fstream>
 #include <filesystem>
 
@@ -282,6 +278,7 @@ namespace Mahakam
 
 		gameViewPanel.OnImGuiRender();
 		profilerPanel.OnImGuiRender();
+		renderPassPanel.OnImGuiRender();
 		sceneViewPanel.OnImGuiRender();
 		sceneHierarchyPanel.OnImGuiRender();
 		statsPanel.OnImGuiRender();

@@ -1,3 +1,4 @@
-POSTPROCESSING:
-  Includes:
-    - assets/shaders/internal/Tonemapping.glsl
+Passes:
+  POSTPROCESSING:
+    Includes:
+      - assets/shaders/internal/Tonemapping.glsl

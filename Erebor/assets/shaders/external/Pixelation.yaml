@@ -1,3 +1,4 @@
-POSTPROCESSING:
-  Includes:
-    - assets/shaders/external/Pixelation.glsl
+Passes:
+  POSTPROCESSING:
+    Includes:
+      - assets/shaders/external/Pixelation.glsl

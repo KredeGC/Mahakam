@@ -28,6 +28,8 @@ namespace Mahakam
 
 		gBuffer = FrameBuffer::Create(gProps);
 
+		Renderer::AddFrameBuffer("GBuffer", gBuffer);
+
 		return true;
 	}
 
