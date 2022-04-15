@@ -1,5 +1,5 @@
 #type vertex
-#version 450 core
+#version 430 core
 #include "assets/shaders/include/Matrix.glsl"
 
 struct v2f {
@@ -31,7 +31,7 @@ void main() {
 
 
 #type fragment
-#version 450 core
+#version 430 core
 #include "assets/shaders/include/Matrix.glsl"
 #include "assets/shaders/include/Normal.glsl"
 #include "assets/shaders/external/include/Texel.glsl"

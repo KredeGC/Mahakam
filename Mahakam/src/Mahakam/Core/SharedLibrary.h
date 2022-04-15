@@ -13,6 +13,10 @@
 #include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 
+#if MH_PLATFORM_LINUX
+#include <dlfcn.h>
+#endif
+
 namespace Mahakam
 {
 	class SharedLibrary
@@ -101,7 +105,7 @@ namespace Mahakam
 #if defined(MH_PLATFORM_WINDOWS)
 			return (R (*)(Args...))GetProcAddress(handle, name);
 #elif defined(MH_PLATFORM_LINUX)
-			return (R (*)(Args...))dlsym(myso, name);
+			return (R (*)(Args...))dlsym(handle, name);
 #endif
 		}
 	};

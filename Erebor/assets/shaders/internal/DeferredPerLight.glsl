@@ -1,5 +1,5 @@
 #type vertex
-#version 450 core
+#version 430 core
 #if defined(POINT) || defined(SPOT)
     layout(location = 0) out flat int v_InstanceID;
 #endif
@@ -33,7 +33,7 @@ void main() {
 
 
 #type fragment
-#version 450 core
+#version 430 core
 #if defined(POINT) || defined(SPOT)
     layout(location = 0) in flat int v_InstanceID;
 #endif

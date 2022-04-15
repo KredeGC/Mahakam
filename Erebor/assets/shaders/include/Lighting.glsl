@@ -136,16 +136,16 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
             vec2 f = fract(projCoords * texSize);
             projCoords += (0.5 - f) * texelSize;
             
-            float tl = texture2D(u_ShadowMap, projCoords).r;
-            float tr = texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, 0.0)).r;
-            float bl = texture2D(u_ShadowMap, projCoords + vec2(0.0, texelSize.y)).r;
-            float br = texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, texelSize.y)).r;
+            float tl = texture(u_ShadowMap, projCoords).r;
+            float tr = texture(u_ShadowMap, projCoords + vec2(texelSize.x, 0.0)).r;
+            float bl = texture(u_ShadowMap, projCoords + vec2(0.0, texelSize.y)).r;
+            float br = texture(u_ShadowMap, projCoords + vec2(texelSize.x, texelSize.y)).r;
             
             float tA = mix(tl, tr, f.x);
             float tB = mix(bl, br, f.x);
             return mix(tA, tB, f.y);
         #else
-            return depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
+            return depth > texture(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
         #endif
     }
     
@@ -154,20 +154,20 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
             vec2 f = fract(projCoords * texSize);
             projCoords += (0.5 - f) * texelSize;
             
-            float tl = depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
-            float tr = depth > texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, 0.0)).r ? 0.0 : 1.0;
-            float bl = depth > texture2D(u_ShadowMap, projCoords + vec2(0.0, texelSize.y)).r ? 0.0 : 1.0;
-            float br = depth > texture2D(u_ShadowMap, projCoords + vec2(texelSize.x, texelSize.y)).r ? 0.0 : 1.0;
+            float tl = depth > texture(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
+            float tr = depth > texture(u_ShadowMap, projCoords + vec2(texelSize.x, 0.0)).r ? 0.0 : 1.0;
+            float bl = depth > texture(u_ShadowMap, projCoords + vec2(0.0, texelSize.y)).r ? 0.0 : 1.0;
+            float br = depth > texture(u_ShadowMap, projCoords + vec2(texelSize.x, texelSize.y)).r ? 0.0 : 1.0;
             
             float tA = mix(tl, tr, f.x);
             float tB = mix(bl, br, f.x);
             return mix(tA, tB, f.y);
         #else
-            return depth > texture2D(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
+            return depth > texture(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
         #endif
     }
     
-    float rand3dTo1d(vec3 value, vec3 dotDir = vec3(12.9898, 78.233, 37.719)) {
+    float rand3dTo1d(vec3 value, vec3 dotDir) {
         vec3 smallValue = cos(value);
         float random = dot(smallValue, dotDir);
         random = fract(sin(random) * 143758.5453);

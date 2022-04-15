@@ -45,7 +45,7 @@ namespace Mahakam
 
 		virtual inline void* GetNativeWindow() const override { return window; }
 
-		virtual inline void* GetProcess() const override { return glfwGetProcAddress; }
+		virtual inline void* GetProcess() const override { return (void*)glfwGetProcAddress; }
 
 		virtual inline RenderingContext* GetContext() const override { return context; }
 

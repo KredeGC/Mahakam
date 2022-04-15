@@ -1,8 +1,8 @@
 #include "mhpch.h"
 #include "SharedLibrary.h"
 
-#define MH_EXPORT_FUNC(signature, func) funcPointers[i++] = static_cast<signature>(func);
-#define MH_IMPORT_FUNC(signature) sh_##signature = static_cast<signature>(ptrs[i++]);
+#define MH_EXPORT_FUNC(signature, func) funcPointers[i++] = (void*)static_cast<signature>(func);
+#define MH_IMPORT_FUNC(signature) sh_##signature = (signature)(ptrs[i++]);
 
 namespace Mahakam
 {

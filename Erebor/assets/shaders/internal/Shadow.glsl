@@ -1,5 +1,5 @@
 #type vertex
-#version 450 core
+#version 430 core
 #include "assets/shaders/include/Matrix.glsl"
 
 layout (std140, binding = 1) uniform LightMatrices {
@@ -17,6 +17,6 @@ void main() {
 
 
 #type fragment
-#version 450 core
+#version 430 core
 
 void main() {}
