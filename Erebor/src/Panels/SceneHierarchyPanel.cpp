@@ -218,6 +218,24 @@ namespace Mahakam
 				transform.SetScale(scale);
 		}, false);
 
+		DrawComponent<AnimatorComponent>("Animator", entity, [](AnimatorComponent& animatorComponent)
+		{
+			Animator& animator = animatorComponent;
+
+			Ref<Animation> animation = animator.GetAnimation();
+
+			float duration = animation->GetDuration() / animation->GetTicksPerSecond();
+
+			ImGui::Text("Animation: %s", animation->GetName().c_str());
+			ImGui::Text("Ticks per second: %d", animation->GetTicksPerSecond());
+			ImGui::Text("Duration: %.1fs", duration);
+
+			float progress = animator.GetTime() / animation->GetDuration();
+			float realtime = animator.GetTime() / animation->GetTicksPerSecond();
+
+			ImGui::ProgressBar(progress, ImVec2(-FLT_MIN, 0), std::to_string(realtime).c_str());
+		}, true);
+
 		DrawComponent<CameraComponent>("Camera", entity, [](CameraComponent& cameraComponent)
 		{
 			Camera& camera = cameraComponent.GetCamera();
@@ -339,9 +357,20 @@ namespace Mahakam
 					light.SetFov(glm::radians(fov));
 			}
 
+			glm::vec3 color = light.GetColor();
+			if (ImGui::ColorEdit3("Color", glm::value_ptr(color), ImGuiColorEditFlags_HDR))
+				light.SetColor(color);
+
 			bool hasShadows = light.IsShadowCasting();
 			if (ImGui::Checkbox("Shadow casting", &hasShadows))
 				light.SetShadowCasting(hasShadows);
+
+			if (hasShadows)
+			{
+				float bias = light.GetBias();
+				if (ImGui::DragFloat("Shadow bias", &bias, 0.001f, 0.0f, 1.0f))
+					light.SetBias(bias);
+			}
 		});
 	}
 

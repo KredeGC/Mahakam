@@ -23,6 +23,7 @@ namespace Mahakam
         else
         {
             auto animation = scene->mAnimations[0];
+            m_Name = animation->mName.C_Str();
             m_Duration = (float)animation->mDuration;
             m_TicksPerSecond = (int)animation->mTicksPerSecond;
 

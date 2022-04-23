@@ -22,6 +22,7 @@ namespace Mahakam
     class Animation
     {
     private:
+        std::string m_Name;
         float m_Duration;
         int m_TicksPerSecond;
         std::unordered_map<std::string, Bone> m_Bones;
@@ -34,6 +35,8 @@ namespace Mahakam
         Animation(const std::string& filepath, SkinnedMesh& skinnedMesh);
 
         Bone* FindBone(const std::string& name);
+
+        inline const std::string& GetName() const { return m_Name; }
 
         inline int GetTicksPerSecond() { return m_TicksPerSecond; }
 

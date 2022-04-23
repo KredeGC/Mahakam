@@ -19,6 +19,9 @@ namespace Mahakam
 			animator.PlayAnimation(animation);
 		}
 
+		operator Animator& () { return animator; }
+		operator const Animator& () const { return animator; }
+
 		Animator& GetAnimator() { return animator; }
 	};
 }

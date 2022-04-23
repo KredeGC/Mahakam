@@ -25,6 +25,10 @@ namespace Mahakam
 
 		void PlayAnimation(Ref<Animation> animation);
 
+		inline float GetTime() const { return m_CurrentTime; }
+
+		inline Ref<Animation> GetAnimation() { return m_CurrentAnimation; }
+
 		inline const glm::mat4* GetFinalBoneMatrices() const { return m_FinalBoneMatrices; }
 
 	private:
