@@ -102,7 +102,7 @@ namespace Mahakam
 			CreateRef<TonemappingRenderPass>() });*/
 
 		// Create a new active scene
-		s_ActiveScene = Scene::CreateScene("assets/textures/pines.hdr");
+		s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
 
 
 		// Setup the viewport in editor
@@ -218,6 +218,220 @@ namespace Mahakam
 		animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
 		animatedEntity.AddComponent<AnimatorComponent>(animation);
 		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();*/
+
+
+
+		//ComponentRegistry::ComponentInterface transformInterface;
+		//transformInterface.HasComponent = [](Entity entity) { return entity.HasComponent<TransformComponent>(); };
+		//transformInterface.AddComponent = [](Entity entity) { entity.AddComponent<TransformComponent>(); };
+		//transformInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<TransformComponent>(); };
+		//transformInterface.OnInspector = [](Entity entity)
+		//{
+		//	TransformComponent& transform = entity.GetComponent<TransformComponent>();
+
+		//	glm::vec3 pos = transform.GetPosition();
+		//	if (GUI::DrawVec3Control("Position", pos))
+		//		transform.SetPosition(pos);
+
+		//	// TODO: Fix
+		//	glm::vec3 eulerAngles = glm::degrees(transform.GetEulerAngles());
+		//	if (GUI::DrawVec3Control("Rotation", eulerAngles))
+		//		transform.SetEulerangles(glm::radians(eulerAngles));
+
+		//	glm::vec3 scale = transform.GetScale();
+		//	if (GUI::DrawVec3Control("Scale", scale, 1.0f))
+		//		transform.SetScale(scale);
+		//};
+
+		//ComponentRegistry::RegisterComponent("Transform", transformInterface);
+
+		// Animator
+		ComponentRegistry::ComponentInterface animatorInterface;
+		animatorInterface.HasComponent = [](Entity entity) { return entity.HasComponent<AnimatorComponent>(); };
+		animatorInterface.AddComponent = [](Entity entity) { entity.AddComponent<AnimatorComponent>(); };
+		animatorInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<AnimatorComponent>(); };
+		animatorInterface.OnInspector = [](Entity entity)
+		{
+			Animator& animator = entity.GetComponent<AnimatorComponent>();
+
+			Ref<Animation> animation = animator.GetAnimation();
+
+			float duration = animation->GetDuration() / animation->GetTicksPerSecond();
+
+			ImGui::Text("Animation: %s", animation->GetName().c_str());
+			ImGui::Text("Ticks per second: %d", animation->GetTicksPerSecond());
+			ImGui::Text("Duration: %.1fs", duration);
+
+			float progress = animator.GetTime() / animation->GetDuration();
+			float realtime = animator.GetTime() / animation->GetTicksPerSecond();
+
+			ImGui::ProgressBar(progress, ImVec2(-FLT_MIN, 0), std::to_string(realtime).c_str());
+		};
+
+		ComponentRegistry::RegisterComponent("Animator", animatorInterface);
+
+		// Camera
+		ComponentRegistry::ComponentInterface cameraInterface;
+		cameraInterface.HasComponent = [](Entity entity) { return entity.HasComponent<CameraComponent>(); };
+		cameraInterface.AddComponent = [](Entity entity) { entity.AddComponent<CameraComponent>(); };
+		cameraInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<CameraComponent>(); };
+		cameraInterface.OnInspector = [](Entity entity)
+		{
+			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
+			Camera& camera = cameraComponent;
+
+			const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
+
+			if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					bool selected = currentProjectionTypeString == projectionTypeStrings[i];
+					if (ImGui::Selectable(projectionTypeStrings[i], selected))
+					{
+						currentProjectionTypeString = projectionTypeStrings[i];
+						camera.SetProjectionType((Camera::ProjectionType)i);
+					}
+
+					if (selected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+
+			if (camera.GetProjectionType() == Camera::ProjectionType::Perspective)
+			{
+				float fov = glm::degrees(camera.GetFov());
+				if (ImGui::DragFloat("Field of view", &fov, 0.1f, 0.0f, 180.0f))
+					camera.SetFov(glm::radians(fov));
+			}
+			else
+			{
+				float size = camera.GetSize();
+				if (ImGui::DragFloat("Size", &size, 0.1f, 0.0f))
+					camera.SetSize(size);
+			}
+
+			float nearClip = camera.GetNearPlane();
+			if (ImGui::DragFloat("Near clip-plane", &nearClip, 0.1f, 0.0f))
+				camera.SetNearPlane(nearClip);
+
+			float farClip = camera.GetFarPlane();
+			if (ImGui::DragFloat("Far clip-plane", &farClip, 0.1f, 0.0f))
+				camera.SetFarPlane(farClip);
+
+			bool fixedAspectRatio = cameraComponent.HasFixedAspectRatio();
+			if (ImGui::Checkbox("Fixed aspect ratio", &fixedAspectRatio))
+				cameraComponent.SetFixedAspectRatio(fixedAspectRatio);
+		};
+
+		ComponentRegistry::RegisterComponent("Camera", cameraInterface);
+
+		// Mesh
+		ComponentRegistry::ComponentInterface meshInterface;
+		meshInterface.HasComponent = [](Entity entity) { return entity.HasComponent<MeshComponent>(); };
+		meshInterface.AddComponent = [](Entity entity) { entity.AddComponent<MeshComponent>(); };
+		meshInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<MeshComponent>(); };
+		meshInterface.OnInspector = [](Entity entity)
+		{
+			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
+			auto& meshes = meshComponent.GetMeshes();
+			Ref<Material> material = meshComponent.GetMaterial();
+
+			uint32_t vertexCount = 0;
+			uint32_t indexCount = 0;
+			for (auto& mesh : meshes)
+			{
+				if (mesh)
+				{
+					vertexCount += mesh->GetVertexCount();
+					indexCount += mesh->GetIndexCount();
+				}
+			}
+
+			if (vertexCount > 0 && indexCount > 0)
+			{
+				ImGui::Text("Vertex count: %d", vertexCount);
+				ImGui::Text("Triangle count: %d", indexCount / 3);
+			}
+
+			if (material)
+			{
+				if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					// TODO: Temporary
+					glm::vec3 color = material->GetFloat3("u_Color");
+					if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
+						material->SetFloat3("u_Color", color);
+				}
+			}
+		};
+
+		ComponentRegistry::RegisterComponent("Mesh", meshInterface);
+
+		// Light
+		ComponentRegistry::ComponentInterface lightInterface;
+		lightInterface.HasComponent = [](Entity entity) { return entity.HasComponent<LightComponent>(); };
+		lightInterface.AddComponent = [](Entity entity) { entity.AddComponent<LightComponent>(); };
+		lightInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<LightComponent>(); };
+		lightInterface.OnInspector = [](Entity entity)
+		{
+			Light& light = entity.GetComponent<LightComponent>();
+
+			const char* projectionTypeStrings[] = { "Directional", "Point", "Spot" };
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)light.GetLightType()];
+
+			if (ImGui::BeginCombo("Light Type", currentProjectionTypeString))
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					bool selected = currentProjectionTypeString == projectionTypeStrings[i];
+					if (ImGui::Selectable(projectionTypeStrings[i], selected))
+					{
+						currentProjectionTypeString = projectionTypeStrings[i];
+						light.SetLightType((Light::LightType)i);
+					}
+
+					if (selected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+
+			float range = light.GetRange();
+			if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f, std::numeric_limits<float>::infinity()))
+				light.SetRange(range);
+
+			if (light.GetLightType() == Light::LightType::Spot)
+			{
+				float fov = glm::degrees(light.GetFov());
+				if (ImGui::DragFloat("Field of view", &fov, 0.1f, 0.0f, 180.0f))
+					light.SetFov(glm::radians(fov));
+			}
+
+			glm::vec3 color = light.GetColor();
+			if (GUI::DrawColor3Edit("Color", color, ImGuiColorEditFlags_HDR))
+				light.SetColor(color);
+
+			bool hasShadows = light.IsShadowCasting();
+			if (ImGui::Checkbox("Shadow casting", &hasShadows))
+				light.SetShadowCasting(hasShadows);
+
+			if (hasShadows)
+			{
+				float bias = light.GetBias();
+				if (ImGui::DragFloat("Shadow bias", &bias, 0.001f, 0.0f, 1.0f))
+					light.SetBias(bias);
+			}
+		};
+
+		ComponentRegistry::RegisterComponent("Light", lightInterface);
+
+		for (auto& [name, component] : ComponentRegistry::GetComponents())
+			MH_CORE_TRACE("Loaded component: {0}", name);
 
 
 
@@ -339,7 +553,7 @@ namespace Mahakam
 					CopyRuntime(binaryStream, binaryLength);
 
 					// Create new scene
-					s_ActiveScene = Scene::CreateScene("assets/textures/pines.hdr");
+					s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
 					gameViewPanel.SetScene(s_ActiveScene);
 					sceneHierarchyPanel.SetContext(s_ActiveScene);
 

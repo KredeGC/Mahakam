@@ -3,11 +3,15 @@
 
 #include "Components.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include "Mahakam/Core/Utility.h"
 #include "Mahakam/Core/AssetDatabase.h"
 #include "Mahakam/Renderer/Renderer.h"
 
 #include "Entity.h"
+
+#include <yaml-cpp/yaml.h>
 
 #include <fstream>
 #include <filesystem>
@@ -62,16 +66,6 @@ namespace Mahakam
 		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F });
 		skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
 		skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
-
-		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
-		skyboxMaterial = Material::Create(skyboxShader);
-		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
-	}
-
-	Scene::Scene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
-		: skyboxTexture(skybox), skyboxIrradiance(irradianceMap), skyboxSpecular(specularMap)
-	{
-		MH_PROFILE_FUNCTION();
 
 		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
 		skyboxMaterial = Material::Create(skyboxShader);
@@ -258,13 +252,10 @@ namespace Mahakam
 		registry.destroy(entity);
 	}
 
-	Ref<Scene> Scene::CreateScene(const std::string& filepath)
+	Ref<Scene> Scene::Create(const std::string& filepath)
 	{
-		return std::make_shared<Scene>(filepath);
-	}
+		MH_OVERRIDE_FUNC(SceneCreate, filepath);
 
-	Ref<Scene> Scene::CreateScene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap)
-	{
-		return std::make_shared<Scene>(skybox, irradianceMap, specularMap);
+		return std::make_shared<Scene>(filepath);
 	}
 }

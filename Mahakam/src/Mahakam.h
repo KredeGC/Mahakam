@@ -16,11 +16,18 @@
 #include "Mahakam/Core/Utility.h"
 #include "Mahakam/Core/Window.h"
 
-//Scene
-#include "Mahakam/Scene/Components.h"
-#include "Mahakam/Scene/Entity.h"
-#include "Mahakam/Scene/Scene.h"
-#include "Mahakam/Scene/ScriptableEntity.h"
+// Events
+#include "Mahakam/Events/Event.h"
+#include "Mahakam/Events/ApplicationEvent.h"
+#include "Mahakam/Events/KeyEvent.h"
+#include "Mahakam/Events/MouseEvent.h"
+
+// ImGui
+#include "Mahakam/ImGui/GUI.h"
+#include "Mahakam/ImGui/ImGuiLayer.h"
+
+// Math
+#include "Mahakam/Math/Math.h"
 
 // Rendering
 #include "Mahakam/Renderer/Animation.h"
@@ -41,5 +48,10 @@
 #include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 
-// Layers
-#include "Mahakam/ImGui/ImGuiLayer.h"
+//Scene
+#include "Mahakam/Scene/ComponentRegistry.h"
+#include "Mahakam/Scene/Components.h"
+#include "Mahakam/Scene/Entity.h"
+#include "Mahakam/Scene/Scene.h"
+#include "Mahakam/Scene/SceneSerializer.h"
+#include "Mahakam/Scene/ScriptableEntity.h"

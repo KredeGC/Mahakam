@@ -1,6 +1,8 @@
 #pragma once
 #include "Core.h"
 
+#include "Mahakam/Scene/ComponentRegistry.h"
+
 #include "Mahakam/Renderer/Animation.h"
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/ComputeShader.h"
@@ -24,6 +26,9 @@ namespace Mahakam
 	public:
 		// Animation
 		MH_SHARED_FUNC(Ref<Animation>, AnimationLoad, const std::string&, SkinnedMesh&);
+
+		// ComponentRegistry
+		MH_SHARED_FUNC(ComponentRegistry*, ComponentRegistryGetInstance);
 
 		// UniformBuffer
 		MH_SHARED_FUNC(Ref<UniformBuffer>, UniformBufferCreate, uint32_t);
@@ -64,6 +69,9 @@ namespace Mahakam
 		// Renderer
 		MH_SHARED_FUNC(Renderer*, RendererGetInstance);
 
+		// Scene
+		MH_SHARED_FUNC(Ref<Scene>, SceneCreate, const std::string&);
+
 		// Shader
 		MH_SHARED_FUNC(Ref<Shader>, ShaderCreate, const std::string&, const std::initializer_list<std::string>&);
 
@@ -76,7 +84,7 @@ namespace Mahakam
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateFilepath, const std::string&, const CubeTextureProps&);
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreatePrefilter, Ref<TextureCube>, TextureCubePrefilter, const CubeTextureProps&);
 
-		static constexpr int NUM_FUNC_PTRS = 24;
+		static constexpr int NUM_FUNC_PTRS = 26;
 
 	private:
 		const char* filepath = nullptr;

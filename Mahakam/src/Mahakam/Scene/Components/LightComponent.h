@@ -21,6 +21,7 @@ namespace Mahakam
 		LightComponent(Light::LightType lightType, float fov, float range, const glm::vec3& color, bool shadowCasting = false) // Spot
 			: light(lightType, fov, range, color, shadowCasting) {}
 
+		operator Light& () { return light; }
 		operator const Light& () const { return light; }
 
 		Light& GetLight() { return light; }

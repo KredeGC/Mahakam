@@ -5,6 +5,10 @@
 
 #include "Mahakam/Renderer/Renderer.h"
 
+#include "Mahakam/Scene/Components.h"
+#include "Mahakam/Scene/ComponentRegistry.h"
+#include "Mahakam/Scene/Entity.h"
+
 namespace Mahakam
 {
 	Application* Application::instance = nullptr;
@@ -21,12 +25,15 @@ namespace Mahakam
 
 		imGuiLayer = new ImGuiLayer();
 		PushOverlay(imGuiLayer);
+
+		ComponentRegistry::Init();
 	}
 
 	Application::~Application()
 	{
 		MH_PROFILE_FUNCTION();
 
+		ComponentRegistry::Shutdown();
 		Renderer::Shutdown();
 	}
 

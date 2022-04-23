@@ -17,6 +17,7 @@ namespace Mahakam
 	{
 	private:
 		friend class Entity;
+		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
 
 		Ref<Material> skyboxMaterial;
@@ -30,7 +31,6 @@ namespace Mahakam
 
 	public:
 		Scene(const std::string& filepath);
-		Scene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
 		~Scene();
 
 		void OnUpdate(Timestep ts, bool dontRender = false);
@@ -47,8 +47,7 @@ namespace Mahakam
 			return registry.view<Args...>().each(func);
 		}
 
-		static Ref<Scene> CreateScene(const std::string& filepath);
-		static Ref<Scene> CreateScene(const Ref<TextureCube>& skybox, const Ref<TextureCube>& irradianceMap, const Ref<TextureCube>& specularMap);
+		static Ref<Scene> Create(const std::string& filepath);
 
 	private:
 		template<typename T>

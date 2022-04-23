@@ -60,6 +60,9 @@ namespace Mahakam
 		// Animation
 		MH_EXPORT_FUNC(AnimationLoad, Animation::Load);
 
+		// ComponentRegistry
+		MH_EXPORT_FUNC(ComponentRegistryGetInstance, ComponentRegistry::GetInstance);
+
 		// UniformBuffer
 		MH_EXPORT_FUNC(UniformBufferCreate, UniformBuffer::Create);
 
@@ -99,6 +102,9 @@ namespace Mahakam
 		// Renderer
 		MH_EXPORT_FUNC(RendererGetInstance, Renderer::GetInstance);
 
+		// Scene
+		MH_EXPORT_FUNC(SceneCreate, Scene::Create);
+
 		// Shader
 		MH_EXPORT_FUNC(ShaderCreate, Shader::Create);
 
@@ -126,6 +132,9 @@ namespace Mahakam
 
 		// Animation
 		MH_IMPORT_FUNC(AnimationLoad);
+
+		// ComponentRegistry
+		MH_IMPORT_FUNC(ComponentRegistryGetInstance);
 
 		// UniformBuffer
 		MH_IMPORT_FUNC(UniformBufferCreate);
@@ -165,6 +174,9 @@ namespace Mahakam
 
 		// Renderer
 		MH_IMPORT_FUNC(RendererGetInstance);
+
+		// Scene
+		MH_IMPORT_FUNC(SceneCreate);
 
 		// Shader
 		MH_IMPORT_FUNC(ShaderCreate);

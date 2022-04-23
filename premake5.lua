@@ -50,7 +50,8 @@ VendorIncludes = {
     "%{IncludeDir.imgui}",
     "%{IncludeDir.imguizmo}",
     "%{IncludeDir.robin_hood}",
-    "%{IncludeDir.spdlog}"
+    "%{IncludeDir.spdlog}",
+    "%{IncludeDir.yaml}"
 }
 
 -- Build ASSIMP for debug and release
