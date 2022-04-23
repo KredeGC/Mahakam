@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "SharedLibrary.h"
 
+#include <imgui.h>
+
 #define MH_EXPORT_FUNC(signature, func) funcPointers[i++] = (void*)static_cast<signature>(func);
 #define MH_IMPORT_FUNC(signature) sh_##signature = (signature)(ptrs[i++]);
 
@@ -27,10 +29,12 @@ namespace Mahakam
 		if (!initialized)
 			ExportFuncPointers();
 
-		auto loadPtr = GetFunction<void, void**>("Load");
+		auto loadPtr = GetFunction<void, ImGuiContext*, void**>("Load");
+
+		ImGuiContext* context = ImGui::GetCurrentContext();
 
 		if (loadPtr)
-			loadPtr(funcPointers);
+			loadPtr(context, funcPointers);
 	}
 
 	SharedLibrary::~SharedLibrary()

@@ -5,18 +5,18 @@
 
 using namespace Mahakam;
 
-struct EXPORTED TestComponent
+struct EXPORTED RotatorComponent
 {
-	float rotation;
+	float rotation = 0.0f;;
+	float rotationSpeed = 10.0f;
 
 public:
-	TestComponent()
-		: rotation(0.0f) {}
+	RotatorComponent() {}
 };
 
-EXTERN_EXPORTED void Load(void** funcPtrs)
+EXTERN_EXPORTED void Load(ImGuiContext* context, void** funcPtrs)
 {
-	SharedLibrary::ImportFuncPointers(funcPtrs);
+	MH_RUNTIME_LOAD(context, funcPtrs);
 
 	// Setup render passes for the default renderer
 	/*Renderer::SetRenderPasses({
@@ -29,6 +29,21 @@ EXTERN_EXPORTED void Load(void** funcPtrs)
 	testTex->GetRendererID();
 
 	MH_CORE_TRACE("DLL Loaded!");
+
+
+	// TestComponent
+	ComponentRegistry::ComponentInterface rotatorInterface;
+	rotatorInterface.HasComponent = [](Entity entity) { return entity.HasComponent<RotatorComponent>(); };
+	rotatorInterface.AddComponent = [](Entity entity) { entity.AddComponent<RotatorComponent>(); };
+	rotatorInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<RotatorComponent>(); };
+	rotatorInterface.OnInspector = [](Entity entity)
+	{
+		RotatorComponent& rotator = entity.GetComponent<RotatorComponent>();
+
+		ImGui::DragFloat("Rotation speed", &rotator.rotationSpeed, 0.1f);
+	};
+
+	ComponentRegistry::RegisterComponent("Rotater", rotatorInterface);
 
 
 	// TODO: Add components to scene list of serializable components
@@ -47,6 +62,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Ref<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.yaml");
 	Ref<Shader> textureShader = Shader::Create("assets/shaders/default/LitTexture.yaml");
 	Ref<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.yaml");
+	/*Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/DitheredSkinned.yaml");
+	Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.yaml");
+	Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.yaml");*/
 
 
 	// Create skinned material
@@ -62,15 +80,49 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	// Create skinned entities
 	for (int x = 0; x < 2; x++)
 	{
-		for (int y = 0; y < 2; y++)
+		for (int z = 0; z < 2; z++)
 		{
 			Entity animatedEntity = scene->CreateEntity("DLL Animated");
 			animatedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
-			animatedEntity.GetComponent<TransformComponent>().SetPosition({ x * 5.0f, 1.5f, 5.0f + y * 5.0f });
+			animatedEntity.GetComponent<TransformComponent>().SetPosition({ x * 5.0f, 1.5f, 5.0f + z * 5.0f });
 			animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
 			animatedEntity.AddComponent<AnimatorComponent>(animation);
+
+			if (z == 1)
+				animatedEntity.GetComponent<TransformComponent>().SetEulerangles({ 0.0f, 3.1415f, 0.0f });
 		}
 	}
+
+
+	// Spot
+	Entity pointLightEntity = scene->CreateEntity("Spot Light");
+	pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
+	pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
+	pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-150.0f), glm::radians(180.0f), 0.0f }));
+
+
+	// Setup plane
+	Ref<Texture> brickAlbedo = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
+	Ref<Texture> brickBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_bump.png", false, { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
+	Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+	Ref<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
+
+	Ref<Material> planeMaterial = Material::Create(textureShader);
+	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo); // TODO: Fix this
+	//planeMaterial->SetTexture("u_Bump", 0, Texture2D::bump);
+	//planeMaterial->SetTexture("u_Metallic", 0, Texture2D::black);
+	planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
+
+	Entity planeEntity = scene->CreateEntity("Plane");
+	planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
+	planeEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
+	planeEntity.GetComponent<TransformComponent>().SetScale({ 30.0f, 30.0f, 30.0f });
+
+
+	// Create particle system
+	Entity particleEntity = scene->CreateEntity("Particle System");
+	particleEntity.AddComponent<ParticleSystemComponent>();
+	particleEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
 	// Create backpack textures
@@ -95,7 +147,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Entity backpackEntity = scene->CreateEntity("Bacpack");
 	backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
 	backpackEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
-	backpackEntity.AddComponent<TestComponent>();
+	backpackEntity.AddComponent<RotatorComponent>();
 
 
 	// Create mesh & base material
@@ -125,10 +177,10 @@ EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
 {
 	MH_PROFILE_FUNCTION();
 
-	scene->ForEach<TransformComponent, TestComponent>([&](auto entity, TransformComponent& transform, TestComponent& testComponent)
+	scene->ForEach<TransformComponent, RotatorComponent>([&](auto entity, TransformComponent& transform, RotatorComponent& rotator)
 	{
-		testComponent.rotation += dt * 10.0f;
-		transform.SetRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(testComponent.rotation), 0.0f }));
+		rotator.rotation += dt * rotator.rotationSpeed;
+		transform.SetRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(rotator.rotation), 0.0f }));
 	});
 }
 
@@ -141,7 +193,7 @@ EXTERN_EXPORTED void Unload()
 {
 	MH_CORE_TRACE("DLL Unloaded!");
 
-
+	ComponentRegistry::DeregisterComponent("Rotator");
 
 	// TODO: Remove components from scene list of serializable components
 	// TODO: Remove components from editor list for inspector

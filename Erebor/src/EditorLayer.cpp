@@ -167,7 +167,6 @@ namespace Mahakam
 		planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
 		planeEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
 		planeEntity.GetComponent<TransformComponent>().SetScale({ 30.0f, 30.0f, 30.0f });
-		//planeEntity.AddComponent<AnimatorComponent>(); // TEMP
 
 
 		// Create particle system
@@ -175,75 +174,6 @@ namespace Mahakam
 		particleEntity.AddComponent<ParticleSystemComponent>();
 		particleEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
-
-		// Create backpack textures
-		//Ref<Texture2D> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
-		//Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
-		//Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
-		//Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
-		//Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
-
-		//// Create backpack model
-		//SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
-
-		//// Create backpack material
-		//Ref<Material> backpackMaterial = Material::Create(textureShader);
-		//backpackMaterial->SetTexture("u_Albedo", 0, backpackDiffuse);
-		//backpackMaterial->SetTexture("u_Bump", 0, backpackBump);
-		//backpackMaterial->SetTexture("u_Metallic", 0, backpackMetallic);
-		//backpackMaterial->SetTexture("u_Roughness", 0, backpackRoughness);
-		//backpackMaterial->SetTexture("u_Occlussion", 0, backpackOcclussion);
-
-		//// Create backpack entity
-		//Entity backpackEntity = activeScene->CreateEntity("Bacpack");
-		//backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
-		//backpackEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.0f, 5.0f });
-		//backpackEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();
-
-
-		// Setup dancing monke
-		/*Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
-		skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
-		skinnedMaterial->SetFloat("u_Metallic", 1.0f);
-		skinnedMaterial->SetFloat("u_Roughness", 0.4f);
-
-		SkinnedMesh testSkinnedModel = AssetDatabase::CreateOrLoadAsset<SkinnedMesh>("assets/models/Defeated.fbx");
-
-		SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/Defeated.fbx");
-		Ref<Animation> animation = Animation::Load("assets/models/Defeated.fbx", skinnedModel);
-
-		Entity animatedEntity = activeScene->CreateEntity("Animated");
-		animatedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
-		animatedEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 1.5f, 5.0f });
-		animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
-		animatedEntity.AddComponent<AnimatorComponent>(animation);
-		animatedEntity.AddComponent<NativeScriptComponent>().Bind<RotateScript>();*/
-
-
-
-		//ComponentRegistry::ComponentInterface transformInterface;
-		//transformInterface.HasComponent = [](Entity entity) { return entity.HasComponent<TransformComponent>(); };
-		//transformInterface.AddComponent = [](Entity entity) { entity.AddComponent<TransformComponent>(); };
-		//transformInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<TransformComponent>(); };
-		//transformInterface.OnInspector = [](Entity entity)
-		//{
-		//	TransformComponent& transform = entity.GetComponent<TransformComponent>();
-
-		//	glm::vec3 pos = transform.GetPosition();
-		//	if (GUI::DrawVec3Control("Position", pos))
-		//		transform.SetPosition(pos);
-
-		//	// TODO: Fix
-		//	glm::vec3 eulerAngles = glm::degrees(transform.GetEulerAngles());
-		//	if (GUI::DrawVec3Control("Rotation", eulerAngles))
-		//		transform.SetEulerangles(glm::radians(eulerAngles));
-
-		//	glm::vec3 scale = transform.GetScale();
-		//	if (GUI::DrawVec3Control("Scale", scale, 1.0f))
-		//		transform.SetScale(scale);
-		//};
-
-		//ComponentRegistry::RegisterComponent("Transform", transformInterface);
 
 		// Animator
 		ComponentRegistry::ComponentInterface animatorInterface;

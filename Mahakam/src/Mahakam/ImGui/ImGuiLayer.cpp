@@ -27,7 +27,7 @@ namespace Mahakam
 
 	}
 
-	static void setDarkTheme()
+	static void SetDarkTheme()
 	{
 		auto& style = ImGui::GetStyle().Colors;
 		style[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.105f, 0.11f, 1.0f);
@@ -85,7 +85,7 @@ namespace Mahakam
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		setDarkTheme();
+		SetDarkTheme();
 
 		Application& app = Application::GetInstance();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());

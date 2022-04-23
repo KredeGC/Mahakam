@@ -23,3 +23,6 @@
 #endif
 
 #define EXTERN_EXPORTED extern "C" EXPORTED
+
+#define MH_RUNTIME_LOAD(context, funcPtrs) ImGui::SetCurrentContext(context); \
+	SharedLibrary::ImportFuncPointers(funcPtrs);
