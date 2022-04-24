@@ -132,7 +132,7 @@ namespace Mahakam
 
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
-			if (componentInterface.HasComponent(entity))
+			if (componentInterface.HasComponent(entity) && componentInterface.Serialize)
 				componentInterface.Serialize(emitter, entity);
 		}
 
@@ -143,7 +143,8 @@ namespace Mahakam
 	{
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
-			componentInterface.Deserialize(node, entity);
+			if (componentInterface.Deserialize)
+				componentInterface.Deserialize(node, entity);
 		}
 	}
 }

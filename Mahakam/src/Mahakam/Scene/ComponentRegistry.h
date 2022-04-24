@@ -11,14 +11,14 @@ namespace Mahakam
 	public:
 		struct ComponentInterface
 		{
-			bool (*HasComponent)(Entity);
-			void (*AddComponent)(Entity);
-			void (*RemoveComponent)(Entity);
+			bool (*HasComponent)(Entity) = nullptr;
+			void (*AddComponent)(Entity) = nullptr;
+			void (*RemoveComponent)(Entity) = nullptr;
 
-			void (*OnInspector)(Entity);
+			void (*OnInspector)(Entity) = nullptr;
 
-			bool (*Serialize)(YAML::Emitter&, Entity);
-			bool (*Deserialize)(YAML::Node&, Entity);
+			bool (*Serialize)(YAML::Emitter&, Entity) = nullptr;
+			bool (*Deserialize)(YAML::Node&, Entity) = nullptr;
 		};
 
 	private:
@@ -27,7 +27,6 @@ namespace Mahakam
 		static ComponentRegistry* s_Instance;
 
 	public:
-		// TODO: Use a singleton and override it in SharedLibrary
 		static ComponentRegistry* GetInstance();
 
 		static void Init() { s_Instance = new ComponentRegistry(); }

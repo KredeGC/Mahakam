@@ -184,7 +184,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Ref<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
 
 	Ref<Material> planeMaterial = Material::Create(textureShader);
-	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo); // TODO: Fix this
+	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
 	planeMaterial->SetTexture("u_Bump", 0, GL::GetTexture2DBump());
 	planeMaterial->SetTexture("u_Metallic", 0, GL::GetTexture2DBlack());
 	planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);

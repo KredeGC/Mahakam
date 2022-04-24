@@ -213,6 +213,12 @@ namespace Mahakam
 		auto runPtr = lib->GetFunction<void, Scene*>("Run");
 
 		runPtr(s_ActiveScene.get());
+
+
+
+		/*SceneSerializer serializer(s_ActiveScene);
+
+		serializer.Serialize("TestScene.yaml");*/
 	}
 
 	void EditorLayer::OnDetach()
