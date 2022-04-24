@@ -9,8 +9,8 @@ namespace Mahakam
 	class StatsPanel
 	{
 	private:
-		Timestep frametime = 0.0f;
-		bool open = true;
+		Timestep m_Frametime = 0.0f;
+		bool m_Open = true;
 
 	public:
 		StatsPanel() = default;

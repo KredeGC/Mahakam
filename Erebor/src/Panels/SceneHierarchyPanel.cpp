@@ -161,18 +161,14 @@ namespace Mahakam
 		}
 	}
 
-	void SceneHierarchyPanel::SetContext(WeakRef<Scene> scene)
-	{
-		this->scene = scene;
-	}
-
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
-		if (open)
+		if (m_Open)
 		{
-			ImGui::Begin("Scene Hierarchy", &open);
+			ImGui::Begin("Scene Hierarchy", &m_Open);
 
-			if (auto context = scene.lock())
+			Ref<Scene> context = EditorLayer::GetActiveScene();
+			if (context)
 			{
 				context->registry.each([&](auto handle)
 				{

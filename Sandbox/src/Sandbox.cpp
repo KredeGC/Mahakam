@@ -14,6 +14,62 @@ public:
 	RotatorComponent() {}
 };
 
+class CameraController : public ScriptableEntity
+{
+public:
+	virtual void OnUpdate(Timestep dt) override
+	{
+		auto& transform = GetComponent<TransformComponent>();
+
+		float speed = 20.0f * dt;
+		float rotationSpeed = dt;
+
+		if (Input::IsKeyPressed(MH_KEY_LEFT_SHIFT))
+			speed *= 0.01f;
+
+		glm::vec3 eulerAngles = transform.GetEulerAngles();
+
+		// Camera rotation
+		if (Input::IsKeyPressed(MH_KEY_LEFT))
+		{
+			eulerAngles.y += rotationSpeed;
+			transform.SetEulerangles(eulerAngles);
+		}
+		else if (Input::IsKeyPressed(MH_KEY_RIGHT))
+		{
+			eulerAngles.y -= rotationSpeed;
+			transform.SetEulerangles(eulerAngles);
+		}
+
+		if (Input::IsKeyPressed(MH_KEY_UP))
+		{
+			eulerAngles.x += rotationSpeed;
+			transform.SetEulerangles(eulerAngles);
+		}
+		else if (Input::IsKeyPressed(MH_KEY_DOWN))
+		{
+			eulerAngles.x -= rotationSpeed;
+			transform.SetEulerangles(eulerAngles);
+		}
+
+		// Camera movement
+		if (Input::IsKeyPressed(MH_KEY_A))
+			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetRight());
+		else if (Input::IsKeyPressed(MH_KEY_D))
+			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetRight());
+
+		if (Input::IsKeyPressed(MH_KEY_W))
+			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetForward());
+		else if (Input::IsKeyPressed(MH_KEY_S))
+			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetForward());
+
+		if (Input::IsKeyPressed(MH_KEY_Q))
+			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetUp());
+		else if (Input::IsKeyPressed(MH_KEY_E))
+			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetUp());
+	}
+};
+
 EXTERN_EXPORTED void Load(ImGuiContext* context, void** funcPtrs)
 {
 	MH_RUNTIME_LOAD(context, funcPtrs);
@@ -25,7 +81,15 @@ EXTERN_EXPORTED void Load(ImGuiContext* context, void** funcPtrs)
 		CreateRef<ParticleRenderPass>(),
 		CreateRef<TonemappingRenderPass>() });*/
 
-	Ref<Texture2D> testTex = Texture2D::Create("assets/textures/brick/brick_albedo.png", { TextureFormat::SRGB_DXT1, TextureFilter::Trilinear });
+	// Setup render passes for pixel renderer
+	/*Renderer::SetRenderPasses({
+		CreateRef<TexelGeometryPass>(),
+		CreateRef<TexelLightingPass>(),
+		CreateRef<PixelationPass>(),
+		CreateRef<ParticleRenderPass>(),
+		CreateRef<TonemappingRenderPass>() });*/
+
+	Ref<Texture2D> testTex = Texture2D::Create("assets/textures/brick/brick_albedo.png", { TextureFormat::SRGB_DXT1, TextureFilter::Point });
 	testTex->GetRendererID();
 
 	MH_CORE_TRACE("DLL Loaded!");
@@ -94,6 +158,18 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	}
 
 
+	// Scene camera
+	Entity cameraEntity = scene->CreateEntity("Main Camera");
+	cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
+	cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
+
+
+	// Directional light
+	Entity mainLightEntity = scene->CreateEntity("Main Light");
+	mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, 20.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
+	mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ -0.7f, -3.0f, 0.0f }));
+
+
 	// Spot
 	Entity pointLightEntity = scene->CreateEntity("Spot Light");
 	pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
@@ -109,8 +185,8 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 	Ref<Material> planeMaterial = Material::Create(textureShader);
 	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo); // TODO: Fix this
-	//planeMaterial->SetTexture("u_Bump", 0, Texture2D::bump);
-	//planeMaterial->SetTexture("u_Metallic", 0, Texture2D::black);
+	planeMaterial->SetTexture("u_Bump", 0, GL::GetTexture2DBump());
+	planeMaterial->SetTexture("u_Metallic", 0, GL::GetTexture2DBlack());
 	planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
 
 	Entity planeEntity = scene->CreateEntity("Plane");

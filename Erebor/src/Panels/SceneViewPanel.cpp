@@ -11,18 +11,18 @@ namespace Mahakam
 {
 	void SceneViewPanel::OnUpdate(Timestep dt)
 	{
-		if (open)
-			editorCamera.OnUpdate(dt, focused, hovered);
+		if (m_Open)
+			m_EditorCamera.OnUpdate(dt, m_Focused, m_Hovered);
 	}
 
 	void SceneViewPanel::OnImGuiRender()
 	{
 		MH_PROFILE_FUNCTION();
 
-		if (open)
+		if (m_Open)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			ImGui::Begin("Scene View", &open);
+			ImGui::Begin("Scene View", &m_Open);
 
 			auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
@@ -30,20 +30,20 @@ namespace Mahakam
 			m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
 			m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-			focused = ImGui::IsWindowFocused();
-			hovered = ImGui::IsWindowHovered();
-			Application::GetInstance().GetImGuiLayer()->BlockEvents(!focused && !hovered);
+			m_Focused = ImGui::IsWindowFocused();
+			m_Hovered = ImGui::IsWindowHovered();
+			Application::GetInstance().GetImGuiLayer()->BlockEvents(!m_Focused && !m_Hovered);
 			ImVec2 newViewportSize = ImGui::GetContentRegionAvail();
-			if (newViewportSize.x != viewportSize.x || newViewportSize.y != viewportSize.y)
+			if (newViewportSize.x != m_ViewportSize.x || newViewportSize.y != m_ViewportSize.y)
 			{
-				viewportSize.x = newViewportSize.x;
-				viewportSize.y = newViewportSize.y;
+				m_ViewportSize.x = newViewportSize.x;
+				m_ViewportSize.y = newViewportSize.y;
 
-				editorCamera.GetCamera().SetRatio(viewportSize.x / viewportSize.y);
+				m_EditorCamera.GetCamera().SetRatio(m_ViewportSize.x / m_ViewportSize.y);
 			}
 
-			if (viewportTexture)
-				ImGui::Image((void*)(uintptr_t)viewportTexture->GetRendererID(), newViewportSize, ImVec2(0, 1), ImVec2(1, 0));
+			if (m_ViewportTexture)
+				ImGui::Image((void*)(uintptr_t)m_ViewportTexture->GetRendererID(), newViewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
 			// Setup ImGuizmo
 			ImVec2 pos = { m_ViewportBounds[0].x, m_ViewportBounds[0].y };
@@ -57,7 +57,7 @@ namespace Mahakam
 			// View manipulation
 			{
 				// FIXME: Gets clamped in the positive z-dome. Possibly due to interference in EditorCamera::OnUpdate
-				glm::mat4 viewMatrix = glm::inverse(editorCamera.GetModelMatrix());
+				glm::mat4 viewMatrix = glm::inverse(m_EditorCamera.GetModelMatrix());
 
 				ImGuizmo::ViewManipulate(glm::value_ptr(viewMatrix), 5.0f, ImVec2(pos.x + size.x - 128, pos.y), ImVec2(128, 128), 0);
 
@@ -74,12 +74,12 @@ namespace Mahakam
 			Entity selectedEntity = EditorLayer::GetSelectedEntity();
 			if (selectedEntity && m_GizmoType != -1)
 			{
-				const glm::mat4 viewMatrix = glm::inverse(editorCamera.GetModelMatrix());
+				const glm::mat4 viewMatrix = glm::inverse(m_EditorCamera.GetModelMatrix());
 
-				ImGuizmo::Enable(!editorCamera.IsControlling());
+				ImGuizmo::Enable(!m_EditorCamera.IsControlling());
 
 				// Setup camera matrices
-				const glm::mat4& projectionMatrix = editorCamera.GetCamera().GetProjectionMatrix();
+				const glm::mat4& projectionMatrix = m_EditorCamera.GetCamera().GetProjectionMatrix();
 
 				// Setup model matrix
 				TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
@@ -113,18 +113,18 @@ namespace Mahakam
 
 	void SceneViewPanel::OnEvent(Event& event)
 	{
-		if (hovered)
+		if (m_Hovered)
 		{
 			EventDispatcher dispatcher(event);
-			dispatcher.DispatchEvent<MouseScrolledEvent>(MH_BIND_EVENT(editorCamera.OnMouseScroll));
-			dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(editorCamera.OnKeyPressed));
+			dispatcher.DispatchEvent<MouseScrolledEvent>(MH_BIND_EVENT(m_EditorCamera.OnMouseScroll));
+			dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(m_EditorCamera.OnKeyPressed));
 			dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(SceneViewPanel::OnKeyPressed));
 		}
 	}
 
 	bool SceneViewPanel::OnKeyPressed(KeyPressedEvent& event)
 	{
-		if (editorCamera.IsControlling())
+		if (m_EditorCamera.IsControlling())
 			return false;
 
 		if (event.GetRepeatCount() > 0)

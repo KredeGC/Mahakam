@@ -24,13 +24,13 @@ namespace Mahakam
 
 		uint8_t whiteData = 255;
 
-		Texture2D::white = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		Texture2D::white->SetData(&whiteData, 1);
+		texture2DWhite = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		texture2DWhite->SetData(&whiteData, 1);
 
 		uint8_t blackData = 0;
 
-		Texture2D::black = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		Texture2D::black->SetData(&blackData, 1);
+		texture2DBlack = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		texture2DBlack->SetData(&blackData, 1);
 
 		uint8_t bumpData[3]
 		{
@@ -39,8 +39,8 @@ namespace Mahakam
 			255
 		};
 
-		Texture2D::bump = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		Texture2D::bump->SetData(&bumpData, 3);
+		texture2DBump = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		texture2DBump->SetData(&bumpData, 3);
 	}
 
 	GL::~GL()
@@ -53,10 +53,10 @@ namespace Mahakam
 		staticCubemapMesh = nullptr;
 		staticCube = nullptr;
 
-		Texture2D::white = nullptr;
-		Texture2D::black = nullptr;
-		Texture2D::bump = nullptr;
-		TextureCube::white = nullptr;
+		texture2DWhite = nullptr;
+		texture2DBlack = nullptr;
+		texture2DBump = nullptr;
+		textureCubeWhite = nullptr;
 	}
 
 	GL* GL::GetInstance()

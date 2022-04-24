@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "OpenGLMaterial.h"
 
+#include "Mahakam/Renderer/GL.h"
+
 namespace Mahakam
 {
 	OpenGLMaterial::OpenGLMaterial(const Ref<Shader>& shader, const std::string& variant)
@@ -15,10 +17,10 @@ namespace Mahakam
 			switch (prop.dataType)
 			{
 			case ShaderDataType::Sampler2D:
-				textures[prop.name] = Texture2D::white;
+				textures[prop.name] = GL::GetTexture2DWhite();
 				break;
 			case ShaderDataType::SamplerCube:
-				textures[prop.name] = TextureCube::white;
+				textures[prop.name] = GL::GetTextureCubeWhite();
 				break;
 			case ShaderDataType::Float:
 				floats[prop.name] = 0.0f;

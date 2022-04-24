@@ -19,6 +19,12 @@ namespace Mahakam
 		Ref<Mesh> staticCubemapMesh;
 		Ref<Mesh> staticCube;
 
+		Ref<Texture2D> texture2DWhite;
+		Ref<Texture2D> texture2DBlack;
+		Ref<Texture2D> texture2DBump;
+
+		Ref<TextureCube> textureCubeWhite;
+
 	public:
 		GL();
 		~GL();
@@ -33,6 +39,11 @@ namespace Mahakam
 		inline static Ref<Mesh> GetInvertedSphere() { return GetInstance()->staticSphereMesh; }
 		inline static Ref<Mesh> GetInvertedCube() { return GetInstance()->staticCubemapMesh; }
 		inline static Ref<Mesh> GetCube() { return GetInstance()->staticCube; }
+
+		inline static Ref<Texture2D> GetTexture2DWhite() { return GetInstance()->texture2DWhite; }
+		inline static Ref<Texture2D> GetTexture2DBlack() { return GetInstance()->texture2DBlack; }
+		inline static Ref<Texture2D> GetTexture2DBump() { return GetInstance()->texture2DBump; }
+		inline static Ref<TextureCube> GetTextureCubeWhite() { return GetInstance()->textureCubeWhite; }
 
 		inline static const char* GetGraphicsVendor() { return GetInstance()->rendererAPI->GetGraphicsVendor(); }
 

@@ -9,19 +9,17 @@ namespace Mahakam
 	class GameViewPanel
 	{
 	private:
-		bool open = true;
-		bool focused = false;
-		bool hovered = false;
+		bool m_Open = true;
+		bool m_Focused = false;
+		bool m_Hovered = false;
 
-		WeakRef<Scene> activeScene;
-		Ref<Texture> viewportTexture;
+		WeakRef<Scene> m_ActiveScene;
+		Ref<Texture> m_ViewportTexture;
 
-		glm::vec2 viewportSize = { 0.0f, 0.0f };
+		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 
 	public:
 		GameViewPanel() = default;
-
-		void SetScene(WeakRef<Scene> scene);
 
 		void SetFrameBuffer(Ref<Texture> tex);
 

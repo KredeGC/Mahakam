@@ -6,82 +6,6 @@
 
 namespace Mahakam
 {
-	// Create scripts
-	class RotateScript : public ScriptableEntity
-	{
-	private:
-		float rotation = 0.0f;
-		TransformComponent* transform = nullptr;
-
-	public:
-		virtual void OnCreate() override
-		{
-			transform = &entity.GetComponent<TransformComponent>();
-		}
-
-		virtual void OnUpdate(Timestep dt) override
-		{
-			rotation += dt * 10.0f;
-			transform->SetRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(rotation), 0.0f }));
-		}
-	};
-
-	class CameraController : public ScriptableEntity
-	{
-	public:
-		virtual void OnUpdate(Timestep dt) override
-		{
-			auto& transform = GetComponent<TransformComponent>();
-
-			float speed = 20.0f * dt;
-			float rotationSpeed = dt;
-
-			if (Input::IsKeyPressed(MH_KEY_LEFT_SHIFT))
-				speed *= 0.01f;
-
-			glm::vec3 eulerAngles = transform.GetEulerAngles();
-
-			// Camera rotation
-			if (Input::IsKeyPressed(MH_KEY_LEFT))
-			{
-				eulerAngles.y += rotationSpeed;
-				transform.SetEulerangles(eulerAngles);
-			}
-			else if (Input::IsKeyPressed(MH_KEY_RIGHT))
-			{
-				eulerAngles.y -= rotationSpeed;
-				transform.SetEulerangles(eulerAngles);
-			}
-
-			if (Input::IsKeyPressed(MH_KEY_UP))
-			{
-				eulerAngles.x += rotationSpeed;
-				transform.SetEulerangles(eulerAngles);
-			}
-			else if (Input::IsKeyPressed(MH_KEY_DOWN))
-			{
-				eulerAngles.x -= rotationSpeed;
-				transform.SetEulerangles(eulerAngles);
-			}
-
-			// Camera movement
-			if (Input::IsKeyPressed(MH_KEY_A))
-				transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetRight());
-			else if (Input::IsKeyPressed(MH_KEY_D))
-				transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetRight());
-
-			if (Input::IsKeyPressed(MH_KEY_W))
-				transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetForward());
-			else if (Input::IsKeyPressed(MH_KEY_S))
-				transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetForward());
-
-			if (Input::IsKeyPressed(MH_KEY_Q))
-				transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetUp());
-			else if (Input::IsKeyPressed(MH_KEY_E))
-				transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetUp());
-		}
-	};
-
 	static SharedLibrary* lib;
 
 	void EditorLayer::OnAttach()
@@ -93,86 +17,8 @@ namespace Mahakam
 			CreateRef<ParticleRenderPass>(),
 			CreateRef<TonemappingRenderPass>() });
 
-		// Setup render passes for pixel renderer
-		/*Renderer::SetRenderPasses({
-			CreateRef<TexelGeometryPass>(),
-			CreateRef<TexelLightingPass>(),
-			CreateRef<PixelationPass>(),
-			CreateRef<ParticleRenderPass>(),
-			CreateRef<TonemappingRenderPass>() });*/
-
 		// Create a new active scene
 		s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
-
-
-		// Setup the viewport in editor
-		gameViewPanel.SetScene(s_ActiveScene);
-		sceneHierarchyPanel.SetContext(s_ActiveScene);
-
-
-		// Test compute shader
-		debugComputeTexture = Texture2D::Create({ width, height, TextureFormat::RGBA32F, TextureFilter::Bilinear, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
-		debugComputeShader = ComputeShader::Create("assets/compute/UV.glsl");
-
-
-		// Setup shaders
-		//Ref<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.yaml");
-		//Ref<Shader> textureShader = Shader::Create("assets/shaders/default/Albedo.yaml");
-		//Ref<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.yaml");
-		Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/DitheredSkinned.yaml");
-		Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.yaml");
-		Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.yaml");
-
-
-		// Setup scene camera
-		Entity cameraEntity = s_ActiveScene->CreateEntity("Main Camera");
-		//cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
-		cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
-		cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
-		cameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-
-
-		// Setup lights
-		Entity mainLightEntity = s_ActiveScene->CreateEntity("Main Light");
-		mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, 20.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
-		mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ -0.7f, -3.0f, 0.0f }));
-
-		/*for (int y = 0; y < 10; y++)
-		{
-			for (int x = 0; x < 10; x++)
-			{*/
-		Entity pointLightEntity = s_ActiveScene->CreateEntity("Spot Light");
-		pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
-		pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
-		//pointLightEntity.GetComponent<TransformComponent>().SetPosition({ x, y, 1.0f });
-		pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-150.0f), glm::radians(180.0f), 0.0f }));
-		/*	}
-		}*/
-
-
-		// Setup plane
-		Ref<Texture> brickAlbedo = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
-		Ref<Texture> brickBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_bump.png", false, { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
-		Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		Ref<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
-
-		Ref<Material> planeMaterial = Material::Create(textureShader);
-		planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
-		//planeMaterial->SetTexture("u_Bump", 0, brickBump);
-		planeMaterial->SetTexture("u_Bump", 0, Texture2D::bump);
-		planeMaterial->SetTexture("u_Metallic", 0, Texture2D::black);
-		planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
-
-		Entity planeEntity = s_ActiveScene->CreateEntity("Plane");
-		planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
-		planeEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
-		planeEntity.GetComponent<TransformComponent>().SetScale({ 30.0f, 30.0f, 30.0f });
-
-
-		// Create particle system
-		Entity particleEntity = s_ActiveScene->CreateEntity("Particle System");
-		particleEntity.AddComponent<ParticleSystemComponent>();
-		particleEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
 		// Animator
@@ -360,9 +206,6 @@ namespace Mahakam
 
 		ComponentRegistry::RegisterComponent("Light", lightInterface);
 
-		for (auto& [name, component] : ComponentRegistry::GetComponents())
-			MH_CORE_TRACE("Loaded component: {0}", name);
-
 
 
 		lib = new SharedLibrary("runtime/Sandbox.dll");
@@ -394,14 +237,14 @@ namespace Mahakam
 #if MH_RUNTIME
 		// Only used during runtime
 		activeScene->OnUpdate(dt);
-		gameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
+		m_GameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
 #else
 		// Only used in editor
 		s_ActiveScene->OnUpdate(dt, true); // TEMPORARY OR SOMETHING?
-		sceneViewPanel.OnUpdate(dt);
-		s_ActiveScene->OnRender(sceneViewPanel.GetCamera(), sceneViewPanel.GetCamera().GetModelMatrix());
-		sceneViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
-		gameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0)); // TEMPORARY UNTIL PLAY IS IMPL
+		m_SceneViewPanel.OnUpdate(dt);
+		s_ActiveScene->OnRender(m_SceneViewPanel.GetCamera(), m_SceneViewPanel.GetCamera().GetModelMatrix());
+		m_SceneViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
+		m_GameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0)); // TEMPORARY UNTIL PLAY IS IMPL
 #endif
 
 		// Test compute shader
@@ -409,34 +252,33 @@ namespace Mahakam
 		debugComputeTexture->BindImage(0, false, true);
 		debugComputeShader->Dispatch(std::ceil(width / 8), std::ceil(height / 4), 1);
 
-		sceneViewPanel.SetFrameBuffer(debugComputeTexture);*/
+		m_SceneViewPanel.SetFrameBuffer(debugComputeTexture);*/
 
-		statsPanel.OnUpdate(dt);
+		m_StatsPanel.OnUpdate(dt);
 	}
 
 	void EditorLayer::OnImGuiRender()
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		dockSpace.Begin();
+		m_DockSpace.Begin();
 
-		gameViewPanel.OnImGuiRender();
-		profilerPanel.OnImGuiRender();
-		renderPassPanel.OnImGuiRender();
-		sceneViewPanel.OnImGuiRender();
-		sceneHierarchyPanel.OnImGuiRender();
-		statsPanel.OnImGuiRender();
+		m_GameViewPanel.OnImGuiRender();
+		m_ProfilerPanel.OnImGuiRender();
+		m_RenderPassPanel.OnImGuiRender();
+		m_SceneViewPanel.OnImGuiRender();
+		m_SceneHierarchyPanel.OnImGuiRender();
+		m_StatsPanel.OnImGuiRender();
 
-		dockSpace.End();
+		m_DockSpace.End();
 	}
 
 	void EditorLayer::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::OnKeyPressed));
-		dispatcher.DispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(EditorLayer::OnWindowResize));
 
-		sceneViewPanel.OnEvent(event);
+		m_SceneViewPanel.OnEvent(event);
 	}
 
 	void EditorLayer::CopyRuntime(std::istream& binaryStream, size_t binaryLength)
@@ -484,8 +326,6 @@ namespace Mahakam
 
 					// Create new scene
 					s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
-					gameViewPanel.SetScene(s_ActiveScene);
-					sceneHierarchyPanel.SetContext(s_ActiveScene);
 
 					// Load new runtime
 					lib = new SharedLibrary("runtime/Sandbox-runtime.dll");
@@ -515,16 +355,6 @@ namespace Mahakam
 
 		if (event.GetKeyCode() == MH_KEY_F7)
 			Renderer::EnableBoundingBox(!Renderer::HasBoundingBoxEnabled());
-
-		return false;
-	}
-
-	bool EditorLayer::OnWindowResize(WindowResizeEvent& event)
-	{
-		width = event.GetWidth();
-		height = event.GetHeight();
-
-		debugComputeTexture->Resize(width, height);
 
 		return false;
 	}

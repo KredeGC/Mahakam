@@ -9,12 +9,6 @@
 
 namespace Mahakam
 {
-	Ref<Texture2D> Texture2D::white;
-	Ref<Texture2D> Texture2D::black;
-	Ref<Texture2D> Texture2D::bump;
-
-	Ref<TextureCube> TextureCube::white;
-
 	Ref<Texture2D> Texture2D::Create(const TextureProps& props)
 	{
 		MH_OVERRIDE_FUNC(Texture2DCreateProps, props);

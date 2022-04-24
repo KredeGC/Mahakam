@@ -7,14 +7,10 @@ namespace Mahakam
 	class SceneHierarchyPanel : public Layer
 	{
 	private:
-		bool open = true;
-
-		WeakRef<Scene> scene;
+		bool m_Open = true;
 
 	public:
 		SceneHierarchyPanel() = default;
-
-		void SetContext(WeakRef<Scene> scene);
 
 		virtual void OnImGuiRender() override;
 

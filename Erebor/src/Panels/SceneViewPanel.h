@@ -11,14 +11,14 @@ namespace Mahakam
 	class SceneViewPanel
 	{
 	private:
-		bool open = true;
-		bool focused = false;
-		bool hovered = false;
+		bool m_Open = true;
+		bool m_Focused = false;
+		bool m_Hovered = false;
 
-		EditorCamera editorCamera;
-		Ref<Texture> viewportTexture;
+		EditorCamera m_EditorCamera;
+		Ref<Texture> m_ViewportTexture;
 
-		glm::vec2 viewportSize = { 0.0f, 0.0f };
+		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 
 		glm::vec2 m_ViewportBounds[2];
 
@@ -34,8 +34,8 @@ namespace Mahakam
 		void OnEvent(Event& event);
 		bool OnKeyPressed(KeyPressedEvent& event);
 
-		void SetFrameBuffer(Ref<Texture> tex) { viewportTexture = tex; }
+		void SetFrameBuffer(Ref<Texture> tex) { m_ViewportTexture = tex; }
 
-		EditorCamera& GetCamera() { return editorCamera; }
+		EditorCamera& GetCamera() { return m_EditorCamera; }
 	};
 }

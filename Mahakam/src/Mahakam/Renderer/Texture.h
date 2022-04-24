@@ -60,10 +60,6 @@ namespace Mahakam
 	class Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> white;
-		static Ref<Texture2D> black;
-		static Ref<Texture2D> bump;
-
 		static Ref<Texture2D> Create(const TextureProps& props = TextureProps());
 		static Ref<Texture2D> Create(const std::string& filepath, const TextureProps& props = TextureProps());
 	};
@@ -91,8 +87,6 @@ namespace Mahakam
 		uint32_t resolution;
 
 	public:
-		static Ref<TextureCube> white;
-
 		static Ref<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps());
 		static Ref<TextureCube> Create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps());
 		static Ref<TextureCube> Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props = CubeTextureProps());
