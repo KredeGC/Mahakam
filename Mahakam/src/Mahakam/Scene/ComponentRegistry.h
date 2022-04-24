@@ -19,6 +19,14 @@ namespace Mahakam
 
 			bool (*Serialize)(YAML::Emitter&, Entity) = nullptr;
 			bool (*Deserialize)(YAML::Node&, Entity) = nullptr;
+
+			template<typename T>
+			void SetComponent()
+			{
+				HasComponent = [](Entity entity) { return entity.HasComponent<T>(); };
+				AddComponent = [](Entity entity) { entity.AddComponent<T>(); };
+				RemoveComponent = [](Entity entity) { entity.RemoveComponent<T>(); };
+			}
 		};
 
 	private:

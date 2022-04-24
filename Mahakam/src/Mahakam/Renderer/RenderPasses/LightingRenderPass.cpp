@@ -162,8 +162,11 @@ namespace Mahakam
 		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
 		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
 
-		deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.irradianceMap);
-		deferredShader->SetTexture("u_SpecularMap", sceneData->environment.specularMap);
+		if (sceneData->environment.irradianceMap)
+			deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.irradianceMap);
+
+		if (sceneData->environment.specularMap)
+			deferredShader->SetTexture("u_SpecularMap", sceneData->environment.specularMap);
 	}
 
 	void LightingRenderPass::RenderLighting(SceneData* sceneData, Ref<FrameBuffer> src)

@@ -270,9 +270,12 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		sceneData.environment.skyboxMaterial->BindShader("GEOMETRY");
-		sceneData.environment.skyboxMaterial->Bind();
-		DrawScreenQuad();
+		if (sceneData.environment.skyboxMaterial)
+		{
+			sceneData.environment.skyboxMaterial->BindShader("GEOMETRY");
+			sceneData.environment.skyboxMaterial->Bind();
+			DrawScreenQuad();
+		}
 	}
 
 	void Renderer::DrawScreenQuadImpl()

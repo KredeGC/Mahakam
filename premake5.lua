@@ -123,6 +123,8 @@ project "Mahakam"
     filter "system:windows"
         systemversion "latest"
         
+        removefiles { "**/Linux/**" }
+        
         defines { "MH_PLATFORM_WINDOWS" }
         
         links {
@@ -133,6 +135,8 @@ project "Mahakam"
     -- Linux
     filter "system:linux"
         systemversion "latest"
+        
+        removefiles { "**/Windows/**" }
         
         defines { "MH_PLATFORM_LINUX" }
         

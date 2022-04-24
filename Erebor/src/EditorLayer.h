@@ -43,6 +43,7 @@ namespace Mahakam
 		inline static void SetSelectedEntity(Entity entity) { s_SelectedEntity = entity; }
 		inline static Entity GetSelectedEntity() { return s_SelectedEntity; }
 
+		inline static void SetActiveScene(Ref<Scene> scene) { s_ActiveScene = scene; }
 		inline static Ref<Scene> GetActiveScene() { return s_ActiveScene; }
 
 	private:

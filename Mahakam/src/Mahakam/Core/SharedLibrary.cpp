@@ -108,6 +108,7 @@ namespace Mahakam
 
 		// Scene
 		MH_EXPORT_FUNC(SceneCreate, Scene::Create);
+		MH_EXPORT_FUNC(SceneCreateFilepath, Scene::Create);
 
 		// Shader
 		MH_EXPORT_FUNC(ShaderCreate, Shader::Create);
@@ -181,6 +182,7 @@ namespace Mahakam
 
 		// Scene
 		MH_IMPORT_FUNC(SceneCreate);
+		MH_IMPORT_FUNC(SceneCreateFilepath);
 
 		// Shader
 		MH_IMPORT_FUNC(ShaderCreate);

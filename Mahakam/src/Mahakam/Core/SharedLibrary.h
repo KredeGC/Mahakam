@@ -70,7 +70,8 @@ namespace Mahakam
 		MH_SHARED_FUNC(Renderer*, RendererGetInstance);
 
 		// Scene
-		MH_SHARED_FUNC(Ref<Scene>, SceneCreate, const std::string&);
+		MH_SHARED_FUNC(Ref<Scene>, SceneCreate);
+		MH_SHARED_FUNC(Ref<Scene>, SceneCreateFilepath, const std::string&);
 
 		// Shader
 		MH_SHARED_FUNC(Ref<Shader>, ShaderCreate, const std::string&, const std::initializer_list<std::string>&);
@@ -84,7 +85,7 @@ namespace Mahakam
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateFilepath, const std::string&, const CubeTextureProps&);
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreatePrefilter, Ref<TextureCube>, TextureCubePrefilter, const CubeTextureProps&);
 
-		static constexpr int NUM_FUNC_PTRS = 26;
+		static constexpr int NUM_FUNC_PTRS = 27;
 
 	private:
 		const char* filepath = nullptr;

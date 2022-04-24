@@ -58,6 +58,15 @@ namespace Mahakam
 
 
 
+	Scene::Scene()
+	{
+		MH_PROFILE_FUNCTION();
+
+		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
+		skyboxMaterial = Material::Create(skyboxShader);
+		skyboxMaterial->SetTexture("u_Environment", 0, GL::GetTextureCubeWhite());
+	}
+
 	Scene::Scene(const std::string& filepath)
 	{
 		MH_PROFILE_FUNCTION();
@@ -252,9 +261,16 @@ namespace Mahakam
 		registry.destroy(entity);
 	}
 
+	Ref<Scene> Scene::Create()
+	{
+		MH_OVERRIDE_FUNC(SceneCreate);
+
+		return std::make_shared<Scene>();
+	}
+
 	Ref<Scene> Scene::Create(const std::string& filepath)
 	{
-		MH_OVERRIDE_FUNC(SceneCreate, filepath);
+		MH_OVERRIDE_FUNC(SceneCreateFilepath, filepath);
 
 		return std::make_shared<Scene>(filepath);
 	}

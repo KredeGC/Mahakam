@@ -3,6 +3,7 @@
 #include "Entity.h"
 
 #include "ComponentRegistry.h"
+#include "Components.h"
 
 namespace YAML {
 
@@ -128,7 +129,10 @@ namespace Mahakam
 	{
 		emitter << YAML::BeginMap;
 		emitter << YAML::Key << "Entity";
-		emitter << YAML::Value << "ID goes here";
+		emitter << YAML::Value << 1234; // ENTITY UUID GOES HERE
+
+		emitter << YAML::Key << "Tag";
+		emitter << YAML::Value << entity.GetComponent<TagComponent>().tag;
 
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{

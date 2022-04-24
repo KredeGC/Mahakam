@@ -30,6 +30,7 @@ namespace Mahakam
 		float viewportRatio = 1.0f;
 
 	public:
+		Scene();
 		Scene(const std::string& filepath);
 		~Scene();
 
@@ -47,6 +48,7 @@ namespace Mahakam
 			return registry.view<Args...>().each(func);
 		}
 
+		static Ref<Scene> Create();
 		static Ref<Scene> Create(const std::string& filepath);
 
 	private:

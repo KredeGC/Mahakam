@@ -23,9 +23,7 @@ namespace Mahakam
 
 		// Animator
 		ComponentRegistry::ComponentInterface animatorInterface;
-		animatorInterface.HasComponent = [](Entity entity) { return entity.HasComponent<AnimatorComponent>(); };
-		animatorInterface.AddComponent = [](Entity entity) { entity.AddComponent<AnimatorComponent>(); };
-		animatorInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<AnimatorComponent>(); };
+		animatorInterface.SetComponent<AnimatorComponent>();
 		animatorInterface.OnInspector = [](Entity entity)
 		{
 			Animator& animator = entity.GetComponent<AnimatorComponent>();
@@ -48,9 +46,7 @@ namespace Mahakam
 
 		// Camera
 		ComponentRegistry::ComponentInterface cameraInterface;
-		cameraInterface.HasComponent = [](Entity entity) { return entity.HasComponent<CameraComponent>(); };
-		cameraInterface.AddComponent = [](Entity entity) { entity.AddComponent<CameraComponent>(); };
-		cameraInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<CameraComponent>(); };
+		cameraInterface.SetComponent<CameraComponent>();
 		cameraInterface.OnInspector = [](Entity entity)
 		{
 			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
@@ -107,9 +103,7 @@ namespace Mahakam
 
 		// Mesh
 		ComponentRegistry::ComponentInterface meshInterface;
-		meshInterface.HasComponent = [](Entity entity) { return entity.HasComponent<MeshComponent>(); };
-		meshInterface.AddComponent = [](Entity entity) { entity.AddComponent<MeshComponent>(); };
-		meshInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<MeshComponent>(); };
+		meshInterface.SetComponent<MeshComponent>();
 		meshInterface.OnInspector = [](Entity entity)
 		{
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
@@ -149,9 +143,7 @@ namespace Mahakam
 
 		// Light
 		ComponentRegistry::ComponentInterface lightInterface;
-		lightInterface.HasComponent = [](Entity entity) { return entity.HasComponent<LightComponent>(); };
-		lightInterface.AddComponent = [](Entity entity) { entity.AddComponent<LightComponent>(); };
-		lightInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<LightComponent>(); };
+		lightInterface.SetComponent<LightComponent>();
 		lightInterface.OnInspector = [](Entity entity)
 		{
 			Light& light = entity.GetComponent<LightComponent>();
@@ -213,12 +205,6 @@ namespace Mahakam
 		auto runPtr = lib->GetFunction<void, Scene*>("Run");
 
 		runPtr(s_ActiveScene.get());
-
-
-
-		/*SceneSerializer serializer(s_ActiveScene);
-
-		serializer.Serialize("TestScene.yaml");*/
 	}
 
 	void EditorLayer::OnDetach()
@@ -283,6 +269,7 @@ namespace Mahakam
 	{
 		EventDispatcher dispatcher(event);
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::OnKeyPressed));
+		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(m_DockSpace.OnKeyPressed));
 
 		m_SceneViewPanel.OnEvent(event);
 	}

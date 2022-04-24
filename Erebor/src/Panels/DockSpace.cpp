@@ -1,6 +1,8 @@
 #include "ebpch.h"
 #include "DockSpace.h"
 
+#include "EditorLayer.h"
+
 namespace Mahakam
 {
 	void DockSpace::Begin()
@@ -44,13 +46,16 @@ namespace Mahakam
 				// which we can't undo at the moment without finer window depth/z control.
 				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);1
 				if (ImGui::MenuItem("New", "Ctrl+N"))
-				{ }
+					NewScene();
 
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
-				{ }
+					OpenScene();
+
+				if (ImGui::MenuItem("Save...", "Ctrl+Shift+S"))
+					SaveScene();
 
 				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
-				{ }
+					SaveSceneAs();
 
 				if (ImGui::MenuItem("Exit"))
 					Application::GetInstance().Close();
@@ -82,5 +87,74 @@ namespace Mahakam
 	void DockSpace::End()
 	{
 		ImGui::End();
+	}
+
+	bool DockSpace::OnKeyPressed(KeyPressedEvent& event)
+	{
+		if (event.GetRepeatCount() > 0) return false;
+
+		// Shortcuts
+		bool controlPressed = Input::IsKeyPressed(MH_KEY_LEFT_CONTROL) || Input::IsKeyPressed(MH_KEY_RIGHT_CONTROL);
+		bool shiftPressed = Input::IsKeyPressed(MH_KEY_LEFT_SHIFT) || Input::IsKeyPressed(MH_KEY_RIGHT_SHIFT);
+
+		switch (event.GetKeyCode())
+		{
+		case MH_KEY_N:
+			if (controlPressed)
+				NewScene();
+			break;
+		case MH_KEY_O:
+			if (controlPressed)
+				OpenScene();
+			break;
+		case MH_KEY_S:
+			if (controlPressed && shiftPressed)
+				SaveSceneAs();
+			else if (controlPressed)
+				SaveScene();
+			break;
+		default:
+			break;
+		}
+
+		return false;
+	}
+
+	void DockSpace::NewScene()
+	{
+		EditorLayer::SetSelectedEntity({});
+		Ref<Scene> scene = Scene::Create();
+		EditorLayer::SetActiveScene(scene);
+	}
+
+	void DockSpace::OpenScene()
+	{
+		std::string filepath = FileUtility::OpenFile("Mahakam Scene (*.mhk)\0*.mhk\0");
+
+		if (!filepath.empty())
+		{
+			EditorLayer::SetSelectedEntity({});
+			Ref<Scene> scene = Scene::Create();
+			EditorLayer::SetActiveScene(scene);
+
+			SceneSerializer serializer(scene);
+			serializer.Deserialize(filepath);
+		}
+	}
+
+	void DockSpace::SaveScene()
+	{
+
+	}
+
+	void DockSpace::SaveSceneAs()
+	{
+		std::string filepath = FileUtility::SaveFile("Mahakam Scene (*.mhk)\0*.mhk\0");
+
+		if (!filepath.empty())
+		{
+			SceneSerializer serializer(EditorLayer::GetActiveScene());
+			serializer.Serialize(filepath);
+		}
 	}
 }

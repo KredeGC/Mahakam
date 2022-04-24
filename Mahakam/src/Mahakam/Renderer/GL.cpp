@@ -22,10 +22,20 @@ namespace Mahakam
 		staticCubemapMesh = Mesh::CreateCube(2, true);
 		staticCube = Mesh::CreateCube(2);
 
-		uint8_t whiteData = 255;
+		uint8_t redData = 255;
 
-		texture2DWhite = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		texture2DWhite->SetData(&whiteData, 1);
+		texture2DRed = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		texture2DRed->SetData(&redData, 1);
+
+		uint8_t whiteData[3]
+		{
+			255,
+			255,
+			255
+		};
+
+		texture2DWhite = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		texture2DWhite->SetData(whiteData, 0);
 
 		uint8_t blackData = 0;
 
@@ -41,6 +51,9 @@ namespace Mahakam
 
 		texture2DBump = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
 		texture2DBump->SetData(&bumpData, 3);
+
+		textureCubeWhite = TextureCube::Create({ 1, TextureFormat::RGB8, TextureFilter::Point, false });
+		textureCubeWhite->SetData(whiteData, 0);
 	}
 
 	GL::~GL()
