@@ -200,7 +200,7 @@ namespace Mahakam
 
 
 
-		lib = new SharedLibrary("runtime/Sandbox.dll");
+		lib = new SharedLibrary("runtime/libSandbox.so");
 
 		auto runPtr = lib->GetFunction<void, Scene*>("Run");
 

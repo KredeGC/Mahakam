@@ -49,14 +49,12 @@ namespace Mahakam
 #if defined(MH_PLATFORM_WINDOWS)
 		MH_CORE_ASSERT(FreeLibrary(handle), "Failed to close shared library!");
 #elif defined(MH_PLATFORM_LINUX)
-		MH_CORE_ASSERT(dlclose(handle), "Failed to close shared library!");
+		dlclose(handle);
 #endif
 	}
 
 	void SharedLibrary::ExportFuncPointers()
 	{
-		MH_PROFILE_FUNCTION();
-
 		initialized = true;
 
 		int i = 0;
@@ -127,8 +125,6 @@ namespace Mahakam
 
 	void SharedLibrary::ImportFuncPointers(void* ptrs[NUM_FUNC_PTRS])
 	{
-		MH_PROFILE_FUNCTION();
-
 		initialized = true;
 
 		std::memcpy(funcPointers, ptrs, NUM_FUNC_PTRS * sizeof(void*));

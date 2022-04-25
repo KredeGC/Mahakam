@@ -249,6 +249,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	}
 }
 
+
 EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
 {
 	MH_PROFILE_FUNCTION();

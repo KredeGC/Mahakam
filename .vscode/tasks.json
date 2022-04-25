@@ -1,0 +1,117 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Premake",
+            "command": "./generate.sh",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "detail": "Generate project files"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build Debug",
+            "command": "make",
+            "args": [
+                "-j4",
+                "config=debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "detail": "Build program for debug mode"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build DebugOptimized",
+            "command": "make",
+            "args": [
+                "-j4",
+                "config=debugoptimized"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "detail": "Build program for optimized debugging"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build Release",
+            "command": "make",
+            "args": [
+                "-j4",
+                "config=release"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "detail": "Build program for release"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Clean Debug",
+            "command": "make",
+            "args": [
+                "config=debug",
+                "clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "detail": "Clean debug directory"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Clean DebugOptimized",
+            "command": "make",
+            "args": [
+                "config=debugoptimized",
+                "clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "detail": "Clean debugoptimized directory"
+        },
+        {
+            "type": "cppbuild",
+            "label": "Clean Release",
+            "command": "make",
+            "args": [
+                "config=release",
+                "clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "detail": "Clean release directory"
+        }
+    ],
+    "version": "2.0.0"
+}

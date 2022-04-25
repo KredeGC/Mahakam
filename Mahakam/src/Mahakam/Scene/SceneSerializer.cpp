@@ -110,7 +110,7 @@ namespace Mahakam
 		auto entities = data["Entities"];
 		if (entities)
 		{
-			for (auto& entity : entities)
+			for (auto entity : entities)
 			{
 				uint64_t uuid = entity["Entity"].as<uint64_t>(); // TODO
 

@@ -7,8 +7,8 @@
 
 #define LINUX_PATH_MAX 4096 + 255 + 1
 
-namespace Hazel {
-
+namespace Mahakam
+{
 	static bool FileDialogsUtilityCheck()
 	{
 		FILE* fp;
@@ -16,11 +16,11 @@ namespace Hazel {
 
 		fp = popen("which zenity", "r");
 		if (fp == NULL)
-			HZ_CORE_ERROR("Null file pointer in FileDialogs::OpenFile().\n");
+			MH_CORE_ERROR("Null file pointer in FileDialogs::OpenFile().\n");
 
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
 		{
-			HZ_CORE_WARN("Zenity not found in path. See Hazel pre-requisites to install.");
+			MH_CORE_WARN("Zenity not found in path. See Hazel pre-requisites to install.");
 			pclose(fp);
 			return false;
 		}
@@ -43,7 +43,7 @@ namespace Hazel {
 			std::string(file_extension) + std::string("\" --title=\"Open File\"");
 		fp = popen(cmdline.c_str(), "r");
 		if (fp == NULL)
-			HZ_CORE_ERROR("Null file pointer in FileDialogs::OpenFile().\n");
+			MH_CORE_ERROR("Null file pointer in FileDialogs::OpenFile().\n");
 
 		//Check for File dialog cancellation.
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
@@ -76,7 +76,7 @@ namespace Hazel {
 			+ ("\" --title=\"Save As File\" --save --confirm-overwrite");
 		fp = popen(cmdline.c_str(), "r");
 		if (fp == NULL)
-			HZ_CORE_ERROR("Null file pointer in FileDialogs::OpenFile().\n");
+			MH_CORE_ERROR("Null file pointer in FileDialogs::OpenFile().\n");
 
 		//Check for File dialog cancellation.
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
