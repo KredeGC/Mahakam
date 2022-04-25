@@ -2,64 +2,9 @@
 #include "SceneSerializer.h"
 #include "Entity.h"
 
+#include "Mahakam/Math/Math.h"
 #include "ComponentRegistry.h"
 #include "Components.h"
-
-namespace YAML {
-
-	template<>
-	struct convert<glm::vec3>
-	{
-		static Node encode(const glm::vec3& rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec3& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 3)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec4>
-	{
-		static Node encode(const glm::vec4& rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.push_back(rhs.w);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec4& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 4)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			rhs.w = node[3].as<float>();
-			return true;
-		}
-	};
-
-}
 
 namespace Mahakam
 {
@@ -112,7 +57,7 @@ namespace Mahakam
 		{
 			for (auto entity : entities)
 			{
-				uint64_t uuid = entity["Entity"].as<uint64_t>(); // TODO
+				uint64_t uuid = entity["Entity"].as<uint64_t>(); // ENTITY UUID GOES HERE
 
 				std::string name = entity["Tag"].as<std::string>();
 
@@ -131,13 +76,36 @@ namespace Mahakam
 		emitter << YAML::Key << "Entity";
 		emitter << YAML::Value << 1234; // ENTITY UUID GOES HERE
 
-		emitter << YAML::Key << "Tag";
-		emitter << YAML::Value << entity.GetComponent<TagComponent>().tag;
+		if (entity.HasComponent<TagComponent>())
+		{
+			emitter << YAML::Key << "Tag";
+			emitter << YAML::Value << entity.GetComponent<TagComponent>().tag;
+		}
+
+		if (entity.HasComponent<TransformComponent>())
+		{
+			emitter << YAML::Key << "Transform";
+			emitter << YAML::BeginMap;
+
+			auto& transform = entity.GetComponent<TransformComponent>();
+			emitter << YAML::Key << "Translation" << YAML::Value << transform.GetPosition();
+			emitter << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
+			emitter << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
+
+			emitter << YAML::EndMap;
+		}
 
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
 			if (componentInterface.HasComponent(entity) && componentInterface.Serialize)
+			{
+				emitter << YAML::Key << name;
+				emitter << YAML::BeginMap;
+
 				componentInterface.Serialize(emitter, entity);
+
+				emitter << YAML::EndMap;
+			}
 		}
 
 		emitter << YAML::EndMap;
@@ -145,10 +113,20 @@ namespace Mahakam
 
 	void SceneSerializer::DeserializeEntity(YAML::Node& node, Entity entity)
 	{
+		YAML::Node transformComponent = node["Transform"];
+		if (transformComponent)
+		{
+			TransformComponent& transform = entity.GetComponent<TransformComponent>();
+			transform.SetPosition(transformComponent["Translation"].as<glm::vec3>());
+			transform.SetRotation(transformComponent["Rotation"].as<glm::quat>());
+			transform.SetScale(transformComponent["Scale"].as<glm::vec3>());
+		}
+
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
-			if (componentInterface.Deserialize)
-				componentInterface.Deserialize(node, entity);
+			YAML::Node& component = node[name];
+			if (component && componentInterface.Deserialize)
+				componentInterface.Deserialize(component, entity);
 		}
 	}
 }

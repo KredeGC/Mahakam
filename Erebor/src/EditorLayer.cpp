@@ -47,6 +47,36 @@ namespace Mahakam
 		// Camera
 		ComponentRegistry::ComponentInterface cameraInterface;
 		cameraInterface.SetComponent<CameraComponent>();
+		cameraInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		{
+			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
+			Camera & camera = cameraComponent;
+
+			emitter << YAML::Key << "Projection" << YAML::Value << (int)camera.GetProjectionType();
+			emitter << YAML::Key << "FOV" << YAML::Value << camera.GetFov();
+			emitter << YAML::Key << "NearZ" << YAML::Value << camera.GetNearPlane();
+			emitter << YAML::Key << "FarZ" << YAML::Value << camera.GetFarPlane();
+			emitter << YAML::Key << "Size" << YAML::Value << camera.GetSize();
+			emitter << YAML::Key << "Ratio" << YAML::Value << camera.GetRatio();
+			emitter << YAML::Key << "FixedRatio" << YAML::Value << cameraComponent.HasFixedAspectRatio();
+
+			return true;
+		};
+		cameraInterface.Deserialize = [](YAML::Node& node, Entity entity)
+		{
+			CameraComponent& cameraComponent = entity.AddComponent<CameraComponent>();
+			Camera& camera = cameraComponent;
+
+			camera.SetProjectionType((Camera::ProjectionType)node["Projection"].as<int>());
+			camera.SetFov(node["FOV"].as<float>());
+			camera.SetNearPlane(node["NearZ"].as<float>());
+			camera.SetFarPlane(node["FarZ"].as<float>());
+			camera.SetSize(node["Size"].as<float>());
+			camera.SetRatio(node["Ratio"].as<float>());
+			cameraComponent.SetFixedAspectRatio(node["FixedRatio"].as<bool>());
+
+			return true;
+		};
 		cameraInterface.OnInspector = [](Entity entity)
 		{
 			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
@@ -144,6 +174,32 @@ namespace Mahakam
 		// Light
 		ComponentRegistry::ComponentInterface lightInterface;
 		lightInterface.SetComponent<LightComponent>();
+		lightInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		{
+			Light& light = entity.GetComponent<LightComponent>();
+
+			emitter << YAML::Key << "LightType" << YAML::Value << (int)light.GetLightType();
+			emitter << YAML::Key << "Range" << YAML::Value << light.GetRange();
+			emitter << YAML::Key << "FOV" << YAML::Value << light.GetFov();
+			emitter << YAML::Key << "Color" << YAML::Value << light.GetColor();
+			emitter << YAML::Key << "ShadowCasting" << YAML::Value << light.IsShadowCasting();
+			emitter << YAML::Key << "ShadowBias" << YAML::Value << light.GetBias();
+
+			return true;
+		};
+		lightInterface.Deserialize = [](YAML::Node& node, Entity entity)
+		{
+			Light& light = entity.AddComponent<LightComponent>();
+
+			light.SetLightType((Light::LightType)node["LightType"].as<int>());
+			light.SetRange(node["Range"].as<float>());
+			light.SetFov(node["FOV"].as<float>());
+			light.SetColor(node["Color"].as<glm::vec3>());
+			light.SetShadowCasting(node["ShadowCasting"].as<bool>());
+			light.SetBias(node["ShadowBias"].as<float>());
+
+			return true;
+		};
 		lightInterface.OnInspector = [](Entity entity)
 		{
 			Light& light = entity.GetComponent<LightComponent>();
@@ -200,7 +256,11 @@ namespace Mahakam
 
 
 
+#if MH_PLATFORM_WINDOWS
+		lib = new SharedLibrary("runtime/Sandbox.dll");
+#else
 		lib = new SharedLibrary("runtime/libSandbox.so");
+#endif
 
 		auto runPtr = lib->GetFunction<void, Scene*>("Run");
 

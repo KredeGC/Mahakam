@@ -10,64 +10,15 @@ struct EXPORTED RotatorComponent
 	float rotation = 0.0f;;
 	float rotationSpeed = 10.0f;
 
-public:
 	RotatorComponent() {}
 };
 
-class CameraController : public ScriptableEntity
+struct EXPORTED CamerControllerComponent
 {
-public:
-	virtual void OnUpdate(Timestep dt) override
-	{
-		auto& transform = GetComponent<TransformComponent>();
+	float moveSpeed = 1.0f;
+	float rotationSpeed = 1.0f;
 
-		float speed = 20.0f * dt;
-		float rotationSpeed = dt;
-
-		if (Input::IsKeyPressed(MH_KEY_LEFT_SHIFT))
-			speed *= 0.01f;
-
-		glm::vec3 eulerAngles = transform.GetEulerAngles();
-
-		// Camera rotation
-		if (Input::IsKeyPressed(MH_KEY_LEFT))
-		{
-			eulerAngles.y += rotationSpeed;
-			transform.SetEulerangles(eulerAngles);
-		}
-		else if (Input::IsKeyPressed(MH_KEY_RIGHT))
-		{
-			eulerAngles.y -= rotationSpeed;
-			transform.SetEulerangles(eulerAngles);
-		}
-
-		if (Input::IsKeyPressed(MH_KEY_UP))
-		{
-			eulerAngles.x += rotationSpeed;
-			transform.SetEulerangles(eulerAngles);
-		}
-		else if (Input::IsKeyPressed(MH_KEY_DOWN))
-		{
-			eulerAngles.x -= rotationSpeed;
-			transform.SetEulerangles(eulerAngles);
-		}
-
-		// Camera movement
-		if (Input::IsKeyPressed(MH_KEY_A))
-			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetRight());
-		else if (Input::IsKeyPressed(MH_KEY_D))
-			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetRight());
-
-		if (Input::IsKeyPressed(MH_KEY_W))
-			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetForward());
-		else if (Input::IsKeyPressed(MH_KEY_S))
-			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetForward());
-
-		if (Input::IsKeyPressed(MH_KEY_Q))
-			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetUp());
-		else if (Input::IsKeyPressed(MH_KEY_E))
-			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetUp());
-	}
+	CamerControllerComponent() {}
 };
 
 EXTERN_EXPORTED void Load(ImGuiContext* context, void** funcPtrs)
@@ -254,10 +205,63 @@ EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
 {
 	MH_PROFILE_FUNCTION();
 
+	// Update rotator component
 	scene->ForEach<TransformComponent, RotatorComponent>([&](auto entity, TransformComponent& transform, RotatorComponent& rotator)
 	{
 		rotator.rotation += dt * rotator.rotationSpeed;
 		transform.SetRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(rotator.rotation), 0.0f }));
+	});
+
+
+	// Update Camera controller
+	scene->ForEach<TransformComponent, CamerControllerComponent>([&](auto entity, TransformComponent& transform, CamerControllerComponent& controller)
+	{
+		float speed = controller.moveSpeed * dt;
+		float rotationSpeed = controller.rotationSpeed * dt;
+
+		if (Input::IsKeyPressed(MH_KEY_LEFT_SHIFT))
+			speed *= 0.01f;
+
+		glm::vec3 eulerAngles = transform.GetEulerAngles();
+
+		// Camera rotation
+		if (Input::IsKeyPressed(MH_KEY_LEFT))
+		{
+			eulerAngles.y += rotationSpeed;
+			transform.SetEulerangles(eulerAngles);
+		}
+		else if (Input::IsKeyPressed(MH_KEY_RIGHT))
+		{
+			eulerAngles.y -= rotationSpeed;
+			transform.SetEulerangles(eulerAngles);
+		}
+
+		if (Input::IsKeyPressed(MH_KEY_UP))
+		{
+			eulerAngles.x += rotationSpeed;
+			transform.SetEulerangles(eulerAngles);
+		}
+		else if (Input::IsKeyPressed(MH_KEY_DOWN))
+		{
+			eulerAngles.x -= rotationSpeed;
+			transform.SetEulerangles(eulerAngles);
+		}
+
+		// Camera movement
+		if (Input::IsKeyPressed(MH_KEY_A))
+			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetRight());
+		else if (Input::IsKeyPressed(MH_KEY_D))
+			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetRight());
+
+		if (Input::IsKeyPressed(MH_KEY_W))
+			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetForward());
+		else if (Input::IsKeyPressed(MH_KEY_S))
+			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetForward());
+
+		if (Input::IsKeyPressed(MH_KEY_Q))
+			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetUp());
+		else if (Input::IsKeyPressed(MH_KEY_E))
+			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetUp());
 	});
 }
 
