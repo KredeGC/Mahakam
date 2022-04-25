@@ -31,7 +31,7 @@ LinuxLinks = {
     "Xrandr",
     "Xi",
     --"GLU",
-    "GL",
+    --"GL",
     "X11",
     "dl",
     "pthread",
@@ -136,7 +136,7 @@ project "Mahakam"
     filter "system:linux"
         systemversion "latest"
         
-        removefiles { "**/Windows/**" }
+        removefiles { "**/Windows/WindowsUtility.cpp" }
         
         defines { "MH_PLATFORM_LINUX" }
         
@@ -263,7 +263,7 @@ project "Sandbox"
     defines { "_CRT_SECURE_NO_WARNINGS" }
     
     postbuildcommands {
-        "{COPYDIR} \"../bin/%{outputdir}/%{prj.name}/\" \"../Erebor/runtime/\""
+        "{COPYDIR} \"../bin/%{outputdir}/%{prj.name}/.\" \"../Erebor/runtime/\""
     }
 
     filter "system:windows"
