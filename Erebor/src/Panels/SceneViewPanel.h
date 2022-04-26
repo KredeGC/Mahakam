@@ -8,7 +8,7 @@
 
 namespace Mahakam::Editor
 {
-	class SceneViewPanel
+	class SceneViewPanel : EditorWindow
 	{
 	private:
 		bool m_Open = true;
@@ -16,7 +16,6 @@ namespace Mahakam::Editor
 		bool m_Hovered = false;
 
 		EditorCamera m_EditorCamera;
-		Ref<Texture> m_ViewportTexture;
 
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 
@@ -27,14 +26,12 @@ namespace Mahakam::Editor
 	public:
 		SceneViewPanel() = default;
 
-		void OnUpdate(Timestep dt);
+		virtual void OnUpdate(Timestep dt) override;
 
-		void OnImGuiRender();
+		virtual void OnImGuiRender() override;
 
-		void OnEvent(Event& event);
+		bool OnEvent(Event& event);
 		bool OnKeyPressed(KeyPressedEvent& event);
-
-		void SetFrameBuffer(Ref<Texture> tex) { m_ViewportTexture = tex; }
 
 		EditorCamera& GetCamera() { return m_EditorCamera; }
 	};

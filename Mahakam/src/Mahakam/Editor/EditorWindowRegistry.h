@@ -17,8 +17,17 @@ namespace Mahakam::Editor
 
 			// TODO: Different ways of opening manually, eg. in the "View" tab
 			bool Viewable = true;
+			bool Unique = true; // Whether only one instance should be allowed
 
 			EditorWindow* (*OpenWindow)() = nullptr;
+
+			EditorWindow* Instance = nullptr;
+
+			template<typename T>
+			void SetWindow()
+			{
+				OpenWindow = []() { return (EditorWindow*)new T(); };
+			}
 		};
 
 	private:

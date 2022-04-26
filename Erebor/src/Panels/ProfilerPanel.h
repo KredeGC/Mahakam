@@ -6,13 +6,13 @@
 
 namespace Mahakam::Editor
 {
-	class ProfilerPanel
+	class ProfilerPanel : EditorWindow
 	{
 	private:
 		bool open = true;
 		bool recording = false;
 
 	public:
-		void OnImGuiRender();
+		virtual void OnImGuiRender() override;
 	};
 }

@@ -6,7 +6,7 @@
 
 namespace Mahakam::Editor
 {
-	class StatsPanel
+	class StatsPanel : EditorWindow
 	{
 	private:
 		Timestep m_Frametime = 0.0f;
@@ -15,8 +15,8 @@ namespace Mahakam::Editor
 	public:
 		StatsPanel() = default;
 
-		void OnUpdate(Timestep dt);
+		virtual void OnUpdate(Timestep dt) override;
 
-		void OnImGuiRender();
+		virtual void OnImGuiRender() override;
 	};
 }

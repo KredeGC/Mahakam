@@ -12,7 +12,11 @@ namespace Mahakam::Editor
 	void SceneViewPanel::OnUpdate(Timestep dt)
 	{
 		if (m_Open)
+		{
 			m_EditorCamera.OnUpdate(dt, m_Focused, m_Hovered);
+
+			EditorLayer::GetActiveScene()->OnRender(m_EditorCamera, m_EditorCamera.GetModelMatrix());
+		}
 	}
 
 	void SceneViewPanel::OnImGuiRender()
@@ -42,8 +46,13 @@ namespace Mahakam::Editor
 				m_EditorCamera.GetCamera().SetRatio(m_ViewportSize.x / m_ViewportSize.y);
 			}
 
-			if (m_ViewportTexture)
-				ImGui::Image((void*)(uintptr_t)m_ViewportTexture->GetRendererID(), newViewportSize, ImVec2(0, 1), ImVec2(1, 0));
+			Ref<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
+			if (framebuffer)
+			{
+				Ref<Texture> viewportTexture = framebuffer->GetColorTexture(0);
+				if (viewportTexture)
+					ImGui::Image((void*)(uintptr_t)viewportTexture->GetRendererID(), newViewportSize, ImVec2(0, 1), ImVec2(1, 0));
+			}
 
 			// Setup ImGuizmo
 			ImVec2 pos = { m_ViewportBounds[0].x, m_ViewportBounds[0].y };
@@ -111,7 +120,7 @@ namespace Mahakam::Editor
 		}
 	}
 
-	void SceneViewPanel::OnEvent(Event& event)
+	bool SceneViewPanel::OnEvent(Event& event)
 	{
 		if (m_Hovered)
 		{
@@ -120,6 +129,8 @@ namespace Mahakam::Editor
 			dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(m_EditorCamera.OnKeyPressed));
 			dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(SceneViewPanel::OnKeyPressed));
 		}
+
+		return false;
 	}
 
 	bool SceneViewPanel::OnKeyPressed(KeyPressedEvent& event)

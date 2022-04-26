@@ -74,6 +74,9 @@ namespace Mahakam
 		// ComputeShader
 		MH_EXPORT_FUNC(ComputeShaderCreate, ComputeShader::Create);
 
+		// EditorWindowRegistry
+		MH_EXPORT_FUNC(EditorWindowRegistryGetInstance, Editor::EditorWindowRegistry::GetInstance);
+
 		// FrameBuffer
 		MH_EXPORT_FUNC(FrameBufferCreate, FrameBuffer::Create);
 
@@ -145,6 +148,9 @@ namespace Mahakam
 
 		// ComputeShader
 		MH_IMPORT_FUNC(ComputeShaderCreate);
+
+		// EditorWindowRegistry
+		MH_IMPORT_FUNC(EditorWindowRegistryGetInstance);
 
 		// FrameBuffer
 		MH_IMPORT_FUNC(FrameBufferCreate);

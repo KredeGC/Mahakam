@@ -23,8 +23,15 @@ namespace Mahakam::Editor
 
 				EditorLayer::GetActiveScene()->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
 			}
-			if (m_ViewportTexture)
-				ImGui::Image((void*)(uintptr_t)m_ViewportTexture->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
+
+			Ref<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
+			if (framebuffer)
+			{
+				Ref<Texture> viewportTexture = framebuffer->GetColorTexture(0);
+				if (viewportTexture)
+					ImGui::Image((void*)(uintptr_t)viewportTexture->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
+			}
+
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}
@@ -39,10 +46,5 @@ namespace Mahakam::Editor
 		}
 
 		return false;
-	}
-
-	void GameViewPanel::SetFrameBuffer(Ref<Texture> tex)
-	{
-		m_ViewportTexture = tex;
 	}
 }

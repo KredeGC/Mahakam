@@ -25,6 +25,7 @@ namespace Mahakam::Editor
 		s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
 
 
+#pragma region Components
 		// Animator
 		ComponentRegistry::ComponentInterface animatorInterface;
 		animatorInterface.SetComponent<AnimatorComponent>();
@@ -258,6 +259,65 @@ namespace Mahakam::Editor
 		};
 
 		ComponentRegistry::RegisterComponent("Light", lightInterface);
+#pragma endregion
+
+
+
+#pragma region Windows
+		// GameViewPanel
+		EditorWindowRegistry::EditorWindowProps gameViewPanelProps;
+		gameViewPanelProps.Name = "GameView";
+		gameViewPanelProps.SetWindow<GameViewPanel>();
+
+		EditorWindowRegistry::RegisterWindow(gameViewPanelProps);
+
+		EditorWindowRegistry::OpenWindow("GameView");
+
+		// ProfilerPanel
+		EditorWindowRegistry::EditorWindowProps profilerPanelProps;
+		profilerPanelProps.Name = "Profiler";
+		profilerPanelProps.SetWindow<ProfilerPanel>();
+
+		EditorWindowRegistry::RegisterWindow(profilerPanelProps);
+
+		EditorWindowRegistry::OpenWindow("Profiler");
+
+		// RenderPassPanel
+		EditorWindowRegistry::EditorWindowProps renderpassPanelProps;
+		renderpassPanelProps.Name = "Renderpass";
+		renderpassPanelProps.SetWindow<RenderPassPanel>();
+
+		EditorWindowRegistry::RegisterWindow(renderpassPanelProps);
+
+		EditorWindowRegistry::OpenWindow("Renderpass");
+
+		// SceneHierarchyPanel
+		EditorWindowRegistry::EditorWindowProps hierarchyPanelProps;
+		hierarchyPanelProps.Name = "SceneHierarchy";
+		hierarchyPanelProps.SetWindow<SceneHierarchyPanel>();
+
+		EditorWindowRegistry::RegisterWindow(hierarchyPanelProps);
+
+		EditorWindowRegistry::OpenWindow("SceneHierarchy");
+
+		// SceneViewPanel
+		EditorWindowRegistry::EditorWindowProps sceneViewPanelProps;
+		sceneViewPanelProps.Name = "SceneHierarchy";
+		sceneViewPanelProps.SetWindow<SceneViewPanel>();
+
+		EditorWindowRegistry::RegisterWindow(sceneViewPanelProps);
+
+		EditorWindowRegistry::OpenWindow("SceneHierarchy");
+
+		// StatsPanel
+		EditorWindowRegistry::EditorWindowProps statsPanelProps;
+		statsPanelProps.Name = "Stats";
+		statsPanelProps.SetWindow<StatsPanel>();
+
+		EditorWindowRegistry::RegisterWindow(statsPanelProps);
+
+		EditorWindowRegistry::OpenWindow("Stats");
+#pragma endregion
 
 
 
@@ -300,12 +360,7 @@ namespace Mahakam::Editor
 		activeScene->OnUpdate(dt);
 		m_GameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
 #else
-		// Only used in editor
-		s_ActiveScene->OnUpdate(dt, true); // TEMPORARY OR SOMETHING?
-		m_SceneViewPanel.OnUpdate(dt);
-		s_ActiveScene->OnRender(m_SceneViewPanel.GetCamera(), m_SceneViewPanel.GetCamera().GetModelMatrix());
-		m_SceneViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
-		m_GameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0)); // TEMPORARY UNTIL PLAY IS IMPL
+		s_ActiveScene->OnUpdate(dt, true); // TEMPORARY until play-mode is implemented
 #endif
 
 		// Test compute shader
@@ -315,7 +370,9 @@ namespace Mahakam::Editor
 
 		m_SceneViewPanel.SetFrameBuffer(debugComputeTexture);*/
 
-		m_StatsPanel.OnUpdate(dt);
+		auto& windows = EditorWindowRegistry::GetWindows();
+		for (auto& window : windows)
+			window->OnUpdate(dt);
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -324,12 +381,9 @@ namespace Mahakam::Editor
 
 		m_DockSpace.Begin();
 
-		m_GameViewPanel.OnImGuiRender();
-		m_ProfilerPanel.OnImGuiRender();
-		m_RenderPassPanel.OnImGuiRender();
-		m_SceneViewPanel.OnImGuiRender();
-		m_SceneHierarchyPanel.OnImGuiRender();
-		m_StatsPanel.OnImGuiRender();
+		auto& windows = EditorWindowRegistry::GetWindows();
+		for (auto& window : windows)
+			window->OnImGuiRender();
 
 		m_DockSpace.End();
 	}
@@ -340,7 +394,9 @@ namespace Mahakam::Editor
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::OnKeyPressed));
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(m_DockSpace.OnKeyPressed));
 
-		m_SceneViewPanel.OnEvent(event);
+		auto& windows = EditorWindowRegistry::GetWindows();
+		for (auto& window : windows)
+			window->OnEvent(event); // TODO: Fix to be blocking if true
 	}
 
 	void EditorLayer::CopyRuntime(std::istream& binaryStream, size_t binaryLength)

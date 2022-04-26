@@ -4,7 +4,7 @@
 
 namespace Mahakam::Editor
 {
-	class SceneHierarchyPanel : public Layer
+	class SceneHierarchyPanel : EditorWindow
 	{
 	private:
 		bool m_Open = true;

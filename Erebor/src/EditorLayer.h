@@ -23,16 +23,9 @@ namespace Mahakam::Editor
 		inline static Ref<Scene> s_ActiveScene;
 
 		DockSpace m_DockSpace;
-		GameViewPanel m_GameViewPanel;
-		ProfilerPanel m_ProfilerPanel;
-		RenderPassPanel m_RenderPassPanel;
-		SceneViewPanel m_SceneViewPanel;
-		SceneHierarchyPanel m_SceneHierarchyPanel;
-		StatsPanel m_StatsPanel;
 
 	public:
-		EditorLayer() : Layer("Editor"), m_DockSpace(), m_GameViewPanel(), m_ProfilerPanel(),
-			m_RenderPassPanel(), m_SceneViewPanel(), m_SceneHierarchyPanel(), m_StatsPanel() {}
+		EditorLayer() : Layer("Editor"), m_DockSpace() {}
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;

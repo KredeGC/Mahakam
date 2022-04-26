@@ -1,6 +1,10 @@
 #pragma once
 #include "Core.h"
 
+#ifndef MH_RUNTIME
+#include "Mahakam/Editor/EditorWindowRegistry.h"
+#endif
+
 #include "Mahakam/Scene/ComponentRegistry.h"
 
 #include "Mahakam/Renderer/Animation.h"
@@ -38,6 +42,9 @@ namespace Mahakam
 
 		// ComputeShader
 		MH_SHARED_FUNC(Ref<ComputeShader>, ComputeShaderCreate, const std::string&);
+
+		// EditorWindowRegistry
+		MH_SHARED_FUNC(Editor::EditorWindowRegistry*, EditorWindowRegistryGetInstance);
 
 		// FrameBuffer
 		MH_SHARED_FUNC(Ref<FrameBuffer>, FrameBufferCreate, const FrameBufferProps&);
@@ -85,7 +92,7 @@ namespace Mahakam
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateFilepath, const std::string&, const CubeTextureProps&);
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreatePrefilter, Ref<TextureCube>, TextureCubePrefilter, const CubeTextureProps&);
 
-		static constexpr int NUM_FUNC_PTRS = 27;
+		static constexpr int NUM_FUNC_PTRS = 28;
 
 	private:
 		const char* filepath = nullptr;

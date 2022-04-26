@@ -6,7 +6,7 @@
 
 namespace Mahakam::Editor
 {
-	class RenderPassPanel
+	class RenderPassPanel : EditorWindow
 	{
 	private:
 		bool open = true;
@@ -20,7 +20,7 @@ namespace Mahakam::Editor
 	public:
 		RenderPassPanel();
 
-		void OnImGuiRender();
+		virtual void OnImGuiRender() override;
 
 	private:
 		void RenderPanel();
