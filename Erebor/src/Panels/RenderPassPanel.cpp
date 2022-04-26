@@ -85,7 +85,7 @@ namespace Mahakam::Editor
 			// Get a list of mutable rendertextures
 			std::vector<std::string> textureNames;
 			std::vector<int> textures;
-			int colorCount = spec.colorAttachments.size();
+			int colorCount = (int)spec.colorAttachments.size();
 			for (int i = 0; i < colorCount; i++)
 			{
 				if (!spec.colorAttachments[i].immutable)

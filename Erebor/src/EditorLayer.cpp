@@ -262,16 +262,15 @@ namespace Mahakam::Editor
 #pragma endregion
 
 
-
 #pragma region Windows
 		// GameViewPanel
 		EditorWindowRegistry::EditorWindowProps gameViewPanelProps;
-		gameViewPanelProps.Name = "GameView";
+		gameViewPanelProps.Name = "Game View";
 		gameViewPanelProps.SetWindow<GameViewPanel>();
 
 		EditorWindowRegistry::RegisterWindow(gameViewPanelProps);
 
-		EditorWindowRegistry::OpenWindow("GameView");
+		EditorWindowRegistry::OpenWindow("Game View");
 
 		// ProfilerPanel
 		EditorWindowRegistry::EditorWindowProps profilerPanelProps;
@@ -293,21 +292,21 @@ namespace Mahakam::Editor
 
 		// SceneHierarchyPanel
 		EditorWindowRegistry::EditorWindowProps hierarchyPanelProps;
-		hierarchyPanelProps.Name = "SceneHierarchy";
+		hierarchyPanelProps.Name = "Scene Hierarchy";
 		hierarchyPanelProps.SetWindow<SceneHierarchyPanel>();
 
 		EditorWindowRegistry::RegisterWindow(hierarchyPanelProps);
 
-		EditorWindowRegistry::OpenWindow("SceneHierarchy");
+		EditorWindowRegistry::OpenWindow("Scene Hierarchy");
 
 		// SceneViewPanel
 		EditorWindowRegistry::EditorWindowProps sceneViewPanelProps;
-		sceneViewPanelProps.Name = "SceneHierarchy";
+		sceneViewPanelProps.Name = "Scene View";
 		sceneViewPanelProps.SetWindow<SceneViewPanel>();
 
 		EditorWindowRegistry::RegisterWindow(sceneViewPanelProps);
 
-		EditorWindowRegistry::OpenWindow("SceneHierarchy");
+		EditorWindowRegistry::OpenWindow("Scene View");
 
 		// StatsPanel
 		EditorWindowRegistry::EditorWindowProps statsPanelProps;
@@ -318,7 +317,6 @@ namespace Mahakam::Editor
 
 		EditorWindowRegistry::OpenWindow("Stats");
 #pragma endregion
-
 
 
 #if MH_PLATFORM_WINDOWS

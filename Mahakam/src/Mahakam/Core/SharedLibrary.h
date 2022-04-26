@@ -1,11 +1,9 @@
 #pragma once
-#include "Core.h"
+#include "Mahakam/Core/Core.h"
 
 #ifndef MH_RUNTIME
 #include "Mahakam/Editor/EditorWindowRegistry.h"
 #endif
-
-#include "Mahakam/Scene/ComponentRegistry.h"
 
 #include "Mahakam/Renderer/Animation.h"
 #include "Mahakam/Renderer/Buffer.h"
@@ -18,6 +16,8 @@
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
+
+#include "Mahakam/Scene/ComponentRegistry.h"
 
 #if MH_PLATFORM_LINUX
 #include <dlfcn.h>
@@ -43,8 +43,10 @@ namespace Mahakam
 		// ComputeShader
 		MH_SHARED_FUNC(Ref<ComputeShader>, ComputeShaderCreate, const std::string&);
 
+#ifndef MH_RUNTIME
 		// EditorWindowRegistry
 		MH_SHARED_FUNC(Editor::EditorWindowRegistry*, EditorWindowRegistryGetInstance);
+#endif
 
 		// FrameBuffer
 		MH_SHARED_FUNC(Ref<FrameBuffer>, FrameBufferCreate, const FrameBufferProps&);
@@ -92,13 +94,17 @@ namespace Mahakam
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateFilepath, const std::string&, const CubeTextureProps&);
 		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreatePrefilter, Ref<TextureCube>, TextureCubePrefilter, const CubeTextureProps&);
 
+#ifndef MH_RUNTIME
 		static constexpr int NUM_FUNC_PTRS = 28;
+#else
+		static constexpr int NUM_FUNC_PTRS = 27;
+#endif
 
 	private:
 		const char* filepath = nullptr;
 #if defined(MH_PLATFORM_WINDOWS)
 		HINSTANCE handle = 0;
-#else
+#elif defined(MH_PLATFORM_LINUX)
 		void* handle = nullptr;
 #endif
 

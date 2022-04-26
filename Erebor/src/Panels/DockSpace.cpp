@@ -65,17 +65,15 @@ namespace Mahakam::Editor
 
 			if (ImGui::BeginMenu("View"))
 			{
-				if (ImGui::MenuItem("Scene View"))
-				{ }
-
-				if (ImGui::MenuItem("Game View"))
-				{ }
-
-				if (ImGui::MenuItem("Performance Stats"))
-				{ }
-
-				if (ImGui::MenuItem("Profiler"))
-				{ }
+				auto& windowProps = EditorWindowRegistry::GetWindowProps();
+				for (auto& props : windowProps)
+				{
+					if (props.second.Viewable)
+					{
+						if (ImGui::MenuItem(props.second.Name.c_str()))
+						{ }
+					}
+				}
 
 				ImGui::EndMenu();
 			}
