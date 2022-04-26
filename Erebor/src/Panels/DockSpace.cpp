@@ -3,7 +3,7 @@
 
 #include "EditorLayer.h"
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
 	void DockSpace::Begin()
 	{

@@ -3,15 +3,15 @@
 
 #include "EditorLayer.h"
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
-	class Editor : public Application
+	class EditorApplication : public Application
 	{
 	private:
 		EditorLayer* m_EditorLayer;
 
 	public:
-		Editor();
-		~Editor();
+		EditorApplication();
+		~EditorApplication();
 	};
 }

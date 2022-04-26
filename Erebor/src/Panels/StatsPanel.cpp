@@ -1,7 +1,7 @@
 #include "ebpch.h"
 #include "StatsPanel.h"
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
 	void StatsPanel::OnUpdate(Timestep dt)
 	{

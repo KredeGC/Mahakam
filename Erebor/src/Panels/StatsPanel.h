@@ -4,7 +4,7 @@
 
 #include <imgui.h>
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
 	class StatsPanel
 	{

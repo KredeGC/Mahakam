@@ -4,12 +4,16 @@
 #include <fstream>
 #include <filesystem>
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
 	static SharedLibrary* lib;
 
 	void EditorLayer::OnAttach()
 	{
+		ComponentRegistry::Init();
+
+		EditorWindowRegistry::Init();
+
 		// Setup render passes for the default renderer
 		Renderer::SetRenderPasses({
 			CreateRef<GeometryRenderPass>(),
@@ -50,7 +54,7 @@ namespace Mahakam
 		cameraInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{
 			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
-			Camera & camera = cameraComponent;
+			Camera& camera = cameraComponent;
 
 			emitter << YAML::Key << "Projection" << YAML::Value << (int)camera.GetProjectionType();
 			emitter << YAML::Key << "FOV" << YAML::Value << camera.GetFov();
@@ -137,6 +141,7 @@ namespace Mahakam
 		meshInterface.OnInspector = [](Entity entity)
 		{
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
+
 			auto& meshes = meshComponent.GetMeshes();
 			Ref<Material> material = meshComponent.GetMaterial();
 
@@ -273,6 +278,10 @@ namespace Mahakam
 		s_ActiveScene = nullptr;
 
 		delete lib;
+
+		EditorWindowRegistry::Shutdown();
+
+		ComponentRegistry::Shutdown();
 	}
 
 	void EditorLayer::OnUpdate(Timestep dt)

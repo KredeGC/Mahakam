@@ -25,15 +25,15 @@ namespace Mahakam
 
 		imGuiLayer = new ImGuiLayer();
 		PushOverlay(imGuiLayer);
-
-		ComponentRegistry::Init();
 	}
 
 	Application::~Application()
 	{
 		MH_PROFILE_FUNCTION();
 
-		ComponentRegistry::Shutdown();
+		for (Layer* layer : layerStack)
+			layer->OnDetach();
+
 		Renderer::Shutdown();
 	}
 

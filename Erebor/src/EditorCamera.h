@@ -2,7 +2,7 @@
 
 #include <Mahakam.h>
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
 	class EditorCamera
 	{

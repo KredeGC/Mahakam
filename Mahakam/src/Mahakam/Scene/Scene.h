@@ -18,7 +18,6 @@ namespace Mahakam
 	private:
 		friend class Entity;
 		friend class SceneSerializer;
-		friend class SceneHierarchyPanel;
 
 		Ref<Material> skyboxMaterial;
 		Ref<TextureCube> skyboxTexture;
@@ -41,6 +40,12 @@ namespace Mahakam
 
 		Entity CreateEntity(const std::string& name = "Entity");
 		void DestroyEntity(Entity entity);
+
+		template<typename Fn>
+		void ForEachEntity(Fn func)
+		{
+			return registry.each(func);
+		}
 
 		template<typename ... Args, typename Fn>
 		void ForEach(Fn func)

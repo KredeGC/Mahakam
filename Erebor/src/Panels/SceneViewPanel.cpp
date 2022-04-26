@@ -7,7 +7,7 @@
 
 #include <ImGuizmo.h>
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
 	void SceneViewPanel::OnUpdate(Timestep dt)
 	{

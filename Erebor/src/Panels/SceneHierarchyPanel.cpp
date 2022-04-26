@@ -8,7 +8,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity, Ref<Scene> context)
 	{
@@ -170,7 +170,7 @@ namespace Mahakam
 			Ref<Scene> context = EditorLayer::GetActiveScene();
 			if (context)
 			{
-				context->registry.each([&](auto handle)
+				context->ForEachEntity([&](auto handle)
 				{
 					Entity entity(handle, context.get());
 

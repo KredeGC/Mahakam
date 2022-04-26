@@ -1,7 +1,7 @@
 #include "ebpch.h"
 #include "RenderPassPanel.h"
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
 	static void DrawComboBox(const char* label, const std::vector<std::string>& names, int& index)
 	{

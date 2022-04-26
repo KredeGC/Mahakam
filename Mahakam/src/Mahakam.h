@@ -16,6 +16,12 @@
 #include "Mahakam/Core/Utility.h"
 #include "Mahakam/Core/Window.h"
 
+// Editor
+#ifndef MH_RUNTIME
+#include "Mahakam/Editor/EditorWindow.h"
+#include "Mahakam/Editor/EditorWindowRegistry.h"
+#endif
+
 // Events
 #include "Mahakam/Events/Event.h"
 #include "Mahakam/Events/ApplicationEvent.h"

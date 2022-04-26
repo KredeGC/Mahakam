@@ -1,7 +1,7 @@
 #include "ebpch.h"
 #include "ProfilerPanel.h"
 
-namespace Mahakam
+namespace Mahakam::Editor
 {
 	void ProfilerPanel::OnImGuiRender()
 	{
