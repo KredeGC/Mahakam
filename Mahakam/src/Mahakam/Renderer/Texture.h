@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/SharedLibrary.h"
 #include "TextureFormats.h"
 #include "RenderBuffer.h"
 
@@ -60,8 +61,12 @@ namespace Mahakam
 	class Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> Create(const TextureProps& props = TextureProps());
-		static Ref<Texture2D> Create(const std::string& filepath, const TextureProps& props = TextureProps());
+		inline static Ref<Texture2D> Create(const TextureProps& props = TextureProps()) { return CreateProps(props); }
+		inline static Ref<Texture2D> Create(const std::string& filepath, const TextureProps& props = TextureProps()) { return CreateFilepath(filepath, props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateProps, Ref<Texture2D>, const TextureProps& props);
+		MH_DECLARE_FUNC(CreateFilepath, Ref<Texture2D>, const std::string& filepath, const TextureProps& props);
 	};
 
 

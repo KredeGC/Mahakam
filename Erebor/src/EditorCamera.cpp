@@ -26,7 +26,7 @@ namespace Mahakam::Editor
 		if (focus && altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_LEFT)) // Orbit around target
 		{
 			controlling = true;
-			Application::GetInstance().GetWindow().SetCursorVisible(false);
+			Application::GetInstance()->GetWindow().SetCursorVisible(false);
 
 			eulerAngles.y -= glm::radians(deltaX * dragSpeed);
 			eulerAngles.x -= glm::radians(deltaY * dragSpeed);
@@ -38,7 +38,7 @@ namespace Mahakam::Editor
 		else if (noCapture && hover && !altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_RIGHT)) // FPS Rotate
 		{
 			controlling = true;
-			Application::GetInstance().GetWindow().SetCursorVisible(false);
+			Application::GetInstance()->GetWindow().SetCursorVisible(false);
 
 			eulerAngles.y -= glm::radians(deltaX * dragSpeed);
 			eulerAngles.x -= glm::radians(deltaY * dragSpeed);
@@ -80,10 +80,10 @@ namespace Mahakam::Editor
 
 			target += deltaY * speed * up - deltaX * speed * right;
 		}
-		else if (!Application::GetInstance().GetWindow().IsCursorVisible())
+		else if (!Application::GetInstance()->GetWindow().IsCursorVisible())
 		{
 			controlling = false;
-			Application::GetInstance().GetWindow().SetCursorVisible(true);
+			Application::GetInstance()->GetWindow().SetCursorVisible(true);
 		}
 
 		zoom = glm::max(zoom + zoomDelta, 0.0f);

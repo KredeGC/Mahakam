@@ -176,9 +176,14 @@ project "Mahakam"
         optimize "on"
         
     filter "configurations:Release"
-        defines "MH_RELEASE"
+        defines {
+            "MH_RELEASE",
+            "MH_RUNTIME"
+        }
         runtime "Release"
         optimize "on"
+        
+        removefiles { "**/Editor/**" }
 
 project "Erebor"
     location "Erebor"
@@ -233,9 +238,14 @@ project "Erebor"
         optimize "on"
         
     filter "configurations:Release"
-        defines "MH_RELEASE"
+        defines {
+            "MH_RELEASE",
+            "MH_RUNTIME"
+        }
         runtime "Release"
         optimize "on"
+        
+        removefiles { "**/Panels/**" }
 
 project "Sandbox"
     location "Sandbox"
@@ -297,6 +307,9 @@ project "Sandbox"
         optimize "on"
         
     filter "configurations:Release"
-        defines "MH_RELEASE"
+        defines {
+            "MH_RELEASE",
+            "MH_RUNTIME"
+        }
         runtime "Release"
         optimize "on"

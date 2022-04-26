@@ -1,13 +1,13 @@
-IF(NOT EXISTS "/home/christian/CPPProjects/Mahakam/Mahakam/vendor/assimp/install_manifest.txt")
-  MESSAGE(FATAL_ERROR "Cannot find install manifest: \"/home/christian/CPPProjects/Mahakam/Mahakam/vendor/assimp/install_manifest.txt\"")
-ENDIF(NOT EXISTS "/home/christian/CPPProjects/Mahakam/Mahakam/vendor/assimp/install_manifest.txt")
+IF(NOT EXISTS "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/install_manifest.txt")
+  MESSAGE(FATAL_ERROR "Cannot find install manifest: \"C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/install_manifest.txt\"")
+ENDIF(NOT EXISTS "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/install_manifest.txt")
 
-FILE(READ "/home/christian/CPPProjects/Mahakam/Mahakam/vendor/assimp/install_manifest.txt" files)
+FILE(READ "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/install_manifest.txt" files)
 STRING(REGEX REPLACE "\n" ";" files "${files}")
 FOREACH(file ${files})
   MESSAGE(STATUS "Uninstalling \"$ENV{DESTDIR}${file}\"")
   EXEC_PROGRAM(
-    "/usr/bin/cmake" ARGS "-E remove \"$ENV{DESTDIR}${file}\""
+    "D:/CMake/bin/cmake.exe" ARGS "-E remove \"$ENV{DESTDIR}${file}\""
     OUTPUT_VARIABLE rm_out
     RETURN_VALUE rm_retval
     )

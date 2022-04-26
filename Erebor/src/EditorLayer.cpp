@@ -8,11 +8,17 @@ namespace Mahakam::Editor
 {
 	static SharedLibrary* lib;
 
+	static Ref<Shader> blitShader;
+
 	void EditorLayer::OnAttach()
 	{
+		blitShader = Shader::Create("assets/shaders/internal/Blit.yaml");
+
 		ComponentRegistry::Init();
 
+#ifndef MH_RUNTIME
 		EditorWindowRegistry::Init();
+#endif
 
 		// Setup render passes for the default renderer
 		Renderer::SetRenderPasses({
@@ -263,6 +269,7 @@ namespace Mahakam::Editor
 
 
 #pragma region Windows
+#ifndef MH_RUNTIME
 		// GameViewPanel
 		EditorWindowRegistry::EditorWindowProps gameViewPanelProps;
 		gameViewPanelProps.Name = "Game View";
@@ -316,6 +323,7 @@ namespace Mahakam::Editor
 		EditorWindowRegistry::RegisterWindow(statsPanelProps);
 
 		EditorWindowRegistry::OpenWindow("Stats");
+#endif
 #pragma endregion
 
 
@@ -337,7 +345,9 @@ namespace Mahakam::Editor
 
 		delete lib;
 
+#ifndef MH_RUNTIME
 		EditorWindowRegistry::Shutdown();
+#endif
 
 		ComponentRegistry::Shutdown();
 	}
@@ -355,8 +365,17 @@ namespace Mahakam::Editor
 
 #if MH_RUNTIME
 		// Only used during runtime
-		activeScene->OnUpdate(dt);
-		m_GameViewPanel.SetFrameBuffer(Renderer::GetFrameBuffer()->GetColorTexture(0));
+		s_ActiveScene->OnUpdate(dt);
+
+		blitShader->Bind("POSTPROCESSING");
+		blitShader->SetTexture("u_Albedo", Renderer::GetFrameBuffer()->GetColorTexture(0));
+		blitShader->SetUniformInt("u_Depth", 0);
+
+		GL::EnableZTesting(false);
+		GL::EnableZWriting(false);
+		Renderer::DrawScreenQuad();
+		GL::EnableZWriting(true);
+		GL::EnableZTesting(true);
 #else
 		s_ActiveScene->OnUpdate(dt, true); // TEMPORARY until play-mode is implemented
 #endif
@@ -368,15 +387,18 @@ namespace Mahakam::Editor
 
 		m_SceneViewPanel.SetFrameBuffer(debugComputeTexture);*/
 
+#ifndef MH_RUNTIME
 		auto& windows = EditorWindowRegistry::GetWindows();
 		for (auto& window : windows)
 			window->OnUpdate(dt);
+#endif
 	}
 
 	void EditorLayer::OnImGuiRender()
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
+#ifndef MH_RUNTIME
 		m_DockSpace.Begin();
 
 		auto& windows = EditorWindowRegistry::GetWindows();
@@ -384,17 +406,23 @@ namespace Mahakam::Editor
 			window->OnImGuiRender();
 
 		m_DockSpace.End();
+#endif
 	}
 
 	void EditorLayer::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::OnKeyPressed));
+
+#ifndef MH_RUNTIME
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(m_DockSpace.OnKeyPressed));
 
 		auto& windows = EditorWindowRegistry::GetWindows();
 		for (auto& window : windows)
 			window->OnEvent(event); // TODO: Fix to be blocking if true
+#else
+		dispatcher.DispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(EditorLayer::OnWindowResized));
+#endif
 	}
 
 	void EditorLayer::CopyRuntime(std::istream& binaryStream, size_t binaryLength)
@@ -471,6 +499,13 @@ namespace Mahakam::Editor
 
 		if (event.GetKeyCode() == MH_KEY_F7)
 			Renderer::EnableBoundingBox(!Renderer::HasBoundingBoxEnabled());
+
+		return false;
+	}
+
+	bool EditorLayer::OnWindowResized(WindowResizeEvent& event)
+	{
+		s_ActiveScene->OnViewportResize(event.GetWidth(), event.GetHeight());
 
 		return false;
 	}

@@ -113,6 +113,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Entity cameraEntity = scene->CreateEntity("Main Camera");
 	cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
 	cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
+	cameraEntity.AddComponent<CamerControllerComponent>();
 
 
 	// Directional light

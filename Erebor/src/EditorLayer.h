@@ -1,5 +1,6 @@
 #pragma once
 
+#ifndef MH_RUNTIME
 #include "Panels/DockSpace.h"
 #include "Panels/GameViewPanel.h"
 #include "Panels/ProfilerPanel.h"
@@ -8,6 +9,7 @@
 #include "Panels/SceneViewPanel.h"
 #include "Panels/StatsPanel.h"
 #include "EditorCamera.h"
+#endif
 
 #include <Mahakam.h>
 
@@ -22,10 +24,16 @@ namespace Mahakam::Editor
 
 		inline static Ref<Scene> s_ActiveScene;
 
+#ifndef MH_RUNTIME
 		DockSpace m_DockSpace;
+#endif
 
 	public:
+#ifndef MH_RUNTIME
 		EditorLayer() : Layer("Editor"), m_DockSpace() {}
+#else
+		EditorLayer() : Layer("Editor") {}
+#endif
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
@@ -44,5 +52,6 @@ namespace Mahakam::Editor
 		void UpdateRuntimeLibrary();
 
 		bool OnKeyPressed(KeyPressedEvent& event);
+		bool OnWindowResized(WindowResizeEvent& event);
 	};
 }

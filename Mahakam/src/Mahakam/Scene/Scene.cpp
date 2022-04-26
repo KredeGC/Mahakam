@@ -8,6 +8,7 @@
 #include "Mahakam/Core/Utility.h"
 #include "Mahakam/Core/AssetDatabase.h"
 #include "Mahakam/Renderer/Renderer.h"
+#include "Mahakam/Renderer/GL.h"
 
 #include "Entity.h"
 

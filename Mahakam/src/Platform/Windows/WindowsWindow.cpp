@@ -27,7 +27,7 @@ namespace Mahakam {
 	{
 		MH_PROFILE_FUNCTION();
 
-#ifndef MH_DEBUG
+#ifdef MH_RUNTIME
 		FreeConsole();
 #endif
 

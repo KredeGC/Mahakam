@@ -1,24 +1,6 @@
 #pragma once
 #include "Mahakam/Core/Core.h"
 
-#ifndef MH_RUNTIME
-#include "Mahakam/Editor/EditorWindowRegistry.h"
-#endif
-
-#include "Mahakam/Renderer/Animation.h"
-#include "Mahakam/Renderer/Buffer.h"
-#include "Mahakam/Renderer/ComputeShader.h"
-#include "Mahakam/Renderer/FrameBuffer.h"
-#include "Mahakam/Renderer/GL.h"
-#include "Mahakam/Renderer/Material.h"
-#include "Mahakam/Renderer/Mesh.h"
-#include "Mahakam/Renderer/RenderBuffer.h"
-#include "Mahakam/Renderer/Renderer.h"
-#include "Mahakam/Renderer/Shader.h"
-#include "Mahakam/Renderer/Texture.h"
-
-#include "Mahakam/Scene/ComponentRegistry.h"
-
 #if MH_PLATFORM_LINUX
 #include <dlfcn.h>
 #endif
@@ -28,77 +10,9 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
-		// Animation
-		MH_SHARED_FUNC(Ref<Animation>, AnimationLoad, const std::string&, SkinnedMesh&);
+		typedef void* FuncPtr;
 
-		// ComponentRegistry
-		MH_SHARED_FUNC(ComponentRegistry*, ComponentRegistryGetInstance);
-
-		// UniformBuffer
-		MH_SHARED_FUNC(Ref<UniformBuffer>, UniformBufferCreate, uint32_t);
-
-		// StorageBuffer
-		MH_SHARED_FUNC(Ref<StorageBuffer>, StorageBufferCreate, uint32_t);
-
-		// ComputeShader
-		MH_SHARED_FUNC(Ref<ComputeShader>, ComputeShaderCreate, const std::string&);
-
-#ifndef MH_RUNTIME
-		// EditorWindowRegistry
-		MH_SHARED_FUNC(Editor::EditorWindowRegistry*, EditorWindowRegistryGetInstance);
-#endif
-
-		// FrameBuffer
-		MH_SHARED_FUNC(Ref<FrameBuffer>, FrameBufferCreate, const FrameBufferProps&);
-
-		// GL
-		MH_SHARED_FUNC(GL*, GLGetInstance);
-
-		// Log
-		MH_SHARED_FUNC(Ref<spdlog::logger>&, EngineLogger);
-		MH_SHARED_FUNC(Ref<spdlog::logger>&, GameLogger);
-
-		// Material
-		MH_SHARED_FUNC(Ref<Material>, MaterialCopy, Ref<Material>);
-		MH_SHARED_FUNC(Ref<Material>, MaterialCreate, Ref<Shader>, const std::string&);
-
-		// Mesh
-		MH_SHARED_FUNC(Ref<Mesh>, MeshCreate, uint32_t, uint32_t, void* verts[Mesh::BUFFER_ELEMENTS_SIZE], const uint32_t*);
-		MH_SHARED_FUNC(SkinnedMesh, MeshLoad, const std::string&, const SkinnedMeshProps&);
-
-		// Profiler
-		MH_SHARED_FUNC(Profiler, ProfilerCreate, const char*, bool);
-		MH_SHARED_FUNC(void, ProfilerAddResult, const char*, std::chrono::time_point<std::chrono::steady_clock>, std::chrono::time_point<std::chrono::steady_clock>);
-		MH_SHARED_FUNC(void, ProfilerClear);
-		MH_SHARED_FUNC(const std::vector<Profiler::ProfileResult>&, ProfilerGetResults);
-
-		// RenderBuffer
-		MH_SHARED_FUNC(Ref<RenderBuffer>, RenderBufferCreate, uint32_t, uint32_t, TextureFormat);
-
-		// Renderer
-		MH_SHARED_FUNC(Renderer*, RendererGetInstance);
-
-		// Scene
-		MH_SHARED_FUNC(Ref<Scene>, SceneCreate);
-		MH_SHARED_FUNC(Ref<Scene>, SceneCreateFilepath, const std::string&);
-
-		// Shader
-		MH_SHARED_FUNC(Ref<Shader>, ShaderCreate, const std::string&, const std::initializer_list<std::string>&);
-
-		// Texture2D
-		MH_SHARED_FUNC(Ref<Texture2D>, Texture2DCreateProps, const TextureProps&);
-		MH_SHARED_FUNC(Ref<Texture2D>, Texture2DCreateFilepath, const std::string&, const TextureProps&);
-
-		// TextureCube
-		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateProps, const CubeTextureProps&);
-		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreateFilepath, const std::string&, const CubeTextureProps&);
-		MH_SHARED_FUNC(Ref<TextureCube>, TextureCubeCreatePrefilter, Ref<TextureCube>, TextureCubePrefilter, const CubeTextureProps&);
-
-#ifndef MH_RUNTIME
-		static constexpr int NUM_FUNC_PTRS = 28;
-#else
-		static constexpr int NUM_FUNC_PTRS = 27;
-#endif
+		static constexpr int NUM_FUNC_PTRS = 3;
 
 	private:
 		const char* filepath = nullptr;
@@ -109,7 +23,8 @@ namespace Mahakam
 #endif
 
 		inline static bool initialized = false;
-		inline static void* funcPointers[NUM_FUNC_PTRS];
+		inline static FuncPtr funcPointers[NUM_FUNC_PTRS];
+		inline static int funcPointerCounter = 0;
 
 	public:
 		SharedLibrary() = default;
@@ -117,6 +32,8 @@ namespace Mahakam
 		SharedLibrary(const char* filepath);
 
 		virtual ~SharedLibrary();
+
+		static void AddFunction(void** funcPtr);
 
 		static void ExportFuncPointers();
 		static void ImportFuncPointers(void* ptrs[NUM_FUNC_PTRS]);

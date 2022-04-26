@@ -66,13 +66,20 @@
 // Returns a non-capturing lambda which calls fn
 #define MH_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
-// Defines a typdef function pointer and initializes it as a static variable
-#define MH_SHARED_FUNC(returnType, type, ...) typedef returnType(*type)(__VA_ARGS__); \
-	inline static type sh_##type = nullptr;
+#define MH_OVERRIDE_FUNC(...)
 
-// Calls the SharedLibrary function and returns the result
-#define MH_OVERRIDE_FUNC(signature, ...) if (SharedLibrary::sh_##signature != nullptr) \
-	return SharedLibrary::sh_##signature(__VA_ARGS__);
+#ifndef MH_STANDALONE
+#define MH_DECLARE_FUNC3(line, func, returnType, ...) static returnType (*func)(__VA_ARGS__); \
+	inline static int generated_##line = (::Mahakam::SharedLibrary::AddFunction((void**)&func), 0);
+
+#define MH_DECLARE_FUNC2(line, func, returnType, ...) MH_DECLARE_FUNC3(line, func, returnType, __VA_ARGS__)
+#define MH_DECLARE_FUNC(func, returnType, ...) MH_DECLARE_FUNC2(__LINE__, func, returnType, __VA_ARGS__)
+
+#define MH_DEFINE_FUNC(func, returnType, ...) returnType (*func)(__VA_ARGS__) = [](__VA_ARGS__)
+#else
+#define MH_DECLARE_FUNC()
+#define MH_DEFINE_FUNC(func, returnType, ...) returnType func(__VA_ARGS__)
+#endif
 
 namespace Mahakam
 {
