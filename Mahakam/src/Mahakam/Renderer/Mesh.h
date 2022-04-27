@@ -9,7 +9,39 @@
 
 namespace Mahakam
 {
-	struct SkinnedMesh;
+	class Mesh;
+
+	struct BoneInfo
+	{
+		int id;
+		glm::mat4 offset;
+	};
+
+	struct SkinnedMesh
+	{
+		std::vector<Ref<Mesh>> meshes;
+		std::vector<Ref<Material>> materials;
+		robin_hood::unordered_map<std::string, BoneInfo> boneInfo;
+		int boneCount = 0;
+
+		//Mesh::Bounds bounds;
+
+		SkinnedMesh() = default;
+
+		SkinnedMesh(const std::vector<Ref<Mesh>>& meshes, const std::vector<Ref<Material>>& materials, const robin_hood::unordered_map<std::string, BoneInfo>& boneInfo, int boneCount = 0)
+			: meshes(meshes), materials(materials), boneInfo(boneInfo), boneCount(boneCount)
+		{
+			//RecalculateBounds();
+		}
+
+		SkinnedMesh(Ref<Mesh> mesh, Ref<Material> material)
+		{
+			meshes.push_back(mesh);
+			materials.push_back(material);
+
+			//RecalculateBounds();
+		}
+	};
 
 	// TODO: Use this prop struct when loading a model
 	struct SkinnedMeshProps
@@ -109,65 +141,20 @@ namespace Mahakam
 		static Bounds CalculateBounds(const glm::vec3* positions, uint32_t vertexCount);
 		static Bounds TransformBounds(const Bounds& bounds, const glm::mat4& transform);
 
-		static Ref<Mesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
+		inline static Ref<Mesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
+		inline static SkinnedMesh LoadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps()) { return LoadModelImpl(filepath, props); }
 
-		static SkinnedMesh LoadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps());
 		static Ref<Mesh> CreateCube(int tessellation, bool reverse = false);
 		static Ref<Mesh> CreatePlane(int rows, int columns);
 		static Ref<Mesh> CreateUVSphere(int rows, int columns);
 		static Ref<Mesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
 
 	private:
+		MH_DECLARE_FUNC(CreateImpl, Ref<Mesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
+		MH_DECLARE_FUNC(LoadModelImpl, SkinnedMesh, const std::string& filepath, const SkinnedMeshProps& props);
+
 		static Ref<Mesh> ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
 
 		static void ProcessNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene);
-	};
-
-	struct BoneInfo
-	{
-		int id;
-		glm::mat4 offset;
-	};
-
-	struct SkinnedMesh
-	{
-		std::vector<Ref<Mesh>> meshes;
-		std::vector<Ref<Material>> materials;
-		robin_hood::unordered_map<std::string, BoneInfo> boneInfo;
-		int boneCount = 0;
-
-		//Mesh::Bounds bounds;
-
-		SkinnedMesh() = default;
-
-		SkinnedMesh(const std::vector<Ref<Mesh>>& meshes, const std::vector<Ref<Material>>& materials, const robin_hood::unordered_map<std::string, BoneInfo>& boneInfo, int boneCount = 0)
-			: meshes(meshes), materials(materials), boneInfo(boneInfo), boneCount(boneCount)
-		{
-			//RecalculateBounds();
-		}
-
-		SkinnedMesh(Ref<Mesh> mesh, Ref<Material> material)
-		{
-			meshes.push_back(mesh);
-			materials.push_back(material);
-
-			//RecalculateBounds();
-		}
-
-		//void RecalculateBounds()
-		//{
-		//	glm::vec3* positions = new glm::vec3[meshes.size() * 2];
-		//	for (size_t i = 0; i < meshes.size(); i++)
-		//	{
-		//		auto& buffer = meshes[i]->GetBounds().positions;
-
-		//		positions[i * 2] = buffer[0]; // Min
-		//		positions[i * 2 + 1] = buffer[7]; // Max
-		//	}
-
-		//	bounds = Mesh::CalculateBounds(positions, (uint32_t)meshes.size() * 2);
-
-		//	delete[] positions;
-		//}
 	};
 }

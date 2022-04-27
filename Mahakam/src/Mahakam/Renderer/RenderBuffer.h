@@ -19,6 +19,9 @@ namespace Mahakam
 
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 
-		static Ref<RenderBuffer> Create(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
+		inline static Ref<RenderBuffer> Create(uint32_t width, uint32_t height, TextureFormat format) { return CreateImpl(width, height, format); }
+
+	private:
+		MH_DECLARE_FUNC(CreateImpl, Ref<RenderBuffer>, uint32_t width, uint32_t height, TextureFormat format);
 	};
 }

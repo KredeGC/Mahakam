@@ -9,70 +9,65 @@ namespace Mahakam
 	class GL
 	{
 	private:
-		static GL* s_Instance;
-
-		RendererAPI* rendererAPI;
-
-		Ref<Mesh> staticScreenQuad;
-		Ref<Mesh> staticPyramid;
-		Ref<Mesh> staticSphereMesh;
-		Ref<Mesh> staticCubemapMesh;
-		Ref<Mesh> staticCube;
-
-		Ref<Texture2D> texture2DRed;
-		Ref<Texture2D> texture2DWhite;
-		Ref<Texture2D> texture2DBlack;
-		Ref<Texture2D> texture2DBump;
-
-		Ref<TextureCube> textureCubeWhite;
+		static RendererAPI* rendererAPI;
+		
+		static Ref<Mesh> staticScreenQuad;
+		static Ref<Mesh> staticPyramid;
+		static Ref<Mesh> staticSphereMesh;
+		static Ref<Mesh> staticCubemapMesh;
+		static Ref<Mesh> staticCube;
+		
+		static Ref<Texture2D> texture2DRed;
+		static Ref<Texture2D> texture2DWhite;
+		static Ref<Texture2D> texture2DBlack;
+		static Ref<Texture2D> texture2DBump;
+		static Ref<TextureCube> textureCubeWhite;
 
 	public:
-		GL();
-		~GL();
+		static void Init();
+		static void Shutdown();
 
-		static GL* GetInstance();
+		MH_DECLARE_FUNC(GetScreenQuad, Ref<Mesh>);
+		MH_DECLARE_FUNC(GetInvertedPyramid, Ref<Mesh>);
+		MH_DECLARE_FUNC(GetInvertedSphere, Ref<Mesh>);
+		MH_DECLARE_FUNC(GetInvertedCube, Ref<Mesh>);
+		MH_DECLARE_FUNC(GetCube, Ref<Mesh>);
 
-		inline static void Init() { s_Instance = new GL; }
-		inline static void Shutdown() { delete s_Instance; }
+		MH_DECLARE_FUNC(GetTexture2DRed, Ref<Texture2D>);
+		MH_DECLARE_FUNC(GetTexture2DWhite, Ref<Texture2D>);
+		MH_DECLARE_FUNC(GetTexture2DBlack, Ref<Texture2D>);
+		MH_DECLARE_FUNC(GetTexture2DBump, Ref<Texture2D>);
+		MH_DECLARE_FUNC(GetTextureCubeWhite, Ref<TextureCube>);
 
-		inline static Ref<Mesh> GetScreenQuad() { return GetInstance()->staticScreenQuad; }
-		inline static Ref<Mesh> GetInvertedPyramid() { return GetInstance()->staticPyramid; }
-		inline static Ref<Mesh> GetInvertedSphere() { return GetInstance()->staticSphereMesh; }
-		inline static Ref<Mesh> GetInvertedCube() { return GetInstance()->staticCubemapMesh; }
-		inline static Ref<Mesh> GetCube() { return GetInstance()->staticCube; }
+		MH_DECLARE_FUNC(GetGraphicsVendor, const char*);
 
-		inline static Ref<Texture2D> GetTexture2DRed() { return GetInstance()->texture2DRed; }
-		inline static Ref<Texture2D> GetTexture2DWhite() { return GetInstance()->texture2DWhite; }
-		inline static Ref<Texture2D> GetTexture2DBlack() { return GetInstance()->texture2DBlack; }
-		inline static Ref<Texture2D> GetTexture2DBump() { return GetInstance()->texture2DBump; }
-		inline static Ref<TextureCube> GetTextureCubeWhite() { return GetInstance()->textureCubeWhite; }
+		inline static void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor = false) { SetViewportImpl(x, y, w, h, scissor); }
 
-		inline static const char* GetGraphicsVendor() { return GetInstance()->rendererAPI->GetGraphicsVendor(); }
+		MH_DECLARE_FUNC(FinishRendering, void);
 
-		inline static void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor = false) { GetInstance()->rendererAPI->SetViewport(x, y, w, h, scissor); }
+		MH_DECLARE_FUNC(SetClearColor, void, const glm::vec4& color);
+		inline static void Clear(bool color = true, bool depth = true) { ClearImpl(color, depth); }
 
-		inline static void FinishRendering() { GetInstance()->rendererAPI->FinishRendering(); }
+		inline static void EnableCulling(bool enable, bool cullFront = false) { EnableCullingImpl(enable, cullFront); }
 
-		inline static void SetClearColor(const glm::vec4& color) { GetInstance()->rendererAPI->SetClearColor(color); }
-		inline static void Clear(bool color = true, bool depth = true) { GetInstance()->rendererAPI->Clear(color, depth); }
+		MH_DECLARE_FUNC(EnableZWriting, void, bool enable);
+		MH_DECLARE_FUNC(EnableZTesting, void, bool enable);
 
-		inline static void EnableCulling(bool enable, bool cullFront = false) { GetInstance()->rendererAPI->EnableCulling(enable, cullFront); }
+		MH_DECLARE_FUNC(SetFillMode, void, bool fill);
+		MH_DECLARE_FUNC(SetBlendMode, void, RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable);
 
-		inline static void EnableZWriting(bool enable) { GetInstance()->rendererAPI->EnableZWriting(enable); }
-		inline static void EnableZTesting(bool enable) { GetInstance()->rendererAPI->EnableZTesting(enable); }
-
-		inline static void SetFillMode(bool fill) { GetInstance()->rendererAPI->SetFillMode(fill); }
-
-		inline static void SetBlendMode(RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable) { GetInstance()->rendererAPI->SetBlendMode(src, dst, enable); }
-
-		inline static void DrawScreenQuad() { GetInstance()->staticScreenQuad->Bind(); DrawIndexed(GetInstance()->staticScreenQuad->GetIndexCount()); }
-
-		inline static void DrawIndexed(uint32_t indexCount) { GetInstance()->rendererAPI->DrawIndexed(indexCount); }
-
-		inline static void DrawInstanced(uint32_t indexCount, uint32_t count) { GetInstance()->rendererAPI->DrawInstanced(indexCount, count); }
+		MH_DECLARE_FUNC(DrawScreenQuad, void);
+		MH_DECLARE_FUNC(DrawIndexed, void, uint32_t indexCount);
+		MH_DECLARE_FUNC(DrawInstanced, void, uint32_t indexCount, uint32_t count);
 
 	private:
 		static Ref<Mesh> CreateScreenQuad();
 		static Ref<Mesh> CreatePyramid();
+
+		MH_DECLARE_FUNC(SetViewportImpl, void, uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor);
+
+		MH_DECLARE_FUNC(ClearImpl, void, bool color, bool depth);
+
+		MH_DECLARE_FUNC(EnableCullingImpl, void, bool enable, bool cullFront);
 	};
 }

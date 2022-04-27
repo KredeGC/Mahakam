@@ -6,7 +6,7 @@
 #ifdef MH_ENABLE_GL_ERRORS
 static void glClearErrors()
 {
-	while (glGetError() != GL_NO_ERROR);
+	for (int i = 0; i < 10 && (glGetError() != GL_NO_ERROR); i++);
 }
 
 static bool glLogCall(const char* name, const char* file, int line)

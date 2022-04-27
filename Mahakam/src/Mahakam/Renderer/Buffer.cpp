@@ -9,8 +9,8 @@
 
 namespace Mahakam
 {
-#pragma region UniformBuffer
-	Ref<UniformBuffer> UniformBuffer::Create(uint32_t size)
+	//Ref<UniformBuffer> UniformBuffer::Create(uint32_t size)
+	MH_DEFINE_FUNC(UniformBuffer::Create, Ref<UniformBuffer>, uint32_t size)
 	{
 		MH_OVERRIDE_FUNC(UniformBufferCreate, size);
 
@@ -25,12 +25,11 @@ namespace Mahakam
 		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
-	}
-#pragma endregion
+	};
 
 
-#pragma region StorageBuffer
-	Ref<StorageBuffer> StorageBuffer::Create(uint32_t size)
+	//Ref<StorageBuffer> StorageBuffer::Create(uint32_t size)
+	MH_DEFINE_FUNC(StorageBuffer::Create, Ref<StorageBuffer>, uint32_t size)
 	{
 		MH_OVERRIDE_FUNC(StorageBufferCreate, size);
 
@@ -45,6 +44,5 @@ namespace Mahakam
 		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
-	}
-#pragma endregion
+	};
 }

@@ -14,8 +14,6 @@ namespace Mahakam::Editor
 	{
 		blitShader = Shader::Create("assets/shaders/internal/Blit.yaml");
 
-		ComponentRegistry::Init();
-
 #ifndef MH_RUNTIME
 		EditorWindowRegistry::Init();
 #endif
@@ -344,12 +342,11 @@ namespace Mahakam::Editor
 		s_ActiveScene = nullptr;
 
 		delete lib;
+		blitShader = nullptr;
 
 #ifndef MH_RUNTIME
 		EditorWindowRegistry::Shutdown();
 #endif
-
-		ComponentRegistry::Shutdown();
 	}
 
 	void EditorLayer::OnUpdate(Timestep dt)

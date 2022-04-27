@@ -72,7 +72,8 @@ namespace Mahakam
 		return Mesh::CalculateBounds(positions, 8);
 	}
 
-	Ref<Mesh> Mesh::Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	//Ref<Mesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	MH_DEFINE_FUNC(Mesh::CreateImpl, Ref<Mesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	{
 		MH_OVERRIDE_FUNC(MeshCreate, vertexCount, indexCount, verts, indices);
 
@@ -87,9 +88,10 @@ namespace Mahakam
 		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
-	}
+	};
 
-	SkinnedMesh Mesh::LoadModel(const std::string& filepath, const SkinnedMeshProps& props)
+	//SkinnedMesh Mesh::LoadModelImpl(const std::string& filepath, const SkinnedMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::LoadModelImpl, SkinnedMesh, const std::string& filepath, const SkinnedMeshProps& props)
 	{
 		MH_OVERRIDE_FUNC(MeshLoad, filepath, props);
 
@@ -120,7 +122,7 @@ namespace Mahakam
 		//skinnedMesh.RecalculateBounds();
 
 		return skinnedMesh;
-	}
+	};
 
 	Ref<Mesh> Mesh::CreateCube(int tessellation, bool reverse)
 	{

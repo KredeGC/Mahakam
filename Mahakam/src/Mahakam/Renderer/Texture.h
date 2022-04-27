@@ -92,8 +92,13 @@ namespace Mahakam
 		uint32_t resolution;
 
 	public:
-		static Ref<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps());
-		static Ref<TextureCube> Create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps());
-		static Ref<TextureCube> Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props = CubeTextureProps());
+		inline static Ref<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps()) { return CreateProps(props); }
+		inline static Ref<TextureCube> Create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps()) { return CreateFilepath(filepath, props); }
+		inline static Ref<TextureCube> Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props = CubeTextureProps()) { return CreatePrefilter(cubemap, prefilter, props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateProps, Ref<TextureCube>, const CubeTextureProps& props);
+		MH_DECLARE_FUNC(CreateFilepath, Ref<TextureCube>, const std::string& filepath, const CubeTextureProps& props);
+		MH_DECLARE_FUNC(CreatePrefilter, Ref<TextureCube>, Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps&);
 	};
 }

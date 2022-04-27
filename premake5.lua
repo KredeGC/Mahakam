@@ -125,7 +125,7 @@ project "Mahakam"
         
         removefiles { "**/Linux/**" }
         
-        defines { "MH_PLATFORM_WINDOWS" }
+        defines { "MH_PLATFORM_WINDOWS", "NOMINMAX" }
         
         links {
             "opengl32.lib",

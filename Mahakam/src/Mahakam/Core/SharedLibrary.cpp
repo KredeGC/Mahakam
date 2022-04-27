@@ -26,7 +26,7 @@ namespace Mahakam
 		if (!initialized)
 			ExportFuncPointers();
 
-		auto loadPtr = GetFunction<void, ImGuiContext*, void**>("Load");
+		auto loadPtr = GetFunction<void, ImGuiContext*, FuncPtr*>("Load");
 
 		ImGuiContext* context = ImGui::GetCurrentContext();
 
@@ -50,7 +50,7 @@ namespace Mahakam
 #endif
 	}
 
-	void SharedLibrary::AddFunction(FuncPtr* funcPtr)
+	void SharedLibrary::AddFunction(FuncPtr funcPtr)
 	{
 		funcPointers[funcPointerCounter++] = funcPtr;
 	}
@@ -59,18 +59,17 @@ namespace Mahakam
 	{
 		initialized = true;
 
-		int i = 0;
-
-		
+		MH_CORE_ASSERT(funcPointerCounter == NUM_FUNC_PTRS, "Inconsisent amount of func pointers exported!");
 	}
 
-	void SharedLibrary::ImportFuncPointers(void* ptrs[NUM_FUNC_PTRS])
+	void SharedLibrary::ImportFuncPointers(FuncPtr ptrs[NUM_FUNC_PTRS])
 	{
 		initialized = true;
 
 		for (int i = 0; i < NUM_FUNC_PTRS; i++)
 		{
-			funcPointers[i] = ptrs[i];
+			if (funcPointers[i] && *funcPointers[i])
+				*funcPointers[i] = *ptrs[i];
 		}
 	}
 }

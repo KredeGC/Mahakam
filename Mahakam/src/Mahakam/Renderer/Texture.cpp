@@ -42,7 +42,8 @@ namespace Mahakam
 	};
 
 
-	Ref<TextureCube> TextureCube::Create(const CubeTextureProps& props)
+	//Ref<TextureCube> TextureCube::Create(const CubeTextureProps& props)
+	MH_DEFINE_FUNC(TextureCube::CreateProps, Ref<TextureCube>, const CubeTextureProps& props)
 	{
 		MH_OVERRIDE_FUNC(TextureCubeCreateProps, props);
 
@@ -51,15 +52,16 @@ namespace Mahakam
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTextureCube>(props);
+			return static_cast<Ref<TextureCube>>(CreateRef<OpenGLTextureCube>(props));
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");
 
-		return nullptr;
-	}
+		return Ref<TextureCube>(nullptr);
+	};
 
-	Ref<TextureCube> TextureCube::Create(const std::string& filepath, const CubeTextureProps& props)
+	//Ref<TextureCube> TextureCube::Create(const std::string& filepath, const CubeTextureProps& props)
+	MH_DEFINE_FUNC(TextureCube::CreateFilepath, Ref<TextureCube>, const std::string& filepath, const CubeTextureProps& props)
 	{
 		MH_OVERRIDE_FUNC(TextureCubeCreateFilepath, filepath, props);
 
@@ -68,15 +70,16 @@ namespace Mahakam
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTextureCube>(filepath, props);
+			return static_cast<Ref<TextureCube>>(CreateRef<OpenGLTextureCube>(filepath, props));
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");
 
-		return nullptr;
-	}
+		return Ref<TextureCube>(nullptr);
+	};
 
-	Ref<TextureCube> TextureCube::Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
+	//Ref<TextureCube> TextureCube::Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
+	MH_DEFINE_FUNC(TextureCube::CreatePrefilter, Ref<TextureCube>, Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 	{
 		MH_OVERRIDE_FUNC(TextureCubeCreatePrefilter, cubemap, prefilter, props);
 
@@ -85,11 +88,11 @@ namespace Mahakam
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTextureCube>(cubemap, prefilter, props);
+			return static_cast<Ref<TextureCube>>(CreateRef<OpenGLTextureCube>(cubemap, prefilter, props));
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");
 
-		return nullptr;
-	}
+		return Ref<TextureCube>(nullptr);
+	};
 }

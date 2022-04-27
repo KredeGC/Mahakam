@@ -1,7 +1,12 @@
 #pragma once
 #include "Mahakam/Core/Core.h"
 
-#if MH_PLATFORM_LINUX
+#if MH_PLATFORM_WINDOWS
+#ifndef _WINDEF_
+struct HINSTANCE__; // Forward or never
+typedef HINSTANCE__* HINSTANCE;
+#endif
+#elif MH_PLATFORM_LINUX
 #include <dlfcn.h>
 #endif
 
@@ -10,9 +15,9 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
-		typedef void* FuncPtr;
+		typedef void** FuncPtr;
 
-		static constexpr int NUM_FUNC_PTRS = 3;
+		static constexpr int NUM_FUNC_PTRS = 66;
 
 	private:
 		const char* filepath = nullptr;
@@ -33,10 +38,10 @@ namespace Mahakam
 
 		virtual ~SharedLibrary();
 
-		static void AddFunction(void** funcPtr);
+		static void AddFunction(FuncPtr funcPtr);
 
 		static void ExportFuncPointers();
-		static void ImportFuncPointers(void* ptrs[NUM_FUNC_PTRS]);
+		static void ImportFuncPointers(FuncPtr ptrs[NUM_FUNC_PTRS]);
 
 		template<typename R, typename ...Args>
 		auto GetFunction(const char* name)
