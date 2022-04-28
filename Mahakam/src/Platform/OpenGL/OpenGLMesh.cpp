@@ -249,7 +249,7 @@ namespace Mahakam
 						componentCount,
 						dataType,
 						0,
-						(const void*)(uintptr_t)vertexBufferOffset));
+						(void*)(uintptr_t)vertexBufferOffset));
 				}
 				else
 				{
@@ -258,7 +258,7 @@ namespace Mahakam
 						dataType,
 						GL_FALSE, // Why normalize it?
 						0,
-						(const void*)(uintptr_t)vertexBufferOffset));
+						(void*)(uintptr_t)vertexBufferOffset));
 				}
 
 				vertexBufferOffset += vertexCount * dataTypeSize;
@@ -290,11 +290,15 @@ namespace Mahakam
 		interleavedVertices = new uint8_t[totalSize]{ 0 };
 
 		uint32_t dstOffset = 0;
-		for (auto& vert : vertices)
+		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
-			uint32_t size = vertexCount * sizes[vert.first];
-			std::memcpy(interleavedVertices + dstOffset, vert.second, size);
-			dstOffset += size;
+			auto iter = vertices.find(i);
+			if (iter != vertices.end())
+			{
+				uint32_t size = vertexCount * sizes[i];
+				std::memcpy(interleavedVertices + dstOffset, iter->second, size);
+				dstOffset += size;
+			}
 		}
 	}
 }

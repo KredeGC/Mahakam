@@ -11,7 +11,7 @@ namespace Mahakam
 
 		uint8_t* interleavedVertices = 0;
 		uint32_t interleavedSize;
-		std::unordered_map<int, void*> vertices; // TODO: Find some way to use robin_hood
+		robin_hood::unordered_map<int, void*> vertices; // TODO: Find some way to use robin_hood
 
 		uint32_t* indices = 0;
 
