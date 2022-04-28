@@ -7,7 +7,6 @@
 
 namespace Mahakam
 {
-#pragma region UniformBuffer
 	class UniformBuffer
 	{
 	public:
@@ -18,12 +17,10 @@ namespace Mahakam
 
 		virtual void SetData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
 
-		static Ref<UniformBuffer> Create(uint32_t size);
+		MH_DECLARE_FUNC(Create, Ref<UniformBuffer>, uint32_t size);
 	};
-#pragma endregion
 
 
-#pragma region StorageBuffer
 	class StorageBuffer
 	{
 	public:
@@ -36,7 +33,6 @@ namespace Mahakam
 
 		virtual void SetData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
 
-		static Ref<StorageBuffer> Create(uint32_t size);
+		MH_DECLARE_FUNC(Create, Ref<StorageBuffer>, uint32_t size);
 	};
-#pragma endregion
 }

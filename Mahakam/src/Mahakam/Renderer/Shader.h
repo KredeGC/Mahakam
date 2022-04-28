@@ -55,6 +55,9 @@ namespace Mahakam
 		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) = 0;
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
 
-		static Ref<Shader> Create(const std::string& filepath, const std::initializer_list<std::string>& keywords = {});
+		inline static Ref<Shader> Create(const std::string& filepath, const std::initializer_list<std::string>& keywords = {}) { return CreateFilepath(filepath, keywords); }
+
+	private:
+		MH_DECLARE_FUNC(CreateFilepath, Ref<Shader>, const std::string& filepath, const std::initializer_list<std::string>& keywords);
 	};
 }

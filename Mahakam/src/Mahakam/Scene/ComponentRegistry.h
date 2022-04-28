@@ -30,25 +30,14 @@ namespace Mahakam
 		};
 
 	private:
-		std::unordered_map<std::string, ComponentInterface> componentInterfaces;
+		using ComponentMap = std::unordered_map<std::string, ComponentInterface>;
 
-		static ComponentRegistry* s_Instance;
+		static ComponentMap componentInterfaces;
 
 	public:
-		static ComponentRegistry* GetInstance();
+		MH_DECLARE_FUNC(RegisterComponent, void, const std::string& name, ComponentInterface componentInterface);
+		MH_DECLARE_FUNC(DeregisterComponent, void, const std::string& name);
 
-		static void Init() { s_Instance = new ComponentRegistry(); }
-		static void Shutdown() { delete s_Instance; }
-
-		inline static void RegisterComponent(const std::string& name, ComponentInterface componentInterface) { GetInstance()->RegisterComponentImpl(name, componentInterface); }
-		inline static void DeregisterComponent(const std::string& name) { GetInstance()->DeregisterComponentImpl(name); }
-
-		inline static const std::unordered_map<std::string, ComponentInterface>& GetComponents() { return GetInstance()->GetComponentsImpl(); }
-
-	private:
-		void RegisterComponentImpl(const std::string& name, ComponentInterface componentInterface);
-		void DeregisterComponentImpl(const std::string& name);
-
-		const std::unordered_map<std::string, ComponentInterface>& GetComponentsImpl() const { return componentInterfaces; }
+		MH_DECLARE_FUNC(GetComponents, const ComponentMap&);
 	};
 }

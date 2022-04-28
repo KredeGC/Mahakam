@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include "Buffer.h"
 #include "FrameBuffer.h"
 #include "RenderData.h"
@@ -29,97 +31,88 @@ namespace Mahakam
 			uint32_t height;
 		};
 
-		RendererData rendererData;
-		SceneData sceneData;
+		using FrameBufferMap = robin_hood::unordered_map<std::string, WeakRef<FrameBuffer>>;
 
-		static Renderer* s_Instance;
+		static RendererData* rendererData;
+		static SceneData* sceneData;
 
 	public:
-		Renderer(uint32_t width, uint32_t height);
-		~Renderer();
+		static void Init(uint32_t width, uint32_t height);
+		static void Shutdown();
 
-		static Renderer* GetInstance();
-
-		static void OnWindowResize(uint32_t width, uint32_t height);
-
-		inline static void Init(uint32_t width, uint32_t height) { s_Instance = new Renderer(width, height); }
-		inline static void Shutdown() { delete s_Instance; }
+		inline static void OnWindowResize(uint32_t width, uint32_t height) { OnWindowResizeImpl(width, height); }
 		
-		inline static void SetRenderPasses(const std::vector<Ref<RenderPass>>& renderPasses) { GetInstance()->SetRenderPassesImpl(renderPasses); }
+		inline static void SetRenderPasses(const std::vector<Ref<RenderPass>>& renderPasses) { SetRenderPassesImpl(renderPasses); }
 		
 		// Scenes
-		inline static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment) { GetInstance()->BeginSceneImpl(cam, transform, environment); }
-		inline static void EndScene() { GetInstance()->EndSceneImpl(); }
+		inline static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment) { BeginSceneImpl(cam, transform, environment); }
+		inline static void EndScene() { EndSceneImpl(); }
 		
-		inline static void Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material) { GetInstance()->SubmitImpl(transform, mesh, material); }
-		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { GetInstance()->SubmitParticlesImpl(transform, particles); }
+		inline static void Submit(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material) { SubmitImpl(transform, mesh, material); }
+		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { SubmitParticlesImpl(transform, particles); }
 		
 		// Drawing
-		inline static void DrawSkybox() { GetInstance()->DrawSkyboxImpl(); }
-		inline static void DrawScreenQuad() { GetInstance()->DrawScreenQuadImpl(); }
-		inline static void DrawInstancedSphere(uint32_t amount) { GetInstance()->DrawInstancedSphereImpl(amount); }
-		inline static void DrawInstancedPyramid(uint32_t amount) { GetInstance()->DrawInstancedPyramidImpl(amount); }
+		inline static void DrawSkybox() { DrawSkyboxImpl(); }
+		inline static void DrawScreenQuad() { DrawScreenQuadImpl(); }
+		inline static void DrawInstancedSphere(uint32_t amount) { DrawInstancedSphereImpl(amount); }
+		inline static void DrawInstancedPyramid(uint32_t amount) { DrawInstancedPyramidImpl(amount); }
 
 		// Settings (TODO: Use a struct or delete)
-		inline static void EnableWireframe(bool enable) { GetInstance()->EnableWireframeImpl(enable); }
-		inline static void EnableBoundingBox(bool enable) { GetInstance()->EnableBoundingBoxImpl(enable); }
-		inline static void EnableGBuffer(bool enable) { GetInstance()->EnableGBufferImpl(enable); }
+		inline static void EnableWireframe(bool enable) { EnableWireframeImpl(enable); }
+		inline static void EnableBoundingBox(bool enable) { EnableBoundingBoxImpl(enable); }
+		inline static void EnableGBuffer(bool enable) { EnableGBufferImpl(enable); }
 
-		inline static bool HasWireframeEnabled() { return GetInstance()->HasWireframeEnabledImpl(); }
-		inline static bool HasBoundingBoxEnabled() { return GetInstance()->HasBoundingBoxEnabledImpl(); }
-		inline static bool HasGBufferEnabled() { return GetInstance()->HasGBufferEnabledImpl(); }
+		inline static bool HasWireframeEnabled() { return HasWireframeEnabledImpl(); }
+		inline static bool HasBoundingBoxEnabled() { return HasBoundingBoxEnabledImpl(); }
+		inline static bool HasGBufferEnabled() { return HasGBufferEnabledImpl(); }
 
 		// Framebuffers
-		inline static void AddFrameBuffer(const std::string& name, WeakRef<FrameBuffer> frameBuffer) { GetInstance()->AddFrameBufferImpl(name, frameBuffer); }
-		inline static const robin_hood::unordered_map<std::string, WeakRef<FrameBuffer>>& GetFrameBuffers() { return GetInstance()->GetFrameBuffersImpl(); }
+		inline static void AddFrameBuffer(const std::string& name, WeakRef<FrameBuffer> frameBuffer) { AddFrameBufferImpl(name, frameBuffer); }
+		inline static const FrameBufferMap& GetFrameBuffers() { return GetFrameBuffersImpl(); }
 
-		inline static Ref<FrameBuffer> GetGBuffer() { return GetInstance()->GetGBufferImpl(); }
-		inline static Ref<FrameBuffer> GetFrameBuffer() { return GetInstance()->GetFrameBufferImpl(); }
+		inline static Ref<FrameBuffer> GetGBuffer() { return GetGBufferImpl(); }
+		inline static Ref<FrameBuffer> GetFrameBuffer() { return GetFrameBufferImpl(); }
 
 		// Performance
-		inline static void AddPerformanceResult(uint32_t vertexCount, uint32_t indexCount) { GetInstance()->AddPerformanceResultImpl(vertexCount, indexCount); }
-		inline static const RendererResults& GetPerformanceResults() { return GetInstance()->GetPerformanceResultsImpl(); }
+		inline static void AddPerformanceResult(uint32_t vertexCount, uint32_t indexCount) { AddPerformanceResultImpl(vertexCount, indexCount); }
+		inline static const RendererResults& GetPerformanceResults() { return GetPerformanceResultsImpl(); }
 
 	private:
-		void SetRenderPassesImpl(const std::vector<Ref<RenderPass>>& renderPasses);
+		MH_DECLARE_FUNC(OnWindowResizeImpl, void, uint32_t width, uint32_t height);
 
+		MH_DECLARE_FUNC(SetRenderPassesImpl, void, const std::vector<Ref<RenderPass>>& renderPasses);
+		 
 		// Scenes
-		void BeginSceneImpl(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
-		void EndSceneImpl();
+		MH_DECLARE_FUNC(BeginSceneImpl, void, const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
+		MH_DECLARE_FUNC(EndSceneImpl, void);
 
-		void SubmitImpl(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
-		void SubmitParticlesImpl(const glm::mat4& transform, const ParticleSystem& particles);
-
+		MH_DECLARE_FUNC(SubmitImpl, void, const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material);
+		MH_DECLARE_FUNC(SubmitParticlesImpl, void, const glm::mat4& transform, const ParticleSystem& particles);
+		 
 		// Drawing
-		void DrawSkyboxImpl();
-		void DrawScreenQuadImpl();
-		void DrawInstancedSphereImpl(uint32_t amount);
-		void DrawInstancedPyramidImpl(uint32_t amount);
-
+		MH_DECLARE_FUNC(DrawSkyboxImpl, void);
+		MH_DECLARE_FUNC(DrawScreenQuadImpl, void);
+		MH_DECLARE_FUNC(DrawInstancedSphereImpl, void, uint32_t amount);
+		MH_DECLARE_FUNC(DrawInstancedPyramidImpl, void, uint32_t amount);
+		 
 		// Settings
-		inline void EnableWireframeImpl(bool enable) { sceneData.wireframe = enable; }
-		inline void EnableBoundingBoxImpl(bool enable) { sceneData.boundingBox = enable; }
-		inline void EnableGBufferImpl(bool enable) { sceneData.gBuffer = enable; }
+		MH_DECLARE_FUNC(EnableWireframeImpl, void, bool enable);
+		MH_DECLARE_FUNC(EnableBoundingBoxImpl, void, bool enable);
+		MH_DECLARE_FUNC(EnableGBufferImpl, void, bool enable);
 
-		inline bool HasWireframeEnabledImpl() { return sceneData.wireframe; }
-		inline bool HasBoundingBoxEnabledImpl() { return sceneData.boundingBox; }
-		inline bool HasGBufferEnabledImpl() { return sceneData.gBuffer; }
-
+		MH_DECLARE_FUNC(HasWireframeEnabledImpl, bool);
+		MH_DECLARE_FUNC(HasBoundingBoxEnabledImpl, bool);
+		MH_DECLARE_FUNC(HasGBufferEnabledImpl, bool);
+		
 		// Framebuffers
-		void AddFrameBufferImpl(const std::string& name, WeakRef<FrameBuffer> frameBuffer);
-		const robin_hood::unordered_map<std::string, WeakRef<FrameBuffer>>& GetFrameBuffersImpl();
-
-		inline Ref<FrameBuffer> GetGBufferImpl() { return rendererData.gBuffer; }
-		inline Ref<FrameBuffer> GetFrameBufferImpl() { return rendererData.viewportFramebuffer; }
-
+		MH_DECLARE_FUNC(AddFrameBufferImpl, void, const std::string& name, WeakRef<FrameBuffer> frameBuffer);
+		MH_DECLARE_FUNC(GetFrameBuffersImpl, const FrameBufferMap&);
+		
+		MH_DECLARE_FUNC(GetGBufferImpl, Ref<FrameBuffer>);
+		MH_DECLARE_FUNC(GetFrameBufferImpl, Ref<FrameBuffer>);
+		 
 		// Performance
-		inline void AddPerformanceResultImpl(uint32_t vertexCount, uint32_t indexCount)
-		{
-			rendererData.rendererResults.drawCalls++;
-			rendererData.rendererResults.vertexCount += vertexCount;
-			rendererData.rendererResults.triCount += indexCount;
-		}
-
-		inline const RendererResults& GetPerformanceResultsImpl() { return rendererData.rendererResults; }
+		MH_DECLARE_FUNC(AddPerformanceResultImpl, void, uint32_t vertexCount, uint32_t indexCount);
+		MH_DECLARE_FUNC(GetPerformanceResultsImpl, const RendererResults&);
 	};
 }

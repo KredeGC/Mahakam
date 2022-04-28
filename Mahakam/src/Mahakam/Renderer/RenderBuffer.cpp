@@ -9,7 +9,8 @@
 
 namespace Mahakam
 {
-	Ref<RenderBuffer> RenderBuffer::Create(uint32_t width, uint32_t height, TextureFormat format)
+	//Ref<RenderBuffer> RenderBuffer::CreateImpl(uint32_t width, uint32_t height, TextureFormat format)
+	MH_DEFINE_FUNC(RenderBuffer::CreateImpl, Ref<RenderBuffer>, uint32_t width, uint32_t height, TextureFormat format)
 	{
 		MH_OVERRIDE_FUNC(RenderBufferCreate, width, height, format);
 
@@ -24,5 +25,5 @@ namespace Mahakam
 		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
-	}
+	};
 }

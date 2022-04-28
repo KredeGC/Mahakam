@@ -15,6 +15,7 @@ namespace Mahakam
 
 		virtual void SetTexture(const std::string& name, Ref<Texture> tex) = 0;
 
-		static Ref<ComputeShader> Create(const std::string& filepath);
+		//static Ref<ComputeShader> Create(const std::string& filepath);
+		MH_DECLARE_FUNC(Create, Ref<ComputeShader>, const std::string& filepath);
 	};
 }

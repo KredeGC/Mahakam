@@ -31,35 +31,19 @@ namespace Mahakam::Editor
 		};
 
 	private:
-		std::unordered_map<std::string, EditorWindowProps> windowProps;
+		using WindowPropsMap = std::unordered_map<std::string, EditorWindowProps>;
 
-		std::unordered_set<EditorWindow*> windows;
-
-		static EditorWindowRegistry* s_Instance;
+		static WindowPropsMap windowProps;
+		static std::unordered_set<EditorWindow*> windows;
 
 	public:
-		static EditorWindowRegistry* GetInstance();
+		MH_DECLARE_FUNC(RegisterWindow, void, EditorWindowProps props); // TODO: Use const &
+		MH_DECLARE_FUNC(DeregisterWindow, void, const std::string& name);
 
-		inline static void Init() { s_Instance = new EditorWindowRegistry(); }
-		inline static void Shutdown() { delete s_Instance; }
+		MH_DECLARE_FUNC(OpenWindow, void, const std::string& name);
+		MH_DECLARE_FUNC(CloseWindow, void, EditorWindow* window);
 
-		inline static void RegisterWindow(EditorWindowProps props) { GetInstance()->RegisterWindowImpl(props); }
-		inline static void DeregisterWindow(const std::string& name) { GetInstance()->DeregisterWindowImpl(name); }
-
-		inline static void OpenWindow(const std::string& name) { GetInstance()->OpenWindowImpl(name); }
-		inline static void CloseWindow(EditorWindow* window) { GetInstance()->CloseWindowImpl(window); }
-
-		inline static const std::unordered_map<std::string, EditorWindowProps>& GetWindowProps() { return GetInstance()->GetWindowPropsImpl(); }
-		inline static std::unordered_set<EditorWindow*>& GetWindows() { return GetInstance()->GetWindowsImpl(); }
-
-	private:
-		void RegisterWindowImpl(EditorWindowProps props);
-		void DeregisterWindowImpl(const std::string& name);
-
-		void OpenWindowImpl(const std::string& name);
-		void CloseWindowImpl(EditorWindow* window);
-
-		const std::unordered_map<std::string, EditorWindowProps>& GetWindowPropsImpl() const { return windowProps; }
-		std::unordered_set<EditorWindow*>& GetWindowsImpl() { return windows; }
+		MH_DECLARE_FUNC(GetWindowProps, const WindowPropsMap&);
+		MH_DECLARE_FUNC(GetWindows, std::unordered_set<EditorWindow*>&);
 	};
 }

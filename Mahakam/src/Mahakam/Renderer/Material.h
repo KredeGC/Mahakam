@@ -47,7 +47,10 @@ namespace Mahakam
 		virtual const glm::vec3 GetFloat3(const std::string& name) const = 0;
 		virtual const glm::vec4 GetFloat4(const std::string& name) const = 0;
 
-		static Ref<Material> Copy(Ref<Material> material);
-		static Ref<Material> Create(Ref<Shader> shader, const std::string& variant = "");
+		inline static Ref<Material> Create(Ref<Shader> shader, const std::string& variant = "") { return CreateImpl(shader, variant); }
+		MH_DECLARE_FUNC(Copy, Ref<Material>, Ref<Material> material);
+
+	private:
+		MH_DECLARE_FUNC(CreateImpl, Ref<Material>, Ref<Shader> shader, const std::string& variant);
 	};
 }

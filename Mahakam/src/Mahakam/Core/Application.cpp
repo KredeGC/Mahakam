@@ -9,6 +9,8 @@
 #include "Mahakam/Scene/ComponentRegistry.h"
 #include "Mahakam/Scene/Entity.h"
 
+#include "SharedLibrary.h"
+
 namespace Mahakam
 {
 	Application* Application::instance = nullptr;
@@ -108,6 +110,13 @@ namespace Mahakam
 		layerStack.PopOverlay(overlay);
 
 		delete overlay;
+	}
+
+	Application* Application::GetInstance()
+	{
+		MH_OVERRIDE_FUNC(ApplicationGetInstance);
+
+		return instance;
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& event)

@@ -7,22 +7,23 @@
 
 namespace Mahakam
 {
-	ComponentRegistry* ComponentRegistry::s_Instance = nullptr;
+	ComponentRegistry::ComponentMap ComponentRegistry::componentInterfaces;
 
-	ComponentRegistry* ComponentRegistry::GetInstance()
-	{
-		MH_OVERRIDE_FUNC(ComponentRegistryGetInstance);
-
-		return s_Instance;
-	}
-
-	void ComponentRegistry::RegisterComponentImpl(const std::string& name, ComponentInterface componentInterface)
+	//void ComponentRegistry::RegisterComponent(const std::string& name, ComponentInterface componentInterface)
+	MH_DEFINE_FUNC(ComponentRegistry::RegisterComponent, void, const std::string& name, ComponentInterface componentInterface)
 	{
 		componentInterfaces[name] = componentInterface;
-	}
+	};
 
-	void ComponentRegistry::DeregisterComponentImpl(const std::string& name)
+	//void ComponentRegistry::DeregisterComponent(const std::string& name)
+	MH_DEFINE_FUNC(ComponentRegistry::DeregisterComponent, void, const std::string& name)
 	{
 		componentInterfaces.erase(name);
-	}
+	};
+
+	//const ComponentMap& ComponentRegistry::GetComponents()
+	MH_DEFINE_FUNC(ComponentRegistry::GetComponents, const ComponentRegistry::ComponentMap&)
+	{
+		return componentInterfaces;
+	};
 }

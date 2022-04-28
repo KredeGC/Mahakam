@@ -58,7 +58,7 @@ namespace Mahakam::Editor
 					SaveSceneAs();
 
 				if (ImGui::MenuItem("Exit"))
-					Application::GetInstance().Close();
+					Application::GetInstance()->Close();
 
 				ImGui::EndMenu();
 			}

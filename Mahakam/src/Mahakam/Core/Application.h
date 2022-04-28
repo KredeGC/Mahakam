@@ -38,7 +38,7 @@ namespace Mahakam
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* layer);
 
-		inline static Application& GetInstance() { return *instance; }
+		static Application* GetInstance();
 
 		inline static bool IsRunning() { return instance->running; }
 		inline static bool IsMinimized() { return instance->minimized; }

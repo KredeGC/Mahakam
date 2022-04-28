@@ -36,7 +36,7 @@ namespace Mahakam::Editor
 
 			m_Focused = ImGui::IsWindowFocused();
 			m_Hovered = ImGui::IsWindowHovered();
-			Application::GetInstance().GetImGuiLayer()->BlockEvents(!m_Focused && !m_Hovered);
+			Application::GetInstance()->GetImGuiLayer()->BlockEvents(!m_Focused && !m_Hovered);
 			ImVec2 newViewportSize = ImGui::GetContentRegionAvail();
 			if (newViewportSize.x != m_ViewportSize.x || newViewportSize.y != m_ViewportSize.y)
 			{

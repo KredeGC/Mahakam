@@ -27,7 +27,7 @@ namespace Mahakam {
 	{
 		MH_PROFILE_FUNCTION();
 
-#ifndef MH_DEBUG
+#ifdef MH_RUNTIME
 		FreeConsole();
 #endif
 
@@ -72,7 +72,17 @@ namespace Mahakam {
 
 
 		// Creating the window
+#ifndef MH_RUNTIME
+		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 		window = glfwCreateWindow((int)data.width, (int)data.height, data.title.c_str(), nullptr, nullptr);
+#else
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+		width = mode->width;
+		height = mode->height;
+
+		window = glfwCreateWindow(width, height, data.title.c_str(), glfwGetPrimaryMonitor(), nullptr);
+#endif
 		context = RenderingContext::Create(window, (void*)glfwGetProcAddress);
 		context->Init();
 		glfwSetWindowUserPointer(window, &data);

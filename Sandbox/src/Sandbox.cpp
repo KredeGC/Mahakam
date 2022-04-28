@@ -21,7 +21,7 @@ struct EXPORTED CamerControllerComponent
 	CamerControllerComponent() {}
 };
 
-EXTERN_EXPORTED void Load(ImGuiContext* context, void** funcPtrs)
+EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 {
 	MH_RUNTIME_LOAD(context, funcPtrs);
 
@@ -113,6 +113,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Entity cameraEntity = scene->CreateEntity("Main Camera");
 	cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
 	cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
+	cameraEntity.AddComponent<CamerControllerComponent>();
 
 
 	// Directional light
@@ -153,6 +154,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create backpack textures
+#if 0
 	Ref<Texture2D> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
 	Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 	Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
@@ -175,6 +177,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
 	backpackEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	backpackEntity.AddComponent<RotatorComponent>();
+#endif
 
 
 	// Create mesh & base material

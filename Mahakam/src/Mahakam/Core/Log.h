@@ -1,7 +1,9 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
-#include "spdlog/fmt/ostr.h"
+#include "SharedLibrary.h"
+
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h>
 
 namespace Mahakam
 {
@@ -14,9 +16,8 @@ namespace Mahakam
 	public:
 		static void Init();
 
-		static Ref<spdlog::logger>& GetEngineLogger();
-
-		static Ref<spdlog::logger>& GetGameLogger();
+		MH_DECLARE_FUNC(GetEngineLogger, Ref<spdlog::logger>&);
+		MH_DECLARE_FUNC(GetGameLogger, Ref<spdlog::logger>&);
 	};
 }
 

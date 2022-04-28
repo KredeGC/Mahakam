@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/SharedLibrary.h"
 #include "TextureFormats.h"
 #include "RenderBuffer.h"
 
@@ -60,8 +61,12 @@ namespace Mahakam
 	class Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> Create(const TextureProps& props = TextureProps());
-		static Ref<Texture2D> Create(const std::string& filepath, const TextureProps& props = TextureProps());
+		inline static Ref<Texture2D> Create(const TextureProps& props = TextureProps()) { return CreateProps(props); }
+		inline static Ref<Texture2D> Create(const std::string& filepath, const TextureProps& props = TextureProps()) { return CreateFilepath(filepath, props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateProps, Ref<Texture2D>, const TextureProps& props);
+		MH_DECLARE_FUNC(CreateFilepath, Ref<Texture2D>, const std::string& filepath, const TextureProps& props);
 	};
 
 
@@ -87,8 +92,13 @@ namespace Mahakam
 		uint32_t resolution;
 
 	public:
-		static Ref<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps());
-		static Ref<TextureCube> Create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps());
-		static Ref<TextureCube> Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props = CubeTextureProps());
+		inline static Ref<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps()) { return CreateProps(props); }
+		inline static Ref<TextureCube> Create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps()) { return CreateFilepath(filepath, props); }
+		inline static Ref<TextureCube> Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props = CubeTextureProps()) { return CreatePrefilter(cubemap, prefilter, props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateProps, Ref<TextureCube>, const CubeTextureProps& props);
+		MH_DECLARE_FUNC(CreateFilepath, Ref<TextureCube>, const std::string& filepath, const CubeTextureProps& props);
+		MH_DECLARE_FUNC(CreatePrefilter, Ref<TextureCube>, Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps&);
 	};
 }
