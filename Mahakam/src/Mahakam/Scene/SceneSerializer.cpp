@@ -124,7 +124,7 @@ namespace Mahakam
 
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
-			YAML::Node& component = node[name];
+			YAML::Node component = node[name];
 			if (component && componentInterface.Deserialize)
 				componentInterface.Deserialize(component, entity);
 		}
