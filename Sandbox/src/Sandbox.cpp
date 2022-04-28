@@ -83,7 +83,6 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create skinned material
-#if 1
 	Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
 	skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
 	skinnedMaterial->SetFloat("u_Metallic", 1.0f);
@@ -108,7 +107,6 @@ EXTERN_EXPORTED void Run(Scene* scene)
 				animatedEntity.GetComponent<TransformComponent>().SetEulerangles({ 0.0f, 3.1415f, 0.0f });
 		}
 	}
-#endif
 
 
 	// Scene camera

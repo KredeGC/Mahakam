@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Timestep.h"
+#include "Mahakam/Core/SharedLibrary.h"
 
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Texture.h"
@@ -53,10 +54,13 @@ namespace Mahakam
 			return registry.view<Args...>().each(func);
 		}
 
-		static Ref<Scene> Create();
-		static Ref<Scene> Create(const std::string& filepath);
+		inline static Ref<Scene> Create() { return CreateEmpty(); }
+		inline static Ref<Scene> Create(const std::string& filepath) { return CreateFilepath(filepath); }
 
 	private:
+		MH_DECLARE_FUNC(CreateEmpty, Ref<Scene>);
+		MH_DECLARE_FUNC(CreateFilepath, Ref<Scene>, const std::string& filepath);
+
 		template<typename T>
 		void OnComponentAdded(const Entity& entity, T& component)
 		{

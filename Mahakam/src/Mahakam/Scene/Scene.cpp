@@ -262,17 +262,19 @@ namespace Mahakam
 		registry.destroy(entity);
 	}
 
-	Ref<Scene> Scene::Create()
+	//Ref<Scene> Scene::CreateEmpty()
+	MH_DEFINE_FUNC(Scene::CreateEmpty, Ref<Scene>)
 	{
 		MH_OVERRIDE_FUNC(SceneCreate);
 
 		return std::make_shared<Scene>();
-	}
+	};
 
-	Ref<Scene> Scene::Create(const std::string& filepath)
+	//Ref<Scene> Scene::CreateFilepath(const std::string& filepath)
+	MH_DEFINE_FUNC(Scene::CreateFilepath, Ref<Scene>, const std::string& filepath)
 	{
 		MH_OVERRIDE_FUNC(SceneCreateFilepath, filepath);
 
 		return std::make_shared<Scene>(filepath);
-	}
+	};
 }

@@ -5,26 +5,23 @@
 
 namespace Mahakam::Editor
 {
-	EditorWindowRegistry* EditorWindowRegistry::s_Instance;
+	std::unordered_map<std::string, EditorWindowRegistry::EditorWindowProps> EditorWindowRegistry::windowProps;
+	std::unordered_set<EditorWindow*> EditorWindowRegistry::windows;
 
-	EditorWindowRegistry* EditorWindowRegistry::GetInstance()
-	{
-		MH_OVERRIDE_FUNC(EditorWindowRegistryGetInstance);
-
-		return s_Instance;
-	}
-
-	void EditorWindowRegistry::RegisterWindowImpl(EditorWindowProps props)
+	//void EditorWindowRegistry::RegisterWindow(EditorWindowProps props)
+	MH_DEFINE_FUNC(EditorWindowRegistry::RegisterWindow, void, EditorWindowProps props)
 	{
 		windowProps[props.Name] = props;
-	}
+	};
 
-	void EditorWindowRegistry::DeregisterWindowImpl(const std::string& name)
+	//void EditorWindowRegistry::DeregisterWindow(const std::string& name)
+	MH_DEFINE_FUNC(EditorWindowRegistry::DeregisterWindow, void, const std::string& name)
 	{
 		windowProps.erase(name);
-	}
+	};
 
-	void EditorWindowRegistry::OpenWindowImpl(const std::string& name)
+	//void EditorWindowRegistry::OpenWindow(const std::string& name)
+	MH_DEFINE_FUNC(EditorWindowRegistry::OpenWindow, void, const std::string& name)
 	{
 		auto iter = windowProps.find(name);
 		if (iter != windowProps.end())
@@ -34,10 +31,23 @@ namespace Mahakam::Editor
 			if (iter->second.Unique)
 				iter->second.Instance = window;
 		}
-	}
+	};
 
-	void EditorWindowRegistry::CloseWindowImpl(EditorWindow* window)
+	//void EditorWindowRegistry::CloseWindow(EditorWindow* window)
+	MH_DEFINE_FUNC(EditorWindowRegistry::CloseWindow, void, EditorWindow* window)
 	{
 		windows.erase(window);
-	}
+	};
+
+	//const EditorWindowRegistry::WindowPropsMap& EditorWindowRegistry::GetWindowProps()
+	MH_DEFINE_FUNC(EditorWindowRegistry::GetWindowProps, const EditorWindowRegistry::WindowPropsMap&)
+	{
+		return windowProps;
+	};
+
+	//std::unordered_set<EditorWindow*>& EditorWindowRegistry::GetWindows()
+	MH_DEFINE_FUNC(EditorWindowRegistry::GetWindows, std::unordered_set<EditorWindow*>&)
+	{
+		return windows;
+	};
 }

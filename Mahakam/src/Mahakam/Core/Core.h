@@ -69,15 +69,14 @@
 #define MH_OVERRIDE_FUNC(...)
 
 #ifndef MH_STANDALONE
-#define MH_DECLARE_FUNC3(line, func, returnType, ...) static returnType (*func)(__VA_ARGS__); \
+#define MH_DECLARE_FUNC_LINE2(line, func, returnType, ...) static returnType (*func)(__VA_ARGS__); \
 	inline static uint8_t generated_##line = (::Mahakam::SharedLibrary::AddFunction((void**)&func), 0);
+#define MH_DECLARE_FUNC_LINE(line, func, returnType, ...) MH_DECLARE_FUNC_LINE2(line, func, returnType, __VA_ARGS__)
 
-#define MH_DECLARE_FUNC2(line, func, returnType, ...) MH_DECLARE_FUNC3(line, func, returnType, __VA_ARGS__)
-#define MH_DECLARE_FUNC(func, returnType, ...) MH_DECLARE_FUNC2(__LINE__, func, returnType, __VA_ARGS__)
-
+#define MH_DECLARE_FUNC(func, returnType, ...) MH_DECLARE_FUNC_LINE(__LINE__, func, returnType, __VA_ARGS__)
 #define MH_DEFINE_FUNC(func, returnType, ...) returnType (*func)(__VA_ARGS__) = [](__VA_ARGS__) -> returnType
 #else
-#define MH_DECLARE_FUNC()
+#define MH_DECLARE_FUNC(func, returnType, ...) static returnType func(__VA_ARGS__);
 #define MH_DEFINE_FUNC(func, returnType, ...) returnType func(__VA_ARGS__)
 #endif
 

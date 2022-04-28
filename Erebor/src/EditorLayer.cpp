@@ -14,10 +14,6 @@ namespace Mahakam::Editor
 	{
 		blitShader = Shader::Create("assets/shaders/internal/Blit.yaml");
 
-#ifndef MH_RUNTIME
-		EditorWindowRegistry::Init();
-#endif
-
 		// Setup render passes for the default renderer
 		Renderer::SetRenderPasses({
 			CreateRef<GeometryRenderPass>(),
@@ -343,10 +339,6 @@ namespace Mahakam::Editor
 
 		delete lib;
 		blitShader = nullptr;
-
-#ifndef MH_RUNTIME
-		EditorWindowRegistry::Shutdown();
-#endif
 	}
 
 	void EditorLayer::OnUpdate(Timestep dt)
