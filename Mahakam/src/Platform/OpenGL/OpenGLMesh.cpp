@@ -105,86 +105,60 @@ namespace Mahakam
 	OpenGLMesh::OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 		: vertexCount(vertexCount), indexCount(indexCount), indices(new uint32_t[indexCount])
 	{
-		MH_PROFILE_FUNCTION();
-
 		std::memcpy(this->indices, indices, indexCount * sizeof(uint32_t));
 
-		// Create VAO
-		MH_GL_CALL(glGenVertexArrays(1, &rendererID));
-		MH_GL_CALL(glBindVertexArray(rendererID));
-
 		// Setup vertices
-		uint32_t size = 0;
+		interleavedSize = 0;
 		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
 			if (verts[i])
 			{
 				const uint32_t elementSize = vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
-				vertices[i] = new uint8_t[elementSize];
+				vertices[i] = new uint8_t[elementSize]{ 0 };
 				std::memcpy(vertices[i], verts[i], elementSize);
-				size += elementSize;
+				interleavedSize += elementSize;
 			}
 		}
 
 		// Copy vertices into interleavedVertices
 		InterleaveBuffers();
 
-		// Create vertex buffer
-		MH_GL_CALL(glGenBuffers(1, &vertexBufferID));
-		MH_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID));
-		MH_GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, interleavedVertices, GL_STATIC_DRAW));
+		// Initialize gpu memory
+		Init();
 
-		// Create index buffer
-		MH_GL_CALL(glGenBuffers(1, &indexBufferID));
-		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID));
-		MH_GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(uint32_t), this->indices, GL_STATIC_DRAW));
+		// Calculate bounds
+		RecalculateBounds();
+	}
 
-		// Setup vertex buffer layout
-		uint32_t vertexBufferOffset = 0;
-		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
+	OpenGLMesh::OpenGLMesh(OpenGLMesh&& other) noexcept
+		: vertexCount(other.vertexCount), indexCount(other.indexCount), bounds(other.bounds), interleavedSize(other.interleavedSize), indices(new uint32_t[indexCount])
+	{
+		std::memcpy(indices, other.indices, indexCount * sizeof(uint32_t));
+
+		interleavedVertices = new uint8_t[interleavedSize];
+		std::memcpy(interleavedVertices, other.interleavedVertices, interleavedSize);
+
+		for (auto& vert : other.vertices)
 		{
-			if (verts[i] != nullptr)
-			{
-				const ShaderDataType& type = BUFFER_ELEMENTS[i];
-
-				GLenum dataType = ShaderDataTypeToOpenGLBaseType(type);
-				uint32_t dataTypeSize = ShaderDataTypeSize(type);
-				uint32_t componentCount = ShaderDataTypeComponentCount(type);
-
-				MH_GL_CALL(glEnableVertexAttribArray(i));
-				if (dataType == GL_INT)
-				{
-					MH_GL_CALL(glVertexAttribIPointer(i,
-						componentCount,
-						dataType,
-						0,
-						(const void*)(uintptr_t)vertexBufferOffset));
-				}
-				else
-				{
-					MH_GL_CALL(glVertexAttribPointer(i,
-						componentCount,
-						dataType,
-						GL_FALSE, // Why normalize it?
-						0,
-						(const void*)(uintptr_t)vertexBufferOffset));
-				}
-
-				vertexBufferOffset += vertexCount * dataTypeSize;
-			}
+			const uint32_t elementSize = vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[vert.first]);
+			vertices[vert.first] = new uint8_t[elementSize]{ 0 };
+			std::memcpy(vertices[vert.first], other.vertices[vert.first], elementSize);
 		}
 
-		MH_GL_CALL(glBindVertexArray(0));
-
-		MH_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
-		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-
-		RecalculateBounds();
+		Init();
 	}
 
 	OpenGLMesh::~OpenGLMesh()
 	{
 		MH_PROFILE_FUNCTION();
+
+		if (interleavedVertices)
+			delete[] interleavedVertices;
+
+		for (auto& vert : vertices)
+			delete[] vert.second;
+
+		delete[] indices;
 
 		MH_GL_CALL(glDeleteVertexArrays(1, &rendererID));
 
@@ -238,6 +212,65 @@ namespace Mahakam
 		}
 	}
 
+	void OpenGLMesh::Init()
+	{
+		MH_PROFILE_FUNCTION();
+
+		// Create VAO
+		MH_GL_CALL(glGenVertexArrays(1, &rendererID));
+		MH_GL_CALL(glBindVertexArray(rendererID));
+
+		// Create vertex buffer
+		MH_GL_CALL(glGenBuffers(1, &vertexBufferID));
+		MH_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID));
+		MH_GL_CALL(glBufferData(GL_ARRAY_BUFFER, interleavedSize, interleavedVertices, GL_STATIC_DRAW));
+
+		// Create index buffer
+		MH_GL_CALL(glGenBuffers(1, &indexBufferID));
+		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID));
+		MH_GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(uint32_t), indices, GL_STATIC_DRAW));
+
+		// Setup vertex buffer layout
+		uint32_t vertexBufferOffset = 0;
+		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
+		{
+			if (vertices.find(i) != vertices.end())
+			{
+				const ShaderDataType& type = BUFFER_ELEMENTS[i];
+
+				GLenum dataType = ShaderDataTypeToOpenGLBaseType(type);
+				uint32_t dataTypeSize = ShaderDataTypeSize(type);
+				uint32_t componentCount = ShaderDataTypeComponentCount(type);
+
+				MH_GL_CALL(glEnableVertexAttribArray(i));
+				if (dataType == GL_INT)
+				{
+					MH_GL_CALL(glVertexAttribIPointer(i,
+						componentCount,
+						dataType,
+						0,
+						(const void*)(uintptr_t)vertexBufferOffset));
+				}
+				else
+				{
+					MH_GL_CALL(glVertexAttribPointer(i,
+						componentCount,
+						dataType,
+						GL_FALSE, // Why normalize it?
+						0,
+						(const void*)(uintptr_t)vertexBufferOffset));
+				}
+
+				vertexBufferOffset += vertexCount * dataTypeSize;
+			}
+		}
+
+		MH_GL_CALL(glBindVertexArray(0));
+
+		MH_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+	}
+
 	void OpenGLMesh::InterleaveBuffers()
 	{
 		uint32_t totalSize = 0;
@@ -254,7 +287,7 @@ namespace Mahakam
 
 		if (interleavedVertices)
 			delete[] interleavedVertices;
-		interleavedVertices = new uint8_t[totalSize];
+		interleavedVertices = new uint8_t[totalSize]{ 0 };
 
 		uint32_t dstOffset = 0;
 		for (auto& vert : vertices)

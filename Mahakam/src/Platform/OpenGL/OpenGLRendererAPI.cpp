@@ -51,6 +51,7 @@ namespace Mahakam
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+		glFrontFace(GL_CCW);
 
 #if defined(MH_ENABLE_GL_ERRORS)
 		glEnable(GL_DEBUG_OUTPUT);
