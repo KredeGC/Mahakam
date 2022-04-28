@@ -121,10 +121,16 @@ namespace Mahakam
 
 	void OpenGLRendererAPI::EnableZTesting(bool enable)
 	{
-		if (enable)
+		// https://www.khronos.org/opengl/wiki/Common_Mistakes#Disable_depth_test_and_allow_depth_writes
+		/*if (enable)
 			glEnable(GL_DEPTH_TEST);
 		else
-			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_DEPTH_TEST);*/
+
+		if (enable)
+			glDepthFunc(GL_LEQUAL);
+		else
+			glDepthFunc(GL_ALWAYS);
 	}
 
 	void OpenGLRendererAPI::SetFillMode(bool fill)

@@ -105,9 +105,9 @@ namespace Mahakam
 	OpenGLMesh::OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 		: vertexCount(vertexCount), indexCount(indexCount), indices(new uint32_t[indexCount])
 	{
-		memcpy(this->indices, indices, indexCount * sizeof(uint32_t));
-
 		MH_PROFILE_FUNCTION();
+
+		std::memcpy(this->indices, indices, indexCount * sizeof(uint32_t));
 
 		// Create VAO
 		MH_GL_CALL(glGenVertexArrays(1, &rendererID));
@@ -120,8 +120,8 @@ namespace Mahakam
 			if (verts[i])
 			{
 				const uint32_t elementSize = vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
-				vertices[i] = new char[elementSize];
-				memcpy(vertices[i], verts[i], elementSize);
+				vertices[i] = new uint8_t[elementSize];
+				std::memcpy(vertices[i], verts[i], elementSize);
 				size += elementSize;
 			}
 		}
@@ -141,7 +141,6 @@ namespace Mahakam
 
 		// Setup vertex buffer layout
 		uint32_t vertexBufferOffset = 0;
-		uint32_t vertexBufferIndex = 0;
 		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
 			if (verts[i] != nullptr)
@@ -152,10 +151,10 @@ namespace Mahakam
 				uint32_t dataTypeSize = ShaderDataTypeSize(type);
 				uint32_t componentCount = ShaderDataTypeComponentCount(type);
 
-				MH_GL_CALL(glEnableVertexAttribArray(vertexBufferIndex));
+				MH_GL_CALL(glEnableVertexAttribArray(i));
 				if (dataType == GL_INT)
 				{
-					MH_GL_CALL(glVertexAttribIPointer(vertexBufferIndex,
+					MH_GL_CALL(glVertexAttribIPointer(i,
 						componentCount,
 						dataType,
 						0,
@@ -163,7 +162,7 @@ namespace Mahakam
 				}
 				else
 				{
-					MH_GL_CALL(glVertexAttribPointer(vertexBufferIndex,
+					MH_GL_CALL(glVertexAttribPointer(i,
 						componentCount,
 						dataType,
 						GL_FALSE, // Why normalize it?
@@ -173,8 +172,12 @@ namespace Mahakam
 
 				vertexBufferOffset += vertexCount * dataTypeSize;
 			}
-			vertexBufferIndex++;
 		}
+
+		MH_GL_CALL(glBindVertexArray(0));
+
+		MH_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
 		RecalculateBounds();
 	}
@@ -218,25 +221,20 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
+		MH_CORE_BREAK("Changing an active mesh not currently supported!");
+
 		uint32_t elementSize = ShaderDataTypeSize(BUFFER_ELEMENTS[slot]);
 		uint32_t size = elementSize * vertexCount;
 
 		auto iter = vertices.find(slot);
 		if (iter == vertices.end())
 		{
-			// The buffer doesn't exist
-			void* verts = new char[size];
-
-			memcpy(verts, verts, size);
-
-			vertices[slot] = verts;
+			
 		}
 		else
 		{
 			// The buffer already exists
-			memcpy(vertices[slot], data, size);
-
-			MH_CORE_BREAK("Changing an active mesh not currently supported!");
+			std::memcpy(vertices[slot], data, size);
 		}
 	}
 
@@ -256,13 +254,13 @@ namespace Mahakam
 
 		if (interleavedVertices)
 			delete[] interleavedVertices;
-		interleavedVertices = new char[totalSize];
+		interleavedVertices = new uint8_t[totalSize];
 
 		uint32_t dstOffset = 0;
 		for (auto& vert : vertices)
 		{
 			uint32_t size = vertexCount * sizes[vert.first];
-			memcpy(interleavedVertices + dstOffset, vert.second, size);
+			std::memcpy(interleavedVertices + dstOffset, vert.second, size);
 			dstOffset += size;
 		}
 	}

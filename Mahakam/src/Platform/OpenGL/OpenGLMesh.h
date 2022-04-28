@@ -9,7 +9,7 @@ namespace Mahakam
 	private:
 		uint32_t rendererID;
 
-		char* interleavedVertices = 0;
+		uint8_t* interleavedVertices = 0;
 		std::unordered_map<int, void*> vertices; // TODO: Find some way to use robin_hood
 
 		uint32_t* indices = 0;

@@ -27,7 +27,7 @@ namespace Mahakam {
 	{
 		MH_PROFILE_FUNCTION();
 
-#ifdef MH_RUNTIME
+#if MH_PLATFORM_WINDOWS && defined(MH_RUNTIME)
 		FreeConsole();
 #endif
 

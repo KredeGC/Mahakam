@@ -12,7 +12,7 @@ namespace Mahakam::GUI
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, COLUMN_WIDTH);
 
-		ImGui::Text(label);
+		ImGui::Text("%s", label);
 		ImGui::NextColumn();
 
 		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
@@ -89,7 +89,7 @@ namespace Mahakam::GUI
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, COLUMN_WIDTH);
 
-		ImGui::Text(label);
+		ImGui::Text("%s", label);
 		ImGui::NextColumn();
 
 		changed = ImGui::ColorEdit3("", glm::value_ptr(value), flags);
