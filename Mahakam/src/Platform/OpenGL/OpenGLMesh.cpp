@@ -130,24 +130,6 @@ namespace Mahakam
 		RecalculateBounds();
 	}
 
-	OpenGLMesh::OpenGLMesh(OpenGLMesh&& other) noexcept
-		: vertexCount(other.vertexCount), indexCount(other.indexCount), bounds(other.bounds), interleavedSize(other.interleavedSize), indices(new uint32_t[indexCount])
-	{
-		std::memcpy(indices, other.indices, indexCount * sizeof(uint32_t));
-
-		interleavedVertices = new uint8_t[interleavedSize];
-		std::memcpy(interleavedVertices, other.interleavedVertices, interleavedSize);
-
-		for (auto& vert : other.vertices)
-		{
-			const uint32_t elementSize = vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[vert.first]);
-			vertices[vert.first] = new uint8_t[elementSize]{ 0 };
-			std::memcpy(vertices[vert.first], other.vertices[vert.first], elementSize);
-		}
-
-		Init();
-	}
-
 	OpenGLMesh::~OpenGLMesh()
 	{
 		MH_PROFILE_FUNCTION();
@@ -155,8 +137,8 @@ namespace Mahakam
 		if (interleavedVertices)
 			delete[] interleavedVertices;
 
-		for (auto& vert : vertices)
-			delete[] vert.second;
+		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
+			delete[] vertices[i];
 
 		delete[] indices;
 
@@ -200,16 +182,8 @@ namespace Mahakam
 		uint32_t elementSize = ShaderDataTypeSize(BUFFER_ELEMENTS[slot]);
 		uint32_t size = elementSize * vertexCount;
 
-		auto iter = vertices.find(slot);
-		if (iter == vertices.end())
-		{
-			
-		}
-		else
-		{
-			// The buffer already exists
-			std::memcpy(vertices[slot], data, size);
-		}
+		// The buffer already exists
+		std::memcpy(vertices[slot], data, size);
 	}
 
 	void OpenGLMesh::Init()
@@ -234,7 +208,7 @@ namespace Mahakam
 		uint32_t vertexBufferOffset = 0;
 		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
-			if (vertices.find(i) != vertices.end())
+			if (vertices[i])
 			{
 				const ShaderDataType& type = BUFFER_ELEMENTS[i];
 
@@ -277,8 +251,7 @@ namespace Mahakam
 		uint32_t sizes[BUFFER_ELEMENTS_SIZE]{ 0 };
 		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
-			auto iter = vertices.find(i);
-			if (iter != vertices.end())
+			if (vertices[i])
 			{
 				totalSize += vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
 				sizes[i] = ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
@@ -292,11 +265,10 @@ namespace Mahakam
 		uint32_t dstOffset = 0;
 		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
-			auto iter = vertices.find(i);
-			if (iter != vertices.end())
+			if (vertices[i])
 			{
 				uint32_t size = vertexCount * sizes[i];
-				std::memcpy(interleavedVertices + dstOffset, iter->second, size);
+				std::memcpy(interleavedVertices + dstOffset, vertices[i], size);
 				dstOffset += size;
 			}
 		}

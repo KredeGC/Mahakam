@@ -38,7 +38,7 @@
 #endif // MH_ENABLE_ASSERT
 
 #ifdef MH_ENABLE_PROFILING
-#define MH_PROFILE_SCOPE_LINE2(name, line, flushRenderer) ::Mahakam::Profiler profiler##line = Profiler::Create(name, flushRenderer);
+#define MH_PROFILE_SCOPE_LINE2(name, line, flushRenderer) ::Mahakam::Profiler profiler##line(name, flushRenderer);
 #define MH_PROFILE_SCOPE_LINE(name, line, flushRenderer) MH_PROFILE_SCOPE_LINE2(name, line, flushRenderer)
 
 #define MH_PROFILE_SCOPE(name) MH_PROFILE_SCOPE_LINE(name, __LINE__, false)
@@ -65,8 +65,6 @@
 
 // Returns a non-capturing lambda which calls fn
 #define MH_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
-
-#define MH_OVERRIDE_FUNC(...)
 
 #ifndef MH_STANDALONE
 #define MH_DECLARE_FUNC_LINE2(line, func, returnType, ...) static returnType (*func)(__VA_ARGS__); \

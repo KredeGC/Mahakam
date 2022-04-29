@@ -75,8 +75,6 @@ namespace Mahakam
 	//Ref<Mesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	MH_DEFINE_FUNC(Mesh::CreateImpl, Ref<Mesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	{
-		MH_OVERRIDE_FUNC(MeshCreate, vertexCount, indexCount, verts, indices);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -93,8 +91,6 @@ namespace Mahakam
 	//SkinnedMesh Mesh::LoadModelImpl(const std::string& filepath, const SkinnedMeshProps& props)
 	MH_DEFINE_FUNC(Mesh::LoadModelImpl, SkinnedMesh, const std::string& filepath, const SkinnedMeshProps& props)
 	{
-		MH_OVERRIDE_FUNC(MeshLoad, filepath, props);
-
 		// TODO: Use SkinnedMeshProps to determine if we should load textures and create materials, or use the provided materials
 
 		MH_PROFILE_FUNCTION();

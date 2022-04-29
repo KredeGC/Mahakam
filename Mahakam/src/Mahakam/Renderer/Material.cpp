@@ -12,8 +12,6 @@ namespace Mahakam
 	//Ref<Material> Material::CreateImpl(Ref<Shader> shader, const std::string& variant)
 	MH_DEFINE_FUNC(Material::CreateImpl, Ref<Material>, Ref<Shader> shader, const std::string& variant)
 	{
-		MH_OVERRIDE_FUNC(MaterialCreate, shader, variant);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -30,8 +28,6 @@ namespace Mahakam
 	//Ref<Material> Material::Copy(Ref<Material> material)
 	MH_DEFINE_FUNC(Material::Copy, Ref<Material>, Ref<Material> material)
 	{
-		MH_OVERRIDE_FUNC(MaterialCopy, material);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:

@@ -45,8 +45,6 @@ namespace Mahakam
 	//Ref<TextureCube> TextureCube::Create(const CubeTextureProps& props)
 	MH_DEFINE_FUNC(TextureCube::CreateProps, Ref<TextureCube>, const CubeTextureProps& props)
 	{
-		MH_OVERRIDE_FUNC(TextureCubeCreateProps, props);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -63,8 +61,6 @@ namespace Mahakam
 	//Ref<TextureCube> TextureCube::Create(const std::string& filepath, const CubeTextureProps& props)
 	MH_DEFINE_FUNC(TextureCube::CreateFilepath, Ref<TextureCube>, const std::string& filepath, const CubeTextureProps& props)
 	{
-		MH_OVERRIDE_FUNC(TextureCubeCreateFilepath, filepath, props);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -81,8 +77,6 @@ namespace Mahakam
 	//Ref<TextureCube> TextureCube::Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 	MH_DEFINE_FUNC(TextureCube::CreatePrefilter, Ref<TextureCube>, Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 	{
-		MH_OVERRIDE_FUNC(TextureCubeCreatePrefilter, cubemap, prefilter, props);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:

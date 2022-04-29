@@ -114,8 +114,6 @@ namespace Mahakam
 
 	Application* Application::GetInstance()
 	{
-		MH_OVERRIDE_FUNC(ApplicationGetInstance);
-
 		return instance;
 	}
 

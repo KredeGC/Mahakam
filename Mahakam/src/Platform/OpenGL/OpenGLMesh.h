@@ -11,7 +11,7 @@ namespace Mahakam
 
 		uint8_t* interleavedVertices = 0;
 		uint32_t interleavedSize;
-		robin_hood::unordered_map<int, void*> vertices; // TODO: Find some way to use robin_hood
+		uint8_t* vertices[BUFFER_ELEMENTS_SIZE]{ 0 };
 
 		uint32_t* indices = 0;
 
@@ -25,7 +25,6 @@ namespace Mahakam
 
 	public:
 		OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
-		OpenGLMesh(OpenGLMesh&& other) noexcept;
 		virtual ~OpenGLMesh() override;
 
 		virtual void Bind() const override;
@@ -41,8 +40,8 @@ namespace Mahakam
 
 		inline uint32_t GetVertexCount() const override { return vertexCount; }
 
-		inline virtual bool HasVertices(int index) const override { return vertices.find(index) != vertices.end(); }
-		inline virtual const void* GetVertices(int index) const override { auto it = vertices.find(index); return it != vertices.end() ? it->second : nullptr; }
+		inline virtual bool HasVertices(int index) const override { return vertices[index]; }
+		inline virtual const void* GetVertices(int index) const override { return vertices[index]; }
 
 		inline const uint32_t* GetIndices() const override { return indices; }
 		inline uint32_t GetIndexCount() const override { return indexCount; }

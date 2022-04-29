@@ -12,8 +12,6 @@ namespace Mahakam
 	//Ref<RenderBuffer> RenderBuffer::CreateImpl(uint32_t width, uint32_t height, TextureFormat format)
 	MH_DEFINE_FUNC(RenderBuffer::CreateImpl, Ref<RenderBuffer>, uint32_t width, uint32_t height, TextureFormat format)
 	{
-		MH_OVERRIDE_FUNC(RenderBufferCreate, width, height, format);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:

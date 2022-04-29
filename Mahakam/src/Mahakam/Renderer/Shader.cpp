@@ -12,8 +12,6 @@ namespace Mahakam
 	//Ref<Shader> Shader::Create(const std::string& filepath, const std::initializer_list<std::string>& keywords)
 	MH_DEFINE_FUNC(Shader::CreateFilepath, Ref<Shader>, const std::string& filepath, const std::initializer_list<std::string>& keywords)
 	{
-		MH_OVERRIDE_FUNC(ShaderCreate, filepath, keywords);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:

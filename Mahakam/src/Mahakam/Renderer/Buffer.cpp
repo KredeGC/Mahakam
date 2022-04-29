@@ -12,8 +12,6 @@ namespace Mahakam
 	//Ref<UniformBuffer> UniformBuffer::Create(uint32_t size)
 	MH_DEFINE_FUNC(UniformBuffer::Create, Ref<UniformBuffer>, uint32_t size)
 	{
-		MH_OVERRIDE_FUNC(UniformBufferCreate, size);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -31,8 +29,6 @@ namespace Mahakam
 	//Ref<StorageBuffer> StorageBuffer::Create(uint32_t size)
 	MH_DEFINE_FUNC(StorageBuffer::Create, Ref<StorageBuffer>, uint32_t size)
 	{
-		MH_OVERRIDE_FUNC(StorageBufferCreate, size);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:

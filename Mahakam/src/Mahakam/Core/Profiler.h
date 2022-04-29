@@ -46,8 +46,6 @@ namespace Mahakam
 
 		void Stop();
 
-		static Profiler Create(const char* name, bool flushRenderer);
-
 		static void AddResult(const char* name, std::chrono::time_point<std::chrono::steady_clock> startTime, std::chrono::time_point<std::chrono::steady_clock> endTime);
 
 		static void ClearResults();

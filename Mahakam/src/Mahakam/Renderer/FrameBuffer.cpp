@@ -12,8 +12,6 @@ namespace Mahakam
 	//Ref<FrameBuffer> FrameBuffer::Create(const FrameBufferProps& prop)
 	MH_DEFINE_FUNC(FrameBuffer::Create, Ref<FrameBuffer>, const FrameBufferProps& prop)
 	{
-		MH_OVERRIDE_FUNC(FrameBufferCreate, prop);
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
