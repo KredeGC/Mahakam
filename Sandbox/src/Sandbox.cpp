@@ -154,7 +154,6 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create backpack textures
-#if 0
 	Ref<Texture2D> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
 	Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
 	Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
@@ -177,7 +176,6 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
 	backpackEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	backpackEntity.AddComponent<RotatorComponent>();
-#endif
 
 
 	// Create mesh & base material

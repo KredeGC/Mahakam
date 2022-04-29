@@ -69,14 +69,6 @@ namespace Mahakam::Editor
 				glm::mat4 viewMatrix = glm::inverse(m_EditorCamera.GetModelMatrix());
 
 				ImGuizmo::ViewManipulate(glm::value_ptr(viewMatrix), 5.0f, ImVec2(pos.x + size.x - 128, pos.y), ImVec2(128, 128), 0);
-
-				/*const glm::mat4 modelMatrix = glm::inverse(viewMatrix);
-
-				glm::quat rotation = glm::quat_cast(modelMatrix);
-
-				editorCamera.SetRotation(rotation);*/
-
-				//MH_CORE_TRACE("{0},{1},{2}", viewEulerAngles.x - viewEulerAngles2.x, viewEulerAngles.y - viewEulerAngles2.y, viewEulerAngles.z - viewEulerAngles2.z);
 			}
 
 			// Transform gizmo
@@ -101,7 +93,7 @@ namespace Mahakam::Editor
 
 				// Draw transform gizmo
 				ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix),
-					(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::MODE::LOCAL, glm::value_ptr(modelMatrix), 0, snap ? snapValues : 0);
+					(ImGuizmo::OPERATION)m_GizmoType, (ImGuizmo::MODE)m_LocalScope, glm::value_ptr(modelMatrix), 0, snap ? snapValues : 0);
 
 				if (ImGuizmo::IsUsing())
 				{
@@ -159,6 +151,9 @@ namespace Mahakam::Editor
 			break;
 		case MH_KEY_R:
 			m_GizmoType = ImGuizmo::OPERATION::SCALE;
+			break;
+		case MH_KEY_G:
+			m_LocalScope = !m_LocalScope;
 			break;
 		}
 
