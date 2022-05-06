@@ -152,7 +152,8 @@ namespace Mahakam::Editor
 						ImGui::EndPopup();
 					}
 
-					componentInterface.OnInspector(entity);
+					if (componentInterface.OnInspector)
+						componentInterface.OnInspector(entity);
 				}
 
 				if (markedForDeletion)

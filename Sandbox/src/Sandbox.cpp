@@ -180,7 +180,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create becret sound entity
-	Ref<Sound> becretSound = Sound::Create("assets/sounds/becret.wav");
+	Ref<Sound> becretSound = Sound::Create("assets/sounds/memory.wav", { 10.0f, true });
 
 	Entity becretEntity = scene->CreateEntity("Becret");
 	becretEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
@@ -190,13 +190,13 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create becret sound entity
-	Ref<Sound> fernSound = Sound::Create("assets/sounds/fern.wav");
+	/*Ref<Sound> fernSound = Sound::Create("assets/sounds/fern.wav");
 
 	Entity fernEntity = scene->CreateEntity("Becret");
 	fernEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
 	AudioSourceComponent& fernSource = fernEntity.AddComponent<AudioSourceComponent>();
 	fernSource.SetSound(fernSound);
-	fernSource.Play();
+	fernSource.Play();*/
 
 
 	// Create mesh & base material

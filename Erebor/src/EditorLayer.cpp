@@ -49,6 +49,32 @@ namespace Mahakam::Editor
 
 		ComponentRegistry::RegisterComponent("Animator", animatorInterface);
 
+		// AudioSource
+		ComponentRegistry::ComponentInterface audioSourceInterface;
+		audioSourceInterface.SetComponent<AudioSourceComponent>();
+		audioSourceInterface.OnInspector = [](Entity entity)
+		{
+			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
+			Ref<Sound> sound = source.GetSound();
+
+			char buffer[256];
+			memset(buffer, 0, sizeof(buffer));
+			if (sound)
+				std::strncpy(buffer, source.GetSound()->GetFilePath().c_str(), sizeof(buffer));
+			if (ImGui::InputText("##Filepath", buffer, sizeof(buffer)))
+			{
+
+			}
+		};
+
+		ComponentRegistry::RegisterComponent("Audio Source", audioSourceInterface);
+
+		// AudioListener
+		ComponentRegistry::ComponentInterface audioListenerInterface;
+		audioListenerInterface.SetComponent<AudioListenerComponent>();
+
+		ComponentRegistry::RegisterComponent("Audio Listener", audioListenerInterface);
+
 		// Camera
 		ComponentRegistry::ComponentInterface cameraInterface;
 		cameraInterface.SetComponent<CameraComponent>();
@@ -400,7 +426,7 @@ namespace Mahakam::Editor
 
 		m_DockSpace.End();
 #endif
-	}
+}
 
 	void EditorLayer::OnEvent(Event& event)
 	{

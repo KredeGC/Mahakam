@@ -6,12 +6,13 @@
 namespace Mahakam
 {
     //Ref<Sound> Sound::Create(const std::string& filepath, AudioContext* context)
-    MH_DEFINE_FUNC(Sound::CreateImpl, Ref<Sound>, const std::string& filepath, AudioContext* context)
+    MH_DEFINE_FUNC(Sound::CreateImpl, Ref<Sound>, const std::string& filepath, const SoundProps& props, AudioContext* context)
     {
-        return CreateRef<MiniAudioSound>(filepath, static_cast<MiniAudioContext*>(context));
+        return CreateRef<MiniAudioSound>(filepath, props, static_cast<MiniAudioContext*>(context));
     };
 
-	MiniAudioSound::MiniAudioSound(const std::string& filepath, MiniAudioContext* context, bool loop)
+    MiniAudioSound::MiniAudioSound(const std::string& filepath, const SoundProps& props, MiniAudioContext* context)
+        : m_Filepath(filepath), m_Props(props)
 	{
         /*
         The binaural node will need to know the input channel count of the sound so we'll need to load
@@ -22,7 +23,8 @@ namespace Mahakam
 
         soundConfig = ma_sound_config_init();
         soundConfig.pFilePath = filepath.c_str();
-        soundConfig.flags = MA_SOUND_FLAG_NO_DEFAULT_ATTACHMENT;  /* We'll attach this to the graph later. */
+        soundConfig.isLooping = m_Props.loop ? MA_TRUE : MA_FALSE;
+        soundConfig.flags = MA_SOUND_FLAG_NO_DEFAULT_ATTACHMENT | MA_SOUND_FLAG_NO_SPATIALIZATION;  /* We'll attach this to the graph later. */
 
         ma_result result = ma_sound_init_ex(&context->GetEngine(), &soundConfig, &m_Sound);
         //MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize audio HRTF.");
@@ -32,8 +34,7 @@ namespace Mahakam
         /* We'll let the Steam Audio binaural effect do the directional attenuation for us. */
         ma_sound_set_directional_attenuation_factor(&m_Sound, 0);
 
-        /* Loop the sound so we can get a continuous sound. */
-        ma_sound_set_looping(&m_Sound, loop ? MA_TRUE : MA_FALSE);
+        ma_sound_set_volume(&m_Sound, m_Props.volume);
 	}
 
 	MiniAudioSound::~MiniAudioSound()
