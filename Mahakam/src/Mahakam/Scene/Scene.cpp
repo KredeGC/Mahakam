@@ -2,15 +2,14 @@
 #include "Scene.h"
 
 #include "Components.h"
+#include "Entity.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
-
 #include "Mahakam/Core/Utility.h"
 #include "Mahakam/Core/AssetDatabase.h"
+#include "Mahakam/Audio/AudioEngine.h"
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/GL.h"
-
-#include "Entity.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -109,6 +108,17 @@ namespace Mahakam
 			});
 		}
 
+		// Update sound positions
+		{
+			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - AudioSourceComponent");
+
+			registry.view<TransformComponent, AudioSourceComponent>().each([=](auto entity, TransformComponent& transformComponent, AudioSourceComponent& audioSourceComponent)
+			{
+				auto& source = audioSourceComponent.GetAudioSource();
+				source->SetPosition(transformComponent.GetPosition());
+			});
+		}
+
 		// Update animators
 		{
 			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - AnimatorComponent");
@@ -127,6 +137,12 @@ namespace Mahakam
 						material->SetMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
 			});
 		}
+
+		// Get the listening source
+
+
+		// Update sound buffers
+		AudioEngine::UpdateSounds({ 0.0f, 0.0f, 0.0f });
 
 		// Get the rendering camera
 		CameraComponent* mainCamera = nullptr;

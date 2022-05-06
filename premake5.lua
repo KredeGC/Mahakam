@@ -18,9 +18,11 @@ IncludeDir["glad"]          = "Mahakam/vendor/glad/include"
 IncludeDir["glm"]           = "Mahakam/vendor/glm"
 IncludeDir["imgui"]         = "Mahakam/vendor/imgui"
 IncludeDir["imguizmo"]      = "Mahakam/vendor/imguizmo"
+IncludeDir["miniaudio"]     = "Mahakam/vendor/miniaudio/include"
 IncludeDir["robin_hood"]    = "Mahakam/vendor/robin_hood"
 IncludeDir["spdlog"]        = "Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"]     = "Mahakam/vendor/stb_image"
+IncludeDir["steamaudio"]    = "Mahakam/vendor/steamaudio/include"
 IncludeDir["yaml"]          = "Mahakam/vendor/yaml-cpp/include"
 
 LinuxLinks = {
@@ -38,7 +40,8 @@ LinuxLinks = {
     "stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
     "yaml-cpp",
     "assimp",
-    "zlibstatic"
+    "zlibstatic",
+    "phonon"
 }
 
 VendorIncludes = {
@@ -49,8 +52,10 @@ VendorIncludes = {
     "%{IncludeDir.glm}",
     "%{IncludeDir.imgui}",
     "%{IncludeDir.imguizmo}",
+    "%{IncludeDir.miniaudio}",
     "%{IncludeDir.robin_hood}",
     "%{IncludeDir.spdlog}",
+    "%{IncludeDir.steamaudio}",
     "%{IncludeDir.yaml}"
 }
 
@@ -86,6 +91,7 @@ project "Mahakam"
         "%{prj.name}/src/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.inl",
+        "%{prj.name}/vendor/miniaudio/include/miniaudio/**.h",
         "%{prj.name}/vendor/robin_hood/**.h",
         "%{prj.name}/vendor/stb_image/**.h",
         "%{prj.name}/vendor/stb_image/**.cpp"
@@ -100,9 +106,11 @@ project "Mahakam"
         "%{IncludeDir.glm}",
         "%{IncludeDir.imgui}",
         "%{IncludeDir.imguizmo}",
+        "%{IncludeDir.miniaudio}",
         "%{IncludeDir.robin_hood}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.stb_image}",
+        "%{IncludeDir.steamaudio}",
         "%{IncludeDir.yaml}"
     }
     
@@ -127,9 +135,12 @@ project "Mahakam"
         
         defines { "MH_PLATFORM_WINDOWS", "NOMINMAX" }
         
+        libdirs { "./Mahakam/vendor/steamaudio/lib/windows-x64" }
+        
         links {
             "opengl32.lib",
-            "assimp-vc142-mt",
+            "phonon",
+            "assimp-vc142-mt"
         }
 
     -- Linux
@@ -142,7 +153,8 @@ project "Mahakam"
         
         libdirs {
             "./Mahakam/vendor/assimp/lib",
-            "./Mahakam/vendor/assimp/contrib/zlib"
+            "./Mahakam/vendor/assimp/contrib/zlib",
+            "./Mahakam/vendor/steamaudio/lib/linux-x64"
         }
         
         links { "zlibstatic" }
@@ -214,6 +226,10 @@ project "Erebor"
         systemversion "latest"
         
         defines { "MH_PLATFORM_WINDOWS" }
+        
+        postbuildcommands {
+            "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/windows-x64/phonon.dll\" \"../bin/%{outputdir}/%{prj.name}/\""
+        }
 
     filter "system:linux"
         systemversion "latest"
@@ -222,10 +238,15 @@ project "Erebor"
         
         libdirs {
             "./Mahakam/vendor/assimp/lib",
-            "./Mahakam/vendor/assimp/contrib/zlib"
+            "./Mahakam/vendor/assimp/contrib/zlib",
+            "./Mahakam/vendor/steamaudio/lib/linux-x64"
         }
         
         links { LinuxLinks }
+        
+        postbuildcommands {
+            "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/linux-x64/phonon.so\" \"../bin/%{outputdir}/%{prj.name}/\""
+        }
     
     filter "configurations:Debug"
         defines "MH_DEBUG"
@@ -291,7 +312,8 @@ project "Sandbox"
         
         libdirs {
             "./Mahakam/vendor/assimp/lib",
-            "./Mahakam/vendor/assimp/contrib/zlib"
+            "./Mahakam/vendor/assimp/contrib/zlib",
+            "./Mahakam/vendor/steamaudio/lib/linux-x64"
         }
         
         links { LinuxLinks }

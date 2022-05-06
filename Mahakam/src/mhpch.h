@@ -42,6 +42,9 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <miniaudio/miniaudio.h>
+#include <steamaudio/phonon.h>
+
 #ifdef MH_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif

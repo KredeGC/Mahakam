@@ -178,6 +178,17 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	backpackEntity.AddComponent<RotatorComponent>();
 
 
+	// Create sound entity
+	Ref<Sound> sound = Sound::Create("assets/sounds/becret.wav", AudioEngine::GetContext());
+
+	Entity soundEntity = scene->CreateEntity("Sound");
+	soundEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
+	AudioSourceComponent& audioSource = soundEntity.AddComponent<AudioSourceComponent>();
+	audioSource.GetAudioSource()->SetPosition({ 2.5f, 4.0f, 7.5f });
+	audioSource.GetAudioSource()->SetSound(sound);
+	audioSource.GetAudioSource()->Play();
+
+
 	// Create mesh & base material
 	Ref<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
 	Ref<Material> baseMaterial = Material::Create(colorShader);

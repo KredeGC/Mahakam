@@ -16,6 +16,12 @@
 #include "Mahakam/Core/Utility.h"
 #include "Mahakam/Core/Window.h"
 
+// Audio
+#include "Mahakam/Audio/AudioContext.h"
+#include "Mahakam/Audio/AudioEngine.h"
+#include "Mahakam/Audio/AudioSource.h"
+#include "Mahakam/Audio/Sound.h"
+
 // Editor
 #ifndef MH_RUNTIME
 #include "Mahakam/Editor/EditorWindow.h"

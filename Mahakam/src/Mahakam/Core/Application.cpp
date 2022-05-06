@@ -3,6 +3,8 @@
 
 #include "Input.h"
 
+#include "Mahakam/Audio/AudioEngine.h"
+
 #include "Mahakam/Renderer/Renderer.h"
 
 #include "Mahakam/Scene/Components.h"
@@ -25,6 +27,8 @@ namespace Mahakam
 
 		Renderer::Init(props.width, props.height);
 
+		AudioEngine::Init();
+
 		imGuiLayer = new ImGuiLayer();
 		PushOverlay(imGuiLayer);
 	}
@@ -35,6 +39,8 @@ namespace Mahakam
 
 		for (Layer* layer : layerStack)
 			layer->OnDetach();
+
+		AudioEngine::Shutdown();
 
 		Renderer::Shutdown();
 	}
