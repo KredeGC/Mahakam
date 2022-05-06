@@ -38,4 +38,4 @@ typedef struct
 
 MA_API ma_result ma_steamaudio_binaural_node_init(ma_node_graph* pNodeGraph, const ma_steamaudio_binaural_node_config* pConfig, const ma_allocation_callbacks* pAllocationCallbacks, ma_steamaudio_binaural_node* pBinauralNode);
 MA_API void ma_steamaudio_binaural_node_uninit(ma_steamaudio_binaural_node* pBinauralNode, const ma_allocation_callbacks* pAllocationCallbacks);
-MA_API ma_result ma_steamaudio_binaural_node_set_position(ma_steamaudio_binaural_node* pBinauralNode, float source[3], float listener[3]);
+MA_API ma_result ma_steamaudio_binaural_node_set_position(ma_steamaudio_binaural_node* pBinauralNode, IPLVector3 direction, IPLVector3 source, IPLVector3 listener);

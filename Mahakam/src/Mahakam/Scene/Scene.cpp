@@ -83,7 +83,7 @@ namespace Mahakam
 
 	Scene::~Scene() {}
 
-	void Scene::OnUpdate(Timestep ts, bool dontRender)
+	void Scene::OnUpdate(Timestep ts, bool editor)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -150,8 +150,8 @@ namespace Mahakam
 		}
 
 		// Update sound buffers
-		if (listener)
-			AudioEngine::UpdateSounds(listener->GetPosition());
+		if (!editor && listener)
+			AudioEngine::UpdateSounds(listener->GetModelMatrix());
 
 		// Get the rendering camera
 		CameraComponent* mainCamera = nullptr;
@@ -167,7 +167,7 @@ namespace Mahakam
 		}
 
 		// Only prepare scene if we actually have something to render to
-		if (!dontRender && mainCamera && mainTransform)
+		if (!editor && mainCamera && mainTransform)
 			OnRender(*mainCamera, *mainTransform);
 	}
 

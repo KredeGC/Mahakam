@@ -66,10 +66,12 @@ namespace Mahakam
 		ma_engine_uninit(&m_Engine);
 	}
 
-	void MiniAudioContext::UpdateSounds(const glm::vec3& listener)
+	void MiniAudioContext::UpdateSounds(const glm::mat4& listenerTransform)
 	{
+		glm::mat4 listenerView = glm::inverse(listenerTransform);
+
 		for (auto& source : m_Sources)
-			source->UpdatePosition(listener);
+			source->UpdatePosition(listenerView, listenerTransform[3]);
 	}
 
 	void MiniAudioContext::RemoveSource(MiniAudioSource* node)

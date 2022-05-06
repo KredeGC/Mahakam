@@ -9,7 +9,7 @@ namespace Mahakam
 	public:
 		virtual ~AudioContext() {}
 
-		virtual void UpdateSounds(const glm::vec3& listener) = 0;
+		virtual void UpdateSounds(const glm::mat4& listenerTransform) = 0;
 
 		static AudioContext* Create();
 	};

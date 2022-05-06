@@ -15,9 +15,9 @@ namespace Mahakam
 		delete m_Context;
 	}
 
-	MH_DEFINE_FUNC(AudioEngine::UpdateSoundsImpl, void, const glm::vec3& listener)
+	MH_DEFINE_FUNC(AudioEngine::UpdateSoundsImpl, void, const glm::mat4& listenerTransform)
 	{
-		m_Context->UpdateSounds(listener);
+		m_Context->UpdateSounds(listenerTransform);
 	};
 
 	MH_DEFINE_FUNC(AudioEngine::GetContextImpl, AudioContext*)

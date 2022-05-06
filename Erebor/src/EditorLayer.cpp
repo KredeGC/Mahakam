@@ -366,7 +366,11 @@ namespace Mahakam::Editor
 		GL::EnableZWriting(true);
 		GL::EnableZTesting(true);
 #else
-		s_ActiveScene->OnUpdate(dt, true); // TEMPORARY until play-mode is implemented
+		static const bool m_PlayMode = false;
+		if (m_PlayMode)
+			s_ActiveScene->OnUpdate(dt);
+		else
+			s_ActiveScene->OnUpdate(dt, true); // TEMPORARY until play-mode is implemented
 #endif
 
 		// Test compute shader

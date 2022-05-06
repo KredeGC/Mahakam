@@ -12,7 +12,7 @@ namespace Mahakam
 		ma_sound m_Sound;
 
 	public:
-		MiniAudioSound(const std::string& filepath, MiniAudioContext* context, bool loop = false);
+		MiniAudioSound(const std::string& filepath, MiniAudioContext* context, bool loop = true); // TODO: Use a SoundSettings struct
 		~MiniAudioSound();
 
 		virtual const std::string& GetFilePath() const override { return filepath; }

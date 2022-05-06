@@ -16,12 +16,12 @@ namespace Mahakam
 		static void Init();
 		static void Shutdown();
 
-		inline static void UpdateSounds(const glm::vec3& listener) { UpdateSoundsImpl(listener); }
+		inline static void UpdateSounds(const glm::mat4& listenerTransform) { UpdateSoundsImpl(listenerTransform); }
 
 		inline static AudioContext* GetContext() { return GetContextImpl(); }
 
 	private:
-		MH_DECLARE_FUNC(UpdateSoundsImpl, void, const glm::vec3& listener);
+		MH_DECLARE_FUNC(UpdateSoundsImpl, void, const glm::mat4& listenerTransform);
 
 		MH_DECLARE_FUNC(GetContextImpl, AudioContext*);
 	};

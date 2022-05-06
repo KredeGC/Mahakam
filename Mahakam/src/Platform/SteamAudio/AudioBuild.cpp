@@ -224,7 +224,7 @@ MA_API void ma_steamaudio_binaural_node_uninit(ma_steamaudio_binaural_node* pBin
     ma_free(pBinauralNode->_pHeap, pAllocationCallbacks);
 }
 
-MA_API ma_result ma_steamaudio_binaural_node_set_position(ma_steamaudio_binaural_node* pBinauralNode, float source[3], float listener[3])
+MA_API ma_result ma_steamaudio_binaural_node_set_position(ma_steamaudio_binaural_node* pBinauralNode, IPLVector3 direction, IPLVector3 source, IPLVector3 listener)
 {
     if (pBinauralNode == NULL)
         return MA_INVALID_ARGS;
@@ -233,20 +233,15 @@ MA_API ma_result ma_steamaudio_binaural_node_set_position(ma_steamaudio_binaural
     IPLDistanceAttenuationModel distanceAttenuationModel{};
     distanceAttenuationModel.type = IPL_DISTANCEATTENUATIONTYPE_DEFAULT;
 
-    IPLVector3 sourcePosition = IPLVector3{ source[0], source[1], source[2] };
-    IPLVector3 listenerPosition = IPLVector3{ listener[0], listener[1], listener[2] };
-
-    float distanceAttenuation = iplDistanceAttenuationCalculate(pBinauralNode->iplContext, sourcePosition, listenerPosition, &distanceAttenuationModel);
+    float distanceAttenuation = iplDistanceAttenuationCalculate(pBinauralNode->iplContext, source, listener, &distanceAttenuationModel);
     
     // Air absorption modelling
     IPLAirAbsorptionModel airAbsorptionModel{};
     airAbsorptionModel.type = IPL_AIRABSORPTIONTYPE_DEFAULT;
 
-    iplAirAbsorptionCalculate(pBinauralNode->iplContext, sourcePosition, listenerPosition, &airAbsorptionModel, pBinauralNode->airAbsorption);
+    iplAirAbsorptionCalculate(pBinauralNode->iplContext, source, listener, &airAbsorptionModel, pBinauralNode->airAbsorption);
 
-    pBinauralNode->direction.x = source[0] - listener[0];
-    pBinauralNode->direction.y = source[1] - listener[1];
-    pBinauralNode->direction.z = source[2] - listener[2];
+    pBinauralNode->direction = direction;
 
     pBinauralNode->distance = distanceAttenuation;
 

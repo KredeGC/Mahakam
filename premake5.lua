@@ -25,6 +25,34 @@ IncludeDir["stb_image"]     = "Mahakam/vendor/stb_image"
 IncludeDir["steamaudio"]    = "Mahakam/vendor/steamaudio/include"
 IncludeDir["yaml"]          = "Mahakam/vendor/yaml-cpp/include"
 
+if os.host() == "linux" then
+    SteamAudioLibDir = "./Mahakam/vendor/steamaudio/lib/linux-x64"
+else
+    SteamAudioLibDir = "./Mahakam/vendor/steamaudio/lib/windows-x64"
+end
+
+AssimpLibDir = "./Mahakam/vendor/assimp/lib"
+ZLibDir = "./Mahakam/vendor/assimp/contrib/zlib"
+
+VendorIncludes = {
+    "%{prj.name}/src",
+    "Mahakam/src",
+    "%{IncludeDir.assimp}",
+    "%{IncludeDir.entt}",
+    "%{IncludeDir.glm}",
+    "%{IncludeDir.imgui}",
+    "%{IncludeDir.imguizmo}",
+    "%{IncludeDir.robin_hood}",
+    "%{IncludeDir.spdlog}",
+    "%{IncludeDir.yaml}"
+}
+
+LinuxLibDirs = {
+    AssimpLibDir,
+    ZLibDir,
+    SteamAudioLibDir
+}
+
 LinuxLinks = {
     "GLFW",
     "glad",
@@ -42,21 +70,6 @@ LinuxLinks = {
     "assimp",
     "zlibstatic",
     "phonon"
-}
-
-VendorIncludes = {
-    "%{prj.name}/src",
-    "Mahakam/src",
-    "%{IncludeDir.assimp}",
-    "%{IncludeDir.entt}",
-    "%{IncludeDir.glm}",
-    "%{IncludeDir.imgui}",
-    "%{IncludeDir.imguizmo}",
-    "%{IncludeDir.miniaudio}",
-    "%{IncludeDir.robin_hood}",
-    "%{IncludeDir.spdlog}",
-    "%{IncludeDir.steamaudio}",
-    "%{IncludeDir.yaml}"
 }
 
 -- Build ASSIMP for debug and release
@@ -91,7 +104,7 @@ project "Mahakam"
         "%{prj.name}/src/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
         "%{prj.name}/vendor/glm/glm/**.inl",
-        "%{prj.name}/vendor/miniaudio/include/miniaudio/**.h",
+        "%{prj.name}/vendor/miniaudio/**.h",
         "%{prj.name}/vendor/robin_hood/**.h",
         "%{prj.name}/vendor/stb_image/**.h",
         "%{prj.name}/vendor/stb_image/**.cpp"
@@ -114,17 +127,21 @@ project "Mahakam"
         "%{IncludeDir.yaml}"
     }
     
+    libdirs { SteamAudioLibDir }
+    
     links {
         "GLFW",
         "glad",
         "ImGui",
         "ImGuizmo",
+        "phonon",
         "yaml-cpp"
     }
 
     defines {
         "_CRT_SECURE_NO_WARNINGS",
-        "GLFW_INCLUDE_NONE"
+        "GLFW_INCLUDE_NONE",
+        "MH_BUILD"
     }
     
     -- Windows
@@ -133,13 +150,13 @@ project "Mahakam"
         
         removefiles { "**/Linux/**" }
         
-        defines { "MH_PLATFORM_WINDOWS", "NOMINMAX" }
-        
-        libdirs { "./Mahakam/vendor/steamaudio/lib/windows-x64" }
+        defines {
+            "MH_PLATFORM_WINDOWS",
+            "NOMINMAX"
+        }
         
         links {
             "opengl32.lib",
-            "phonon",
             "assimp-vc142-mt"
         }
 
@@ -152,18 +169,20 @@ project "Mahakam"
         defines { "MH_PLATFORM_LINUX" }
         
         libdirs {
-            "./Mahakam/vendor/assimp/lib",
-            "./Mahakam/vendor/assimp/contrib/zlib",
-            "./Mahakam/vendor/steamaudio/lib/linux-x64"
+            "%{AssimpLibDir}",
+            "%{ZLibDir}"
         }
         
-        links { "zlibstatic" }
+        links {
+            "assimp",
+            "zlibstatic"
+        }
     
     -- Windows Debug
     filter { "system:windows", "configurations:Debug" }
         libdirs {
-            "./Mahakam/vendor/assimp/lib/Debug",
-            "./Mahakam/vendor/assimp/contrib/zlib/Debug"
+            "%{AssimpLibDir}/Debug",
+            "%{ZLibDir}/Debug"
         }
         
         links { "zlibstaticd" }
@@ -171,8 +190,8 @@ project "Mahakam"
     -- Windows DebugOptimized and Release
     filter { "system:windows", "configurations:DebugOptimized or Release" }
         libdirs {
-            "./Mahakam/vendor/assimp/lib/Release",
-            "./Mahakam/vendor/assimp/contrib/zlib/Release"
+            "%{AssimpLibDir}/Release",
+            "%{ZLibDir}/Release"
         }
         
         links { "zlibstatic" }
@@ -192,10 +211,11 @@ project "Mahakam"
             "MH_RELEASE",
             "MH_RUNTIME"
         }
-        runtime "Release"
-        optimize "on"
         
         removefiles { "**/Editor/**" }
+        
+        runtime "Release"
+        optimize "on"
 
 project "Erebor"
     location "Erebor"
@@ -236,11 +256,7 @@ project "Erebor"
         
         defines { "MH_PLATFORM_LINUX" }
         
-        libdirs {
-            "./Mahakam/vendor/assimp/lib",
-            "./Mahakam/vendor/assimp/contrib/zlib",
-            "./Mahakam/vendor/steamaudio/lib/linux-x64"
-        }
+        libdirs { LinuxLibDirs }
         
         links { LinuxLinks }
         
@@ -263,10 +279,11 @@ project "Erebor"
             "MH_RELEASE",
             "MH_RUNTIME"
         }
-        runtime "Release"
-        optimize "on"
         
         removefiles { "**/Panels/**" }
+        
+        runtime "Release"
+        optimize "on"
 
 project "Sandbox"
     location "Sandbox"
@@ -310,11 +327,7 @@ project "Sandbox"
         
         defines { "MH_PLATFORM_LINUX" }
         
-        libdirs {
-            "./Mahakam/vendor/assimp/lib",
-            "./Mahakam/vendor/assimp/contrib/zlib",
-            "./Mahakam/vendor/steamaudio/lib/linux-x64"
-        }
+        libdirs { LinuxLibDirs }
         
         links { LinuxLinks }
     

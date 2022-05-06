@@ -28,7 +28,7 @@ namespace Mahakam
 		MiniAudioContext();
 		~MiniAudioContext();
 
-		virtual void UpdateSounds(const glm::vec3& listener) override;
+		virtual void UpdateSounds(const glm::mat4& listenerTransform) override;
 
 		void AddSource(MiniAudioSource* node) { m_Sources.push_back(node); }
 		void RemoveSource(MiniAudioSource* node);

@@ -15,8 +15,8 @@ struct EXPORTED RotatorComponent
 
 struct EXPORTED CamerControllerComponent
 {
-	float moveSpeed = 1.0f;
-	float rotationSpeed = 1.0f;
+	float moveSpeed = 5.0f;
+	float rotationSpeed = 2.0f;
 
 	CamerControllerComponent() {}
 };
@@ -179,14 +179,24 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	backpackEntity.AddComponent<RotatorComponent>();
 
 
-	// Create sound entity
-	Ref<Sound> sound = Sound::Create("assets/sounds/becret.wav");
+	// Create becret sound entity
+	Ref<Sound> becretSound = Sound::Create("assets/sounds/becret.wav");
 
-	Entity soundEntity = scene->CreateEntity("Sound");
-	soundEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
-	AudioSourceComponent& audioSource = soundEntity.AddComponent<AudioSourceComponent>();
-	audioSource.SetSound(sound);
-	audioSource.Play();
+	Entity becretEntity = scene->CreateEntity("Becret");
+	becretEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
+	AudioSourceComponent& becretSource = becretEntity.AddComponent<AudioSourceComponent>();
+	becretSource.SetSound(becretSound);
+	becretSource.Play();
+
+
+	// Create becret sound entity
+	Ref<Sound> fernSound = Sound::Create("assets/sounds/fern.wav");
+
+	Entity fernEntity = scene->CreateEntity("Becret");
+	fernEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
+	AudioSourceComponent& fernSource = fernEntity.AddComponent<AudioSourceComponent>();
+	fernSource.SetSound(fernSound);
+	fernSource.Play();
 
 
 	// Create mesh & base material

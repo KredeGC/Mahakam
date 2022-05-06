@@ -34,7 +34,7 @@ namespace Mahakam
 		Scene(const std::string& filepath);
 		~Scene();
 
-		void OnUpdate(Timestep ts, bool dontRender = false);
+		void OnUpdate(Timestep ts, bool editor = false);
 		void OnRender(Camera& camera, const glm::mat4& cameraTransform);
 
 		void OnViewportResize(uint32_t width, uint32_t height);

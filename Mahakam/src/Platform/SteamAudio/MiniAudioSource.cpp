@@ -54,15 +54,17 @@ namespace Mahakam
 
     void MiniAudioSource::SetPosition(const glm::vec3& source)
     {
-        m_Source[0] = source.x;
-        m_Source[1] = source.y;
-        m_Source[2] = source.z;
+        m_Source = { source, 1.0f };
     }
 
-    void MiniAudioSource::UpdatePosition(const glm::vec3& listener)
+    void MiniAudioSource::UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos)
     {
-        float listenerFloats[3]{ listener.x, listener.y, listener.z };
+        glm::vec3 direction = listenerView * m_Source;
 
-        ma_steamaudio_binaural_node_set_position(&m_Node, m_Source, listenerFloats);
+        IPLVector3 iplDirection = { direction.x, direction.y, direction.z };
+        IPLVector3 iplListener = { listenerPos.x, listenerPos.y, listenerPos.z };
+        IPLVector3 iplSource = { m_Source.x, m_Source.y, m_Source.z };
+
+        ma_steamaudio_binaural_node_set_position(&m_Node, iplDirection, iplSource, iplListener);
     }
 }

@@ -15,6 +15,8 @@ namespace Mahakam::Editor
 		{
 			m_EditorCamera.OnUpdate(dt, m_Focused, m_Hovered);
 
+			AudioEngine::UpdateSounds(m_EditorCamera.GetModelMatrix());
+
 			EditorLayer::GetActiveScene()->OnRender(m_EditorCamera, m_EditorCamera.GetModelMatrix());
 		}
 	}

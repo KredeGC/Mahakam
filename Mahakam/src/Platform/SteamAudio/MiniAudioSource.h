@@ -14,7 +14,7 @@ namespace Mahakam
 
 		MiniAudioContext* m_Context;
 
-		float m_Source[3]{ 0 };
+		glm::vec4 m_Source{ 0 };
 
 		Ref<MiniAudioSound> m_Sound;
 
@@ -29,11 +29,7 @@ namespace Mahakam
 
 		virtual void SetPosition(const glm::vec3& source) override;
 
-		void UpdatePosition(const glm::vec3& listener);
-
-		// These must be called from MiniAudioContext::Update
-		//void SetListenerPosition(float x, float y, float z);
-		//void SetSourcePosition(float x, float y, float z);
+		void UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos);
 
 		ma_steamaudio_binaural_node& GetNode() { return m_Node; }
 	};
