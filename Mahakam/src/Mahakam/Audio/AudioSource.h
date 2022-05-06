@@ -2,6 +2,7 @@
 
 #include "Mahakam/Core/Core.h"
 
+#include "AudioEngine.h"
 #include "AudioContext.h"
 
 #include <glm/glm.hpp>
@@ -20,6 +21,10 @@ namespace Mahakam
 		
 		virtual void SetPosition(const glm::vec3& source) = 0;
 
-		static Ref<AudioSource> Create(AudioContext* context);
+		inline static Ref<AudioSource> Create() { return CreateImpl(AudioEngine::GetContext()); }
+		inline static Ref<AudioSource> Create(AudioContext* context) { return CreateImpl(context); }
+
+	private:
+		MH_DECLARE_FUNC(CreateImpl, Ref<AudioSource>, AudioContext* context);
 	};
 }

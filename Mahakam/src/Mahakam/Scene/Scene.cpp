@@ -139,10 +139,19 @@ namespace Mahakam
 		}
 
 		// Get the listening source
+		TransformComponent* listener = nullptr;
+		{
+			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - AudioListenerComponent");
 
+			registry.view<TransformComponent, AudioListenerComponent>().each([&](auto entity, TransformComponent& transform, AudioListenerComponent& audio)
+			{
+				listener = &transform;
+			});
+		}
 
 		// Update sound buffers
-		AudioEngine::UpdateSounds({ 0.0f, 0.0f, 0.0f });
+		if (listener)
+			AudioEngine::UpdateSounds(listener->GetPosition());
 
 		// Get the rendering camera
 		CameraComponent* mainCamera = nullptr;

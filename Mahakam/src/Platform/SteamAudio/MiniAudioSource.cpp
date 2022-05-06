@@ -3,10 +3,11 @@
 
 namespace Mahakam
 {
-    Ref<AudioSource> AudioSource::Create(AudioContext* context)
+    //Ref<AudioSource> AudioSource::Create(AudioContext* context)
+    MH_DEFINE_FUNC(AudioSource::CreateImpl, Ref<AudioSource>, AudioContext* context)
     {
         return CreateRef<MiniAudioSource>(static_cast<MiniAudioContext*>(context));
-    }
+    };
 
     MiniAudioSource::MiniAudioSource(MiniAudioContext* context)
         : m_Context(context)

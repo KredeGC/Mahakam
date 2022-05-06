@@ -113,6 +113,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Entity cameraEntity = scene->CreateEntity("Main Camera");
 	cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
 	cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
+	cameraEntity.AddComponent<AudioListenerComponent>();
 	cameraEntity.AddComponent<CamerControllerComponent>();
 
 
@@ -179,14 +180,13 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create sound entity
-	Ref<Sound> sound = Sound::Create("assets/sounds/becret.wav", AudioEngine::GetContext());
+	Ref<Sound> sound = Sound::Create("assets/sounds/becret.wav");
 
 	Entity soundEntity = scene->CreateEntity("Sound");
 	soundEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	AudioSourceComponent& audioSource = soundEntity.AddComponent<AudioSourceComponent>();
-	audioSource.GetAudioSource()->SetPosition({ 2.5f, 4.0f, 7.5f });
-	audioSource.GetAudioSource()->SetSound(sound);
-	audioSource.GetAudioSource()->Play();
+	audioSource.SetSound(sound);
+	audioSource.Play();
 
 
 	// Create mesh & base material

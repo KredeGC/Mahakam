@@ -17,7 +17,7 @@ namespace Mahakam
 	public:
 		typedef void** FuncPtr;
 
-		static constexpr int NUM_FUNC_PTRS = 80;
+		static constexpr int NUM_FUNC_PTRS = 82;
 
 	private:
 		const char* filepath = nullptr;
