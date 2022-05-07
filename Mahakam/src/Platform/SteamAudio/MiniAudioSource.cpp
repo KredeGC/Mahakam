@@ -23,6 +23,9 @@ namespace Mahakam
         ma_result result = ma_steamaudio_binaural_node_init(ma_engine_get_node_graph(&m_Context->GetEngine()), &binauralNodeConfig, NULL, &m_Node);
         MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize binaural node.");
 
+        /* Set the spatial blend to full spatialization. */
+        m_Node.spatialBlend = 1.0f;
+
         /* Connect the output of the delay node to the input of the endpoint. */
         ma_node_attach_output_bus(&m_Node, 0, ma_engine_get_endpoint(&m_Context->GetEngine()), 0);
 
@@ -41,6 +44,11 @@ namespace Mahakam
         ma_sound_start(&m_Sound->GetNativeSound());
     }
 
+    void MiniAudioSource::Stop()
+    {
+        ma_sound_stop(&m_Sound->GetNativeSound());
+    }
+
     void MiniAudioSource::SetSound(Ref<Sound> sound)
     {
         if (m_Sound)
@@ -52,6 +60,11 @@ namespace Mahakam
         ma_node_attach_output_bus(&m_Sound->GetNativeSound(), 0, &m_Node, 0);
     }
 
+    void MiniAudioSource::SetSpatialBlend(float blend)
+    {
+        m_Node.spatialBlend = blend;
+    }
+
     void MiniAudioSource::SetPosition(const glm::vec3& source)
     {
         m_Source = { source, 1.0f };
@@ -59,12 +72,15 @@ namespace Mahakam
 
     void MiniAudioSource::UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos)
     {
-        glm::vec3 direction = listenerView * m_Source;
+        if (m_Node.spatialBlend > 0.0f)
+        {
+            glm::vec3 direction = listenerView * m_Source;
 
-        IPLVector3 iplDirection = { direction.x, direction.y, direction.z };
-        IPLVector3 iplListener = { listenerPos.x, listenerPos.y, listenerPos.z };
-        IPLVector3 iplSource = { m_Source.x, m_Source.y, m_Source.z };
+            IPLVector3 iplDirection = { direction.x, direction.y, direction.z };
+            IPLVector3 iplListener = { listenerPos.x, listenerPos.y, listenerPos.z };
+            IPLVector3 iplSource = { m_Source.x, m_Source.y, m_Source.z };
 
-        ma_steamaudio_binaural_node_set_position(&m_Node, iplDirection, iplSource, iplListener);
+            ma_steamaudio_binaural_node_set_position(&m_Node, iplDirection, iplSource, iplListener);
+        }
     }
 }

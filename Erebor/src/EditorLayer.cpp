@@ -65,6 +65,10 @@ namespace Mahakam::Editor
 			{
 
 			}
+
+			float spatialBlend = source.GetSpatialBlend();
+			if (ImGui::DragFloat("Spatial blend", &spatialBlend, 0.01f, 0.0f, 1.0f))
+				source.SetSpatialBlend(spatialBlend);
 		};
 
 		ComponentRegistry::RegisterComponent("Audio Source", audioSourceInterface);

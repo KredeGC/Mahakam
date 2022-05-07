@@ -29,6 +29,7 @@ typedef struct
     IPLBinauralEffect iplBinauralEffect;
     IPLDirectEffect iplDirectEffect;
     IPLVector3 direction;
+    float spatialBlend;
     float distance;
     IPLfloat32 airAbsorption[3];
     float* ppBuffersIn[2];      /* Each buffer is an offset of _pHeap. */

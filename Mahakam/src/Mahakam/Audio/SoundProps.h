@@ -6,8 +6,8 @@ namespace Mahakam
 {
 	struct SoundProps
 	{
-		bool loop;
 		float volume;
+		bool loop;
 
 		SoundProps(float volume = 1.0f, bool loop = false)
 			: volume(volume), loop(loop) {}

@@ -15,10 +15,14 @@ namespace Mahakam
 	{
 	public:
 		virtual void Play() = 0;
+		virtual void Stop() = 0;
 		
 		virtual void SetSound(Ref<Sound> sound) = 0;
 		virtual Ref<Sound> GetSound() = 0;
 		
+		virtual void SetSpatialBlend(float blend) = 0;
+		virtual float GetSpatialBlend() = 0;
+
 		virtual void SetPosition(const glm::vec3& source) = 0;
 
 		inline static Ref<AudioSource> Create() { return CreateImpl(AudioEngine::GetContext()); }
