@@ -111,10 +111,15 @@ namespace Mahakam::Editor
 				{
 					std::string pathName = file.path().filename().string();
 
+					ImVec4 col = { 1, 1, 1, 1 };
+					std::string importPath = "res/" + file.path().string() + ".import";
+					if (!std::filesystem::exists(importPath))
+						col = { 0.48f, 0.5f, 0.53f, 1 };
+
 					ImGui::TableNextColumn();
 
 					ImGui::PushID(file.path().string().c_str());
-					ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+					ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, col);
 					ImGui::TextWrapped(pathName.c_str());
 					ImGui::PopID();
 				}
