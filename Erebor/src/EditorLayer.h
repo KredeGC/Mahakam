@@ -2,13 +2,6 @@
 
 #ifndef MH_RUNTIME
 #include "Panels/DockSpace.h"
-#include "Panels/GameViewPanel.h"
-#include "Panels/ProfilerPanel.h"
-#include "Panels/RenderPassPanel.h"
-#include "Panels/SceneHierarchyPanel.h"
-#include "Panels/SceneViewPanel.h"
-#include "Panels/StatsPanel.h"
-#include "EditorCamera.h"
 #endif
 
 #include <Mahakam.h>

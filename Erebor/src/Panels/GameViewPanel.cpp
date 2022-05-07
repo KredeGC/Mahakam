@@ -29,7 +29,7 @@ namespace Mahakam::Editor
 			{
 				Ref<Texture> viewportTexture = framebuffer->GetColorTexture(0);
 				if (viewportTexture)
-					ImGui::Image((void*)(uintptr_t)viewportTexture->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
+					ImGui::Image((ImTextureID)(uintptr_t)viewportTexture->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
 			}
 
 			ImGui::End();

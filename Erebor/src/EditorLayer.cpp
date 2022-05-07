@@ -1,6 +1,17 @@
 #include "ebpch.h"
 #include "EditorLayer.h"
 
+#ifndef MH_RUNTIME
+#include "Panels/ContentBrowserPanel.h"
+#include "Panels/GameViewPanel.h"
+#include "Panels/ProfilerPanel.h"
+#include "Panels/RenderPassPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/SceneViewPanel.h"
+#include "Panels/StatsPanel.h"
+#include "EditorCamera.h"
+#endif
+
 #include <fstream>
 #include <filesystem>
 
@@ -294,6 +305,15 @@ namespace Mahakam::Editor
 
 #pragma region Windows
 #ifndef MH_RUNTIME
+		// ContentBrowserPanel
+		EditorWindowRegistry::EditorWindowProps contentBrowserPanelProps;
+		contentBrowserPanelProps.Name = "Content Browser";
+		contentBrowserPanelProps.SetWindow<ContentBrowserPanel>();
+
+		EditorWindowRegistry::RegisterWindow(contentBrowserPanelProps);
+
+		EditorWindowRegistry::OpenWindow("Content Browser");
+
 		// GameViewPanel
 		EditorWindowRegistry::EditorWindowProps gameViewPanelProps;
 		gameViewPanelProps.Name = "Game View";
