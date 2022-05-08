@@ -165,7 +165,7 @@ namespace Mahakam
 			MH_GL_CALL(glUniform4f(slot, value.x, value.y, value.z, value.w));
 	}
 
-	uint32_t OpenGLShader::CompileBinary(const std::string& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives)
+	uint32_t OpenGLShader::CompileBinary(const std::filesystem::path& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

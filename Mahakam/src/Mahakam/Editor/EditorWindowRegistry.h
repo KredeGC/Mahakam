@@ -40,10 +40,20 @@ namespace Mahakam::Editor
 		MH_DECLARE_FUNC(RegisterWindow, void, EditorWindowProps props); // TODO: Use const &
 		MH_DECLARE_FUNC(DeregisterWindow, void, const std::string& name);
 
-		MH_DECLARE_FUNC(OpenWindow, void, const std::string& name);
+		MH_DECLARE_FUNC(OpenWindow, EditorWindow*, const std::string& name);
 		MH_DECLARE_FUNC(CloseWindow, void, EditorWindow* window);
 
 		MH_DECLARE_FUNC(GetWindowProps, const WindowPropsMap&);
 		MH_DECLARE_FUNC(GetWindows, std::unordered_set<EditorWindow*>&);
+
+		template<typename T>
+		static void RegisterWindowClass(const std::string& name)
+		{
+			EditorWindowProps panelProps;
+			panelProps.Name = name;
+			panelProps.SetWindow<T>();
+
+			RegisterWindow(panelProps);
+		}
 	};
 }

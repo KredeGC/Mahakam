@@ -41,6 +41,8 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <yaml-cpp/yaml.h>
+
 #ifdef MH_BUILD
 #include <miniaudio/miniaudio.h>
 #include <steamaudio/phonon.h>

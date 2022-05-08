@@ -23,10 +23,10 @@ namespace Mahakam
 	void TexelLightingPass::SetupShaders()
 	{
 		// Create lighting shader
-		deferredShader = Shader::Create("assets/shaders/external/DeferredTexel.yaml", { "DEBUG" });
+		deferredShader = Shader::Create("assets/shaders/external/DeferredTexel.shader", { "DEBUG" });
 
 		// Create default shadow shader
-		shadowShader = Shader::Create("assets/shaders/internal/Shadow.yaml");
+		shadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
 	}
 
 	void TexelLightingPass::SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src)

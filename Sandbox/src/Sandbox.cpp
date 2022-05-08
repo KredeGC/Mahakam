@@ -74,9 +74,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create shaders
-	Ref<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.yaml");
-	Ref<Shader> textureShader = Shader::Create("assets/shaders/default/LitTexture.yaml");
-	Ref<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.yaml");
+	Ref<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.shader");
+	Ref<Shader> textureShader = Shader::Create("assets/shaders/default/LitTexture.shader");
+	Ref<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.shader");
 	/*Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/DitheredSkinned.yaml");
 	Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.yaml");
 	Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.yaml");*/
@@ -88,6 +88,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	skinnedMaterial->SetFloat("u_Metallic", 1.0f);
 	skinnedMaterial->SetFloat("u_Roughness", 0.4f);
 
+#if 0
 	// Create animation and model
 	SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/mannequin_clap.fbx");
 	Ref<Animation> animation = Animation::Load("assets/models/mannequin_clap.fbx", skinnedModel);
@@ -107,6 +108,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 				animatedEntity.GetComponent<TransformComponent>().SetEulerangles({ 0.0f, 3.1415f, 0.0f });
 		}
 	}
+#endif
 
 
 	// Scene camera
@@ -157,6 +159,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	particleEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
+#if 0
 	// Create backpack textures
 	Ref<Texture2D> backpackDiffuse = Texture2D::Create("assets/textures/backpack/diffuse.jpg", { 4096, 4096, TextureFormat::SRGB_DXT1 });
 	Ref<Texture2D> backpackOcclussion = Texture2D::Create("assets/textures/backpack/ao.jpg", { 4096, 4096, TextureFormat::R_BC4 });
@@ -185,6 +188,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
 	backpackEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	backpackEntity.AddComponent<RotatorComponent>();
+#endif
 
 
 	// Create becret sound entity

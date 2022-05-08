@@ -8,35 +8,36 @@ namespace Mahakam
 	class FileUtility
 	{
 	public:
+		inline static const std::filesystem::path CACHE_PATH = "cache";
+		inline static const std::filesystem::path IMPORT_PATH = "res";
+
 		inline static bool Exists(const std::string& src)
 		{
 			return std::filesystem::exists(src);
 		}
 
-		inline static void CreateDirectories(const std::string& src)
+		inline static void CreateDirectories(const std::filesystem::path& src)
 		{
 			if (!std::filesystem::exists(src))
 				std::filesystem::create_directories(src);
 		}
 
-		inline static std::string GetCachePath(const std::string& src)
+		inline static std::filesystem::path GetCachePath(const std::filesystem::path& filepath)
 		{
-			auto lastDir = src.rfind('/');
-			const std::string cacheDirectory = "cache/" + src.substr(0, lastDir) + "/";
+			std::filesystem::path importDirectory = CACHE_PATH / filepath.parent_path();
 
-			CreateDirectories(cacheDirectory);
+			CreateDirectories(importDirectory);
 
-			return "cache/" + src + ".cache";
+			return CACHE_PATH / std::filesystem::path(filepath.string() + ".cache");
 		}
 
-		inline static std::string GetResourcePath(const std::string& src)
+		inline static std::filesystem::path GetImportPath(const std::filesystem::path& filepath)
 		{
-			auto lastDir = src.rfind('/');
-			const std::string cacheDirectory = "res/" + src.substr(0, lastDir) + "/";
+			std::filesystem::path importDirectory = IMPORT_PATH / filepath.parent_path();
 
-			CreateDirectories(cacheDirectory);
+			CreateDirectories(importDirectory);
 
-			return "res/" + src + ".bin";
+			return IMPORT_PATH / std::filesystem::path(filepath.string() + ".yaml");
 		}
 
 		static std::string OpenFile(const char* filter);

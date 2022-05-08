@@ -16,7 +16,7 @@ namespace Mahakam
 		MiniAudioSound(const std::string& filepath, const SoundProps& props, MiniAudioContext* context);
 		~MiniAudioSound();
 
-		virtual const std::string& GetFilePath() const override { return m_Filepath; }
+		virtual const std::string& GetFilepath() const override { return m_Filepath; }
 
 		virtual const SoundProps& GetProps() const override { return m_Props; }
 

@@ -1,7 +1,15 @@
 #include "mhpch.h"
 #include "Scene.h"
 
-#include "Components.h"
+#include "Components/AnimatorComponent.h"
+#include "Components/AudioListenerComponent.h"
+#include "Components/AudioSourceComponent.h"
+#include "Components/CameraComponent.h"
+#include "Components/LightComponent.h"
+#include "Components/MeshComponent.h"
+#include "Components/ParticleSystemComponent.h"
+#include "Components/TagComponent.h"
+#include "Components/TransformComponent.h"
 #include "Entity.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
@@ -62,7 +70,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
+		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
 		skyboxMaterial = Material::Create(skyboxShader);
 		skyboxMaterial->SetTexture("u_Environment", 0, GL::GetTextureCubeWhite());
 	}
@@ -79,7 +87,7 @@ namespace Mahakam
 		//skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
 		//skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
 
-		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
+		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
 		skyboxMaterial = Material::Create(skyboxShader);
 		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
 	}
@@ -89,27 +97,6 @@ namespace Mahakam
 	void Scene::OnUpdate(Timestep ts, bool editor)
 	{
 		MH_PROFILE_FUNCTION();
-
-		// Update scripts.... REMOVE
-		{
-			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - NativeScriptComponent");
-
-			registry.view<NativeScriptComponent>().each([=](auto entity, auto& scriptComponent)
-			{
-				// TODO: onScenePlay
-				for (auto& runtime : scriptComponent.scripts)
-				{
-					if (!runtime.script)
-					{
-						runtime.script = runtime.instantiateScript();
-						runtime.script->entity = Entity{ entity, this };
-						runtime.script->OnCreate();
-					}
-
-					runtime.script->OnUpdate(ts);
-				}
-			});
-		}
 
 		// Update sound positions
 		{

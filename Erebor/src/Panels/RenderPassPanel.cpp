@@ -46,7 +46,7 @@ namespace Mahakam::Editor
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
-		blitShader = Shader::Create("assets/shaders/internal/Blit.yaml");
+		blitShader = Shader::Create("assets/shaders/internal/Blit.shader");
 	}
 
 	void RenderPassPanel::OnImGuiRender()

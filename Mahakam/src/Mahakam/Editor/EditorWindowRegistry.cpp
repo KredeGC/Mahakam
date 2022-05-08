@@ -21,7 +21,7 @@ namespace Mahakam::Editor
 	};
 
 	//void EditorWindowRegistry::OpenWindow(const std::string& name)
-	MH_DEFINE_FUNC(EditorWindowRegistry::OpenWindow, void, const std::string& name)
+	MH_DEFINE_FUNC(EditorWindowRegistry::OpenWindow, EditorWindow*, const std::string& name)
 	{
 		auto iter = windowProps.find(name);
 		if (iter != windowProps.end())
@@ -30,7 +30,11 @@ namespace Mahakam::Editor
 			windows.emplace(window);
 			if (iter->second.Unique)
 				iter->second.Instance = window;
+
+			return window;
 		}
+
+		return nullptr;
 	};
 
 	//void EditorWindowRegistry::CloseWindow(EditorWindow* window)

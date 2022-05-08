@@ -4,7 +4,9 @@
 
 #include "Mahakam/Math/Math.h"
 #include "ComponentRegistry.h"
-#include "Components.h"
+
+#include "Components/TagComponent.h"
+#include "Components/TransformComponent.h"
 
 namespace Mahakam
 {

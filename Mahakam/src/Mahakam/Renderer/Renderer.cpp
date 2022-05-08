@@ -38,7 +38,7 @@ namespace Mahakam
 		sceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
 
 		// Initialize default material
-		Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.yaml");
+		Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.shader");
 		rendererData->unlitMaterial = Material::Create(unlitColorShader);
 		rendererData->unlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
 	}

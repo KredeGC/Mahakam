@@ -1,0 +1,5 @@
+Extension: .wav
+ID: 1234567
+Filepath: assets\sounds\memory_mono.wav
+Volume: 0.25
+Loop: true

@@ -9,7 +9,7 @@ namespace Mahakam
 	class Sound
 	{
 	public:
-		virtual const std::string& GetFilePath() const = 0;
+		virtual const std::string& GetFilepath() const = 0;
 
 		virtual const SoundProps& GetProps() const = 0;
 

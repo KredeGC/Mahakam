@@ -145,7 +145,8 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
             float tB = mix(bl, br, f.x);
             return mix(tA, tB, f.y);
         #else
-            return depth > texture(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
+            //return depth > texture(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
+            return texture(u_ShadowMap, projCoords).r;
         #endif
     }
     
@@ -196,10 +197,11 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
     }
 
     float SamplePCFShadow(vec2 projCoords, float depth, vec3 worldPos) {
+        vec2 texSize = textureSize(u_ShadowMap, 0);
+        vec2 texelSize = 1.0 / texSize;
+        
         #if defined(PCSS_SHADOWS)
             const float lightSize = 4.0;
-            vec2 texSize = textureSize(u_ShadowMap, 0);
-            vec2 texelSize = 1.0 / texSize;
             
             float penumbra = EstimatePenumbra(lightSize, depth, projCoords, texSize, texelSize);
             
@@ -215,8 +217,6 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
             return shadow / FILTER_SQUARE;
         #elif defined(PCF_SHADOWS)
             float shadow = 0.0;
-            vec2 texSize = textureSize(u_ShadowMap, 0);
-            vec2 texelSize = 1.0 / texSize;
             for (int x = -FILTER_SIZE; x <= FILTER_SIZE; x++) {
                 for (int y = -FILTER_SIZE; y <= FILTER_SIZE; y++) {
                     vec2 offset = vec2(x, y) * texelSize;
@@ -227,7 +227,7 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
             
             return shadow / FILTER_SQUARE;
         #else
-            return SampleShadowMap(projCoords.xy, depth);
+            return SampleShadowMap(projCoords.xy, depth, texSize, texelSize);
         #endif
     }
 

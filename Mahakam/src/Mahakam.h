@@ -16,6 +16,11 @@
 #include "Mahakam/Core/Utility.h"
 #include "Mahakam/Core/Window.h"
 
+// Asset
+#include "Mahakam/Asset/AssetImporter.h"
+#include "Mahakam/Asset/ShaderAssetImporter.h"
+#include "Mahakam/Asset/SoundAssetImporter.h"
+
 // Audio
 #include "Mahakam/Audio/AudioContext.h"
 #include "Mahakam/Audio/AudioEngine.h"
@@ -61,8 +66,16 @@
 #include "Mahakam/Renderer/Texture.h"
 
 //Scene
+#include "Mahakam/Scene/Components/AnimatorComponent.h"
+#include "Mahakam/Scene/Components/AudioListenerComponent.h"
+#include "Mahakam/Scene/Components/AudioSourceComponent.h"
+#include "Mahakam/Scene/Components/CameraComponent.h"
+#include "Mahakam/Scene/Components/LightComponent.h"
+#include "Mahakam/Scene/Components/MeshComponent.h"
+#include "Mahakam/Scene/Components/ParticleSystemComponent.h"
+#include "Mahakam/Scene/Components/TagComponent.h"
+#include "Mahakam/Scene/Components/TransformComponent.h"
 #include "Mahakam/Scene/ComponentRegistry.h"
-#include "Mahakam/Scene/Components.h"
 #include "Mahakam/Scene/Entity.h"
 #include "Mahakam/Scene/Scene.h"
 #include "Mahakam/Scene/SceneSerializer.h"

@@ -3,10 +3,7 @@
 #include "Log.h"
 #include "Utility.h"
 
-#include "Mahakam/Audio/Sound.h"
-
-#include "Mahakam/Renderer/Texture.h"
-#include "Mahakam/Renderer/Mesh.h"
+#include "Mahakam/Asset/AssetImporter.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -17,39 +14,50 @@ namespace Mahakam
 {
 	class AssetDatabase
 	{
+	private:
+		inline static std::unordered_map<std::string, Ref<AssetImporter>> m_AssetImporters;
+
+		inline static std::unordered_map<uint64_t, std::filesystem::path> m_AssetPaths;
+
+		inline static std::unordered_map<uint64_t, WeakRef<void>> m_CachedAssets;
+
+		inline static std::unordered_map<void*, uint64_t> m_AssetIndex;
+
 	public:
-		struct AssetImporter
+		// Registering asset importers
+		static void RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport);
+		static void DeregisterAssetImporter(const std::string& extension);
+		static Ref<AssetImporter> GetAssetImporter(const std::string& extension);
+
+		// Miscellaneous functions
+		static void CollectGarbage();
+		static void ReloadAssetImports();
+		static uint64_t GetAssetID(Ref<void> asset);
+
+		// Saving and loading assets
+		static void SaveAsset(Ref<void> asset, const std::string& extension, const std::filesystem::path& importPath);
+		static Ref<void> LoadAsset(const std::filesystem::path& importPath);
+		static Ref<void> LoadAsset(uint64_t id);
+
+		// Template functions for convenience
+		template<typename T>
+		static Ref<T> LoadAsset(const std::filesystem::path& importPath)
 		{
-			Ref<void> (*CreateDefault)(const std::string&) = nullptr;
-			void (*Serialize)(YAML::Emitter&, Ref<void>) = nullptr;
-			Ref<void> (*Deserialize)(YAML::Node&) = nullptr;
-		};
+			return StaticCastRef<T>(AssetDatabase::LoadAsset(importPath));
+		}
+
+		template<typename T>
+		static Ref<T> LoadAsset(uint64_t id)
+		{
+			return StaticCastRef<T>(AssetDatabase::LoadAsset(id));
+		}
 
 	private:
-		using AssetMap = std::unordered_map<std::string, Ref<AssetImporter>>;
+		static uint64_t ReadAssetID(const std::filesystem::path& filepath);
 
-		inline static AssetMap assetInterfaces;
+		static void RecursiveCacheAssets(const std::filesystem::path& filepath);
 
-		inline static std::unordered_map<uint64_t, std::filesystem::path> assetMapping;
-
-		inline static std::unordered_map<void*, uint64_t> assetIDs;
-
-	public:
-		static void RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport);
-
-		static void DeregisterAssetImporter(const std::string& extension);
-
-		static void ReloadAssetImports(); // TODO: Recreate the asset index map
-
-		static uint64_t GetAssetID(Ref<void>); // TODO: Get the ID of this asset, if it exists
-
-		// TODO: Instead of just creating a default asset, prompt the user with an import wizard which then handles it
-		// This could simply be registered for each type of asset
-		static void CreateAsset(const std::filesystem::path& filepath, const std::filesystem::path& import); // TODO: Create a default asset
-
-		static void SaveAsset(Ref<void> asset, const std::string& extension, const std::filesystem::path& filepath);
-
-		static Ref<void> LoadAsset(const std::filesystem::path& filepath);
+		static void RecursiveImportAssets(const std::filesystem::path& filepath);
 
 
 
@@ -322,23 +330,6 @@ namespace Mahakam
 
 		//		return skinnedMesh;
 		//	}
-		//}
-
-		//template<typename T, typename = typename std::enable_if<std::is_same<T, Ref<Sound>>::value, void>::type>
-		//static void SaveAsset(const std::string& filepath, T sound)
-		//{
-		//	YAML::Emitter emitter;
-		//	emitter << YAML::BeginMap;
-		//	emitter << YAML::Key << "Filepath";
-		//	emitter << YAML::Value << sound->GetFilePath();
-		//	emitter << YAML::Key << "Volume";
-		//	emitter << YAML::Value << sound->GetProps().volume;
-		//	emitter << YAML::Key << "Loop";
-		//	emitter << YAML::Value << sound->GetProps().loop;
-		//	emitter << YAML::EndMap;
-
-		//	std::ofstream filestream(filepath);
-		//	filestream << emitter.c_str();
 		//}
 	};
 }

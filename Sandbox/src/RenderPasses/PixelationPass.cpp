@@ -19,7 +19,7 @@ namespace Mahakam
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
-		pixelationShader = Shader::Create("assets/shaders/external/Pixelation.yaml");
+		pixelationShader = Shader::Create("assets/shaders/external/Pixelation.shader");
 
 		return true;
 	}

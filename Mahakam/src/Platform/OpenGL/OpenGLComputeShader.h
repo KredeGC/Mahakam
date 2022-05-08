@@ -26,7 +26,7 @@ namespace Mahakam
 		virtual void SetTexture(const std::string & name, Ref<Texture> tex);
 
 	private:
-		void CompileBinary(const std::string& cachePath, const std::string& src);
+		void CompileBinary(const std::filesystem::path& cachePath, const std::string& src);
 
 		int GetUniformLocation(const std::string& name);
 	};

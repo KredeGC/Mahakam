@@ -26,7 +26,7 @@ namespace Mahakam
 		name = filepath.substr(lastSlash, count);
 
 		//const std::string cachePath = "cache/compute/" + name + ".dat";
-		const std::string cachePath = FileUtility::GetCachePath(filepath);
+		std::filesystem::path cachePath = FileUtility::GetCachePath(filepath);
 
 		std::string src = OpenGLUtility::ReadFile(filepath);
 
@@ -58,7 +58,7 @@ namespace Mahakam
 			MH_GL_CALL(glBindTextureUnit(slot, tex->GetRendererID()));
 	}
 
-	void OpenGLComputeShader::CompileBinary(const std::string& cachePath, const std::string& src)
+	void OpenGLComputeShader::CompileBinary(const std::filesystem::path& cachePath, const std::string& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

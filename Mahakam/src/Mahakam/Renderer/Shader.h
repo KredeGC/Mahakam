@@ -37,6 +37,7 @@ namespace Mahakam
 
 		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") = 0;
 
+		virtual const std::string& GetFilepath() const = 0;
 		virtual const std::string& GetName() const = 0;
 
 		virtual const std::vector<ShaderElement>& GetProperties() const = 0;

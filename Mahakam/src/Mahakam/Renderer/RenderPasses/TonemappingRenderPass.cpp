@@ -23,7 +23,7 @@ namespace Mahakam
 
 		Renderer::AddFrameBuffer("Tonemapping", viewportFramebuffer);
 
-		tonemappingShader = Shader::Create("assets/shaders/internal/Tonemapping.yaml");
+		tonemappingShader = Shader::Create("assets/shaders/internal/Tonemapping.shader");
 
 		return true;
 	}

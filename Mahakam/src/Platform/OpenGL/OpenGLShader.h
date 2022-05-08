@@ -31,6 +31,7 @@ namespace Mahakam
 
 		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") override;
 
+		virtual const std::string& GetFilepath() const override { return filepath; }
 		virtual const std::string& GetName() const override { return name; }
 
 		virtual const std::vector<ShaderElement>& GetProperties() const override { return properties.elements; }
@@ -50,7 +51,7 @@ namespace Mahakam
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) override;
 
 	private:
-		uint32_t CompileBinary(const std::string& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives);
+		uint32_t CompileBinary(const std::filesystem::path& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives);
 
 		void ParseYAMLFile(const std::string& filepath, const std::vector<std::string>& keywords);
 		robin_hood::unordered_map<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);

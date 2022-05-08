@@ -4,6 +4,7 @@
 #ifndef MH_RUNTIME
 #include "Panels/ContentBrowserPanel.h"
 #include "Panels/GameViewPanel.h"
+#include "Panels/ImportWizardPanel.h"
 #include "Panels/ProfilerPanel.h"
 #include "Panels/RenderPassPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
@@ -11,6 +12,8 @@
 #include "Panels/StatsPanel.h"
 #include "EditorCamera.h"
 #endif
+
+#include "Mahakam/Asset/SoundAssetImporter.h"
 
 #include <fstream>
 #include <filesystem>
@@ -23,7 +26,7 @@ namespace Mahakam::Editor
 
 	void EditorLayer::OnAttach()
 	{
-		blitShader = Shader::Create("assets/shaders/internal/Blit.yaml");
+		blitShader = Shader::Create("assets/shaders/internal/Blit.shader");
 
 		// Setup render passes for the default renderer
 		Renderer::SetRenderPasses({
@@ -67,7 +70,8 @@ namespace Mahakam::Editor
 		{
 			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
 
-			//emitter << YAML::Key << "Sound" << YAML::Value << AssetDatabase::GetAssetID(source.GetSound());
+			emitter << YAML::Key << "Sound" << YAML::Value << AssetDatabase::GetAssetID(source.GetSound());
+			emitter << YAML::Key << "SpatialBlend" << YAML::Value << source.GetSpatialBlend();
 
 			return true;
 		};
@@ -75,7 +79,21 @@ namespace Mahakam::Editor
 		{
 			AudioSourceComponent& source = entity.AddComponent<AudioSourceComponent>();
 
-			
+			YAML::Node soundNode = node["Sound"];
+			if (soundNode)
+			{
+				Ref<Sound> sound = AssetDatabase::LoadAsset<Sound>(soundNode.as<uint64_t>());
+
+				if (sound)
+				{
+					source.SetSound(sound);
+					source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
+				}
+			}
+
+			YAML::Node spatialNode = node["SpatialBlend"];
+			if (spatialNode)
+				source.SetSpatialBlend(spatialNode.as<float>());
 
 			return true;
 		};
@@ -87,7 +105,7 @@ namespace Mahakam::Editor
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
 			if (sound)
-				std::strncpy(buffer, source.GetSound()->GetFilePath().c_str(), sizeof(buffer));
+				std::strncpy(buffer, source.GetSound()->GetFilepath().c_str(), sizeof(buffer));
 			if (ImGui::InputText("##Filepath", buffer, sizeof(buffer)))
 			{
 
@@ -320,96 +338,57 @@ namespace Mahakam::Editor
 
 
 #pragma region Assets
-		Ref<AssetDatabase::AssetImporter> soundAssetInterface = CreateRef<AssetDatabase::AssetImporter>();
-		soundAssetInterface->Serialize = [](YAML::Emitter& emitter, Ref<void> asset)
-		{
-			Ref<Sound> sound = StaticCastRef<Sound>(asset);
+		// Sound
+		Ref<SoundAssetImporter> soundAssetImporter = CreateRef<SoundAssetImporter>();
 
-			emitter << YAML::Key << "Filepath";
-			emitter << YAML::Value << sound->GetFilePath();
-			emitter << YAML::Key << "Volume";
-			emitter << YAML::Value << sound->GetProps().volume;
-			emitter << YAML::Key << "Loop";
-			emitter << YAML::Value << sound->GetProps().loop;
-		};
-		soundAssetInterface->Deserialize = [](YAML::Node& node) -> Ref<void>
-		{
+		AssetDatabase::RegisterAssetImporter(".wav", soundAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".mp3", soundAssetImporter);
 
+		// Shader
+		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
 
-			return nullptr;
-		};
-
-		AssetDatabase::RegisterAssetImporter(".wav", soundAssetInterface);
-		AssetDatabase::RegisterAssetImporter(".mp3", soundAssetInterface);
+		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);
 #pragma endregion
 
 
 #pragma region Windows
 #ifndef MH_RUNTIME
 		// ContentBrowserPanel
-		EditorWindowRegistry::EditorWindowProps contentBrowserPanelProps;
-		contentBrowserPanelProps.Name = "Content Browser";
-		contentBrowserPanelProps.SetWindow<ContentBrowserPanel>();
-
-		EditorWindowRegistry::RegisterWindow(contentBrowserPanelProps);
-
+		EditorWindowRegistry::RegisterWindowClass<ContentBrowserPanel>("Content Browser");
 		EditorWindowRegistry::OpenWindow("Content Browser");
 
+		// ImportWizardPanel
+		EditorWindowRegistry::RegisterWindowClass<ImportWizardPanel>("Import Wizard");
+		EditorWindowRegistry::OpenWindow("Import Wizard");
+
 		// GameViewPanel
-		EditorWindowRegistry::EditorWindowProps gameViewPanelProps;
-		gameViewPanelProps.Name = "Game View";
-		gameViewPanelProps.SetWindow<GameViewPanel>();
-
-		EditorWindowRegistry::RegisterWindow(gameViewPanelProps);
-
+		EditorWindowRegistry::RegisterWindowClass<GameViewPanel>("Game View");
 		EditorWindowRegistry::OpenWindow("Game View");
 
 		// ProfilerPanel
-		EditorWindowRegistry::EditorWindowProps profilerPanelProps;
-		profilerPanelProps.Name = "Profiler";
-		profilerPanelProps.SetWindow<ProfilerPanel>();
-
-		EditorWindowRegistry::RegisterWindow(profilerPanelProps);
-
+		EditorWindowRegistry::RegisterWindowClass<ProfilerPanel>("Profiler");
 		EditorWindowRegistry::OpenWindow("Profiler");
 
 		// RenderPassPanel
-		EditorWindowRegistry::EditorWindowProps renderpassPanelProps;
-		renderpassPanelProps.Name = "Renderpass";
-		renderpassPanelProps.SetWindow<RenderPassPanel>();
-
-		EditorWindowRegistry::RegisterWindow(renderpassPanelProps);
-
+		EditorWindowRegistry::RegisterWindowClass<RenderPassPanel>("Renderpass");
 		EditorWindowRegistry::OpenWindow("Renderpass");
 
 		// SceneHierarchyPanel
-		EditorWindowRegistry::EditorWindowProps hierarchyPanelProps;
-		hierarchyPanelProps.Name = "Scene Hierarchy";
-		hierarchyPanelProps.SetWindow<SceneHierarchyPanel>();
-
-		EditorWindowRegistry::RegisterWindow(hierarchyPanelProps);
-
+		EditorWindowRegistry::RegisterWindowClass<SceneHierarchyPanel>("Scene Hierarchy");
 		EditorWindowRegistry::OpenWindow("Scene Hierarchy");
 
 		// SceneViewPanel
-		EditorWindowRegistry::EditorWindowProps sceneViewPanelProps;
-		sceneViewPanelProps.Name = "Scene View";
-		sceneViewPanelProps.SetWindow<SceneViewPanel>();
-
-		EditorWindowRegistry::RegisterWindow(sceneViewPanelProps);
-
+		EditorWindowRegistry::RegisterWindowClass<SceneViewPanel>("Scene View");
 		EditorWindowRegistry::OpenWindow("Scene View");
 
 		// StatsPanel
-		EditorWindowRegistry::EditorWindowProps statsPanelProps;
-		statsPanelProps.Name = "Stats";
-		statsPanelProps.SetWindow<StatsPanel>();
-
-		EditorWindowRegistry::RegisterWindow(statsPanelProps);
-
+		EditorWindowRegistry::RegisterWindowClass<StatsPanel>("Stats");
 		EditorWindowRegistry::OpenWindow("Stats");
 #endif
 #pragma endregion
+
+
+		AssetDatabase::ReloadAssetImports();
 
 
 #if MH_PLATFORM_WINDOWS
@@ -491,7 +470,7 @@ namespace Mahakam::Editor
 
 		m_DockSpace.End();
 #endif
-}
+	}
 
 	void EditorLayer::OnEvent(Event& event)
 	{

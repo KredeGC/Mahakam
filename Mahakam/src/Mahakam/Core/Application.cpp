@@ -7,10 +7,6 @@
 
 #include "Mahakam/Renderer/Renderer.h"
 
-#include "Mahakam/Scene/Components.h"
-#include "Mahakam/Scene/ComponentRegistry.h"
-#include "Mahakam/Scene/Entity.h"
-
 #include "SharedLibrary.h"
 
 namespace Mahakam

@@ -89,8 +89,8 @@ namespace Mahakam
 		// Create BRDF and falloff maps
 		FileUtility::CreateDirectories("res/internal/");
 
-		brdfLut = LoadOrCreateLUTTexture("res/internal/brdf.dat", "assets/shaders/internal/BRDF.yaml", TextureFormat::RG16F, 512, 512);
-		falloffLut = LoadOrCreateLUTTexture("res/internal/falloff.dat", "assets/shaders/internal/Falloff.yaml", TextureFormat::R8, 16, 16);
+		brdfLut = LoadOrCreateLUTTexture("res/internal/brdf.dat", "assets/shaders/internal/BRDF.shader", TextureFormat::RG16F, 512, 512);
+		falloffLut = LoadOrCreateLUTTexture("res/internal/falloff.dat", "assets/shaders/internal/Falloff.shader", TextureFormat::R8, 16, 16);
 
 		spotlightTexture = Texture2D::Create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
 	}
@@ -116,10 +116,10 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		// Create lighting shader
-		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.yaml", { "DEBUG" });
+		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.shader", { "DEBUG" });
 
 		// Create default shadow shader
-		shadowShader = Shader::Create("assets/shaders/internal/Shadow.yaml");
+		shadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
 	}
 
 	void LightingRenderPass::RenderShadowMaps(SceneData* sceneData, const Frustum& frustum)
