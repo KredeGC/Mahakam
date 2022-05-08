@@ -14,6 +14,14 @@ namespace Mahakam
 {
 	class AssetDatabase
 	{
+	public:
+		struct AssetInfo
+		{
+			uint64_t ID;
+			std::filesystem::path Filepath;
+			std::string Extension;
+		};
+
 	private:
 		inline static std::unordered_map<std::string, Ref<AssetImporter>> m_AssetImporters;
 
@@ -25,19 +33,20 @@ namespace Mahakam
 
 	public:
 		// Registering asset importers
-		static void RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport);
-		static void DeregisterAssetImporter(const std::string& extension);
-		static Ref<AssetImporter> GetAssetImporter(const std::string& extension);
+		MH_DECLARE_FUNC(RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImport);
+		MH_DECLARE_FUNC(DeregisterAssetImporter, void, const std::string& extension);
+		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const std::string& extension);
 
 		// Miscellaneous functions
-		static void CollectGarbage();
-		static void ReloadAssetImports();
-		static uint64_t GetAssetID(Ref<void> asset);
+		MH_DECLARE_FUNC(CollectGarbage, void);
+		MH_DECLARE_FUNC(ReloadAssetImports, void);
+		MH_DECLARE_FUNC(GetAssetID, uint64_t, Ref<void> asset);
+		MH_DECLARE_FUNC(GetAssetInfo, AssetInfo, const std::filesystem::path& importPath);
 
 		// Saving and loading assets
-		static void SaveAsset(Ref<void> asset, const std::string& extension, const std::filesystem::path& importPath);
-		static Ref<void> LoadAsset(const std::filesystem::path& importPath);
-		static Ref<void> LoadAsset(uint64_t id);
+		MH_DECLARE_FUNC(SaveAsset, void, Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath);
+		inline static Ref<void> LoadAsset(const std::filesystem::path& importPath) { return LoadAssetFromPath(importPath); }
+		inline static Ref<void> LoadAsset(uint64_t id) { return LoadAssetFromID(id); }
 
 		// Template functions for convenience
 		template<typename T>
@@ -53,6 +62,9 @@ namespace Mahakam
 		}
 
 	private:
+		MH_DECLARE_FUNC(LoadAssetFromPath, Ref<void>, const std::filesystem::path& importPath);
+		MH_DECLARE_FUNC(LoadAssetFromID, Ref<void>, uint64_t id);
+
 		static uint64_t ReadAssetID(const std::filesystem::path& filepath);
 
 		static void RecursiveCacheAssets(const std::filesystem::path& filepath);

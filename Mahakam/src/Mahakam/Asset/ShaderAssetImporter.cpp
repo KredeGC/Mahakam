@@ -22,10 +22,7 @@ namespace Mahakam
 
 	void ShaderAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
 	{
-		Ref<Shader> shader = StaticCastRef<Shader>(asset);
-
-		emitter << YAML::Key << "Filepath";
-		emitter << YAML::Value << shader->GetFilepath();
+		//Ref<Shader> shader = StaticCastRef<Shader>(asset);
 	}
 
 	Ref<void> ShaderAssetImporter::Deserialize(YAML::Node& node)

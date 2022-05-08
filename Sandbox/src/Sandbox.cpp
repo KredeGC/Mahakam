@@ -192,12 +192,13 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create becret sound entity
-	Ref<Sound> becretSound = Sound::Create("assets/sounds/memory_mono.wav", { 0.5f, true });
+	//Ref<Sound> becretSound = Sound::Create("assets/sounds/memory_mono.wav", { 0.5f, true });
+	Ref<Sound> becretSound = AssetDatabase::LoadAsset<Sound>("res/assets/sounds/memory_mono.wav.yaml");
 
 	Entity becretEntity = scene->CreateEntity("Becret");
 	becretEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	AudioSourceComponent& becretSource = becretEntity.AddComponent<AudioSourceComponent>();
-	becretSource.SetSpatialBlend(0.0f);
+	becretSource.SetSpatialBlend(1.0f);
 	becretSource.SetSound(becretSound);
 	becretSource.Play();
 

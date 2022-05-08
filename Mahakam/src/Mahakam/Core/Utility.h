@@ -37,7 +37,10 @@ namespace Mahakam
 
 			CreateDirectories(importDirectory);
 
-			return IMPORT_PATH / std::filesystem::path(filepath.string() + ".yaml");
+			if (std::filesystem::is_directory(filepath))
+				return IMPORT_PATH / filepath.string();
+			else
+				return IMPORT_PATH / std::filesystem::path(filepath.string() + ".yaml");
 		}
 
 		static std::string OpenFile(const char* filter);

@@ -79,4 +79,3 @@
 #include "Mahakam/Scene/Entity.h"
 #include "Mahakam/Scene/Scene.h"
 #include "Mahakam/Scene/SceneSerializer.h"
-#include "Mahakam/Scene/ScriptableEntity.h"

@@ -17,6 +17,6 @@ namespace Mahakam::Editor
 	public:
 		virtual void OnImGuiRender() override;
 
-		static void ImportAsset(const std::filesystem::path& filepath, const std::filesystem::path& importPath);
+		static void ImportAsset(const std::filesystem::path& filepath, const std::string& extension, const std::filesystem::path& importPath);
 	};
 }

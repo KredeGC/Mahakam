@@ -35,8 +35,6 @@ namespace Mahakam
 	{
 		Ref<Sound> sound = StaticCastRef<Sound>(asset);
 
-		emitter << YAML::Key << "Filepath";
-		emitter << YAML::Value << sound->GetFilepath();
 		emitter << YAML::Key << "Volume";
 		emitter << YAML::Value << sound->GetProps().volume;
 		emitter << YAML::Key << "Loop";
