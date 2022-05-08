@@ -80,6 +80,8 @@
 
 namespace Mahakam
 {
+	typedef void** FuncPtr;
+
 	template<typename T>
 	using Scope = std::unique_ptr<T>;
 
@@ -91,6 +93,18 @@ namespace Mahakam
 
 	template<typename T>
 	using Ref = std::shared_ptr<T>;
+
+	template<typename T>
+	constexpr Ref<T> DynamicCastRef(Ref<void> ptr)
+	{
+		return std::dynamic_pointer_cast<T>(ptr);
+	}
+
+	template<typename T>
+	constexpr Ref<T> StaticCastRef(Ref<void> ptr)
+	{
+		return std::static_pointer_cast<T>(ptr);
+	}
 
 	template<typename T, typename ... Args>
 	constexpr Ref<T> CreateRef(Args&& ... args)

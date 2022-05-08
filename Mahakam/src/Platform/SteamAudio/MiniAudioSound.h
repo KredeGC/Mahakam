@@ -18,6 +18,8 @@ namespace Mahakam
 
 		virtual const std::string& GetFilePath() const override { return m_Filepath; }
 
-		ma_sound& GetNativeSound() { return m_Sound; } // Unused
+		virtual const SoundProps& GetProps() const override { return m_Props; }
+
+		ma_sound& GetNativeSound() { return m_Sound; }
 	};
 }

@@ -73,8 +73,11 @@ namespace Mahakam
 
 		// Idea:: Use RG11B10f instead, should halve memory usage
 		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F });
-		skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
-		skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
+		skyboxIrradiance = TextureCube::Create(skyboxTexture, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
+		skyboxSpecular = TextureCube::Create(skyboxTexture, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
+
+		//skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
+		//skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
 
 		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.yaml");
 		skyboxMaterial = Material::Create(skyboxShader);

@@ -63,6 +63,22 @@ namespace Mahakam::Editor
 		// AudioSource
 		ComponentRegistry::ComponentInterface audioSourceInterface;
 		audioSourceInterface.SetComponent<AudioSourceComponent>();
+		audioSourceInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		{
+			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
+
+			//emitter << YAML::Key << "Sound" << YAML::Value << AssetDatabase::GetAssetID(source.GetSound());
+
+			return true;
+		};
+		audioSourceInterface.Deserialize = [](YAML::Node& node, Entity entity)
+		{
+			AudioSourceComponent& source = entity.AddComponent<AudioSourceComponent>();
+
+			
+
+			return true;
+		};
 		audioSourceInterface.OnInspector = [](Entity entity)
 		{
 			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
@@ -300,6 +316,31 @@ namespace Mahakam::Editor
 		};
 
 		ComponentRegistry::RegisterComponent("Light", lightInterface);
+#pragma endregion
+
+
+#pragma region Assets
+		Ref<AssetDatabase::AssetImporter> soundAssetInterface = CreateRef<AssetDatabase::AssetImporter>();
+		soundAssetInterface->Serialize = [](YAML::Emitter& emitter, Ref<void> asset)
+		{
+			Ref<Sound> sound = StaticCastRef<Sound>(asset);
+
+			emitter << YAML::Key << "Filepath";
+			emitter << YAML::Value << sound->GetFilePath();
+			emitter << YAML::Key << "Volume";
+			emitter << YAML::Value << sound->GetProps().volume;
+			emitter << YAML::Key << "Loop";
+			emitter << YAML::Value << sound->GetProps().loop;
+		};
+		soundAssetInterface->Deserialize = [](YAML::Node& node) -> Ref<void>
+		{
+
+
+			return nullptr;
+		};
+
+		AssetDatabase::RegisterAssetImporter(".wav", soundAssetInterface);
+		AssetDatabase::RegisterAssetImporter(".mp3", soundAssetInterface);
 #pragma endregion
 
 

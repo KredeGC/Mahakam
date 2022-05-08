@@ -14,7 +14,6 @@
 #include <robin_hood.h>
 
 #include "Mahakam/Core/Application.h"
-#include "Mahakam/Core/AssetDatabase.h"
 #include "Mahakam/Core/Frustum.h"
 #include "Mahakam/Core/Input.h"
 #include "Mahakam/Core/Instrumentor.h"

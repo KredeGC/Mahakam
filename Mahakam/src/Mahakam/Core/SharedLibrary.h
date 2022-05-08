@@ -15,8 +15,6 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
-		typedef void** FuncPtr;
-
 		static constexpr int NUM_FUNC_PTRS = 82;
 
 	private:

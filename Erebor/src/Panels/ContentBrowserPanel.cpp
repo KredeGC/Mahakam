@@ -112,7 +112,7 @@ namespace Mahakam::Editor
 					std::string pathName = file.path().filename().string();
 
 					ImVec4 col = { 1, 1, 1, 1 };
-					std::string importPath = "res/" + file.path().string() + ".import";
+					std::string importPath = "res/" + file.path().string() + ".yaml";
 					if (!std::filesystem::exists(importPath))
 						col = { 0.48f, 0.5f, 0.53f, 1 };
 
@@ -120,6 +120,11 @@ namespace Mahakam::Editor
 
 					ImGui::PushID(file.path().string().c_str());
 					ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, col);
+					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+					{
+						Ref<Sound> sound = Sound::Create(file.path().string());
+						AssetDatabase::SaveAsset(sound, file.path().extension().string(), importPath);
+					}
 					ImGui::TextWrapped(pathName.c_str());
 					ImGui::PopID();
 				}
