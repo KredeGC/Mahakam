@@ -5,8 +5,8 @@
 
 namespace Mahakam
 {
-	OpenGLMaterial::OpenGLMaterial(const Ref<Shader>& shader, const std::string& variant)
-		: shader(std::static_pointer_cast<OpenGLShader>(shader)), variant(variant)
+	OpenGLMaterial::OpenGLMaterial(const Asset<Shader>& shader, const std::string& variant)
+		: shader(shader), variant(variant)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -49,17 +49,17 @@ namespace Mahakam
 		}
 	}
 
-	OpenGLMaterial::OpenGLMaterial(const Ref<Material>& material) :
-		shader(std::static_pointer_cast<OpenGLMaterial>(material)->shader),
-		variant(std::static_pointer_cast<OpenGLMaterial>(material)->variant),
-		textures(std::static_pointer_cast<OpenGLMaterial>(material)->textures),
-		mat3s(std::static_pointer_cast<OpenGLMaterial>(material)->mat3s),
-		mat4s(std::static_pointer_cast<OpenGLMaterial>(material)->mat4s),
-		ints(std::static_pointer_cast<OpenGLMaterial>(material)->ints),
-		floats(std::static_pointer_cast<OpenGLMaterial>(material)->floats),
-		float2s(std::static_pointer_cast<OpenGLMaterial>(material)->float2s),
-		float3s(std::static_pointer_cast<OpenGLMaterial>(material)->float3s),
-		float4s(std::static_pointer_cast<OpenGLMaterial>(material)->float4s) {}
+	OpenGLMaterial::OpenGLMaterial(const Asset<Material>& material) :
+		shader(static_cast<Asset<OpenGLMaterial>>(material)->shader),
+		variant(static_cast<Asset<OpenGLMaterial>>(material)->variant),
+		textures(static_cast<Asset<OpenGLMaterial>>(material)->textures),
+		mat3s(static_cast<Asset<OpenGLMaterial>>(material)->mat3s),
+		mat4s(static_cast<Asset<OpenGLMaterial>>(material)->mat4s),
+		ints(static_cast<Asset<OpenGLMaterial>>(material)->ints),
+		floats(static_cast<Asset<OpenGLMaterial>>(material)->floats),
+		float2s(static_cast<Asset<OpenGLMaterial>>(material)->float2s),
+		float3s(static_cast<Asset<OpenGLMaterial>>(material)->float3s),
+		float4s(static_cast<Asset<OpenGLMaterial>>(material)->float4s) {}
 
 	uint64_t OpenGLMaterial::Hash() const
 	{
@@ -140,7 +140,7 @@ namespace Mahakam
 		return hash;
 	}
 
-	void OpenGLMaterial::Bind() const
+	void OpenGLMaterial::Bind()
 	{
 		//shader->bind();
 
@@ -174,7 +174,7 @@ namespace Mahakam
 		shader->SetUniformMat4("u_m4_M", modelMatrix);
 	}
 
-	Ref<Texture> OpenGLMaterial::GetTexture(const std::string& name) const
+	Asset<Texture> OpenGLMaterial::GetTexture(const std::string& name) const
 	{
 		auto texIter = textures.find(name);
 		if (texIter != textures.end())

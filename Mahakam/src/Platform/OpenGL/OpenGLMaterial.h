@@ -11,11 +11,11 @@ namespace Mahakam
 	class OpenGLMaterial : public Material
 	{
 	private:
-		Ref<OpenGLShader> shader;
+		Asset<OpenGLShader> shader;
 
 		std::string variant = "";
 
-		robin_hood::unordered_map<std::string, Ref<Texture>> textures;
+		robin_hood::unordered_map<std::string, Asset<Texture>> textures;
 		
 		robin_hood::unordered_map<std::string, glm::mat3> mat3s;
 		robin_hood::unordered_map<std::string, glm::mat4> mat4s;
@@ -28,20 +28,20 @@ namespace Mahakam
 		robin_hood::unordered_map<std::string, glm::vec4> float4s;
 
 	public:
-		OpenGLMaterial(const Ref<Shader>& shader, const std::string& variant = "");
-		OpenGLMaterial(const Ref<Material>& material);
+		OpenGLMaterial(const Asset<Shader>& shader, const std::string& variant = "");
+		OpenGLMaterial(const Asset<Material>& material);
 
 		virtual uint64_t Hash() const override;
 
-		inline virtual Ref<Shader> GetShader() const override { return shader; }
+		inline virtual Asset<Shader> GetShader() const override { return shader; }
 
-		virtual void BindShader(const std::string& shaderPass) const override { shader->Bind(shaderPass); }
-		virtual void BindShader(const std::string& shaderPass, const std::string& variant) const override { shader->Bind(shaderPass, variant); }
-		virtual void Bind() const override;
+		virtual void BindShader(const std::string& shaderPass) override { shader->Bind(shaderPass); }
+		virtual void BindShader(const std::string& shaderPass, const std::string& variant) override { shader->Bind(shaderPass, variant); }
+		virtual void Bind() override;
 
 		virtual void SetTransform(const glm::mat4& modelMatrix) override;
 
-		virtual void SetTexture(const std::string& name, int slot, Ref<Texture> tex) override { textures[name] = tex; }
+		virtual void SetTexture(const std::string& name, int slot, Asset<Texture> tex) override { textures[name] = tex; }
 
 		virtual void SetMat3(const std::string& name, const glm::mat3& value) override { mat3s[name] = value; }
 		virtual void SetMat4(const std::string& name, const glm::mat4& value) override { mat4s[name] = value; }
@@ -54,7 +54,7 @@ namespace Mahakam
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value) override { float4s[name] = value; }
 
 
-		virtual Ref<Texture> GetTexture(const std::string& name) const override;
+		virtual Asset<Texture> GetTexture(const std::string& name) const override;
 
 		virtual const glm::mat3 GetMat3(const std::string& name) const override;
 		virtual const glm::mat4 GetMat4(const std::string& name) const override;

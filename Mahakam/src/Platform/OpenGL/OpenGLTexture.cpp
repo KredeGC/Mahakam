@@ -455,7 +455,7 @@ namespace Mahakam
 		MH_GL_CALL(glDeleteRenderbuffers(1, &captureRBO));
 	}
 
-	OpenGLTextureCube::OpenGLTextureCube(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
+	OpenGLTextureCube::OpenGLTextureCube(Asset<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 		: props(props)
 	{
 		MH_PROFILE_FUNCTION();

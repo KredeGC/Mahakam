@@ -23,7 +23,7 @@ namespace Mahakam::Editor
 {
 	static SharedLibrary* lib;
 
-	static Ref<Shader> blitShader;
+	static Asset<Shader> blitShader;
 
 	void EditorLayer::OnAttach()
 	{
@@ -71,7 +71,7 @@ namespace Mahakam::Editor
 		{
 			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
 
-			emitter << YAML::Key << "Sound" << YAML::Value << AssetDatabase::GetAssetID(source.GetSound());
+			emitter << YAML::Key << "Sound" << YAML::Value << source.GetSound();
 			emitter << YAML::Key << "SpatialBlend" << YAML::Value << source.GetSpatialBlend();
 
 			return true;
@@ -101,7 +101,7 @@ namespace Mahakam::Editor
 		audioSourceInterface.OnInspector = [](Entity entity)
 		{
 			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
-			Ref<Sound> sound = source.GetSound();
+			Asset<Sound> sound = source.GetSound();
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
@@ -220,7 +220,7 @@ namespace Mahakam::Editor
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
 
 			auto& meshes = meshComponent.GetMeshes();
-			Ref<Material> material = meshComponent.GetMaterial();
+			Asset<Material> material = meshComponent.GetMaterial();
 
 			uint32_t vertexCount = 0;
 			uint32_t indexCount = 0;

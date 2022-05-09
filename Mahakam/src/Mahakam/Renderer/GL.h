@@ -11,33 +11,33 @@ namespace Mahakam
 	private:
 		static RendererAPI* rendererAPI;
 		
-		static Ref<Mesh> staticScreenQuad;
-		static Ref<Mesh> staticPyramid;
-		static Ref<Mesh> staticSphereMesh;
-		static Ref<Mesh> staticCubemapMesh;
-		static Ref<Mesh> staticCube;
-		
-		static Ref<Texture2D> texture2DRed;
-		static Ref<Texture2D> texture2DWhite;
-		static Ref<Texture2D> texture2DBlack;
-		static Ref<Texture2D> texture2DBump;
-		static Ref<TextureCube> textureCubeWhite;
+		static Asset<Mesh> staticScreenQuad;
+		static Asset<Mesh> staticPyramid;
+		static Asset<Mesh> staticSphereMesh;
+		static Asset<Mesh> staticCubemapMesh;
+		static Asset<Mesh> staticCube;
+
+		static Asset<Texture2D> texture2DRed;
+		static Asset<Texture2D> texture2DWhite;
+		static Asset<Texture2D> texture2DBlack;
+		static Asset<Texture2D> texture2DBump;
+		static Asset<TextureCube> textureCubeWhite;
 
 	public:
 		static void Init();
 		static void Shutdown();
 
-		MH_DECLARE_FUNC(GetScreenQuad, Ref<Mesh>);
-		MH_DECLARE_FUNC(GetInvertedPyramid, Ref<Mesh>);
-		MH_DECLARE_FUNC(GetInvertedSphere, Ref<Mesh>);
-		MH_DECLARE_FUNC(GetInvertedCube, Ref<Mesh>);
-		MH_DECLARE_FUNC(GetCube, Ref<Mesh>);
+		MH_DECLARE_FUNC(GetScreenQuad, Asset<Mesh>);
+		MH_DECLARE_FUNC(GetInvertedPyramid, Asset<Mesh>);
+		MH_DECLARE_FUNC(GetInvertedSphere, Asset<Mesh>);
+		MH_DECLARE_FUNC(GetInvertedCube, Asset<Mesh>);
+		MH_DECLARE_FUNC(GetCube, Asset<Mesh>);
 
-		MH_DECLARE_FUNC(GetTexture2DRed, Ref<Texture2D>);
-		MH_DECLARE_FUNC(GetTexture2DWhite, Ref<Texture2D>);
-		MH_DECLARE_FUNC(GetTexture2DBlack, Ref<Texture2D>);
-		MH_DECLARE_FUNC(GetTexture2DBump, Ref<Texture2D>);
-		MH_DECLARE_FUNC(GetTextureCubeWhite, Ref<TextureCube>);
+		MH_DECLARE_FUNC(GetTexture2DRed, Asset<Texture2D>);
+		MH_DECLARE_FUNC(GetTexture2DWhite, Asset<Texture2D>);
+		MH_DECLARE_FUNC(GetTexture2DBlack, Asset<Texture2D>);
+		MH_DECLARE_FUNC(GetTexture2DBump, Asset<Texture2D>);
+		MH_DECLARE_FUNC(GetTextureCubeWhite, Asset<TextureCube>);
 
 		MH_DECLARE_FUNC(GetGraphicsVendor, const char*);
 
@@ -61,8 +61,8 @@ namespace Mahakam
 		MH_DECLARE_FUNC(DrawInstanced, void, uint32_t indexCount, uint32_t count);
 
 	private:
-		static Ref<Mesh> CreateScreenQuad();
-		static Ref<Mesh> CreatePyramid();
+		static Asset<Mesh> CreateScreenQuad();
+		static Asset<Mesh> CreatePyramid();
 
 		MH_DECLARE_FUNC(SetViewportImpl, void, uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor);
 

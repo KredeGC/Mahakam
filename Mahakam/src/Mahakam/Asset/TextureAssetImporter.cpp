@@ -146,27 +146,19 @@ namespace Mahakam
 		}
 	}
 
-	void TextureAssetImporter::OnWizardImport(Ref<void>& asset, const std::filesystem::path& filepath)
+	Asset<void> TextureAssetImporter::OnWizardImport(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Ref<Texture> textureAsset = std::static_pointer_cast<Texture>(asset);
-		Ref<Texture2D> texture2D = std::dynamic_pointer_cast<Texture2D>(textureAsset);
-		Ref<TextureCube> textureCube = std::dynamic_pointer_cast<TextureCube>(textureAsset);
-
-		MH_CORE_TRACE(textureAsset);
-
 		if (m_TextureType == 0)
-			asset = Texture2D::Create(filepath.string(), m_Props2D);
+			return Texture2D::Create(filepath.string(), m_Props2D);
 		else
-			asset = TextureCube::Create(filepath.string(), m_PropsCube);
-
-		MH_CORE_TRACE(textureAsset);
+			return TextureCube::Create(filepath.string(), m_PropsCube);
 	}
 
-	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
+	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{
-		Ref<Texture> textureAsset = StaticCastRef<Texture>(asset);
-		Ref<Texture2D> texture2D = std::dynamic_pointer_cast<Texture2D>(textureAsset);
-		Ref<TextureCube> textureCube = std::dynamic_pointer_cast<TextureCube>(textureAsset);
+		/*Asset<Texture> textureAsset = StaticCastRef<Texture>(asset);
+		Asset<Texture2D> texture2D = std::dynamic_pointer_cast<Texture2D>(textureAsset);
+		Asset<TextureCube> textureCube = std::dynamic_pointer_cast<TextureCube>(textureAsset);
 
 		emitter << YAML::Key << "Type";
 		if (texture2D)
@@ -199,12 +191,12 @@ namespace Mahakam
 		if (texture2D)
 			emitter << YAML::Value << texture2D->GetProps().mipmaps;
 		else
-			emitter << YAML::Value << textureCube->GetProps().mipmaps;
+			emitter << YAML::Value << textureCube->GetProps().mipmaps;*/
 	}
 
-	Ref<void> TextureAssetImporter::Deserialize(YAML::Node& node)
+	Asset<void> TextureAssetImporter::Deserialize(YAML::Node& node)
 	{
-		TextureProps props2D;
+		/*TextureProps props2D;
 		CubeTextureProps propsCube;
 
 		YAML::Node filepathNode = node["Filepath"];
@@ -258,6 +250,8 @@ namespace Mahakam
 		if (textureType == 0)
 			return Texture2D::Create(filepath, props2D);
 		else
-			return TextureCube::Create(filepath, propsCube);
+			return TextureCube::Create(filepath, propsCube);*/
+
+		return nullptr;
 	}
 }

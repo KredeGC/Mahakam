@@ -36,9 +36,9 @@ namespace Mahakam
 		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
-	void OpenGLFrameBuffer::Blit(Ref<FrameBuffer> dest, bool color, bool depth)
+	void OpenGLFrameBuffer::Blit(Asset<FrameBuffer> dest, bool color, bool depth)
 	{
-		Ref<OpenGLFrameBuffer> fbo = std::static_pointer_cast<OpenGLFrameBuffer>(dest);
+		Asset<OpenGLFrameBuffer> fbo = static_cast<Asset<OpenGLFrameBuffer>>(dest);
 
 		MH_GL_CALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID));
 		MH_GL_CALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID));
@@ -123,7 +123,7 @@ namespace Mahakam
 		{
 			FrameBufferAttachmentProps& spec = props.colorAttachments[i];
 
-			Ref<Texture> tex = Texture2D::Create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+			Asset<Texture> tex = Texture2D::Create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
 
 			colorAttachments.push_back(tex);
 

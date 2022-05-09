@@ -10,7 +10,7 @@
 namespace Mahakam
 {
 	//Ref<FrameBuffer> FrameBuffer::Create(const FrameBufferProps& prop)
-	MH_DEFINE_FUNC(FrameBuffer::Create, Ref<FrameBuffer>, const FrameBufferProps& prop)
+	MH_DEFINE_FUNC(FrameBuffer::Create, Asset<FrameBuffer>, const FrameBufferProps& prop)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -18,7 +18,7 @@ namespace Mahakam
 			MH_CORE_BREAK("Renderer API not supported!");
 			break;
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLFrameBuffer>(prop);
+			return Asset<OpenGLFrameBuffer>::Create(prop);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

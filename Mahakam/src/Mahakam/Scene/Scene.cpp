@@ -26,11 +26,11 @@
 
 namespace Mahakam
 {
-	static Ref<TextureCube> LoadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, TextureCubePrefilter prefilter, const CubeTextureProps& props)
+	static Asset<TextureCube> LoadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, TextureCubePrefilter prefilter, const CubeTextureProps& props)
 	{
 		if (!FileUtility::Exists(cachePath))
 		{
-			Ref<TextureCube> texture = TextureCube::Create(src, prefilter, props);
+			Asset<TextureCube> texture = TextureCube::Create(src, prefilter, props);
 
 			uint32_t size = texture->GetSize();
 			uint32_t totalSize = texture->GetTotalSize();
@@ -54,7 +54,7 @@ namespace Mahakam
 			uint32_t size = 0;
 			stream.read((char*)&size, sizeof(uint32_t));
 			ss << stream.rdbuf();
-			Ref<TextureCube> texture = TextureCube::Create(props);
+			Asset<TextureCube> texture = TextureCube::Create(props);
 			texture->SetData((void*)ss.str().c_str(), size, saveMips);
 
 			stream.close();
@@ -70,7 +70,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
+		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
 		skyboxMaterial = Material::Create(skyboxShader);
 		skyboxMaterial->SetTexture("u_Environment", 0, GL::GetTextureCubeWhite());
 	}
@@ -87,7 +87,7 @@ namespace Mahakam
 		//skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
 		//skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
 
-		Ref<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
+		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
 		skyboxMaterial = Material::Create(skyboxShader);
 		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
 	}

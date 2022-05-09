@@ -117,7 +117,7 @@ namespace Mahakam::Editor
 		}
 	}
 
-	void RenderPassPanel::RenderImage(Ref<FrameBuffer> frameBuffer, int index, bool depth)
+	void RenderPassPanel::RenderImage(Asset<FrameBuffer> frameBuffer, int index, bool depth)
 	{
 		viewportFramebuffer->Bind();
 

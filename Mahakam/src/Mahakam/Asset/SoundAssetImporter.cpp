@@ -26,14 +26,14 @@ namespace Mahakam
 		ImGui::Checkbox("Sound Looping", &soundProps.loop);
 	}
 
-	void SoundAssetImporter::OnWizardImport(Ref<void>& asset, const std::filesystem::path& filepath)
+	Asset<void> SoundAssetImporter::OnWizardImport(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		asset = Sound::Create(filepath.string(), soundProps);
+		return Sound::Create(filepath.string(), soundProps);
 	}
 
-	void SoundAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
+	void SoundAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{
-		Ref<Sound> sound = StaticCastRef<Sound>(asset);
+		Asset<Sound> sound = asset;
 
 		emitter << YAML::Key << "Volume";
 		emitter << YAML::Value << sound->GetProps().volume;
@@ -41,7 +41,7 @@ namespace Mahakam
 		emitter << YAML::Value << sound->GetProps().loop;
 	}
 
-	Ref<void> SoundAssetImporter::Deserialize(YAML::Node& node)
+	Asset<void> SoundAssetImporter::Deserialize(YAML::Node& node)
 	{
 		YAML::Node filepathNode = node["Filepath"];
 		std::string filepath;

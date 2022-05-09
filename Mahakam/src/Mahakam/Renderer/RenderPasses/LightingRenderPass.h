@@ -12,17 +12,17 @@ namespace Mahakam
 	class LightingRenderPass : public RenderPass
 	{
 	protected:
-		Ref<Texture> brdfLut = nullptr;
-		Ref<Texture> falloffLut = nullptr;
-		Ref<Texture> spotlightTexture = nullptr;
+		Asset<Texture> brdfLut = nullptr;
+		Asset<Texture> falloffLut = nullptr;
+		Asset<Texture> spotlightTexture = nullptr;
 
-		Ref<FrameBuffer> hdrFrameBuffer = nullptr;
-		Ref<Shader> deferredShader = nullptr;
+		Asset<FrameBuffer> hdrFrameBuffer = nullptr;
+		Asset<Shader> deferredShader = nullptr;
 
-		Ref<FrameBuffer> shadowFramebuffer = nullptr;
-		Ref<Shader> shadowShader = nullptr;
+		Asset<FrameBuffer> shadowFramebuffer = nullptr;
+		Asset<Shader> shadowShader = nullptr;
 
-		Ref<UniformBuffer> shadowMatrixBuffer = nullptr;
+		Asset<UniformBuffer> shadowMatrixBuffer = nullptr;
 
 		robin_hood::unordered_map<glm::ivec2, uint64_t> lightHashes;
 
@@ -36,9 +36,9 @@ namespace Mahakam
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 
-		virtual bool Render(SceneData* sceneData, Ref<FrameBuffer>& src) override;
+		virtual bool Render(SceneData* sceneData, Asset<FrameBuffer>& src) override;
 
-		virtual Ref<FrameBuffer> GetFrameBuffer() { return hdrFrameBuffer; }
+		virtual Asset<FrameBuffer> GetFrameBuffer() { return hdrFrameBuffer; }
 
 	protected:
 		virtual void SetupBRDF();
@@ -46,8 +46,8 @@ namespace Mahakam
 		virtual void SetupShaders();
 
 		virtual void RenderShadowMaps(SceneData* sceneData, const Frustum& frustum);
-		virtual void SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src);
-		virtual void RenderLighting(SceneData* sceneData, Ref<FrameBuffer> src);
+		virtual void SetupTextures(SceneData* sceneData, Asset<FrameBuffer> src);
+		virtual void RenderLighting(SceneData* sceneData, Asset<FrameBuffer> src);
 
 		virtual uint64_t PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum, std::vector<uint64_t>& renderQueue);
 		virtual void RenderShadowGeometry(SceneData* sceneData, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
@@ -59,6 +59,6 @@ namespace Mahakam
 		virtual void RenderPointLights(SceneData* sceneData);
 		virtual void RenderSpotLights(SceneData* sceneData);
 
-		virtual Ref<Texture> LoadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height);
+		virtual Asset<Texture> LoadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height);
 	};
 }

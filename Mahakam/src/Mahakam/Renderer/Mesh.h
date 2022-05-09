@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Asset/Asset.h"
 #include "Material.h"
 
 #include "Assimp.h"
@@ -19,8 +20,8 @@ namespace Mahakam
 
 	struct SkinnedMesh
 	{
-		std::vector<Ref<Mesh>> meshes;
-		std::vector<Ref<Material>> materials;
+		std::vector<Asset<Mesh>> meshes;
+		std::vector<Asset<Material>> materials;
 		robin_hood::unordered_map<std::string, BoneInfo> boneInfo;
 		int boneCount = 0;
 
@@ -28,13 +29,13 @@ namespace Mahakam
 
 		SkinnedMesh() = default;
 
-		SkinnedMesh(const std::vector<Ref<Mesh>>& meshes, const std::vector<Ref<Material>>& materials, const robin_hood::unordered_map<std::string, BoneInfo>& boneInfo, int boneCount = 0)
+		SkinnedMesh(const std::vector<Asset<Mesh>>& meshes, const std::vector<Asset<Material>>& materials, const robin_hood::unordered_map<std::string, BoneInfo>& boneInfo, int boneCount = 0)
 			: meshes(meshes), materials(materials), boneInfo(boneInfo), boneCount(boneCount)
 		{
 			//RecalculateBounds();
 		}
 
-		SkinnedMesh(Ref<Mesh> mesh, Ref<Material> material)
+		SkinnedMesh(Asset<Mesh> mesh, Asset<Material> material)
 		{
 			meshes.push_back(mesh);
 			materials.push_back(material);
@@ -47,14 +48,14 @@ namespace Mahakam
 	struct SkinnedMeshProps
 	{
 		bool createMaterials = false;
-		std::vector<Ref<Material>> overrideMaterials;
-		std::vector<Ref<Shader>> overrideShaders;
+		std::vector<Asset<Material>> overrideMaterials;
+		std::vector<Asset<Shader>> overrideShaders;
 
 		SkinnedMeshProps() = default;
 
-		SkinnedMeshProps(std::initializer_list<Ref<Shader>> shaders) : createMaterials(true), overrideShaders(shaders) {}
+		SkinnedMeshProps(std::initializer_list<Asset<Shader>> shaders) : createMaterials(true), overrideShaders(shaders) {}
 
-		SkinnedMeshProps(std::initializer_list<Ref<Material>> materials) : createMaterials(false), overrideMaterials(materials) {}
+		SkinnedMeshProps(std::initializer_list<Asset<Material>> materials) : createMaterials(false), overrideMaterials(materials) {}
 	};
 
 	class Mesh
@@ -141,19 +142,19 @@ namespace Mahakam
 		static Bounds CalculateBounds(const glm::vec3* positions, uint32_t vertexCount);
 		static Bounds TransformBounds(const Bounds& bounds, const glm::mat4& transform);
 
-		inline static Ref<Mesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
+		inline static Asset<Mesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
 		inline static SkinnedMesh LoadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps()) { return LoadModelImpl(filepath, props); }
 
-		static Ref<Mesh> CreateCube(int tessellation, bool reverse = false);
-		static Ref<Mesh> CreatePlane(int rows, int columns);
-		static Ref<Mesh> CreateUVSphere(int rows, int columns);
-		static Ref<Mesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
+		static Asset<Mesh> CreateCube(int tessellation, bool reverse = false);
+		static Asset<Mesh> CreatePlane(int rows, int columns);
+		static Asset<Mesh> CreateUVSphere(int rows, int columns);
+		static Asset<Mesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Ref<Mesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
+		MH_DECLARE_FUNC(CreateImpl, Asset<Mesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
 		MH_DECLARE_FUNC(LoadModelImpl, SkinnedMesh, const std::string& filepath, const SkinnedMeshProps& props);
 
-		static Ref<Mesh> ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
+		static Asset<Mesh> ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
 
 		static void ProcessNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene);
 	};

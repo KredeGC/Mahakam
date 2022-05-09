@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "AssetDatabase.h"
 
+#include "Mahakam/Asset/AssetImporter.h"
+
 #include <random>
 
 namespace Mahakam
@@ -63,6 +65,8 @@ namespace Mahakam
 
 		// Recreate asset ID to filepath mapping
 		m_AssetPaths.clear();
+		m_CachedAssets.clear();
+		m_AssetIndex.clear();
 		RecursiveCacheAssets("res");
 	};
 
@@ -153,6 +157,12 @@ namespace Mahakam
 	//Ref<void> AssetDatabase::LoadAsset(const std::filesystem::path& importPath)
 	MH_DEFINE_FUNC(AssetDatabase::LoadAssetFromPath, Ref<void>, const std::filesystem::path& importPath)
 	{
+		if (!std::filesystem::exists(importPath))
+		{
+			MH_CORE_WARN("The path {0} doesn't exist", importPath.string());
+			return nullptr;
+		}
+
 		YAML::Node data;
 		try
 		{
@@ -177,12 +187,16 @@ namespace Mahakam
 		auto importIter = m_AssetImporters.find(extension);
 		if (importIter != m_AssetImporters.end())
 		{
-			Ref<void> asset = importIter->second->Deserialize(data);
+			Asset<void> asset = importIter->second->Deserialize(data);
 
-			m_CachedAssets[id] = asset;
-			m_AssetIndex[asset.get()] = id;
+			Ref<void> ref = asset.Get();
 
-			return asset;
+			asset.SetID(id);
+
+			m_CachedAssets[id] = ref;
+			m_AssetIndex[ref.get()] = id;
+
+			return ref;
 		}
 
 		return nullptr;
@@ -254,10 +268,9 @@ namespace Mahakam
 					{
 						YAML::Node node;
 						importer->OnWizardOpen(node);
-						Ref<void> asset = AssetDatabase::LoadAsset(importPath);
-						importer->OnWizardImport(asset, directory.path());
+						Asset<void> asset = importer->OnWizardImport(directory.path(), importPath);
 
-						AssetDatabase::SaveAsset(asset, directory.path(), importPath);
+						AssetDatabase::SaveAsset(asset.Get(), directory.path(), importPath);
 					}
 				}
 			}

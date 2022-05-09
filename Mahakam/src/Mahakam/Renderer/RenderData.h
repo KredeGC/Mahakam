@@ -70,9 +70,9 @@ namespace Mahakam
 
 	struct EnvironmentData
 	{
-		Ref<Material> skyboxMaterial;
-		Ref<Texture> irradianceMap;
-		Ref<Texture> specularMap;
+		Asset<Material> skyboxMaterial;
+		Asset<Texture> irradianceMap;
+		Asset<Texture> specularMap;
 		std::vector<DirectionalLight> directionalLights;
 		std::vector<PointLight> pointLights;
 		std::vector<SpotLight> spotLights;
@@ -138,13 +138,13 @@ namespace Mahakam
 		//  16 bits - Transform index
 		std::vector<uint64_t> renderQueue;
 
-		robin_hood::unordered_map<Ref<Shader>, uint64_t> shaderRefLookup;
-		robin_hood::unordered_map<Ref<Material>, uint64_t> materialRefLookup;
-		robin_hood::unordered_map<Ref<Mesh>, uint64_t> meshRefLookup;
+		robin_hood::unordered_map<Asset<Shader>, uint64_t> shaderRefLookup;
+		robin_hood::unordered_map<Asset<Material>, uint64_t> materialRefLookup;
+		robin_hood::unordered_map<Asset<Mesh>, uint64_t> meshRefLookup;
 
-		robin_hood::unordered_map<uint64_t, Ref<Shader>> shaderIDLookup;
-		robin_hood::unordered_map<uint64_t, Ref<Material>> materialIDLookup;
-		robin_hood::unordered_map<uint64_t, Ref<Mesh>> meshIDLookup;
+		robin_hood::unordered_map<uint64_t, Asset<Shader>> shaderIDLookup;
+		robin_hood::unordered_map<uint64_t, Asset<Material>> materialIDLookup;
+		robin_hood::unordered_map<uint64_t, Asset<Mesh>> meshIDLookup;
 		robin_hood::unordered_map<uint64_t, glm::mat4> transformIDLookup;
 
 		// Particle queue ID
@@ -160,11 +160,11 @@ namespace Mahakam
 
 		// Render camera matrices
 		CameraData cameraData;
-		Ref<UniformBuffer> cameraBuffer;
+		Asset<UniformBuffer> cameraBuffer;
 
 		// Lighting buffers
-		Ref<StorageBuffer> directionalLightBuffer;
-		Ref<StorageBuffer> pointLightBuffer;
-		Ref<StorageBuffer> spotLightBuffer;
+		Asset<StorageBuffer> directionalLightBuffer;
+		Asset<StorageBuffer> pointLightBuffer;
+		Asset<StorageBuffer> spotLightBuffer;
 	};
 }

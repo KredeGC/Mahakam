@@ -36,6 +36,8 @@ namespace Mahakam
 	{
 		m_Context->RemoveSource(this);
 
+		ma_node_detach_output_bus(&m_Sound->GetNativeSound(), 0);
+
 		ma_steamaudio_binaural_node_uninit(&m_Node, NULL);
 	}
 
@@ -51,12 +53,13 @@ namespace Mahakam
 			ma_sound_stop(&m_Sound->GetNativeSound());
 	}
 
-	void MiniAudioSource::SetSound(Ref<Sound> sound)
+	void MiniAudioSource::SetSound(Asset<Sound> sound)
 	{
 		if (m_Sound)
-			ma_node_detach_output_bus(&m_Sound->GetNativeSound(), 0);
+			ma_node_detach_output_bus(m_SoundPtr, 0);
 
-		m_Sound = std::static_pointer_cast<MiniAudioSound>(sound);
+		m_Sound = static_cast<Asset<MiniAudioSound>>(sound);
+		m_SoundPtr = m_Sound.Get().get();
 
 		/* We can now wire up the sound to the binaural node and start it. */
 		ma_node_attach_output_bus(&m_Sound->GetNativeSound(), 0, &m_Node, 0);
@@ -74,6 +77,16 @@ namespace Mahakam
 
 	void MiniAudioSource::UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos)
 	{
+		if (m_Sound.Get().get() != m_SoundPtr)
+		{
+			ma_sound_stop(&m_Sound->GetNativeSound());
+			//ma_node_detach_output_bus(m_SoundPtr, 0);
+			m_SoundPtr = m_Sound.Get().get();
+			ma_node_attach_output_bus(&m_Sound->GetNativeSound(), 0, &m_Node, 0);
+
+			Play(); // TEMP
+		}
+
 		if (m_Node.spatialBlend > 0.0f)
 		{
 			glm::vec3 direction = listenerView * m_Source;

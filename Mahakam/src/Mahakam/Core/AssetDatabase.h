@@ -3,8 +3,6 @@
 #include "Log.h"
 #include "Utility.h"
 
-#include "Mahakam/Asset/AssetImporter.h"
-
 #include <yaml-cpp/yaml.h>
 
 #include <filesystem>
@@ -12,6 +10,8 @@
 
 namespace Mahakam
 {
+	class AssetImporter;
+
 	class AssetDatabase
 	{
 	public:

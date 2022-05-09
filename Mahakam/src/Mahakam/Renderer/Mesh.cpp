@@ -73,14 +73,14 @@ namespace Mahakam
 	}
 
 	//Ref<Mesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
-	MH_DEFINE_FUNC(Mesh::CreateImpl, Ref<Mesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	MH_DEFINE_FUNC(Mesh::CreateImpl, Asset<Mesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLMesh>(vertexCount, indexCount, verts, indices);
+			return Asset<OpenGLMesh>::Create(vertexCount, indexCount, verts, indices);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");
@@ -120,7 +120,7 @@ namespace Mahakam
 		return skinnedMesh;
 	};
 
-	Ref<Mesh> Mesh::CreateCube(int tessellation, bool reverse)
+	Asset<Mesh> Mesh::CreateCube(int tessellation, bool reverse)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -202,7 +202,7 @@ namespace Mahakam
 		interleavedVertices.texcoords = uvs;
 		interleavedVertices.normals = normals;
 
-		Ref<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -212,7 +212,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Ref<Mesh> Mesh::CreatePlane(int rows, int columns)
+	Asset<Mesh> Mesh::CreatePlane(int rows, int columns)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -270,7 +270,7 @@ namespace Mahakam
 		interleavedVertices.normals = normals;
 		interleavedVertices.tangents = tangents;
 
-		Ref<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -281,7 +281,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Ref<Mesh> Mesh::CreateUVSphere(int rows, int columns)
+	Asset<Mesh> Mesh::CreateUVSphere(int rows, int columns)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -351,7 +351,7 @@ namespace Mahakam
 		interleavedVertices.texcoords = uvs;
 		interleavedVertices.normals = normals;
 
-		Ref<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -361,7 +361,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Ref<Mesh> Mesh::CreateCubeSphere(int tessellation, bool reverse, bool equirectangular)
+	Asset<Mesh> Mesh::CreateCubeSphere(int tessellation, bool reverse, bool equirectangular)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -448,7 +448,7 @@ namespace Mahakam
 		interleavedVertices.texcoords = uvs;
 		interleavedVertices.normals = normals;
 
-		Ref<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -458,7 +458,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Ref<Mesh> Mesh::ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
+	Asset<Mesh> Mesh::ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -583,7 +583,7 @@ namespace Mahakam
 			interleavedVertices.boneWeights = boneWeights;
 		}
 
-		Ref<Mesh> m = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<Mesh> m = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] texcoords;

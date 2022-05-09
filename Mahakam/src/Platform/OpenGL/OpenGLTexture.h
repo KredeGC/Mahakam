@@ -66,7 +66,7 @@ namespace Mahakam {
 	public:
 		OpenGLTextureCube(const CubeTextureProps& props);
 		OpenGLTextureCube(const std::string& filepath, const CubeTextureProps& props);
-		OpenGLTextureCube(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props);
+		OpenGLTextureCube(Asset<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props);
 		virtual ~OpenGLTextureCube();
 
 		virtual const CubeTextureProps& GetProps() const override { return props; };

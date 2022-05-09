@@ -20,10 +20,10 @@ namespace Mahakam
 		friend class Entity;
 		friend class SceneSerializer;
 
-		Ref<Material> skyboxMaterial;
-		Ref<TextureCube> skyboxTexture;
-		Ref<TextureCube> skyboxIrradiance;
-		Ref<TextureCube> skyboxSpecular;
+		Asset<Material> skyboxMaterial;
+		Asset<TextureCube> skyboxTexture;
+		Asset<TextureCube> skyboxIrradiance;
+		Asset<TextureCube> skyboxSpecular;
 
 		entt::registry registry;
 

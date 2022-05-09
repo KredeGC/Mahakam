@@ -18,7 +18,7 @@ namespace Mahakam
 
 		AudioSourceComponent(const AudioSourceComponent&) = default;
 
-		AudioSourceComponent(Ref<Sound> sound)
+		AudioSourceComponent(Asset<Sound> sound)
 		{
 			m_Source->SetSound(sound);
 		}
@@ -26,8 +26,8 @@ namespace Mahakam
 		void Play() { m_Source->Play(); }
 		void Stop() { m_Source->Stop(); }
 
-		void SetSound(Ref<Sound> sound) { m_Source->SetSound(sound); }
-		Ref<Sound> GetSound() { return m_Source->GetSound(); }
+		void SetSound(Asset<Sound> sound) { m_Source->SetSound(sound); }
+		Asset<Sound> GetSound() { return m_Source->GetSound(); }
 
 		void SetSpatialBlend(float blend) { m_Source->SetSpatialBlend(blend); }
 		float GetSpatialBlend() { return m_Source->GetSpatialBlend(); }

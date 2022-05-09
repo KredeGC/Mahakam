@@ -24,10 +24,10 @@ namespace Mahakam::Editor
 				EditorLayer::GetActiveScene()->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
 			}
 
-			Ref<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
+			Asset<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
 			if (framebuffer)
 			{
-				Ref<Texture> viewportTexture = framebuffer->GetColorTexture(0);
+				Asset<Texture> viewportTexture = framebuffer->GetColorTexture(0);
 				if (viewportTexture)
 					ImGui::Image((ImTextureID)(uintptr_t)viewportTexture->GetRendererID(), size, ImVec2(0, 1), ImVec2(1, 0));
 			}

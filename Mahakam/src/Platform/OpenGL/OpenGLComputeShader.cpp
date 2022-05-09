@@ -51,7 +51,7 @@ namespace Mahakam
 		MH_GL_CALL(glMemoryBarrier(GL_ALL_BARRIER_BITS));
 	}
 
-	void OpenGLComputeShader::SetTexture(const std::string& name, Ref<Texture> tex)
+	void OpenGLComputeShader::SetTexture(const std::string& name, Asset<Texture> tex)
 	{
 		int slot = GetUniformLocation(name);
 		if (slot != -1)

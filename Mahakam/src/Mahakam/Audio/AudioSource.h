@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Asset/Asset.h"
 
 #include "AudioEngine.h"
 #include "AudioContext.h"
@@ -17,8 +18,8 @@ namespace Mahakam
 		virtual void Play() = 0;
 		virtual void Stop() = 0;
 		
-		virtual void SetSound(Ref<Sound> sound) = 0;
-		virtual Ref<Sound> GetSound() = 0;
+		virtual void SetSound(Asset<Sound> sound) = 0;
+		virtual Asset<Sound> GetSound() = 0;
 		
 		virtual void SetSpatialBlend(float blend) = 0;
 		virtual float GetSpatialBlend() = 0;

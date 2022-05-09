@@ -6,9 +6,9 @@
 namespace Mahakam
 {
     //Ref<Sound> Sound::Create(const std::string& filepath, AudioContext* context)
-    MH_DEFINE_FUNC(Sound::CreateImpl, Ref<Sound>, const std::string& filepath, const SoundProps& props, AudioContext* context)
+    MH_DEFINE_FUNC(Sound::CreateImpl, Asset<Sound>, const std::string& filepath, const SoundProps& props, AudioContext* context)
     {
-        return CreateRef<MiniAudioSound>(filepath, props, static_cast<MiniAudioContext*>(context));
+        return Asset<MiniAudioSound>::Create(filepath, props, static_cast<MiniAudioContext*>(context));
     };
 
     MiniAudioSound::MiniAudioSound(const std::string& filepath, const SoundProps& props, MiniAudioContext* context)
@@ -27,9 +27,7 @@ namespace Mahakam
         soundConfig.flags = MA_SOUND_FLAG_NO_DEFAULT_ATTACHMENT | MA_SOUND_FLAG_NO_SPATIALIZATION;  /* We'll attach this to the graph later. */
 
         ma_result result = ma_sound_init_ex(&context->GetEngine(), &soundConfig, &m_Sound);
-        //MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize audio HRTF.");
-        if (result != MA_SUCCESS)
-            throw("Failed to initialize sound.");
+        MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize sound.");
 
         /* We'll let the Steam Audio binaural effect do the directional attenuation for us. */
         ma_sound_set_directional_attenuation_factor(&m_Sound, 0);

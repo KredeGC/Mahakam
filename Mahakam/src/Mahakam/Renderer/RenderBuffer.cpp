@@ -10,14 +10,14 @@
 namespace Mahakam
 {
 	//Ref<RenderBuffer> RenderBuffer::CreateImpl(uint32_t width, uint32_t height, TextureFormat format)
-	MH_DEFINE_FUNC(RenderBuffer::CreateImpl, Ref<RenderBuffer>, uint32_t width, uint32_t height, TextureFormat format)
+	MH_DEFINE_FUNC(RenderBuffer::CreateImpl, Asset<RenderBuffer>, uint32_t width, uint32_t height, TextureFormat format)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLRenderBuffer>(width, height, format);
+			return Asset<OpenGLRenderBuffer>::Create(width, height, format);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

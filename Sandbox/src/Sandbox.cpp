@@ -40,7 +40,7 @@ EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 		CreateRef<ParticleRenderPass>(),
 		CreateRef<TonemappingRenderPass>() });*/
 
-	Ref<Texture2D> testTex = Texture2D::Create("assets/textures/brick/brick_albedo.png", { TextureFormat::SRGB_DXT1, TextureFilter::Point });
+	Asset<Texture2D> testTex = Texture2D::Create("assets/textures/brick/brick_albedo.png", { TextureFormat::SRGB_DXT1, TextureFilter::Point });
 	testTex->GetRendererID();
 
 	MH_CORE_TRACE("DLL Loaded!");
@@ -74,16 +74,16 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create shaders
-	Ref<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.shader");
-	Ref<Shader> textureShader = Shader::Create("assets/shaders/default/LitTexture.shader");
-	Ref<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.shader");
+	Asset<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.shader");
+	Asset<Shader> textureShader = Shader::Create("assets/shaders/default/LitTexture.shader");
+	Asset<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.shader");
 	/*Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/DitheredSkinned.yaml");
 	Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.yaml");
 	Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.yaml");*/
 
 
 	// Create skinned material
-	Ref<Material> skinnedMaterial = Material::Create(skinnedShader);
+	Asset<Material> skinnedMaterial = Material::Create(skinnedShader);
 	skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
 	skinnedMaterial->SetFloat("u_Metallic", 1.0f);
 	skinnedMaterial->SetFloat("u_Roughness", 0.4f);
@@ -134,16 +134,16 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 	// Setup plane
 	//Asset<Texture2D> brickAlbedo = Asset<Texture2D>("res/assets/textures/brick/brick_albedo.png.yaml");
-	Ref<Texture2D> brickAlbedo = AssetDatabase::LoadAsset<Texture2D>("res/assets/textures/brick/brick_albedo.png.yaml");
-	//Ref<Texture> brickAlbedo = Texture2D::Create("assets/textures/brick/brick_albedo.png", { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
-	Ref<Texture> brickBump = Texture2D::Create("assets/textures/brick/brick_bump.png", { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
-	Ref<Texture> brickRoughness = Texture2D::Create("assets/textures/brick/brick_roughness.png", { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+	//Ref<Texture2D> brickAlbedo = AssetDatabase::LoadAsset<Texture2D>("res/assets/textures/brick/brick_albedo.png.yaml");
+	Asset<Texture> brickAlbedo = Texture2D::Create("assets/textures/brick/brick_albedo.png", { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
+	Asset<Texture> brickBump = Texture2D::Create("assets/textures/brick/brick_bump.png", { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
+	Asset<Texture> brickRoughness = Texture2D::Create("assets/textures/brick/brick_roughness.png", { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
 	/*Ref<Texture> brickAlbedo = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
 	Ref<Texture> brickBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_bump.png", false, { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
 	Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });*/
-	Ref<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
+	Asset<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
 
-	Ref<Material> planeMaterial = Material::Create(textureShader);
+	Asset<Material> planeMaterial = Material::Create(textureShader);
 	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
 	planeMaterial->SetTexture("u_Bump", 0, GL::GetTexture2DBump());
 	planeMaterial->SetTexture("u_Metallic", 0, GL::GetTexture2DBlack());
@@ -194,8 +194,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create becret sound entity
-	//Ref<Sound> becretSound = Sound::Create("assets/sounds/memory_mono.wav", { 0.5f, true });
-	Ref<Sound> becretSound = AssetDatabase::LoadAsset<Sound>("res/assets/sounds/memory_mono.wav.yaml");
+	//Asset<Sound> becretSound = Sound::Create("assets/sounds/memory_mono.wav", { 0.5f, true });
+	Asset<Sound> becretSound = Asset<Sound>("res/assets/sounds/memory_mono.wav.yaml");
+	//Asset<Sound> becretSound = AssetDatabase::LoadAsset<Sound>("res/assets/sounds/memory_mono.wav.yaml");
 
 	Entity becretEntity = scene->CreateEntity("Becret");
 	becretEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
@@ -216,8 +217,8 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create mesh & base material
-	Ref<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
-	Ref<Material> baseMaterial = Material::Create(colorShader);
+	Asset<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
+	Asset<Material> baseMaterial = Material::Create(colorShader);
 	baseMaterial->SetFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 
 	// Create scene entities
@@ -226,7 +227,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 		for (int x = 0; x < 10; x++)
 		{
 			// Setup material with texture
-			Ref<Material> material = Material::Copy(baseMaterial);
+			Asset<Material> material = Material::Copy(baseMaterial);
 			material->SetFloat("u_Metallic", y / 10.0f);
 			material->SetFloat("u_Roughness", x / 10.0f);
 

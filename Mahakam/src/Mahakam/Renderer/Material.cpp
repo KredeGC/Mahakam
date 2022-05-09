@@ -10,14 +10,14 @@
 namespace Mahakam
 {
 	//Ref<Material> Material::CreateImpl(Ref<Shader> shader, const std::string& variant)
-	MH_DEFINE_FUNC(Material::CreateImpl, Ref<Material>, Ref<Shader> shader, const std::string& variant)
+	MH_DEFINE_FUNC(Material::CreateImpl, Asset<Material>, Asset<Shader> shader, const std::string& variant)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLMaterial>(shader, variant);
+			return Asset<OpenGLMaterial>::Create(shader, variant);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");
@@ -26,14 +26,14 @@ namespace Mahakam
 	};
 
 	//Ref<Material> Material::Copy(Ref<Material> material)
-	MH_DEFINE_FUNC(Material::Copy, Ref<Material>, Ref<Material> material)
+	MH_DEFINE_FUNC(Material::Copy, Asset<Material>, Asset<Material> material)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLMaterial>(material);
+			return Asset<OpenGLMaterial>::Create(material);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

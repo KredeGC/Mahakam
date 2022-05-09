@@ -9,8 +9,8 @@ namespace Mahakam
 	class ParticleRenderPass : public RenderPass
 	{
 	private:
-		Ref<FrameBuffer> viewportFramebuffer = nullptr;
-		Ref<ComputeShader> particleCompute = nullptr;
+		Asset<FrameBuffer> viewportFramebuffer = nullptr;
+		Asset<ComputeShader> particleCompute = nullptr;
 
 	public:
 		virtual bool Init(uint32_t width, uint32_t height) override;
@@ -18,8 +18,8 @@ namespace Mahakam
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 
-		virtual bool Render(SceneData* sceneData, Ref<FrameBuffer>& src) override;
+		virtual bool Render(SceneData* sceneData, Asset<FrameBuffer>& src) override;
 
-		virtual Ref<FrameBuffer> GetFrameBuffer() { return viewportFramebuffer; }
+		virtual Asset<FrameBuffer> GetFrameBuffer() { return viewportFramebuffer; }
 	};
 }

@@ -23,7 +23,7 @@ namespace Mahakam
 
 		virtual void Dispatch(uint32_t x, uint32_t y, uint32_t z);
 
-		virtual void SetTexture(const std::string & name, Ref<Texture> tex);
+		virtual void SetTexture(const std::string & name, Asset<Texture> tex);
 
 	private:
 		void CompileBinary(const std::filesystem::path& cachePath, const std::string& src);

@@ -11,8 +11,8 @@ namespace Mahakam::Editor
 
 		std::filesystem::path m_CurrentDirectory = s_AssetDirectory;
 
-		Ref<Texture2D> m_DirectoryIcon;
-		Ref<Texture2D> m_FileIcon;
+		Asset<Texture2D> m_DirectoryIcon;
+		Asset<Texture2D> m_FileIcon;
 
 		inline const static std::filesystem::path s_AssetDirectory = "assets";
 

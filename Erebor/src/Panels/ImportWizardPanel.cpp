@@ -31,15 +31,9 @@ namespace Mahakam::Editor
 
 			if (ImGui::Button("Import"))
 			{
-				Ref<void> asset = AssetDatabase::LoadAsset(m_ImportPath);
+				Asset<void> asset = m_Importer->OnWizardImport(m_FilePath, m_ImportPath);
 
-				MH_CORE_TRACE(asset);
-
-				m_Importer->OnWizardImport(asset, m_FilePath);
-
-				MH_CORE_TRACE(asset);
-
-				AssetDatabase::SaveAsset(asset, m_FilePath, m_ImportPath);
+				AssetDatabase::SaveAsset(asset.Get(), m_FilePath, m_ImportPath);
 
 				AssetDatabase::ReloadAssetImports();
 

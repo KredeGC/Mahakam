@@ -14,7 +14,8 @@ namespace Mahakam
 
 		MiniAudioContext* m_Context;
 
-		Ref<MiniAudioSound> m_Sound;
+		MiniAudioSound* m_SoundPtr;
+		Asset<MiniAudioSound> m_Sound;
 
 		glm::vec4 m_Source{ 0 };
 
@@ -25,8 +26,8 @@ namespace Mahakam
 		virtual void Play() override;
 		virtual void Stop() override;
 
-		virtual void SetSound(Ref<Sound> sound) override;
-		virtual Ref<Sound> GetSound() override { return m_Sound; }
+		virtual void SetSound(Asset<Sound> sound) override;
+		virtual Asset<Sound> GetSound() override { return m_Sound; }
 
 		virtual void SetSpatialBlend(float blend) override;
 		virtual float GetSpatialBlend() override { return m_Node.spatialBlend; }

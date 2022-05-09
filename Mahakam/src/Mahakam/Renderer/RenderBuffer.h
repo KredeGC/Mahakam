@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Asset/Asset.h"
 
 #include "TextureFormats.h"
 
@@ -19,9 +20,9 @@ namespace Mahakam
 
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 
-		inline static Ref<RenderBuffer> Create(uint32_t width, uint32_t height, TextureFormat format) { return CreateImpl(width, height, format); }
+		inline static Asset<RenderBuffer> Create(uint32_t width, uint32_t height, TextureFormat format) { return CreateImpl(width, height, format); }
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Ref<RenderBuffer>, uint32_t width, uint32_t height, TextureFormat format);
+		MH_DECLARE_FUNC(CreateImpl, Asset<RenderBuffer>, uint32_t width, uint32_t height, TextureFormat format);
 	};
 }
