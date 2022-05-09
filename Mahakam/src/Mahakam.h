@@ -17,9 +17,11 @@
 #include "Mahakam/Core/Window.h"
 
 // Asset
+#include "Mahakam/Asset/Asset.h"
 #include "Mahakam/Asset/AssetImporter.h"
 #include "Mahakam/Asset/ShaderAssetImporter.h"
 #include "Mahakam/Asset/SoundAssetImporter.h"
+#include "Mahakam/Asset/TextureAssetImporter.h"
 
 // Audio
 #include "Mahakam/Audio/AudioContext.h"

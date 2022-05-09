@@ -133,7 +133,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Ref<Texture> brickAlbedo = Texture2D::Create("assets/textures/brick/brick_albedo.png", { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
+	//Asset<Texture2D> brickAlbedo = Asset<Texture2D>("res/assets/textures/brick/brick_albedo.png.yaml");
+	Ref<Texture2D> brickAlbedo = AssetDatabase::LoadAsset<Texture2D>("res/assets/textures/brick/brick_albedo.png.yaml");
+	//Ref<Texture> brickAlbedo = Texture2D::Create("assets/textures/brick/brick_albedo.png", { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
 	Ref<Texture> brickBump = Texture2D::Create("assets/textures/brick/brick_bump.png", { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
 	Ref<Texture> brickRoughness = Texture2D::Create("assets/textures/brick/brick_roughness.png", { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
 	/*Ref<Texture> brickAlbedo = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });

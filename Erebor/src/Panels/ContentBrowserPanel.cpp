@@ -163,7 +163,7 @@ namespace Mahakam::Editor
 		}
 
 		// Raw files last
-		if (ImGui::CollapsingHeader("Files", ImGuiTreeNodeFlags_SpanAvailWidth))
+		if (ImGui::CollapsingHeader("Files", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			if (ImGui::BeginTable("Raw Divisor", numColumns))
 			{

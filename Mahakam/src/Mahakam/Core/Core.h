@@ -66,6 +66,7 @@
 // Returns a non-capturing lambda which calls fn
 #define MH_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
+// Function declarations which should be reachable in DLLs
 #ifndef MH_STANDALONE
 #define MH_DECLARE_FUNC_LINE2(line, func, returnType, ...) static returnType (*func)(__VA_ARGS__); \
 	inline static uint8_t generated_##line = (::Mahakam::SharedLibrary::AddFunction((void**)&func), 0);

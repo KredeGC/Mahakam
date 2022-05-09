@@ -115,7 +115,7 @@ namespace Mahakam
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const TextureProps& props)
-		: props(props)
+		: m_Props(props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -128,25 +128,25 @@ namespace Mahakam
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath, const TextureProps& props)
-		: filepath(filepath), props(props)
+		: filepath(filepath), m_Props(props)
 	{
 		MH_PROFILE_FUNCTION();
 
 		int w, h, channels, hdr;
 		void* data = LoadImageFile(filepath.c_str(), &w, &h, &channels, &hdr);
 
-		this->props.width = w;
-		this->props.height = h;
+		m_Props.width = w;
+		m_Props.height = h;
 
-		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
+		internalFormat = TextureFormatToOpenGLInternalFormat(m_Props.format);
 		dataFormat = ChannelCountToOpenGLBaseFormat(channels);
-		formatType = TextureFormatToOpenGLType(this->props.format);
-		compressed = IsTextureFormatCompressed(this->props.format);
+		formatType = TextureFormatToOpenGLType(m_Props.format);
+		compressed = IsTextureFormatCompressed(m_Props.format);
 
 		// Create and populate the texture
 		MH_GL_CALL(glGenTextures(1, &rendererID));
 		MH_GL_CALL(glBindTexture(GL_TEXTURE_2D, rendererID));
-		MH_GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, this->props.width, this->props.height, 0, dataFormat, formatType, data));
+		MH_GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_Props.width, m_Props.height, 0, dataFormat, formatType, data));
 
 		if (channels == 2) // TODO: Look some more into this, but keep it for now
 		{
@@ -155,22 +155,22 @@ namespace Mahakam
 		}
 
 		// Wrap X
-		SetWrapMode(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->props.wrapX);
+		SetWrapMode(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Props.wrapX);
 
 		// Wrap Y
-		SetWrapMode(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->props.wrapY);
+		SetWrapMode(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Props.wrapY);
 
 		// Filter mode & mipmaps
-		SetFilterMode(GL_TEXTURE_2D, this->props.mipmaps, this->props.filterMode);
+		SetFilterMode(GL_TEXTURE_2D, m_Props.mipmaps, m_Props.filterMode);
 
-		if (this->props.mipmaps)
+		if (m_Props.mipmaps)
 			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 
 		// Calculate the size
-		dataFormat = TextureFormatToOpenGLBaseFormat(this->props.format); // Should this just be this way by default? idk
-		uint32_t bpp = TextureFormatToByteSize(this->props.format);
-		size = CalculateTextureByteSize(GL_TEXTURE_2D, bpp, compressed, false, this->props.width, this->props.height);
-		totalSize = CalculateTextureByteSize(GL_TEXTURE_2D, bpp, compressed, this->props.mipmaps, this->props.width, this->props.height);
+		dataFormat = TextureFormatToOpenGLBaseFormat(m_Props.format); // Should this just be this way by default? idk
+		uint32_t bpp = TextureFormatToByteSize(m_Props.format);
+		size = CalculateTextureByteSize(GL_TEXTURE_2D, bpp, compressed, false, m_Props.width, m_Props.height);
+		totalSize = CalculateTextureByteSize(GL_TEXTURE_2D, bpp, compressed, m_Props.mipmaps, m_Props.width, m_Props.height);
 
 		stbi_image_free(data);
 	}
@@ -188,14 +188,14 @@ namespace Mahakam
 
 		MH_CORE_ASSERT(!mipmaps || !compressed, "Compressed mipmaps are currently not supported!");
 
-		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(props.width, props.height))));
+		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(m_Props.width, m_Props.height))));
 		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
 
 		uint32_t offset = 0;
 		for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
 		{
-			uint32_t mipWidth = (uint32_t)(props.width * std::pow(0.5, mip));
-			uint32_t mipHeight = (uint32_t)(props.height * std::pow(0.5, mip));
+			uint32_t mipWidth = (uint32_t)(m_Props.width * std::pow(0.5, mip));
+			uint32_t mipHeight = (uint32_t)(m_Props.height * std::pow(0.5, mip));
 
 			if (compressed)
 				MH_GL_CALL(glCompressedTexSubImage2D(GL_TEXTURE_2D, mip, 0, 0, mipWidth, mipHeight, dataFormat, size, (char*)data + offset))
@@ -206,7 +206,7 @@ namespace Mahakam
 			size /= 4;
 		}
 
-		if (props.mipmaps && !mipmaps)
+		if (m_Props.mipmaps && !mipmaps)
 			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 	}
 
@@ -226,9 +226,9 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		uint32_t bpp = TextureFormatToByteSize(props.format);
+		uint32_t bpp = TextureFormatToByteSize(m_Props.format);
 
-		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(props.width, props.height))));
+		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(m_Props.width, m_Props.height))));
 		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
 
 		uint32_t offset = 0;
@@ -246,8 +246,8 @@ namespace Mahakam
 			}
 			else
 			{
-				uint32_t mipWidth = (uint32_t)(this->props.width * std::pow(0.5, mip));
-				uint32_t mipHeight = (uint32_t)(this->props.height * std::pow(0.5, mip));
+				uint32_t mipWidth = (uint32_t)(m_Props.width * std::pow(0.5, mip));
+				uint32_t mipHeight = (uint32_t)(m_Props.height * std::pow(0.5, mip));
 
 				mipSize = mipWidth * mipHeight * bpp;
 				MH_GL_CALL(glGetTexImage(GL_TEXTURE_2D, mip, dataFormat, formatType, (char*)pixels + offset));
@@ -263,8 +263,8 @@ namespace Mahakam
 
 		MH_GL_CALL(glDeleteTextures(1, &rendererID));
 
-		props.width = width;
-		props.height = height;
+		m_Props.width = width;
+		m_Props.height = height;
 
 		Init();
 	}
@@ -274,26 +274,26 @@ namespace Mahakam
 		// Create an empty texture
 		MH_GL_CALL(glGenTextures(1, &rendererID));
 		MH_GL_CALL(glBindTexture(GL_TEXTURE_2D, rendererID));
-		//glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, this->props.width, this->props.height, 0, dataFormat, formatType, nullptr);
-		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(props.width, props.height))));
-		MH_GL_CALL(glTexStorage2D(GL_TEXTURE_2D, props.mipmaps ? mipLevels : 1, internalFormat, props.width, props.height));
+		//glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_Props.width, m_Props.height, 0, dataFormat, formatType, nullptr);
+		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(m_Props.width, m_Props.height))));
+		MH_GL_CALL(glTexStorage2D(GL_TEXTURE_2D, m_Props.mipmaps ? mipLevels : 1, internalFormat, m_Props.width, m_Props.height));
 
 		// Wrap X
-		SetWrapMode(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, props.wrapX);
+		SetWrapMode(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Props.wrapX);
 
 		// Wrap Y
-		SetWrapMode(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, props.wrapY);
+		SetWrapMode(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Props.wrapY);
 
 		// Filter mode & mipmaps
-		SetFilterMode(GL_TEXTURE_2D, props.mipmaps, props.filterMode);
+		SetFilterMode(GL_TEXTURE_2D, m_Props.mipmaps, m_Props.filterMode);
 
-		if (props.mipmaps)
+		if (m_Props.mipmaps)
 			MH_GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 
 		// Calculate the size
-		uint32_t bpp = TextureFormatToByteSize(props.format);
-		size = CalculateTextureByteSize(GL_TEXTURE_2D, bpp, false, false, props.width, props.height);
-		totalSize = CalculateTextureByteSize(GL_TEXTURE_2D, bpp, false, props.mipmaps, props.width, props.height);
+		uint32_t bpp = TextureFormatToByteSize(m_Props.format);
+		size = CalculateTextureByteSize(GL_TEXTURE_2D, bpp, false, false, m_Props.width, m_Props.height);
+		totalSize = CalculateTextureByteSize(GL_TEXTURE_2D, bpp, false, m_Props.mipmaps, m_Props.width, m_Props.height);
 	}
 
 

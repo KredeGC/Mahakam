@@ -23,9 +23,11 @@ namespace Mahakam
 		};
 
 	private:
+		using AssetMap = std::unordered_map<uint64_t, std::filesystem::path>;
+
 		inline static std::unordered_map<std::string, Ref<AssetImporter>> m_AssetImporters;
 
-		inline static std::unordered_map<uint64_t, std::filesystem::path> m_AssetPaths;
+		inline static AssetMap m_AssetPaths;
 
 		inline static std::unordered_map<uint64_t, WeakRef<void>> m_CachedAssets;
 
@@ -40,6 +42,8 @@ namespace Mahakam
 		// Miscellaneous functions
 		MH_DECLARE_FUNC(CollectGarbage, void);
 		MH_DECLARE_FUNC(ReloadAssetImports, void);
+		MH_DECLARE_FUNC(GetAssetHandles, AssetMap);
+		MH_DECLARE_FUNC(GetAssetReferences, uint32_t, uint64_t id);
 		MH_DECLARE_FUNC(GetAssetID, uint64_t, Ref<void> asset);
 		MH_DECLARE_FUNC(GetAssetInfo, AssetInfo, const std::filesystem::path& importPath);
 

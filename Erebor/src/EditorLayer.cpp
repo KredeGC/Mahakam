@@ -2,6 +2,7 @@
 #include "EditorLayer.h"
 
 #ifndef MH_RUNTIME
+#include "Panels/AssetManagerPanel.h"
 #include "Panels/ContentBrowserPanel.h"
 #include "Panels/GameViewPanel.h"
 #include "Panels/ImportWizardPanel.h"
@@ -348,11 +349,23 @@ namespace Mahakam::Editor
 		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
 
 		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);
+
+		// Texture
+		Ref<TextureAssetImporter> textureAssetImporter = CreateRef<TextureAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".png", textureAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".jpeg", textureAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".jpg", textureAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".hdr", textureAssetImporter);
 #pragma endregion
 
 
 #pragma region Windows
 #ifndef MH_RUNTIME
+		// AssetManagerPanel
+		EditorWindowRegistry::RegisterWindowClass<AssetManagerPanel>("Asset Manager");
+		EditorWindowRegistry::OpenWindow("Asset Manager");
+
 		// ContentBrowserPanel
 		EditorWindowRegistry::RegisterWindowClass<ContentBrowserPanel>("Content Browser");
 		EditorWindowRegistry::OpenWindow("Content Browser");

@@ -61,6 +61,8 @@ namespace Mahakam
 	class Texture2D : public Texture
 	{
 	public:
+		virtual const TextureProps& GetProps() const = 0;
+
 		inline static Ref<Texture2D> Create(const TextureProps& props = TextureProps()) { return CreateProps(props); }
 		inline static Ref<Texture2D> Create(const std::string& filepath, const TextureProps& props = TextureProps()) { return CreateFilepath(filepath, props); }
 
@@ -88,10 +90,9 @@ namespace Mahakam
 
 	class TextureCube : public Texture
 	{
-	private:
-		uint32_t resolution;
-
 	public:
+		virtual const CubeTextureProps& GetProps() const = 0;
+
 		inline static Ref<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps()) { return CreateProps(props); }
 		inline static Ref<TextureCube> Create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps()) { return CreateFilepath(filepath, props); }
 		inline static Ref<TextureCube> Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props = CubeTextureProps()) { return CreatePrefilter(cubemap, prefilter, props); }

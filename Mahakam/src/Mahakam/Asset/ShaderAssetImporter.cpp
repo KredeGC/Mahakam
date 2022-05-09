@@ -15,9 +15,9 @@ namespace Mahakam
 		ImGui::Text("Shaders have no options");
 	}
 
-	Ref<void> ShaderAssetImporter::OnWizardImport(const std::filesystem::path& filepath)
+	void ShaderAssetImporter::OnWizardImport(Ref<void>& asset, const std::filesystem::path& filepath)
 	{
-		return Shader::Create(filepath.string());
+		asset = Shader::Create(filepath.string());
 	}
 
 	void ShaderAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)

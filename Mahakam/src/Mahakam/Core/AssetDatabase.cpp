@@ -66,6 +66,22 @@ namespace Mahakam
 		RecursiveCacheAssets("res");
 	};
 
+	//AssetDatabase::AssetMap AssetDatabase::GetAssetHandles()
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetHandles, AssetDatabase::AssetMap)
+	{
+		return m_AssetPaths;
+	};
+
+	//uint32_t AssetDatabase::GetAssetReferences(uint64_t id)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetReferences, uint32_t, uint64_t id)
+	{
+		auto cacheIter = m_CachedAssets.find(id);
+		if (cacheIter != m_CachedAssets.end())
+			return cacheIter->second.use_count();
+
+		return 0;
+	};
+
 	//uint64_t AssetDatabase::GetAssetID(Ref<void> asset)
 	MH_DEFINE_FUNC(AssetDatabase::GetAssetID, uint64_t, Ref<void> asset)
 	{
@@ -238,7 +254,8 @@ namespace Mahakam
 					{
 						YAML::Node node;
 						importer->OnWizardOpen(node);
-						Ref<void> asset = importer->OnWizardImport(directory.path());
+						Ref<void> asset = AssetDatabase::LoadAsset(importPath);
+						importer->OnWizardImport(asset, directory.path());
 
 						AssetDatabase::SaveAsset(asset, directory.path(), importPath);
 					}

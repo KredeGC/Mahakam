@@ -26,9 +26,9 @@ namespace Mahakam
 		ImGui::Checkbox("Sound Looping", &soundProps.loop);
 	}
 
-	Ref<void> SoundAssetImporter::OnWizardImport(const std::filesystem::path& filepath)
+	void SoundAssetImporter::OnWizardImport(Ref<void>& asset, const std::filesystem::path& filepath)
 	{
-		return Sound::Create(filepath.string(), soundProps);
+		asset = Sound::Create(filepath.string(), soundProps);
 	}
 
 	void SoundAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
