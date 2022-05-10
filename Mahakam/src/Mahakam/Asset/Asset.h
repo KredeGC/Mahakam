@@ -20,6 +20,8 @@ namespace Mahakam
 	public:
 		Asset() : m_ID(0), m_Ptr(nullptr) {}
 
+		Asset(const nullptr_t&) {}
+
 		Asset(Ref<T> ptr)
 		{
 			m_Ptr = ptr;

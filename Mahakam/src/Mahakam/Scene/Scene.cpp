@@ -104,7 +104,7 @@ namespace Mahakam
 
 			registry.view<TransformComponent, AudioSourceComponent>().each([=](auto entity, TransformComponent& transformComponent, AudioSourceComponent& audioSourceComponent)
 			{
-				auto& source = audioSourceComponent.GetAudioSource();
+				auto source = audioSourceComponent.GetAudioSource();
 				source->SetPosition(transformComponent.GetPosition());
 			});
 		}

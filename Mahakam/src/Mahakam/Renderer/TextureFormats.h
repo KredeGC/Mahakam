@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MH_TEXTURE_FORMATS_INCLUDED
+#define MH_TEXTURE_FORMATS_INCLUDED
 
 #include "Mahakam/Core/Enum.h"
 
@@ -62,3 +63,5 @@ namespace Mahakam
 	}
 	MH_END_ENUM(TextureCubePrefilter);
 }
+
+#endif

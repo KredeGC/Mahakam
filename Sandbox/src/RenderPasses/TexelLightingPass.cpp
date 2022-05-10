@@ -29,7 +29,7 @@ namespace Mahakam
 		shadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
 	}
 
-	void TexelLightingPass::SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src)
+	void TexelLightingPass::SetupTextures(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

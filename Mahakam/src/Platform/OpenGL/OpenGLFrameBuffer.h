@@ -10,7 +10,7 @@ namespace Mahakam
 		uint32_t rendererID = 0;
 		FrameBufferProps props;
 		std::vector<Asset<RenderBuffer>> colorAttachments;
-		Asset<RenderBuffer> depthAttachment = 0;
+		Asset<RenderBuffer> depthAttachment = nullptr;
 
 	public:
 		OpenGLFrameBuffer(const FrameBufferProps& props);
