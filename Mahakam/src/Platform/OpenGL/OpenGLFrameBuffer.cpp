@@ -38,7 +38,7 @@ namespace Mahakam
 
 	void OpenGLFrameBuffer::Blit(Asset<FrameBuffer> dest, bool color, bool depth)
 	{
-		Asset<OpenGLFrameBuffer> fbo = static_cast<Asset<OpenGLFrameBuffer>>(dest);
+		Asset<OpenGLFrameBuffer> fbo = dest;
 
 		MH_GL_CALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID));
 		MH_GL_CALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID));

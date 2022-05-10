@@ -71,7 +71,7 @@ namespace Mahakam::Editor
 		{
 			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
 
-			emitter << YAML::Key << "Sound" << YAML::Value << source.GetSound();
+			emitter << YAML::Key << "Sound" << YAML::Value << source.GetSound().GetID();
 			emitter << YAML::Key << "SpatialBlend" << YAML::Value << source.GetSpatialBlend();
 
 			return true;
@@ -83,7 +83,7 @@ namespace Mahakam::Editor
 			YAML::Node soundNode = node["Sound"];
 			if (soundNode)
 			{
-				Ref<Sound> sound = AssetDatabase::LoadAsset<Sound>(soundNode.as<uint64_t>());
+				Asset<Sound> sound = Asset<Sound>(soundNode.as<uint64_t>());
 
 				if (sound)
 				{

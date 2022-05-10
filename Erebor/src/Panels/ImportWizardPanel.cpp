@@ -33,7 +33,9 @@ namespace Mahakam::Editor
 			{
 				Asset<void> asset = m_Importer->OnWizardImport(m_FilePath, m_ImportPath);
 
-				AssetDatabase::SaveAsset(asset.Get(), m_FilePath, m_ImportPath);
+				asset.Save(m_FilePath, m_ImportPath);
+
+				//AssetDatabase::SaveAsset(asset.Get(), m_FilePath, m_ImportPath);
 
 				AssetDatabase::ReloadAssetImports();
 

@@ -194,11 +194,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create becret sound entity
-	//Asset<Sound> becretSound = Sound::Create("assets/sounds/memory_mono.wav", { 0.5f, true });
 	Asset<Sound> becretSound = Asset<Sound>("res/assets/sounds/memory_mono.wav.yaml");
-	//Asset<Sound> becretSound = AssetDatabase::LoadAsset<Sound>("res/assets/sounds/memory_mono.wav.yaml");
 
-	Entity becretEntity = scene->CreateEntity("Becret");
+	Entity becretEntity = scene->CreateEntity("Memory Zone");
 	becretEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	AudioSourceComponent& becretSource = becretEntity.AddComponent<AudioSourceComponent>();
 	becretSource.SetSpatialBlend(1.0f);
@@ -206,14 +204,14 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	becretSource.Play();
 
 
-	// Create becret sound entity
-	/*Ref<Sound> fernSound = Sound::Create("assets/sounds/fern.wav");
+	// Create fern sound entity
+	Asset<Sound> fernSound = Asset<Sound>("res/assets/sounds/memory_mono.wav.yaml");
 
-	Entity fernEntity = scene->CreateEntity("Becret");
+	Entity fernEntity = scene->CreateEntity("Fern");
 	fernEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
 	AudioSourceComponent& fernSource = fernEntity.AddComponent<AudioSourceComponent>();
 	fernSource.SetSound(fernSound);
-	fernSource.Play();*/
+	fernSource.Play();
 
 
 	// Create mesh & base material

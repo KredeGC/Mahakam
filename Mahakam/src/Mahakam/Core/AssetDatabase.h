@@ -15,11 +15,20 @@ namespace Mahakam
 	class AssetDatabase
 	{
 	public:
+		template <class T>
+		friend class Asset;
+
 		struct AssetInfo
 		{
 			uint64_t ID;
 			std::filesystem::path Filepath;
 			std::string Extension;
+		};
+
+		struct LiveAsset
+		{
+			Ref<void> Asset;
+			int32_t UseCount;
 		};
 
 	private:
@@ -29,9 +38,7 @@ namespace Mahakam
 
 		inline static AssetMap m_AssetPaths;
 
-		inline static std::unordered_map<uint64_t, WeakRef<void>> m_CachedAssets;
-
-		inline static std::unordered_map<void*, uint64_t> m_AssetIndex;
+		inline static std::unordered_map<uint64_t, LiveAsset> m_CachedAssets;
 
 	public:
 		// Registering asset importers
@@ -40,34 +47,24 @@ namespace Mahakam
 		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const std::string& extension);
 
 		// Miscellaneous functions
-		MH_DECLARE_FUNC(CollectGarbage, void);
 		MH_DECLARE_FUNC(ReloadAssetImports, void);
 		MH_DECLARE_FUNC(GetAssetHandles, AssetMap);
 		MH_DECLARE_FUNC(GetAssetReferences, uint32_t, uint64_t id);
-		MH_DECLARE_FUNC(GetAssetID, uint64_t, Ref<void> asset);
 		MH_DECLARE_FUNC(GetAssetInfo, AssetInfo, const std::filesystem::path& importPath);
 
+	private:
 		// Saving and loading assets
-		MH_DECLARE_FUNC(SaveAsset, void, Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath);
-		inline static Ref<void> LoadAsset(const std::filesystem::path& importPath) { return LoadAssetFromPath(importPath); }
-		inline static Ref<void> LoadAsset(uint64_t id) { return LoadAssetFromID(id); }
-
-		// Template functions for convenience
-		template<typename T>
-		static Ref<T> LoadAsset(const std::filesystem::path& importPath)
-		{
-			return StaticCastRef<T>(AssetDatabase::LoadAsset(importPath));
-		}
+		MH_DECLARE_FUNC(SaveAsset, uint64_t, Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath);
+		MH_DECLARE_FUNC(LoadAssetFromID, Ref<void>, uint64_t id);
 
 		template<typename T>
 		static Ref<T> LoadAsset(uint64_t id)
 		{
-			return StaticCastRef<T>(AssetDatabase::LoadAsset(id));
+			return StaticCastRef<T>(AssetDatabase::LoadAssetFromID(id));
 		}
 
-	private:
-		MH_DECLARE_FUNC(LoadAssetFromPath, Ref<void>, const std::filesystem::path& importPath);
-		MH_DECLARE_FUNC(LoadAssetFromID, Ref<void>, uint64_t id);
+		MH_DECLARE_FUNC(RegisterAsset, void, uint64_t);
+		MH_DECLARE_FUNC(DeregisterAsset, void, uint64_t);
 
 		static uint64_t ReadAssetID(const std::filesystem::path& filepath);
 

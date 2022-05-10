@@ -10,7 +10,7 @@ namespace Mahakam
 	class Asset
 	{
 	private:
-		template <class T2>
+		template<typename T2>
 		friend class Asset;
 
 		uint64_t m_ID = 0;
@@ -27,21 +27,34 @@ namespace Mahakam
 
 		Asset(uint64_t id) : m_ID(id)
 		{
-			m_Ptr = AssetDatabase::LoadAsset<T>(m_ID);
+			if (m_ID)
+				AssetDatabase::RegisterAsset(m_ID);
 		}
 
 		Asset(const std::filesystem::path& filepath)
 		{
 			m_ID = AssetDatabase::GetAssetInfo(filepath).ID;
-			m_Ptr = AssetDatabase::LoadAsset<T>(m_ID);
+			if (m_ID)
+				AssetDatabase::RegisterAsset(m_ID);
 		}
 
-		void SetID(uint64_t id)
+		Asset(Asset&& other) noexcept
+			: m_ID(other.m_ID), m_Ptr(other.m_Ptr) {}
+
+		Asset(const Asset& other) noexcept
+			: m_ID(other.m_ID), m_Ptr(other.m_Ptr)
 		{
-			m_ID = id;
+			if (m_ID)
+				AssetDatabase::RegisterAsset(m_ID);
 		}
 
-		template<class T2>
+		~Asset()
+		{
+			if (m_ID)
+				AssetDatabase::DeregisterAsset(m_ID);
+		}
+
+		template<typename T2>
 		operator Asset<T2>() const
 		{
 			auto ptr = std::static_pointer_cast<T2>(this->m_Ptr);
@@ -52,26 +65,41 @@ namespace Mahakam
 				return Asset<T2>(ptr);
 		}
 
-		template<class T2>
+		template<typename T2>
 		Asset& operator=(const Asset<T2>& rhs)
 		{
+			AssetDatabase::DeregisterAsset(m_ID);
 			m_Ptr = rhs.m_Ptr;
 			m_ID = rhs.m_ID;
+			AssetDatabase::RegisterAsset(m_ID);
 			return *this;
 		}
 
 		Asset& operator=(const Asset& rhs)
 		{
+			AssetDatabase::DeregisterAsset(m_ID);
 			m_Ptr = rhs.m_Ptr;
 			m_ID = rhs.m_ID;
+			AssetDatabase::RegisterAsset(m_ID);
 			return *this;
 		}
 
 		Asset& operator=(const nullptr_t& rhs)
 		{
+			AssetDatabase::DeregisterAsset(m_ID);
 			m_Ptr = nullptr;
 			m_ID = 0;
 			return *this;
+		}
+
+		void Save(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+		{
+			m_ID = AssetDatabase::SaveAsset(Get(), filepath, importPath);
+			if (m_Ptr)
+			{
+				AssetDatabase::RegisterAsset(m_ID);
+				m_Ptr = nullptr;
+			}
 		}
 
 		uint64_t GetID() const
@@ -103,11 +131,6 @@ namespace Mahakam
 			return Get();
 		}
 
-		operator uint64_t() const noexcept
-		{
-			return m_ID;
-		}
-
 		explicit operator bool() const noexcept
 		{
 			return Get() != nullptr;
@@ -120,26 +143,27 @@ namespace Mahakam
 		}
 	};
 
-	template<class T>
-	bool operator==(const Asset<T>& _Left, nullptr_t) noexcept {
+	template<typename T>
+	bool operator==(const Asset<T>& _Left, nullptr_t) noexcept
+	{
 		return _Left.Get().get() == nullptr;
 	}
 
-	template <class T1, class T2>
-	bool operator==(const Asset<T1>& _Left, const Asset<T2>& _Right) noexcept {
+	template<typename T1, typename T2>
+	bool operator==(const Asset<T1>& _Left, const Asset<T2>& _Right) noexcept
+	{
 		return _Left.Get().get() == _Right.Get().get();
 	}
 }
 
 namespace std
 {
-	template <class _Ty>
-	struct hash<Mahakam::Asset<_Ty>> {
-		_CXX17_DEPRECATE_ADAPTOR_TYPEDEFS typedef Mahakam::Asset<_Ty> _ARGUMENT_TYPE_NAME;
-		_CXX17_DEPRECATE_ADAPTOR_TYPEDEFS typedef size_t _RESULT_TYPE_NAME;
-
-		_NODISCARD size_t operator()(const Mahakam::Asset<_Ty>& _Keyval) const noexcept {
-			return hash<typename _Ty*>()(_Keyval.Get().get());
+	template<typename _Ty>
+	struct hash<Mahakam::Asset<_Ty>>
+	{
+		size_t operator()(const Mahakam::Asset<_Ty>& _Keyval) const noexcept
+		{
+			return hash<_Ty*>()(_Keyval.Get().get());
 		}
 	};
 }

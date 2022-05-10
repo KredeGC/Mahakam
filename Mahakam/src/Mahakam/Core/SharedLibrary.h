@@ -15,7 +15,7 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
-		static constexpr int NUM_FUNC_PTRS = 94;
+		static constexpr int NUM_FUNC_PTRS = 93;
 
 	private:
 		const char* filepath = nullptr;

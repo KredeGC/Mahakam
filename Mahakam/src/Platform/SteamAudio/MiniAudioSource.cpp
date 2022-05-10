@@ -36,7 +36,8 @@ namespace Mahakam
 	{
 		m_Context->RemoveSource(this);
 
-		ma_node_detach_output_bus(&m_Sound->GetNativeSound(), 0);
+		if (m_Sound)
+			UninitSound();
 
 		ma_steamaudio_binaural_node_uninit(&m_Node, NULL);
 	}
@@ -44,25 +45,24 @@ namespace Mahakam
 	void MiniAudioSource::Play()
 	{
 		if (m_Sound)
-			ma_sound_start(&m_Sound->GetNativeSound());
+			ma_sound_start(&m_MaSound);
 	}
 
 	void MiniAudioSource::Stop()
 	{
 		if (m_Sound)
-			ma_sound_stop(&m_Sound->GetNativeSound());
+			ma_sound_stop(&m_MaSound);
 	}
 
 	void MiniAudioSource::SetSound(Asset<Sound> sound)
 	{
 		if (m_Sound)
-			ma_node_detach_output_bus(m_SoundPtr, 0);
+			UninitSound();
 
 		m_Sound = static_cast<Asset<MiniAudioSound>>(sound);
-		m_SoundPtr = m_Sound.Get().get();
+		m_SoundSwitch = m_Sound.Get();
 
-		/* We can now wire up the sound to the binaural node and start it. */
-		ma_node_attach_output_bus(&m_Sound->GetNativeSound(), 0, &m_Node, 0);
+		InitSound();
 	}
 
 	void MiniAudioSource::SetSpatialBlend(float blend)
@@ -77,12 +77,13 @@ namespace Mahakam
 
 	void MiniAudioSource::UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos)
 	{
-		if (m_Sound.Get().get() != m_SoundPtr)
+		if (m_Sound.Get().get() != m_SoundSwitch.get())
 		{
-			ma_sound_stop(&m_Sound->GetNativeSound());
-			//ma_node_detach_output_bus(m_SoundPtr, 0);
-			m_SoundPtr = m_Sound.Get().get();
-			ma_node_attach_output_bus(&m_Sound->GetNativeSound(), 0, &m_Node, 0);
+			UninitSound();
+
+			m_SoundSwitch = m_Sound.Get();
+
+			InitSound();
 
 			Play(); // TEMP
 		}
@@ -97,5 +98,38 @@ namespace Mahakam
 
 			ma_steamaudio_binaural_node_set_position(&m_Node, iplDirection, iplSource, iplListener);
 		}
+	}
+
+	void MiniAudioSource::InitSound()
+	{
+		/*
+		The binaural node will need to know the input channel count of the sound so we'll need to load
+		the sound first. We'll initialize this such that it'll be initially detached from the graph.
+		It will be attached to the graph after the binaural node is initialized.
+		*/
+		ma_sound_config soundConfig;
+
+		soundConfig = ma_sound_config_init();
+		soundConfig.pFilePath = m_Sound->GetFilepath().c_str();
+		soundConfig.isLooping = m_Sound->GetProps().loop ? MA_TRUE : MA_FALSE;
+		soundConfig.flags = MA_SOUND_FLAG_NO_DEFAULT_ATTACHMENT | MA_SOUND_FLAG_NO_SPATIALIZATION;  /* We'll attach this to the graph later. */
+
+		ma_result result = ma_sound_init_ex(&m_Context->GetEngine(), &soundConfig, &m_MaSound);
+		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize sound.");
+
+		/* We'll let the Steam Audio binaural effect do the directional attenuation for us. */
+		ma_sound_set_directional_attenuation_factor(&m_MaSound, 0);
+
+		ma_sound_set_volume(&m_MaSound, m_Sound->GetProps().volume);
+
+		/* We can now wire up the sound to the binaural node and start it. */
+		ma_node_attach_output_bus(&m_MaSound, 0, &m_Node, 0);
+	}
+
+	void MiniAudioSource::UninitSound()
+	{
+		ma_sound_stop(&m_MaSound);
+		ma_node_detach_output_bus(&m_MaSound, 0);
+		ma_sound_uninit(&m_MaSound);
 	}
 }

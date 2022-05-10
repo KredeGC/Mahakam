@@ -10,7 +10,7 @@ namespace Mahakam
 	private:
 		std::string m_Filepath;
 		SoundProps m_Props;
-		ma_sound m_Sound;
+		//ma_sound m_Sound;
 
 	public:
 		MiniAudioSound(const std::string& filepath, const SoundProps& props, MiniAudioContext* context);
@@ -20,6 +20,6 @@ namespace Mahakam
 
 		virtual const SoundProps& GetProps() const override { return m_Props; }
 
-		ma_sound& GetNativeSound() { return m_Sound; }
+		//ma_sound& GetNativeSound() { return m_Sound; }
 	};
 }
