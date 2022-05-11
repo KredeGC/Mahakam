@@ -65,5 +65,18 @@ namespace Mahakam
 		virtual const glm::vec2 GetFloat2(const std::string& name) const override;
 		virtual const glm::vec3 GetFloat3(const std::string& name) const override;
 		virtual const glm::vec4 GetFloat4(const std::string& name) const override;
+
+
+		virtual const robin_hood::unordered_map<std::string, Asset<Texture>>& GetTextures() const { return textures; }
+
+		virtual const robin_hood::unordered_map<std::string, glm::mat3>& GetMat3s() const { return mat3s; }
+		virtual const robin_hood::unordered_map<std::string, glm::mat4>& GetMat4s() const { return mat4s; }
+
+		virtual const robin_hood::unordered_map<std::string, int32_t>& GetInts() const { return ints; }
+
+		virtual const robin_hood::unordered_map<std::string, float>& GetFloats() const { return floats; }
+		virtual const robin_hood::unordered_map<std::string, glm::vec2>& GetFloat2s() const { return float2s; }
+		virtual const robin_hood::unordered_map<std::string, glm::vec3>& GetFloat3s() const { return float3s; }
+		virtual const robin_hood::unordered_map<std::string, glm::vec4>& GetFloat4s() const { return float4s; }
 	};
 }

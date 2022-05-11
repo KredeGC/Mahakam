@@ -173,7 +173,7 @@ namespace Mahakam
 
 		GLuint program = glCreateProgram();
 
-#if MH_DEBUG
+#if MH_DEBUG // Always recompile in debug mode
 		if (true)
 #else
 		if (!FileUtility::Exists(cachePath))
@@ -296,7 +296,6 @@ namespace Mahakam
 
 
 		// Shader reflection
-
 		GLint numUniforms = 0;
 		MH_GL_CALL(glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms));
 		const GLenum props[4] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION };
@@ -340,6 +339,7 @@ namespace Mahakam
 
 		robin_hood::unordered_map<std::string, std::string> keywordPermutations = ParseShaderKeywords(keywords);
 
+		// Read properties
 		auto propertiesNode = rootNode["Properties"];
 
 		MH_CORE_INFO("Loading properties for shader: {0}", name);
@@ -352,6 +352,7 @@ namespace Mahakam
 			MH_CORE_INFO("  {0}: {1}", propertyNode.first, propertyNode.second);
 		}
 
+		// Read shader passes
 		auto passesNode = rootNode["Passes"];
 
 		for (auto shaderPassNode : passesNode)

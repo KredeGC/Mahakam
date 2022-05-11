@@ -8,10 +8,17 @@ namespace Mahakam
 	class MaterialAssetImporter : public AssetImporter
 	{
 	private:
-		TextureProps m_Props2D;
-		CubeTextureProps m_PropsCube;
+		robin_hood::unordered_map<std::string, Asset<Texture>> m_Textures;
 
-		int m_TextureType = 0;
+		robin_hood::unordered_map<std::string, glm::mat3> m_Mat3s;
+		robin_hood::unordered_map<std::string, glm::mat4> m_Mat4s;
+
+		robin_hood::unordered_map<std::string, int32_t> m_Ints;
+
+		robin_hood::unordered_map<std::string, float> m_Floats;
+		robin_hood::unordered_map<std::string, glm::vec2> m_Float2s;
+		robin_hood::unordered_map<std::string, glm::vec3> m_Float3s;
+		robin_hood::unordered_map<std::string, glm::vec4> m_Float4s;
 
 	public:
 		virtual void OnWizardOpen(YAML::Node& node) override;

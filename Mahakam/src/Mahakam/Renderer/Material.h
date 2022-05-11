@@ -48,6 +48,20 @@ namespace Mahakam
 		virtual const glm::vec3 GetFloat3(const std::string& name) const = 0;
 		virtual const glm::vec4 GetFloat4(const std::string& name) const = 0;
 
+
+		virtual const robin_hood::unordered_map<std::string, Asset<Texture>>& GetTextures() const = 0;
+
+		virtual const robin_hood::unordered_map<std::string, glm::mat3>& GetMat3s() const = 0;
+		virtual const robin_hood::unordered_map<std::string, glm::mat4>& GetMat4s() const = 0;
+
+		virtual const robin_hood::unordered_map<std::string, int32_t>& GetInts() const = 0;
+
+		virtual const robin_hood::unordered_map<std::string, float>& GetFloats() const = 0;
+		virtual const robin_hood::unordered_map<std::string, glm::vec2>& GetFloat2s() const = 0;
+		virtual const robin_hood::unordered_map<std::string, glm::vec3>& GetFloat3s() const = 0;
+		virtual const robin_hood::unordered_map<std::string, glm::vec4>& GetFloat4s() const = 0;
+
+
 		inline static Asset<Material> Create(Asset<Shader> shader, const std::string& variant = "") { return CreateImpl(shader, variant); }
 		MH_DECLARE_FUNC(Copy, Asset<Material>, Asset<Material> material);
 
