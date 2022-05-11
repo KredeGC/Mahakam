@@ -20,18 +20,21 @@ namespace Mahakam::Editor
 
 			ImGui::Separator();
 
-			std::string filepathString = m_FilePath.string();
-			char filepathBuffer[256]{ 0 };
-			strncpy(filepathBuffer, filepathString.c_str(), filepathString.size());
-			if (ImGui::InputText("File path", filepathBuffer, 256))
-				m_FilePath = std::string(filepathBuffer);
-
-			std::string importString = m_ImportPath.string();
-			char importBuffer[256]{ 0 };
-			strncpy(importBuffer, importString.c_str(), importString.size() - 5);
-			if (ImGui::InputText("Import path", importBuffer, 256))
+			if (!m_Importer->GetImporterProps().NoFilepath)
 			{
-				m_ImportPath = std::string(importBuffer) + ".yaml";
+				std::string filepathString = m_FilePath.string();
+				char filepathBuffer[256]{ 0 };
+				strncpy(filepathBuffer, filepathString.c_str(), filepathString.size());
+				if (ImGui::InputText("File path", filepathBuffer, 256))
+					m_FilePath = std::string(filepathBuffer);
+
+				std::string importString = m_ImportPath.string();
+				char importBuffer[256]{ 0 };
+				strncpy(importBuffer, importString.c_str(), importString.size() - 5);
+				if (ImGui::InputText("Import path", importBuffer, 256))
+				{
+					m_ImportPath = std::string(importBuffer) + ".yaml";
+				}
 			}
 
 			if (ImGui::Button("Import"))

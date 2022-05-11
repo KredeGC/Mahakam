@@ -13,11 +13,18 @@ namespace Mahakam
 	class AssetImporter
 	{
 	public:
+		struct ImporterProps
+		{
+			bool CreateMenu = false;
+			bool NoFilepath = false;
+		};
+
 		virtual ~AssetImporter() = default;
+
+		virtual const ImporterProps& GetImporterProps() const = 0;
 
 		virtual void OnWizardOpen(YAML::Node& node) = 0;
 		virtual void OnWizardRender() = 0;
-		//virtual Asset<void> OnWizardImport(const std::filesystem::path& filepath, const std::filesystem::path& importPath) = 0;
 		virtual void OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) = 0;
 
 		virtual void Serialize(YAML::Emitter& emitter, Asset<void> asset) = 0;

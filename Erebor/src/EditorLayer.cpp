@@ -349,16 +349,21 @@ namespace Mahakam::Editor
 
 
 #pragma region Assets
-		// Sound
-		Ref<SoundAssetImporter> soundAssetImporter = CreateRef<SoundAssetImporter>();
+		// Material
+		Ref<MaterialAssetImporter> materialAssetImporter = CreateRef<MaterialAssetImporter>();
 
-		AssetDatabase::RegisterAssetImporter(".wav", soundAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".mp3", soundAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".material", materialAssetImporter);
 
 		// Shader
 		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
 
 		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);
+
+		// Sound
+		Ref<SoundAssetImporter> soundAssetImporter = CreateRef<SoundAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".wav", soundAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".mp3", soundAssetImporter);
 
 		// Texture
 		Ref<TextureAssetImporter> textureAssetImporter = CreateRef<TextureAssetImporter>();
