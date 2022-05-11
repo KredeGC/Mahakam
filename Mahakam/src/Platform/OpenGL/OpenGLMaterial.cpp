@@ -14,37 +14,38 @@ namespace Mahakam
 
 		for (auto& prop : defaultProps)
 		{
-			switch (prop.dataType)
+			switch (prop.second.dataType)
 			{
 			case ShaderDataType::Sampler2D:
-				textures[prop.name] = GL::GetTexture2DWhite();
+				textures[prop.first] = GL::GetTexture2DWhite();
 				break;
 			case ShaderDataType::SamplerCube:
-				textures[prop.name] = GL::GetTextureCubeWhite();
+				textures[prop.first] = GL::GetTextureCubeWhite();
 				break;
 			case ShaderDataType::Float:
-				floats[prop.name] = 0.0f;
+				floats[prop.first] = 0.0f;
 				break;
 			case ShaderDataType::Float2:
-				float2s[prop.name] = glm::vec2(0.0f);
+				float2s[prop.first] = glm::vec2(0.0f);
 				break;
 			case ShaderDataType::Float3:
-				float3s[prop.name] = glm::vec3(0.0f);
+				float3s[prop.first] = glm::vec3(0.0f);
 				break;
 			case ShaderDataType::Float4:
-				float4s[prop.name] = glm::vec4(0.0f);
+				float4s[prop.first] = glm::vec4(0.0f);
 				break;
 			case ShaderDataType::Mat3:
-				mat3s[prop.name] = glm::mat3(1.0f);
+				mat3s[prop.first] = glm::mat3(1.0f);
 				break;
 			case ShaderDataType::Mat4:
-				mat4s[prop.name] = glm::mat4(1.0f);
+				mat4s[prop.first] = glm::mat4(1.0f);
 				break;
 			case ShaderDataType::Int:
-				ints[prop.name] = 0;
+				ints[prop.first] = 0;
 				break;
 			default:
-				MH_CORE_BREAK("Unsupported ShaderDataType!");
+				MH_CORE_WARN("Material properties for {0} shader include unused property: {1}", shader->GetName(), prop.first);
+				break;
 			}
 		}
 	}

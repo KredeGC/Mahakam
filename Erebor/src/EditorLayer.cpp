@@ -39,6 +39,16 @@ namespace Mahakam::Editor
 		// Create a new active scene
 		s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
 
+		// Use this once scenes are setup correctly
+		/*Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
+		Asset<Material> skyboxMaterial = Material::Create(skyboxShader);
+
+		Asset<TextureCube> skyboxTexture = Asset<TextureCube>("res/assets/textures/pines.hdr.yaml");
+		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
+
+		s_ActiveScene = Scene::Create();
+		s_ActiveScene->SetSkyboxMaterial(skyboxMaterial);*/
+
 
 #pragma region Components
 		// Animator

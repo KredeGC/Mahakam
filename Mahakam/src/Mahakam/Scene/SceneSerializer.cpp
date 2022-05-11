@@ -20,6 +20,19 @@ namespace Mahakam
 		emitter << YAML::BeginMap;
 		emitter << YAML::Key << "Scene";
 		emitter << YAML::Value << "Name";
+
+		emitter << YAML::Key << "Skybox";
+		emitter << YAML::Value << YAML::BeginMap;
+
+		emitter << YAML::Key << "Material";
+		emitter << YAML::Value << m_Scene->GetSkyboxMaterial().GetID();
+		emitter << YAML::Key << "Irradiance";
+		emitter << YAML::Value << m_Scene->GetSkyboxIrradiance().GetID();
+		emitter << YAML::Key << "Specular";
+		emitter << YAML::Value << m_Scene->GetSkyboxSpecular().GetID();
+
+		emitter << YAML::Value << YAML::EndMap;
+
 		emitter << YAML::Key << "Entities";
 		emitter << YAML::Value << YAML::BeginSeq;
 		m_Scene->registry.each([&](auto entityID)
@@ -53,6 +66,35 @@ namespace Mahakam
 			return false;
 
 		std::string sceneName = data["Scene"].as<std::string>();
+
+		YAML::Node skyboxNode = data["Skybox"];
+		if (skyboxNode)
+		{
+			Asset<Material> skyboxMaterial;
+			YAML::Node materialNode = skyboxNode["Material"];
+			if (materialNode)
+				skyboxMaterial = Asset<Material>(materialNode.as<uint64_t>());
+			if (!skyboxMaterial)
+			{
+				Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
+				skyboxMaterial = Material::Create(skyboxShader);
+			}
+			m_Scene->SetSkyboxMaterial(skyboxMaterial);
+
+			YAML::Node irradianceNode = skyboxNode["Irradiance"];
+			if (irradianceNode)
+			{
+				Asset<TextureCube> irradianceTexture = Asset<TextureCube>(irradianceNode.as<uint64_t>());
+				m_Scene->SetSkyboxIrradiance(irradianceTexture);
+			}
+
+			YAML::Node specularNode = skyboxNode["Specular"];
+			if (specularNode)
+			{
+				Asset<TextureCube> specularTexture = Asset<TextureCube>(specularNode.as<uint64_t>());
+				m_Scene->SetSkyboxSpecular(specularTexture);
+			}
+		}
 
 		auto entities = data["Entities"];
 		if (entities)

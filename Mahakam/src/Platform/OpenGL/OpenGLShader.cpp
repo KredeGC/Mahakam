@@ -296,35 +296,29 @@ namespace Mahakam
 
 
 		// Shader reflection
-		if (properties.elements.empty())
+
+		GLint numUniforms = 0;
+		MH_GL_CALL(glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms));
+		const GLenum props[4] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION };
+
+		for (int unif = 0; unif < numUniforms; ++unif)
 		{
-			MH_CORE_INFO("Loading properties for shader: {0}", name);
+			GLint values[4];
+			MH_GL_CALL(glGetProgramResourceiv(program, GL_UNIFORM, unif, 4, props, 4, NULL, values));
 
-			GLint numUniforms = 0;
-			MH_GL_CALL(glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms));
-			const GLenum props[4] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION };
+			// Skip any uniforms that are in a block.
+			if (values[0] != -1)
+				continue;
 
-			for (int unif = 0; unif < numUniforms; ++unif)
-			{
-				GLint values[4];
-				MH_GL_CALL(glGetProgramResourceiv(program, GL_UNIFORM, unif, 4, props, 4, NULL, values));
+			// Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
+			// C++11 would let you use a std::string directly.
+			std::vector<char> nameData(values[2]);
+			MH_GL_CALL(glGetProgramResourceName(program, GL_UNIFORM, unif, (GLsizei)nameData.size(), NULL, &nameData[0]));
+			std::string name(nameData.begin(), nameData.end() - 1);
 
-				// Skip any uniforms that are in a block.
-				if (values[0] != -1)
-					continue;
+			ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
 
-				// Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
-				// C++11 would let you use a std::string directly.
-				std::vector<char> nameData(values[2]);
-				MH_GL_CALL(glGetProgramResourceName(program, GL_UNIFORM, unif, (GLsizei)nameData.size(), NULL, &nameData[0]));
-				std::string name(nameData.begin(), nameData.end() - 1);
-
-				ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
-
-				MH_CORE_INFO("  layout(location = {0}) {1}", (uint32_t)values[3], name);
-
-				properties.elements.push_back({ OpenGLDataTypeToShaderDataType(values[1]), name, (uint32_t)values[3] });
-			}
+			properties[name] = { OpenGLDataTypeToShaderDataType(values[1]), (uint32_t)values[3] };
 		}
 
 		return program;
@@ -348,9 +342,14 @@ namespace Mahakam
 
 		auto propertiesNode = rootNode["Properties"];
 
+		MH_CORE_INFO("Loading properties for shader: {0}", name);
 		for (auto propertyNode : propertiesNode)
 		{
-			MH_CORE_TRACE("{0}: {1}", propertyNode.first, propertyNode.second);
+			std::string propertyName = propertyNode.first.as<std::string>();
+
+			properties[propertyName] = { ShaderDataType::None, 0 };
+
+			MH_CORE_INFO("  {0}: {1}", propertyNode.first, propertyNode.second);
 		}
 
 		auto passesNode = rootNode["Passes"];

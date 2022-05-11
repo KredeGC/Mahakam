@@ -97,7 +97,7 @@ namespace Mahakam::Editor
 		ImGui::PushStyleColor(ImGuiCol_Button, { 0, 0, 0, 0 });
 
 		// Directories first
-		if (ImGui::CollapsingHeader("Directories", ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Directories", ImGuiTreeNodeFlags_SpanAvailWidth))
 		{
 			if (ImGui::BeginTable("Directory Divisor", numColumns))
 			{
@@ -173,18 +173,14 @@ namespace Mahakam::Editor
 					{
 						std::string pathName = file.path().filename().string();
 
-						ImVec4 col = { 1, 1, 1, 1 };
-						std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
-						if (!std::filesystem::exists(importPath))
-							col = { 0.48f, 0.5f, 0.53f, 1 };
-
 						ImGui::TableNextColumn();
 
 						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 						ImGui::PushID(file.path().string().c_str());
-						ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, col);
+						ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, { 0.48f, 0.5f, 0.53f, 1 });
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 						{
+							std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
 							ImportWizardPanel::ImportAsset(file.path(), file.path().extension().string(), importPath);
 						}
 						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);

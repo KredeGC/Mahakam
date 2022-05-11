@@ -13,6 +13,8 @@ namespace Mahakam
 	class AssetImporter
 	{
 	public:
+		virtual ~AssetImporter() = default;
+
 		virtual void OnWizardOpen(YAML::Node& node) = 0;
 		virtual void OnWizardRender() = 0;
 		//virtual Asset<void> OnWizardImport(const std::filesystem::path& filepath, const std::filesystem::path& importPath) = 0;

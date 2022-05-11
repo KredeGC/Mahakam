@@ -195,7 +195,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create becret sound entity
-	Asset<Sound> becretSound = Asset<Sound>("res/assets/sounds/memory_mono.wav.yaml");
+	Asset<Sound> becretSound = Asset<Sound>("res/assets/sounds/honeywood.wav.yaml");
 
 	Entity becretEntity = scene->CreateEntity("Memory Zone");
 	becretEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
@@ -206,7 +206,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create fern sound entity
-	Asset<Sound> fernSound = Asset<Sound>("res/assets/sounds/memory_mono.wav.yaml");
+	Asset<Sound> fernSound = Asset<Sound>("res/assets/sounds/fern.wav.yaml");
 
 	Entity fernEntity = scene->CreateEntity("Fern");
 	fernEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });

@@ -21,9 +21,8 @@ namespace Mahakam
 			robin_hood::unordered_map<std::string, // Shader variants
 			uint32_t>> shaderPasses;
 
-		//std::unordered_map<std::string, uint32_t> shaderVariants;
 		robin_hood::unordered_map<std::string, int> uniformIDCache;
-		ShaderProps properties;
+		std::unordered_map<std::string, ShaderElement> properties;
 
 	public:
 		OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& defines = {});
@@ -34,7 +33,7 @@ namespace Mahakam
 		virtual const std::string& GetFilepath() const override { return filepath; }
 		virtual const std::string& GetName() const override { return name; }
 
-		virtual const std::vector<ShaderElement>& GetProperties() const override { return properties.elements; }
+		virtual const std::unordered_map<std::string, ShaderElement>& GetProperties() const override { return properties; }
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const override;
 

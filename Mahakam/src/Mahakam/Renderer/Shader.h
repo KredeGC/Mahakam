@@ -12,22 +12,16 @@ namespace Mahakam
 	struct ShaderElement
 	{
 		ShaderDataType dataType;
-		std::string name;
 		uint32_t location;
 
-		ShaderElement(ShaderDataType dataType, const std::string& name, uint32_t location)
-			: dataType(dataType), name(name), location(location) {}
-
-		ShaderElement(ShaderDataType dataType, const std::string& name)
-			: dataType(dataType), name(name), location(0) {}
+		ShaderElement()
+			: dataType(ShaderDataType::None), location(0) {}
 
 		ShaderElement(ShaderDataType dataType, uint32_t location)
-			: dataType(dataType), name(""), location(location) {}
-	};
+			: dataType(dataType), location(location) {}
 
-	struct ShaderProps
-	{
-		std::vector<ShaderElement> elements;
+		ShaderElement(ShaderDataType dataType)
+			: dataType(dataType), location(0) {}
 	};
 
 	class Shader
@@ -40,7 +34,7 @@ namespace Mahakam
 		virtual const std::string& GetFilepath() const = 0;
 		virtual const std::string& GetName() const = 0;
 
-		virtual const std::vector<ShaderElement>& GetProperties() const = 0;
+		virtual const std::unordered_map<std::string, ShaderElement>& GetProperties() const = 0;
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const = 0;
 

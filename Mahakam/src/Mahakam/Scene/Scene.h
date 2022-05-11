@@ -54,6 +54,14 @@ namespace Mahakam
 			return registry.view<Args...>().each(func);
 		}
 
+		void SetSkyboxMaterial(Asset<Material> material) { skyboxMaterial = material; }
+		void SetSkyboxIrradiance(Asset<TextureCube> irradiance) { skyboxIrradiance = irradiance; }
+		void SetSkyboxSpecular(Asset<TextureCube> specular) { skyboxSpecular = specular; }
+
+		Asset<Material> GetSkyboxMaterial() const { return skyboxMaterial; }
+		Asset<TextureCube> GetSkyboxIrradiance() const { return skyboxIrradiance; }
+		Asset<TextureCube> GetSkyboxSpecular() const { return skyboxSpecular; }
+
 		inline static Ref<Scene> Create() { return CreateEmpty(); }
 		inline static Ref<Scene> Create(const std::string& filepath) { return CreateFilepath(filepath); }
 

@@ -8,6 +8,39 @@
 
 namespace Mahakam
 {
+	/*static ShaderDataType StringToShaderDataType(const std::string& enumString)
+	{
+		if (enumString == "Float")
+			return ShaderDataType::Float;
+		if (enumString == "Float2")
+			return ShaderDataType::Float2;
+		if (enumString == "Float3")
+			return ShaderDataType::Float3;
+		if (enumString == "Float4")
+			return ShaderDataType::Float4;
+		if (enumString == "Mat3")
+			return ShaderDataType::Mat3;
+		if (enumString == "Mat4")
+			return ShaderDataType::Mat4;
+		if (enumString == "Int")
+			return ShaderDataType::Int;
+		if (enumString == "Int2")
+			return ShaderDataType::Int2;
+		if (enumString == "Int3")
+			return ShaderDataType::Int3;
+		if (enumString == "Int4")
+			return ShaderDataType::Int4;
+		if (enumString == "Bool")
+			return ShaderDataType::Bool;
+		if (enumString == "Sampler2D")
+			return ShaderDataType::Sampler2D;
+		if (enumString == "SamplerCube")
+			return ShaderDataType::SamplerCube;
+
+		MH_CORE_BREAK("Unknown ShaderDataType provided!");
+		return ShaderDataType::None;
+	}*/
+
 	static GLenum ShaderDataTypeToOpenGLDataType(ShaderDataType type)
 	{
 		switch (type)
