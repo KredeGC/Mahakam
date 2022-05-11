@@ -20,24 +20,25 @@ namespace Mahakam::Editor
 
 			ImGui::Separator();
 
-			ImGui::TextWrapped("Base file path: %s", m_FilePath.string().c_str());
-			std::string pathString = m_ImportPath.string();
-			char pathBuffer[256]{ 0 };
-			strncpy(pathBuffer, pathString.c_str(), pathString.size() - 5);
-			if (ImGui::InputText("Import path", pathBuffer, 256))
+			std::string filepathString = m_FilePath.string();
+			char filepathBuffer[256]{ 0 };
+			strncpy(filepathBuffer, filepathString.c_str(), filepathString.size());
+			if (ImGui::InputText("File path", filepathBuffer, 256))
+				m_FilePath = std::string(filepathBuffer);
+
+			std::string importString = m_ImportPath.string();
+			char importBuffer[256]{ 0 };
+			strncpy(importBuffer, importString.c_str(), importString.size() - 5);
+			if (ImGui::InputText("Import path", importBuffer, 256))
 			{
-				m_ImportPath = std::string(pathBuffer) + ".yaml";
+				m_ImportPath = std::string(importBuffer) + ".yaml";
 			}
 
 			if (ImGui::Button("Import"))
 			{
-				Asset<void> asset = m_Importer->OnWizardImport(m_FilePath, m_ImportPath);
+				Asset<void> asset(m_ImportPath);
 
-				asset.Save(m_FilePath, m_ImportPath);
-
-				//AssetDatabase::SaveAsset(asset.Get(), m_FilePath, m_ImportPath);
-
-				AssetDatabase::ReloadAssetImports();
+				m_Importer->OnWizardImport(asset, m_FilePath, m_ImportPath);
 
 				m_Open = false;
 				m_Importer = nullptr;

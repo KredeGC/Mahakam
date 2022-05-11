@@ -10,6 +10,7 @@ namespace Mahakam
 	public:
 		inline static const std::filesystem::path CACHE_PATH = "cache";
 		inline static const std::filesystem::path IMPORT_PATH = "res";
+		inline static const std::filesystem::path ASSET_PATH = "assets";
 
 		inline static bool Exists(const std::string& src)
 		{

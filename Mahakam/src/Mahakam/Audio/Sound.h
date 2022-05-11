@@ -14,6 +14,8 @@ namespace Mahakam
 
 		virtual const SoundProps& GetProps() const = 0;
 
+		virtual void SetProps(const SoundProps& props) = 0;
+
 		inline static Asset<Sound> Create(const std::string& filepath, const SoundProps& props = {}) { return CreateImpl(filepath, props, AudioEngine::GetContext()); }
 		inline static Asset<Sound> Create(const std::string& filepath, AudioContext* context, const SoundProps& props = {}) { return CreateImpl(filepath, props, context); }
 

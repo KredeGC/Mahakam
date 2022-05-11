@@ -33,16 +33,27 @@ namespace Mahakam
 		return nullptr;
 	};
 
+	//void AssetDatabase::ReloadAsset(uint64_t id)
+	MH_DEFINE_FUNC(AssetDatabase::ReloadAsset, void, uint64_t id)
+	{
+		auto iter = m_CachedAssets.find(id);
+		if (iter != m_CachedAssets.end())
+		{
+			iter->second.Asset = nullptr;
+			Ref<void> asset = LoadAssetFromID(id);
+			iter->second.Asset = asset;
+		}
+	};
+
 	//void AssetDatabase::ReloadAssetImports()
 	MH_DEFINE_FUNC(AssetDatabase::ReloadAssetImports, void)
 	{
 		// Import any assets that haven't been imported yet
-		// TODO: Think about whether this is need? Maybe people don't want to import everything
-		//RecursiveImportAssets("assets");
+		// TODO: Think about whether this is needed? Maybe people don't want to import everything
+		//RecursiveImportAssets(FileUtility::ASSET_PATH);
 
 		// Recreate asset ID to filepath mapping
-		m_AssetPaths.clear();
-		RecursiveCacheAssets("res");
+		AssetDatabase::RefreshAssetImports();
 
 		// Reimport all imported assets
 		for (auto& kv : m_CachedAssets)
@@ -53,8 +64,25 @@ namespace Mahakam
 		}
 	};
 
-	//AssetDatabase::AssetMap AssetDatabase::GetAssetHandles()
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetHandles, AssetDatabase::AssetMap)
+	//void AssetDatabase::RefreshAssetImports()
+	MH_DEFINE_FUNC(AssetDatabase::RefreshAssetImports, void)
+	{
+		m_AssetPaths.clear();
+		RecursiveCacheAssets(FileUtility::IMPORT_PATH);
+	};
+
+	//std::filesystem::path AssetDatabase::GetAssetImportPath(uint64_t id)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImportPath, std::filesystem::path, uint64_t id)
+	{
+		auto iter = m_AssetPaths.find(id);
+		if (iter != m_AssetPaths.end())
+			return iter->second;
+
+		return "";
+	};
+
+	//const AssetDatabase::AssetMap& AssetDatabase::GetAssetHandles()
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetHandles, const AssetDatabase::AssetMap&)
 	{
 		return m_AssetPaths;
 	};
@@ -62,16 +90,32 @@ namespace Mahakam
 	//uint32_t AssetDatabase::GetAssetReferences(uint64_t id)
 	MH_DEFINE_FUNC(AssetDatabase::GetAssetReferences, uint32_t, uint64_t id)
 	{
-		auto cacheIter = m_CachedAssets.find(id);
-		if (cacheIter != m_CachedAssets.end())
-			return cacheIter->second.UseCount;
+		auto iter = m_CachedAssets.find(id);
+		if (iter != m_CachedAssets.end())
+			return iter->second.UseCount;
+
+		return 0;
+	};
+
+	//uint32_t AssetDatabase::GetStrongReferences(uint64_t id)
+	MH_DEFINE_FUNC(AssetDatabase::GetStrongReferences, uint32_t, uint64_t id)
+	{
+		auto iter = m_CachedAssets.find(id);
+		if (iter != m_CachedAssets.end())
+			return iter->second.Asset.use_count();
 
 		return 0;
 	};
 
 	//std::string GetAssetType::GetAssetType(const std::filesystem::path& importPath)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetInfo, AssetDatabase::AssetInfo, const std::filesystem::path& importPath)
+	MH_DEFINE_FUNC(AssetDatabase::ReadAssetInfo, AssetDatabase::AssetInfo, const std::filesystem::path& importPath)
 	{
+		if (!std::filesystem::exists(importPath))
+		{
+			MH_CORE_WARN("The path {0} doesn't exist", importPath.string());
+			return {};
+		}
+
 		YAML::Node data;
 		try
 		{
@@ -84,14 +128,22 @@ namespace Mahakam
 
 		AssetInfo info;
 
-		info.ID = data["ID"].as<uint64_t>();
-		info.Filepath = data["Filepath"].as<std::string>();
-		info.Extension = data["Extension"].as<std::string>();
+		YAML::Node idNode = data["ID"];
+		if (idNode)
+			info.ID = idNode.as<uint64_t>();
+
+		YAML::Node filepathNode = data["Filepath"];
+		if (filepathNode)
+			info.Filepath = filepathNode.as<std::string>();
+
+		YAML::Node extensionNode = data["Extension"];
+		if (extensionNode)
+			info.Extension = extensionNode.as<std::string>();
 
 		return info;
 	};
 
-	//void AssetDatabase::SaveAsset(Ref<void> asset, const std::string& extension, const std::filesystem::path& importPath)
+	//uint64_t AssetDatabase::SaveAsset(Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, uint64_t, Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
 		std::string extension = filepath.extension().string();
@@ -102,8 +154,8 @@ namespace Mahakam
 			// Read the ID if it exists, otherwise generate
 			uint64_t id = 0;
 			if (std::filesystem::exists(importPath))
-				id = ReadAssetID(importPath);
-			if (id == 0) // TODO: Check if this ID already exists
+				id = ReadAssetInfo(importPath).ID;
+			while (id == 0) // TODO: Check if this ID already exists
 				id = distribution(generator);
 
 			FileUtility::CreateDirectories(importPath.parent_path());
@@ -207,21 +259,6 @@ namespace Mahakam
 		}
 	};
 
-	uint64_t AssetDatabase::ReadAssetID(const std::filesystem::path& importPath)
-	{
-		YAML::Node data;
-		try
-		{
-			data = YAML::LoadFile(importPath.string());
-		}
-		catch (YAML::ParserException e)
-		{
-			MH_CORE_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.msg);
-		}
-
-		return data["ID"].as<uint64_t>();
-	}
-
 	void AssetDatabase::RecursiveCacheAssets(const std::filesystem::path& filepath)
 	{
 		auto iter = std::filesystem::directory_iterator(filepath);
@@ -234,7 +271,7 @@ namespace Mahakam
 			}
 			else if (directory.path().extension() == ".yaml" || directory.path().extension() == ".yml")
 			{
-				uint64_t id = ReadAssetID(directory.path());
+				uint64_t id = ReadAssetInfo(directory.path()).ID;
 
 				if (id)
 					m_AssetPaths[id] = directory.path().string();
@@ -263,9 +300,10 @@ namespace Mahakam
 					{
 						YAML::Node node;
 						importer->OnWizardOpen(node);
-						Asset<void> asset = importer->OnWizardImport(directory.path(), importPath);
 
-						AssetDatabase::SaveAsset(asset.Get(), directory.path(), importPath);
+						Asset<void> asset(importPath);
+
+						importer->OnWizardImport(asset, directory.path(), importPath);
 					}
 				}
 			}

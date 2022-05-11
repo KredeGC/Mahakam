@@ -33,9 +33,9 @@ namespace Mahakam
 				AssetDatabase::RegisterAsset(m_ID);
 		}
 
-		Asset(const std::filesystem::path& filepath)
+		Asset(const std::filesystem::path& importPath)
 		{
-			m_ID = AssetDatabase::GetAssetInfo(filepath).ID;
+			m_ID = AssetDatabase::ReadAssetInfo(importPath).ID;
 			if (m_ID)
 				AssetDatabase::RegisterAsset(m_ID);
 		}
@@ -104,15 +104,12 @@ namespace Mahakam
 			}
 		}
 
-		uint64_t GetID() const
-		{
-			return m_ID;
-		}
+		uint64_t GetID() const { return m_ID; }
 
 		Ref<T> Get()
 		{
 			if (m_ID != 0)
-				m_Ptr = AssetDatabase::LoadAsset<T>(m_ID);
+				return AssetDatabase::LoadAsset<T>(m_ID);
 			return m_Ptr;
 		}
 
@@ -123,21 +120,13 @@ namespace Mahakam
 			return m_Ptr;
 		}
 
-		Ref<T> operator->() noexcept
-		{
-			return Get();
-		}
+		Ref<T> operator->() noexcept { return Get(); }
 
-		Ref<T> operator->() const noexcept
-		{
-			return Get();
-		}
+		Ref<T> operator->() const noexcept { return Get(); }
 
-		explicit operator bool() const noexcept
-		{
-			return Get() != nullptr;
-		}
+		explicit operator bool() const noexcept { return Get() != nullptr; }
 
+		// TODO: Remove this and just do it explicitly in each asset type constructor
 		template<typename ... Args>
 		inline static Asset<T> Create(Args&& ... args)
 		{

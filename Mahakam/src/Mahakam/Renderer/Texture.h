@@ -56,12 +56,16 @@ namespace Mahakam
 		virtual void BindImage(uint32_t slot = 0, bool read = true, bool write = true) const = 0;
 
 		virtual void ReadPixels(void* pixels, bool mipmaps = false) = 0;
+
+		virtual bool IsCubemap() const = 0;
 	};
 
 
 	class Texture2D : public Texture
 	{
 	public:
+		virtual bool IsCubemap() const override { return false; }
+
 		virtual const TextureProps& GetProps() const = 0;
 
 		inline static Asset<Texture2D> Create(const TextureProps& props = TextureProps()) { return CreateProps(props); }
@@ -76,6 +80,8 @@ namespace Mahakam
 	class Texture2DArray : public Texture
 	{
 	public:
+		virtual bool IsCubemap() const override { return false; }
+
 		static Asset<Texture2DArray> Create(const TextureProps& props = TextureProps());
 	};
 
@@ -83,6 +89,8 @@ namespace Mahakam
 	class Texture3D : public Texture
 	{
 	public:
+		virtual bool IsCubemap() const override { return false; }
+
 		virtual uint32_t GetDepth() const = 0;
 
 		static Asset<Texture3D> Create(const std::string& filepath, const TextureProps& props = TextureProps());
@@ -92,6 +100,8 @@ namespace Mahakam
 	class TextureCube : public Texture
 	{
 	public:
+		virtual bool IsCubemap() const override { return true; }
+
 		virtual const CubeTextureProps& GetProps() const = 0;
 
 		inline static Asset<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps()) { return CreateProps(props); }

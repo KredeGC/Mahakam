@@ -10,25 +10,44 @@ namespace Mahakam
 	void SoundAssetImporter::OnWizardOpen(YAML::Node& node)
 	{
 		YAML::Node volumeNode = node["Volume"];
-		soundProps.volume = 1.0f;
+		m_Props.volume = 1.0f;
 		if (volumeNode)
-			soundProps.volume = volumeNode.as<float>();
+			m_Props.volume = volumeNode.as<float>();
 
 		YAML::Node loopNode = node["Loop"];
-		soundProps.loop = false;
+		m_Props.loop = false;
 		if (loopNode)
-			soundProps.loop = loopNode.as<bool>();
+			m_Props.loop = loopNode.as<bool>();
 	}
 
 	void SoundAssetImporter::OnWizardRender()
 	{
-		ImGui::DragFloat("Sound Volume", &soundProps.volume, 0.01f, 0.0f);
-		ImGui::Checkbox("Sound Looping", &soundProps.loop);
+		ImGui::DragFloat("Sound Volume", &m_Props.volume, 0.01f, 0.0f);
+		ImGui::Checkbox("Sound Looping", &m_Props.loop);
 	}
 
-	Asset<void> SoundAssetImporter::OnWizardImport(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	void SoundAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		return Sound::Create(filepath.string(), soundProps);
+		AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
+
+		if (asset && info.Filepath == filepath)
+		{
+			// If the sound already exists, just update some parameters and save
+			Asset<Sound> sound(asset);
+
+			sound->SetProps(m_Props);
+
+			sound.Save(filepath, importPath);
+		}
+		else
+		{
+			// If the sound doesn't exist, or the filepath has changed, reload everything
+			Asset<Sound> sound = Sound::Create(filepath.string(), m_Props);
+
+			sound.Save(filepath, importPath);
+
+			AssetDatabase::ReloadAsset(sound.GetID());
+		}
 	}
 
 	void SoundAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)

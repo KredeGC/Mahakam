@@ -14,6 +14,44 @@ namespace Mahakam
 		m_TextureType = 0;
 		if (cubeNode)
 			m_TextureType = cubeNode.as<int>();
+
+		YAML::Node formatNode = node["Format"];
+		if (formatNode)
+		{
+			if (m_TextureType == 0)
+				m_Props2D.format = (TextureFormat)formatNode.as<int>();
+			else
+				m_PropsCube.format = (TextureFormat)formatNode.as<int>();
+		}
+
+		YAML::Node filterNode = node["Filter"];
+		if (filterNode)
+		{
+			if (m_TextureType == 0)
+				m_Props2D.filterMode = (TextureFilter)filterNode.as<int>();
+			else
+				m_PropsCube.filterMode = (TextureFilter)filterNode.as<int>();
+		}
+
+		if (m_TextureType == 0)
+		{
+			YAML::Node wrapXNode = node["WrapX"];
+			if (wrapXNode)
+				m_Props2D.wrapX = (TextureWrapMode)wrapXNode.as<int>();
+
+			YAML::Node wrapYNode = node["WrapY"];
+			if (wrapYNode)
+				m_Props2D.wrapY = (TextureWrapMode)wrapYNode.as<int>();
+		}
+
+		YAML::Node mipmapsNode = node["Mipmaps"];
+		if (mipmapsNode)
+		{
+			if (m_TextureType == 0)
+				m_Props2D.mipmaps = mipmapsNode.as<bool>();
+			else
+				m_PropsCube.mipmaps = mipmapsNode.as<bool>();
+		}
 	}
 
 	void TextureAssetImporter::OnWizardRender()
@@ -146,57 +184,65 @@ namespace Mahakam
 		}
 	}
 
-	Asset<void> TextureAssetImporter::OnWizardImport(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	void TextureAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
 		if (m_TextureType == 0)
-			return Texture2D::Create(filepath.string(), m_Props2D);
+		{
+			Asset<Texture2D> texture = Texture2D::Create(filepath.string(), m_Props2D);
+
+			texture.Save(filepath, importPath);
+
+			AssetDatabase::ReloadAsset(texture.GetID());
+		}
 		else
-			return TextureCube::Create(filepath.string(), m_PropsCube);
+		{
+			Asset<TextureCube> texture = TextureCube::Create(filepath.string(), m_PropsCube);
+
+			texture.Save(filepath, importPath);
+
+			AssetDatabase::ReloadAsset(texture.GetID());
+		}
 	}
 
 	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{
-		/*Asset<Texture> textureAsset = StaticCastRef<Texture>(asset);
-		Asset<Texture2D> texture2D = std::dynamic_pointer_cast<Texture2D>(textureAsset);
-		Asset<TextureCube> textureCube = std::dynamic_pointer_cast<TextureCube>(textureAsset);
+		Asset<Texture> texture(asset);
 
-		emitter << YAML::Key << "Type";
-		if (texture2D)
-			emitter << YAML::Value << 0;
-		else
-			emitter << YAML::Value << 1;
-
-		emitter << YAML::Key << "Format";
-		if (texture2D)
-			emitter << YAML::Value << (int)texture2D->GetProps().format;
-		else
-			emitter << YAML::Value << (int)textureCube->GetProps().format;
-
-		emitter << YAML::Key << "Filter";
-		if (texture2D)
-			emitter << YAML::Value << (int)texture2D->GetProps().filterMode;
-		else
-			emitter << YAML::Value << (int)textureCube->GetProps().filterMode;
-
-		if (texture2D)
+		if (!texture->IsCubemap())
 		{
+			Asset<Texture2D> texture2D(texture);
+
+			emitter << YAML::Key << "Type";
+			emitter << YAML::Value << 0;
+			emitter << YAML::Key << "Format";
+			emitter << YAML::Value << (int)texture2D->GetProps().format;
+			emitter << YAML::Key << "Filter";
+			emitter << YAML::Value << (int)texture2D->GetProps().filterMode;
 			emitter << YAML::Key << "WrapX";
 			emitter << YAML::Value << (int)texture2D->GetProps().wrapX;
-
 			emitter << YAML::Key << "WrapY";
 			emitter << YAML::Value << (int)texture2D->GetProps().wrapY;
-		}
-
-		emitter << YAML::Key << "Mipmaps";
-		if (texture2D)
+			emitter << YAML::Key << "Mipmaps";
 			emitter << YAML::Value << texture2D->GetProps().mipmaps;
+		}
 		else
-			emitter << YAML::Value << textureCube->GetProps().mipmaps;*/
+		{
+			Asset<TextureCube> textureCube(texture);
+
+			emitter << YAML::Key << "Type";
+			emitter << YAML::Value << 1;
+			emitter << YAML::Key << "Format";
+			emitter << YAML::Value << (int)textureCube->GetProps().format;
+			emitter << YAML::Key << "Filter";
+			emitter << YAML::Value << (int)textureCube->GetProps().filterMode;
+			emitter << YAML::Key << "Mipmaps";
+			emitter << YAML::Value << textureCube->GetProps().mipmaps;
+		}
 	}
 
 	Asset<void> TextureAssetImporter::Deserialize(YAML::Node& node)
 	{
-		/*TextureProps props2D;
+		TextureProps props2D;
 		CubeTextureProps propsCube;
 
 		YAML::Node filepathNode = node["Filepath"];
@@ -250,7 +296,7 @@ namespace Mahakam
 		if (textureType == 0)
 			return Texture2D::Create(filepath, props2D);
 		else
-			return TextureCube::Create(filepath, propsCube);*/
+			return TextureCube::Create(filepath, propsCube);
 
 		return nullptr;
 	}

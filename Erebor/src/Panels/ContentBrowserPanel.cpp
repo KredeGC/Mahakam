@@ -147,7 +147,7 @@ namespace Mahakam::Editor
 							ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{
-								AssetDatabase::AssetInfo info = AssetDatabase::GetAssetInfo(file.path());
+								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(file.path());
 
 								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, file.path());
 							}

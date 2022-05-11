@@ -17,7 +17,12 @@ namespace Mahakam
 		// ma_sound is internally ref-counted, so this doesn't matter performance-wise
 		ma_sound m_MaSound;
 
+		// Need to keep a reference to the sound itself, in case it changes
 		Ref<MiniAudioSound> m_SoundSwitch;
+
+		// Need to keep a reference to props, in case they change
+		SoundProps m_SoundProps;
+
 		Asset<MiniAudioSound> m_Sound;
 
 		glm::vec4 m_Source{ 0 };

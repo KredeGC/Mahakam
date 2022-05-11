@@ -25,9 +25,13 @@ namespace Mahakam::Editor
 					ImGui::TextWrapped("Asset ID: %s", assetIDString.c_str());
 					ImGui::TextWrapped("Asset Import path: %s", asset.second.string().c_str());
 
-					uint32_t useCount = AssetDatabase::GetAssetReferences(asset.first);
-					std::string useCountString = std::to_string(useCount);
-					ImGui::TextWrapped("Current references: %s", useCountString.c_str());
+					uint32_t assetCount = AssetDatabase::GetAssetReferences(asset.first);
+					std::string assetCountString = std::to_string(assetCount);
+					ImGui::TextWrapped("Asset references: %s", assetCountString.c_str());
+
+					uint32_t strongCount = AssetDatabase::GetStrongReferences(asset.first);
+					std::string strongCountString = std::to_string(strongCount);
+					ImGui::TextWrapped("Strong references: %s", strongCountString.c_str());
 				}
 
 				ImGui::EndTable();

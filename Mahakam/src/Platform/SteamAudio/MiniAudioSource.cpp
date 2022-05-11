@@ -60,6 +60,7 @@ namespace Mahakam
 			UninitSound();
 
 		m_Sound = static_cast<Asset<MiniAudioSound>>(sound);
+		m_SoundProps = m_Sound->GetProps();
 		m_SoundSwitch = m_Sound.Get();
 
 		InitSound();
@@ -77,15 +78,33 @@ namespace Mahakam
 
 	void MiniAudioSource::UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos)
 	{
+		const SoundProps& props = m_Sound->GetProps();
+
+		// Reload the sound if the path changed
 		if (m_Sound.Get().get() != m_SoundSwitch.get())
 		{
 			UninitSound();
 
+			m_SoundProps = props;
 			m_SoundSwitch = m_Sound.Get();
 
 			InitSound();
 
 			Play(); // TEMP
+		}
+
+		// Update volume, if it has changed
+		if (props.volume != m_SoundProps.volume)
+		{
+			m_SoundProps.volume = props.volume;
+			ma_sound_set_volume(&m_MaSound, props.volume);
+		}
+
+		// Update looping, if it has changed
+		if (props.loop != m_SoundProps.loop)
+		{
+			m_SoundProps.loop = props.loop;
+			ma_sound_set_looping(&m_MaSound, props.loop ? MA_TRUE : MA_FALSE);
 		}
 
 		if (m_Node.spatialBlend > 0.0f)

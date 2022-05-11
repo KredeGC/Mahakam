@@ -4,6 +4,7 @@
 #include "Utility.h"
 
 #include <yaml-cpp/yaml.h>
+#include <robin_hood.h>
 
 #include <filesystem>
 #include <string>
@@ -20,9 +21,9 @@ namespace Mahakam
 
 		struct AssetInfo
 		{
-			uint64_t ID;
-			std::filesystem::path Filepath;
-			std::string Extension;
+			uint64_t ID = 0;
+			std::filesystem::path Filepath = "";
+			std::string Extension = "";
 		};
 
 		struct LiveAsset
@@ -32,9 +33,9 @@ namespace Mahakam
 		};
 
 	private:
-		using AssetMap = std::unordered_map<uint64_t, std::filesystem::path>;
+		using AssetMap = robin_hood::unordered_map<uint64_t, std::filesystem::path>;
 
-		inline static std::unordered_map<std::string, Ref<AssetImporter>> m_AssetImporters;
+		inline static robin_hood::unordered_map<std::string, Ref<AssetImporter>> m_AssetImporters;
 
 		inline static AssetMap m_AssetPaths;
 
@@ -46,11 +47,19 @@ namespace Mahakam
 		MH_DECLARE_FUNC(DeregisterAssetImporter, void, const std::string& extension);
 		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const std::string& extension);
 
-		// Miscellaneous functions
-		MH_DECLARE_FUNC(ReloadAssetImports, void);
-		MH_DECLARE_FUNC(GetAssetHandles, AssetMap);
-		MH_DECLARE_FUNC(GetAssetReferences, uint32_t, uint64_t id);
-		MH_DECLARE_FUNC(GetAssetInfo, AssetInfo, const std::filesystem::path& importPath);
+		// Asset reloading
+		MH_DECLARE_FUNC(ReloadAsset, void, uint64_t id); // Reloads a specific asset
+		MH_DECLARE_FUNC(ReloadAssetImports, void); // Reloads all assets, essentially recreating them
+		MH_DECLARE_FUNC(RefreshAssetImports, void); // Refreshes the asset paths, finding new assets and removing unused ones
+
+		// Various getters
+		MH_DECLARE_FUNC(GetAssetImportPath, std::filesystem::path, uint64_t id); // Gets the import path of a given asset
+		MH_DECLARE_FUNC(GetAssetHandles, const AssetMap&); // Gets a reference to all assets, whether they're currently loaded or not
+		MH_DECLARE_FUNC(GetAssetReferences, uint32_t, uint64_t id); // Gets the amount of references to this asset, if any
+		MH_DECLARE_FUNC(GetStrongReferences, uint32_t, uint64_t id); // Gets the amount of references to this asset, if any
+
+		// If you don't want to load the asset first
+		MH_DECLARE_FUNC(ReadAssetInfo, AssetInfo, const std::filesystem::path& importPath); // Gets information about the given asset without loading it
 
 	private:
 		// Saving and loading assets
@@ -65,8 +74,6 @@ namespace Mahakam
 
 		MH_DECLARE_FUNC(RegisterAsset, void, uint64_t);
 		MH_DECLARE_FUNC(DeregisterAsset, void, uint64_t);
-
-		static uint64_t ReadAssetID(const std::filesystem::path& filepath);
 
 		static void RecursiveCacheAssets(const std::filesystem::path& filepath);
 

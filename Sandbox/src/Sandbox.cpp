@@ -133,11 +133,12 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	//Asset<Texture2D> brickAlbedo = Asset<Texture2D>("res/assets/textures/brick/brick_albedo.png.yaml");
-	//Ref<Texture2D> brickAlbedo = AssetDatabase::LoadAsset<Texture2D>("res/assets/textures/brick/brick_albedo.png.yaml");
-	Asset<Texture> brickAlbedo = Texture2D::Create("assets/textures/brick/brick_albedo.png", { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
+	Asset<Texture2D> brickAlbedo = Asset<Texture2D>("res/assets/textures/brick/brick_albedo.png.yaml");
+	Asset<Texture> brickBump = Asset<Texture2D>("res/assets/textures/brick/brick_bump.png.yaml");
+	Asset<Texture> brickRoughness = Asset<Texture2D>("res/assets/textures/brick/brick_roughness.png.yaml");
+	/*Asset<Texture> brickAlbedo = Texture2D::Create("assets/textures/brick/brick_albedo.png", { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
 	Asset<Texture> brickBump = Texture2D::Create("assets/textures/brick/brick_bump.png", { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
-	Asset<Texture> brickRoughness = Texture2D::Create("assets/textures/brick/brick_roughness.png", { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+	Asset<Texture> brickRoughness = Texture2D::Create("assets/textures/brick/brick_roughness.png", { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });*/
 	/*Ref<Texture> brickAlbedo = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
 	Ref<Texture> brickBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_bump.png", false, { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
 	Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });*/
@@ -145,7 +146,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 	Asset<Material> planeMaterial = Material::Create(textureShader);
 	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
-	planeMaterial->SetTexture("u_Bump", 0, GL::GetTexture2DBump());
+	planeMaterial->SetTexture("u_Bump", 0, brickBump);
 	planeMaterial->SetTexture("u_Metallic", 0, GL::GetTexture2DBlack());
 	planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
 
