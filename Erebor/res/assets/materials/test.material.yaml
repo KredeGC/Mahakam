@@ -1,15 +1,8 @@
-Filepath: test.material
+Filepath: assets\materials\LitColor.material
 Extension: .material
 ID: 798124709
 Shader: 10701105304502518583
-Textures:
-  {}
-Floats:
+Properties:
   u_Metallic: 0
-  u_Roughness: 0
-Float2s:
-  {}
-Float3s:
-  u_Color: [1, 0, 0]
-Float4s:
-  {}
+  u_Color: [1, 1, 1]
+  u_Roughness: 0.5

@@ -110,7 +110,7 @@ namespace Mahakam
 	//std::string GetAssetType::GetAssetType(const std::filesystem::path& importPath)
 	MH_DEFINE_FUNC(AssetDatabase::ReadAssetInfo, AssetDatabase::AssetInfo, const std::filesystem::path& importPath)
 	{
-		if (!std::filesystem::exists(importPath))
+		if (std::filesystem::is_directory(importPath) || !std::filesystem::exists(importPath))
 		{
 			MH_CORE_WARN("The path {0} doesn't exist", importPath.string());
 			return {};

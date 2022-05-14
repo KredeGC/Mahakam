@@ -20,7 +20,7 @@ namespace Mahakam
 			m_Props.loop = loopNode.as<bool>();
 	}
 
-	void SoundAssetImporter::OnWizardRender()
+	void SoundAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
 		ImGui::DragFloat("Sound Volume", &m_Props.volume, 0.01f, 0.0f);
 		ImGui::Checkbox("Sound Looping", &m_Props.loop);

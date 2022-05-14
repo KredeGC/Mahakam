@@ -12,42 +12,7 @@ namespace Mahakam
 
 		auto& defaultProps = shader->GetProperties();
 
-		for (auto& prop : defaultProps)
-		{
-			switch (prop.second.dataType)
-			{
-			case ShaderDataType::Sampler2D:
-				textures[prop.first] = GL::GetTexture2DWhite();
-				break;
-			case ShaderDataType::SamplerCube:
-				textures[prop.first] = GL::GetTextureCubeWhite();
-				break;
-			case ShaderDataType::Float:
-				floats[prop.first] = 0.0f;
-				break;
-			case ShaderDataType::Float2:
-				float2s[prop.first] = glm::vec2(0.0f);
-				break;
-			case ShaderDataType::Float3:
-				float3s[prop.first] = glm::vec3(0.0f);
-				break;
-			case ShaderDataType::Float4:
-				float4s[prop.first] = glm::vec4(0.0f);
-				break;
-			case ShaderDataType::Mat3:
-				mat3s[prop.first] = glm::mat3(1.0f);
-				break;
-			case ShaderDataType::Mat4:
-				mat4s[prop.first] = glm::mat4(1.0f);
-				break;
-			case ShaderDataType::Int:
-				ints[prop.first] = 0;
-				break;
-			default:
-				MH_CORE_WARN("Material properties for {0} shader include unused property: {1}", shader->GetName(), prop.first);
-				break;
-			}
-		}
+		ResetShaderProperties(defaultProps);
 	}
 
 	OpenGLMaterial::OpenGLMaterial(const Asset<Material>& material) :
@@ -261,5 +226,45 @@ namespace Mahakam
 		MH_CORE_WARN("Material ({0}) has no float4 named {1}", GetShader()->GetName(), name);
 
 		return glm::vec4(0.0f);
+	}
+
+	void OpenGLMaterial::ResetShaderProperties(const std::unordered_map<std::string, ShaderElement>& properties)
+	{
+		for (auto& prop : properties)
+		{
+			switch (prop.second.dataType)
+			{
+			case ShaderDataType::Sampler2D:
+				textures[prop.first] = GL::GetTexture2DWhite();
+				break;
+			case ShaderDataType::SamplerCube:
+				textures[prop.first] = GL::GetTextureCubeWhite();
+				break;
+			case ShaderDataType::Float:
+				floats[prop.first] = 0.0f;
+				break;
+			case ShaderDataType::Float2:
+				float2s[prop.first] = glm::vec2(0.0f);
+				break;
+			case ShaderDataType::Float3:
+				float3s[prop.first] = glm::vec3(0.0f);
+				break;
+			case ShaderDataType::Float4:
+				float4s[prop.first] = glm::vec4(0.0f);
+				break;
+			case ShaderDataType::Mat3:
+				mat3s[prop.first] = glm::mat3(1.0f);
+				break;
+			case ShaderDataType::Mat4:
+				mat4s[prop.first] = glm::mat4(1.0f);
+				break;
+			case ShaderDataType::Int:
+				ints[prop.first] = 0;
+				break;
+			default:
+				MH_CORE_WARN("Material properties for {0} shader include unused property: {1}", shader->GetName(), prop.first);
+				break;
+			}
+		}
 	}
 }

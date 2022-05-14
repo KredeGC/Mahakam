@@ -10,7 +10,7 @@ namespace Mahakam
 		
 	}
 
-	void ShaderAssetImporter::OnWizardRender()
+	void ShaderAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
 		ImGui::Text("Shaders have no options");
 	}

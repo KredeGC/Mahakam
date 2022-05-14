@@ -54,7 +54,7 @@ namespace Mahakam
 		}
 	}
 
-	void TextureAssetImporter::OnWizardRender()
+	void TextureAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
 		// Type (2D, Cube)
 		const char* projectionTypeStrings[] = { "Texture2D", "TextureCube" };

@@ -5,12 +5,32 @@
 
 namespace Mahakam
 {
+	enum class MaterialPropertyType
+	{
+		Color,
+		HDR,
+		Vector,
+		Range,
+		Drag,
+		Default
+	};
+
+	struct MaterialProperty
+	{
+		MaterialPropertyType PropertyType;
+		ShaderDataType DataType;
+		float Min = -std::numeric_limits<float>::infinity();
+		float Max = std::numeric_limits<float>::infinity();
+	};
+
 	class MaterialAssetImporter : public AssetImporter
 	{
 	private:
 		std::string m_ShaderFilepath;
 
 		ImporterProps m_ImporterProps;
+
+		std::unordered_map<std::string, MaterialProperty> m_MaterialProperties;
 
 		std::unordered_map<std::string, Asset<Texture>> m_Textures;
 		
@@ -30,13 +50,13 @@ namespace Mahakam
 		virtual const ImporterProps& GetImporterProps() const override { return m_ImporterProps; }
 
 		virtual void OnWizardOpen(YAML::Node& node) override;
-		virtual void OnWizardRender() override;
+		virtual void OnWizardRender(const std::filesystem::path& filepath) override;
 		virtual void OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) override;
 
 		virtual void Serialize(YAML::Emitter& emitter, Asset<void> asset) override;
 		virtual Asset<void> Deserialize(YAML::Node& node) override;
 
 	private:
-		void SetupProperties(const std::unordered_map<std::string, ShaderElement>& properties);
+		void SetupMaterialProperties(const std::unordered_map<std::string, ShaderElement>& shaderProperties, const std::filesystem::path& filepath);
 	};
 }

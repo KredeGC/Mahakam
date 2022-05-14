@@ -317,7 +317,9 @@ namespace Mahakam
 
 			ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
 
-			properties[name] = { OpenGLDataTypeToShaderDataType(values[1]), (uint32_t)values[3] };
+			auto iter = properties.find(name);
+			if (iter != properties.end())
+				properties[name] = { OpenGLDataTypeToShaderDataType(values[1]), (uint32_t)values[3] };
 		}
 
 		return program;

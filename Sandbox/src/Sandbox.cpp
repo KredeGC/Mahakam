@@ -149,6 +149,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	planeMaterial->SetTexture("u_Bump", 0, brickBump);
 	planeMaterial->SetTexture("u_Metallic", 0, GL::GetTexture2DBlack());
 	planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
+	planeMaterial->SetTexture("u_Occlussion", 0, GL::GetTexture2DWhite());
 
 	Entity planeEntity = scene->CreateEntity("Plane");
 	planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);

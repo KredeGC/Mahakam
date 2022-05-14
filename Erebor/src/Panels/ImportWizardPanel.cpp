@@ -16,7 +16,7 @@ namespace Mahakam::Editor
 		{
 			ImGui::Begin("Import Asset", &m_Open);
 
-			m_Importer->OnWizardRender();
+			m_Importer->OnWizardRender(m_FilePath);
 
 			ImGui::Separator();
 

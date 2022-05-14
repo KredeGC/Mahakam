@@ -8,29 +8,19 @@
 
 namespace Mahakam
 {
-	template<typename T>
-	static void AddProperties(YAML::Emitter& emitter, const char* name, const std::unordered_map<std::string, T>& values)
-	{
-		emitter << YAML::Key << name;
-		emitter << YAML::Value << YAML::BeginMap;
-
-		for (auto& kv : values)
-		{
-			emitter << YAML::Key << kv.first;
-			emitter << YAML::Value << kv.second;
-		}
-
-		emitter << YAML::EndMap;
-	}
-
 	MaterialAssetImporter::MaterialAssetImporter()
 	{
 		m_ImporterProps.CreateMenu = true;
-		m_ImporterProps.NoFilepath = true;
+		//m_ImporterProps.NoFilepath = true;
 	}
 
 	void MaterialAssetImporter::OnWizardOpen(YAML::Node& node)
 	{
+		YAML::Node filepathNode = node["Filepath"];
+		std::filesystem::path filepath;
+		if (filepathNode)
+			filepath = filepathNode.as<std::string>();
+
 		YAML::Node shaderNode = node["Shader"];
 		if (shaderNode)
 		{
@@ -39,12 +29,12 @@ namespace Mahakam
 			if (shader)
 			{
 				m_ShaderFilepath = AssetDatabase::GetAssetImportPath(shader.GetID()).string();
-				SetupProperties(shader->GetProperties());
+				SetupMaterialProperties(shader->GetProperties(), filepath);
 			}
 		}
 	}
 
-	void MaterialAssetImporter::OnWizardRender()
+	void MaterialAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
 		char filepathBuffer[256]{ 0 };
 		strncpy(filepathBuffer, m_ShaderFilepath.c_str(), m_ShaderFilepath.size());
@@ -55,19 +45,55 @@ namespace Mahakam
 			Asset<Shader> shader = Asset<Shader>(m_ShaderFilepath);
 
 			if (shader)
-				SetupProperties(shader->GetProperties());
+				SetupMaterialProperties(shader->GetProperties(), filepath);
+			else
+				SetupMaterialProperties({}, filepath);
 		}
 
-		for (auto& kv : m_Textures)
+		for (auto& kv : m_MaterialProperties)
 		{
-
+			const std::string& propertyName = kv.first;
+			const MaterialProperty& property = kv.second;
+			ShaderDataType dataType = property.DataType;
+			MaterialPropertyType propertyType = property.PropertyType;
+			switch (propertyType)
+			{
+			case MaterialPropertyType::Color:
+				switch (dataType)
+				{
+				case ShaderDataType::Float3:	ImGui::ColorEdit3(propertyName.c_str(), glm::value_ptr(m_Float3s[propertyName])); break;
+				case ShaderDataType::Float4:	ImGui::ColorEdit4(propertyName.c_str(), glm::value_ptr(m_Float4s[propertyName])); break;
+				}
+				break;
+			case MaterialPropertyType::HDR:
+				switch (dataType)
+				{
+				case ShaderDataType::Float3:	ImGui::ColorEdit3(propertyName.c_str(), glm::value_ptr(m_Float3s[propertyName]), ImGuiColorEditFlags_HDR); break;
+				case ShaderDataType::Float4:	ImGui::ColorEdit4(propertyName.c_str(), glm::value_ptr(m_Float4s[propertyName]), ImGuiColorEditFlags_HDR); break;
+				}
+				break;
+			case MaterialPropertyType::Vector: // TODO: Vector visualization
+				break;
+			case MaterialPropertyType::Range:
+				switch (dataType)
+				{
+				case ShaderDataType::Float:		ImGui::SliderFloat(propertyName.c_str(), &m_Floats[propertyName], property.Min, property.Max); break;
+				case ShaderDataType::Float2:	ImGui::SliderFloat2(propertyName.c_str(), glm::value_ptr(m_Float2s[propertyName]), property.Min, property.Max); break;
+				case ShaderDataType::Float3:	ImGui::SliderFloat3(propertyName.c_str(), glm::value_ptr(m_Float3s[propertyName]), property.Min, property.Max); break;
+				case ShaderDataType::Float4:	ImGui::SliderFloat4(propertyName.c_str(), glm::value_ptr(m_Float4s[propertyName]), property.Min, property.Max); break;
+				}
+				break;
+			case MaterialPropertyType::Drag:
+				float speed = (property.Max - property.Min) / 100.0f;
+				switch (dataType)
+				{
+				case ShaderDataType::Float:		ImGui::DragFloat(propertyName.c_str(), &m_Floats[propertyName], speed, property.Min, property.Max); break;
+				case ShaderDataType::Float2:	ImGui::DragFloat2(propertyName.c_str(), glm::value_ptr(m_Float2s[propertyName]), speed, property.Min, property.Max); break;
+				case ShaderDataType::Float3:	ImGui::DragFloat3(propertyName.c_str(), glm::value_ptr(m_Float3s[propertyName]), speed, property.Min, property.Max); break;
+				case ShaderDataType::Float4:	ImGui::DragFloat4(propertyName.c_str(), glm::value_ptr(m_Float4s[propertyName]), speed, property.Min, property.Max); break;
+				}
+			}
 		}
-
-		for (auto& kv : m_Floats)
-			ImGui::DragFloat(kv.first.c_str(), &kv.second, 0.01f);
-
-		for (auto& kv : m_Float3s)
-			ImGui::ColorEdit3(kv.first.c_str(), glm::value_ptr(kv.second), ImGuiColorEditFlags_HDR);
 	}
 
 	void MaterialAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
@@ -76,7 +102,23 @@ namespace Mahakam
 
 		Asset<Material> material = Material::Create(shader);
 
-		material.Save("test.material", importPath);
+		for (auto& kv : m_MaterialProperties)
+		{
+			switch (kv.second.DataType)
+			{
+			case ShaderDataType::Float:			material->SetFloat(kv.first, m_Floats[kv.first]); break;
+			case ShaderDataType::Float2:		material->SetFloat2(kv.first, m_Float2s[kv.first]); break;
+			case ShaderDataType::Float3:		material->SetFloat3(kv.first, m_Float3s[kv.first]); break;
+			case ShaderDataType::Float4:		material->SetFloat4(kv.first, m_Float4s[kv.first]); break;
+			case ShaderDataType::Mat3:			material->SetMat3(kv.first, m_Mat3s[kv.first]); break;
+			case ShaderDataType::Mat4:			material->SetMat4(kv.first, m_Mat4s[kv.first]); break;
+			case ShaderDataType::Int:			material->SetInt(kv.first, m_Ints[kv.first]); break;
+			case ShaderDataType::Sampler2D:		material->SetTexture(kv.first, 0, m_Textures[kv.first]); break;
+			case ShaderDataType::SamplerCube:	material->SetTexture(kv.first, 0, m_Textures[kv.first]); break;
+			}
+		}
+
+		material.Save(filepath, importPath);
 	}
 
 	void MaterialAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
@@ -86,33 +128,31 @@ namespace Mahakam
 		emitter << YAML::Key << "Shader";
 		emitter << YAML::Value << material->GetShader().GetID();
 
-		// Textures
-		emitter << YAML::Key << "Textures";
+		// Material properties
+		emitter << YAML::Key << "Properties";
 		emitter << YAML::Value << YAML::BeginMap;
 
-		for (auto& kv : m_Textures)
+		const std::unordered_map<std::string, ShaderElement>& properties = material->GetShader()->GetProperties();
+		for (auto& kv : properties)
 		{
-			uint64_t textureID = kv.second.GetID();
-			if (textureID)
+			emitter << YAML::Key << kv.first;
+			emitter << YAML::Value;
+
+			switch (kv.second.dataType)
 			{
-				emitter << YAML::Key << kv.first;
-				emitter << YAML::Value << textureID;
+			case ShaderDataType::Float:			emitter << material->GetFloat(kv.first); break;
+			case ShaderDataType::Float2:		emitter << material->GetFloat2(kv.first); break;
+			case ShaderDataType::Float3:		emitter << material->GetFloat3(kv.first); break;
+			case ShaderDataType::Float4:		emitter << material->GetFloat4(kv.first); break;
+			case ShaderDataType::Mat3:			emitter << material->GetMat3(kv.first); break;
+			case ShaderDataType::Mat4:			emitter << material->GetMat4(kv.first); break;
+			case ShaderDataType::Int:			emitter << material->GetInt(kv.first); break;
+			case ShaderDataType::Sampler2D:		emitter << material->GetTexture(kv.first).GetID(); break;
+			case ShaderDataType::SamplerCube:	emitter << material->GetTexture(kv.first).GetID(); break;
 			}
 		}
 
 		emitter << YAML::EndMap;
-
-		// Floats
-		AddProperties<float>(emitter, "Floats", m_Floats);
-
-		// Float2s
-		AddProperties<glm::vec2>(emitter, "Float2s", m_Float2s);
-
-		// Float3s
-		AddProperties<glm::vec3>(emitter, "Float3s", m_Float3s);
-
-		// Float4s
-		AddProperties<glm::vec4>(emitter, "Float4s", m_Float4s);
 	}
 
 	Asset<void> MaterialAssetImporter::Deserialize(YAML::Node& node)
@@ -124,21 +164,37 @@ namespace Mahakam
 
 		Asset<Material> material = Material::Create(shader);
 
-		// Floats
-		YAML::Node floatsNode = node["Floats"];
-		if (floatsNode)
+		const std::unordered_map<std::string, ShaderElement>& properties = material->GetShader()->GetProperties();
+		YAML::Node propertiesNode = node["Properties"];
+		if (propertiesNode)
 		{
-			for (auto node : floatsNode)
+			for (auto propertyNode : propertiesNode)
 			{
-				std::string propertyName = node.first.as<std::string>();
-				material->SetFloat(propertyName, node.as<float>());
+				std::string propertyName = propertyNode.first.as<std::string>();
+
+				auto iter = properties.find(propertyName);
+				if (iter != properties.end())
+				{
+					switch (iter->second.dataType)
+					{
+					case ShaderDataType::Float:			material->SetFloat(propertyName, propertyNode.second.as<float>()); break;
+					case ShaderDataType::Float2:		material->SetFloat2(propertyName, propertyNode.second.as<glm::vec2>()); break;
+					case ShaderDataType::Float3:		material->SetFloat3(propertyName, propertyNode.second.as<glm::vec3>()); break;
+					case ShaderDataType::Float4:		material->SetFloat4(propertyName, propertyNode.second.as<glm::vec4>()); break;
+					//case ShaderDataType::Mat3:			material->SetMat3(propertyName, propertyNode.second.as<glm::mat3>()); break;
+					//case ShaderDataType::Mat4:			material->SetMat4(propertyName, propertyNode.second.as<glm::mat4>()); break;
+					case ShaderDataType::Int:			material->SetInt(propertyName, propertyNode.second.as<int>()); break;
+					case ShaderDataType::Sampler2D:		material->SetTexture(propertyName, 0, Asset<Texture2D>(propertyNode.second.as<uint64_t>())); break;
+					case ShaderDataType::SamplerCube:	material->SetTexture(propertyName, 0, Asset<Texture2D>(propertyNode.second.as<uint64_t>())); break;
+					}
+				}
 			}
 		}
 
 		return material;
 	}
 
-	void MaterialAssetImporter::SetupProperties(const std::unordered_map<std::string, ShaderElement>& properties)
+	void MaterialAssetImporter::SetupMaterialProperties(const std::unordered_map<std::string, ShaderElement>& shaderProperties, const std::filesystem::path& filepath)
 	{
 		m_Floats.clear();
 		m_Float2s.clear();
@@ -152,19 +208,77 @@ namespace Mahakam
 
 		m_Textures.clear();
 
-		for (auto& kv : properties)
+		m_MaterialProperties.clear();
+
+		YAML::Node rootNode;
+		try
 		{
-			switch (kv.second.dataType)
+			rootNode = YAML::LoadFile(filepath.string());
+		}
+		catch (YAML::Exception e)
+		{
+			MH_CORE_BREAK(e.what());
+		}
+
+		YAML::Node propertiesNode = rootNode["Properties"];
+		if (propertiesNode)
+		{
+			for (auto propertyNode : propertiesNode)
 			{
-			case ShaderDataType::Float:			m_Floats[kv.first] = 0.0f; break;
-			case ShaderDataType::Float2:		m_Float2s[kv.first] = glm::vec2{ 0.0f }; break;
-			case ShaderDataType::Float3:		m_Float3s[kv.first] = glm::vec3{ 0.0f }; break;
-			case ShaderDataType::Float4:		m_Float4s[kv.first] = glm::vec4{ 0.0f }; break;
-			case ShaderDataType::Mat3:			m_Mat3s[kv.first] = glm::mat3{ 0.0f }; break;
-			case ShaderDataType::Mat4:			m_Mat4s[kv.first] = glm::mat4{ 0.0f }; break;
-			case ShaderDataType::Int:			m_Ints[kv.first] = 0; break;
-			case ShaderDataType::Sampler2D:		m_Textures[kv.first] = GL::GetTexture2DWhite(); break;
-			case ShaderDataType::SamplerCube:	m_Textures[kv.first] = GL::GetTextureCubeWhite(); break;
+				std::string propertyName = propertyNode.first.as<std::string>();
+
+				auto iter = shaderProperties.find(propertyName);
+				if (iter != shaderProperties.end())
+				{
+					YAML::Node typeNode = propertyNode.second["Type"];
+					YAML::Node minNode = propertyNode.second["Min"];
+					YAML::Node maxNode = propertyNode.second["Max"];
+					YAML::Node defaultNode = propertyNode.second["Default"];
+
+					MaterialPropertyType propertyType = MaterialPropertyType::Default;
+					if (typeNode)
+					{
+						std::string typeString = typeNode.as<std::string>();
+						if (typeString == "Color")
+							propertyType = MaterialPropertyType::Color;
+						else if (typeString == "HDR")
+							propertyType = MaterialPropertyType::HDR;
+						else if (typeString == "Vector")
+							propertyType = MaterialPropertyType::Vector;
+						else if (typeString == "Range")
+							propertyType = MaterialPropertyType::Range;
+						else if (typeString == "Drag")
+							propertyType = MaterialPropertyType::Drag;
+						else if (typeString == "Default")
+							propertyType = MaterialPropertyType::Default;
+					}
+
+					float min = -std::numeric_limits<float>::infinity();
+					if (minNode)
+						min = minNode.as<float>();
+
+					float max = std::numeric_limits<float>::infinity();
+					if (maxNode)
+						max = maxNode.as<float>();
+
+					m_MaterialProperties[propertyName] = { propertyType, iter->second.dataType, min, max };
+
+					if (defaultNode)
+					{
+						switch (iter->second.dataType)
+						{
+						case ShaderDataType::Float:			m_Floats[propertyName] = defaultNode.as<float>(); break;
+						case ShaderDataType::Float2:		m_Float2s[propertyName] = defaultNode.as<glm::vec2>(); break;
+						case ShaderDataType::Float3:		m_Float3s[propertyName] = defaultNode.as<glm::vec3>(); break;
+						case ShaderDataType::Float4:		m_Float4s[propertyName] = defaultNode.as<glm::vec4>(); break;
+						case ShaderDataType::Int:			m_Ints[propertyName] = defaultNode.as<int>(); break;
+						case ShaderDataType::Mat3:			break; // TODO: Support these types
+						case ShaderDataType::Mat4:			break;
+						case ShaderDataType::Sampler2D:		m_Textures[propertyName] = Asset<Texture2D>(defaultNode.as<uint64_t>()); break;
+						case ShaderDataType::SamplerCube:	m_Textures[propertyName] = Asset<TextureCube>(defaultNode.as<uint64_t>()); break;
+						}
+					}
+				}
 			}
 		}
 	}
