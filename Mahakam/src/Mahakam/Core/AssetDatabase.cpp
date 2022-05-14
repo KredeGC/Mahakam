@@ -210,7 +210,7 @@ namespace Mahakam
 		}
 		catch (YAML::ParserException e)
 		{
-			MH_CORE_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.msg);
+			MH_CORE_WARN("AssetDatabase encountered exception trying to import yaml file {0}: {1}", importPath.string(), e.msg);
 		}
 
 		// If the asset type has an importer

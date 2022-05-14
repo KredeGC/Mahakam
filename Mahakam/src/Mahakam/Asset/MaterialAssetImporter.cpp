@@ -14,14 +14,14 @@ namespace Mahakam
 		//m_ImporterProps.NoFilepath = true;
 	}
 
-	void MaterialAssetImporter::OnWizardOpen(YAML::Node& node)
+	void MaterialAssetImporter::OnWizardOpen(YAML::Node& rootNode)
 	{
-		YAML::Node filepathNode = node["Filepath"];
+		YAML::Node filepathNode = rootNode["Filepath"];
 		std::filesystem::path filepath;
 		if (filepathNode)
 			filepath = filepathNode.as<std::string>();
 
-		YAML::Node shaderNode = node["Shader"];
+		YAML::Node shaderNode = rootNode["Shader"];
 		if (shaderNode)
 		{
 			Asset<Shader> shader = Asset<Shader>(shaderNode.as<uint64_t>());
@@ -30,7 +30,42 @@ namespace Mahakam
 			{
 				m_ShaderFilepath = AssetDatabase::GetAssetImportPath(shader.GetID()).string();
 				SetupMaterialProperties(shader->GetProperties(), filepath);
+
+				const std::unordered_map<std::string, ShaderElement>& properties = shader->GetProperties();
+				YAML::Node propertiesNode = rootNode["Properties"];
+				if (propertiesNode)
+				{
+					for (auto propertyNode : propertiesNode)
+					{
+						std::string propertyName = propertyNode.first.as<std::string>();
+
+						auto iter = properties.find(propertyName);
+						if (iter != properties.end())
+						{
+							switch (iter->second.dataType)
+							{
+							case ShaderDataType::Float:			m_Floats[propertyName] = propertyNode.second.as<float>(); break;
+							case ShaderDataType::Float2:		m_Float2s[propertyName] = propertyNode.second.as<glm::vec2>(); break;
+							case ShaderDataType::Float3:		m_Float3s[propertyName] = propertyNode.second.as<glm::vec3>(); break;
+							case ShaderDataType::Float4:		m_Float4s[propertyName] = propertyNode.second.as<glm::vec4>(); break;
+							case ShaderDataType::Mat3:			break; // TODO: Support mats
+							case ShaderDataType::Mat4:			break;
+							case ShaderDataType::Int:			m_Ints[propertyName] = propertyNode.second.as<int>(); break;
+							case ShaderDataType::Sampler2D:		m_Textures[propertyName] = Asset<Texture2D>(propertyNode.second.as<uint64_t>()); break;
+							case ShaderDataType::SamplerCube:	m_Textures[propertyName] = Asset<Texture2D>(propertyNode.second.as<uint64_t>()); break;
+							}
+						}
+					}
+				}
 			}
+			else
+			{
+				SetupMaterialProperties({}, filepath);
+			}
+		}
+		else
+		{
+			SetupMaterialProperties({}, filepath);
 		}
 	}
 
@@ -155,17 +190,17 @@ namespace Mahakam
 		emitter << YAML::EndMap;
 	}
 
-	Asset<void> MaterialAssetImporter::Deserialize(YAML::Node& node)
+	Asset<void> MaterialAssetImporter::Deserialize(YAML::Node& rootNode)
 	{
 		Asset<Shader> shader;
-		YAML::Node shaderNode = node["Shader"];
+		YAML::Node shaderNode = rootNode["Shader"];
 		if (shaderNode)
 			shader = Asset<Shader>(shaderNode.as<uint64_t>());
 
 		Asset<Material> material = Material::Create(shader);
 
 		const std::unordered_map<std::string, ShaderElement>& properties = material->GetShader()->GetProperties();
-		YAML::Node propertiesNode = node["Properties"];
+		YAML::Node propertiesNode = rootNode["Properties"];
 		if (propertiesNode)
 		{
 			for (auto propertyNode : propertiesNode)
@@ -211,14 +246,19 @@ namespace Mahakam
 		m_MaterialProperties.clear();
 
 		YAML::Node rootNode;
-		try
+		if (std::filesystem::exists(filepath))
 		{
-			rootNode = YAML::LoadFile(filepath.string());
+			try
+			{
+				rootNode = YAML::LoadFile(filepath.string());
+			}
+			catch (YAML::Exception e)
+			{
+				MH_CORE_WARN("MaterialAssetImporter encountered exception trying to import yaml file {0}: {1}", filepath, e.msg);
+			}
 		}
-		catch (YAML::Exception e)
-		{
-			MH_CORE_BREAK(e.what());
-		}
+
+		if (!rootNode || rootNode.size() <= 0) return;
 
 		YAML::Node propertiesNode = rootNode["Properties"];
 		if (propertiesNode)
@@ -275,6 +315,7 @@ namespace Mahakam
 						case ShaderDataType::Mat3:			break; // TODO: Support these types
 						case ShaderDataType::Mat4:			break;
 						case ShaderDataType::Sampler2D:		m_Textures[propertyName] = Asset<Texture2D>(defaultNode.as<uint64_t>()); break;
+							// TODO: These should use strings for default values, unless they can be interpreted as uint64s
 						case ShaderDataType::SamplerCube:	m_Textures[propertyName] = Asset<TextureCube>(defaultNode.as<uint64_t>()); break;
 						}
 					}

@@ -1,14 +1,16 @@
 Properties:
-  u_Color:
-    Type: Color
-    Default: [1, 1, 1]
+  u_Albedo:
+    Type: Texture
+    Default: White
+  u_Bump:
+    Type: Normal
+    Default: Bump
   u_Metallic:
-    Type: Range
-    Min: 0
-    Max: 1
-    Default: 0
+    Type: Texture
+    Default: Black
   u_Roughness:
-    Type: Range
-    Min: 0
-    Max: 1
-    Default: 0.5
+    Type: Texture
+    Default: White
+  u_Occlussion:
+    Type: Texture
+    Default: White

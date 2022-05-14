@@ -12,6 +12,8 @@ namespace Mahakam
 		Vector,
 		Range,
 		Drag,
+		Texture,
+		Normal,
 		Default
 	};
 

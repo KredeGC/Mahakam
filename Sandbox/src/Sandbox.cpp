@@ -218,8 +218,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 	// Create mesh & base material
 	Asset<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
-	Asset<Material> baseMaterial = Material::Create(colorShader);
-	baseMaterial->SetFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
+	//Asset<Material> baseMaterial = Material::Create(colorShader);
+	Asset<Material> baseMaterial = Asset<Material>("res/assets/materials/LitColor.material.yaml");
+	//baseMaterial->SetFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 
 	// Create scene entities
 	for (int y = 0; y < 10; y++)
