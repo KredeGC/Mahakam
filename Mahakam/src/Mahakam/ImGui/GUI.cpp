@@ -126,4 +126,54 @@ namespace Mahakam::GUI
 
 		return false;
 	}
+
+	bool DrawColor3Edit(const std::string& label, glm::vec3& value, ImGuiColorEditFlags flags)
+	{
+		return ImGui::ColorEdit3(label.c_str(), glm::value_ptr(value), flags);
+	}
+
+	bool DrawColor4Edit(const std::string& label, glm::vec4& value, ImGuiColorEditFlags flags)
+	{
+		return ImGui::ColorEdit4(label.c_str(), glm::value_ptr(value), flags);
+	}
+
+	bool DrawFloatSlider(const std::string& label, float& value, float min, float max)
+	{
+		return ImGui::SliderFloat(label.c_str(), &value, min, max);
+	}
+
+	bool DrawFloat2Slider(const std::string& label, glm::vec2& value, float min, float max)
+	{
+		return ImGui::SliderFloat2(label.c_str(), glm::value_ptr(value), min, max);
+	}
+
+	bool DrawFloat3Slider(const std::string& label, glm::vec3& value, float min, float max)
+	{
+		return ImGui::SliderFloat3(label.c_str(), glm::value_ptr(value), min, max);
+	}
+
+	bool DrawFloat4Slider(const std::string& label, glm::vec4& value, float min, float max)
+	{
+		return ImGui::SliderFloat4(label.c_str(), glm::value_ptr(value), min, max);
+	}
+
+	bool DrawFloatDrag(const std::string& label, float& value, float speed, float min, float max)
+	{
+		return ImGui::DragFloat(label.c_str(), &value, speed, min, max);
+	}
+
+	bool DrawFloat2Drag(const std::string& label, glm::vec2& value, float speed, float min, float max)
+	{
+		return ImGui::DragFloat2(label.c_str(), glm::value_ptr(value), speed, min, max);
+	}
+
+	bool DrawFloat3Drag(const std::string& label, glm::vec3& value, float speed, float min, float max)
+	{
+		return ImGui::DragFloat3(label.c_str(), glm::value_ptr(value), speed, min, max);
+	}
+
+	bool DrawFloat4Drag(const std::string& label, glm::vec4& value, float speed, float min, float max)
+	{
+		return ImGui::DragFloat4(label.c_str(), glm::value_ptr(value), speed, min, max);
+	}
 }

@@ -12,9 +12,10 @@ namespace Mahakam
 		static RendererAPI* rendererAPI;
 		
 		static Asset<Mesh> staticScreenQuad;
-		static Asset<Mesh> staticPyramid;
 		static Asset<Mesh> staticSphereMesh;
-		static Asset<Mesh> staticCubemapMesh;
+		static Asset<Mesh> staticInvertedPyramid;
+		static Asset<Mesh> staticInvertedSphereMesh;
+		static Asset<Mesh> staticInvertedCubemapMesh;
 		static Asset<Mesh> staticCube;
 
 		static Asset<Texture2D> texture2DRed;
@@ -28,6 +29,7 @@ namespace Mahakam
 		static void Shutdown();
 
 		MH_DECLARE_FUNC(GetScreenQuad, Asset<Mesh>);
+		MH_DECLARE_FUNC(GetSphere, Asset<Mesh>);
 		MH_DECLARE_FUNC(GetInvertedPyramid, Asset<Mesh>);
 		MH_DECLARE_FUNC(GetInvertedSphere, Asset<Mesh>);
 		MH_DECLARE_FUNC(GetInvertedCube, Asset<Mesh>);

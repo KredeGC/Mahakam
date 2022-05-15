@@ -14,4 +14,17 @@ namespace Mahakam::GUI
 	bool DrawColor3Edit(const char* label, glm::vec3& value, ImGuiColorEditFlags flags = 0);
 
 	bool DrawDragDropTarget(const std::string& label, const std::string& extension, std::filesystem::path& importPath);
+
+	bool DrawColor3Edit(const std::string& label, glm::vec3& value, ImGuiColorEditFlags flags = ImGuiColorEditFlags_None);
+	bool DrawColor4Edit(const std::string& label, glm::vec4& value, ImGuiColorEditFlags flags = ImGuiColorEditFlags_None);
+
+	bool DrawFloatSlider(const std::string& label, float& value, float min, float max);
+	bool DrawFloat2Slider(const std::string& label, glm::vec2& value, float min, float max);
+	bool DrawFloat3Slider(const std::string& label, glm::vec3& value, float min, float max);
+	bool DrawFloat4Slider(const std::string& label, glm::vec4& value, float min, float max);
+
+	bool DrawFloatDrag(const std::string& label, float& value, float speed, float min, float max);
+	bool DrawFloat2Drag(const std::string& label, glm::vec2& value, float speed, float min, float max);
+	bool DrawFloat3Drag(const std::string& label, glm::vec3& value, float speed, float min, float max);
+	bool DrawFloat4Drag(const std::string& label, glm::vec4& value, float speed, float min, float max);
 }

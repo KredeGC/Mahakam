@@ -2,6 +2,9 @@
 
 #include "AssetImporter.h"
 #include "Mahakam/Renderer/Material.h"
+#include "Mahakam/Renderer/FrameBuffer.h"
+#include "Mahakam/Renderer/Buffer.h"
+#include "Mahakam/Renderer/Camera.h"
 
 namespace Mahakam
 {
@@ -20,18 +23,12 @@ namespace Mahakam
 		UnorderedMap<std::string, ShaderProperty> m_MaterialProperties;
 		
 		UnorderedMap<std::string, Asset<Texture>> m_DefaultTextures;
-		
-		UnorderedMap<std::string, Asset<Texture>> m_Textures;
-		
-		UnorderedMap<std::string, glm::mat3> m_Mat3s;
-		UnorderedMap<std::string, glm::mat4> m_Mat4s;
-		
-		UnorderedMap<std::string, int32_t> m_Ints;
-		
-		UnorderedMap<std::string, float> m_Floats;
-		UnorderedMap<std::string, glm::vec2> m_Float2s;
-		UnorderedMap<std::string, glm::vec3> m_Float3s;
-		UnorderedMap<std::string, glm::vec4> m_Float4s;
+
+		// Preview
+		Asset<Mesh> m_PreviewSphereMesh;
+		Camera m_PreviewCamera;
+		Asset<FrameBuffer> m_FrameBuffer;
+		Asset<UniformBuffer> m_CameraBuffer;
 
 	public:
 		MaterialAssetImporter();

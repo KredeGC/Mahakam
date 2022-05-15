@@ -45,6 +45,7 @@ namespace Mahakam
 		// Registering asset importers
 		MH_DECLARE_FUNC(RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImport);
 		MH_DECLARE_FUNC(DeregisterAssetImporter, void, const std::string& extension);
+		MH_DECLARE_FUNC(DeregisterAllAssetImporters, void);
 		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const std::string& extension);
 
 		// Asset reloading

@@ -151,7 +151,7 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	const glm::mat3 OpenGLMaterial::GetMat3(const std::string& name) const
+	glm::mat3 OpenGLMaterial::GetMat3(const std::string& name) const
 	{
 		auto matIter = mat3s.find(name);
 		if (matIter != mat3s.end())
@@ -162,7 +162,7 @@ namespace Mahakam
 		return glm::mat3(1.0f);
 	}
 
-	const glm::mat4 OpenGLMaterial::GetMat4(const std::string& name) const
+	glm::mat4 OpenGLMaterial::GetMat4(const std::string& name) const
 	{
 		auto matIter = mat4s.find(name);
 		if (matIter != mat4s.end())
@@ -195,7 +195,7 @@ namespace Mahakam
 		return 0.0f;
 	}
 
-	const glm::vec2 OpenGLMaterial::GetFloat2(const std::string& name) const
+	glm::vec2 OpenGLMaterial::GetFloat2(const std::string& name) const
 	{
 		auto floatIter = float2s.find(name);
 		if (floatIter != float2s.end())
@@ -206,7 +206,7 @@ namespace Mahakam
 		return glm::vec2(0.0f);
 	}
 
-	const glm::vec3 OpenGLMaterial::GetFloat3(const std::string& name) const
+	glm::vec3 OpenGLMaterial::GetFloat3(const std::string& name) const
 	{
 		auto floatIter = float3s.find(name);
 		if (floatIter != float3s.end())
@@ -217,7 +217,7 @@ namespace Mahakam
 		return glm::vec3(0.0f);
 	}
 
-	const glm::vec4 OpenGLMaterial::GetFloat4(const std::string& name) const
+	glm::vec4 OpenGLMaterial::GetFloat4(const std::string& name) const
 	{
 		auto floatIter = float4s.find(name);
 		if (floatIter != float4s.end())

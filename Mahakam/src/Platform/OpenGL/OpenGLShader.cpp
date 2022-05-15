@@ -388,11 +388,11 @@ namespace Mahakam
 				else if (typeString == "Default")	propertyType = ShaderPropertyType::Default;
 			}
 
-			float min = -std::numeric_limits<float>::infinity();
+			float min = 0;
 			if (minNode)
 				min = minNode.as<float>();
 
-			float max = std::numeric_limits<float>::infinity();
+			float max = 0;
 			if (maxNode)
 				max = maxNode.as<float>();
 

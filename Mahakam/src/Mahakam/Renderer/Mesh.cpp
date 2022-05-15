@@ -331,12 +331,12 @@ namespace Mahakam
 				if (x != rows - 1 && y != columns - 1)
 				{
 					indices[triIndex] = index;
-					indices[triIndex + 1] = index + rows + 1;
-					indices[triIndex + 2] = index + rows;
+					indices[triIndex + 1] = index + rows;
+					indices[triIndex + 2] = index + rows + 1;
 
 					indices[triIndex + 3] = index;
-					indices[triIndex + 4] = index + 1;
-					indices[triIndex + 5] = index + rows + 1;
+					indices[triIndex + 4] = index + rows + 1;
+					indices[triIndex + 5] = index + 1;
 
 					triIndex += 6;
 				}

@@ -11,9 +11,10 @@ namespace Mahakam
 	RendererAPI* GL::rendererAPI;
 
 	Asset<Mesh> GL::staticScreenQuad;
-	Asset<Mesh> GL::staticPyramid;
 	Asset<Mesh> GL::staticSphereMesh;
-	Asset<Mesh> GL::staticCubemapMesh;
+	Asset<Mesh> GL::staticInvertedPyramid;
+	Asset<Mesh> GL::staticInvertedSphereMesh;
+	Asset<Mesh> GL::staticInvertedCubemapMesh;
 	Asset<Mesh> GL::staticCube;
 
 	Asset<Texture2D> GL::texture2DRed;
@@ -30,9 +31,10 @@ namespace Mahakam
 		rendererAPI->Init();
 
 		staticScreenQuad = CreateScreenQuad();
-		staticPyramid = CreatePyramid();
-		staticSphereMesh = Mesh::CreateCubeSphere(5, true);
-		staticCubemapMesh = Mesh::CreateCube(2, true);
+		staticSphereMesh = Mesh::CreateUVSphere(10, 10);
+		staticInvertedPyramid = CreatePyramid();
+		staticInvertedSphereMesh = Mesh::CreateCubeSphere(5, true);
+		staticInvertedCubemapMesh = Mesh::CreateCube(2, true);
 		staticCube = Mesh::CreateCube(2);
 
 		uint8_t redData = 255;
@@ -75,9 +77,10 @@ namespace Mahakam
 		delete rendererAPI;
 
 		staticScreenQuad = nullptr;
-		staticPyramid = nullptr;
 		staticSphereMesh = nullptr;
-		staticCubemapMesh = nullptr;
+		staticInvertedPyramid = nullptr;
+		staticInvertedSphereMesh = nullptr;
+		staticInvertedCubemapMesh = nullptr;
 		staticCube = nullptr;
 
 		texture2DRed = nullptr;
@@ -94,22 +97,28 @@ namespace Mahakam
 		return staticScreenQuad;
 	};
 
+	//Ref<Mesh> GL::GetSphere()
+	MH_DEFINE_FUNC(GL::GetSphere, Asset<Mesh>)
+	{
+		return staticSphereMesh;
+	};
+
 	//Ref<Mesh> GL::GetInvertedPyramid()
 	MH_DEFINE_FUNC(GL::GetInvertedPyramid, Asset<Mesh>)
 	{
-		return staticPyramid;
+		return staticInvertedPyramid;
 	};
 
 	//Ref<Mesh> GL::GetInvertedSphere()
 	MH_DEFINE_FUNC(GL::GetInvertedSphere, Asset<Mesh>)
 	{
-		return staticSphereMesh;
+		return staticInvertedSphereMesh;
 	};
 
 	//Ref<Mesh> GL::GetInvertedCube()
 	MH_DEFINE_FUNC(GL::GetInvertedCube, Asset<Mesh>)
 	{
-		return staticCubemapMesh;
+		return staticInvertedCubemapMesh;
 	};
 
 	//Ref<Mesh> GL::GetCube()

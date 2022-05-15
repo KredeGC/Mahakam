@@ -38,15 +38,15 @@ namespace Mahakam
 
 		virtual Asset<Texture> GetTexture(const std::string& name) const = 0;
 
-		virtual const glm::mat3 GetMat3(const std::string& name) const = 0;
-		virtual const glm::mat4 GetMat4(const std::string& name) const = 0;
+		virtual glm::mat3 GetMat3(const std::string& name) const = 0;
+		virtual glm::mat4 GetMat4(const std::string& name) const = 0;
 
 		virtual int32_t GetInt(const std::string& name) const = 0;
 
 		virtual float GetFloat(const std::string& name) const = 0;
-		virtual const glm::vec2 GetFloat2(const std::string& name) const = 0;
-		virtual const glm::vec3 GetFloat3(const std::string& name) const = 0;
-		virtual const glm::vec4 GetFloat4(const std::string& name) const = 0;
+		virtual glm::vec2 GetFloat2(const std::string& name) const = 0;
+		virtual glm::vec3 GetFloat3(const std::string& name) const = 0;
+		virtual glm::vec4 GetFloat4(const std::string& name) const = 0;
 
 
 		virtual const robin_hood::unordered_map<std::string, Asset<Texture>>& GetTextures() const = 0;

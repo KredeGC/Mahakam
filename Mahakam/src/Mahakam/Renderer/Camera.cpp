@@ -35,21 +35,21 @@ namespace Mahakam
 
 	void Camera::SetPerspective(float fov, float nearPlane, float farPlane)
 	{
+		changed = true;
 		projectionType = ProjectionType::Perspective;
 		this->fov = fov;
-		this->ratio = ratio;
-		nearZ = nearPlane;
-		farZ = farPlane;
+		this->nearZ = nearPlane;
+		this->farZ = farPlane;
 		RecalculateProjectionMatrix();
 	}
 
 	void Camera::SetOrthographic(float size, float nearPlane, float farPlane)
 	{
+		changed = true;
 		projectionType = ProjectionType::Orthographic;
 		this->size = size;
-		this->ratio = ratio;
-		nearZ = nearPlane;
-		farZ = farPlane;
+		this->nearZ = nearPlane;
+		this->farZ = farPlane;
 		RecalculateProjectionMatrix();
 	}
 }

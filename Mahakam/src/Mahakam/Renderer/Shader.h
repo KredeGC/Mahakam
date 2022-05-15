@@ -25,8 +25,8 @@ namespace Mahakam
 	{
 		ShaderPropertyType PropertyType;
 		ShaderDataType DataType;
-		float Min = -std::numeric_limits<float>::infinity();
-		float Max = std::numeric_limits<float>::infinity();
+		float Min = 0;
+		float Max = 0;
 		std::string DefaultString;
 	};
 

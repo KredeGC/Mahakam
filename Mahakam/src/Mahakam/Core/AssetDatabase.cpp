@@ -35,6 +35,12 @@ namespace Mahakam
 		}
 	};
 
+	//void AssetDatabase::DeregisterAllAssetImporters()
+	MH_DEFINE_FUNC(AssetDatabase::DeregisterAllAssetImporters, void) // TODO: Define the function
+	{
+		
+	};
+
 	//Ref<AssetImporter> AssetDatabase::GetAssetImporter(const std::string& extension)
 	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporter, Ref<AssetImporter>, const std::string& extension)
 	{
