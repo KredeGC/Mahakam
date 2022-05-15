@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
+#include <robin_hood.h>
 
 
 #ifdef MH_DEBUG
@@ -81,6 +83,14 @@
 
 namespace Mahakam
 {
+#ifdef MH_DEBUG
+	template<typename K, typename V>
+	using UnorderedMap = std::unordered_map<K, V>;
+#else
+	template<typename K, typename V>
+	using UnorderedMap = robin_hood::unordered_map<K, V>;
+#endif
+
 	typedef void** FuncPtr;
 
 	template<typename T>

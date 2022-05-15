@@ -4,6 +4,8 @@
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Math/Math.h"
 
+#include "Mahakam/ImGui/GUI.h"
+
 #include <imgui.h>
 
 namespace Mahakam
@@ -51,8 +53,12 @@ namespace Mahakam
 							case ShaderDataType::Mat3:			break; // TODO: Support mats
 							case ShaderDataType::Mat4:			break;
 							case ShaderDataType::Int:			m_Ints[propertyName] = propertyNode.second.as<int>(); break;
-							case ShaderDataType::Sampler2D:		m_Textures[propertyName] = Asset<Texture2D>(propertyNode.second.as<uint64_t>()); break;
-							case ShaderDataType::SamplerCube:	m_Textures[propertyName] = Asset<Texture2D>(propertyNode.second.as<uint64_t>()); break;
+							case ShaderDataType::Sampler2D:
+							case ShaderDataType::SamplerCube:
+								uint64_t textureID = propertyNode.second.as<uint64_t>();
+								if (textureID)
+									m_Textures[propertyName] = Asset<Texture>(textureID);
+								break;
 							}
 						}
 					}
@@ -71,12 +77,8 @@ namespace Mahakam
 
 	void MaterialAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
-		char filepathBuffer[256]{ 0 };
-		strncpy(filepathBuffer, m_ShaderFilepath.c_str(), m_ShaderFilepath.size());
-		if (ImGui::InputText("Shader Filepath", filepathBuffer, 256))
+		if (GUI::DrawDragDropTarget("Shader Filepath", ".shader", m_ShaderFilepath))
 		{
-			m_ShaderFilepath = std::string(filepathBuffer);
-
 			Asset<Shader> shader = Asset<Shader>(m_ShaderFilepath);
 
 			if (shader)
@@ -91,6 +93,7 @@ namespace Mahakam
 			const MaterialProperty& property = kv.second;
 			ShaderDataType dataType = property.DataType;
 			MaterialPropertyType propertyType = property.PropertyType;
+			float dragSpeed = (property.Max - property.Min) / 100.0f;
 			switch (propertyType)
 			{
 			case MaterialPropertyType::Color:
@@ -119,14 +122,36 @@ namespace Mahakam
 				}
 				break;
 			case MaterialPropertyType::Drag:
-				float speed = (property.Max - property.Min) / 100.0f;
 				switch (dataType)
 				{
-				case ShaderDataType::Float:		ImGui::DragFloat(propertyName.c_str(), &m_Floats[propertyName], speed, property.Min, property.Max); break;
-				case ShaderDataType::Float2:	ImGui::DragFloat2(propertyName.c_str(), glm::value_ptr(m_Float2s[propertyName]), speed, property.Min, property.Max); break;
-				case ShaderDataType::Float3:	ImGui::DragFloat3(propertyName.c_str(), glm::value_ptr(m_Float3s[propertyName]), speed, property.Min, property.Max); break;
-				case ShaderDataType::Float4:	ImGui::DragFloat4(propertyName.c_str(), glm::value_ptr(m_Float4s[propertyName]), speed, property.Min, property.Max); break;
+				case ShaderDataType::Float:		ImGui::DragFloat(propertyName.c_str(), &m_Floats[propertyName], dragSpeed, property.Min, property.Max); break;
+				case ShaderDataType::Float2:	ImGui::DragFloat2(propertyName.c_str(), glm::value_ptr(m_Float2s[propertyName]), dragSpeed, property.Min, property.Max); break;
+				case ShaderDataType::Float3:	ImGui::DragFloat3(propertyName.c_str(), glm::value_ptr(m_Float3s[propertyName]), dragSpeed, property.Min, property.Max); break;
+				case ShaderDataType::Float4:	ImGui::DragFloat4(propertyName.c_str(), glm::value_ptr(m_Float4s[propertyName]), dragSpeed, property.Min, property.Max); break;
 				}
+				break;
+			case MaterialPropertyType::Texture:
+			case MaterialPropertyType::Normal:
+				std::filesystem::path texturePath;
+				if (m_Textures[propertyName])
+					texturePath = m_Textures[propertyName].GetImportPath();
+				if (GUI::DrawTextureDragDropTarget(propertyName, texturePath))
+				{
+					Asset<Texture> texture = Asset<Texture>(texturePath);
+					if (!texture)
+						texture = m_DefaultTextures[propertyName];
+					m_Textures[propertyName] = texture;
+				}
+
+				Asset<Texture>& texture = m_Textures[propertyName];
+				if (texture && ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Image((void*)(uintptr_t)texture->GetRendererID(), { 128, 128 }, { 0, 1 }, { 1, 0 });
+					ImGui::EndTooltip();
+				}
+
+				break;
 			}
 		}
 	}
@@ -154,6 +179,8 @@ namespace Mahakam
 		}
 
 		material.Save(filepath, importPath);
+
+		AssetDatabase::ReloadAsset(material.GetID());
 	}
 
 	void MaterialAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
@@ -216,11 +243,15 @@ namespace Mahakam
 					case ShaderDataType::Float2:		material->SetFloat2(propertyName, propertyNode.second.as<glm::vec2>()); break;
 					case ShaderDataType::Float3:		material->SetFloat3(propertyName, propertyNode.second.as<glm::vec3>()); break;
 					case ShaderDataType::Float4:		material->SetFloat4(propertyName, propertyNode.second.as<glm::vec4>()); break;
-					//case ShaderDataType::Mat3:			material->SetMat3(propertyName, propertyNode.second.as<glm::mat3>()); break;
-					//case ShaderDataType::Mat4:			material->SetMat4(propertyName, propertyNode.second.as<glm::mat4>()); break;
+						//case ShaderDataType::Mat3:			material->SetMat3(propertyName, propertyNode.second.as<glm::mat3>()); break;
+						//case ShaderDataType::Mat4:			material->SetMat4(propertyName, propertyNode.second.as<glm::mat4>()); break;
 					case ShaderDataType::Int:			material->SetInt(propertyName, propertyNode.second.as<int>()); break;
-					case ShaderDataType::Sampler2D:		material->SetTexture(propertyName, 0, Asset<Texture2D>(propertyNode.second.as<uint64_t>())); break;
-					case ShaderDataType::SamplerCube:	material->SetTexture(propertyName, 0, Asset<Texture2D>(propertyNode.second.as<uint64_t>())); break;
+					case ShaderDataType::Sampler2D:
+					case ShaderDataType::SamplerCube:
+						uint64_t textureID = propertyNode.second.as<uint64_t>();
+						if (textureID)
+							material->SetTexture(propertyName, 0, Asset<Texture>(textureID));
+						break;
 					}
 				}
 			}
@@ -241,6 +272,7 @@ namespace Mahakam
 
 		m_Ints.clear();
 
+		m_DefaultTextures.clear();
 		m_Textures.clear();
 
 		m_MaterialProperties.clear();
@@ -279,18 +311,14 @@ namespace Mahakam
 					if (typeNode)
 					{
 						std::string typeString = typeNode.as<std::string>();
-						if (typeString == "Color")
-							propertyType = MaterialPropertyType::Color;
-						else if (typeString == "HDR")
-							propertyType = MaterialPropertyType::HDR;
-						else if (typeString == "Vector")
-							propertyType = MaterialPropertyType::Vector;
-						else if (typeString == "Range")
-							propertyType = MaterialPropertyType::Range;
-						else if (typeString == "Drag")
-							propertyType = MaterialPropertyType::Drag;
-						else if (typeString == "Default")
-							propertyType = MaterialPropertyType::Default;
+						if (typeString == "Color")			propertyType = MaterialPropertyType::Color;
+						else if (typeString == "HDR")		propertyType = MaterialPropertyType::HDR;
+						else if (typeString == "Vector")	propertyType = MaterialPropertyType::Vector;
+						else if (typeString == "Range")		propertyType = MaterialPropertyType::Range;
+						else if (typeString == "Drag")		propertyType = MaterialPropertyType::Drag;
+						else if (typeString == "Texture")	propertyType = MaterialPropertyType::Texture;
+						else if (typeString == "Normal")	propertyType = MaterialPropertyType::Normal;
+						else if (typeString == "Default")	propertyType = MaterialPropertyType::Default;
 					}
 
 					float min = -std::numeric_limits<float>::infinity();
@@ -305,6 +333,7 @@ namespace Mahakam
 
 					if (defaultNode)
 					{
+						std::string defaultString;
 						switch (iter->second.dataType)
 						{
 						case ShaderDataType::Float:			m_Floats[propertyName] = defaultNode.as<float>(); break;
@@ -314,9 +343,30 @@ namespace Mahakam
 						case ShaderDataType::Int:			m_Ints[propertyName] = defaultNode.as<int>(); break;
 						case ShaderDataType::Mat3:			break; // TODO: Support these types
 						case ShaderDataType::Mat4:			break;
-						case ShaderDataType::Sampler2D:		m_Textures[propertyName] = Asset<Texture2D>(defaultNode.as<uint64_t>()); break;
-							// TODO: These should use strings for default values, unless they can be interpreted as uint64s
-						case ShaderDataType::SamplerCube:	m_Textures[propertyName] = Asset<TextureCube>(defaultNode.as<uint64_t>()); break;
+						case ShaderDataType::Sampler2D:
+							defaultString = defaultNode.as<std::string>();
+
+							if (defaultString == "White")
+								m_DefaultTextures[propertyName] = GL::GetTexture2DWhite();
+							else if (defaultString == "Black")
+								m_DefaultTextures[propertyName] = GL::GetTexture2DBlack();
+							else if (defaultString == "Bump")
+								m_DefaultTextures[propertyName] = GL::GetTexture2DBump();
+
+							m_Textures[propertyName] = m_DefaultTextures[propertyName];
+
+							break;
+						case ShaderDataType::SamplerCube:
+							defaultString = defaultNode.as<std::string>();
+
+							if (defaultString == "White")
+								m_DefaultTextures[propertyName] = GL::GetTextureCubeWhite();
+							else if (defaultString == "Black")
+								m_DefaultTextures[propertyName] = GL::GetTextureCubeWhite();
+
+							m_Textures[propertyName] = m_DefaultTextures[propertyName];
+
+							break;
 						}
 					}
 				}

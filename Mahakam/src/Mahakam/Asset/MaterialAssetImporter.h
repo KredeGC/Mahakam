@@ -28,23 +28,25 @@ namespace Mahakam
 	class MaterialAssetImporter : public AssetImporter
 	{
 	private:
-		std::string m_ShaderFilepath;
+		std::filesystem::path m_ShaderFilepath;
 
 		ImporterProps m_ImporterProps;
 
-		std::unordered_map<std::string, MaterialProperty> m_MaterialProperties;
-
-		std::unordered_map<std::string, Asset<Texture>> m_Textures;
+		UnorderedMap<std::string, MaterialProperty> m_MaterialProperties;
 		
-		std::unordered_map<std::string, glm::mat3> m_Mat3s;
-		std::unordered_map<std::string, glm::mat4> m_Mat4s;
+		UnorderedMap<std::string, Asset<Texture>> m_DefaultTextures;
 		
-		std::unordered_map<std::string, int32_t> m_Ints;
+		UnorderedMap<std::string, Asset<Texture>> m_Textures;
 		
-		std::unordered_map<std::string, float> m_Floats;
-		std::unordered_map<std::string, glm::vec2> m_Float2s;
-		std::unordered_map<std::string, glm::vec3> m_Float3s;
-		std::unordered_map<std::string, glm::vec4> m_Float4s;
+		UnorderedMap<std::string, glm::mat3> m_Mat3s;
+		UnorderedMap<std::string, glm::mat4> m_Mat4s;
+		
+		UnorderedMap<std::string, int32_t> m_Ints;
+		
+		UnorderedMap<std::string, float> m_Floats;
+		UnorderedMap<std::string, glm::vec2> m_Float2s;
+		UnorderedMap<std::string, glm::vec3> m_Float3s;
+		UnorderedMap<std::string, glm::vec4> m_Float4s;
 
 	public:
 		MaterialAssetImporter();

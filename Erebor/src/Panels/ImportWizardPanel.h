@@ -12,7 +12,7 @@ namespace Mahakam::Editor
 		static std::filesystem::path m_FilePath;
 		static std::filesystem::path m_ImportPath;
 
-		static Ref<AssetImporter> m_Importer;
+		static WeakRef<AssetImporter> m_Importer;
 
 	public:
 		virtual void OnImGuiRender() override;

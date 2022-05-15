@@ -1,0 +1,10 @@
+Filepath: assets\materials\LitTexture.material
+Extension: .material
+ID: 660037763570734260
+Shader: 15872580642915974979
+Properties:
+  u_Metallic: 4232175179651810790
+  u_Albedo: 8387792792684495064
+  u_Occlussion: 4232175179651810790
+  u_Roughness: 4232175179651810790
+  u_Bump: 125392180592167870

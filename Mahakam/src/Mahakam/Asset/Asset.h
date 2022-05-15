@@ -106,6 +106,8 @@ namespace Mahakam
 
 		uint64_t GetID() const { return m_ID; }
 
+		std::filesystem::path GetImportPath() const { return AssetDatabase::GetAssetImportPath(m_ID); }
+
 		Ref<T> Get()
 		{
 			if (m_ID != 0)

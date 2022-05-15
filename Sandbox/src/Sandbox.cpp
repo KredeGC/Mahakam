@@ -144,12 +144,13 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });*/
 	Asset<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
 
-	Asset<Material> planeMaterial = Material::Create(textureShader);
+	Asset<Material> planeMaterial = Asset<Material>("res/assets/materials/LitTexture.material.yaml");
+	/*Asset<Material> planeMaterial = Material::Create(textureShader);
 	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
 	planeMaterial->SetTexture("u_Bump", 0, brickBump);
 	planeMaterial->SetTexture("u_Metallic", 0, GL::GetTexture2DBlack());
 	planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
-	planeMaterial->SetTexture("u_Occlussion", 0, GL::GetTexture2DWhite());
+	planeMaterial->SetTexture("u_Occlussion", 0, GL::GetTexture2DWhite());*/
 
 	Entity planeEntity = scene->CreateEntity("Plane");
 	planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);

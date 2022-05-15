@@ -435,8 +435,26 @@ namespace Mahakam::Editor
 		// IMPORTANT: Unload the scene before unloading the runtime
 		s_ActiveScene = nullptr;
 
-		delete lib;
+		delete lib; // TODO: Make this better, why the fuck is it just a static field
 		blitShader = nullptr;
+
+#pragma region Assets
+		// Material
+		AssetDatabase::DeregisterAssetImporter(".material");
+
+		// Shader
+		AssetDatabase::DeregisterAssetImporter(".shader");
+
+		// Sound
+		AssetDatabase::DeregisterAssetImporter(".wav");
+		AssetDatabase::DeregisterAssetImporter(".mp3");
+
+		// Texture
+		AssetDatabase::DeregisterAssetImporter(".png");
+		AssetDatabase::DeregisterAssetImporter(".jpeg");
+		AssetDatabase::DeregisterAssetImporter(".jpg");
+		AssetDatabase::DeregisterAssetImporter(".hdr");
+#pragma endregion
 	}
 
 	void EditorLayer::OnUpdate(Timestep dt)

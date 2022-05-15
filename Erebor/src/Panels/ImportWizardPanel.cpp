@@ -8,19 +8,20 @@ namespace Mahakam::Editor
 	std::filesystem::path ImportWizardPanel::m_FilePath;
 	std::filesystem::path ImportWizardPanel::m_ImportPath;
 
-	Ref<AssetImporter> ImportWizardPanel::m_Importer;
+	WeakRef<AssetImporter> ImportWizardPanel::m_Importer;
 
 	void ImportWizardPanel::OnImGuiRender()
 	{
-		if (m_Open && m_Importer)
+		Ref<AssetImporter> importer;
+		if (m_Open && (importer = m_Importer.lock()))
 		{
 			ImGui::Begin("Import Asset", &m_Open);
 
-			m_Importer->OnWizardRender(m_FilePath);
+			importer->OnWizardRender(m_FilePath);
 
 			ImGui::Separator();
 
-			if (!m_Importer->GetImporterProps().NoFilepath)
+			if (!importer->GetImporterProps().NoFilepath)
 			{
 				std::string filepathString = m_FilePath.string();
 				char filepathBuffer[256]{ 0 };
@@ -41,10 +42,9 @@ namespace Mahakam::Editor
 			{
 				Asset<void> asset(m_ImportPath);
 
-				m_Importer->OnWizardImport(asset, m_FilePath, m_ImportPath);
+				importer->OnWizardImport(asset, m_FilePath, m_ImportPath);
 
 				m_Open = false;
-				m_Importer = nullptr;
 			}
 
 			ImGui::End();
@@ -72,7 +72,7 @@ namespace Mahakam::Editor
 		}
 
 		m_Importer = AssetDatabase::GetAssetImporter(extension);
-		if (m_Importer)
-			m_Importer->OnWizardOpen(data);
+		if (Ref<AssetImporter> importer = m_Importer.lock())
+			importer->OnWizardOpen(data);
 	}
 }

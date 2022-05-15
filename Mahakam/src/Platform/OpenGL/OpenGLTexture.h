@@ -7,7 +7,7 @@ namespace Mahakam {
 	{
 	private:
 		uint32_t rendererID;
-		std::string filepath;
+		std::filesystem::path filepath;
 
 		TextureProps m_Props;
 
@@ -21,8 +21,10 @@ namespace Mahakam {
 
 	public:
 		OpenGLTexture2D(const TextureProps& props);
-		OpenGLTexture2D(const std::string& filepath, const TextureProps& props);
+		OpenGLTexture2D(const std::filesystem::path& filepath, const TextureProps& props);
 		virtual ~OpenGLTexture2D();
+
+		virtual const std::filesystem::path& GetFilepath() const override { return filepath; }
 
 		virtual const TextureProps& GetProps() const override { return m_Props; }
 
@@ -52,7 +54,7 @@ namespace Mahakam {
 	{
 	private:
 		uint32_t rendererID;
-		std::string filepath;
+		std::filesystem::path filepath;
 		uint32_t internalFormat;
 		uint32_t dataFormat;
 		uint32_t formatType;
@@ -65,9 +67,11 @@ namespace Mahakam {
 
 	public:
 		OpenGLTextureCube(const CubeTextureProps& props);
-		OpenGLTextureCube(const std::string& filepath, const CubeTextureProps& props);
+		OpenGLTextureCube(const std::filesystem::path& filepath, const CubeTextureProps& props);
 		OpenGLTextureCube(Asset<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props);
 		virtual ~OpenGLTextureCube();
+
+		virtual const std::filesystem::path& GetFilepath() const override { return filepath; }
 
 		virtual const CubeTextureProps& GetProps() const override { return props; };
 

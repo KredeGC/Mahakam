@@ -127,13 +127,13 @@ namespace Mahakam
 		Init();
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const std::string& filepath, const TextureProps& props)
+	OpenGLTexture2D::OpenGLTexture2D(const std::filesystem::path& filepath, const TextureProps& props)
 		: filepath(filepath), m_Props(props)
 	{
 		MH_PROFILE_FUNCTION();
 
 		int w, h, channels, hdr;
-		void* data = LoadImageFile(filepath.c_str(), &w, &h, &channels, &hdr);
+		void* data = LoadImageFile(this->filepath.string().c_str(), &w, &h, &channels, &hdr);
 
 		m_Props.width = w;
 		m_Props.height = h;
@@ -335,13 +335,13 @@ namespace Mahakam
 		totalSize = 6 * CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, false, this->props.mipmaps, this->props.resolution, this->props.resolution);
 	}
 
-	OpenGLTextureCube::OpenGLTextureCube(const std::string& filepath, const CubeTextureProps& props)
+	OpenGLTextureCube::OpenGLTextureCube(const std::filesystem::path& filepath, const CubeTextureProps& props)
 		: filepath(filepath), props(props)
 	{
 		MH_PROFILE_FUNCTION();
 
 		int w, h, channels, hdr;
-		void* data = LoadImageFile(this->filepath.c_str(), &w, &h, &channels, &hdr);
+		void* data = LoadImageFile(this->filepath.string().c_str(), &w, &h, &channels, &hdr);
 
 		internalFormat = TextureFormatToOpenGLInternalFormat(this->props.format);
 		dataFormat = ChannelCountToOpenGLBaseFormat(channels);

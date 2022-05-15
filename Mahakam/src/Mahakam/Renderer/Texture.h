@@ -47,6 +47,8 @@ namespace Mahakam
 	class Texture : public RenderBuffer
 	{
 	public:
+		virtual const std::filesystem::path& GetFilepath() const = 0;
+
 		virtual uint32_t GetTotalSize() const = 0;
 
 		virtual void SetData(void* data, uint32_t size, bool mipmaps = false) = 0;

@@ -100,4 +100,81 @@ namespace Mahakam::GUI
 
 		return changed;
 	}
+
+	bool DrawDragDropTarget(const std::string& label, const std::string& extension, std::filesystem::path& importPath)
+	{
+		static constexpr int MAX_STR_LEN = 256; // TODO: Un-hardcode this
+
+		std::string importString = importPath.string();
+		char filepathBuffer[MAX_STR_LEN]{ 0 };
+		strncpy(filepathBuffer, importString.c_str(), importString.size());
+		if (ImGui::InputText(label.c_str(), filepathBuffer, MAX_STR_LEN))
+		{
+			importPath = std::string(filepathBuffer);
+
+			return true;
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(extension.c_str()))
+			{
+				importPath = (const char*)payload->Data;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool DrawTextureDragDropTarget(const std::string& label, std::filesystem::path& importPath)
+	{
+		static constexpr int MAX_STR_LEN = 256; // TODO: Un-hardcode this
+
+		//ImGui::PushID(label.c_str());
+
+		std::string importString = importPath.string();
+		char filepathBuffer[MAX_STR_LEN]{ 0 };
+		strncpy(filepathBuffer, importString.c_str(), importString.size());
+		if (ImGui::InputText(label.c_str(), filepathBuffer, MAX_STR_LEN))
+		{
+			importPath = std::string(filepathBuffer);
+
+			return true;
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			const ImGuiPayload* payload;
+			if (payload = ImGui::AcceptDragDropPayload(".png"))
+			{
+				importPath = (const char*)payload->Data;
+				return true;
+			}
+
+			if (payload = ImGui::AcceptDragDropPayload(".jpg"))
+			{
+				importPath = (const char*)payload->Data;
+				return true;
+			}
+
+			if (payload = ImGui::AcceptDragDropPayload(".jpeg"))
+			{
+				importPath = (const char*)payload->Data;
+				return true;
+			}
+
+			if (payload = ImGui::AcceptDragDropPayload(".hdr"))
+			{
+				importPath = (const char*)payload->Data;
+				return true;
+			}
+
+			// TODO: Add more extensions...
+		}
+
+		//ImGui::PopID();
+
+		return false;
+	}
 }

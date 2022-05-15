@@ -136,20 +136,33 @@ namespace Mahakam::Editor
 				{
 					for (auto& file : std::filesystem::directory_iterator(importPath))
 					{
-						if (!file.is_directory())
+						std::filesystem::path importPath = file.path();
+						if (!file.is_directory() && (importPath.extension() == ".yaml" || importPath.extension() == ".yml"))
 						{
-							std::string pathName = file.path().stem().string();
+							std::string pathName = importPath.stem().string();
 
 							ImGui::TableNextColumn();
 
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
-							ImGui::PushID(file.path().string().c_str());
+							ImGui::PushID(importPath.string().c_str());
 							ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+
+							if (ImGui::BeginDragDropSource())
+							{
+								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
+
+								std::string importString = importPath.string();
+								const char* importBuffer = importString.c_str();
+
+								ImGui::SetDragDropPayload(info.Extension.c_str(), importBuffer, strlen(importBuffer) + 1);
+								ImGui::EndDragDropSource();
+							}
+
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{
-								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(file.path());
+								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
 
-								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, file.path());
+								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
 							}
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 							ImGui::TextWrapped(pathName.c_str());
