@@ -1,6 +1,3 @@
-Properties:
-  u_Albedo: Texture2D::white
-  u_BumpMap: Texture2D::bump
 Passes:
   GEOMETRY:
     Defines:

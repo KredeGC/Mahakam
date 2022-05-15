@@ -5,34 +5,19 @@
 
 namespace Mahakam
 {
-	enum class MaterialPropertyType
-	{
-		Color,
-		HDR,
-		Vector,
-		Range,
-		Drag,
-		Texture,
-		Normal,
-		Default
-	};
-
-	struct MaterialProperty
-	{
-		MaterialPropertyType PropertyType;
-		ShaderDataType DataType;
-		float Min = -std::numeric_limits<float>::infinity();
-		float Max = std::numeric_limits<float>::infinity();
-	};
+	// TODO:
+	// Make a ShaderLibrary that maintains a reference to all loaded shaders
 
 	class MaterialAssetImporter : public AssetImporter
 	{
 	private:
-		std::filesystem::path m_ShaderFilepath;
-
 		ImporterProps m_ImporterProps;
 
-		UnorderedMap<std::string, MaterialProperty> m_MaterialProperties;
+		Asset<Material> m_Material;
+
+		std::filesystem::path m_ShaderFilepath;
+
+		UnorderedMap<std::string, ShaderProperty> m_MaterialProperties;
 		
 		UnorderedMap<std::string, Asset<Texture>> m_DefaultTextures;
 		
@@ -61,6 +46,8 @@ namespace Mahakam
 		virtual Asset<void> Deserialize(YAML::Node& node) override;
 
 	private:
-		void SetupMaterialProperties(const std::unordered_map<std::string, ShaderElement>& shaderProperties, const std::filesystem::path& filepath);
+		Asset<Texture> GetDefaultTexture(const ShaderProperty& property);
+
+		void SetupMaterialProperties(const std::unordered_map<std::string, ShaderProperty>& shaderProperties, const std::filesystem::path& filepath);
 	};
 }

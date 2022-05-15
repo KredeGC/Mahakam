@@ -5,6 +5,7 @@ namespace Mahakam::Editor
 {
 	bool ImportWizardPanel::m_Open;
 
+	std::string ImportWizardPanel::m_Extension;
 	std::filesystem::path ImportWizardPanel::m_FilePath;
 	std::filesystem::path ImportWizardPanel::m_ImportPath;
 
@@ -23,11 +24,7 @@ namespace Mahakam::Editor
 
 			if (!importer->GetImporterProps().NoFilepath)
 			{
-				std::string filepathString = m_FilePath.string();
-				char filepathBuffer[256]{ 0 };
-				strncpy(filepathBuffer, filepathString.c_str(), filepathString.size());
-				if (ImGui::InputText("File path", filepathBuffer, 256))
-					m_FilePath = std::string(filepathBuffer);
+				GUI::DrawDragDropTarget("File path", m_Extension, m_FilePath);
 
 				std::string importString = m_ImportPath.string();
 				char importBuffer[256]{ 0 };
@@ -55,6 +52,7 @@ namespace Mahakam::Editor
 	{
 		m_Open = true;
 
+		m_Extension = extension;
 		m_FilePath = filepath;
 		m_ImportPath = importPath;
 

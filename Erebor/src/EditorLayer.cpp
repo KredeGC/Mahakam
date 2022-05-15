@@ -352,12 +352,12 @@ namespace Mahakam::Editor
 		// Material
 		Ref<MaterialAssetImporter> materialAssetImporter = CreateRef<MaterialAssetImporter>();
 
-		AssetDatabase::RegisterAssetImporter(".material", materialAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".shader", materialAssetImporter);
 
 		// Shader
-		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
+		/*Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
 
-		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);*/
 
 		// Sound
 		Ref<SoundAssetImporter> soundAssetImporter = CreateRef<SoundAssetImporter>();
@@ -440,10 +440,10 @@ namespace Mahakam::Editor
 
 #pragma region Assets
 		// Material
-		AssetDatabase::DeregisterAssetImporter(".material");
+		AssetDatabase::DeregisterAssetImporter(".shader");
 
 		// Shader
-		AssetDatabase::DeregisterAssetImporter(".shader");
+		//AssetDatabase::DeregisterAssetImporter(".shader");
 
 		// Sound
 		AssetDatabase::DeregisterAssetImporter(".wav");

@@ -14,6 +14,8 @@ namespace Mahakam
 		SoundProps m_Props;
 
 	public:
+		SoundAssetImporter();
+
 		virtual const ImporterProps& GetImporterProps() const override { return m_ImporterProps; }
 
 		virtual void OnWizardOpen(YAML::Node& node) override;

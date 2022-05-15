@@ -80,6 +80,6 @@ namespace Mahakam
 		virtual const robin_hood::unordered_map<std::string, glm::vec4>& GetFloat4s() const { return float4s; }
 
 	private:
-		void ResetShaderProperties(const std::unordered_map<std::string, ShaderElement>& properties);
+		void ResetShaderProperties(const std::unordered_map<std::string, ShaderProperty>& properties);
 	};
 }

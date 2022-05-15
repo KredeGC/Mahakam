@@ -14,7 +14,7 @@ namespace Mahakam
 	{
 	private:
 		uint32_t rendererID;
-		std::string filepath;
+		std::filesystem::path filepath;
 		std::string name;
 
 		robin_hood::unordered_map<std::string, // Render passes
@@ -22,18 +22,18 @@ namespace Mahakam
 			uint32_t>> shaderPasses;
 
 		robin_hood::unordered_map<std::string, int> uniformIDCache;
-		std::unordered_map<std::string, ShaderElement> properties;
+		std::unordered_map<std::string, ShaderProperty> properties;
 
 	public:
-		OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& defines = {});
+		OpenGLShader(const std::filesystem::path& filepath, const std::initializer_list<std::string>& defines = {});
 		virtual ~OpenGLShader();
 
 		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") override;
 
-		virtual const std::string& GetFilepath() const override { return filepath; }
+		virtual const std::filesystem::path& GetFilepath() const override { return filepath; }
 		virtual const std::string& GetName() const override { return name; }
 
-		virtual const std::unordered_map<std::string, ShaderElement>& GetProperties() const override { return properties; }
+		virtual const std::unordered_map<std::string, ShaderProperty>& GetProperties() const override { return properties; }
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const override;
 
@@ -52,7 +52,8 @@ namespace Mahakam
 	private:
 		uint32_t CompileBinary(const std::filesystem::path& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives);
 
-		void ParseYAMLFile(const std::string& filepath, const std::vector<std::string>& keywords);
+		std::string ParseDefaultValue(YAML::Node& node);
+		void ParseYAMLFile(const std::filesystem::path& filepath, const std::vector<std::string>& keywords);
 		robin_hood::unordered_map<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
 		robin_hood::unordered_map<GLenum, std::string> ParseGLSLFile(const std::string& source);
 

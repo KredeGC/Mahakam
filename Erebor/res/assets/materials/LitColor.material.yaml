@@ -1,7 +1,6 @@
-Filepath: assets\materials\LitColor.material
+Filepath: assets\shaders\default\LitColor.shader
 Extension: .material
 ID: 15739498696759362444
-Shader: 10701105304502518583
 Properties:
   u_Metallic: 0
   u_Color: [0.611764729, 1, 0.517647088]

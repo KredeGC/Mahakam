@@ -5,6 +5,11 @@
 
 namespace Mahakam
 {
+	TextureAssetImporter::TextureAssetImporter()
+	{
+		m_ImporterProps.Extension = ".texture";
+	}
+
 	void TextureAssetImporter::OnWizardOpen(YAML::Node& node)
 	{
 		m_Props2D = TextureProps{};

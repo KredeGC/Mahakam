@@ -16,6 +16,8 @@ namespace Mahakam
 		int m_TextureType = 0;
 
 	public:
+		TextureAssetImporter();
+
 		virtual const ImporterProps& GetImporterProps() const override { return m_ImporterProps; }
 
 		virtual void OnWizardOpen(YAML::Node& node) override;

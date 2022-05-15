@@ -17,6 +17,7 @@ namespace Mahakam
 		{
 			bool CreateMenu = false;
 			bool NoFilepath = false;
+			std::string Extension;
 		};
 
 		virtual ~AssetImporter() = default;

@@ -672,7 +672,7 @@ Entities:
       NearZ: 0.00999999978
       FarZ: 100
       Size: 10
-      Ratio: 1.78190625
+      Ratio: 1.63327944
       FixedRatio: false
   - Entity: 1234
     Tag: DLL Light Test

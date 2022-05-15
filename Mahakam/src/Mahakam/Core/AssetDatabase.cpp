@@ -12,15 +12,27 @@ namespace Mahakam
 	static std::uniform_int_distribution<uint64_t> distribution(0, 0xFFFFFFFFFFFFFFFF);
 
 	//void AssetDatabase::RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport)
-	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImport)
+	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImporter)
 	{
-		m_AssetImporters[extension] = assetImport;
+		m_AssetImporters[extension] = assetImporter;
+		m_AssetImporters[assetImporter->GetImporterProps().Extension] = assetImporter;
 	};
 
 	//void AssetDatabase::DeregisterAssetImporter(const std::string& extension)
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterAssetImporter, void, const std::string& extension)
 	{
-		m_AssetImporters.erase(extension);
+		auto iter = m_AssetImporters.find(extension);
+		if (iter != m_AssetImporters.end())
+		{
+			std::string extension = iter->second->GetImporterProps().Extension;
+			long useCount = iter->second.use_count();
+
+			m_AssetImporters.erase(iter);
+
+			// 2 references should exist at this point, the extension itself and this iterator
+			if (useCount <= 2)
+				m_AssetImporters.erase(extension);
+		}
 	};
 
 	//Ref<AssetImporter> AssetDatabase::GetAssetImporter(const std::string& extension)
@@ -166,7 +178,7 @@ namespace Mahakam
 			emitter << YAML::Key << "Filepath";
 			emitter << YAML::Value << filepath.string();
 			emitter << YAML::Key << "Extension";
-			emitter << YAML::Value << extension;
+			emitter << YAML::Value << m_AssetImporters[extension]->GetImporterProps().Extension;
 			emitter << YAML::Key << "ID";
 			emitter << YAML::Value << id;
 

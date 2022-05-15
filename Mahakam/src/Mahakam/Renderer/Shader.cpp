@@ -10,7 +10,7 @@
 namespace Mahakam
 {
 	//Ref<Shader> Shader::Create(const std::string& filepath, const std::initializer_list<std::string>& keywords)
-	MH_DEFINE_FUNC(Shader::CreateFilepath, Asset<Shader>, const std::string& filepath, const std::initializer_list<std::string>& keywords)
+	MH_DEFINE_FUNC(Shader::CreateFilepath, Asset<Shader>, const std::filesystem::path& filepath, const std::initializer_list<std::string>& keywords)
 	{
 		switch (RendererAPI::GetAPI())
 		{

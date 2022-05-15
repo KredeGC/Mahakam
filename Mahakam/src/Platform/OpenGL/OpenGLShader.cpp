@@ -5,6 +5,8 @@
 #include "OpenGLShaderDataTypes.h"
 #include "Mahakam/Core/Utility.h"
 
+#include "Mahakam/Math/Math.h"
+
 #include <filesystem>
 #include <fstream>
 
@@ -42,19 +44,13 @@ namespace Mahakam
 		return "";
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& filepath, const std::initializer_list<std::string>& keywords)
+	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath, const std::initializer_list<std::string>& keywords)
 		: filepath(filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
 		// Naming
-		auto lastSlash = filepath.find_last_of("/\\");
-		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-
-		auto lastDot = filepath.rfind(".");
-		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
-
-		name = filepath.substr(lastSlash, count);
+		name = filepath.stem().string();
 
 		std::vector<std::string> features = keywords;
 		features.emplace_back("");
@@ -319,22 +315,46 @@ namespace Mahakam
 
 			auto iter = properties.find(name);
 			if (iter != properties.end())
-				properties[name] = { OpenGLDataTypeToShaderDataType(values[1]), (uint32_t)values[3] };
+				iter->second.DataType = OpenGLDataTypeToShaderDataType(values[1]);
 		}
 
 		return program;
 	}
 
-	void OpenGLShader::ParseYAMLFile(const std::string& filepath, const std::vector<std::string>& keywords)
+	std::string OpenGLShader::ParseDefaultValue(YAML::Node& node)
+	{
+		if (node)
+		{
+			if (node.IsScalar())
+			{
+				return node.Scalar();
+			}
+			else if (node.IsSequence())
+			{
+				std::stringstream value;
+				for (auto iter = node.begin(); iter != node.end();)
+				{
+					value << ParseDefaultValue(*iter);
+					if (++iter != node.end())
+						value << ",";
+				}
+				return "[" + value.str() + "]";
+			}
+		}
+
+		return "";
+	}
+
+	void OpenGLShader::ParseYAMLFile(const std::filesystem::path& filepath, const std::vector<std::string>& keywords)
 	{
 		YAML::Node rootNode;
 		try
 		{
-			rootNode = YAML::LoadFile(filepath);
+			rootNode = YAML::LoadFile(filepath.string());
 		}
 		catch (YAML::Exception e)
 		{
-			MH_CORE_BREAK(e.what());
+			MH_CORE_WARN("OpenGLShader encountered exception trying to parse YAML file {0}: {1}", filepath, e.msg);
 		}
 
 		MH_CORE_ASSERT(rootNode && rootNode.size() > 0, "Loaded empty shader file! Path may be wrong!");
@@ -349,9 +369,38 @@ namespace Mahakam
 		{
 			std::string propertyName = propertyNode.first.as<std::string>();
 
-			properties[propertyName] = { ShaderDataType::None, 0 };
+			YAML::Node typeNode = propertyNode.second["Type"];
+			YAML::Node minNode = propertyNode.second["Min"];
+			YAML::Node maxNode = propertyNode.second["Max"];
+			YAML::Node defaultNode = propertyNode.second["Default"];
 
-			MH_CORE_INFO("  {0}: {1}", propertyNode.first, propertyNode.second);
+			ShaderPropertyType propertyType = ShaderPropertyType::Default;
+			if (typeNode)
+			{
+				std::string typeString = typeNode.as<std::string>();
+				if (typeString == "Color")			propertyType = ShaderPropertyType::Color;
+				else if (typeString == "HDR")		propertyType = ShaderPropertyType::HDR;
+				else if (typeString == "Vector")	propertyType = ShaderPropertyType::Vector;
+				else if (typeString == "Range")		propertyType = ShaderPropertyType::Range;
+				else if (typeString == "Drag")		propertyType = ShaderPropertyType::Drag;
+				else if (typeString == "Texture")	propertyType = ShaderPropertyType::Texture;
+				else if (typeString == "Normal")	propertyType = ShaderPropertyType::Normal;
+				else if (typeString == "Default")	propertyType = ShaderPropertyType::Default;
+			}
+
+			float min = -std::numeric_limits<float>::infinity();
+			if (minNode)
+				min = minNode.as<float>();
+
+			float max = std::numeric_limits<float>::infinity();
+			if (maxNode)
+				max = maxNode.as<float>();
+
+			std::string defaultValue = ParseDefaultValue(defaultNode);
+
+			properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue };
+
+			MH_CORE_INFO("  {0}: {1}", propertyName, defaultValue);
 		}
 
 		// Read shader passes
@@ -370,7 +419,7 @@ namespace Mahakam
 					shaderPassDefines << "#define " + define.as<std::string>() + "\n";
 			}
 
-			const std::string partialPath = filepath + "_" + shaderPassName;
+			const std::string partialPath = filepath.string() + "_" + shaderPassName;
 
 			// Read and compile include files
 			auto includesNode = shaderPassNode.second["Includes"];

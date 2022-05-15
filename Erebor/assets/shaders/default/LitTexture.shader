@@ -1,9 +1,19 @@
 Properties:
-  u_Albedo: (1, 1, 1)
-  u_Bump: 0
-  u_Metallic: 0.5
-  u_Roughness: 0
-  u_Occlussion: 1
+  u_Albedo:
+    Type: Texture
+    Default: White
+  u_Bump:
+    Type: Normal
+    Default: Bump
+  u_Metallic:
+    Type: Texture
+    Default: Black
+  u_Roughness:
+    Type: Texture
+    Default: White
+  u_Occlussion:
+    Type: Texture
+    Default: White
 Passes:
   GEOMETRY:
     Defines:

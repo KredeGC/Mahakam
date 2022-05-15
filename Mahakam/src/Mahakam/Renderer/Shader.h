@@ -9,19 +9,25 @@
 
 namespace Mahakam
 {
-	struct ShaderElement
+	enum class ShaderPropertyType
 	{
-		ShaderDataType dataType;
-		uint32_t location;
+		Color,
+		HDR,
+		Vector,
+		Range,
+		Drag,
+		Texture,
+		Normal,
+		Default
+	};
 
-		ShaderElement()
-			: dataType(ShaderDataType::None), location(0) {}
-
-		ShaderElement(ShaderDataType dataType, uint32_t location)
-			: dataType(dataType), location(location) {}
-
-		ShaderElement(ShaderDataType dataType)
-			: dataType(dataType), location(0) {}
+	struct ShaderProperty
+	{
+		ShaderPropertyType PropertyType;
+		ShaderDataType DataType;
+		float Min = -std::numeric_limits<float>::infinity();
+		float Max = std::numeric_limits<float>::infinity();
+		std::string DefaultString;
 	};
 
 	class Shader
@@ -31,10 +37,10 @@ namespace Mahakam
 
 		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") = 0;
 
-		virtual const std::string& GetFilepath() const = 0;
+		virtual const std::filesystem::path& GetFilepath() const = 0;
 		virtual const std::string& GetName() const = 0;
 
-		virtual const std::unordered_map<std::string, ShaderElement>& GetProperties() const = 0;
+		virtual const std::unordered_map<std::string, ShaderProperty>& GetProperties() const = 0;
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const = 0;
 
@@ -50,9 +56,9 @@ namespace Mahakam
 		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) = 0;
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
 
-		inline static Asset<Shader> Create(const std::string& filepath, const std::initializer_list<std::string>& keywords = {}) { return CreateFilepath(filepath, keywords); }
+		inline static Asset<Shader> Create(const std::filesystem::path& filepath, const std::initializer_list<std::string>& keywords = {}) { return CreateFilepath(filepath, keywords); }
 
 	private:
-		MH_DECLARE_FUNC(CreateFilepath, Asset<Shader>, const std::string& filepath, const std::initializer_list<std::string>& keywords);
+		MH_DECLARE_FUNC(CreateFilepath, Asset<Shader>, const std::filesystem::path& filepath, const std::initializer_list<std::string>& keywords);
 	};
 }

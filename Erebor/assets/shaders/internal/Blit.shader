@@ -1,5 +1,3 @@
-Properties:
-  u_Albedo: Texture2D::black
 Passes:
   POSTPROCESSING:
     Includes:

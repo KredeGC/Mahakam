@@ -162,7 +162,7 @@ namespace Mahakam::Editor
 							{
 								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
 
-								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
+								ImportWizardPanel::ImportAsset(info.Filepath, info.Filepath.extension().string(), importPath);
 							}
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 							ImGui::TextWrapped(pathName.c_str());
@@ -191,6 +191,17 @@ namespace Mahakam::Editor
 						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 						ImGui::PushID(file.path().string().c_str());
 						ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, { 0.48f, 0.5f, 0.53f, 1 });
+						
+						if (ImGui::BeginDragDropSource())
+						{
+							std::string extension = file.path().extension().string();
+							std::string importString = file.path().string();
+							const char* importBuffer = importString.c_str();
+
+							ImGui::SetDragDropPayload(extension.c_str(), importBuffer, strlen(importBuffer) + 1);
+							ImGui::EndDragDropSource();
+						}
+						
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 						{
 							std::filesystem::path importPath = FileUtility::GetImportPath(file.path());

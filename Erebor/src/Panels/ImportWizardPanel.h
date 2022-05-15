@@ -9,6 +9,7 @@ namespace Mahakam::Editor
 	private:
 		static bool m_Open;
 
+		static std::string m_Extension;
 		static std::filesystem::path m_FilePath;
 		static std::filesystem::path m_ImportPath;
 

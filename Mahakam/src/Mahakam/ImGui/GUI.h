@@ -14,6 +14,4 @@ namespace Mahakam::GUI
 	bool DrawColor3Edit(const char* label, glm::vec3& value, ImGuiColorEditFlags flags = 0);
 
 	bool DrawDragDropTarget(const std::string& label, const std::string& extension, std::filesystem::path& importPath);
-
-	bool DrawTextureDragDropTarget(const std::string& label, std::filesystem::path& importPath);
 }
