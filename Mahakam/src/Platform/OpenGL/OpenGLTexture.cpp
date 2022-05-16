@@ -78,7 +78,7 @@ namespace Mahakam
 		}
 
 		// Magnification
-		if (filterMode == TextureFilter::Bilinear)
+		if (filterMode == TextureFilter::Bilinear || filterMode == TextureFilter::Trilinear)
 			MH_GL_CALL(glTexParameteri(targetID, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
 		else
 			MH_GL_CALL(glTexParameteri(targetID, GL_TEXTURE_MAG_FILTER, GL_NEAREST))

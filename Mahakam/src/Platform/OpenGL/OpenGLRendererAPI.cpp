@@ -33,10 +33,12 @@ namespace Mahakam
 		return 0;
 	}
 
-#if defined(MH_ENABLE_GL_ERRORS)
+#ifdef MH_ENABLE_GL_ERRORS
 	static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
-		if (type != GL_DEBUG_TYPE_OTHER)
+		if (type == GL_DEBUG_TYPE_PERFORMANCE)
+			MH_CORE_WARN("[OpenGL Performance] {0}", message);
+		else if (type != GL_DEBUG_TYPE_OTHER)
 			MH_CORE_ERROR("[OpenGL Error] {0}", message);
 	}
 #endif
@@ -53,7 +55,7 @@ namespace Mahakam
 		glCullFace(GL_BACK);
 		glFrontFace(GL_CCW);
 
-#if defined(MH_ENABLE_GL_ERRORS)
+#ifdef MH_ENABLE_GL_ERRORS
 		glEnable(GL_DEBUG_OUTPUT);
 		glDebugMessageCallback(MessageCallback, 0);
 #endif
