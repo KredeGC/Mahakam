@@ -29,6 +29,7 @@ typedef struct
     IPLBinauralEffect iplBinauralEffect;
     IPLDirectEffect iplDirectEffect;
     IPLVector3 direction;
+    bool interpolate;
     float spatialBlend;
     float distance;
     IPLfloat32 airAbsorption[3];

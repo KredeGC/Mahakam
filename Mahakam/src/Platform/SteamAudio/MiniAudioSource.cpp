@@ -25,6 +25,7 @@ namespace Mahakam
 
 		/* Set the spatial blend to full spatialization. */
 		m_Node.spatialBlend = 1.0f;
+		m_Node.interpolate = false;
 
 		/* Connect the output of the delay node to the input of the endpoint. */
 		ma_node_attach_output_bus(&m_Node, 0, ma_engine_get_endpoint(&m_Context->GetEngine()), 0);
@@ -64,6 +65,11 @@ namespace Mahakam
 		m_SoundSwitch = m_Sound.Get();
 
 		InitSound();
+	}
+
+	void MiniAudioSource::SetInterpolation(bool interpolate)
+	{
+		m_Node.interpolate = interpolate;
 	}
 
 	void MiniAudioSource::SetSpatialBlend(float blend)

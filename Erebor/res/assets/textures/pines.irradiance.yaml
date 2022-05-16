@@ -1,9 +1,9 @@
 Filepath: assets\textures\pines.hdr
 Extension: .texture
-ID: 15966881194349846934
+ID: 5839156319952352249
 Type: 1
 Format: 12
 Filter: 2
-Resolution: 4096
-Prefilter: 0
-Mipmaps: true
+Resolution: 64
+Prefilter: 1
+Mipmaps: false

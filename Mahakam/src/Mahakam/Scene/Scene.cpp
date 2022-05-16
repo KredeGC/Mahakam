@@ -26,42 +26,42 @@
 
 namespace Mahakam
 {
-	static Asset<TextureCube> LoadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, TextureCubePrefilter prefilter, const CubeTextureProps& props)
-	{
-		if (!FileUtility::Exists(cachePath))
-		{
-			Asset<TextureCube> texture = TextureCube::Create(src, prefilter, props);
+	//static Asset<TextureCube> LoadOrCreate(const std::string& cachePath, Ref<TextureCube> src, bool saveMips, TextureCubePrefilter prefilter, const CubeTextureProps& props)
+	//{
+	//	if (!FileUtility::Exists(cachePath))
+	//	{
+	//		Asset<TextureCube> texture = TextureCube::Create(src, prefilter, props);
 
-			uint32_t size = texture->GetSize();
-			uint32_t totalSize = texture->GetTotalSize();
+	//		uint32_t size = texture->GetSize();
+	//		uint32_t totalSize = texture->GetTotalSize();
 
-			// Save to cache
-			char* pixels = new char[totalSize];
-			texture->ReadPixels(pixels, saveMips);
-			std::ofstream stream(cachePath, std::ios::binary);
-			stream.write((char*)&size, sizeof(uint32_t));
-			stream.write(pixels, totalSize);
+	//		// Save to cache
+	//		char* pixels = new char[totalSize];
+	//		texture->ReadPixels(pixels, saveMips);
+	//		std::ofstream stream(cachePath, std::ios::binary);
+	//		stream.write((char*)&size, sizeof(uint32_t));
+	//		stream.write(pixels, totalSize);
 
-			delete[] pixels;
+	//		delete[] pixels;
 
-			return texture;
-		}
-		else
-		{
-			// Load from cache
-			std::ifstream stream(cachePath, std::ios::binary);
-			std::stringstream ss;
-			uint32_t size = 0;
-			stream.read((char*)&size, sizeof(uint32_t));
-			ss << stream.rdbuf();
-			Asset<TextureCube> texture = TextureCube::Create(props);
-			texture->SetData((void*)ss.str().c_str(), size, saveMips);
+	//		return texture;
+	//	}
+	//	else
+	//	{
+	//		// Load from cache
+	//		std::ifstream stream(cachePath, std::ios::binary);
+	//		std::stringstream ss;
+	//		uint32_t size = 0;
+	//		stream.read((char*)&size, sizeof(uint32_t));
+	//		ss << stream.rdbuf();
+	//		Asset<TextureCube> texture = TextureCube::Create(props);
+	//		texture->SetData((void*)ss.str().c_str(), size, saveMips);
 
-			stream.close();
+	//		stream.close();
 
-			return texture;
-		}
-	}
+	//		return texture;
+	//	}
+	//}
 
 
 
@@ -81,8 +81,8 @@ namespace Mahakam
 
 		// Idea:: Use RG11B10f instead, should halve memory usage
 		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F });
-		skyboxIrradiance = TextureCube::Create(skyboxTexture, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
-		skyboxSpecular = TextureCube::Create(skyboxTexture, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
+		skyboxIrradiance = TextureCube::Create(filepath, { 64, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false });
+		skyboxSpecular = TextureCube::Create(filepath, { 512, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true });
 
 		//skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
 		//skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });

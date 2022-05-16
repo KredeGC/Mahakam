@@ -27,10 +27,13 @@ namespace Mahakam
 		void Stop() { m_Source->Stop(); }
 
 		void SetSound(Asset<Sound> sound) { m_Source->SetSound(sound); }
-		Asset<Sound> GetSound() { return m_Source->GetSound(); }
+		Asset<Sound> GetSound() const { return m_Source->GetSound(); }
+
+		void SetInterpolation(bool interpolate) { m_Source->SetInterpolation(interpolate); }
+		bool GetInterpolation() const { return m_Source->GetInterpolation(); }
 
 		void SetSpatialBlend(float blend) { m_Source->SetSpatialBlend(blend); }
-		float GetSpatialBlend() { return m_Source->GetSpatialBlend(); }
+		float GetSpatialBlend() const { return m_Source->GetSpatialBlend(); }
 
 		Ref<AudioSource> GetAudioSource() { return m_Source; }
 	};

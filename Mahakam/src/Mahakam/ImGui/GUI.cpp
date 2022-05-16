@@ -176,4 +176,9 @@ namespace Mahakam::GUI
 	{
 		return ImGui::DragFloat4(label.c_str(), glm::value_ptr(value), speed, min, max);
 	}
+
+	bool DrawIntDrag(const std::string& label, int32_t& value, float speed, int32_t min, int32_t max)
+	{
+		return ImGui::DragInt(label.c_str(), &value, speed, min, max);
+	}
 }

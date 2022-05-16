@@ -1,0 +1,689 @@
+Scene: Name
+Skybox:
+  Material: 1413214623375882268
+  Irradiance: 5839156319952352249
+  Specular: 14413137597893043784
+Entities:
+  - Entity: 1234
+    Tag: Sphere 9,9
+    Transform:
+      Translation: [9, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,9
+    Transform:
+      Translation: [8, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,9
+    Transform:
+      Translation: [7, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,9
+    Transform:
+      Translation: [6, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,9
+    Transform:
+      Translation: [5, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,9
+    Transform:
+      Translation: [4, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,9
+    Transform:
+      Translation: [3, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,9
+    Transform:
+      Translation: [2, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,9
+    Transform:
+      Translation: [1, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,9
+    Transform:
+      Translation: [0, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 9,8
+    Transform:
+      Translation: [9, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,8
+    Transform:
+      Translation: [8, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,8
+    Transform:
+      Translation: [7, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,8
+    Transform:
+      Translation: [6, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,8
+    Transform:
+      Translation: [5, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,8
+    Transform:
+      Translation: [4, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,8
+    Transform:
+      Translation: [3, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,8
+    Transform:
+      Translation: [2, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,8
+    Transform:
+      Translation: [1, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,8
+    Transform:
+      Translation: [0, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 9,7
+    Transform:
+      Translation: [9, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,7
+    Transform:
+      Translation: [8, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,7
+    Transform:
+      Translation: [7, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,7
+    Transform:
+      Translation: [6, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,7
+    Transform:
+      Translation: [5, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,7
+    Transform:
+      Translation: [4, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,7
+    Transform:
+      Translation: [3, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,7
+    Transform:
+      Translation: [2, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,7
+    Transform:
+      Translation: [1, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,7
+    Transform:
+      Translation: [0, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 9,6
+    Transform:
+      Translation: [9, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,6
+    Transform:
+      Translation: [8, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,6
+    Transform:
+      Translation: [7, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,6
+    Transform:
+      Translation: [6, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,6
+    Transform:
+      Translation: [5, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,6
+    Transform:
+      Translation: [4, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,6
+    Transform:
+      Translation: [3, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,6
+    Transform:
+      Translation: [2, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,6
+    Transform:
+      Translation: [1, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,6
+    Transform:
+      Translation: [0, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 9,5
+    Transform:
+      Translation: [9, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,5
+    Transform:
+      Translation: [8, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,5
+    Transform:
+      Translation: [7, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,5
+    Transform:
+      Translation: [6, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,5
+    Transform:
+      Translation: [5, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,5
+    Transform:
+      Translation: [4, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,5
+    Transform:
+      Translation: [3, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,5
+    Transform:
+      Translation: [2, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,5
+    Transform:
+      Translation: [1, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,5
+    Transform:
+      Translation: [0, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 9,4
+    Transform:
+      Translation: [9, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,4
+    Transform:
+      Translation: [8, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,4
+    Transform:
+      Translation: [7, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,4
+    Transform:
+      Translation: [6, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,4
+    Transform:
+      Translation: [5, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,4
+    Transform:
+      Translation: [4, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,4
+    Transform:
+      Translation: [3, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,4
+    Transform:
+      Translation: [2, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,4
+    Transform:
+      Translation: [1, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,4
+    Transform:
+      Translation: [0, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 9,3
+    Transform:
+      Translation: [9, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,3
+    Transform:
+      Translation: [8, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,3
+    Transform:
+      Translation: [7, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,3
+    Transform:
+      Translation: [6, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,3
+    Transform:
+      Translation: [5, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,3
+    Transform:
+      Translation: [4, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,3
+    Transform:
+      Translation: [3, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,3
+    Transform:
+      Translation: [2, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,3
+    Transform:
+      Translation: [1, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,3
+    Transform:
+      Translation: [0, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 9,2
+    Transform:
+      Translation: [9, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,2
+    Transform:
+      Translation: [8, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,2
+    Transform:
+      Translation: [7, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,2
+    Transform:
+      Translation: [6, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,2
+    Transform:
+      Translation: [5, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,2
+    Transform:
+      Translation: [4, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,2
+    Transform:
+      Translation: [3, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,2
+    Transform:
+      Translation: [2, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,2
+    Transform:
+      Translation: [1, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,2
+    Transform:
+      Translation: [0, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 9,1
+    Transform:
+      Translation: [9, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,1
+    Transform:
+      Translation: [8, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,1
+    Transform:
+      Translation: [7, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,1
+    Transform:
+      Translation: [6, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,1
+    Transform:
+      Translation: [5, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,1
+    Transform:
+      Translation: [4, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,1
+    Transform:
+      Translation: [3, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,1
+    Transform:
+      Translation: [2, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,1
+    Transform:
+      Translation: [1, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,1
+    Transform:
+      Translation: [0, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 9,0
+    Transform:
+      Translation: [9, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 8,0
+    Transform:
+      Translation: [8, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 7,0
+    Transform:
+      Translation: [7, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 6,0
+    Transform:
+      Translation: [6, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 5,0
+    Transform:
+      Translation: [5, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 4,0
+    Transform:
+      Translation: [4, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 3,0
+    Transform:
+      Translation: [3, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 2,0
+    Transform:
+      Translation: [2, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 1,0
+    Transform:
+      Translation: [1, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Sphere 0,0
+    Transform:
+      Translation: [0, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Fern
+    Transform:
+      Translation: [0, 1, 2]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    Audio Source:
+      Sound: 4427875287976122912
+      SpatialBlend: 1
+  - Entity: 1234
+    Tag: Memory Zone
+    Transform:
+      Translation: [2.5, 4, 7.5]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    Audio Source:
+      Sound: 12306613305876806607
+      SpatialBlend: 1
+  - Entity: 1234
+    Tag: Particle System
+    Transform:
+      Translation: [0, 0, 1]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 1234
+    Tag: Plane
+    Transform:
+      Translation: [0, -1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [30, 30, 30]
+  - Entity: 1234
+    Tag: Spot Light
+    Transform:
+      Translation: [1, 2.5, 4]
+      Rotation: [-1.13133414e-08, 4.22219593e-08, 0.258819073, 0.965925813]
+      Scale: [1, 1, 1]
+    Light:
+      LightType: 2
+      Range: 10
+      FOV: 0.785398185
+      Color: [1, 1, 1]
+      ShadowCasting: true
+      ShadowBias: 0
+  - Entity: 1234
+    Tag: Main Light
+    Transform:
+      Translation: [0, 0, 0]
+      Rotation: [0.0664485916, -0.0242556296, -0.937019587, -0.34203884]
+      Scale: [1, 1, 1]
+    Light:
+      LightType: 0
+      Range: 20
+      FOV: 1.04719758
+      Color: [1, 1, 1]
+      ShadowCasting: true
+      ShadowBias: 0.00100000005
+  - Entity: 1234
+    Tag: Main Camera
+    Transform:
+      Translation: [7.81920338, 5.49849892, 9.87421799]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    Camera:
+      Projection: 0
+      FOV: 0.785398185
+      NearZ: 0.00999999978
+      FarZ: 100
+      Size: 10
+      Ratio: 1.63327944
+      FixedRatio: false
+  - Entity: 1234
+    Tag: DLL Light Test
+    Transform:
+      Translation: [0, 0, 1]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    Light:
+      LightType: 2
+      Range: 10
+      FOV: 0.785398185
+      Color: [1, 1, 1]
+      ShadowCasting: true
+      ShadowBias: 0

@@ -35,10 +35,13 @@ namespace Mahakam
 		virtual void Stop() override;
 
 		virtual void SetSound(Asset<Sound> sound) override;
-		virtual Asset<Sound> GetSound() override { return m_Sound; }
+		virtual Asset<Sound> GetSound() const override { return m_Sound; }
+
+		virtual void SetInterpolation(bool interpolate) override;
+		virtual bool GetInterpolation() const override { return m_Node.interpolate; }
 
 		virtual void SetSpatialBlend(float blend) override;
-		virtual float GetSpatialBlend() override { return m_Node.spatialBlend; }
+		virtual float GetSpatialBlend() const override { return m_Node.spatialBlend; }
 
 		virtual void SetPosition(const glm::vec3& source) override;
 

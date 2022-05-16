@@ -57,6 +57,7 @@ namespace Mahakam
 
 	MH_BEGIN_ENUM(TextureCubePrefilter)
 	{
+		MH_DECL_ENUM_ELEMENT(None),
 		MH_DECL_ENUM_ELEMENT(Convolute),
 		MH_DECL_ENUM_ELEMENT(Prefilter),
 		MH_DECL_ENUM_ELEMENT(Count)

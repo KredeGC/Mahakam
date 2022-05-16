@@ -53,34 +53,34 @@ namespace Mahakam {
 	class OpenGLTextureCube : public TextureCube
 	{
 	private:
-		uint32_t rendererID;
-		std::filesystem::path filepath;
-		uint32_t internalFormat;
-		uint32_t dataFormat;
-		uint32_t formatType;
+		uint32_t m_RendererID;
+		std::filesystem::path m_Filepath;
+		uint32_t m_InternalFormat;
+		uint32_t m_DataFormat;
+		uint32_t m_FormatType;
 
-		bool compressed;
-		uint32_t size;
-		uint32_t totalSize;
+		bool m_Compressed;
+		uint32_t m_Size;
+		uint32_t m_TotalSize;
 
-		CubeTextureProps props;
+		CubeTextureProps m_Props;
 
 	public:
 		OpenGLTextureCube(const CubeTextureProps& props);
 		OpenGLTextureCube(const std::filesystem::path& filepath, const CubeTextureProps& props);
-		OpenGLTextureCube(Asset<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props);
+		//OpenGLTextureCube(Asset<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props);
 		virtual ~OpenGLTextureCube();
 
-		virtual const std::filesystem::path& GetFilepath() const override { return filepath; }
+		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
 
-		virtual const CubeTextureProps& GetProps() const override { return props; };
+		virtual const CubeTextureProps& GetProps() const override { return m_Props; };
 
-		virtual uint32_t GetWidth() const override { return props.resolution; }
-		virtual uint32_t GetHeight() const override { return props.resolution; }
-		virtual uint32_t GetRendererID() const override { return rendererID; }
+		virtual uint32_t GetWidth() const override { return m_Props.resolution; }
+		virtual uint32_t GetHeight() const override { return m_Props.resolution; }
+		virtual uint32_t GetRendererID() const override { return m_RendererID; }
 
-		virtual uint32_t GetSize() const override { return size; }
-		virtual uint32_t GetTotalSize() const override { return totalSize; }
+		virtual uint32_t GetSize() const override { return m_Size; }
+		virtual uint32_t GetTotalSize() const override { return m_TotalSize; }
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
 
@@ -91,5 +91,9 @@ namespace Mahakam {
 		virtual void BindImage(uint32_t slot = 0, bool read = true, bool write = true) const override;
 
 		virtual void ReadPixels(void* pixels, bool mipmaps) override;
+
+	private:
+		void CreateCubemap();
+		void CreatePrefilter(uint32_t cubemapID);
 	};
 }

@@ -67,7 +67,7 @@ namespace Mahakam
 		texture2DBump = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
 		texture2DBump->SetData(&bumpData, 3);
 
-		textureCubeWhite = TextureCube::Create({ 1, TextureFormat::RGB8, TextureFilter::Point, false });
+		textureCubeWhite = TextureCube::Create({ 1, TextureFormat::RGB8, TextureFilter::Point, TextureCubePrefilter::None, false });
 		textureCubeWhite->SetData(whiteData, 0);
 	}
 

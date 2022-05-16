@@ -45,7 +45,7 @@ static void ma_steamaudio_binaural_node_process_pcm_frames(ma_node* pNode, const
 	binauralParams.direction.x = pBinauralNode->direction.x;
 	binauralParams.direction.y = pBinauralNode->direction.y;
 	binauralParams.direction.z = pBinauralNode->direction.z;
-	binauralParams.interpolation = IPL_HRTFINTERPOLATION_NEAREST;
+	binauralParams.interpolation = pBinauralNode->interpolate ? IPL_HRTFINTERPOLATION_BILINEAR : IPL_HRTFINTERPOLATION_NEAREST;
 	binauralParams.spatialBlend = pBinauralNode->spatialBlend;
 	binauralParams.hrtf = pBinauralNode->iplHRTF;
 

@@ -19,10 +19,13 @@ namespace Mahakam
 		virtual void Stop() = 0;
 		
 		virtual void SetSound(Asset<Sound> sound) = 0;
-		virtual Asset<Sound> GetSound() = 0;
+		virtual Asset<Sound> GetSound() const = 0;
+
+		virtual void SetInterpolation(bool interpolate) = 0;
+		virtual bool GetInterpolation() const = 0;
 		
 		virtual void SetSpatialBlend(float blend) = 0;
-		virtual float GetSpatialBlend() = 0;
+		virtual float GetSpatialBlend() const = 0;
 
 		virtual void SetPosition(const glm::vec3& source) = 0;
 

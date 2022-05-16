@@ -34,13 +34,14 @@ namespace Mahakam
 		uint32_t resolution;
 		TextureFormat format;
 		TextureFilter filterMode;
+		TextureCubePrefilter prefilter;
 		bool mipmaps;
 
-		CubeTextureProps(uint32_t resolution = 1024, TextureFormat format = TextureFormat::RGB8, TextureFilter filterMode = TextureFilter::Trilinear, bool mipmaps = true)
-			: resolution(resolution), format(format), filterMode(filterMode), mipmaps(mipmaps) {}
+		CubeTextureProps(uint32_t resolution = 1024, TextureFormat format = TextureFormat::RGB8, TextureFilter filterMode = TextureFilter::Trilinear, TextureCubePrefilter prefilter = TextureCubePrefilter::None, bool mipmaps = true)
+			: resolution(resolution), format(format), filterMode(filterMode), prefilter(prefilter), mipmaps(mipmaps) {}
 
-		CubeTextureProps(uint32_t resolution, TextureFormat format, bool mipmaps)
-			: resolution(resolution), format(format), filterMode(TextureFilter::Trilinear), mipmaps(mipmaps) {}
+		CubeTextureProps(uint32_t resolution, TextureFormat format, TextureCubePrefilter prefilter, bool mipmaps)
+			: resolution(resolution), format(format), filterMode(TextureFilter::Trilinear), prefilter(prefilter), mipmaps(mipmaps) {}
 	};
 
 
@@ -108,11 +109,9 @@ namespace Mahakam
 
 		inline static Asset<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps()) { return CreateProps(props); }
 		inline static Asset<TextureCube> Create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps()) { return CreateFilepath(filepath, props); }
-		inline static Asset<TextureCube> Create(Asset<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props = CubeTextureProps()) { return CreatePrefilter(cubemap, prefilter, props); }
-
+		
 	private:
 		MH_DECLARE_FUNC(CreateProps, Asset<TextureCube>, const CubeTextureProps& props);
 		MH_DECLARE_FUNC(CreateFilepath, Asset<TextureCube>, const std::string& filepath, const CubeTextureProps& props);
-		MH_DECLARE_FUNC(CreatePrefilter, Asset<TextureCube>, Asset<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps&);
 	};
 }

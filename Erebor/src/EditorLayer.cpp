@@ -11,7 +11,6 @@
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/SceneViewPanel.h"
 #include "Panels/StatsPanel.h"
-#include "EditorCamera.h"
 #endif
 
 #include "Mahakam/Asset/SoundAssetImporter.h"
@@ -27,29 +26,6 @@ namespace Mahakam::Editor
 
 	void EditorLayer::OnAttach()
 	{
-		blitShader = Shader::Create("assets/shaders/internal/Blit.shader");
-
-		// Setup render passes for the default renderer
-		Renderer::SetRenderPasses({
-			CreateRef<GeometryRenderPass>(),
-			CreateRef<LightingRenderPass>(),
-			CreateRef<ParticleRenderPass>(),
-			CreateRef<TonemappingRenderPass>() });
-
-		// Create a new active scene
-		s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
-
-		// Use this once scenes are setup correctly
-		/*Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
-		Asset<Material> skyboxMaterial = Material::Create(skyboxShader);
-
-		Asset<TextureCube> skyboxTexture = Asset<TextureCube>("res/assets/textures/pines.hdr.yaml");
-		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
-
-		s_ActiveScene = Scene::Create();
-		s_ActiveScene->SetSkyboxMaterial(skyboxMaterial);*/
-
-
 #pragma region Components
 		// Animator
 		ComponentRegistry::ComponentInterface animatorInterface;
@@ -113,18 +89,20 @@ namespace Mahakam::Editor
 			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
 			Asset<Sound> sound = source.GetSound();
 
-			char buffer[256];
-			memset(buffer, 0, sizeof(buffer));
-			if (sound)
-				std::strncpy(buffer, source.GetSound()->GetFilepath().c_str(), sizeof(buffer));
-			if (ImGui::InputText("##Filepath", buffer, sizeof(buffer)))
+			std::filesystem::path importPath = sound.GetImportPath();
+			if (GUI::DrawDragDropTarget("Sound", ".sound", importPath))
 			{
-
+				source.SetSound(Asset<Sound>(importPath));
+				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
 			}
 
 			float spatialBlend = source.GetSpatialBlend();
 			if (ImGui::DragFloat("Spatial blend", &spatialBlend, 0.01f, 0.0f, 1.0f))
 				source.SetSpatialBlend(spatialBlend);
+
+			bool interpolate = source.GetInterpolation();
+			if (ImGui::Checkbox("Interpolate", &interpolate))
+				source.SetInterpolation(interpolate);
 		};
 
 		ComponentRegistry::RegisterComponent("Audio Source", audioSourceInterface);
@@ -417,6 +395,38 @@ namespace Mahakam::Editor
 
 
 		AssetDatabase::ReloadAssetImports();
+
+		blitShader = Shader::Create("assets/shaders/internal/Blit.shader");
+
+		// Setup render passes for the default renderer
+		Renderer::SetRenderPasses({
+			CreateRef<GeometryRenderPass>(),
+			CreateRef<LightingRenderPass>(),
+			CreateRef<ParticleRenderPass>(),
+			CreateRef<TonemappingRenderPass>() });
+
+		// Create a new active scene
+		//s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
+
+		// Use this once scenes are setup correctly
+		Asset<Material> skyboxMaterial = Asset<Material>("res/assets/materials/Skybox.material.yaml");
+		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("res/assets/textures/pines.irradiance.yaml");
+		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("res/assets/textures/pines.specular.yaml");
+
+		/*Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
+		Asset<Material> skyboxMaterial = Material::Create(skyboxShader);
+
+		Asset<TextureCube> skyboxTexture = Asset<TextureCube>("res/assets/textures/pines.hdr.yaml");
+		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
+
+		skyboxMaterial.Save("assets/shaders/Skybox.shader", "res/assets/materials/Skybox.material.yaml");
+
+		AssetDatabase::ReloadAsset(skyboxMaterial.GetID());*/
+
+		s_ActiveScene = Scene::Create();
+		s_ActiveScene->SetSkyboxMaterial(skyboxMaterial);
+		s_ActiveScene->SetSkyboxIrradiance(skyboxIrradiance);
+		s_ActiveScene->SetSkyboxSpecular(skyboxSpecular);
 
 
 #if MH_PLATFORM_WINDOWS

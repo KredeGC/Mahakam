@@ -27,4 +27,6 @@ namespace Mahakam::GUI
 	bool DrawFloat2Drag(const std::string& label, glm::vec2& value, float speed, float min, float max);
 	bool DrawFloat3Drag(const std::string& label, glm::vec3& value, float speed, float min, float max);
 	bool DrawFloat4Drag(const std::string& label, glm::vec4& value, float speed, float min, float max);
+
+	bool DrawIntDrag(const std::string& label, int32_t& value, float speed, int32_t min, int32_t max);
 }

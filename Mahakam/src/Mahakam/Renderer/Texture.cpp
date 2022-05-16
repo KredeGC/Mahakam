@@ -73,20 +73,4 @@ namespace Mahakam
 
 		return nullptr;
 	};
-
-	//Ref<TextureCube> TextureCube::Create(Ref<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
-	MH_DEFINE_FUNC(TextureCube::CreatePrefilter, Asset<TextureCube>, Asset<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props)
-	{
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-		case RendererAPI::API::OpenGL:
-			return Asset<OpenGLTextureCube>::Create(cubemap, prefilter, props);
-		}
-
-		MH_CORE_BREAK("Unknown renderer API!");
-
-		return nullptr;
-	};
 }

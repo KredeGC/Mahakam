@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "TextureAssetImporter.h"
 
+#include "Mahakam/ImGui/GUI.h"
+
 #include <imgui.h>
 
 namespace Mahakam
@@ -47,6 +49,16 @@ namespace Mahakam
 			YAML::Node wrapYNode = node["WrapY"];
 			if (wrapYNode)
 				m_Props2D.wrapY = (TextureWrapMode)wrapYNode.as<int>();
+		}
+		else
+		{
+			YAML::Node resolutionNode = node["Resolution"];
+			if (resolutionNode)
+				m_PropsCube.resolution = resolutionNode.as<uint32_t>();
+
+			YAML::Node prefilterNode = node["Prefilter"];
+			if (prefilterNode)
+				m_PropsCube.prefilter = (TextureCubePrefilter)prefilterNode.as<int>();
 		}
 
 		YAML::Node mipmapsNode = node["Mipmaps"];
@@ -177,6 +189,34 @@ namespace Mahakam
 				ImGui::EndCombo();
 			}
 		}
+		else
+		{
+			int32_t resolution = (int32_t)m_PropsCube.resolution;
+			if (GUI::DrawIntDrag("Size", resolution, 32, 32, 8192))
+				m_PropsCube.resolution = (uint32_t)resolution;
+
+			const char* prefilterStrings[(int)TextureCubePrefilter::Count];
+
+			for (int i = 0; i < (int)TextureCubePrefilter::Count; i++)
+				prefilterStrings[i] = GetStringTextureCubePrefilter((TextureCubePrefilter)i);
+
+			const char* currentPrefilter = prefilterStrings[(int)m_PropsCube.prefilter];
+
+			if (ImGui::BeginCombo("Prefilter", currentPrefilter))
+			{
+				for (int i = 0; i < (int)TextureCubePrefilter::Count; i++)
+				{
+					bool selected = currentPrefilter == prefilterStrings[i];
+					if (ImGui::Selectable(prefilterStrings[i], selected))
+						m_PropsCube.prefilter = (TextureCubePrefilter)i;
+
+					if (selected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+		}
 
 		// Mips
 		bool* mipmaps = m_TextureType == 0 ? &m_Props2D.mipmaps : &m_PropsCube.mipmaps;
@@ -240,6 +280,10 @@ namespace Mahakam
 			emitter << YAML::Value << (int)textureCube->GetProps().format;
 			emitter << YAML::Key << "Filter";
 			emitter << YAML::Value << (int)textureCube->GetProps().filterMode;
+			emitter << YAML::Key << "Resolution";
+			emitter << YAML::Value << textureCube->GetProps().resolution;
+			emitter << YAML::Key << "Prefilter";
+			emitter << YAML::Value << (int)textureCube->GetProps().prefilter;
 			emitter << YAML::Key << "Mipmaps";
 			emitter << YAML::Value << textureCube->GetProps().mipmaps;
 		}
@@ -282,11 +326,21 @@ namespace Mahakam
 		{
 			YAML::Node wrapXNode = node["WrapX"];
 			if (wrapXNode)
-					props2D.wrapX = (TextureWrapMode)wrapXNode.as<int>();
+				props2D.wrapX = (TextureWrapMode)wrapXNode.as<int>();
 
 			YAML::Node wrapYNode = node["WrapY"];
 			if (wrapYNode)
 				props2D.wrapY = (TextureWrapMode)wrapYNode.as<int>();
+		}
+		else
+		{
+			YAML::Node resolutionNode = node["Resolution"];
+			if (resolutionNode)
+				propsCube.resolution = resolutionNode.as<uint32_t>();
+
+			YAML::Node prefilterNode = node["Prefilter"];
+			if (prefilterNode)
+				propsCube.prefilter = (TextureCubePrefilter)prefilterNode.as<int>();
 		}
 
 		YAML::Node mipmapsNode = node["Mipmaps"];
