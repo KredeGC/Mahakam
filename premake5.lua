@@ -261,7 +261,7 @@ project "Erebor"
         links { LinuxLinks }
         
         postbuildcommands {
-            "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/linux-x64/phonon.so\" \"../bin/%{outputdir}/%{prj.name}/\""
+            "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/linux-x64/libphonon.so\" \"../bin/%{outputdir}/%{prj.name}/\""
         }
     
     filter "configurations:Debug"
