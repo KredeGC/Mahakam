@@ -9,29 +9,29 @@
 namespace Mahakam
 {
 	OpenGLRenderBuffer::OpenGLRenderBuffer(uint32_t width, uint32_t height, TextureFormat format)
-		: width(width), height(height), size(width * height * TextureFormatToByteSize(format))
+		: m_Width(width), m_Height(height), m_Size(width * height * TextureFormatToByteSize(format))
 	{
-		internalFormat = TextureFormatToOpenGLInternalFormat(format);
+		m_InternalFormat = TextureFormatToOpenGLInternalFormat(format);
 
-		MH_GL_CALL(glGenRenderbuffers(1, &rendererID));
-		MH_GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, rendererID));
-		MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height));
+		MH_GL_CALL(glGenRenderbuffers(1, &m_RendererID));
+		MH_GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID));
+		MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, m_InternalFormat, width, height));
 	}
 
 	OpenGLRenderBuffer::~OpenGLRenderBuffer()
 	{
-		MH_GL_CALL(glDeleteRenderbuffers(1, &rendererID));
+		MH_GL_CALL(glDeleteRenderbuffers(1, &m_RendererID));
 	}
 
 	void OpenGLRenderBuffer::Resize(uint32_t width, uint32_t height)
 	{
-		this->width = width;
-		this->height = height;
+		m_Width = width;
+		m_Height = height;
 
-		MH_GL_CALL(glDeleteRenderbuffers(1, &rendererID));
+		MH_GL_CALL(glDeleteRenderbuffers(1, &m_RendererID));
 
-		MH_GL_CALL(glGenRenderbuffers(1, &rendererID));
-		MH_GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, rendererID));
-		MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height));
+		MH_GL_CALL(glGenRenderbuffers(1, &m_RendererID));
+		MH_GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, m_RendererID));
+		MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, m_InternalFormat, m_Width, m_Height));
 	}
 }

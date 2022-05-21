@@ -13,7 +13,7 @@ namespace Mahakam
 		std::string filepath;
 		std::string name;
 
-		robin_hood::unordered_map<std::string, int> uniformIDCache;
+		UnorderedMap<std::string, int> uniformIDCache;
 
 	public:
 		OpenGLComputeShader(const std::string& filepath);

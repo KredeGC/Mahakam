@@ -6,34 +6,34 @@ namespace Mahakam {
 	class OpenGLTexture2D : public Texture2D
 	{
 	private:
-		uint32_t rendererID;
-		std::filesystem::path filepath;
+		uint32_t m_RendererID;
+		std::filesystem::path m_Filepath;
 
 		TextureProps m_Props;
 
-		uint32_t internalFormat;
-		uint32_t dataFormat;
-		uint32_t formatType;
+		uint32_t m_InternalFormat;
+		uint32_t m_DataFormat;
+		uint32_t m_FormatType;
 
-		bool compressed;
-		uint32_t size;
-		uint32_t totalSize;
+		bool m_Compressed;
+		uint32_t m_Size;
+		uint32_t m_TotalSize;
 
 	public:
 		OpenGLTexture2D(const TextureProps& props);
 		OpenGLTexture2D(const std::filesystem::path& filepath, const TextureProps& props);
 		virtual ~OpenGLTexture2D();
 
-		virtual const std::filesystem::path& GetFilepath() const override { return filepath; }
+		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
 
 		virtual const TextureProps& GetProps() const override { return m_Props; }
 
 		virtual uint32_t GetWidth() const override { return m_Props.width; }
 		virtual uint32_t GetHeight() const override { return m_Props.height; }
-		virtual uint32_t GetRendererID() const override { return rendererID; }
+		virtual uint32_t GetRendererID() const override { return m_RendererID; }
 
-		virtual uint32_t GetSize() const override { return size; }
-		virtual uint32_t GetTotalSize() const override { return totalSize; }
+		virtual uint32_t GetSize() const override { return m_Size; }
+		virtual uint32_t GetTotalSize() const override { return m_TotalSize; }
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
 

@@ -138,14 +138,14 @@ namespace Mahakam
 		//  16 bits - Transform index
 		std::vector<uint64_t> renderQueue;
 
-		robin_hood::unordered_map<Asset<Shader>, uint64_t> shaderRefLookup;
-		robin_hood::unordered_map<Asset<Material>, uint64_t> materialRefLookup;
-		robin_hood::unordered_map<Asset<Mesh>, uint64_t> meshRefLookup;
+		UnorderedMap<Asset<Shader>, uint64_t> shaderRefLookup;
+		UnorderedMap<Asset<Material>, uint64_t> materialRefLookup;
+		UnorderedMap<Asset<Mesh>, uint64_t> meshRefLookup;
 
-		robin_hood::unordered_map<uint64_t, Asset<Shader>> shaderIDLookup;
-		robin_hood::unordered_map<uint64_t, Asset<Material>> materialIDLookup;
-		robin_hood::unordered_map<uint64_t, Asset<Mesh>> meshIDLookup;
-		robin_hood::unordered_map<uint64_t, glm::mat4> transformIDLookup;
+		UnorderedMap<uint64_t, Asset<Shader>> shaderIDLookup;
+		UnorderedMap<uint64_t, Asset<Material>> materialIDLookup;
+		UnorderedMap<uint64_t, Asset<Mesh>> meshIDLookup;
+		UnorderedMap<uint64_t, glm::mat4> transformIDLookup;
 
 		// Particle queue ID
 		// 32 bits - Depth

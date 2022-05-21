@@ -22,7 +22,7 @@ namespace Mahakam
 		{
 			RendererResults rendererResults;
 			std::vector<Ref<RenderPass>> renderPasses;
-			robin_hood::unordered_map<std::string, WeakRef<FrameBuffer>> frameBuffers;
+			UnorderedMap<std::string, WeakRef<FrameBuffer>> frameBuffers;
 
 			Asset<FrameBuffer> gBuffer;
 			Asset<FrameBuffer> viewportFramebuffer;
@@ -31,7 +31,7 @@ namespace Mahakam
 			uint32_t height;
 		};
 
-		using FrameBufferMap = robin_hood::unordered_map<std::string, WeakRef<FrameBuffer>>;
+		using FrameBufferMap = UnorderedMap<std::string, WeakRef<FrameBuffer>>;
 
 		static RendererData* rendererData;
 		static SceneData* sceneData;

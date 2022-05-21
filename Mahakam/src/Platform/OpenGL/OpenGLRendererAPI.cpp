@@ -70,9 +70,9 @@ namespace Mahakam
 	{
 		MH_GL_CALL(glViewport(x, y, w, h));
 
-		if (scissor != scissorEnabled)
+		if (scissor != m_ScissorEnabled)
 		{
-			scissorEnabled = scissor;
+			m_ScissorEnabled = scissor;
 			if (scissor)
 				glEnable(GL_SCISSOR_TEST);
 			else

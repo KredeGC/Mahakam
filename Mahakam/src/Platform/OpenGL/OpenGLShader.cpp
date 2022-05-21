@@ -45,12 +45,12 @@ namespace Mahakam
 	}
 
 	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath, const std::initializer_list<std::string>& keywords)
-		: filepath(filepath)
+		: m_Filepath(filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
 		// Naming
-		name = filepath.stem().string();
+		m_Name = filepath.stem().string();
 
 		std::vector<std::string> features = keywords;
 		features.emplace_back("");
@@ -63,7 +63,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		for (auto& pass : shaderPasses)
+		for (auto& pass : m_ShaderPasses)
 		{
 			for (auto& shader : pass.second)
 			{
@@ -74,16 +74,16 @@ namespace Mahakam
 
 	void OpenGLShader::Bind(const std::string& shaderPass, const std::string& variant)
 	{
-		auto passIter = shaderPasses.find(shaderPass);
-		if (passIter != shaderPasses.end())
+		auto passIter = m_ShaderPasses.find(shaderPass);
+		if (passIter != m_ShaderPasses.end())
 		{
 			auto& variants = passIter->second;
 
 			auto variantIter = variants.find(variant);
 			if (variantIter != variants.end())
 			{
-				rendererID = variantIter->second;
-				MH_GL_CALL(glUseProgram(rendererID));
+				m_RendererID = variantIter->second;
+				MH_GL_CALL(glUseProgram(m_RendererID));
 			}
 			else
 			{
@@ -98,8 +98,8 @@ namespace Mahakam
 
 	bool OpenGLShader::HasShaderPass(const std::string& shaderPass) const
 	{
-		auto iter = shaderPasses.find(shaderPass);
-		if (iter != shaderPasses.end())
+		auto iter = m_ShaderPasses.find(shaderPass);
+		if (iter != m_ShaderPasses.end())
 			return true;
 
 		return false;
@@ -313,8 +313,8 @@ namespace Mahakam
 
 			ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
 
-			auto iter = properties.find(name);
-			if (iter != properties.end())
+			auto iter = m_Properties.find(name);
+			if (iter != m_Properties.end())
 				iter->second.DataType = OpenGLDataTypeToShaderDataType(values[1]);
 		}
 
@@ -364,7 +364,7 @@ namespace Mahakam
 		// Read properties
 		auto propertiesNode = rootNode["Properties"];
 
-		MH_CORE_INFO("Loading properties for shader: {0}", name);
+		MH_CORE_INFO("Loading properties for shader: {0}", m_Name);
 		for (auto propertyNode : propertiesNode)
 		{
 			std::string propertyName = propertyNode.first.as<std::string>();
@@ -398,7 +398,7 @@ namespace Mahakam
 
 			std::string defaultValue = ParseDefaultValue(defaultNode);
 
-			properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue };
+			m_Properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue };
 
 			MH_CORE_INFO("  {0}: {1}", propertyName, defaultValue);
 		}
@@ -438,7 +438,7 @@ namespace Mahakam
 
 				// Generate shaders for each shader pass * each keyword combination
 				for (const auto& directives : keywordPermutations)
-					shaderPasses[shaderPassName][directives.first] = CompileBinary(FileUtility::GetCachePath(partialPath + directives.first), sources, shaderPassDefines.str() + directives.second);
+					m_ShaderPasses[shaderPassName][directives.first] = CompileBinary(FileUtility::GetCachePath(partialPath + directives.first), sources, shaderPassDefines.str() + directives.second);
 			}
 		}
 	}
@@ -495,13 +495,13 @@ namespace Mahakam
 
 	int OpenGLShader::GetUniformLocation(const std::string& name)
 	{
-		if (uniformIDCache.find(name) != uniformIDCache.end())
-			return uniformIDCache[name];
+		if (m_UniformIDCache.find(name) != m_UniformIDCache.end())
+			return m_UniformIDCache[name];
 
-		int uniformID = glGetUniformLocation(rendererID, name.c_str());
+		int uniformID = glGetUniformLocation(m_RendererID, name.c_str());
 
 		if (uniformID != -1)
-			uniformIDCache[name] = uniformID;
+			m_UniformIDCache[name] = uniformID;
 		else
 			MH_CORE_WARN("Uniform {0} unused or optimized away", name);
 

@@ -6,7 +6,7 @@
 namespace Mahakam
 {
 	OpenGLMaterial::OpenGLMaterial(const Asset<Shader>& shader, const std::string& variant)
-		: shader(shader), variant(variant)
+		: m_Shader(shader), m_Variant(variant)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -16,22 +16,22 @@ namespace Mahakam
 	}
 
 	OpenGLMaterial::OpenGLMaterial(const Asset<Material>& material) :
-		shader(static_cast<Asset<OpenGLMaterial>>(material)->shader),
-		variant(static_cast<Asset<OpenGLMaterial>>(material)->variant),
-		textures(static_cast<Asset<OpenGLMaterial>>(material)->textures),
-		mat3s(static_cast<Asset<OpenGLMaterial>>(material)->mat3s),
-		mat4s(static_cast<Asset<OpenGLMaterial>>(material)->mat4s),
-		ints(static_cast<Asset<OpenGLMaterial>>(material)->ints),
-		floats(static_cast<Asset<OpenGLMaterial>>(material)->floats),
-		float2s(static_cast<Asset<OpenGLMaterial>>(material)->float2s),
-		float3s(static_cast<Asset<OpenGLMaterial>>(material)->float3s),
-		float4s(static_cast<Asset<OpenGLMaterial>>(material)->float4s) {}
+		m_Shader(static_cast<Asset<OpenGLMaterial>>(material)->m_Shader),
+		m_Variant(static_cast<Asset<OpenGLMaterial>>(material)->m_Variant),
+		m_Textures(static_cast<Asset<OpenGLMaterial>>(material)->m_Textures),
+		m_Mat3s(static_cast<Asset<OpenGLMaterial>>(material)->m_Mat3s),
+		m_Mat4s(static_cast<Asset<OpenGLMaterial>>(material)->m_Mat4s),
+		m_Ints(static_cast<Asset<OpenGLMaterial>>(material)->m_Ints),
+		m_Floats(static_cast<Asset<OpenGLMaterial>>(material)->m_Floats),
+		m_Float2s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float2s),
+		m_Float3s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float3s),
+		m_Float4s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float4s) {}
 
 	uint64_t OpenGLMaterial::Hash() const
 	{
 		uint64_t hash = 2166136261ULL;
 
-		for (auto& kv : textures)
+		for (auto& kv : m_Textures)
 		{
 			unsigned char bytes[sizeof(Texture*)];
 			memcpy(bytes, &kv.second, sizeof(Texture*));
@@ -40,7 +40,7 @@ namespace Mahakam
 				hash = (hash * 16777619ULL) ^ bytes[i];
 		}
 
-		for (auto& kv : mat3s)
+		for (auto& kv : m_Mat3s)
 		{
 			unsigned char bytes[sizeof(glm::mat3)];
 			memcpy(bytes, &kv.second, sizeof(glm::mat3));
@@ -49,7 +49,7 @@ namespace Mahakam
 				hash = (hash * 16777619ULL) ^ bytes[i];
 		}
 
-		for (auto& kv : mat4s)
+		for (auto& kv : m_Mat4s)
 		{
 			unsigned char bytes[sizeof(glm::mat4)];
 			memcpy(bytes, &kv.second, sizeof(glm::mat4));
@@ -58,7 +58,7 @@ namespace Mahakam
 				hash = (hash * 16777619ULL) ^ bytes[i];
 		}
 
-		for (auto& kv : ints)
+		for (auto& kv : m_Ints)
 		{
 			unsigned char bytes[sizeof(int32_t)];
 			memcpy(bytes, &kv.second, sizeof(int32_t));
@@ -67,7 +67,7 @@ namespace Mahakam
 				hash = (hash * 16777619ULL) ^ bytes[i];
 		}
 
-		for (auto& kv : floats)
+		for (auto& kv : m_Floats)
 		{
 			unsigned char bytes[sizeof(float)];
 			memcpy(bytes, &kv.second, sizeof(float));
@@ -76,7 +76,7 @@ namespace Mahakam
 				hash = (hash * 16777619ULL) ^ bytes[i];
 		}
 
-		for (auto& kv : float2s)
+		for (auto& kv : m_Float2s)
 		{
 			unsigned char bytes[sizeof(glm::vec2)];
 			memcpy(bytes, &kv.second, sizeof(glm::vec2));
@@ -85,7 +85,7 @@ namespace Mahakam
 				hash = (hash * 16777619ULL) ^ bytes[i];
 		}
 
-		for (auto& kv : float3s)
+		for (auto& kv : m_Float3s)
 		{
 			unsigned char bytes[sizeof(glm::vec3)];
 			memcpy(bytes, &kv.second, sizeof(glm::vec3));
@@ -94,7 +94,7 @@ namespace Mahakam
 				hash = (hash * 16777619ULL) ^ bytes[i];
 		}
 
-		for (auto& kv : float4s)
+		for (auto& kv : m_Float4s)
 		{
 			unsigned char bytes[sizeof(glm::vec4)];
 			memcpy(bytes, &kv.second, sizeof(glm::vec4));
@@ -110,40 +110,40 @@ namespace Mahakam
 	{
 		//shader->bind();
 
-		for (auto& kv : textures)
-			shader->SetTexture(kv.first, kv.second);
+		for (auto& kv : m_Textures)
+			m_Shader->SetTexture(kv.first, kv.second);
 
-		for (auto& kv : mat3s)
-			shader->SetUniformMat3(kv.first, kv.second);
+		for (auto& kv : m_Mat3s)
+			m_Shader->SetUniformMat3(kv.first, kv.second);
 
-		for (auto& kv : mat4s)
-			shader->SetUniformMat4(kv.first, kv.second);
+		for (auto& kv : m_Mat4s)
+			m_Shader->SetUniformMat4(kv.first, kv.second);
 
-		for (auto& kv : ints)
-			shader->SetUniformInt(kv.first, kv.second);
+		for (auto& kv : m_Ints)
+			m_Shader->SetUniformInt(kv.first, kv.second);
 
-		for (auto& kv : floats)
-			shader->SetUniformFloat(kv.first, kv.second);
+		for (auto& kv : m_Floats)
+			m_Shader->SetUniformFloat(kv.first, kv.second);
 
-		for (auto& kv : float2s)
-			shader->SetUniformFloat2(kv.first, kv.second);
+		for (auto& kv : m_Float2s)
+			m_Shader->SetUniformFloat2(kv.first, kv.second);
 
-		for (auto& kv : float3s)
-			shader->SetUniformFloat3(kv.first, kv.second);
+		for (auto& kv : m_Float3s)
+			m_Shader->SetUniformFloat3(kv.first, kv.second);
 
-		for (auto& kv : float4s)
-			shader->SetUniformFloat4(kv.first, kv.second);
+		for (auto& kv : m_Float4s)
+			m_Shader->SetUniformFloat4(kv.first, kv.second);
 	}
 
 	void OpenGLMaterial::SetTransform(const glm::mat4& modelMatrix)
 	{
-		shader->SetUniformMat4("u_m4_M", modelMatrix);
+		m_Shader->SetUniformMat4("u_m4_M", modelMatrix);
 	}
 
 	Asset<Texture> OpenGLMaterial::GetTexture(const std::string& name) const
 	{
-		auto texIter = textures.find(name);
-		if (texIter != textures.end())
+		auto texIter = m_Textures.find(name);
+		if (texIter != m_Textures.end())
 			return texIter->second;
 
 		MH_CORE_WARN("Material ({0}) has no texture named {1}", GetShader()->GetName(), name);
@@ -153,8 +153,8 @@ namespace Mahakam
 
 	glm::mat3 OpenGLMaterial::GetMat3(const std::string& name) const
 	{
-		auto matIter = mat3s.find(name);
-		if (matIter != mat3s.end())
+		auto matIter = m_Mat3s.find(name);
+		if (matIter != m_Mat3s.end())
 			return matIter->second;
 
 		MH_CORE_WARN("Material ({0}) has no mat3 named {1}", GetShader()->GetName(), name);
@@ -164,8 +164,8 @@ namespace Mahakam
 
 	glm::mat4 OpenGLMaterial::GetMat4(const std::string& name) const
 	{
-		auto matIter = mat4s.find(name);
-		if (matIter != mat4s.end())
+		auto matIter = m_Mat4s.find(name);
+		if (matIter != m_Mat4s.end())
 			return matIter->second;
 
 		MH_CORE_WARN("Material ({0}) has no mat4 named {1}", GetShader()->GetName(), name);
@@ -175,8 +175,8 @@ namespace Mahakam
 
 	int32_t OpenGLMaterial::GetInt(const std::string& name) const
 	{
-		auto intIter = ints.find(name);
-		if (intIter != ints.end())
+		auto intIter = m_Ints.find(name);
+		if (intIter != m_Ints.end())
 			return intIter->second;
 
 		MH_CORE_WARN("Material ({0}) has no int named {1}", GetShader()->GetName(), name);
@@ -186,8 +186,8 @@ namespace Mahakam
 
 	float OpenGLMaterial::GetFloat(const std::string& name) const
 	{
-		auto floatIter = floats.find(name);
-		if (floatIter != floats.end())
+		auto floatIter = m_Floats.find(name);
+		if (floatIter != m_Floats.end())
 			return floatIter->second;
 
 		MH_CORE_WARN("Material ({0}) has no float named {1}", GetShader()->GetName(), name);
@@ -197,8 +197,8 @@ namespace Mahakam
 
 	glm::vec2 OpenGLMaterial::GetFloat2(const std::string& name) const
 	{
-		auto floatIter = float2s.find(name);
-		if (floatIter != float2s.end())
+		auto floatIter = m_Float2s.find(name);
+		if (floatIter != m_Float2s.end())
 			return floatIter->second;
 
 		MH_CORE_WARN("Material ({0}) has no float2 named {1}", GetShader()->GetName(), name);
@@ -208,8 +208,8 @@ namespace Mahakam
 
 	glm::vec3 OpenGLMaterial::GetFloat3(const std::string& name) const
 	{
-		auto floatIter = float3s.find(name);
-		if (floatIter != float3s.end())
+		auto floatIter = m_Float3s.find(name);
+		if (floatIter != m_Float3s.end())
 			return floatIter->second;
 
 		MH_CORE_WARN("Material ({0}) has no float3 named {1}", GetShader()->GetName(), name);
@@ -219,8 +219,8 @@ namespace Mahakam
 
 	glm::vec4 OpenGLMaterial::GetFloat4(const std::string& name) const
 	{
-		auto floatIter = float4s.find(name);
-		if (floatIter != float4s.end())
+		auto floatIter = m_Float4s.find(name);
+		if (floatIter != m_Float4s.end())
 			return floatIter->second;
 
 		MH_CORE_WARN("Material ({0}) has no float4 named {1}", GetShader()->GetName(), name);
@@ -235,34 +235,34 @@ namespace Mahakam
 			switch (prop.second.DataType)
 			{
 			case ShaderDataType::Sampler2D:
-				textures[prop.first] = GL::GetTexture2DWhite();
+				m_Textures[prop.first] = GL::GetTexture2DWhite();
 				break;
 			case ShaderDataType::SamplerCube:
-				textures[prop.first] = GL::GetTextureCubeWhite();
+				m_Textures[prop.first] = GL::GetTextureCubeWhite();
 				break;
 			case ShaderDataType::Float:
-				floats[prop.first] = 0.0f;
+				m_Floats[prop.first] = 0.0f;
 				break;
 			case ShaderDataType::Float2:
-				float2s[prop.first] = glm::vec2(0.0f);
+				m_Float2s[prop.first] = glm::vec2(0.0f);
 				break;
 			case ShaderDataType::Float3:
-				float3s[prop.first] = glm::vec3(0.0f);
+				m_Float3s[prop.first] = glm::vec3(0.0f);
 				break;
 			case ShaderDataType::Float4:
-				float4s[prop.first] = glm::vec4(0.0f);
+				m_Float4s[prop.first] = glm::vec4(0.0f);
 				break;
 			case ShaderDataType::Mat3:
-				mat3s[prop.first] = glm::mat3(1.0f);
+				m_Mat3s[prop.first] = glm::mat3(1.0f);
 				break;
 			case ShaderDataType::Mat4:
-				mat4s[prop.first] = glm::mat4(1.0f);
+				m_Mat4s[prop.first] = glm::mat4(1.0f);
 				break;
 			case ShaderDataType::Int:
-				ints[prop.first] = 0;
+				m_Ints[prop.first] = 0;
 				break;
 			default:
-				MH_CORE_WARN("Material properties for {0} shader include unused property: {1}", shader->GetName(), prop.first);
+				MH_CORE_WARN("Material properties for {0} shader include unused property: {1}", m_Shader->GetName(), prop.first);
 				break;
 			}
 		}

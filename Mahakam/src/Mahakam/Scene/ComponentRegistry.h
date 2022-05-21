@@ -30,7 +30,7 @@ namespace Mahakam
 		};
 
 	private:
-		using ComponentMap = std::unordered_map<std::string, ComponentInterface>;
+		using ComponentMap = UnorderedMap<std::string, ComponentInterface>;
 
 		static ComponentMap componentInterfaces;
 

@@ -31,7 +31,7 @@ namespace Mahakam::Editor
 		};
 
 	private:
-		using WindowPropsMap = std::unordered_map<std::string, EditorWindowProps>;
+		using WindowPropsMap = UnorderedMap<std::string, EditorWindowProps>;
 
 		static WindowPropsMap windowProps;
 		static std::unordered_set<EditorWindow*> windows;

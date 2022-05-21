@@ -13,16 +13,16 @@ namespace Mahakam
 	class OpenGLShader : public Shader
 	{
 	private:
-		uint32_t rendererID;
-		std::filesystem::path filepath;
-		std::string name;
+		uint32_t m_RendererID;
+		std::filesystem::path m_Filepath;
+		std::string m_Name;
 
-		robin_hood::unordered_map<std::string, // Render passes
-			robin_hood::unordered_map<std::string, // Shader variants
-			uint32_t>> shaderPasses;
+		UnorderedMap<std::string, // Render passes
+			UnorderedMap<std::string, // Shader variants
+			uint32_t>> m_ShaderPasses;
 
-		robin_hood::unordered_map<std::string, int> uniformIDCache;
-		std::unordered_map<std::string, ShaderProperty> properties;
+		UnorderedMap<std::string, int> m_UniformIDCache;
+		UnorderedMap<std::string, ShaderProperty> m_Properties;
 
 	public:
 		OpenGLShader(const std::filesystem::path& filepath, const std::initializer_list<std::string>& defines = {});
@@ -30,10 +30,10 @@ namespace Mahakam
 
 		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") override;
 
-		virtual const std::filesystem::path& GetFilepath() const override { return filepath; }
-		virtual const std::string& GetName() const override { return name; }
+		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
+		virtual const std::string& GetName() const override { return m_Name; }
 
-		virtual const std::unordered_map<std::string, ShaderProperty>& GetProperties() const override { return properties; }
+		virtual const std::unordered_map<std::string, ShaderProperty>& GetProperties() const override { return m_Properties; }
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const override;
 

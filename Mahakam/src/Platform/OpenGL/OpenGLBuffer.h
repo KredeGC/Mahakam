@@ -7,8 +7,8 @@ namespace Mahakam
 	class OpenGLUniformBuffer : public UniformBuffer
 	{
 	private:
-		uint32_t rendererID;
-		uint32_t size;
+		uint32_t m_RendererID;
+		uint32_t m_Size;
 
 	public:
 		OpenGLUniformBuffer(uint32_t size);
@@ -26,8 +26,8 @@ namespace Mahakam
 	class OpenGLStorageBuffer : public StorageBuffer
 	{
 	private:
-		uint32_t rendererID;
-		uint32_t size;
+		uint32_t m_RendererID;
+		uint32_t m_Size;
 
 	public:
 		OpenGLStorageBuffer(uint32_t size);

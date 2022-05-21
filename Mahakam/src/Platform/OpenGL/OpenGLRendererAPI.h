@@ -9,7 +9,7 @@ namespace Mahakam
 	class OpenGLRendererAPI : public RendererAPI
 	{
 	private:
-		bool scissorEnabled = false;
+		bool m_ScissorEnabled = false;
 
 	public:
 		virtual void Init() override;

@@ -7,12 +7,12 @@
 namespace Mahakam
 {
 #pragma region OpenGLUniformBuffer
-	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size) : size(size)
+	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size) : m_Size(size)
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_GL_CALL(glGenBuffers(1, &rendererID));
-		MH_GL_CALL(glBindBuffer(GL_UNIFORM_BUFFER, rendererID));
+		MH_GL_CALL(glGenBuffers(1, &m_RendererID));
+		MH_GL_CALL(glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID));
 		MH_GL_CALL(glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW));
 	}
 
@@ -20,15 +20,15 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_GL_CALL(glDeleteBuffers(1, &rendererID));
+		MH_GL_CALL(glDeleteBuffers(1, &m_RendererID));
 	}
 
 	void OpenGLUniformBuffer::Bind(int slot, int offset, int size) const
 	{
 		if (!offset && !size)
-			MH_GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, slot, rendererID))
+			MH_GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, slot, m_RendererID))
 		else
-			MH_GL_CALL(glBindBufferRange(GL_UNIFORM_BUFFER, slot, rendererID, offset, size > 0 ? size : this->size))
+			MH_GL_CALL(glBindBufferRange(GL_UNIFORM_BUFFER, slot, m_RendererID, offset, size > 0 ? size : m_Size))
 	}
 
 	void OpenGLUniformBuffer::Unbind(int slot) const
@@ -53,12 +53,12 @@ namespace Mahakam
 
 
 #pragma region OpenGLStorageBuffer
-	OpenGLStorageBuffer::OpenGLStorageBuffer(uint32_t size) : size(size)
+	OpenGLStorageBuffer::OpenGLStorageBuffer(uint32_t size) : m_Size(size)
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_GL_CALL(glGenBuffers(1, &rendererID));
-		MH_GL_CALL(glBindBuffer(GL_SHADER_STORAGE_BUFFER, rendererID));
+		MH_GL_CALL(glGenBuffers(1, &m_RendererID));
+		MH_GL_CALL(glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_RendererID));
 		MH_GL_CALL(glBufferData(GL_SHADER_STORAGE_BUFFER, size, nullptr, GL_DYNAMIC_DRAW));
 	}
 
@@ -66,15 +66,15 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_GL_CALL(glDeleteBuffers(1, &rendererID));
+		MH_GL_CALL(glDeleteBuffers(1, &m_RendererID));
 	}
 
 	void OpenGLStorageBuffer::Bind(int slot, int offset, int size) const
 	{
 		if (!offset && !size)
-			MH_GL_CALL(glBindBufferBase(GL_SHADER_STORAGE_BUFFER, slot, rendererID))
+			MH_GL_CALL(glBindBufferBase(GL_SHADER_STORAGE_BUFFER, slot, m_RendererID))
 		else
-			MH_GL_CALL(glBindBufferRange(GL_SHADER_STORAGE_BUFFER, slot, rendererID, offset, size > 0 ? size : this->size))
+			MH_GL_CALL(glBindBufferRange(GL_SHADER_STORAGE_BUFFER, slot, m_RendererID, offset, size > 0 ? size : m_Size))
 	}
 
 	void OpenGLStorageBuffer::Unbind(int slot) const
@@ -84,7 +84,7 @@ namespace Mahakam
 
 	uint32_t OpenGLStorageBuffer::GetSize() const
 	{
-		return size;
+		return m_Size;
 	}
 
 	void OpenGLStorageBuffer::SetData(const void* data, uint32_t offset, uint32_t size)
