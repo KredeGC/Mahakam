@@ -5,15 +5,15 @@ namespace Mahakam::Editor
 {
 	void ProfilerPanel::OnImGuiRender()
 	{
-		if (open)
+		if (m_Open)
 		{
-			ImGui::Begin("Profiler", &open);
+			ImGui::Begin("Profiler", &m_Open);
 
-			if (!recording)
+			if (!m_Recording)
 			{
 				if (ImGui::Button("Record"))
 				{
-					recording = true;
+					m_Recording = true;
 					uint64_t time = std::chrono::steady_clock::now().time_since_epoch().count();
 					MH_PROFILE_BEGIN_SESSION("record", std::string("profiling/Record-") + std::to_string(time) + ".json");
 				}
@@ -22,7 +22,7 @@ namespace Mahakam::Editor
 			{
 				if (ImGui::Button("Stop"))
 				{
-					recording = false;
+					m_Recording = false;
 					MH_PROFILE_END_SESSION();
 				}
 			}
@@ -36,8 +36,6 @@ namespace Mahakam::Editor
 			}
 
 			ImGui::End();
-
-			Profiler::ClearResults();
 		}
 	}
 }

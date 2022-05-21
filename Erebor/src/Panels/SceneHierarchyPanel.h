@@ -12,6 +12,8 @@ namespace Mahakam::Editor
 	public:
 		SceneHierarchyPanel() = default;
 
+		virtual bool IsOpen() const override { return m_Open; }
+
 		virtual void OnImGuiRender() override;
 
 	private:

@@ -26,6 +26,8 @@ namespace Mahakam::Editor
 	public:
 		SceneViewPanel() = default;
 
+		virtual bool IsOpen() const override { return m_Open; }
+
 		virtual void OnUpdate(Timestep dt) override;
 
 		virtual void OnImGuiRender() override;

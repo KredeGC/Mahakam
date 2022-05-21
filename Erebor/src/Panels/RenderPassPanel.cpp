@@ -44,16 +44,16 @@ namespace Mahakam::Editor
 		viewportProps.colorAttachments = { TextureFormat::RGB8 };
 		viewportProps.depthAttachment = TextureFormat::Depth24;
 
-		viewportFramebuffer = FrameBuffer::Create(viewportProps);
+		m_ViewportFramebuffer = FrameBuffer::Create(viewportProps);
 
-		blitShader = Shader::Create("assets/shaders/internal/Blit.shader");
+		m_BlitShader = Shader::Create("assets/shaders/internal/Blit.shader");
 	}
 
 	void RenderPassPanel::OnImGuiRender()
 	{
-		if (open)
+		if (m_Open)
 		{
-			ImGui::Begin("Renderpasses", &open);
+			ImGui::Begin("Renderpasses", &m_Open);
 
 			RenderPanel();
 
@@ -72,13 +72,13 @@ namespace Mahakam::Editor
 		for (auto& kv : frameBuffers)
 			frameBufferNames.push_back(kv.first);
 
-		if (frameBufferIndex > frameBuffers.size())
-			frameBufferIndex = 0;
+		if (m_FrameBufferIndex > frameBuffers.size())
+			m_FrameBufferIndex = 0;
 
 		// Show framebuffer combo box
-		DrawComboBox("Framebuffer", frameBufferNames, frameBufferIndex);
+		DrawComboBox("Framebuffer", frameBufferNames, m_FrameBufferIndex);
 
-		if (auto frameBuffer = frameBuffers.at(frameBufferNames[frameBufferIndex]).lock())
+		if (auto frameBuffer = frameBuffers.at(frameBufferNames[m_FrameBufferIndex]).lock())
 		{
 			auto& spec = frameBuffer->GetSpecification();
 
@@ -101,8 +101,8 @@ namespace Mahakam::Editor
 				textureNames.push_back("Depth");
 			}
 
-			if (textureIndex > textures.size())
-				textureIndex = 0;
+			if (m_TextureIndex > textures.size())
+				m_TextureIndex = 0;
 
 			if (textures.size() == 0)
 			{
@@ -110,24 +110,24 @@ namespace Mahakam::Editor
 			}
 			else
 			{
-				DrawComboBox("Texture", textureNames, textureIndex);
+				DrawComboBox("Texture", textureNames, m_TextureIndex);
 
-				RenderImage(frameBuffer, textures[textureIndex], textures[textureIndex] == -1);
+				RenderImage(frameBuffer, textures[m_TextureIndex], textures[m_TextureIndex] == -1);
 			}
 		}
 	}
 
 	void RenderPassPanel::RenderImage(Asset<FrameBuffer> frameBuffer, int index, bool depth)
 	{
-		viewportFramebuffer->Bind();
+		m_ViewportFramebuffer->Bind();
 
-		blitShader->Bind("POSTPROCESSING");
+		m_BlitShader->Bind("POSTPROCESSING");
 		if (depth)
-			blitShader->SetTexture("u_Albedo", frameBuffer->GetDepthTexture());
+			m_BlitShader->SetTexture("u_Albedo", frameBuffer->GetDepthTexture());
 		else
-			blitShader->SetTexture("u_Albedo", frameBuffer->GetColorTexture(index));
+			m_BlitShader->SetTexture("u_Albedo", frameBuffer->GetColorTexture(index));
 
-		blitShader->SetUniformInt("u_Depth", depth);
+		m_BlitShader->SetUniformInt("u_Depth", depth);
 
 		GL::EnableZTesting(false);
 		GL::EnableZWriting(false);
@@ -135,11 +135,11 @@ namespace Mahakam::Editor
 		GL::EnableZWriting(true);
 		GL::EnableZTesting(true);
 
-		viewportFramebuffer->Unbind();
+		m_ViewportFramebuffer->Unbind();
 
 		ImVec2 contentSize = ImGui::GetContentRegionAvail();
 		float maxSize = std::min(contentSize.x, contentSize.y);
 
-		ImGui::Image((void*)(uintptr_t)viewportFramebuffer->GetColorTexture(0)->GetRendererID(), ImVec2(maxSize, maxSize), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((void*)(uintptr_t)m_ViewportFramebuffer->GetColorTexture(0)->GetRendererID(), ImVec2(maxSize, maxSize), ImVec2(0, 1), ImVec2(1, 0));
 	}
 }

@@ -27,10 +27,6 @@ namespace Mahakam {
 	{
 		MH_PROFILE_FUNCTION();
 
-#if MH_PLATFORM_WINDOWS && defined(MH_RUNTIME)
-		FreeConsole();
-#endif
-
 		data.title = props.title;
 		data.width = props.width;
 		data.height = props.height;

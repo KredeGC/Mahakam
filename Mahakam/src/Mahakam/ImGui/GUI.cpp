@@ -103,8 +103,6 @@ namespace Mahakam::GUI
 
 	bool DrawDragDropTarget(const std::string& label, const std::string& extension, std::filesystem::path& importPath)
 	{
-		static constexpr int MAX_STR_LEN = 256; // TODO: Un-hardcode this
-
 		std::string importString = importPath.string();
 		char filepathBuffer[MAX_STR_LEN]{ 0 };
 		strncpy(filepathBuffer, importString.c_str(), importString.size());

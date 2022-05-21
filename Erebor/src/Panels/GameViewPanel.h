@@ -20,6 +20,8 @@ namespace Mahakam::Editor
 	public:
 		GameViewPanel() = default;
 
+		virtual bool IsOpen() const override { return m_Open; }
+
 		virtual void OnImGuiRender() override;
 
 		bool OnMouseScrolled(MouseScrolledEvent& event);

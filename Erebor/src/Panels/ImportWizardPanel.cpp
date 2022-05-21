@@ -3,14 +3,6 @@
 
 namespace Mahakam::Editor
 {
-	bool ImportWizardPanel::m_Open;
-
-	std::string ImportWizardPanel::m_Extension;
-	std::filesystem::path ImportWizardPanel::m_FilePath;
-	std::filesystem::path ImportWizardPanel::m_ImportPath;
-
-	WeakRef<AssetImporter> ImportWizardPanel::m_Importer;
-
 	void ImportWizardPanel::OnImGuiRender()
 	{
 		Ref<AssetImporter> importer;
@@ -50,11 +42,13 @@ namespace Mahakam::Editor
 
 	void ImportWizardPanel::ImportAsset(const std::filesystem::path& filepath, const std::string& extension, const std::filesystem::path& importPath)
 	{
-		m_Open = true;
+		ImportWizardPanel* window = (ImportWizardPanel*)EditorWindowRegistry::OpenWindow("Import Wizard");
 
-		m_Extension = extension;
-		m_FilePath = filepath;
-		m_ImportPath = importPath;
+		window->m_Open = true;
+
+		window->m_Extension = extension;
+		window->m_FilePath = filepath;
+		window->m_ImportPath = importPath;
 
 		YAML::Node data;
 		if (std::filesystem::exists(importPath))
@@ -69,8 +63,8 @@ namespace Mahakam::Editor
 			}
 		}
 
-		m_Importer = AssetDatabase::GetAssetImporter(extension);
-		if (Ref<AssetImporter> importer = m_Importer.lock())
+		window->m_Importer = AssetDatabase::GetAssetImporter(extension);
+		if (Ref<AssetImporter> importer = window->m_Importer.lock())
 			importer->OnWizardOpen(data);
 	}
 }

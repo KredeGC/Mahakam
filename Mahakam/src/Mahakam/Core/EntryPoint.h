@@ -10,6 +10,10 @@ extern Mahakam::Application* Mahakam::CreateApplication();
 
 int main(int argc, char** argv)
 {
+#if defined(MH_PLATFORM_WINDOWS) && !defined(MH_DEBUG)
+	FreeConsole();
+#endif
+
 	Mahakam::Log::Init();
 	MH_CORE_INFO("Logging initialized");
 	MH_INFO("Logging initialized");

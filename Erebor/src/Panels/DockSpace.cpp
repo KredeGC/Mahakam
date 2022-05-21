@@ -70,8 +70,17 @@ namespace Mahakam::Editor
 				{
 					if (props.second.Viewable)
 					{
-						if (ImGui::MenuItem(props.second.Name.c_str()))
-						{ }
+						bool enabled = false;
+						if (props.second.Unique && props.second.Instance)
+							enabled = true;
+
+						if (ImGui::MenuItem(props.second.Name.c_str(), nullptr, enabled))
+						{
+							if (!enabled)
+								EditorWindowRegistry::OpenWindow(props.second.Name);
+							else if (props.second.Unique)
+								EditorWindowRegistry::CloseWindow(props.second.Instance);
+						}
 					}
 				}
 

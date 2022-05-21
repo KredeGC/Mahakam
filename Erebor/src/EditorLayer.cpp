@@ -1,8 +1,10 @@
 #include "ebpch.h"
 #include "EditorLayer.h"
+#include "ConsoleLogSink.h"
 
 #ifndef MH_RUNTIME
 #include "Panels/AssetManagerPanel.h"
+#include "Panels/ConsolePanel.h"
 #include "Panels/ContentBrowserPanel.h"
 #include "Panels/GameViewPanel.h"
 #include "Panels/ImportWizardPanel.h"
@@ -12,8 +14,6 @@
 #include "Panels/SceneViewPanel.h"
 #include "Panels/StatsPanel.h"
 #endif
-
-#include "Mahakam/Asset/SoundAssetImporter.h"
 
 #include <fstream>
 #include <filesystem>
@@ -26,6 +26,12 @@ namespace Mahakam::Editor
 
 	void EditorLayer::OnAttach()
 	{
+		// Add the console panel to the logger
+		auto sink = std::make_shared<ConsoleLogSinkMt>();
+
+		Log::GetEngineLogger()->sinks().push_back(sink);
+		Log::GetGameLogger()->sinks().push_back(sink);
+
 #pragma region Components
 		// Animator
 		ComponentRegistry::ComponentInterface animatorInterface;
@@ -357,15 +363,23 @@ namespace Mahakam::Editor
 #ifndef MH_RUNTIME
 		// AssetManagerPanel
 		EditorWindowRegistry::RegisterWindowClass<AssetManagerPanel>("Asset Manager");
-		EditorWindowRegistry::OpenWindow("Asset Manager");
+		//EditorWindowRegistry::OpenWindow("Asset Manager");
+
+		// ConsolePanel
+		EditorWindowRegistry::RegisterWindowClass<ConsolePanel>("Console");
+		EditorWindowRegistry::OpenWindow("Console");
 
 		// ContentBrowserPanel
 		EditorWindowRegistry::RegisterWindowClass<ContentBrowserPanel>("Content Browser");
 		EditorWindowRegistry::OpenWindow("Content Browser");
 
 		// ImportWizardPanel
-		EditorWindowRegistry::RegisterWindowClass<ImportWizardPanel>("Import Wizard");
-		EditorWindowRegistry::OpenWindow("Import Wizard");
+		EditorWindowRegistry::EditorWindowProps panelProps;
+		panelProps.Name = "Import Wizard";
+		panelProps.Viewable = false;
+		panelProps.SetWindow<ImportWizardPanel>();
+
+		EditorWindowRegistry::RegisterWindow(panelProps);
 
 		// GameViewPanel
 		EditorWindowRegistry::RegisterWindowClass<GameViewPanel>("Game View");
@@ -373,11 +387,11 @@ namespace Mahakam::Editor
 
 		// ProfilerPanel
 		EditorWindowRegistry::RegisterWindowClass<ProfilerPanel>("Profiler");
-		EditorWindowRegistry::OpenWindow("Profiler");
+		//EditorWindowRegistry::OpenWindow("Profiler");
 
 		// RenderPassPanel
 		EditorWindowRegistry::RegisterWindowClass<RenderPassPanel>("Renderpass");
-		EditorWindowRegistry::OpenWindow("Renderpass");
+		//EditorWindowRegistry::OpenWindow("Renderpass");
 
 		// SceneHierarchyPanel
 		EditorWindowRegistry::RegisterWindowClass<SceneHierarchyPanel>("Scene Hierarchy");
@@ -524,7 +538,20 @@ namespace Mahakam::Editor
 		for (auto& window : windows)
 			window->OnImGuiRender();
 
+		auto iter = windows.begin();
+		while (iter != windows.end())
+		{
+			if (!(*iter)->IsOpen())
+				iter = EditorWindowRegistry::CloseWindow(*iter);
+			else
+				iter++;
+		}
+
 		m_DockSpace.End();
+#endif
+
+#ifdef MH_ENABLE_PROFILING
+		Profiler::ClearResults();
 #endif
 	}
 

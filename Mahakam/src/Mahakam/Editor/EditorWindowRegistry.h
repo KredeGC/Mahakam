@@ -41,7 +41,7 @@ namespace Mahakam::Editor
 		MH_DECLARE_FUNC(DeregisterWindow, void, const std::string& name);
 
 		MH_DECLARE_FUNC(OpenWindow, EditorWindow*, const std::string& name);
-		MH_DECLARE_FUNC(CloseWindow, void, EditorWindow* window);
+		MH_DECLARE_FUNC(CloseWindow, std::unordered_set<EditorWindow*>::iterator, EditorWindow* window);
 
 		MH_DECLARE_FUNC(GetWindowProps, const WindowPropsMap&);
 		MH_DECLARE_FUNC(GetWindows, std::unordered_set<EditorWindow*>&);

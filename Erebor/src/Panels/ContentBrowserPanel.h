@@ -19,6 +19,8 @@ namespace Mahakam::Editor
 	public:
 		ContentBrowserPanel();
 
+		virtual bool IsOpen() const override { return m_Open; }
+
 		virtual void OnImGuiRender() override;
 
 	private:

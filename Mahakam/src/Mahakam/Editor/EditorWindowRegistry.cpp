@@ -26,6 +26,11 @@ namespace Mahakam::Editor
 		auto iter = windowProps.find(name);
 		if (iter != windowProps.end())
 		{
+			// Return the instance if unique
+			if (iter->second.Unique && iter->second.Instance)
+				return iter->second.Instance;
+
+			// Create a new window
 			EditorWindow* window = iter->second.OpenWindow();
 			windows.emplace(window);
 			if (iter->second.Unique)
@@ -38,9 +43,20 @@ namespace Mahakam::Editor
 	};
 
 	//void EditorWindowRegistry::CloseWindow(EditorWindow* window)
-	MH_DEFINE_FUNC(EditorWindowRegistry::CloseWindow, void, EditorWindow* window)
+	MH_DEFINE_FUNC(EditorWindowRegistry::CloseWindow, std::unordered_set<EditorWindow*>::iterator, EditorWindow* window)
 	{
-		windows.erase(window);
+		for (auto& props : windowProps)
+		{
+			if (props.second.Unique && props.second.Instance == window)
+			{
+				props.second.Instance = nullptr;
+				break;
+			}
+		}
+
+		auto iter = windows.find(window);
+
+		return windows.erase(iter);
 	};
 
 	//const EditorWindowRegistry::WindowPropsMap& EditorWindowRegistry::GetWindowProps()

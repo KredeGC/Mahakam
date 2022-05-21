@@ -1,20 +1,19 @@
 #pragma once
 
-#include <Mahakam.h>
-
-#include <imgui.h>
-
 namespace Mahakam::Editor
 {
-	class ProfilerPanel : EditorWindow
+	class ConsolePanel : public EditorWindow
 	{
 	private:
 		bool m_Open = true;
-		bool m_Recording = false;
+
+		static std::vector<std::string> m_Lines;
 
 	public:
 		virtual bool IsOpen() const override { return m_Open; }
 
 		virtual void OnImGuiRender() override;
+
+		static void AddLog(const std::string& msg);
 	};
 }
