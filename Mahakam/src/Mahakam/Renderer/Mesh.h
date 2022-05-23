@@ -22,40 +22,34 @@ namespace Mahakam
 	{
 		std::vector<Asset<Mesh>> meshes;
 		std::vector<Asset<Material>> materials;
-		robin_hood::unordered_map<std::string, BoneInfo> boneInfo;
+		UnorderedMap<std::string, BoneInfo> boneInfo;
 		int boneCount = 0;
-
-		//Mesh::Bounds bounds;
 
 		SkinnedMesh() = default;
 
-		SkinnedMesh(const std::vector<Asset<Mesh>>& meshes, const std::vector<Asset<Material>>& materials, const robin_hood::unordered_map<std::string, BoneInfo>& boneInfo, int boneCount = 0)
+		SkinnedMesh(const std::vector<Asset<Mesh>>& meshes, const std::vector<Asset<Material>>& materials, const UnorderedMap<std::string, BoneInfo>& boneInfo, int boneCount = 0)
 			: meshes(meshes), materials(materials), boneInfo(boneInfo), boneCount(boneCount)
-		{
-			//RecalculateBounds();
-		}
+		{ }
 
 		SkinnedMesh(Asset<Mesh> mesh, Asset<Material> material)
 		{
 			meshes.push_back(mesh);
 			materials.push_back(material);
-
-			//RecalculateBounds();
 		}
 	};
 
 	// TODO: Use this prop struct when loading a model
 	struct SkinnedMeshProps
 	{
-		bool createMaterials = false;
-		std::vector<Asset<Material>> overrideMaterials;
-		std::vector<Asset<Shader>> overrideShaders;
+		bool CreateMaterials = false;
+		std::vector<Asset<Material>> OverrideMaterials;
+		std::vector<Asset<Shader>> OverrideShaders;
 
 		SkinnedMeshProps() = default;
 
-		SkinnedMeshProps(std::initializer_list<Asset<Shader>> shaders) : createMaterials(true), overrideShaders(shaders) {}
+		SkinnedMeshProps(std::initializer_list<Asset<Shader>> shaders) : CreateMaterials(true), OverrideShaders(shaders) {}
 
-		SkinnedMeshProps(std::initializer_list<Asset<Material>> materials) : createMaterials(false), overrideMaterials(materials) {}
+		SkinnedMeshProps(std::initializer_list<Asset<Material>> materials) : CreateMaterials(false), OverrideMaterials(materials) {}
 	};
 
 	class Mesh
@@ -99,7 +93,8 @@ namespace Mahakam
 		};
 
 		static constexpr uint32_t BUFFER_ELEMENTS_SIZE = 7U;
-		static constexpr ShaderDataType BUFFER_ELEMENTS[BUFFER_ELEMENTS_SIZE]{
+		static constexpr ShaderDataType BUFFER_ELEMENTS[BUFFER_ELEMENTS_SIZE]
+		{
 			ShaderDataType::Float3, // Pos
 			ShaderDataType::Float2, // UV
 			ShaderDataType::Float3, // Normal

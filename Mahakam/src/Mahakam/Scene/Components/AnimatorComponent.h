@@ -14,9 +14,9 @@ namespace Mahakam
 
 		AnimatorComponent(const AnimatorComponent&) = default;
 
-		AnimatorComponent(Ref<Animation> animation)
+		AnimatorComponent(Asset<Animation> animation)
 		{
-			animator.PlayAnimation(animation);
+			animator.LoadAnimation(animation);
 		}
 
 		operator Animator& () { return animator; }

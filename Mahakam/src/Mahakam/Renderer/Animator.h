@@ -10,28 +10,35 @@ namespace Mahakam
 		static constexpr int MAX_BONES = 100;
 
 	private:
+		UnorderedMap<std::string, Bone> m_Bones;
 		std::vector<BoneTransform> m_BoneHierarchy;
+
 		glm::mat4 m_FinalBoneMatrices[MAX_BONES];
-		Ref<Animation> m_CurrentAnimation;
+		Asset<Animation> m_CurrentAnimation;
 		float m_CurrentTime;
 
 	public:
 		Animator() = default;
 
-		Animator(Ref<Animation> currentAnimation)
-			: m_CurrentTime(0.0f), m_CurrentAnimation(currentAnimation), m_BoneHierarchy(m_CurrentAnimation->GetBoneHierarchy()) { }
+		Animator(Asset<Animation> animation);
+
+		void LoadAnimation(Asset<Animation> animation);
 
 		void UpdateAnimation(float dt);
 
-		void PlayAnimation(Ref<Animation> animation);
+		void PlayAnimation();
+
+		Bone* FindBone(const std::string& name);
 
 		inline float GetTime() const { return m_CurrentTime; }
 
-		inline Ref<Animation> GetAnimation() { return m_CurrentAnimation; }
+		inline Asset<Animation> GetAnimation() { return m_CurrentAnimation; }
 
 		inline const glm::mat4* GetFinalBoneMatrices() const { return m_FinalBoneMatrices; }
 
 	private:
 		void CalculateBoneTransforms();
+
+		void ConstructBones(const aiAnimation* animation, const UnorderedMap<std::string, BoneInfo>& boneInfoMap);
 	};
 }

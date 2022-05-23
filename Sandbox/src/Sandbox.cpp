@@ -88,10 +88,10 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	skinnedMaterial->SetFloat("u_Metallic", 1.0f);
 	skinnedMaterial->SetFloat("u_Roughness", 0.4f);
 
-#if 0
+#if 1
 	// Create animation and model
 	SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/mannequin_clap.fbx");
-	Ref<Animation> animation = Animation::Load("assets/models/mannequin_clap.fbx", skinnedModel);
+	Asset<Animation> animation = Animation::Load("assets/models/mannequin_clap.fbx", skinnedModel);
 
 	// Create skinned entities
 	for (int x = 0; x < 2; x++)

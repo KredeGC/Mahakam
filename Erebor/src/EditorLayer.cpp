@@ -40,7 +40,7 @@ namespace Mahakam::Editor
 		{
 			Animator& animator = entity.GetComponent<AnimatorComponent>();
 
-			Ref<Animation> animation = animator.GetAnimation();
+			Asset<Animation> animation = animator.GetAnimation();
 
 			float duration = animation->GetDuration() / animation->GetTicksPerSecond();
 
