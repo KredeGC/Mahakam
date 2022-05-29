@@ -1,6 +1,7 @@
 # Binaries
 **/bin/
 **/bin-obj/
+**/obj/
 **/out/
 
 Erebor/cache/

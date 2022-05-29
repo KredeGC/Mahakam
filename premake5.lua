@@ -11,19 +11,23 @@ workspace "Mahakam"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
-IncludeDir["assimp"]        = "Mahakam/vendor/assimp/include"
-IncludeDir["entt"]          = "Mahakam/vendor/entt/include"
-IncludeDir["GLFW"]          = "Mahakam/vendor/GLFW/include"
-IncludeDir["glad"]          = "Mahakam/vendor/glad/include"
-IncludeDir["glm"]           = "Mahakam/vendor/glm"
-IncludeDir["imgui"]         = "Mahakam/vendor/imgui"
-IncludeDir["imguizmo"]      = "Mahakam/vendor/imguizmo"
-IncludeDir["miniaudio"]     = "Mahakam/vendor/miniaudio/include"
-IncludeDir["robin_hood"]    = "Mahakam/vendor/robin_hood"
-IncludeDir["spdlog"]        = "Mahakam/vendor/spdlog/include"
-IncludeDir["stb_image"]     = "Mahakam/vendor/stb_image"
-IncludeDir["steamaudio"]    = "Mahakam/vendor/steamaudio/include"
-IncludeDir["yaml"]          = "Mahakam/vendor/yaml-cpp/include"
+IncludeDir["assimp"]            = "Mahakam/vendor/assimp/include"
+IncludeDir["bullet"]            = "Mahakam/vendor/bullet/src"
+IncludeDir["bullet_dynamics"]   = "Mahakam/vendor/bullet/src/BulletDynamics"
+IncludeDir["bullet_collision"]  = "Mahakam/vendor/bullet/src/BulletCollision"
+IncludeDir["linear_math"]       = "Mahakam/vendor/bullet/src/LinearMath"
+IncludeDir["entt"]              = "Mahakam/vendor/entt/include"
+IncludeDir["GLFW"]              = "Mahakam/vendor/GLFW/include"
+IncludeDir["glad"]              = "Mahakam/vendor/glad/include"
+IncludeDir["glm"]               = "Mahakam/vendor/glm"
+IncludeDir["imgui"]             = "Mahakam/vendor/imgui"
+IncludeDir["imguizmo"]          = "Mahakam/vendor/imguizmo"
+IncludeDir["miniaudio"]         = "Mahakam/vendor/miniaudio/include"
+IncludeDir["robin_hood"]        = "Mahakam/vendor/robin_hood"
+IncludeDir["spdlog"]            = "Mahakam/vendor/spdlog/include"
+IncludeDir["stb_image"]         = "Mahakam/vendor/stb_image"
+IncludeDir["steamaudio"]        = "Mahakam/vendor/steamaudio/include"
+IncludeDir["yaml"]              = "Mahakam/vendor/yaml-cpp/include"
 
 if os.host() == "linux" then
     SteamAudioLibDir = "./Mahakam/vendor/steamaudio/lib/linux-x64"
@@ -38,6 +42,10 @@ VendorIncludes = {
     "%{prj.name}/src",
     "Mahakam/src",
     "%{IncludeDir.assimp}",
+    "%{IncludeDir.bullet}",
+    "%{IncludeDir.bullet_dynamics}",
+    "%{IncludeDir.bullet_collision}",
+    "%{IncludeDir.linear_math}",
     "%{IncludeDir.entt}",
     "%{IncludeDir.glm}",
     "%{IncludeDir.imgui}",
@@ -54,6 +62,9 @@ LinuxLibDirs = {
 }
 
 LinuxLinks = {
+    "BulletDynamics",
+    "BulletCollision",
+    "LinearMath",
     "GLFW",
     "glad",
     "ImGui",
@@ -83,6 +94,7 @@ group "Dependencies"
     include "Mahakam/vendor/imguizmo"
     include "Mahakam/vendor/glad"
     include "Mahakam/vendor/yaml-cpp"
+    include "Mahakam/vendor/bullet/build3"
 group ""
 
 project "Mahakam"
@@ -113,6 +125,10 @@ project "Mahakam"
     includedirs {
         "%{prj.name}/src",
         "%{IncludeDir.assimp}",
+        "%{IncludeDir.bullet}",
+        "%{IncludeDir.bullet_dynamics}",
+        "%{IncludeDir.bullet_collision}",
+        "%{IncludeDir.linear_math}",
         "%{IncludeDir.entt}",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.glad}",
@@ -130,6 +146,9 @@ project "Mahakam"
     libdirs { SteamAudioLibDir }
     
     links {
+        "BulletDynamics",
+        "BulletCollision",
+        "LinearMath",
         "GLFW",
         "glad",
         "ImGui",
