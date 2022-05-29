@@ -5,6 +5,8 @@
 
 #include "Mahakam/Audio/AudioEngine.h"
 
+#include "Mahakam/Physics/PhysicsEngine.h"
+
 #include "Mahakam/Renderer/Renderer.h"
 
 #include "SharedLibrary.h"
@@ -25,6 +27,8 @@ namespace Mahakam
 
 		AudioEngine::Init();
 
+		PhysicsEngine::Init();
+
 		imGuiLayer = new ImGuiLayer();
 		PushOverlay(imGuiLayer);
 	}
@@ -37,6 +41,8 @@ namespace Mahakam
 			layer->OnDetach();
 
 		AudioEngine::Shutdown();
+
+		PhysicsEngine::Shutdown();
 
 		Renderer::Shutdown();
 	}

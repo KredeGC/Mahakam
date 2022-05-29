@@ -503,7 +503,7 @@ namespace Mahakam
 		if (uniformID != -1)
 			m_UniformIDCache[name] = uniformID;
 		else
-			MH_CORE_WARN("Uniform {0} unused or optimized away", name);
+			MH_CORE_WARN("Shader {0} Uniform {1} unused or optimized away", m_Filepath.string(), name);
 
 		return uniformID;
 	}
