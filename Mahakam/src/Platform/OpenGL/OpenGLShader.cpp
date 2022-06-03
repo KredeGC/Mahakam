@@ -495,14 +495,16 @@ namespace Mahakam
 
 	int OpenGLShader::GetUniformLocation(const std::string& name)
 	{
-		if (m_UniformIDCache.find(name) != m_UniformIDCache.end())
-			return m_UniformIDCache[name];
+		auto iter = m_UniformIDCache.find(name);
+		if (iter != m_UniformIDCache.end() && iter->second != -1)
+			return iter->second;
 
 		int uniformID = glGetUniformLocation(m_RendererID, name.c_str());
 
-		if (uniformID != -1)
-			m_UniformIDCache[name] = uniformID;
-		else
+		m_UniformIDCache[name] = uniformID;
+
+		// Inform the user that a property is unused
+		if (iter == m_UniformIDCache.end() && uniformID == -1)
 			MH_CORE_WARN("Shader {0} Uniform {1} unused or optimized away", m_Filepath.string(), name);
 
 		return uniformID;

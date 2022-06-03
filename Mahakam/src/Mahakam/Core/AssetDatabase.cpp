@@ -3,7 +3,9 @@
 
 #include "Mahakam/Asset/AssetImporter.h"
 
+#include <algorithm>
 #include <random>
+#include <fstream>
 
 namespace Mahakam
 {
@@ -181,8 +183,13 @@ namespace Mahakam
 			YAML::Emitter emitter;
 			emitter << YAML::BeginMap;
 
+			char seperator = std::filesystem::path::preferred_separator;
+
+			std::string filepathUnix = filepath.string();
+			std::replace(filepathUnix.begin(), filepathUnix.end(), seperator, '/');
+
 			emitter << YAML::Key << "Filepath";
-			emitter << YAML::Value << filepath.string();
+			emitter << YAML::Value << filepathUnix;
 			emitter << YAML::Key << "Extension";
 			emitter << YAML::Value << m_AssetImporters[extension]->GetImporterProps().Extension;
 			emitter << YAML::Key << "ID";
