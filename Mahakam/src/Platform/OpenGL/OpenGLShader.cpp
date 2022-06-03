@@ -321,7 +321,7 @@ namespace Mahakam
 		return program;
 	}
 
-	std::string OpenGLShader::ParseDefaultValue(YAML::Node& node)
+	std::string OpenGLShader::ParseDefaultValue(const YAML::Node& node)
 	{
 		if (node)
 		{

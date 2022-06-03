@@ -52,7 +52,7 @@ namespace Mahakam
 	private:
 		uint32_t CompileBinary(const std::filesystem::path& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives);
 
-		std::string ParseDefaultValue(YAML::Node& node);
+		std::string ParseDefaultValue(const YAML::Node& node);
 		void ParseYAMLFile(const std::filesystem::path& filepath, const std::vector<std::string>& keywords);
 		robin_hood::unordered_map<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
 		robin_hood::unordered_map<GLenum, std::string> ParseGLSLFile(const std::string& source);

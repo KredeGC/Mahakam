@@ -21,9 +21,12 @@
                 }
             ],
             "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceFolder}/bin/Debug-linux-x86_64/Erebor/"
-                },
+                "environment": [
+                    {
+                        "name": "LD_LIBRARY_PATH",
+                        "value": "${workspaceFolder}/bin/Debug-linux-x86_64/Erebor/"
+                    }
+                ],
                 "program": "${workspaceFolder}/bin/Debug-linux-x86_64/Erebor/Erebor",
                 "MIMode": "gdb",
                 "miDebuggerPath": "/usr/bin/gdb"
@@ -33,7 +36,7 @@
                 "MIMode": "lldb"
             },
             "windows": {
-                "program": "${workspaceFolder}/bin/Debug-windows-x86_64/BSTest/BSTest.exe",
+                "program": "${workspaceFolder}/bin/Debug-windows-x86_64/Erebor/Erebor.exe",
                 "MIMode": "gdb",
                 "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
             },
