@@ -154,7 +154,14 @@ namespace Mahakam
 
 		YAML::Node filepathNode = data["Filepath"];
 		if (filepathNode)
-			info.Filepath = filepathNode.as<std::string>();
+		{
+			char seperator = std::filesystem::path::preferred_separator;
+
+			std::string filepathUnix = filepathNode.as<std::string>();
+			std::replace(filepathUnix.begin(), filepathUnix.end(), '/', seperator);
+
+			info.Filepath = filepathUnix;
+		}
 
 		YAML::Node extensionNode = data["Extension"];
 		if (extensionNode)
@@ -299,7 +306,14 @@ namespace Mahakam
 				uint64_t id = ReadAssetInfo(directory.path()).ID;
 
 				if (id)
-					m_AssetPaths[id] = directory.path().string();
+				{
+					char seperator = std::filesystem::path::preferred_separator;
+
+					std::string filepathUnix = directory.path().string();
+					std::replace(filepathUnix.begin(), filepathUnix.end(), '/', seperator);
+
+					m_AssetPaths[id] = filepathUnix;
+				}
 			}
 		}
 	}

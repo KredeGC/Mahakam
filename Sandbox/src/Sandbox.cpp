@@ -1,7 +1,10 @@
 #include "sbpch.h"
 
-#include <Mahakam.h>
+#if MH_STANDALONE
+#include <MahakamEntrypoint.h>
+#else
 #include <MahakamRuntime.h>
+#endif
 
 using namespace Mahakam;
 
