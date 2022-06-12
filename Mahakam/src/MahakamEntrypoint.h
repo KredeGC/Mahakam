@@ -2,8 +2,13 @@
 
 #include <Mahakam/Core/EntryPoint.h>
 
-#define MH_STANDALONE_TITLE "Title"
-#define MH_STANDALONE_ICON "res/internal/icons/icon-editor.png"
+#if !defined(MH_STANDALONE_TITLE)
+#error MH_STANDALONE_TITLE not defined
+#endif
+
+#if !defined(MH_STANDALONE_ICON)
+#error MH_STANDALONE_ICON not defined
+#endif
 
 namespace Mahakam
 {
