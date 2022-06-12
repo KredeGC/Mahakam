@@ -10,14 +10,18 @@
 #include "Components/ParticleSystemComponent.h"
 #include "Components/TagComponent.h"
 #include "Components/TransformComponent.h"
-#include "Entity.h"
 
-#include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Utility.h"
 #include "Mahakam/Core/AssetDatabase.h"
+
 #include "Mahakam/Audio/AudioEngine.h"
-#include "Mahakam/Renderer/Renderer.h"
+
 #include "Mahakam/Renderer/GL.h"
+#include "Mahakam/Renderer/Material.h"
+#include "Mahakam/Renderer/Renderer.h"
+#include "Mahakam/Renderer/Texture.h"
+
+#include "Entity.h"
 
 #include <yaml-cpp/yaml.h>
 

@@ -3,9 +3,6 @@
 #include "Mahakam/Core/Timestep.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
-#include "Mahakam/Renderer/Material.h"
-#include "Mahakam/Renderer/Texture.h"
-
 #include "Components/CameraComponent.h"
 
 #include <entt/entt.hpp>
@@ -13,6 +10,8 @@
 namespace Mahakam
 {
 	class Entity;
+	class Material;
+	class TextureCube;
 
 	class Scene
 	{
