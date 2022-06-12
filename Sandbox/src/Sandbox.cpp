@@ -1,9 +1,12 @@
 #include "sbpch.h"
 
+#define MH_STANDALONE_TITLE "Title"
+#define MH_STANDALONE_ICON "res/internal/icons/icon-editor.png"
+
+#include <MahakamRuntime.h>
+
 #if MH_STANDALONE
 #include <MahakamEntrypoint.h>
-#else
-#include <MahakamRuntime.h>
 #endif
 
 using namespace Mahakam;
