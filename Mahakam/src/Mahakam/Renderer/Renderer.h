@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Mahakam/Asset/Asset.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include "Buffer.h"

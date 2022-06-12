@@ -3,6 +3,7 @@
 #include "OpenGLComputeShader.h"
 #include "OpenGLUtility.h"
 #include "Mahakam/Core/Utility.h"
+#include "Mahakam/Renderer/Texture.h"
 
 #include <filesystem>
 #include <fstream>

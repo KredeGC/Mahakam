@@ -2,11 +2,9 @@
 
 #include "Mahakam/Renderer/Shader.h"
 
-#include <robin_hood.h>
-
 #include <glm/glm.hpp>
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
 
 namespace Mahakam
 {
@@ -33,7 +31,7 @@ namespace Mahakam
 		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
 		virtual const std::string& GetName() const override { return m_Name; }
 
-		virtual const std::unordered_map<std::string, ShaderProperty>& GetProperties() const override { return m_Properties; }
+		virtual const UnorderedMap<std::string, ShaderProperty>& GetProperties() const override { return m_Properties; }
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const override;
 
@@ -50,12 +48,12 @@ namespace Mahakam
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) override;
 
 	private:
-		uint32_t CompileBinary(const std::filesystem::path& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives);
+		uint32_t CompileBinary(const std::filesystem::path& cachePath, const UnorderedMap<uint32_t, std::string>& sources, const std::string& directives);
 
 		std::string ParseDefaultValue(const YAML::Node& node);
 		void ParseYAMLFile(const std::filesystem::path& filepath, const std::vector<std::string>& keywords);
-		robin_hood::unordered_map<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
-		robin_hood::unordered_map<GLenum, std::string> ParseGLSLFile(const std::string& source);
+		UnorderedMap<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
+		UnorderedMap<uint32_t, std::string> ParseGLSLFile(const std::string& source);
 
 		int GetUniformLocation(const std::string& name);
 	};

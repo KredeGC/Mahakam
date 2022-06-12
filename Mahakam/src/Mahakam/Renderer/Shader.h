@@ -1,14 +1,18 @@
 #pragma once
 
 #include "ShaderDataTypes.h"
-#include "Texture.h"
 
+#include "Mahakam/Asset/Asset.h"
+
+#include <filesystem>
 #include <string>
 
 #include <glm/glm.hpp>
 
 namespace Mahakam
 {
+	class Texture;
+
 	enum class ShaderPropertyType
 	{
 		Color,
@@ -40,7 +44,7 @@ namespace Mahakam
 		virtual const std::filesystem::path& GetFilepath() const = 0;
 		virtual const std::string& GetName() const = 0;
 
-		virtual const std::unordered_map<std::string, ShaderProperty>& GetProperties() const = 0;
+		virtual const UnorderedMap<std::string, ShaderProperty>& GetProperties() const = 0;
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const = 0;
 

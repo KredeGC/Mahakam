@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Texture.h"
 #include "Mahakam/Asset/Asset.h"
 
 namespace Mahakam
 {
+	class Texture;
+
 	class ComputeShader
 	{
 	public:

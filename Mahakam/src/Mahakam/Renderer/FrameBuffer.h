@@ -1,14 +1,16 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Asset/Asset.h"
 #include "TextureFormats.h"
-#include "RenderBuffer.h"
-#include "Texture.h"
 
 #include <vector>
 
 namespace Mahakam
 {
+	class RenderBuffer;
+	class Texture;
+
 	struct FrameBufferAttachmentProps
 	{
 		TextureFormat format = TextureFormat::RGBA8;

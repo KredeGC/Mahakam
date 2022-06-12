@@ -2,6 +2,8 @@
 
 #include "Animation.h"
 
+#include "Bone.h"
+
 namespace Mahakam
 {
 	class Animator

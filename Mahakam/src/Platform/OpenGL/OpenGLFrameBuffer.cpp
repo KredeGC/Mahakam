@@ -4,6 +4,9 @@
 
 #include "OpenGLTextureFormats.h"
 
+#include "Mahakam/Renderer/RenderBuffer.h"
+#include "Mahakam/Renderer/Texture.h"
+
 #include <glad/glad.h>
 
 namespace Mahakam

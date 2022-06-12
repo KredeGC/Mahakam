@@ -7,6 +7,8 @@
 
 #include "Mahakam/Math/Math.h"
 
+#include "Mahakam/Renderer/Texture.h"
+
 #include <filesystem>
 #include <fstream>
 
@@ -161,7 +163,7 @@ namespace Mahakam
 			MH_GL_CALL(glUniform4f(slot, value.x, value.y, value.z, value.w));
 	}
 
-	uint32_t OpenGLShader::CompileBinary(const std::filesystem::path& cachePath, const robin_hood::unordered_map<GLenum, std::string>& sources, const std::string& directives)
+	uint32_t OpenGLShader::CompileBinary(const std::filesystem::path& cachePath, const UnorderedMap<uint32_t, std::string>& sources, const std::string& directives)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -359,7 +361,7 @@ namespace Mahakam
 
 		MH_CORE_ASSERT(rootNode && rootNode.size() > 0, "Loaded empty shader file! Path may be wrong!");
 
-		robin_hood::unordered_map<std::string, std::string> keywordPermutations = ParseShaderKeywords(keywords);
+		UnorderedMap<std::string, std::string> keywordPermutations = ParseShaderKeywords(keywords);
 
 		// Read properties
 		auto propertiesNode = rootNode["Properties"];
@@ -443,12 +445,12 @@ namespace Mahakam
 		}
 	}
 
-	robin_hood::unordered_map<std::string, std::string> OpenGLShader::ParseShaderKeywords(const std::vector<std::string>& keywords)
+	UnorderedMap<std::string, std::string> OpenGLShader::ParseShaderKeywords(const std::vector<std::string>& keywords)
 	{
 		const uint64_t length = keywords.size();
 		const uint64_t bits = 1ULL << length;
 
-		robin_hood::unordered_map<std::string, std::string> result;
+		UnorderedMap<std::string, std::string> result;
 		for (uint64_t i = 1; i < bits; ++i)
 		{
 			std::stringstream combinedTag;
@@ -467,11 +469,11 @@ namespace Mahakam
 		return result;
 	}
 
-	robin_hood::unordered_map<GLenum, std::string> OpenGLShader::ParseGLSLFile(const std::string& source)
+	UnorderedMap<uint32_t, std::string> OpenGLShader::ParseGLSLFile(const std::string& source)
 	{
 		MH_PROFILE_FUNCTION();
 
-		robin_hood::unordered_map<GLenum, std::string> sources;
+		UnorderedMap<uint32_t, std::string> sources;
 
 		const char* typeToken = "#type";
 		size_t typeTokenLength = strlen(typeToken);

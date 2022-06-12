@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Mahakam/Renderer/FrameBuffer.h"
+#include "Mahakam/Renderer/RenderBuffer.h"
+#include "Mahakam/Renderer/Texture.h"
 
 namespace Mahakam
 {
