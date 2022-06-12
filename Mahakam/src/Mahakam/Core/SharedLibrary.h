@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Mahakam/Core/Core.h"
 
 #if MH_PLATFORM_WINDOWS

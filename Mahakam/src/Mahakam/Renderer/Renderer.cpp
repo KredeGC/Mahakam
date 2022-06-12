@@ -3,11 +3,11 @@
 
 #include "Mahakam/Core/SharedLibrary.h"
 
-#include "GL.h"
-
 #include "Camera.h"
-#include "Mesh.h"
+#include "GL.h"
 #include "Light.h"
+#include "Material.h"
+#include "Mesh.h"
 #include "ParticleSystem.h"
 
 #include "RenderPasses.h"

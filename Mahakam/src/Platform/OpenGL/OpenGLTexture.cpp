@@ -6,6 +6,7 @@
 #include "OpenGLShader.h"
 
 #include "Mahakam/Renderer/GL.h"
+#include "Mahakam/Renderer/Mesh.h"
 
 #include <stb_image.h>
 

@@ -1,10 +1,8 @@
 #pragma once
 
-#include "OpenGLShader.h"
 #include "Mahakam/Renderer/Material.h"
-#include "Mahakam/Renderer/Texture.h"
 
-#include <robin_hood.h>
+#include "OpenGLShader.h"
 
 namespace Mahakam
 {

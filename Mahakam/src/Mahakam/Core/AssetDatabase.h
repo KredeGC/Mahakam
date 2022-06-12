@@ -1,10 +1,6 @@
 #pragma once
 #include "Core.h"
 #include "Log.h"
-#include "Utility.h"
-
-#include <yaml-cpp/yaml.h>
-#include <robin_hood.h>
 
 #include <filesystem>
 #include <string>
@@ -33,13 +29,13 @@ namespace Mahakam
 		};
 
 	private:
-		using AssetMap = robin_hood::unordered_map<uint64_t, std::filesystem::path>;
+		using AssetMap = UnorderedMap<uint64_t, std::filesystem::path>;
 
-		inline static robin_hood::unordered_map<std::string, Ref<AssetImporter>> m_AssetImporters;
+		inline static UnorderedMap<std::string, Ref<AssetImporter>> m_AssetImporters;
 
 		inline static AssetMap m_AssetPaths;
 
-		inline static std::unordered_map<uint64_t, LiveAsset> m_CachedAssets;
+		inline static UnorderedMap<uint64_t, LiveAsset> m_CachedAssets;
 
 	public:
 		// Registering asset importers

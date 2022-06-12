@@ -1,11 +1,15 @@
 #pragma once
 
-#include "RendererAPI.h"
+#include "Mahakam/Asset/Asset.h"
 
-#include "Mesh.h"
+#include "RendererAPI.h"
 
 namespace Mahakam
 {
+	class Mesh;
+	class Texture2D;
+	class TextureCube;
+
 	class GL
 	{
 	private:

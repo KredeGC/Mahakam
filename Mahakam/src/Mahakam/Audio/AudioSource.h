@@ -4,12 +4,12 @@
 #include "Mahakam/Asset/Asset.h"
 
 #include "AudioEngine.h"
-#include "AudioContext.h"
 
 #include <glm/glm.hpp>
 
 namespace Mahakam
 {
+	class AudioContext;
 	class Sound;
 
 	class AudioSource

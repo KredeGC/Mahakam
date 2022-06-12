@@ -4,6 +4,7 @@
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/RenderData.h"
+#include "Mahakam/Renderer/Mesh.h"
 #include "Mahakam/Math/Math.h"
 
 #include "Mahakam/ImGui/GUI.h"

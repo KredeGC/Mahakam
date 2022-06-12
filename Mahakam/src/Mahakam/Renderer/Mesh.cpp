@@ -2,6 +2,7 @@
 #include "Mesh.h"
 
 #include "RendererAPI.h"
+#include "Material.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Mahakam/Core/Core.h"
-
 namespace Mahakam
 {
 	struct SoundProps

@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "GUI.h"
 
+#include <imgui_internal.h>
+
 namespace Mahakam::GUI
 {
 	bool DrawVec3Control(const char* label, glm::vec3& value, float resetValue)

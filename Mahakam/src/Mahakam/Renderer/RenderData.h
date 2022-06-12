@@ -8,8 +8,6 @@
 
 #include <vector>
 
-#include <robin_hood.h>
-
 namespace Mahakam
 {
 	// Forward declare most things, don't want to pollute the header files too much
@@ -153,7 +151,7 @@ namespace Mahakam
 		// 16 bits - Transform index
 		std::vector<uint64_t> particleQueue;
 
-		robin_hood::unordered_map<uint64_t, ParticleSystem> particleIDLookup;
+		UnorderedMap<uint64_t, ParticleSystem> particleIDLookup;
 
 		// Environment data, provided by scene
 		EnvironmentData environment;

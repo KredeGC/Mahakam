@@ -2,6 +2,8 @@
 #include "OpenGLMaterial.h"
 
 #include "Mahakam/Renderer/GL.h"
+#include "Mahakam/Renderer/Material.h"
+#include "Mahakam/Renderer/Texture.h"
 
 namespace Mahakam
 {

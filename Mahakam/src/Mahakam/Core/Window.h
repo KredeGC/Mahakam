@@ -3,8 +3,6 @@
 #include "Core.h"
 #include "Mahakam/Events/Event.h"
 
-//#include "Mahakam/Renderer/RenderingContext.h"
-
 namespace Mahakam
 {
 	class RenderingContext;

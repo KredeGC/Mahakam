@@ -6,6 +6,9 @@
 
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
 
+#include "Mesh.h"
+#include "Texture.h"
+
 namespace Mahakam
 {
 	RendererAPI* GL::rendererAPI;

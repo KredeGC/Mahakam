@@ -2,8 +2,6 @@
 
 #include "Mahakam/Renderer/RendererAPI.h"
 
-#include <glad/glad.h>
-
 namespace Mahakam
 {
 	class OpenGLRendererAPI : public RendererAPI

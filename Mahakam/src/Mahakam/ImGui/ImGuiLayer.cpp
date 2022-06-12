@@ -10,11 +10,6 @@
 
 #include <ImGuizmo.h>
 
-
-// TEMPORARY
-//#include <glad/glad.h>
-//#include <GLFW/glfw3.h>
-
 namespace Mahakam
 {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGui")

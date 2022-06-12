@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
-#include "AudioContext.h"
 
 #include <string>
 
 namespace Mahakam
 {
+	class AudioContext;
+
 	class AudioEngine
 	{
 	private:

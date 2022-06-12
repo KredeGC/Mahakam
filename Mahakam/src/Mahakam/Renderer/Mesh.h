@@ -2,14 +2,14 @@
 
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Asset/Asset.h"
-#include "Material.h"
+#include "ShaderDataTypes.h"
 
 #include "Assimp.h"
 
-#include <robin_hood.h>
-
 namespace Mahakam
 {
+	class Material;
+	class Shader;
 	class Mesh;
 
 	struct BoneInfo

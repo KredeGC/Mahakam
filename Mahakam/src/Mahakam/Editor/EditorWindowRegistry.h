@@ -2,12 +2,12 @@
 
 #include "Mahakam/Core/Core.h"
 
-#include "EditorWindow.h"
-
 #include <unordered_set>
 
 namespace Mahakam::Editor
 {
+	class EditorWindow;
+
 	class EditorWindowRegistry
 	{
 	public:

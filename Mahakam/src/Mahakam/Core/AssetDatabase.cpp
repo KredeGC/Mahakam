@@ -3,6 +3,10 @@
 
 #include "Mahakam/Asset/AssetImporter.h"
 
+#include "Utility.h"
+
+#include <yaml-cpp/yaml.h>
+
 #include <algorithm>
 #include <random>
 #include <fstream>

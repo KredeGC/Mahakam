@@ -3,6 +3,8 @@
 
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "EditorWindow.h"
+
 namespace Mahakam::Editor
 {
 	std::unordered_map<std::string, EditorWindowRegistry::EditorWindowProps> EditorWindowRegistry::windowProps;
