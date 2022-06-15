@@ -76,13 +76,6 @@ namespace Mahakam
 		std::vector<SpotLight> spotLights;
 	};
 
-	struct RendererResults
-	{
-		uint32_t drawCalls = 0;
-		uint32_t vertexCount = 0;
-		uint32_t triCount = 0;
-	};
-
 	struct CameraData
 	{
 	public:

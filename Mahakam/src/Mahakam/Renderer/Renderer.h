@@ -3,17 +3,29 @@
 #include "Mahakam/Asset/Asset.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
-#include "Buffer.h"
-#include "FrameBuffer.h"
-#include "RenderData.h"
-
 #include <vector>
+#include <string>
 
 namespace Mahakam
 {
+	class Camera;
+	class FrameBuffer;
+	class Material;
+	class Mesh;
+	class ParticleSystem;
 	class RenderPass;
 
+	struct EnvironmentData;
+	struct SceneData;
+
 	// IDEA: Move the AABB visuals to a renderpass in Erebor, which can then be injected at will
+
+	struct RendererResults
+	{
+		uint32_t drawCalls = 0;
+		uint32_t vertexCount = 0;
+		uint32_t triCount = 0;
+	};
 
 	class Renderer
 	{

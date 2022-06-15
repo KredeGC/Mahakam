@@ -13,6 +13,7 @@
 #include <robin_hood.h>
 
 #include "Mahakam/Asset/Asset.h"
+#include "Mahakam/Asset/AssetImporter.h"
 #include "Mahakam/Asset/AssetDatabase.h"
 
 #include "Mahakam/Core/Application.h"

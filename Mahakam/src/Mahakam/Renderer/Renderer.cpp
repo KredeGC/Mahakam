@@ -3,12 +3,15 @@
 
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Buffer.h"
 #include "Camera.h"
+#include "FrameBuffer.h"
 #include "GL.h"
 #include "Light.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "ParticleSystem.h"
+#include "RenderData.h"
 
 #include "RenderPasses.h"
 
