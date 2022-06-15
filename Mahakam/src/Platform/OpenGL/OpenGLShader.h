@@ -4,8 +4,6 @@
 
 #include <glm/glm.hpp>
 
-//#include <glad/glad.h>
-
 namespace Mahakam
 {
 	class OpenGLShader : public Shader

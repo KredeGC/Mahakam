@@ -2,7 +2,6 @@
 
 // Core
 #include "Mahakam/Core/Application.h"
-#include "Mahakam/Core/AssetDatabase.h"
 #include "Mahakam/Core/Input.h"
 #include "Mahakam/Core/Instrumentor.h"
 #include "Mahakam/Core/KeyCodes.h"
@@ -18,6 +17,7 @@
 
 // Asset
 #include "Mahakam/Asset/Asset.h"
+#include "Mahakam/Asset/AssetDatabase.h"
 #include "Mahakam/Asset/AssetImporter.h"
 #include "Mahakam/Asset/MaterialAssetImporter.h"
 #include "Mahakam/Asset/ShaderAssetImporter.h"

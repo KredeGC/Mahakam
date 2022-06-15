@@ -1,9 +1,9 @@
 #include "mhpch.h"
 #include "AssetDatabase.h"
 
-#include "Mahakam/Asset/AssetImporter.h"
+#include "Mahakam/Core/Utility.h"
 
-#include "Utility.h"
+#include "AssetImporter.h"
 
 #include <yaml-cpp/yaml.h>
 

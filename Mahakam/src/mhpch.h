@@ -1,5 +1,4 @@
 #include <emmintrin.h>
-#include <iostream>
 #include <memory>
 #include <utility>
 #include <algorithm>
@@ -12,6 +11,9 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <robin_hood.h>
+
+#include "Mahakam/Asset/Asset.h"
+#include "Mahakam/Asset/AssetDatabase.h"
 
 #include "Mahakam/Core/Application.h"
 #include "Mahakam/Core/Frustum.h"

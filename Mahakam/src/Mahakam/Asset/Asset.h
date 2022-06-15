@@ -2,7 +2,7 @@
 
 #include "Mahakam/Core/Core.h"
 
-#include "Mahakam/Core/AssetDatabase.h"
+#include "AssetDatabase.h"
 
 namespace Mahakam
 {

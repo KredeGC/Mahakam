@@ -169,6 +169,8 @@ project "Mahakam"
         
         removefiles { "**/Linux/**" }
         
+        flags { "MultiProcessorCompile" }
+        
         defines {
             "MH_PLATFORM_WINDOWS",
             "NOMINMAX"
@@ -226,6 +228,8 @@ project "Mahakam"
         optimize "on"
         
     filter "configurations:Release"
+        flags { "LinkTimeOptimization" }
+        
         defines {
             "MH_RELEASE",
             "MH_RUNTIME"
@@ -266,6 +270,8 @@ project "Erebor"
         
         defines { "MH_PLATFORM_WINDOWS" }
         
+        flags { "MultiProcessorCompile" }
+        
         postbuildcommands {
             "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/windows-x64/phonon.dll\" \"../bin/%{outputdir}/%{prj.name}/\""
         }
@@ -294,6 +300,8 @@ project "Erebor"
         optimize "on"
         
     filter "configurations:Release"
+        flags { "LinkTimeOptimization" }
+        
         defines {
             "MH_RELEASE",
             "MH_RUNTIME"
@@ -340,6 +348,8 @@ project "Sandbox"
             "MH_PLATFORM_WINDOWS",
             "WIN_EXPORT"
         }
+        
+        flags { "MultiProcessorCompile" }
 
     filter "system:linux"
         systemversion "latest"
@@ -361,6 +371,8 @@ project "Sandbox"
         optimize "on"
         
     filter "configurations:Release"
+        flags { "LinkTimeOptimization" }
+        
         defines {
             "MH_RELEASE",
             "MH_RUNTIME"
