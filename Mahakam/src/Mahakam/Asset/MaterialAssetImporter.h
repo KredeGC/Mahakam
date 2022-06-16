@@ -45,6 +45,6 @@ namespace Mahakam
 	private:
 		Asset<Texture> GetDefaultTexture(const ShaderProperty& property);
 
-		void SetupMaterialProperties(const std::unordered_map<std::string, ShaderProperty>& shaderProperties, const std::filesystem::path& filepath);
+		void SetupMaterialProperties(const UnorderedMap<std::string, ShaderProperty>& shaderProperties, const std::filesystem::path& filepath);
 	};
 }

@@ -1,0 +1,1 @@
+call "../bin/DebugOptimized-windows-x86_64/Erebor/Erebor.exe"

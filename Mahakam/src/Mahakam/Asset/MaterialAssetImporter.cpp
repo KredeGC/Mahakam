@@ -70,7 +70,7 @@ namespace Mahakam
 
 				SetupMaterialProperties(shader->GetProperties(), m_ShaderFilepath);
 
-				const std::unordered_map<std::string, ShaderProperty>& properties = shader->GetProperties();
+				const UnorderedMap<std::string, ShaderProperty>& properties = shader->GetProperties();
 				YAML::Node propertiesNode = rootNode["Properties"];
 				if (propertiesNode)
 				{
@@ -245,7 +245,7 @@ namespace Mahakam
 		emitter << YAML::Key << "Properties";
 		emitter << YAML::Value << YAML::BeginMap;
 
-		const std::unordered_map<std::string, ShaderProperty>& properties = material->GetShader()->GetProperties();
+		const UnorderedMap<std::string, ShaderProperty>& properties = material->GetShader()->GetProperties();
 		for (auto& kv : properties)
 		{
 			emitter << YAML::Key << kv.first;
@@ -277,7 +277,7 @@ namespace Mahakam
 
 		Asset<Material> material = Material::Create(shader);
 
-		const std::unordered_map<std::string, ShaderProperty>& properties = material->GetShader()->GetProperties();
+		const UnorderedMap<std::string, ShaderProperty>& properties = material->GetShader()->GetProperties();
 		YAML::Node propertiesNode = rootNode["Properties"];
 		if (propertiesNode)
 		{
@@ -364,7 +364,7 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	void MaterialAssetImporter::SetupMaterialProperties(const std::unordered_map<std::string, ShaderProperty>& shaderProperties, const std::filesystem::path& filepath)
+	void MaterialAssetImporter::SetupMaterialProperties(const UnorderedMap<std::string, ShaderProperty>& shaderProperties, const std::filesystem::path& filepath)
 	{
 		m_DefaultTextures.clear();
 

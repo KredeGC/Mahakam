@@ -1,6 +1,5 @@
 #include "ebpch.h"
 #include "EditorLayer.h"
-#include "ConsoleLogSink.h"
 
 #ifndef MH_RUNTIME
 #include "Panels/AssetManagerPanel.h"
@@ -13,6 +12,7 @@
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/SceneViewPanel.h"
 #include "Panels/StatsPanel.h"
+#include "ConsoleLogSink.h"
 #endif
 
 #include <fstream>
@@ -26,11 +26,13 @@ namespace Mahakam::Editor
 
 	void EditorLayer::OnAttach()
 	{
+#ifndef MH_RUNTIME
 		// Add the console panel to the logger
 		auto sink = std::make_shared<ConsoleLogSinkMt>();
 
 		Log::GetEngineLogger()->sinks().push_back(sink);
 		Log::GetGameLogger()->sinks().push_back(sink);
+#endif
 
 #pragma region Components
 		// Animator

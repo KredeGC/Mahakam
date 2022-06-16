@@ -78,6 +78,6 @@ namespace Mahakam
 		virtual const UnorderedMap<std::string, glm::vec4>& GetFloat4s() const { return m_Float4s; }
 
 	private:
-		void ResetShaderProperties(const std::unordered_map<std::string, ShaderProperty>& properties);
+		void ResetShaderProperties(const UnorderedMap<std::string, ShaderProperty>& properties);
 	};
 }

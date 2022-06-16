@@ -2,7 +2,7 @@
 #undef MH_BEGIN_ENUM
 #undef MH_END_ENUM
 
-#ifndef MH_RUNTIME
+#if 1
 #ifndef MH_GENERATE_ENUM_STRINGS
 #define MH_DECL_ENUM_ELEMENT( element ) element
 #define MH_BEGIN_ENUM( ENUM_NAME ) enum class ENUM_NAME

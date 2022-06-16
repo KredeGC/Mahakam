@@ -230,7 +230,7 @@ namespace Mahakam
 		return glm::vec4(0.0f);
 	}
 
-	void OpenGLMaterial::ResetShaderProperties(const std::unordered_map<std::string, ShaderProperty>& properties)
+	void OpenGLMaterial::ResetShaderProperties(const UnorderedMap<std::string, ShaderProperty>& properties)
 	{
 		for (auto& prop : properties)
 		{
