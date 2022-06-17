@@ -20,5 +20,7 @@ jobs:
         version: "5.0.0-beta1"
     - name: Run premake
       run: premake5 gmake2
+    - name: Install X11
+      run: apt install libx11-dev -y
     - name: Compile Erebor
       run: make -j 4 Erebor
