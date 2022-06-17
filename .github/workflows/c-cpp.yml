@@ -21,6 +21,6 @@ jobs:
     - name: Run premake
       run: premake5 gmake2
     - name: Install X11
-      run: sudo apt-get install -y libx11-dev mesa-common-dev libglu1-mesa-dev libxrandr-dev libxi-dev #libxcursor-dev 
+      run: sudo apt-get install -y libx11-dev mesa-common-dev libglu1-mesa-dev libxrandr-dev libxi-dev libxcursor-dev 
     - name: Compile Erebor
       run: make -j 4 Erebor
