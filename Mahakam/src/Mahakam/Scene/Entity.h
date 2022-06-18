@@ -37,7 +37,7 @@ namespace Mahakam
 		{
 			MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
 
-			T& component = scene->registry.emplace<T>(handle, std::forward<Args>(args)...);
+			T& component = scene->registry.template emplace<T>(handle, std::forward<Args>(args)...);
 
 			scene->OnComponentAdded<T>(*this, component);
 
@@ -49,7 +49,7 @@ namespace Mahakam
 		{
 			MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
 
-			return scene->registry.get<T>(handle);
+			return scene->registry.template get<T>(handle);
 		}
 
 		template<typename T>
@@ -57,13 +57,13 @@ namespace Mahakam
 		{
 			MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
 
-			return scene->registry.remove<T>(handle);
+			return scene->registry.template remove<T>(handle);
 		}
 
 		template<typename T>
 		bool HasComponent() const
 		{
-			return scene->registry.any_of<T>(handle);
+			return scene->registry.template any_of<T>(handle);
 		}
 	};
 }
