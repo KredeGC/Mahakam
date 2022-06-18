@@ -22,6 +22,11 @@ The solution file can then simply be opened via Visual Studio.
 ## Linux
 In addition to premake, other libraries are also needed, including X11, Xrandr.
 These can usually be installed via the distro's package manager.
+In Ubuntu, these packages can be installed using the command below:
+```bash
+sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+```
+
 Run the command below to generate project files.
 ```bash
 premake5 gmake2
