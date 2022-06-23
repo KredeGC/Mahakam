@@ -20,5 +20,7 @@ namespace Mahakam
 		~BulletPhysicsContext();
 
 		virtual void Update(Timestep ts) override;
+
+		btDiscreteDynamicsWorld* GetDynamicsWorld() const { return m_DynamicsWorld; }
 	};
 }

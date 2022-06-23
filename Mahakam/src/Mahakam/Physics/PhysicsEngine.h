@@ -16,5 +16,7 @@ namespace Mahakam
 		static void Shutdown();
 
 		MH_DECLARE_FUNC(Update, void, Timestep ts);
+
+		MH_DECLARE_FUNC(GetContext, PhysicsContext*);
 	};
 }

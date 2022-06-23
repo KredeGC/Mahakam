@@ -21,4 +21,10 @@ namespace Mahakam
 	{
 		s_Context->Update(ts);
 	};
+
+	//PhysicsContext* PhysicsEngine::GetContext()
+	MH_DEFINE_FUNC(PhysicsEngine::GetContext, PhysicsContext*)
+	{
+		return s_Context;
+	};
 }

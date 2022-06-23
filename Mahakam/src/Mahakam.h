@@ -49,6 +49,14 @@
 // Math
 #include "Mahakam/Math/Math.h"
 
+// Physics
+#include "Mahakam/Physics/Colliders/BoxCollider.h"
+#include "Mahakam/Physics/Colliders/Collider.h"
+#include "Mahakam/Physics/Colliders/SphereCollider.h"
+#include "Mahakam/Physics/PhysicsContext.h"
+#include "Mahakam/Physics/PhysicsEngine.h"
+#include "Mahakam/Physics/Rigidbody.h"
+
 // Rendering
 #include "Mahakam/Renderer/Animation.h"
 #include "Mahakam/Renderer/Animator.h"
