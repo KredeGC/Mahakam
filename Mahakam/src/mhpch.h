@@ -36,7 +36,11 @@
 #include "Mahakam/Events/KeyEvent.h"
 #include "Mahakam/Events/MouseEvent.h"
 
+#include "Mahakam/ImGui/GUI.h"
 #include "Mahakam/ImGui/ImGuiLayer.h"
+
+#include <imgui.h>
+#include <ImGuizmo.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>

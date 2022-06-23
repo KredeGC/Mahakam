@@ -29,6 +29,6 @@ jobs:
     - name: Run premake
       run: premake5 gmake2
     - name: Compile Mahakam
-      run: make -j 4 Mahakam
+      run: make -j2 Mahakam
     - name: Compile Erebor
-      run: make -j 4 Erebor
+      run: make -j2 Erebor

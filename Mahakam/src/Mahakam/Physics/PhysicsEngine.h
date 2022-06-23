@@ -1,22 +1,20 @@
 #pragma once
 
-#include "btBulletDynamicsCommon.h"
+#include "Mahakam/Core/SharedLibrary.h"
 
 namespace Mahakam
 {
+	class PhysicsContext;
+
 	class PhysicsEngine
 	{
 	private:
-		static btDefaultCollisionConfiguration* m_CollisionConfiguration;
-		static btCollisionDispatcher* m_Dispatcher;
-		static btBroadphaseInterface* m_OverlappingPairCache;
-		static btSequentialImpulseConstraintSolver* m_Solver;
-		static btDiscreteDynamicsWorld* m_DynamicsWorld;
+		static PhysicsContext* s_Context;
 
 	public:
 		static void Init();
 		static void Shutdown();
 
-		static void Update();
+		MH_DECLARE_FUNC(Update, void, Timestep ts);
 	};
 }

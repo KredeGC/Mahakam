@@ -1,66 +1,24 @@
 #include "mhpch.h"
 #include "PhysicsEngine.h"
+#include "PhysicsContext.h"
 
 namespace Mahakam
 {
-	btDefaultCollisionConfiguration* PhysicsEngine::m_CollisionConfiguration;
-	btCollisionDispatcher* PhysicsEngine::m_Dispatcher;
-	btBroadphaseInterface* PhysicsEngine::m_OverlappingPairCache;
-	btSequentialImpulseConstraintSolver* PhysicsEngine::m_Solver;
-	btDiscreteDynamicsWorld* PhysicsEngine::m_DynamicsWorld;
+	PhysicsContext* PhysicsEngine::s_Context = nullptr;
 
 	void PhysicsEngine::Init()
 	{
-		//collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
-		m_CollisionConfiguration = new btDefaultCollisionConfiguration();
-
-		//use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
-		m_Dispatcher = new btCollisionDispatcher(m_CollisionConfiguration);
-
-		//btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
-		m_OverlappingPairCache = new btDbvtBroadphase();
-
-		//the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
-		m_Solver = new btSequentialImpulseConstraintSolver;
-
-		m_DynamicsWorld = new btDiscreteDynamicsWorld(m_Dispatcher, m_OverlappingPairCache, m_Solver, m_CollisionConfiguration);
-
-		m_DynamicsWorld->setGravity(btVector3(0, -10, 0));
-
-
-		//keep track of the shapes, we release memory at exit.
-		//make sure to re-use collision shapes among rigid bodies whenever possible!
-		//btAlignedObjectArray<btCollisionShape*> collisionShapes;
+		s_Context = PhysicsContext::Create();
 	}
 
 	void PhysicsEngine::Shutdown()
 	{
-		delete m_DynamicsWorld;
-		delete m_Solver;
-		delete m_OverlappingPairCache;
-		delete m_Dispatcher;
-		delete m_CollisionConfiguration;
+		delete s_Context;
 	}
 
-	void PhysicsEngine::Update()
+	//void PhysicsEngine::Update()
+	MH_DEFINE_FUNC(PhysicsEngine::Update, void, Timestep ts)
 	{
-		m_DynamicsWorld->stepSimulation(1.f / 60.f, 10);
-
-		//print positions of all objects
-		for (int j = m_DynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
-		{
-			btCollisionObject* obj = m_DynamicsWorld->getCollisionObjectArray()[j];
-			btRigidBody* body = btRigidBody::upcast(obj);
-			btTransform trans;
-			if (body && body->getMotionState())
-			{
-				body->getMotionState()->getWorldTransform(trans);
-			}
-			else
-			{
-				trans = obj->getWorldTransform();
-			}
-			//printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
-		}
-	}
+		s_Context->Update(ts);
+	};
 }
