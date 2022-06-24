@@ -242,7 +242,8 @@ vec3 depthToWorldSpace(vec2 uv, float depth) {
             float bias = light.offset.w;
             
             float texelSize = 0.5 * light.offset.z;
-            vec3 normalBias = normal * texelSize * 1.4142136;
+            //vec3 normalBias = normal * texelSize * 1.4142136;
+            vec3 normalBias = vec3(0.0);
         #elif defined(SPOT)
             vec3 lightDir = normalize(light.objectToWorld[3].xyz - worldPos);
             

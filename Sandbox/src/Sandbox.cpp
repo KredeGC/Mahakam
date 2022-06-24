@@ -1,7 +1,7 @@
 #include "sbpch.h"
 
 #define MH_STANDALONE_TITLE "Title"
-#define MH_STANDALONE_ICON "res/internal/icons/icon-editor.png"
+#define MH_STANDALONE_ICON "import/internal/icons/icon-editor.png"
 
 #include <MahakamRuntime.h>
 
@@ -83,9 +83,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Asset<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.shader");
 	Asset<Shader> textureShader = Shader::Create("assets/shaders/default/LitTexture.shader");
 	Asset<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.shader");
-	/*Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/DitheredSkinned.yaml");
-	Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.yaml");
-	Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.yaml");*/
+	/*Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/DitheredSkinned.import");
+	Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.import");
+	Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.import");*/
 
 
 	// Create skinned material
@@ -93,7 +93,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	// skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
 	// skinnedMaterial->SetFloat("u_Metallic", 1.0f);
 	// skinnedMaterial->SetFloat("u_Roughness", 0.4f);
-	Asset<Material> skinnedMaterial = Asset<Material>("res/assets/materials/Skinned.material.yaml");
+	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
 #if 1
 	// Create animation and model
@@ -140,9 +140,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<Texture2D> brickAlbedo = Asset<Texture2D>("res/assets/textures/brick/brick_albedo.png.yaml");
-	Asset<Texture> brickBump = Asset<Texture2D>("res/assets/textures/brick/brick_bump.png.yaml");
-	Asset<Texture> brickRoughness = Asset<Texture2D>("res/assets/textures/brick/brick_roughness.png.yaml");
+	Asset<Texture2D> brickAlbedo = Asset<Texture2D>("import/assets/textures/brick/brick_albedo.png.import");
+	Asset<Texture> brickBump = Asset<Texture2D>("import/assets/textures/brick/brick_bump.png.import");
+	Asset<Texture> brickRoughness = Asset<Texture2D>("import/assets/textures/brick/brick_roughness.png.import");
 	/*Asset<Texture> brickAlbedo = Texture2D::Create("assets/textures/brick/brick_albedo.png", { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
 	Asset<Texture> brickBump = Texture2D::Create("assets/textures/brick/brick_bump.png", { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
 	Asset<Texture> brickRoughness = Texture2D::Create("assets/textures/brick/brick_roughness.png", { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });*/
@@ -151,7 +151,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });*/
 	Asset<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
 
-	Asset<Material> planeMaterial = Asset<Material>("res/assets/materials/LitTexture.material.yaml");
+	Asset<Material> planeMaterial = Asset<Material>("import/assets/materials/LitTexture.material.import");
 	/*Asset<Material> planeMaterial = Material::Create(textureShader);
 	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
 	planeMaterial->SetTexture("u_Bump", 0, brickBump);
@@ -204,7 +204,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create becret sound entity
-	Asset<Sound> becretSound = Asset<Sound>("res/assets/sounds/honeywood.wav.yaml");
+	Asset<Sound> becretSound = Asset<Sound>("import/assets/sounds/honeywood.wav.import");
 
 	Entity becretEntity = scene->CreateEntity("Memory Zone");
 	becretEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
@@ -215,7 +215,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create fern sound entity
-	Asset<Sound> fernSound = Asset<Sound>("res/assets/sounds/fern.wav.yaml");
+	Asset<Sound> fernSound = Asset<Sound>("import/assets/sounds/fern.wav.import");
 
 	Entity fernEntity = scene->CreateEntity("Fern");
 	fernEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
@@ -227,7 +227,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	// Create mesh & base material
 	Asset<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
 	//Asset<Material> baseMaterial = Material::Create(colorShader);
-	Asset<Material> baseMaterial = Asset<Material>("res/assets/materials/LitColor.material.yaml");
+	Asset<Material> baseMaterial = Asset<Material>("import/assets/materials/LitColor.material.import");
 	//baseMaterial->SetFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 
 	// Create scene entities

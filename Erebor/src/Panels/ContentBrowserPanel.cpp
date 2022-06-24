@@ -7,8 +7,8 @@ namespace Mahakam::Editor
 {
 	ContentBrowserPanel::ContentBrowserPanel()
 	{
-		m_DirectoryIcon = Texture2D::Create("res/internal/icons/icon-directory.png", { TextureFormat::RGBA8 });
-		m_FileIcon = Texture2D::Create("res/internal/icons/icon-file.png", { TextureFormat::RGBA8 });
+		m_DirectoryIcon = Texture2D::Create("internal/icons/icon-directory.png", { TextureFormat::RGBA8 });
+		m_FileIcon = Texture2D::Create("internal/icons/icon-file.png", { TextureFormat::RGBA8 });
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
@@ -137,7 +137,7 @@ namespace Mahakam::Editor
 					for (auto& file : std::filesystem::directory_iterator(importPath))
 					{
 						std::filesystem::path importPath = file.path();
-						if (!file.is_directory() && (importPath.extension() == ".yaml" || importPath.extension() == ".yml"))
+						if (!file.is_directory() && importPath.extension() == ".import")
 						{
 							std::string pathName = importPath.stem().string();
 

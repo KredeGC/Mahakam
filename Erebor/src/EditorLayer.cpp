@@ -425,17 +425,17 @@ namespace Mahakam::Editor
 		//s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
 
 		// Use this once scenes are setup correctly
-		Asset<Material> skyboxMaterial = Asset<Material>("res/assets/materials/Skybox.material.yaml");
-		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("res/assets/textures/pines.irradiance.yaml");
-		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("res/assets/textures/pines.specular.yaml");
+		Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/Skybox.material.import");
+		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/pines.irradiance.import");
+		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/pines.specular.import");
 
 		/*Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
 		Asset<Material> skyboxMaterial = Material::Create(skyboxShader);
 
-		Asset<TextureCube> skyboxTexture = Asset<TextureCube>("res/assets/textures/pines.hdr.yaml");
+		Asset<TextureCube> skyboxTexture = Asset<TextureCube>("import/assets/textures/pines.hdr.import");
 		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
 
-		skyboxMaterial.Save("assets/shaders/Skybox.shader", "res/assets/materials/Skybox.material.yaml");
+		skyboxMaterial.Save("assets/shaders/Skybox.shader", "import/assets/materials/Skybox.material.import");
 
 		AssetDatabase::ReloadAsset(skyboxMaterial.GetID());*/
 

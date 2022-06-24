@@ -305,7 +305,7 @@ namespace Mahakam
 			{
 				RecursiveCacheAssets(directory.path());
 			}
-			else if (directory.path().extension() == ".yaml" || directory.path().extension() == ".yml")
+			else if (directory.path().extension() == ".import")
 			{
 				uint64_t id = ReadAssetInfo(directory.path()).ID;
 

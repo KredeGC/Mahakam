@@ -9,7 +9,7 @@ namespace Mahakam
 	{
 	public:
 		inline static const std::filesystem::path CACHE_PATH = "cache";
-		inline static const std::filesystem::path IMPORT_PATH = "res";
+		inline static const std::filesystem::path IMPORT_PATH = "import";
 		inline static const std::filesystem::path ASSET_PATH = "assets";
 
 		inline static bool Exists(const std::filesystem::path& src)
@@ -41,7 +41,7 @@ namespace Mahakam
 			if (std::filesystem::is_directory(filepath))
 				return IMPORT_PATH / filepath.string();
 			else
-				return IMPORT_PATH / std::filesystem::path(filepath.string() + ".yaml");
+				return IMPORT_PATH / std::filesystem::path(filepath.string() + ".import");
 		}
 
 		static std::string OpenFile(const char* filter);
