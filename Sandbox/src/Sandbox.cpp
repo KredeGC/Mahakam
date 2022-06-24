@@ -89,10 +89,11 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create skinned material
-	Asset<Material> skinnedMaterial = Material::Create(skinnedShader);
-	skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
-	skinnedMaterial->SetFloat("u_Metallic", 1.0f);
-	skinnedMaterial->SetFloat("u_Roughness", 0.4f);
+	// Asset<Material> skinnedMaterial = Material::Create(skinnedShader);
+	// skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
+	// skinnedMaterial->SetFloat("u_Metallic", 1.0f);
+	// skinnedMaterial->SetFloat("u_Roughness", 0.4f);
+	Asset<Material> skinnedMaterial = Asset<Material>("res/assets/materials/Skinned.material.yaml");
 
 #if 1
 	// Create animation and model
