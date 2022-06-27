@@ -64,7 +64,7 @@ namespace Mahakam
 		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { SubmitParticlesImpl(transform, particles); }
 		
 		// Drawing
-		inline static void DrawSkybox() { DrawSkyboxImpl(); }
+		inline static void DrawSkybox(SceneData* sceneData) { DrawSkyboxImpl(sceneData); }
 		inline static void DrawScreenQuad() { DrawScreenQuadImpl(); }
 		inline static void DrawInstancedSphere(uint32_t amount) { DrawInstancedSphereImpl(amount); }
 		inline static void DrawInstancedPyramid(uint32_t amount) { DrawInstancedPyramidImpl(amount); }
@@ -100,9 +100,9 @@ namespace Mahakam
 
 		MH_DECLARE_FUNC(SubmitImpl, void, const glm::mat4& transform, Asset<Mesh> mesh, Asset<Material> material);
 		MH_DECLARE_FUNC(SubmitParticlesImpl, void, const glm::mat4& transform, const ParticleSystem& particles);
-		 
+		
 		// Drawing
-		MH_DECLARE_FUNC(DrawSkyboxImpl, void);
+		MH_DECLARE_FUNC(DrawSkyboxImpl, void, SceneData* sceneData);
 		MH_DECLARE_FUNC(DrawScreenQuadImpl, void);
 		MH_DECLARE_FUNC(DrawInstancedSphereImpl, void, uint32_t amount);
 		MH_DECLARE_FUNC(DrawInstancedPyramidImpl, void, uint32_t amount);

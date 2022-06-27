@@ -11,6 +11,9 @@ namespace Mahakam
 	// TODO:
 	// Make a ShaderLibrary that maintains a reference to all loaded shaders
 
+	class RenderPass;
+	struct SceneData;
+
 	class MaterialAssetImporter : public AssetImporter
 	{
 	private:
@@ -27,8 +30,15 @@ namespace Mahakam
 		// Preview
 		Asset<Mesh> m_PreviewSphereMesh;
 		Camera m_PreviewCamera;
-		Asset<FrameBuffer> m_FrameBuffer;
-		Asset<UniformBuffer> m_CameraBuffer;
+		//Asset<FrameBuffer> m_FrameBuffer;
+		//Asset<UniformBuffer> m_CameraBuffer;
+		Ref<SceneData> m_SceneData;
+		glm::ivec2 m_ViewportSize;
+		float m_Rotation = 0.0f;
+
+		Ref<RenderPass> m_GeometryPass;
+		Ref<RenderPass> m_LightingPass;
+		Ref<RenderPass> m_TonemapPass;
 
 	public:
 		MaterialAssetImporter();

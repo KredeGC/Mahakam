@@ -276,8 +276,8 @@ namespace Mahakam
 		sceneData->particleQueue.push_back(drawID);
 	};
 
-	//void Renderer::DrawSkyboxImpl()
-	MH_DEFINE_FUNC(Renderer::DrawSkyboxImpl, void)
+	//void Renderer::DrawSkyboxImpl(SceneData* sceneData)
+	MH_DEFINE_FUNC(Renderer::DrawSkyboxImpl, void, SceneData* sceneData)
 	{
 		MH_PROFILE_FUNCTION();
 

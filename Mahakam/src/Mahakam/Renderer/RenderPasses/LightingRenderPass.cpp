@@ -209,7 +209,7 @@ namespace Mahakam
 
 		// Render skybox
 		if (!sceneData->gBuffer)
-			Renderer::DrawSkybox();
+			Renderer::DrawSkybox(sceneData);
 
 		hdrFrameBuffer->Unbind();
 	}

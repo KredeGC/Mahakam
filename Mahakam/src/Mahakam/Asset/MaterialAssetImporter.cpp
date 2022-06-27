@@ -1,7 +1,11 @@
 #include "mhpch.h"
 #include "MaterialAssetImporter.h"
 
+#include "Mahakam/Renderer/RenderPasses/GeometryRenderPass.h"
+#include "Mahakam/Renderer/RenderPasses/LightingRenderPass.h"
+#include "Mahakam/Renderer/RenderPasses/TonemappingRenderPass.h"
 #include "Mahakam/Renderer/GL.h"
+#include "Mahakam/Renderer/Light.h"
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/RenderData.h"
 #include "Mahakam/Renderer/Mesh.h"
@@ -36,24 +40,51 @@ namespace Mahakam
 
 		// Preview stuff
 		m_PreviewSphereMesh = Mesh::CreateUVSphere(20, 20);
+		//m_PreviewSphereMesh = Mesh::CreateCubeSphere(10);
 
 		m_PreviewCamera = Camera(Camera::ProjectionType::Perspective, 45, 0.03f, 10.0f);
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 0, 2 });
+		// TODO: Have this be user-defined somehow
+		std::string filepath = "assets/textures/night.hdr";
+		Asset<TextureCube> skyboxTexture = TextureCube::Create(filepath, { 1024, TextureFormat::RG11B10F });
+		Asset<TextureCube> skyboxIrradiance = TextureCube::Create(filepath, { 32, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false });
+		Asset<TextureCube> skyboxSpecular = TextureCube::Create(filepath, { 128, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true });
 
+		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
+		Asset<Material> skyboxMaterial = Material::Create(skyboxShader);
+		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
+
+		// Setup scene data
+		m_SceneData = CreateRef<SceneData>();
+		m_SceneData->environment = EnvironmentData{ skyboxMaterial, skyboxIrradiance, skyboxSpecular };
+		m_SceneData->meshIDLookup[0] = m_PreviewSphereMesh;
+		m_SceneData->meshRefLookup[m_PreviewSphereMesh] = 0;
+		m_SceneData->transformIDLookup[0] = glm::mat4(1.0f);
+		//m_SceneData->gBuffer = true;
+
+		m_SceneData->renderQueue.push_back(0);
+
+		// Lights
+		glm::quat rot = glm::quat({ -0.7f, -glm::radians(45.0f), 0.0f });
+		Light light(Light::LightType::Directional, 10.0f, { 1.0f, 1.0f, 1.0f });
+		m_SceneData->environment.directionalLights.push_back({ glm::vec3{ 0.0f }, rot, light });
+
+		// Camera
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 0, 2 });
 		CameraData cameraData(m_PreviewCamera, { 512, 512 }, transform);
 
-		m_CameraBuffer = UniformBuffer::Create(sizeof(CameraData));
-		m_CameraBuffer->Bind();
-		m_CameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
+		m_SceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
+		m_SceneData->cameraBuffer->Bind();
+		m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
 
-		FrameBufferProps props;
-		props.width = 512;
-		props.height = 512;
-		props.colorAttachments = { TextureFormat::RGBA8 };
-		props.depthAttachment = TextureFormat::Depth24;
+		// Renderpasses
+		m_GeometryPass = CreateRef<GeometryRenderPass>();
+		m_LightingPass = CreateRef<LightingRenderPass>();
+		m_TonemapPass = CreateRef<TonemappingRenderPass>();
 
-		m_FrameBuffer = FrameBuffer::Create(props);
+		m_GeometryPass->Init(1, 1);
+		m_LightingPass->Init(1, 1);
+		m_TonemapPass->Init(1, 1);
 	}
 
 	void MaterialAssetImporter::OnWizardOpen(YAML::Node& rootNode)
@@ -101,10 +132,19 @@ namespace Mahakam
 					}
 				}
 			}
-			else
-			{
-				SetupMaterialProperties({}, "");
-			}
+		}
+
+		if (m_Material)
+		{
+			// Setup scene data for the material
+			m_SceneData->shaderRefLookup.clear();
+			m_SceneData->materialRefLookup.clear();
+
+			m_SceneData->shaderIDLookup[0] = m_Material->GetShader();
+			m_SceneData->shaderRefLookup[m_Material->GetShader()] = 0;
+
+			m_SceneData->materialIDLookup[0] = m_Material;
+			m_SceneData->materialRefLookup[m_Material] = 0;
 		}
 		else
 		{
@@ -203,30 +243,35 @@ namespace Mahakam
 			float maxSize = glm::min(size.x, size.y);
 			ImVec2 viewportSize = { size.x, maxSize };
 
-			m_FrameBuffer->Bind();
-			GL::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-			GL::Clear();
+			// Update renderpasses
+			if (viewportSize.x != m_ViewportSize.x && viewportSize.y != m_ViewportSize.y)
+			{
+				m_ViewportSize = { (uint32_t)viewportSize.x, (uint32_t)viewportSize.y };
+				m_GeometryPass->OnWindowResize(m_ViewportSize.x, m_ViewportSize.y);
+				m_LightingPass->OnWindowResize(m_ViewportSize.x, m_ViewportSize.y);
+				m_TonemapPass->OnWindowResize(m_ViewportSize.x, m_ViewportSize.y);
+			}
 
+			// Render the material
+			Asset<FrameBuffer> nullBuffer = nullptr;
+			m_GeometryPass->Render(m_SceneData.get(), nullBuffer);
+			m_LightingPass->Render(m_SceneData.get(), m_GeometryPass->GetFrameBuffer());
+			m_TonemapPass->Render(m_SceneData.get(), m_LightingPass->GetFrameBuffer());
+
+			// Setup camera
 			m_PreviewCamera.SetRatio(viewportSize.x / viewportSize.y);
 			m_PreviewCamera.RecalculateProjectionMatrix();
-			glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 0, 2 });
+			m_Rotation += 0.001f;
+			glm::quat rot = glm::quat({ 0.0f, m_Rotation, 0.0f });
+			glm::mat4 transform = glm::toMat4(rot) * glm::translate(glm::mat4(1.0f), { 0, 0, 1.5f });
+			//glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 0, 1.5f });
 
 			CameraData cameraData(m_PreviewCamera, { 512, 512 }, transform);
 
-			m_CameraBuffer->Bind();
-			m_CameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
+			m_SceneData->cameraBuffer->Bind(0);
+			m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
 
-			m_Material->GetShader()->Bind("GEOMETRY");
-			m_Material->Bind();
-
-			m_Material->SetTransform(glm::mat4(1.0f));
-
-			m_PreviewSphereMesh->Bind();
-			GL::DrawIndexed(m_PreviewSphereMesh->GetIndexCount());
-
-			m_FrameBuffer->Unbind();
-
-			ImGui::Image((void*)(uintptr_t)m_FrameBuffer->GetColorTexture(0)->GetRendererID(), viewportSize, { 0, 1 }, { 1, 0 });
+			ImGui::Image((void*)(uintptr_t)m_TonemapPass->GetFrameBuffer()->GetColorTexture(0)->GetRendererID(), viewportSize, { 0, 1 }, { 1, 0 });
 		}
 	}
 

@@ -31,6 +31,30 @@ namespace Mahakam
 		return uv;
 	}
 
+	static glm::vec3 CalculateUVSphere(const glm::vec2& coords)
+	{
+		const float pi = glm::pi<float>();
+		const float pi2 = pi * 2.0f;
+
+		float theta = coords.x * pi2;
+		float phi = (coords.y - 0.5f) * pi;
+
+		while (theta >= pi2)
+			theta -= pi2;
+
+		// This determines the radius of the ring of this line of latitude.
+		// It's widest at the equator, and narrows as phi increases/decreases.
+		float c = glm::cos(phi);
+
+		// Usual formula for a vector in spherical coordinates.
+		// You can exchange x & z to wind the opposite way around the sphere.
+		return glm::normalize(glm::vec3(
+			c * glm::cos(theta),
+			glm::sin(phi),
+			c * glm::sin(theta)
+		));
+	}
+
 	Mesh::Bounds Mesh::CalculateBounds(const glm::vec3* positions, uint32_t vertexCount)
 	{
 		glm::vec3 min = positions[0];
@@ -292,6 +316,7 @@ namespace Mahakam
 		glm::vec3* positions = new glm::vec3[vertexCount];
 		glm::vec2* uvs = new glm::vec2[vertexCount];
 		glm::vec3* normals = new glm::vec3[vertexCount];
+		glm::vec3* tangents = new glm::vec3[vertexCount];
 
 		uint32_t* indices = new uint32_t[indexCount];
 
@@ -305,29 +330,16 @@ namespace Mahakam
 		{
 			for (int x = 0; x < rows; x++)
 			{
-				glm::vec2 percent = { x / (float)(rows - 1), y / (float)(columns - 1) };
+				glm::vec2 percentCenter = { x / (float)(rows - 1), y / (float)(columns - 1) };
+				glm::vec2 percentRight = { (x + 1) / (float)(rows - 1), y / (float)(columns - 1) };
 
-				float theta = percent.x * 2.0f * 3.1415f;
-				float phi = (percent.y - 0.5f) * 3.1415f;
+				glm::vec3 pointOnSphereCenter = CalculateUVSphere(percentCenter);
+				glm::vec3 pointOnSphereRight = CalculateUVSphere(percentRight);
 
-				if (x == rows - 1)
-					theta = 0.0f;
-
-				// This determines the radius of the ring of this line of latitude.
-				// It's widest at the equator, and narrows as phi increases/decreases.
-				float c = cos(phi);
-
-				// Usual formula for a vector in spherical coordinates.
-				// You can exchange x & z to wind the opposite way around the sphere.
-				glm::vec3 pointOnSphere = glm::vec3(
-					c * cos(theta),
-					sin(phi),
-					c * sin(theta)
-				);
-
-				positions[index] = pointOnSphere * 0.5f;
-				uvs[index] = percent;
-				normals[index] = glm::normalize(pointOnSphere);
+				positions[index] = pointOnSphereCenter * 0.5f;
+				uvs[index] = { percentCenter.x, 1.0f - percentCenter.y };
+				normals[index] = pointOnSphereCenter;
+				tangents[index] = glm::normalize(pointOnSphereRight - pointOnSphereCenter);
 
 				if (x != rows - 1 && y != columns - 1)
 				{
@@ -351,12 +363,14 @@ namespace Mahakam
 		interleavedVertices.positions = positions;
 		interleavedVertices.texcoords = uvs;
 		interleavedVertices.normals = normals;
+		interleavedVertices.tangents = tangents;
 
 		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
 		delete[] normals;
+		delete[] tangents;
 		delete[] indices;
 
 		return mesh;
@@ -382,6 +396,7 @@ namespace Mahakam
 		glm::vec3* positions = new glm::vec3[vertexCount];
 		glm::vec2* uvs = new glm::vec2[vertexCount];
 		glm::vec3* normals = new glm::vec3[vertexCount];
+		glm::vec3* tangents = new glm::vec3[vertexCount];
 
 		uint32_t* indices = new uint32_t[indexCount];
 
@@ -403,7 +418,12 @@ namespace Mahakam
 						+ (percent.x - 0.5f) * 2.0f * axisA
 						+ (percent.y - 0.5f) * 2.0f * axisB;
 
+					glm::vec3 pointOnCubeRight = upwards
+						+ (percent.x + 1 / (float)(tessellation - 1) - 0.5f) * 2.0f * axisA
+						+ (percent.y - 0.5f) * 2.0f * axisB;
+
 					glm::vec3 pointOnSphere = CalculateCubeSphereVertex(pointOnCube);
+					glm::vec3 pointOnSphereRight = CalculateCubeSphereVertex(pointOnCubeRight);
 
 					positions[index] = pointOnSphere * 0.5f;
 					if (equirectangular)
@@ -411,6 +431,7 @@ namespace Mahakam
 					else
 						uvs[index] = percent;
 					normals[index] = pointOnSphere;
+					tangents[index] = glm::normalize(pointOnSphereRight - pointOnSphere);
 
 					if (x != tessellation - 1 && y != tessellation - 1)
 					{
@@ -448,12 +469,14 @@ namespace Mahakam
 		interleavedVertices.positions = positions;
 		interleavedVertices.texcoords = uvs;
 		interleavedVertices.normals = normals;
+		interleavedVertices.tangents = tangents;
 
 		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
 		delete[] normals;
+		delete[] tangents;
 		delete[] indices;
 
 		return mesh;
