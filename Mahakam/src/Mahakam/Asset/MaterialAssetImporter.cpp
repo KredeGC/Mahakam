@@ -261,8 +261,7 @@ namespace Mahakam
 			// Setup camera
 			m_PreviewCamera.SetRatio(viewportSize.x / viewportSize.y);
 			m_PreviewCamera.RecalculateProjectionMatrix();
-			m_Rotation += 0.001f;
-			glm::quat rot = glm::quat({ 0.0f, m_Rotation, 0.0f });
+			glm::quat rot = glm::quat(m_OrbitEulerAngles);
 			glm::mat4 transform = glm::toMat4(rot) * glm::translate(glm::mat4(1.0f), { 0, 0, 1.5f });
 
 			CameraData cameraData(m_PreviewCamera, { 512, 512 }, transform);
@@ -270,7 +269,26 @@ namespace Mahakam
 			m_SceneData->cameraBuffer->Bind(0);
 			m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
 
+			ImGui::BeginChild("Material Preview");
+			bool focused = ImGui::IsWindowFocused();
+			bool hovered = ImGui::IsWindowHovered();
+
+			// Calculate mouse delta
+			auto [mouseX, mouseY] = Input::GetMousePos();
+			float deltaX = mouseX - m_MousePos.x;
+			float deltaY = mouseY - m_MousePos.y;
+			m_MousePos.x = mouseX;
+			m_MousePos.y = mouseY;
+
+			if (focused && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_LEFT))
+			{
+				m_OrbitEulerAngles.y -= glm::radians(deltaX * m_DragSpeed);
+				m_OrbitEulerAngles.x = glm::clamp(m_OrbitEulerAngles.x - glm::radians(deltaY * m_DragSpeed), -1.5707f, 1.5707f);
+			}
+
 			ImGui::Image((void*)(uintptr_t)m_TonemapPass->GetFrameBuffer()->GetColorTexture(0)->GetRendererID(), viewportSize, { 0, 1 }, { 1, 0 });
+
+			ImGui::EndChild();
 		}
 	}
 

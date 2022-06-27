@@ -17,6 +17,8 @@ namespace Mahakam
 	class MaterialAssetImporter : public AssetImporter
 	{
 	private:
+		const float m_DragSpeed = 0.3f;
+
 		ImporterProps m_ImporterProps;
 
 		Asset<Material> m_Material;
@@ -31,8 +33,10 @@ namespace Mahakam
 		Asset<Mesh> m_PreviewSphereMesh;
 		Camera m_PreviewCamera;
 		Ref<SceneData> m_SceneData;
-		glm::ivec2 m_ViewportSize;
-		float m_Rotation = 0.0f;
+		glm::ivec2 m_ViewportSize{ 0 };
+		glm::vec2 m_MousePos{ 0.0f };
+		glm::vec3 m_OrbitEulerAngles{ 0.0f };
+		//float m_Rotation = 0.0f;
 
 		Ref<RenderPass> m_GeometryPass;
 		Ref<RenderPass> m_LightingPass;
