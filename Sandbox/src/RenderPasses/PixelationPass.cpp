@@ -35,7 +35,7 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool PixelationPass::Render(SceneData* sceneData, Asset<FrameBuffer>& src)
+	bool PixelationPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

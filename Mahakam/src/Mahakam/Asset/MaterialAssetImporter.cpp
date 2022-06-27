@@ -264,7 +264,6 @@ namespace Mahakam
 			m_Rotation += 0.001f;
 			glm::quat rot = glm::quat({ 0.0f, m_Rotation, 0.0f });
 			glm::mat4 transform = glm::toMat4(rot) * glm::translate(glm::mat4(1.0f), { 0, 0, 1.5f });
-			//glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 0, 1.5f });
 
 			CameraData cameraData(m_PreviewCamera, { 512, 512 }, transform);
 

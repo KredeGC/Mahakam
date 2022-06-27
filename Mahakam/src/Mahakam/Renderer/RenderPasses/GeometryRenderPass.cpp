@@ -48,7 +48,7 @@ namespace Mahakam
 		gBuffer->Resize(width, height);
 	}
 
-	bool GeometryRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer>& src)
+	bool GeometryRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

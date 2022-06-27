@@ -62,7 +62,7 @@ namespace Mahakam
 		hdrFrameBuffer->Resize(width, height);
 	}
 
-	bool LightingRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer>& src)
+	bool LightingRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -89,10 +89,10 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		// Create BRDF and falloff maps
-		FileUtility::CreateDirectories("res/internal/");
-
-		brdfLut = LoadOrCreateLUTTexture("res/internal/brdf.dat", "assets/shaders/internal/BRDF.shader", TextureFormat::RG16F, 512, 512);
-		falloffLut = LoadOrCreateLUTTexture("res/internal/falloff.dat", "assets/shaders/internal/Falloff.shader", TextureFormat::R8, 16, 16);
+		FileUtility::CreateDirectories("cache/internal/");
+		 
+		brdfLut = LoadOrCreateLUTTexture("cache/internal/brdf.dat", "assets/shaders/internal/BRDF.shader", TextureFormat::RG16F, 512, 512);
+		falloffLut = LoadOrCreateLUTTexture("cache/internal/falloff.dat", "assets/shaders/internal/Falloff.shader", TextureFormat::R8, 16, 16);
 
 		spotlightTexture = Texture2D::Create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
 	}

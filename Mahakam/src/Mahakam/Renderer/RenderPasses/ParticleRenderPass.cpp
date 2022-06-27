@@ -41,7 +41,7 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool ParticleRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer>& src)
+	bool ParticleRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

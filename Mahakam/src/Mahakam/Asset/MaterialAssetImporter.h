@@ -30,8 +30,6 @@ namespace Mahakam
 		// Preview
 		Asset<Mesh> m_PreviewSphereMesh;
 		Camera m_PreviewCamera;
-		//Asset<FrameBuffer> m_FrameBuffer;
-		//Asset<UniformBuffer> m_CameraBuffer;
 		Ref<SceneData> m_SceneData;
 		glm::ivec2 m_ViewportSize;
 		float m_Rotation = 0.0f;

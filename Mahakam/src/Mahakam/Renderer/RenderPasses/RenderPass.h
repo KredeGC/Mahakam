@@ -30,7 +30,7 @@ namespace Mahakam
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) {}
 
-		virtual bool Render(SceneData* sceneData, Asset<FrameBuffer>& src) = 0;
+		virtual bool Render(SceneData* sceneData, Asset<FrameBuffer> src) = 0;
 
 		virtual Asset<FrameBuffer> GetFrameBuffer() = 0;
 
