@@ -158,6 +158,7 @@ namespace Mahakam
 			deferredShader->Bind("DIRECTIONAL");
 		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
 		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
+		deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(2));
 		deferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3));
 		deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
 

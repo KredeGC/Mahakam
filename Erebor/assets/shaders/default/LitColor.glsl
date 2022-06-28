@@ -29,7 +29,7 @@ void main() {
 
 layout(location = 0) out vec4 o_Albedo;
 layout(location = 1) out vec4 o_Specular;
-layout(location = 2) out vec4 o_Pos;
+layout(location = 2) out vec4 o_Emission;
 layout(location = 3) out vec4 o_Normal;
 
 struct v2f {
@@ -43,19 +43,14 @@ layout(location = 0) in v2f i;
 layout(location = 1) uniform vec3 u_Color;
 layout(location = 2) uniform float u_Metallic;
 layout(location = 3) uniform float u_Roughness;
-layout(location = 4) uniform float u_AO;
+layout(location = 4) uniform vec3 u_Emission;
 
 void main() {
-    // Surface values
-    vec3 albedo = u_Color;
-    float metallic = u_Metallic;
-    float roughness = u_Roughness;
-    float ao = 1.0;
-    
+    // Get normal from vertices
     vec3 normal = normalize(i.v_WorldNormal);
     
-    o_Albedo = vec4(albedo, ao);
-    o_Specular = vec4(0.0, 0.0, metallic, roughness);
-    o_Pos = vec4(i.v_WorldPos, 1.0);
+    o_Albedo = vec4(u_Color, 1.0);
+    o_Specular = vec4(0.0, 0.0, u_Metallic, u_Roughness);
+    o_Emission = vec4(u_Emission, 0.0);
     o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
 }

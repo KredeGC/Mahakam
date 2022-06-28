@@ -28,7 +28,7 @@ layout(location = 6) in vec4 i_BoneWeights;
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
 
-layout(location = 6) uniform mat4 finalBonesMatrices[MAX_BONES];
+layout(location = 4) uniform mat4 finalBonesMatrices[MAX_BONES];
 
 void main() {
     // vec4 boneWeights = i_BoneWeights;
@@ -81,12 +81,13 @@ void main() {
 
 layout(location = 0) out vec4 o_Albedo;
 layout(location = 1) out vec4 o_Specular;
-layout(location = 2) out vec4 o_Pos;
+layout(location = 2) out vec4 o_Emission;
 layout(location = 3) out vec4 o_Normal;
 
 layout(location = 0) uniform vec3 u_Color;
 layout(location = 1) uniform float u_Metallic;
 layout(location = 2) uniform float u_Roughness;
+layout(location = 3) uniform vec3 u_Emission;
 
 void main() {
 #if defined(GEOMETRY)
@@ -94,6 +95,7 @@ void main() {
     vec3 albedo = u_Color;
     float metallic = u_Metallic;
     float roughness = u_Roughness;
+    vec3 emission = u_Emission;
     
     vec3 normal = normalize(i.v_WorldNormal);
     
@@ -103,7 +105,7 @@ void main() {
     
     o_Albedo = vec4(albedo, 1.0);
     o_Specular = vec4(0.0, 0.0, metallic, roughness);
-    o_Pos = vec4(i.v_WorldPos, 1.0);
+    o_Emission = vec4(emission, 0.0);
     o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
 #endif
 }

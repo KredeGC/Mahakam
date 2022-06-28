@@ -151,7 +151,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });*/
 	Asset<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
 
-	Asset<Material> planeMaterial = Asset<Material>("import/assets/materials/LitTexture.material.import");
+	Asset<Material> planeMaterial = Asset<Material>("import/assets/materials/BrickPlane.material.import");
 	/*Asset<Material> planeMaterial = Material::Create(textureShader);
 	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
 	planeMaterial->SetTexture("u_Bump", 0, brickBump);
@@ -227,7 +227,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	// Create mesh & base material
 	Asset<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
 	//Asset<Material> baseMaterial = Material::Create(colorShader);
-	Asset<Material> baseMaterial = Asset<Material>("import/assets/materials/LitColor.material.import");
+	Asset<Material> baseMaterial = Asset<Material>("import/assets/materials/WhiteDiffuse.material.import");
 	//baseMaterial->SetFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 
 	// Create scene entities

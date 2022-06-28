@@ -2,19 +2,9 @@
 #define PBR_INCLUDED
 
 #include "assets/shaders/include/lighting/LightStruct.glsl"
-#include "assets/shaders/include/lighting/Shadows.glsl"
 
 layout(binding = 9, location = 9) uniform sampler2D u_AttenuationLUT;
 layout(binding = 10, location = 10) uniform sampler2D u_LightCookie;
-
-vec3 depthToWorldSpace(vec2 uv, float depth) {
-    vec4 clipSpaceLocation;
-    clipSpaceLocation.xy = uv * 2.0 - 1.0;
-    clipSpaceLocation.z = depth * 2.0 - 1.0;
-    clipSpaceLocation.w = 1.0;
-    vec4 homogenousLocation = MATRIX_IVP * clipSpaceLocation;
-    return homogenousLocation.xyz / homogenousLocation.w;
-}
 
 // vec3 depthToViewSpace(vec2 uv, float depth) {
 //     vec4 clipSpaceLocation;
@@ -99,7 +89,7 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             vec3 cookie = texture(u_LightCookie, uvCookie.xy / uvCookie.w * 0.5 + vec2(0.5, 0.5), -8.0).rgb;
             float attenuation = uvCookie.w > 0.0 ? 1.0 : 0.0;
             
-            float shadowAttenuation = CalculateShadowAttenuation(light, worldPos, worldNormal);
+            float shadowAttenuation = PBR_SHADOW(light, worldPos, worldNormal);
             
             float normalizedDist = max(distSqr * rcpRangeSqr, 0.00001);
             attenuation *= texture(u_AttenuationLUT, normalizedDist.rr).r;
@@ -120,7 +110,7 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             Light light = lights[i];
             // calculate per-light radiance
             vec3 L = normalize(-light.direction);
-            float attenuation = CalculateShadowAttenuation(light, worldPos, worldNormal);
+            float attenuation = PBR_SHADOW(light, worldPos, worldNormal);
             
             Lo += PBR_DIRECT(albedo, metallic, roughness, viewDir, worldNormal, L, light.color, attenuation);
         }

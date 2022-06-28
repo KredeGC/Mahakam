@@ -54,8 +54,18 @@ layout(location = 0) out vec4 o_Color;
 
 layout(binding = 0, location = 0) uniform sampler2D u_GBuffer0;
 layout(binding = 1, location = 1) uniform sampler2D u_GBuffer1;
+layout(binding = 2, location = 2) uniform sampler2D u_GBuffer2;
 layout(binding = 3, location = 3) uniform sampler2D u_GBuffer3;
 layout(binding = 4, location = 4) uniform sampler2D u_Depth;
+
+vec3 DepthToWorldSpace(vec2 uv, float depth) {
+    vec4 clipSpaceLocation;
+    clipSpaceLocation.xy = uv * 2.0 - 1.0;
+    clipSpaceLocation.z = depth * 2.0 - 1.0;
+    clipSpaceLocation.w = 1.0;
+    vec4 homogenousLocation = MATRIX_IVP * clipSpaceLocation;
+    return homogenousLocation.xyz / homogenousLocation.w;
+}
 
 void main() {
     #if defined(POINT) || defined(SPOT)
@@ -69,9 +79,10 @@ void main() {
     #endif
     
     // Surface values
-    vec4 gBuffer0 = texture(u_GBuffer0, screenUV);
-    vec4 gBuffer1 = texture(u_GBuffer1, screenUV);
-    vec4 gBuffer3 = texture(u_GBuffer3, screenUV);
+    vec4 gBuffer0 = texture(u_GBuffer0, screenUV); // RGB - Albedo, A - Occlussion
+    vec4 gBuffer1 = texture(u_GBuffer1, screenUV); // RG - Unused, B - Metallic, A - Roughness
+    vec4 gBuffer2 = texture(u_GBuffer2, screenUV); // RGB - Emission (not affected by light)
+    vec4 gBuffer3 = texture(u_GBuffer3, screenUV); // RGB - World normal, A - Unused
     float depth = texture(u_Depth, screenUV).r;
     
     // GBuffer0
@@ -82,15 +93,20 @@ void main() {
     float metallic = gBuffer1.b;
     float roughness = clamp(gBuffer1.a, 0.05, 1.0);
     
+    // GBuffer2
+    vec3 emission = gBuffer2.rgb;
+    
     // GBuffer3
     vec3 worldNormal = normalize(gBuffer3.xyz * 2.0 - 1.0);
     
     // Depth Buffer
-    vec3 worldPos = depthToWorldSpace(screenUV, depth);
+    vec3 worldPos = DepthToWorldSpace(screenUV, depth);
     
     vec3 viewDir = getViewDir(worldPos);
     
+    // Final render
     vec3 color = BRDF(albedo, metallic, roughness, ao, viewDir, worldPos, worldNormal);
+    color += emission;
 
     o_Color = vec4(color, 1.0);
     

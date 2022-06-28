@@ -36,4 +36,4 @@ vec3 getViewDir(vec3 worldPos) {
         return normalize(u_CameraPos - worldPos);
 }
 
-#endif
+#endif // MATRIX_INCLUDED

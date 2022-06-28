@@ -5,6 +5,9 @@
     #define SHADOWS_ENABLED
 #endif
 
+#include "assets/shaders/include/lighting/LightStruct.glsl"
+#include "assets/shaders/include/Random.glsl"
+
 #if defined(SHADOWS_ENABLED)
     layout(binding = 8, location = 8) uniform sampler2D u_ShadowMap;
     
@@ -46,20 +49,6 @@
         #else
             return depth > texture(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
         #endif
-    }
-    
-    float rand3dTo1d(vec3 value, vec3 dotDir) {
-        vec3 smallValue = cos(value);
-        float random = dot(smallValue, dotDir);
-        random = fract(sin(random) * 143758.5453);
-        return random;
-    }
-    
-    vec2 rand3dTo2d(vec3 value) {
-        return vec2(
-            rand3dTo1d(value, vec3(12.989, 78.233, 37.719)),
-            rand3dTo1d(value, vec3(39.346, 11.135, 83.155))
-        );
     }
     
     float EstimatePenumbra(float lightSize, float depth, vec2 projCoords, vec2 texSize, vec2 texelSize) {

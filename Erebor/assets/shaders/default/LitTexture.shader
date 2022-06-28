@@ -17,6 +17,12 @@ Properties:
   u_Occlussion:
     Type: Texture
     Default: White
+  u_Emission:
+    Type: Texture
+    Default: Black
+  u_EmissionColor:
+    Type: HDR
+    Default: [0, 0, 0]
 Passes:
   GEOMETRY:
     Defines:

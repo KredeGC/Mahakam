@@ -29,7 +29,7 @@ namespace Mahakam
 	public:
 		Light() = default;
 
-		Light(LightType lightType, float range, const glm::vec3& color, bool shadowCasting = false, float bias = 0.001f); // Directional
+		Light(LightType lightType, float range, const glm::vec3& color, bool shadowCasting = false, float bias = 0.005f); // Directional
 
 		Light(LightType lightType, float fov, float range, const glm::vec3& color, bool shadowCasting = false, float bias = 0.0f); // Spot
 

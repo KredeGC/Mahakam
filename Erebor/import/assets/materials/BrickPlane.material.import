@@ -1,0 +1,12 @@
+Filepath: assets/shaders/default/LitTexture.shader
+Extension: .material
+ID: 660037763570734260
+Properties:
+  u_UVTransform: [2, 2, 0, 0]
+  u_Metallic: 0
+  u_Albedo: 8387792792684495064
+  u_Occlussion: 0
+  u_Roughness: 4232175179651810790
+  u_Bump: 125392180592167870
+  u_Emission: 0
+  u_EmissionColor: [0, 0, 0]

@@ -17,7 +17,7 @@ layout(location = 1) in vec2 i_UV;
 layout(location = 2) in vec3 i_Normal;
 layout(location = 3) in vec3 i_Tangent;
 
-layout(location = 5) uniform vec4 u_UVTransform;
+layout(location = 0) uniform vec4 u_UVTransform;
 
 void main() {
     gl_Position = MATRIX_MVP * vec4(i_Pos, 1.0);
@@ -52,19 +52,23 @@ layout(location = 1) out vec4 o_Specular;
 layout(location = 2) out vec4 o_Emission;
 layout(location = 3) out vec4 o_Normal;
 
-layout(binding = 0, location = 0) uniform sampler2D u_Albedo;
-layout(binding = 1, location = 1) uniform sampler2D u_Bump;
-layout(binding = 2, location = 2) uniform sampler2D u_Metallic;
-layout(binding = 3, location = 3) uniform sampler2D u_Roughness;
-layout(binding = 4, location = 4) uniform sampler2D u_Occlussion;
+layout(binding = 1, location = 1) uniform sampler2D u_Albedo;
+layout(binding = 2, location = 2) uniform sampler2D u_Bump;
+layout(binding = 3, location = 3) uniform sampler2D u_Metallic;
+layout(binding = 4, location = 4) uniform sampler2D u_Roughness;
+layout(binding = 5, location = 5) uniform sampler2D u_Occlussion;
+layout(binding = 6, location = 6) uniform sampler2D u_Emission;
+layout(location = 7) uniform vec3 u_EmissionColor;
 
 void main() {
     // Surface values
     vec3 albedo = texture(u_Albedo, i.v_UV).rgb;
+    //vec3 albedo = SampleStochastic(u_Albedo, i.v_UV).rgb;
     vec3 bump = UnpackNormal(texture(u_Bump, i.v_UV).xy);
     float metallic = texture(u_Metallic, i.v_UV).r;
     float roughness = texture(u_Roughness, i.v_UV).r;
     float ao = texture(u_Occlussion, i.v_UV).r;
+    vec3 emission = texture(u_Emission, i.v_UV).rgb * u_EmissionColor;
     
     //albedo = pow(albedo, vec3(2.2)); // sRGB correction
     
@@ -76,6 +80,6 @@ void main() {
     
     o_Albedo = vec4(albedo, ao);
     o_Specular = vec4(0.0, 0.0, metallic, roughness);
-    o_Emission = vec4(i.v_WorldPos, 1.0);
+    o_Emission = vec4(emission, 0.0);
     o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
 }

@@ -43,8 +43,6 @@ namespace Mahakam
 
 		m_PreviewCamera = Camera(Camera::ProjectionType::Perspective, 45, 0.03f, 10.0f);
 
-		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
-
 		// TODO: Have this be user-defined somehow
 		std::string filepath = "assets/textures/night.hdr";
 		Asset<TextureCube> skyboxTexture = TextureCube::Create(filepath, { 1024, TextureFormat::RG11B10F });
@@ -89,6 +87,8 @@ namespace Mahakam
 
 	void MaterialAssetImporter::OnWizardOpen(YAML::Node& rootNode)
 	{
+		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
+
 		YAML::Node filepathNode = rootNode["Filepath"];
 		if (filepathNode)
 		{
@@ -271,7 +271,6 @@ namespace Mahakam
 
 			ImGui::BeginChild("Material Preview", viewportSize);
 			bool focused = ImGui::IsWindowFocused();
-			bool hovered = ImGui::IsWindowHovered();
 
 			// Calculate mouse delta
 			auto [mouseX, mouseY] = Input::GetMousePos();

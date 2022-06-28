@@ -1,7 +1,0 @@
-Filepath: assets/shaders/default/LitColor.shader
-Extension: .material
-ID: 15739498696759362444
-Properties:
-  u_Metallic: 0
-  u_Color: [1, 1, 1]
-  u_Roughness: 0.497000009

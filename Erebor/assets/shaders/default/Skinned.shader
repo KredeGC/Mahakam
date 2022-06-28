@@ -12,6 +12,9 @@ Properties:
     Min: 0
     Max: 1
     Default: 0.5
+  u_Emission:
+    Type: HDR
+    Default: [0, 0, 0]
 Passes:
   GEOMETRY:
     Defines:
