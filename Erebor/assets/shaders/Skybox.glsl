@@ -11,7 +11,7 @@ layout(location = 0) out v2f o;
 layout(location = 0) in vec3 i_Pos;
 
 void main() {
-    mat4 invProjection = inverse(MATRIX_P);
+    mat4 invProjection = MATRIX_IP;
     mat3 invView = transpose(mat3(MATRIX_V));
     vec3 unprojected = (invProjection * vec4(i_Pos, 1.0)).xyz;
     vec3 viewDir = invView * unprojected;

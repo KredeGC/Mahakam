@@ -17,6 +17,8 @@ layout(location = 1) in vec2 i_UV;
 layout(location = 2) in vec3 i_Normal;
 layout(location = 3) in vec3 i_Tangent;
 
+layout(location = 5) uniform vec4 u_UVTransform;
+
 void main() {
     gl_Position = MATRIX_MVP * vec4(i_Pos, 1.0);
     
@@ -25,7 +27,7 @@ void main() {
     o.v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
     o.v_WorldTangent = (MATRIX_M * vec4(i_Tangent, 0.0)).xyz;
     o.v_WorldBinormal = cross(o.v_WorldNormal, o.v_WorldTangent);
-    o.v_UV = i_UV;
+    o.v_UV = u_UVTransform.xy * i_UV + u_UVTransform.zw;
 }
 
 

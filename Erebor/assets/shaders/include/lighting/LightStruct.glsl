@@ -11,7 +11,7 @@
 #elif defined(POINT)
     struct Light {
         vec4 position; // xyz - pos, w - range
-        vec4 color; // xyz - pos, w - 1.0 / (range * range)
+        vec4 color; // xyz - color, w - 1.0 / (range * range)
     };
 #elif defined(SPOT)
     struct Light {

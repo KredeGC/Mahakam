@@ -1,4 +1,7 @@
 Properties:
+  u_UVTransform:
+    Type: Drag
+    Default: [1, 1, 0, 0]
   u_Albedo:
     Type: Texture
     Default: White

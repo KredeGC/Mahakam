@@ -1,3 +1,4 @@
+// Normals are packed in the RG channels, preferably using BC5
 vec3 UnpackNormal(vec2 xy) {
     xy *= 2.0;
     xy -= 1.0;

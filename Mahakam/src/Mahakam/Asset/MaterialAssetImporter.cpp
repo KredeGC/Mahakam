@@ -40,9 +40,10 @@ namespace Mahakam
 
 		// Preview stuff
 		m_PreviewSphereMesh = Mesh::CreateUVSphere(20, 20);
-		//m_PreviewSphereMesh = Mesh::CreateCubeSphere(10);
 
 		m_PreviewCamera = Camera(Camera::ProjectionType::Perspective, 45, 0.03f, 10.0f);
+
+		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
 
 		// TODO: Have this be user-defined somehow
 		std::string filepath = "assets/textures/night.hdr";
@@ -60,7 +61,6 @@ namespace Mahakam
 		m_SceneData->meshIDLookup[0] = m_PreviewSphereMesh;
 		m_SceneData->meshRefLookup[m_PreviewSphereMesh] = 0;
 		m_SceneData->transformIDLookup[0] = glm::mat4(1.0f);
-		//m_SceneData->gBuffer = true;
 
 		m_SceneData->renderQueue.push_back(0);
 
@@ -269,7 +269,7 @@ namespace Mahakam
 			m_SceneData->cameraBuffer->Bind(0);
 			m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
 
-			ImGui::BeginChild("Material Preview");
+			ImGui::BeginChild("Material Preview", viewportSize);
 			bool focused = ImGui::IsWindowFocused();
 			bool hovered = ImGui::IsWindowHovered();
 
