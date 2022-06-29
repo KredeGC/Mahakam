@@ -8,9 +8,6 @@
 
 namespace Mahakam
 {
-	// TODO:
-	// Make a ShaderLibrary that maintains a reference to all loaded shaders
-
 	class RenderPass;
 	struct SceneData;
 
@@ -23,7 +20,7 @@ namespace Mahakam
 
 		Asset<Material> m_Material;
 
-		std::filesystem::path m_ShaderFilepath;
+		std::filesystem::path m_ShaderImportPath;
 
 		UnorderedMap<std::string, ShaderProperty> m_MaterialProperties;
 		
@@ -36,7 +33,6 @@ namespace Mahakam
 		glm::ivec2 m_ViewportSize{ 0 };
 		glm::vec2 m_MousePos{ 0.0f };
 		glm::vec3 m_OrbitEulerAngles{ 0.0f };
-		//float m_Rotation = 0.0f;
 
 		Ref<RenderPass> m_GeometryPass;
 		Ref<RenderPass> m_LightingPass;
@@ -57,6 +53,6 @@ namespace Mahakam
 	private:
 		Asset<Texture> GetDefaultTexture(const ShaderProperty& property);
 
-		void SetupMaterialProperties(const UnorderedMap<std::string, ShaderProperty>& shaderProperties, const std::filesystem::path& filepath);
+		void SetupMaterialProperties(const UnorderedMap<std::string, ShaderProperty>& shaderProperties);
 	};
 }

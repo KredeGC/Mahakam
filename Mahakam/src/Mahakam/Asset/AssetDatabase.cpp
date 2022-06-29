@@ -57,9 +57,19 @@ namespace Mahakam
 		return nullptr;
 	};
 
+	//const AssetDatabase::ImporterMap& AssetDatabase::GetAssetImporters()
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporters, const AssetDatabase::ImporterMap&)
+	{
+		return m_AssetImporters;
+	};
+
 	//void AssetDatabase::ReloadAsset(uint64_t id)
 	MH_DEFINE_FUNC(AssetDatabase::ReloadAsset, void, uint64_t id)
 	{
+		auto pathIter = m_AssetPaths.find(id);
+		if (pathIter == m_AssetPaths.end())
+			RefreshAssetImports();
+
 		auto iter = m_CachedAssets.find(id);
 		if (iter != m_CachedAssets.end())
 		{
@@ -77,7 +87,7 @@ namespace Mahakam
 		//RecursiveImportAssets(FileUtility::ASSET_PATH);
 
 		// Recreate asset ID to filepath mapping
-		AssetDatabase::RefreshAssetImports();
+		RefreshAssetImports();
 
 		// Reimport all imported assets
 		for (auto& kv : m_CachedAssets)

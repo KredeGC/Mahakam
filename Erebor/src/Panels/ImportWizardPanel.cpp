@@ -16,7 +16,7 @@ namespace Mahakam::Editor
 
 			if (!importer->GetImporterProps().NoFilepath)
 			{
-				GUI::DrawDragDropTarget("File path", m_Extension, m_FilePath);
+				GUI::DrawDragDropField("File path", m_Extension, m_FilePath);
 
 				std::string importString = m_ImportPath.string();
 				char importBuffer[256]{ 0 };
@@ -42,29 +42,40 @@ namespace Mahakam::Editor
 
 	void ImportWizardPanel::ImportAsset(const std::filesystem::path& filepath, const std::string& extension, const std::filesystem::path& importPath)
 	{
-		ImportWizardPanel* window = (ImportWizardPanel*)EditorWindowRegistry::OpenWindow("Import Wizard");
-
-		window->m_Open = true;
-
-		window->m_Extension = extension;
-		window->m_FilePath = filepath;
-		window->m_ImportPath = importPath;
-
-		YAML::Node data;
-		if (std::filesystem::exists(importPath))
+		if (Ref<AssetImporter> importer = AssetDatabase::GetAssetImporter(extension))
 		{
-			try
+			if (importer->GetImporterProps().NoWizard)
 			{
-				data = YAML::LoadFile(importPath.string());
+				Asset<void> asset(importPath);
+
+				importer->OnWizardImport(asset, filepath, importPath);
 			}
-			catch (YAML::ParserException e)
+			else
 			{
-				MH_CORE_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.msg);
+				ImportWizardPanel* window = (ImportWizardPanel*)EditorWindowRegistry::OpenWindow("Import Wizard");
+
+				window->m_Open = true;
+				window->m_Importer = importer;
+
+				window->m_Extension = extension;
+				window->m_FilePath = filepath;
+				window->m_ImportPath = importPath;
+
+				YAML::Node data;
+				if (std::filesystem::exists(importPath))
+				{
+					try
+					{
+						data = YAML::LoadFile(importPath.string());
+					}
+					catch (YAML::ParserException e)
+					{
+						MH_CORE_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.msg);
+					}
+				}
+
+				importer->OnWizardOpen(data);
 			}
 		}
-
-		window->m_Importer = AssetDatabase::GetAssetImporter(extension);
-		if (Ref<AssetImporter> importer = window->m_Importer.lock())
-			importer->OnWizardOpen(data);
 	}
 }

@@ -1,5 +1,6 @@
 Filepath: assets/shaders/Skybox.shader
 Extension: .material
 ID: 1413214623375882268
+Shader: 15878312828750934895
 Properties:
   u_Environment: 15966881194349846934

@@ -12,6 +12,8 @@ namespace Mahakam
 		ImporterProps m_ImporterProps;
 
 	public:
+		ShaderAssetImporter();
+
 		virtual const ImporterProps& GetImporterProps() const override { return m_ImporterProps; }
 
 		virtual void OnWizardOpen(YAML::Node& node) override;

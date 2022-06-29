@@ -5,6 +5,12 @@
 
 namespace Mahakam
 {
+	ShaderAssetImporter::ShaderAssetImporter()
+	{
+		m_ImporterProps.Extension = ".shader";
+		m_ImporterProps.NoWizard = true;
+	}
+
 	void ShaderAssetImporter::OnWizardOpen(YAML::Node& node)
 	{
 		

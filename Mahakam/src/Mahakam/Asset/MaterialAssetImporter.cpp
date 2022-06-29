@@ -34,8 +34,9 @@ namespace Mahakam
 {
 	MaterialAssetImporter::MaterialAssetImporter()
 	{
-		m_ImporterProps.CreateMenu = true;
 		m_ImporterProps.Extension = ".material";
+		m_ImporterProps.CreateMenu = true;
+		m_ImporterProps.NoFilepath = true;
 
 
 		// Preview stuff
@@ -89,17 +90,18 @@ namespace Mahakam
 	{
 		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
 
-		YAML::Node filepathNode = rootNode["Filepath"];
-		if (filepathNode)
+		YAML::Node shaderNode = rootNode["Shader"];
+		if (shaderNode)
 		{
-			m_ShaderFilepath = filepathNode.as<std::string>();
-			Asset<Shader> shader = Shader::Create(m_ShaderFilepath);
+			uint64_t shaderID = shaderNode.as<uint64_t>();
+			Asset<Shader> shader = Asset<Shader>(shaderID);
+			m_ShaderImportPath = shader.GetImportPath();
 
 			if (shader)
 			{
 				m_Material = Material::Create(shader);
 
-				SetupMaterialProperties(shader->GetProperties(), m_ShaderFilepath);
+				SetupMaterialProperties(shader->GetProperties());
 
 				const UnorderedMap<std::string, ShaderProperty>& properties = shader->GetProperties();
 				YAML::Node propertiesNode = rootNode["Properties"];
@@ -148,25 +150,27 @@ namespace Mahakam
 		}
 		else
 		{
-			SetupMaterialProperties({}, "");
+			SetupMaterialProperties({});
 		}
 	}
 
 	void MaterialAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
-		if (filepath != m_ShaderFilepath)
+		if (GUI::DrawDragDropField("Shader", ".shader", m_ShaderImportPath))
 		{
-			m_ShaderFilepath = filepath;
-			Asset<Shader> shader = Shader::Create(m_ShaderFilepath);
+			if (std::filesystem::exists(m_ShaderImportPath))
+			{
+				Asset<Shader> shader = Asset<Shader>(m_ShaderImportPath);
 
-			if (shader)
-			{
-				m_Material = Material::Create(shader);
-				SetupMaterialProperties(shader->GetProperties(), filepath);
-			}
-			else
-			{
-				SetupMaterialProperties({}, filepath);
+				if (shader)
+				{
+					m_Material = Material::Create(shader);
+					SetupMaterialProperties(shader->GetProperties());
+				}
+				else
+				{
+					SetupMaterialProperties({});
+				}
 			}
 		}
 
@@ -217,7 +221,7 @@ namespace Mahakam
 				Asset<Texture> texture = m_Material->GetTexture(propertyName);
 				if (texture)
 					texturePath = texture.GetImportPath();
-				if (GUI::DrawDragDropTarget(propertyName, ".texture", texturePath))
+				if (GUI::DrawDragDropField(propertyName, ".texture", texturePath))
 				{
 					texture = Asset<Texture>(texturePath);
 					if (!texture)
@@ -302,6 +306,10 @@ namespace Mahakam
 	{
 		Asset<Material> material(asset);
 
+		// Shader ID
+		emitter << YAML::Key << "Shader";
+		emitter << YAML::Value << material->GetShader().GetID();
+
 		// Material properties
 		emitter << YAML::Key << "Properties";
 		emitter << YAML::Value << YAML::BeginMap;
@@ -332,47 +340,51 @@ namespace Mahakam
 	Asset<void> MaterialAssetImporter::Deserialize(YAML::Node& rootNode)
 	{
 		Asset<Shader> shader;
-		YAML::Node shaderNode = rootNode["Filepath"];
+		YAML::Node shaderNode = rootNode["Shader"];
 		if (shaderNode)
-			shader = Shader::Create(shaderNode.as<std::string>());
+			shader = Asset<Shader>(shaderNode.as<uint64_t>());
 
-		Asset<Material> material = Material::Create(shader);
-
-		const UnorderedMap<std::string, ShaderProperty>& properties = material->GetShader()->GetProperties();
-		YAML::Node propertiesNode = rootNode["Properties"];
-		if (propertiesNode)
+		if (shader)
 		{
-			for (auto propertyNode : propertiesNode)
+			Asset<Material> material = Material::Create(shader);
+
+			const UnorderedMap<std::string, ShaderProperty>& properties = material->GetShader()->GetProperties();
+			YAML::Node propertiesNode = rootNode["Properties"];
+			if (propertiesNode)
 			{
-				std::string propertyName = propertyNode.first.as<std::string>();
-
-				auto iter = properties.find(propertyName);
-				if (iter != properties.end())
+				for (auto propertyNode : propertiesNode)
 				{
-					switch (iter->second.DataType)
-					{
-					case ShaderDataType::Float:			material->SetFloat(propertyName, propertyNode.second.as<float>()); break;
-					case ShaderDataType::Float2:		material->SetFloat2(propertyName, propertyNode.second.as<glm::vec2>()); break;
-					case ShaderDataType::Float3:		material->SetFloat3(propertyName, propertyNode.second.as<glm::vec3>()); break;
-					case ShaderDataType::Float4:		material->SetFloat4(propertyName, propertyNode.second.as<glm::vec4>()); break;
-					//case ShaderDataType::Mat3:			material->SetMat3(propertyName, propertyNode.second.as<glm::mat3>()); break;
-					//case ShaderDataType::Mat4:			material->SetMat4(propertyName, propertyNode.second.as<glm::mat4>()); break;
-					case ShaderDataType::Int:			material->SetInt(propertyName, propertyNode.second.as<int>()); break;
-					case ShaderDataType::Sampler2D:
-					case ShaderDataType::SamplerCube:
-						uint64_t textureID = propertyNode.second.as<uint64_t>();
-						if (textureID)
-							material->SetTexture(propertyName, 0, Asset<Texture>(textureID));
-						else
-							material->SetTexture(propertyName, 0, GetDefaultTexture(iter->second));
+					std::string propertyName = propertyNode.first.as<std::string>();
 
-						break;
+					auto iter = properties.find(propertyName);
+					if (iter != properties.end())
+					{
+						switch (iter->second.DataType)
+						{
+						case ShaderDataType::Float:			material->SetFloat(propertyName, propertyNode.second.as<float>()); break;
+						case ShaderDataType::Float2:		material->SetFloat2(propertyName, propertyNode.second.as<glm::vec2>()); break;
+						case ShaderDataType::Float3:		material->SetFloat3(propertyName, propertyNode.second.as<glm::vec3>()); break;
+						case ShaderDataType::Float4:		material->SetFloat4(propertyName, propertyNode.second.as<glm::vec4>()); break;
+							//case ShaderDataType::Mat3:			material->SetMat3(propertyName, propertyNode.second.as<glm::mat3>()); break;
+							//case ShaderDataType::Mat4:			material->SetMat4(propertyName, propertyNode.second.as<glm::mat4>()); break;
+						case ShaderDataType::Int:			material->SetInt(propertyName, propertyNode.second.as<int>()); break;
+						case ShaderDataType::Sampler2D:
+						case ShaderDataType::SamplerCube:
+							uint64_t textureID = propertyNode.second.as<uint64_t>();
+							if (textureID)
+								material->SetTexture(propertyName, 0, Asset<Texture>(textureID));
+							else
+								material->SetTexture(propertyName, 0, GetDefaultTexture(iter->second));
+
+							break;
+						}
 					}
 				}
 			}
+			return material;
 		}
 
-		return material;
+		return nullptr;
 	}
 
 	Asset<Texture> MaterialAssetImporter::GetDefaultTexture(const ShaderProperty& property)
@@ -425,7 +437,7 @@ namespace Mahakam
 		return nullptr;
 	}
 
-	void MaterialAssetImporter::SetupMaterialProperties(const UnorderedMap<std::string, ShaderProperty>& shaderProperties, const std::filesystem::path& filepath)
+	void MaterialAssetImporter::SetupMaterialProperties(const UnorderedMap<std::string, ShaderProperty>& shaderProperties)
 	{
 		m_DefaultTextures.clear();
 

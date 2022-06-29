@@ -1,6 +1,7 @@
 Filepath: assets/shaders/default/LitABR.shader
 Extension: .material
 ID: 660037763570734260
+Shader: 332566198138111729
 Properties:
   u_UVTransform: [2, 2, 0, 0]
   u_Color: [1, 1, 1]

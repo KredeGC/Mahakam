@@ -1,6 +1,7 @@
 Filepath: assets/shaders/default/Skinned.shader
 Extension: .material
 ID: 7079340428320316353
+Shader: 9447544911046152283
 Properties:
   u_Roughness: 0.404000014
   u_Metallic: 0

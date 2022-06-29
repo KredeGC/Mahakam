@@ -17,6 +17,7 @@ namespace Mahakam
 		{
 			bool CreateMenu = false;
 			bool NoFilepath = false;
+			bool NoWizard = false;
 			std::string Extension;
 		};
 

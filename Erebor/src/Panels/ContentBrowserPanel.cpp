@@ -162,7 +162,7 @@ namespace Mahakam::Editor
 							{
 								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
 
-								ImportWizardPanel::ImportAsset(info.Filepath, info.Filepath.extension().string(), importPath);
+								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
 							}
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 							ImGui::TextWrapped(pathName.c_str());

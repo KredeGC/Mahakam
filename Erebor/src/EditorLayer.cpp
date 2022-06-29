@@ -98,7 +98,7 @@ namespace Mahakam::Editor
 			Asset<Sound> sound = source.GetSound();
 
 			std::filesystem::path importPath = sound.GetImportPath();
-			if (GUI::DrawDragDropTarget("Sound", ".sound", importPath))
+			if (GUI::DrawDragDropField("Sound", ".sound", importPath))
 			{
 				source.SetSound(Asset<Sound>(importPath));
 				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
@@ -338,12 +338,12 @@ namespace Mahakam::Editor
 		// Material
 		Ref<MaterialAssetImporter> materialAssetImporter = CreateRef<MaterialAssetImporter>();
 
-		AssetDatabase::RegisterAssetImporter(".shader", materialAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".material", materialAssetImporter);
 
 		// Shader
-		/*Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
+		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
 
-		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);*/
+		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);
 
 		// Sound
 		Ref<SoundAssetImporter> soundAssetImporter = CreateRef<SoundAssetImporter>();
@@ -466,10 +466,10 @@ namespace Mahakam::Editor
 
 #pragma region Assets
 		// Material
-		AssetDatabase::DeregisterAssetImporter(".shader");
+		AssetDatabase::DeregisterAssetImporter(".material");
 
 		// Shader
-		//AssetDatabase::DeregisterAssetImporter(".shader");
+		AssetDatabase::DeregisterAssetImporter(".shader");
 
 		// Sound
 		AssetDatabase::DeregisterAssetImporter(".wav");

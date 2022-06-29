@@ -103,7 +103,7 @@ namespace Mahakam::GUI
 		return changed;
 	}
 
-	bool DrawDragDropTarget(const std::string& label, const std::string& extension, std::filesystem::path& importPath)
+	bool DrawDragDropField(const std::string& label, const std::string& extension, std::filesystem::path& importPath)
 	{
 		std::string importString = importPath.string();
 		char filepathBuffer[MAX_STR_LEN]{ 0 };
@@ -122,6 +122,27 @@ namespace Mahakam::GUI
 				importPath = (const char*)payload->Data;
 				return true;
 			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		return false;
+	}
+
+	bool DrawDragDropTarget(const std::vector<std::string>& extensions, std::filesystem::path& importPath)
+	{
+		if (ImGui::BeginDragDropTarget())
+		{
+			for (auto& extension : extensions)
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(extension.c_str()))
+				{
+					importPath = (const char*)payload->Data;
+					return true;
+				}
+			}
+
+			ImGui::EndDragDropTarget();
 		}
 
 		return false;
