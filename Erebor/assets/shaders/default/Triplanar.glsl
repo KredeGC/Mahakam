@@ -5,8 +5,6 @@
 struct v2f {
     vec3 v_WorldPos;
     vec3 v_WorldNormal;
-    vec3 v_WorldTangent;
-    vec3 v_WorldBinormal;
 };
 
 layout(location = 0) out v2f o;
@@ -22,8 +20,6 @@ void main() {
     o.v_WorldPos = (MATRIX_M * vec4(i_Pos, 1.0)).xyz;
     //o.v_WorldNormal = (MATRIX_M * vec4(i_Normal, 0.0)).xyz;
     o.v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
-    o.v_WorldTangent = (MATRIX_M * vec4(i_Tangent, 0.0)).xyz;
-    o.v_WorldBinormal = cross(o.v_WorldNormal, o.v_WorldTangent);
 }
 
 
@@ -45,8 +41,6 @@ void main() {
 struct v2f {
     vec3 v_WorldPos;
     vec3 v_WorldNormal;
-    vec3 v_WorldTangent;
-    vec3 v_WorldBinormal;
 };
 
 layout(location = 0) in v2f i;
@@ -80,11 +74,6 @@ void main() {
     float roughness = SampleTriplanar(u_Roughness, uvX, uvY, uvZ, blend).r;
     float ao = SampleTriplanar(u_Occlussion, uvX, uvY, uvZ, blend).r;
     vec3 emission = SampleTriplanar(u_Emission, uvX, uvY, uvZ, blend).rgb * u_EmissionColor;
-    
-    // o_Albedo = vec4(blend, 1.0);
-    // o_Specular = vec4(0.0, 0.0, 0.0, 1.0);
-    // o_Emission = vec4(0.0, 0.0, 0.0, 0.0);
-    // o_Normal = vec4(worldNormal * 0.5 + 0.5, 0.0);
     
     o_Albedo = vec4(albedo, ao);
     o_Specular = vec4(0.0, 0.0, metallic, roughness);

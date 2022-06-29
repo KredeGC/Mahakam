@@ -11,7 +11,7 @@ vec3 ToonDirect(vec3 albedo, float metallic, float roughness, vec3 V, vec3 N, ve
 }
 
 vec3 ToonIndirect(vec3 albedo, float metallic, float roughness, float ao, vec3 V, vec3 N) {
-    return vec3(0.015, 0.018, 0.025);
+    return albedo * vec3(0.08, 0.085, 0.09);
 }
 
 #include "assets/shaders/include/lighting/Shadows.glsl"

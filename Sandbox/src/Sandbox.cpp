@@ -78,16 +78,6 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	entity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 	entity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
-
-	// Create shaders
-	Asset<Shader> skinnedShader = Shader::Create("assets/shaders/default/Skinned.shader");
-	Asset<Shader> textureShader = Shader::Create("assets/shaders/default/LitTexture.shader");
-	Asset<Shader> colorShader = Shader::Create("assets/shaders/default/LitColor.shader");
-	/*Ref<Shader> skinnedShader = Shader::Create("assets/shaders/external/DitheredSkinned.import");
-	Ref<Shader> textureShader = Shader::Create("assets/shaders/external/LitTexel.import");
-	Ref<Shader> colorShader = Shader::Create("assets/shaders/external/DitheredColor.import");*/
-
-
 	// Create skinned material
 	// Asset<Material> skinnedMaterial = Material::Create(skinnedShader);
 	// skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
@@ -237,8 +227,8 @@ EXTERN_EXPORTED void Run(Scene* scene)
 		{
 			// Setup material with texture
 			Asset<Material> material = Material::Copy(baseMaterial);
-			material->SetFloat("u_Metallic", y / 10.0f);
-			material->SetFloat("u_Roughness", x / 10.0f);
+			material->SetFloat("u_MetallicMul", y / 10.0f);
+			material->SetFloat("u_RoughnessMul", x / 10.0f);
 
 			// Create entity
 			Entity entity = scene->CreateEntity(std::string("Sphere ") + std::to_string(x) + std::string(",") + std::to_string(y));

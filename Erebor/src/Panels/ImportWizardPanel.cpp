@@ -20,10 +20,10 @@ namespace Mahakam::Editor
 
 				std::string importString = m_ImportPath.string();
 				char importBuffer[256]{ 0 };
-				strncpy(importBuffer, importString.c_str(), importString.size() - 5);
+				strncpy(importBuffer, importString.c_str(), importString.size() - 7);
 				if (ImGui::InputText("Import path", importBuffer, 256))
 				{
-					m_ImportPath = std::string(importBuffer) + ".yaml";
+					m_ImportPath = std::string(importBuffer) + ".import";
 				}
 			}
 
