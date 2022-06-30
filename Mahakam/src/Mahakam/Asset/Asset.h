@@ -146,30 +146,33 @@ namespace Mahakam
 			return m_Ptr;
 		}
 
+		T* Ptr()
+		{
+			return Get().get();
+		}
+
+		T* Ptr() const
+		{
+			return Get().get();
+		}
+
 		Ref<T> operator->() noexcept { return Get(); }
 
 		Ref<T> operator->() const noexcept { return Get(); }
 
 		explicit operator bool() const noexcept { return Get() != nullptr; }
-
-		// TODO: Remove this and just do it explicitly in each asset type constructor
-		template<typename ... Args>
-		inline static Asset<T> Create(Args&& ... args)
-		{
-			return Asset<T>(CreateRef<T>(std::forward<Args>(args)...));
-		}
 	};
 
 	template<typename T>
 	bool operator==(const Asset<T>& _Left, nullptr_t) noexcept
 	{
-		return _Left.Get().get() == nullptr;
+		return _Left.Ptr() == nullptr;
 	}
 
 	template<typename T1, typename T2>
 	bool operator==(const Asset<T1>& _Left, const Asset<T2>& _Right) noexcept
 	{
-		return _Left.Get().get() == _Right.Get().get();
+		return _Left.Ptr() == _Right.Ptr();
 	}
 }
 
@@ -180,7 +183,7 @@ namespace std
 	{
 		size_t operator()(const Mahakam::Asset<_Ty>& _Keyval) const noexcept
 		{
-			return hash<_Ty*>()(_Keyval.Get().get());
+			return hash<_Ty*>()(_Keyval.Ptr());
 		}
 	};
 }

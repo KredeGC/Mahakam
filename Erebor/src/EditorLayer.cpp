@@ -239,7 +239,7 @@ namespace Mahakam::Editor
 			{
 				if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					// TODO: Temporary
+					// TODO: Show the material inspector instead?
 					glm::vec3 color = material->GetFloat3("u_Color");
 					if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
 						material->SetFloat3("u_Color", color);

@@ -44,17 +44,9 @@ namespace Mahakam
 
 		m_PreviewCamera = Camera(Camera::ProjectionType::Perspective, 45, 0.03f, 10.0f);
 
-		// TODO: Have this be user-defined somehow
-		std::string filepath = "assets/textures/night.hdr";
-		Asset<TextureCube> skyboxTexture = TextureCube::Create(filepath, { 1024, TextureFormat::RG11B10F });
-		Asset<TextureCube> skyboxIrradiance = TextureCube::Create(filepath, { 32, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false });
-		Asset<TextureCube> skyboxSpecular = TextureCube::Create(filepath, { 128, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true });
-
-		/*Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
-		Asset<Material> skyboxMaterial = Material::Create(skyboxShader);
-		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);*/
-
 		Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/internal/PreviewSky.material.import");
+		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/internal/previewirradiance.hdr.import");
+		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/internal/previewspecular.hdr.import");
 
 		// Setup scene data
 		m_SceneData = CreateRef<SceneData>();
@@ -99,16 +91,9 @@ namespace Mahakam
 			Asset<Shader> shader = Asset<Shader>(shaderID);
 			m_ShaderImportPath = shader.GetImportPath();
 
-			// FIXME: This somehow desynchronizes the asset count for the given shader
-			// Loading via the filepath seems to work as it should, but loading via the AssetDatabase does not
-
 			if (shader)
 			{
-				uint32_t t1 = AssetDatabase::GetAssetReferences(shader.GetID());
-
 				m_Material = Material::Create(shader);
-
-				uint32_t t2 = AssetDatabase::GetAssetReferences(shader.GetID());
 
 				SetupMaterialProperties(shader->GetProperties());
 
@@ -148,9 +133,7 @@ namespace Mahakam
 		if (m_Material)
 		{
 			// Setup scene data for the material
-			//m_SceneData->shaderIDLookup.clear();
 			m_SceneData->shaderRefLookup.clear();
-			//m_SceneData->materialIDLookup.clear();
 			m_SceneData->materialRefLookup.clear();
 
 			Asset<Shader> shader = m_Material->GetShader();

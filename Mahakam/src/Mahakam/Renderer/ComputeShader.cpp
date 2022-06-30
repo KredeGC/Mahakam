@@ -17,8 +17,9 @@ namespace Mahakam
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
+			return nullptr;
 		case RendererAPI::API::OpenGL:
-			return Asset<OpenGLComputeShader>::Create(filepath);
+			return Asset<OpenGLComputeShader>(CreateRef<OpenGLComputeShader>(filepath));
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

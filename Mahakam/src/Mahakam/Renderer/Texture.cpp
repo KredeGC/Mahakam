@@ -16,8 +16,9 @@ namespace Mahakam
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
+			return nullptr;
 		case RendererAPI::API::OpenGL:
-			return Asset<OpenGLTexture2D>::Create(props);
+			return Asset<OpenGLTexture2D>(CreateRef<OpenGLTexture2D>(props));
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");
@@ -32,8 +33,9 @@ namespace Mahakam
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
+			return nullptr;
 		case RendererAPI::API::OpenGL:
-			return Asset<OpenGLTexture2D>::Create(filepath, props);
+			return Asset<OpenGLTexture2D>(CreateRef<OpenGLTexture2D>(filepath, props));
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");
@@ -49,8 +51,9 @@ namespace Mahakam
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
+			return nullptr;
 		case RendererAPI::API::OpenGL:
-			return Asset<OpenGLTextureCube>::Create(props);
+			return Asset<OpenGLTextureCube>(CreateRef<OpenGLTextureCube>(props));
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");
@@ -65,8 +68,9 @@ namespace Mahakam
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
+			return nullptr;
 		case RendererAPI::API::OpenGL:
-			return Asset<OpenGLTextureCube>::Create(filepath, props);
+			return Asset<OpenGLTextureCube>(CreateRef<OpenGLTextureCube>(filepath, props));
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

@@ -7,7 +7,7 @@ namespace Mahakam
 {
     Asset<Animation> Animation::Load(const std::string& filepath, SkinnedMesh& skinnedMesh)
     {
-        return Asset<Animation>::Create(filepath, skinnedMesh);
+        return Asset<Animation>(CreateRef<Animation>(filepath, skinnedMesh));
     }
 
     Animation::Animation(const std::string& filepath, SkinnedMesh& skinnedMesh)

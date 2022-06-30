@@ -1,16 +1,13 @@
 <div align="center">
-	<img width=218 height=218 alt="Hazel" src="/.github/Mahakam.png?raw=true" />
-	
-	
+<img width=218 height=218 alt="Hazel" src="/.github/Mahakam.png?raw=true" />
+<h1>Mahakam</h1>
+<p>A functional game engine with suppport for rendering and sound (currently).
+More functionality will be added as I find the will to work on it.
+Physics will be handled by Bullet3 once integrated fully.</p>
+
 [![License](https://img.shields.io/github/license/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/issues)
-	
 </div>
-
-# Mahakam
-A functional game engine with suppport for rendering and sound (currently).
-More functionality will be added as I find the will to work on it.
-Physics will be handled by Bullet3 once integrated fully.
 
 # Libraries and technologies
 * Uses OpenGL for rendering. No other rendering APIs are supported currently, but may in the future.
@@ -40,6 +37,6 @@ It can also be run using various files within the Erebor directory, namely: Ereb
 There are both bash and batch files for Linux and Windows.
 
 # Building
-Refer to the BUILDING.md file.
+Refer to the [BUILDING.md](BUILDING.md) file.
 
 # Media

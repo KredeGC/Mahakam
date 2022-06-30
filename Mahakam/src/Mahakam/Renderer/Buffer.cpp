@@ -16,6 +16,7 @@ namespace Mahakam
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
+			return nullptr;
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLUniformBuffer>(size);
 		}
@@ -33,6 +34,7 @@ namespace Mahakam
 		{
 		case RendererAPI::API::None:
 			MH_CORE_BREAK("Renderer API not supported!");
+			return nullptr;
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLStorageBuffer>(size);
 		}
