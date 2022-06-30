@@ -6,7 +6,7 @@
 
 namespace Mahakam::Editor
 {
-	EditorApplication::EditorApplication() : Application({ "Erebor", "internal/icons/icon-editor.png" })
+	EditorApplication::EditorApplication() : Application({ "Erebor", "internal/icons/icon-64.png" })
 	{
 		// Create editor layer
 		m_EditorLayer = new EditorLayer();
