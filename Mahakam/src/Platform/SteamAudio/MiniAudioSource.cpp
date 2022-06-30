@@ -134,8 +134,10 @@ namespace Mahakam
 		*/
 		ma_sound_config soundConfig;
 
+		std::string filepath = m_Sound->GetFilepath();
+
 		soundConfig = ma_sound_config_init();
-		soundConfig.pFilePath = m_Sound->GetFilepath().c_str();
+		soundConfig.pFilePath = filepath.c_str();
 		soundConfig.isLooping = m_Sound->GetProps().loop ? MA_TRUE : MA_FALSE;
 		soundConfig.flags = MA_SOUND_FLAG_NO_DEFAULT_ATTACHMENT | MA_SOUND_FLAG_NO_SPATIALIZATION;  /* We'll attach this to the graph later. */
 

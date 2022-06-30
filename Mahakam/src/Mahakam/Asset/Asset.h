@@ -68,27 +68,51 @@ namespace Mahakam
 		}
 
 		template<typename T2>
-		Asset& operator=(const Asset<T2>& rhs)
+		Asset& operator=(Asset<T2>&& rhs)
 		{
-			AssetDatabase::DeregisterAsset(m_ID);
 			m_Ptr = rhs.m_Ptr;
 			m_ID = rhs.m_ID;
-			AssetDatabase::RegisterAsset(m_ID);
+			if (m_ID)
+				AssetDatabase::RegisterAsset(m_ID);
+			return *this;
+		}
+
+		Asset& operator=(Asset&& rhs) noexcept
+		{
+			m_Ptr = rhs.m_Ptr;
+			m_ID = rhs.m_ID;
+			if (m_ID)
+				AssetDatabase::RegisterAsset(m_ID);
+			return *this;
+		}
+
+		template<typename T2>
+		Asset& operator=(const Asset<T2>& rhs)
+		{
+			if (m_ID)
+				AssetDatabase::DeregisterAsset(m_ID);
+			m_Ptr = rhs.m_Ptr;
+			m_ID = rhs.m_ID;
+			if (m_ID)
+				AssetDatabase::RegisterAsset(m_ID);
 			return *this;
 		}
 
 		Asset& operator=(const Asset& rhs)
 		{
-			AssetDatabase::DeregisterAsset(m_ID);
+			if (m_ID)
+				AssetDatabase::DeregisterAsset(m_ID);
 			m_Ptr = rhs.m_Ptr;
 			m_ID = rhs.m_ID;
-			AssetDatabase::RegisterAsset(m_ID);
+			if (m_ID)
+				AssetDatabase::RegisterAsset(m_ID);
 			return *this;
 		}
 
 		Asset& operator=(const nullptr_t& rhs)
 		{
-			AssetDatabase::DeregisterAsset(m_ID);
+			if (m_ID)
+				AssetDatabase::DeregisterAsset(m_ID);
 			m_Ptr = nullptr;
 			m_ID = 0;
 			return *this;

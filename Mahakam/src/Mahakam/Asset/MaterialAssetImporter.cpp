@@ -50,9 +50,11 @@ namespace Mahakam
 		Asset<TextureCube> skyboxIrradiance = TextureCube::Create(filepath, { 32, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false });
 		Asset<TextureCube> skyboxSpecular = TextureCube::Create(filepath, { 128, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true });
 
-		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
+		/*Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
 		Asset<Material> skyboxMaterial = Material::Create(skyboxShader);
-		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
+		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);*/
+
+		Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/internal/PreviewSky.material.import");
 
 		// Setup scene data
 		m_SceneData = CreateRef<SceneData>();
@@ -97,9 +99,16 @@ namespace Mahakam
 			Asset<Shader> shader = Asset<Shader>(shaderID);
 			m_ShaderImportPath = shader.GetImportPath();
 
+			// FIXME: This somehow desynchronizes the asset count for the given shader
+			// Loading via the filepath seems to work as it should, but loading via the AssetDatabase does not
+
 			if (shader)
 			{
+				uint32_t t1 = AssetDatabase::GetAssetReferences(shader.GetID());
+
 				m_Material = Material::Create(shader);
+
+				uint32_t t2 = AssetDatabase::GetAssetReferences(shader.GetID());
 
 				SetupMaterialProperties(shader->GetProperties());
 
@@ -139,11 +148,15 @@ namespace Mahakam
 		if (m_Material)
 		{
 			// Setup scene data for the material
+			//m_SceneData->shaderIDLookup.clear();
 			m_SceneData->shaderRefLookup.clear();
+			//m_SceneData->materialIDLookup.clear();
 			m_SceneData->materialRefLookup.clear();
 
-			m_SceneData->shaderIDLookup[0] = m_Material->GetShader();
-			m_SceneData->shaderRefLookup[m_Material->GetShader()] = 0;
+			Asset<Shader> shader = m_Material->GetShader();
+
+			m_SceneData->shaderIDLookup[0] = shader;
+			m_SceneData->shaderRefLookup[shader] = 0; // This is the culprit, for some reason
 
 			m_SceneData->materialIDLookup[0] = m_Material;
 			m_SceneData->materialRefLookup[m_Material] = 0;
@@ -348,7 +361,7 @@ namespace Mahakam
 		{
 			Asset<Material> material = Material::Create(shader);
 
-			const UnorderedMap<std::string, ShaderProperty>& properties = material->GetShader()->GetProperties();
+			const UnorderedMap<std::string, ShaderProperty>& properties = shader->GetProperties();
 			YAML::Node propertiesNode = rootNode["Properties"];
 			if (propertiesNode)
 			{

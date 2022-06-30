@@ -26,8 +26,9 @@ namespace Mahakam
 		UnorderedMap<std::string, glm::vec4> m_Float4s;
 
 	public:
-		OpenGLMaterial(const Asset<Shader>& shader, const std::string& variant = "");
+		OpenGLMaterial(Asset<Shader> shader, const std::string& variant = "");
 		OpenGLMaterial(const Asset<Material>& material);
+		virtual ~OpenGLMaterial() = default;
 
 		virtual uint64_t Hash() const override;
 

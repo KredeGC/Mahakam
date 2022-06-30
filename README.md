@@ -1,3 +1,12 @@
+<div align="center">
+	<img width=218 height=218 alt="Hazel" src="/Resources/Branding/Hazel_Logo_Text_Light_Square.png?raw=true" />
+	
+	
+[![License](https://img.shields.io/github/license/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/blob/master/LICENSE)
+![GitHub issues](https://img.shields.io/github/issues/KredeGC/Mahakam?style=flat-square)
+	
+</div>
+
 # Mahakam
 A functional game engine with suppport for rendering and sound (currently).
 More functionality will be added as I find the will to work on it.

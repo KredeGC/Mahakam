@@ -38,10 +38,13 @@ namespace Mahakam
 	Asset<void> ShaderAssetImporter::Deserialize(YAML::Node& node)
 	{
 		YAML::Node filepathNode = node["Filepath"];
-		std::string filepath;
 		if (filepathNode)
-			filepath = filepathNode.as<std::string>();
+		{
+			std::string filepath = filepathNode.as<std::string>();
 
-		return Shader::Create(filepath);
+			return Shader::Create(filepath);
+		}
+
+		return nullptr;
 	}
 }

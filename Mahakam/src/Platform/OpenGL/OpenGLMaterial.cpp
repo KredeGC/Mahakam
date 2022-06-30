@@ -7,7 +7,7 @@
 
 namespace Mahakam
 {
-	OpenGLMaterial::OpenGLMaterial(const Asset<Shader>& shader, const std::string& variant)
+	OpenGLMaterial::OpenGLMaterial(Asset<Shader> shader, const std::string& variant)
 		: m_Shader(shader), m_Variant(variant)
 	{
 		MH_PROFILE_FUNCTION();
