@@ -58,6 +58,10 @@
 #include "Mahakam/Physics/Rigidbody.h"
 
 // Rendering
+#include "Mahakam/Renderer/RenderPasses/GeometryRenderPass.h"
+#include "Mahakam/Renderer/RenderPasses/LightingRenderPass.h"
+#include "Mahakam/Renderer/RenderPasses/ParticleRenderPass.h"
+#include "Mahakam/Renderer/RenderPasses/TonemappingRenderPass.h"
 #include "Mahakam/Renderer/Animation.h"
 #include "Mahakam/Renderer/Animator.h"
 #include "Mahakam/Renderer/Bone.h"
@@ -72,7 +76,6 @@
 #include "Mahakam/Renderer/RenderBuffer.h"
 #include "Mahakam/Renderer/RenderData.h"
 #include "Mahakam/Renderer/Renderer.h"
-#include "Mahakam/Renderer/RenderPasses.h"
 #include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 

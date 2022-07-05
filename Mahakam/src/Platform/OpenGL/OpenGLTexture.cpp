@@ -510,12 +510,9 @@ namespace Mahakam
 		// Convert HDR equirectangular environment map to cubemap equivalent
 		OpenGLShader equiToCubeShader("assets/shaders/internal/Cubemap.shader");
 		equiToCubeShader.Bind("LUT");
-		equiToCubeShader.SetUniformInt("equirectangularMap", 0);
-		equiToCubeShader.SetUniformMat4("projection", captureProjection);
+		equiToCubeShader.SetUniformMat4("u_Projection", captureProjection);
 
 		MH_GL_CALL(glBindTextureUnit(0, hdrID));
-		//MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
-		//MH_GL_CALL(glBindTexture(GL_TEXTURE_2D, hdrID));
 
 		GLint viewport[4];
 		MH_GL_CALL(glGetIntegerv(GL_VIEWPORT, viewport));
@@ -524,7 +521,7 @@ namespace Mahakam
 		MH_GL_CALL(glViewport(0, 0, m_Props.resolution, m_Props.resolution));
 		for (unsigned int i = 0; i < 6; ++i)
 		{
-			equiToCubeShader.SetUniformMat4("view", captureViews[i]);
+			equiToCubeShader.SetUniformMat4("u_View", captureViews[i]);
 			MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_RendererID, 0));
 
 			MH_GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -618,12 +615,9 @@ namespace Mahakam
 			shaderPath += "CubemapSpec.shader";
 		OpenGLShader equiToCubeShader(shaderPath);
 		equiToCubeShader.Bind("LUT");
-		equiToCubeShader.SetUniformInt("environmentMap", 0);
-		equiToCubeShader.SetUniformMat4("projection", captureProjection);
+		equiToCubeShader.SetUniformMat4("u_Projection", captureProjection);
 
 		MH_GL_CALL(glBindTextureUnit(0, cubemapID));
-		//MH_GL_CALL(glActiveTexture(GL_TEXTURE0));
-		//MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->GetRendererID()));
 
 		GLint viewport[4];
 		MH_GL_CALL(glGetIntegerv(GL_VIEWPORT, viewport));
@@ -642,10 +636,10 @@ namespace Mahakam
 				MH_GL_CALL(glViewport(0, 0, mipWidth, mipHeight));
 
 				float roughness = (float)mip / (float)(maxMipLevels - 1);
-				equiToCubeShader.SetUniformFloat("roughness", roughness);
+				equiToCubeShader.SetUniformFloat("u_Roughness", roughness);
 				for (unsigned int i = 0; i < 6; ++i)
 				{
-					equiToCubeShader.SetUniformMat4("view", captureViews[i]);
+					equiToCubeShader.SetUniformMat4("u_View", captureViews[i]);
 					MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_RendererID, mip));
 
 					MH_GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -661,7 +655,7 @@ namespace Mahakam
 			MH_GL_CALL(glViewport(0, 0, m_Props.resolution, m_Props.resolution)); // don't forget to configure the viewport to the capture dimensions.
 			for (unsigned int i = 0; i < 6; ++i)
 			{
-				equiToCubeShader.SetUniformMat4("view", captureViews[i]);
+				equiToCubeShader.SetUniformMat4("u_View", captureViews[i]);
 				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_RendererID, 0));
 
 				MH_GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));

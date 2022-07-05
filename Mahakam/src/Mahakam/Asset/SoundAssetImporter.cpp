@@ -12,7 +12,7 @@ namespace Mahakam
 		m_ImporterProps.Extension = ".sound";
 	}
 
-	void SoundAssetImporter::OnWizardOpen(YAML::Node& node)
+	void SoundAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
 	{
 		YAML::Node volumeNode = node["Volume"];
 		m_Props.volume = 1.0f;

@@ -3,14 +3,18 @@
 
 layout(location = 0) in vec3 i_Pos;
 
-layout(location = 0) out vec3 v_LocalPos;
+struct v2f {
+    vec3 v_LocalPos;
+};
 
-layout(location = 1) uniform mat4 projection;
-layout(location = 2) uniform mat4 view;
+layout(location = 0) out v2f o;
+
+layout(location = 1) uniform mat4 u_Projection;
+layout(location = 2) uniform mat4 u_View;
 
 void main() {
-    v_LocalPos = i_Pos;  
-    gl_Position = projection * view * vec4(i_Pos, 1.0);
+    o.v_LocalPos = i_Pos;  
+    gl_Position = u_Projection * u_View * vec4(i_Pos, 1.0);
 }
 
 
@@ -18,12 +22,16 @@ void main() {
 #type fragment
 #version 430 core
 
+struct v2f {
+    vec3 v_LocalPos;
+};
+
+layout(location = 0) in v2f i;
+
 layout(location = 0) out vec4 o_Color;
 
-layout(location = 0) in vec3 v_LocalPos;
-
-layout(binding = 0, location = 0) uniform samplerCube environmentMap;
-layout(location = 3) uniform float roughness;
+layout(binding = 0, location = 0) uniform samplerCube u_EnvironmentMap;
+layout(location = 3) uniform float u_Roughness;
 
 const float PI = 3.14159265359;
 
@@ -80,7 +88,7 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
 // ----------------------------------------------------------------------------
 
 void main() {
-    vec3 N = normalize(v_LocalPos);
+    vec3 N = normalize(i.v_LocalPos);
     
     // make the simplyfying assumption that V equals R equals the normal 
     vec3 R = N;
@@ -93,13 +101,13 @@ void main() {
     for (uint i = 0u; i < SAMPLE_COUNT; ++i) {
         // generates a sample vector that's biased towards the preferred alignment direction (importance sampling).
         vec2 Xi = Hammersley(i, SAMPLE_COUNT);
-        vec3 H = ImportanceSampleGGX(Xi, N, roughness);
+        vec3 H = ImportanceSampleGGX(Xi, N, u_Roughness);
         vec3 L  = normalize(2.0 * dot(V, H) * H - V);
 
         float NdotL = max(dot(N, L), 0.0);
         if (NdotL > 0.0) {
             // sample from the environment's mip level based on roughness/pdf
-            float D   = DistributionGGX(N, H, roughness);
+            float D   = DistributionGGX(N, H, u_Roughness);
             float NdotH = max(dot(N, H), 0.0);
             float HdotV = max(dot(H, V), 0.0);
             float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
@@ -108,9 +116,9 @@ void main() {
             float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
             float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
 
-            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
+            float mipLevel = u_Roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
             
-            prefilteredColor += min(textureLod(environmentMap, L, mipLevel).rgb, 1000.0) * NdotL;
+            prefilteredColor += min(textureLod(u_EnvironmentMap, L, mipLevel).rgb, 1000.0) * NdotL;
             totalWeight      += NdotL;
         }
     }

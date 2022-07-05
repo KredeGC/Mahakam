@@ -80,7 +80,7 @@ namespace Mahakam
 		m_TonemapPass->Init(1, 1);
 	}
 
-	void MaterialAssetImporter::OnWizardOpen(YAML::Node& rootNode)
+	void MaterialAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& rootNode)
 	{
 		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
 

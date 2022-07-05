@@ -15,7 +15,7 @@ namespace Mahakam
 
 		virtual const ImporterProps& GetImporterProps() const override { return m_ImporterProps; }
 
-		virtual void OnWizardOpen(YAML::Node& node) override;
+		virtual void OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node) override;
 		virtual void OnWizardRender(const std::filesystem::path& filepath) override;
 		virtual void OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) override;
 

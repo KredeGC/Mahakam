@@ -352,7 +352,7 @@ namespace Mahakam
 					if (!std::filesystem::exists(importPath))
 					{
 						YAML::Node node;
-						importer->OnWizardOpen(node);
+						importer->OnWizardOpen(directory.path(), node);
 
 						Asset<void> asset(importPath);
 

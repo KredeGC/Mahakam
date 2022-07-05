@@ -2,6 +2,7 @@
 #include "TextureAssetImporter.h"
 
 #include "Mahakam/ImGui/GUI.h"
+#include "Mahakam/Renderer/FrameBuffer.h"
 
 #include <imgui.h>
 
@@ -10,9 +11,17 @@ namespace Mahakam
 	TextureAssetImporter::TextureAssetImporter()
 	{
 		m_ImporterProps.Extension = ".texture";
+
+		// Create preview buffer
+		FrameBufferProps gProps;
+		gProps.width = 128;
+		gProps.height = 128;
+		gProps.colorAttachments = { TextureFormat::RGBA8 };
+
+		m_PreviewBuffer = FrameBuffer::Create(gProps);
 	}
 
-	void TextureAssetImporter::OnWizardOpen(YAML::Node& node)
+	void TextureAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
 	{
 		m_Props2D = TextureProps{};
 		m_PropsCube = CubeTextureProps{};
@@ -69,6 +78,11 @@ namespace Mahakam
 			else
 				m_PropsCube.mipmaps = mipmapsNode.as<bool>();
 		}
+
+		if (m_TextureType == 0)
+			m_Texture = Texture2D::Create(filepath.string(), m_Props2D);
+		else
+			m_Texture = TextureCube::Create(filepath.string(), m_PropsCube);
 	}
 
 	void TextureAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
@@ -83,7 +97,10 @@ namespace Mahakam
 			{
 				bool selected = currentTextureType == projectionTypeStrings[i];
 				if (ImGui::Selectable(projectionTypeStrings[i], selected))
+				{
 					m_TextureType = i;
+					CreateTexture(filepath);
+				}
 
 				if (selected)
 					ImGui::SetItemDefaultFocus();
@@ -111,6 +128,7 @@ namespace Mahakam
 						m_Props2D.format = (TextureFormat)i;
 					else
 						m_PropsCube.format = (TextureFormat)i;
+					CreateTexture(filepath);
 				}
 
 				if (selected)
@@ -139,6 +157,7 @@ namespace Mahakam
 						m_Props2D.filterMode = (TextureFilter)i;
 					else
 						m_PropsCube.filterMode = (TextureFilter)i;
+					CreateTexture(filepath);
 				}
 
 				if (selected)
@@ -165,7 +184,10 @@ namespace Mahakam
 				{
 					bool selected = currentWrapX == textureWrapStrings[i];
 					if (ImGui::Selectable(textureWrapStrings[i], selected))
+					{
 						m_Props2D.wrapX = (TextureWrapMode)i;
+						CreateTexture(filepath);
+					}
 
 					if (selected)
 						ImGui::SetItemDefaultFocus();
@@ -180,7 +202,10 @@ namespace Mahakam
 				{
 					bool selected = currentWrapY == textureWrapStrings[i];
 					if (ImGui::Selectable(textureWrapStrings[i], selected))
+					{
 						m_Props2D.wrapY = (TextureWrapMode)i;
+						CreateTexture(filepath);
+					}
 
 					if (selected)
 						ImGui::SetItemDefaultFocus();
@@ -208,7 +233,10 @@ namespace Mahakam
 				{
 					bool selected = currentPrefilter == prefilterStrings[i];
 					if (ImGui::Selectable(prefilterStrings[i], selected))
+					{
 						m_PropsCube.prefilter = (TextureCubePrefilter)i;
+						CreateTexture(filepath);
+					}
 
 					if (selected)
 						ImGui::SetItemDefaultFocus();
@@ -226,12 +254,68 @@ namespace Mahakam
 				m_Props2D.mipmaps = *mipmaps;
 			else
 				m_PropsCube.mipmaps = *mipmaps;
+			CreateTexture(filepath);
+		}
+
+		// Render preview texture
+		if (m_Texture)
+		{
+			ImVec2 size = ImGui::GetContentRegionAvail();
+			float maxSize = glm::min(size.x, size.y);
+			ImVec2 viewportSize = { size.x, maxSize };
+
+			ImGui::BeginChild("Texture Preview", viewportSize);
+
+			if (m_TextureType == 0) // Render 2D texture
+			{
+				ImVec2 pos = ImGui::GetCursorScreenPos();
+				ImGui::Image((void*)(uintptr_t)m_Texture->GetRendererID(), viewportSize, { 0, 1 }, { 1, 0 });
+
+				if (ImGui::IsItemHovered())
+				{
+					ImGuiIO& io = ImGui::GetIO();
+					float my_tex_w = (float)viewportSize.x;
+					float my_tex_h = (float)viewportSize.y;
+
+					ImGui::BeginTooltip();
+					float region_sz = 32.0f;
+					float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
+					float region_y = io.MousePos.y - pos.y - region_sz * 0.5f;
+					float zoom = 4.0f;
+
+					if (region_x < 0.0f)
+						region_x = 0.0f;
+					else if (region_x > my_tex_w - region_sz)
+						region_x = my_tex_w - region_sz;
+
+					if (region_y < 0.0f)
+						region_y = 0.0f;
+					else if (region_y > my_tex_h - region_sz)
+						region_y = my_tex_h - region_sz;
+
+					ImGui::Text("UV: (%.3f, %.3f)", (region_x + region_sz * 0.5f) / my_tex_w, (region_y + region_sz * 0.5f) / my_tex_h);
+					ImVec2 uv0 = ImVec2(region_x / my_tex_w, my_tex_h - region_y / my_tex_h);
+					ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, my_tex_h - (region_y + region_sz) / my_tex_h);
+					ImGui::Image((void*)(uintptr_t)m_Texture->GetRendererID(), ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1, ImVec4(1.0f, 1.0f, 1.0f, 1.0f), ImVec4(1.0f, 1.0f, 1.0f, 0.5f));
+					ImGui::EndTooltip();
+				}
+			}
+			else // Render cubemap texture
+			{
+
+			}
+
+			ImGui::EndChild();
 		}
 	}
 
 	void TextureAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		if (m_TextureType == 0)
+		m_Texture.Save(filepath, importPath);
+
+		AssetDatabase::ReloadAsset(m_Texture.GetID());
+
+		/*if (m_TextureType == 0)
 		{
 			Asset<Texture2D> texture = Texture2D::Create(filepath.string(), m_Props2D);
 
@@ -246,7 +330,7 @@ namespace Mahakam
 			texture.Save(filepath, importPath);
 
 			AssetDatabase::ReloadAsset(texture.GetID());
-		}
+		}*/
 	}
 
 	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
@@ -358,5 +442,13 @@ namespace Mahakam
 			return TextureCube::Create(filepath, propsCube);
 
 		return nullptr;
+	}
+
+	void TextureAssetImporter::CreateTexture(const std::filesystem::path& filepath)
+	{
+		if (m_TextureType == 0)
+			m_Texture = Texture2D::Create(filepath.string(), m_Props2D);
+		else
+			m_Texture = TextureCube::Create(filepath.string(), m_PropsCube);
 	}
 }

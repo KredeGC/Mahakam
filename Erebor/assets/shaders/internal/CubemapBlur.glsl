@@ -3,14 +3,18 @@
 
 layout(location = 0) in vec3 i_Pos;
 
-layout(location = 0) out vec3 v_LocalPos;
+struct v2f {
+    vec3 v_LocalPos;
+};
 
-layout(location = 1) uniform mat4 projection;
-layout(location = 2) uniform mat4 view;
+layout(location = 0) out v2f o;
+
+layout(location = 1) uniform mat4 u_Projection;
+layout(location = 2) uniform mat4 u_View;
 
 void main() {
-    v_LocalPos = i_Pos;  
-    gl_Position = projection * view * vec4(i_Pos, 1.0);
+    o.v_LocalPos = i_Pos;  
+    gl_Position = u_Projection * u_View * vec4(i_Pos, 1.0);
 }
 
 
@@ -18,20 +22,21 @@ void main() {
 #type fragment
 #version 430 core
 
+struct v2f {
+    vec3 v_LocalPos;
+};
+
+layout(location = 0) in v2f i;
+
 layout(location = 0) out vec4 o_Color;
 
-layout(location = 0) in vec3 v_LocalPos;
-
-layout(binding = 0, location = 0) uniform samplerCube environmentMap;
+layout(binding = 0, location = 0) uniform samplerCube u_EnvironmentMap;
 
 const float PI = 3.14159265359;
 
 void main() {
-    vec3 normal = normalize(v_LocalPos);
-    //vec2 uv = sampleSphericalMap(normal);
-    //vec3 irradiance = texture(equirectangularMap, uv).rgb;
+    vec3 normal = normalize(i.v_LocalPos);
 
-    // if (irradiance)
     vec3 irradiance = vec3(0.0);
 
     vec3 up    = vec3(0.0, 1.0, 0.0);
@@ -49,11 +54,9 @@ void main() {
             // tangent space to world
             vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * normal;
 
-            irradiance += PI * invNrSamples * min(textureLod(environmentMap, sampleVec, 0.0).rgb, 1000.0) * cos(theta) * sin(theta);
-            //nrSamples++;
+            irradiance += PI * invNrSamples * min(textureLod(u_EnvironmentMap, sampleVec, 0.0).rgb, 1000.0) * cos(theta) * sin(theta);
         }
     }
-    //irradiance = PI * irradiance * (1.0 / float(nrSamples));
     
     o_Color = vec4(irradiance, 1.0);
 }

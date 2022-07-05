@@ -8,7 +8,7 @@ namespace Mahakam
 		m_ImporterProps.Extension = ".mesh";
 	}
 
-	void MeshAssetImporter::OnWizardOpen(YAML::Node& node)
+	void MeshAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
 	{
 
 	}

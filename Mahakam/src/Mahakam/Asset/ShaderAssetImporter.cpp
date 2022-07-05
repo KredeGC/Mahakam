@@ -11,7 +11,7 @@ namespace Mahakam
 		m_ImporterProps.NoWizard = true;
 	}
 
-	void ShaderAssetImporter::OnWizardOpen(YAML::Node& node)
+	void ShaderAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
 	{
 		
 	}

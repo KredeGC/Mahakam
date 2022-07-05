@@ -13,7 +13,10 @@
 #include "ParticleSystem.h"
 #include "RenderData.h"
 
-#include "RenderPasses.h"
+#include "RenderPasses/GeometryRenderPass.h"
+#include "RenderPasses/LightingRenderPass.h"
+#include "RenderPasses/ParticleRenderPass.h"
+#include "RenderPasses/TonemappingRenderPass.h"
 
 #include <filesystem>
 #include <sstream>

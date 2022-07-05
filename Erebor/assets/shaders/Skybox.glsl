@@ -2,13 +2,13 @@
 #version 430 core
 #include "assets/shaders/include/Matrix.glsl"
 
+layout(location = 0) in vec3 i_Pos;
+
 struct v2f {
     vec3 v_Normal;
 };
 
 layout(location = 0) out v2f o;
-
-layout(location = 0) in vec3 i_Pos;
 
 void main() {
     mat4 invProjection = MATRIX_IP;

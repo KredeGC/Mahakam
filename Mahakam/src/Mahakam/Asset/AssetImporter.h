@@ -25,7 +25,7 @@ namespace Mahakam
 
 		virtual const ImporterProps& GetImporterProps() const = 0;
 
-		virtual void OnWizardOpen(YAML::Node& rootNode) = 0;
+		virtual void OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& rootNode) = 0;
 		virtual void OnWizardRender(const std::filesystem::path& filepath) = 0;
 		virtual void OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) = 0;
 

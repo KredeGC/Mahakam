@@ -74,7 +74,7 @@ namespace Mahakam::Editor
 					}
 				}
 
-				importer->OnWizardOpen(data);
+				importer->OnWizardOpen(filepath, data);
 			}
 		}
 	}
