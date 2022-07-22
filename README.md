@@ -1,5 +1,5 @@
 <div align="center">
-<img width=218 height=218 alt="Hazel" src="/.github/Mahakam.png?raw=true" />
+<img width=218 height=218 alt="Mahakam" src="/.github/Mahakam.png?raw=true" />
 <h1>Mahakam</h1>
 <p>A somewhat functional game engine with suppport for rendering and sound (currently).
 More functionality will be added as I find the will to work on it.
@@ -7,7 +7,7 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 
 [![License](https://img.shields.io/github/license/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/issues)
-[![Build](https://img.shields.io/github/workflow/status/KredeGC/Mahakam/Test?style=flat-square)](https://github.com/KredeGC/Mahakam/actions/workflows/c-cpp.yml)
+[![Build](https://img.shields.io/github/workflow/status/KredeGC/Mahakam/Build?style=flat-square)](https://github.com/KredeGC/Mahakam/actions/workflows/c-cpp.yml)
 </div>
 
 # Libraries and technologies
