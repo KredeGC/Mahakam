@@ -194,9 +194,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create becret sound entity
-	Asset<Sound> becretSound = Asset<Sound>("import/assets/sounds/honeywood.wav.import");
+	Asset<Sound> becretSound = Asset<Sound>("import/assets/sounds/piano.wav.import");
 
-	Entity becretEntity = scene->CreateEntity("Memory Zone");
+	Entity becretEntity = scene->CreateEntity("Piano");
 	becretEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	AudioSourceComponent& becretSource = becretEntity.AddComponent<AudioSourceComponent>();
 	becretSource.SetSpatialBlend(1.0f);
@@ -205,9 +205,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create fern sound entity
-	Asset<Sound> fernSound = Asset<Sound>("import/assets/sounds/fern.wav.import");
+	Asset<Sound> fernSound = Asset<Sound>("import/assets/sounds/vespa.wav.import");
 
-	Entity fernEntity = scene->CreateEntity("Fern");
+	Entity fernEntity = scene->CreateEntity("Vespa Sound");
 	fernEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
 	AudioSourceComponent& fernSource = fernEntity.AddComponent<AudioSourceComponent>();
 	fernSource.SetSound(fernSound);
