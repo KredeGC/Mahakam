@@ -76,7 +76,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	// Create light entity
 	Entity entity = scene->CreateEntity("DLL Light Test");
 	entity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
-	entity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
+	entity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 	// Create skinned material
 	// Asset<Material> skinnedMaterial = Material::Create(skinnedShader);
@@ -97,7 +97,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 		{
 			Entity animatedEntity = scene->CreateEntity("DLL Animated");
 			animatedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
-			animatedEntity.GetComponent<TransformComponent>().SetPosition({ x * 5.0f, 1.5f, 5.0f + z * 5.0f });
+			animatedEntity.AddComponent<TransformComponent>().SetPosition({ x * 5.0f, 1.5f, 5.0f + z * 5.0f });
 			animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
 			animatedEntity.AddComponent<AnimatorComponent>(animation);
 
@@ -111,7 +111,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	// Scene camera
 	Entity cameraEntity = scene->CreateEntity("Main Camera");
 	cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
-	cameraEntity.GetComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
+	cameraEntity.AddComponent<TransformComponent>().SetPosition({ 4.5f, 4.5f, 12.5f });
 	cameraEntity.AddComponent<AudioListenerComponent>();
 	cameraEntity.AddComponent<CamerControllerComponent>();
 
@@ -119,13 +119,13 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	// Directional light
 	Entity mainLightEntity = scene->CreateEntity("Main Light");
 	mainLightEntity.AddComponent<LightComponent>(Light::LightType::Directional, 20.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
-	mainLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ -0.7f, -3.0f, 0.0f }));
+	mainLightEntity.AddComponent<TransformComponent>().SetRotation(glm::quat({ -0.7f, -3.0f, 0.0f }));
 
 
 	// Spot
 	Entity pointLightEntity = scene->CreateEntity("Spot Light");
 	pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
-	pointLightEntity.GetComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
+	pointLightEntity.AddComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
 	pointLightEntity.GetComponent<TransformComponent>().SetRotation(glm::quat({ glm::radians(-150.0f), glm::radians(180.0f), 0.0f }));
 
 
@@ -151,14 +151,15 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 	Entity planeEntity = scene->CreateEntity("Plane");
 	planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
-	planeEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
+	planeEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
 	planeEntity.GetComponent<TransformComponent>().SetScale({ 30.0f, 30.0f, 30.0f });
+	planeEntity.GetComponent<TransformComponent>().SetStatic(true);
 
 
 	// Create particle system
 	Entity particleEntity = scene->CreateEntity("Particle System");
 	particleEntity.AddComponent<ParticleSystemComponent>();
-	particleEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
+	particleEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
 #if 0
@@ -188,30 +189,30 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	// Create backpack entity
 	Entity backpackEntity = scene->CreateEntity("Bacpack");
 	backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
-	backpackEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
+	backpackEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	backpackEntity.AddComponent<RotatorComponent>();
 #endif
 
 
-	// Create becret sound entity
+	// Create piano sound entity
 	Asset<Sound> becretSound = Asset<Sound>("import/assets/sounds/piano.wav.import");
 
-	Entity becretEntity = scene->CreateEntity("Piano");
-	becretEntity.GetComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
-	AudioSourceComponent& becretSource = becretEntity.AddComponent<AudioSourceComponent>();
-	becretSource.SetSpatialBlend(1.0f);
-	becretSource.SetSound(becretSound);
-	becretSource.Play();
+	Entity pianoEntity = scene->CreateEntity("Piano");
+	pianoEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
+	AudioSourceComponent& pianoSource = pianoEntity.AddComponent<AudioSourceComponent>();
+	pianoSource.SetSpatialBlend(1.0f);
+	pianoSource.SetSound(becretSound);
+	pianoSource.Play();
 
 
-	// Create fern sound entity
+	// Create vespa sound entity
 	Asset<Sound> fernSound = Asset<Sound>("import/assets/sounds/vespa.wav.import");
 
-	Entity fernEntity = scene->CreateEntity("Vespa Sound");
-	fernEntity.GetComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
-	AudioSourceComponent& fernSource = fernEntity.AddComponent<AudioSourceComponent>();
-	fernSource.SetSound(fernSound);
-	fernSource.Play();
+	Entity vespaEntity = scene->CreateEntity("Vespa Sound");
+	vespaEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
+	AudioSourceComponent& vespaSource = vespaEntity.AddComponent<AudioSourceComponent>();
+	vespaSource.SetSound(fernSound);
+	vespaSource.Play();
 
 
 	// Create mesh & base material
@@ -233,7 +234,8 @@ EXTERN_EXPORTED void Run(Scene* scene)
 			// Create entity
 			Entity entity = scene->CreateEntity(std::string("Sphere ") + std::to_string(x) + std::string(",") + std::to_string(y));
 			entity.AddComponent<MeshComponent>(sphereMesh, material);
-			entity.GetComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
+			entity.AddComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
+			entity.GetComponent<TransformComponent>().SetStatic(true);
 		}
 	}
 }

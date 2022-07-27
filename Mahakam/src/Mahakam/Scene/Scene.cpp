@@ -186,7 +186,6 @@ namespace Mahakam
 			{
 				glm::vec3 pos = transformComponent.GetPosition();
 				glm::quat rot = transformComponent.GetRotation();
-				glm::vec3 dir = rot * glm::vec3(0.0f, 0.0f, 1.0f);
 				Light& light = lightComponent.GetLight();
 
 				switch (light.GetLightType())
@@ -231,8 +230,11 @@ namespace Mahakam
 					auto& meshes = meshComponent.GetMeshes();
 					auto& materials = meshComponent.GetMaterials();
 					int materialCount = (int)materials.size() - 1;
+
+					glm::mat4 modelMatrix = transformComponent.GetModelMatrix();
+
 					for (int i = 0; i < meshComponent.GetMeshCount(); i++)
-						Renderer::Submit(transformComponent, meshes[i], materials[i < materialCount ? i : materialCount]);
+						Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
 				});
 			}
 
@@ -252,7 +254,7 @@ namespace Mahakam
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
-		// In editor this is caleld by SceneViewPanel / GameViewPanel
+		// In editor this is called by SceneViewPanel / GameViewPanel
 		// In release this is called by EditorLayer.OnWindowResize
 		viewportRatio = (float)width / (float)height;
 
@@ -271,7 +273,7 @@ namespace Mahakam
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		Entity entity(registry.create(), this);
-		entity.AddComponent<TransformComponent>();
+		//entity.AddComponent<TransformComponent>();
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.tag = name.empty() ? "Entity" : name;
 		return entity;
@@ -285,12 +287,12 @@ namespace Mahakam
 	//Ref<Scene> Scene::CreateEmpty()
 	MH_DEFINE_FUNC(Scene::CreateEmpty, Ref<Scene>)
 	{
-		return std::make_shared<Scene>();
+		return CreateRef<Scene>();
 	};
 
 	//Ref<Scene> Scene::CreateFilepath(const std::string& filepath)
 	MH_DEFINE_FUNC(Scene::CreateFilepath, Ref<Scene>, const std::string& filepath)
 	{
-		return std::make_shared<Scene>(filepath);
+		return CreateRef<Scene>(filepath);
 	};
 }

@@ -87,42 +87,6 @@ namespace Mahakam::Editor
 
 		ImGui::PopItemWidth();
 
-		// Draw Transform
-		if (entity.HasComponent<TransformComponent>())
-		{
-			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1))
-					ImGui::OpenPopup("Transform");
-
-				if (ImGui::BeginPopup("Transform"))
-				{
-					if (ImGui::MenuItem("Reset"))
-					{
-						entity.RemoveComponent<TransformComponent>();
-						entity.AddComponent<TransformComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-
-					ImGui::EndPopup();
-				}
-
-				TransformComponent& transform = entity.GetComponent<TransformComponent>();
-
-				glm::vec3 pos = transform.GetPosition();
-				if (GUI::DrawVec3Control("Position", pos))
-					transform.SetPosition(pos);
-
-				glm::vec3 eulerAngles = glm::degrees(transform.GetEulerAngles());
-				if (GUI::DrawVec3Control("Rotation", eulerAngles))
-					transform.SetEulerangles(glm::radians(eulerAngles));
-
-				glm::vec3 scale = transform.GetScale();
-				if (GUI::DrawVec3Control("Scale", scale, 1.0f))
-					transform.SetScale(scale);
-			}
-		}
-
 		// Draw the rest of the components
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{

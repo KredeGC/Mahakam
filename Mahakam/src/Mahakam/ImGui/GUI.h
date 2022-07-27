@@ -9,7 +9,7 @@ namespace Mahakam::GUI
 	constexpr float COLUMN_WIDTH = 100.0f;
 	constexpr int MAX_STR_LEN = 256;
 
-	bool DrawVec3Control(const char* label, glm::vec3& value, float resetValue = 0.0f);
+	bool DrawVec3Control(const char* label, glm::vec3& value, float resetValue = 0.0f, bool disabled = false);
 
 	bool DrawColor3Edit(const char* label, glm::vec3& value, ImGuiColorEditFlags flags = 0);
 

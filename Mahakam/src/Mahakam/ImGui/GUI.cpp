@@ -5,11 +5,12 @@
 
 namespace Mahakam::GUI
 {
-	bool DrawVec3Control(const char* label, glm::vec3& value, float resetValue)
+	bool DrawVec3Control(const char* label, glm::vec3& value, float resetValue, bool disabled)
 	{
 		bool changed = false;
 
 		ImGui::PushID(&value);
+		ImGui::BeginDisabled(disabled);
 
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, COLUMN_WIDTH);
@@ -77,6 +78,7 @@ namespace Mahakam::GUI
 		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 
+		ImGui::EndDisabled();
 		ImGui::PopID();
 
 		return changed;
@@ -86,19 +88,19 @@ namespace Mahakam::GUI
 	{
 		bool changed = false;
 
-		ImGui::PushID(&value);
-
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, COLUMN_WIDTH);
 
 		ImGui::Text("%s", label);
 		ImGui::NextColumn();
 
+		ImGui::PushID(label);
+
 		changed = ImGui::ColorEdit3("", glm::value_ptr(value), flags);
 
-		ImGui::Columns(1);
-
 		ImGui::PopID();
+
+		ImGui::Columns(1);
 
 		return changed;
 	}

@@ -129,19 +129,6 @@ namespace Mahakam
 			emitter << YAML::Value << entity.GetComponent<TagComponent>().tag;
 		}
 
-		if (entity.HasComponent<TransformComponent>())
-		{
-			emitter << YAML::Key << "Transform";
-			emitter << YAML::BeginMap;
-
-			auto& transform = entity.GetComponent<TransformComponent>();
-			emitter << YAML::Key << "Translation" << YAML::Value << transform.GetPosition();
-			emitter << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
-			emitter << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
-
-			emitter << YAML::EndMap;
-		}
-
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
 			if (componentInterface.HasComponent(entity) && componentInterface.Serialize)
@@ -160,15 +147,6 @@ namespace Mahakam
 
 	void SceneSerializer::DeserializeEntity(YAML::Node& node, Entity entity)
 	{
-		YAML::Node transformComponent = node["Transform"];
-		if (transformComponent)
-		{
-			TransformComponent& transform = entity.GetComponent<TransformComponent>();
-			transform.SetPosition(transformComponent["Translation"].as<glm::vec3>());
-			transform.SetRotation(transformComponent["Rotation"].as<glm::quat>());
-			transform.SetScale(transformComponent["Scale"].as<glm::vec3>());
-		}
-
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
 			YAML::Node component = node[name];

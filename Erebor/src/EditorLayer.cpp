@@ -35,6 +35,54 @@ namespace Mahakam::Editor
 #endif
 
 #pragma region Components
+		// Transform
+		ComponentRegistry::ComponentInterface transformInterface;
+		transformInterface.SetComponent<TransformComponent>();
+		transformInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		{
+			TransformComponent& transform = entity.GetComponent<TransformComponent>();
+
+			emitter << YAML::Key << "Translation" << YAML::Value << transform.GetPosition();
+			emitter << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
+			emitter << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
+			emitter << YAML::Key << "Static" << YAML::Value << transform.IsStatic();
+
+			return true;
+		};
+		transformInterface.Deserialize = [](YAML::Node& node, Entity entity)
+		{
+			TransformComponent& transform = entity.AddComponent<TransformComponent>();
+
+			transform.SetPosition(node["Translation"].as<glm::vec3>());
+			transform.SetRotation(node["Rotation"].as<glm::quat>());
+			transform.SetScale(node["Scale"].as<glm::vec3>());
+			transform.SetStatic(node["Static"].as<bool>());
+
+			return true;
+		};
+		transformInterface.OnInspector = [](Entity entity)
+		{
+			TransformComponent& transform = entity.GetComponent<TransformComponent>();
+
+			bool isStatic = transform.IsStatic();
+			if (ImGui::Checkbox("Static", &isStatic))
+				transform.SetStatic(isStatic);
+
+			glm::vec3 pos = transform.GetPosition();
+			if (GUI::DrawVec3Control("Position", pos, 0.0f, isStatic))
+				transform.SetPosition(pos);
+
+			glm::vec3 eulerAngles = glm::degrees(transform.GetEulerAngles());
+			if (GUI::DrawVec3Control("Rotation", eulerAngles, 0.0f, isStatic))
+				transform.SetEulerangles(glm::radians(eulerAngles));
+
+			glm::vec3 scale = transform.GetScale();
+			if (GUI::DrawVec3Control("Scale", scale, 1.0f, isStatic))
+				transform.SetScale(scale);
+		};
+
+		ComponentRegistry::RegisterComponent("Transform", transformInterface);
+
 		// Animator
 		ComponentRegistry::ComponentInterface animatorInterface;
 		animatorInterface.SetComponent<AnimatorComponent>();
@@ -57,6 +105,12 @@ namespace Mahakam::Editor
 		};
 
 		ComponentRegistry::RegisterComponent("Animator", animatorInterface);
+
+		// AudioListener
+		ComponentRegistry::ComponentInterface audioListenerInterface;
+		audioListenerInterface.SetComponent<AudioListenerComponent>();
+
+		ComponentRegistry::RegisterComponent("Audio Listener", audioListenerInterface);
 
 		// AudioSource
 		ComponentRegistry::ComponentInterface audioSourceInterface;
@@ -114,12 +168,6 @@ namespace Mahakam::Editor
 		};
 
 		ComponentRegistry::RegisterComponent("Audio Source", audioSourceInterface);
-
-		// AudioListener
-		ComponentRegistry::ComponentInterface audioListenerInterface;
-		audioListenerInterface.SetComponent<AudioListenerComponent>();
-
-		ComponentRegistry::RegisterComponent("Audio Listener", audioListenerInterface);
 
 		// Camera
 		ComponentRegistry::ComponentInterface cameraInterface;
@@ -208,47 +256,6 @@ namespace Mahakam::Editor
 
 		ComponentRegistry::RegisterComponent("Camera", cameraInterface);
 
-		// Mesh
-		ComponentRegistry::ComponentInterface meshInterface;
-		meshInterface.SetComponent<MeshComponent>();
-		meshInterface.OnInspector = [](Entity entity)
-		{
-			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
-
-			auto& meshes = meshComponent.GetMeshes();
-			Asset<Material> material = meshComponent.GetMaterial();
-
-			uint32_t vertexCount = 0;
-			uint32_t indexCount = 0;
-			for (auto& mesh : meshes)
-			{
-				if (mesh)
-				{
-					vertexCount += mesh->GetVertexCount();
-					indexCount += mesh->GetIndexCount();
-				}
-			}
-
-			if (vertexCount > 0 && indexCount > 0)
-			{
-				ImGui::Text("Vertex count: %d", vertexCount);
-				ImGui::Text("Triangle count: %d", indexCount / 3);
-			}
-
-			if (material)
-			{
-				if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
-				{
-					// TODO: Show the material inspector instead?
-					glm::vec3 color = material->GetFloat3("u_Color");
-					if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
-						material->SetFloat3("u_Color", color);
-				}
-			}
-		};
-
-		ComponentRegistry::RegisterComponent("Mesh", meshInterface);
-
 		// Light
 		ComponentRegistry::ComponentInterface lightInterface;
 		lightInterface.SetComponent<LightComponent>();
@@ -331,6 +338,47 @@ namespace Mahakam::Editor
 		};
 
 		ComponentRegistry::RegisterComponent("Light", lightInterface);
+
+		// Mesh
+		ComponentRegistry::ComponentInterface meshInterface;
+		meshInterface.SetComponent<MeshComponent>();
+		meshInterface.OnInspector = [](Entity entity)
+		{
+			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
+
+			auto& meshes = meshComponent.GetMeshes();
+			Asset<Material> material = meshComponent.GetMaterial();
+
+			uint32_t vertexCount = 0;
+			uint32_t indexCount = 0;
+			for (auto& mesh : meshes)
+			{
+				if (mesh)
+				{
+					vertexCount += mesh->GetVertexCount();
+					indexCount += mesh->GetIndexCount();
+				}
+			}
+
+			if (vertexCount > 0 && indexCount > 0)
+			{
+				ImGui::Text("Vertex count: %d", vertexCount);
+				ImGui::Text("Triangle count: %d", indexCount / 3);
+			}
+
+			if (material)
+			{
+				if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					// TODO: Show the material inspector instead?
+					glm::vec3 color = material->GetFloat3("u_Color");
+					if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
+						material->SetFloat3("u_Color", color);
+				}
+			}
+		};
+
+		ComponentRegistry::RegisterComponent("Mesh", meshInterface);
 #pragma endregion
 
 
