@@ -195,23 +195,23 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create piano sound entity
-	Asset<Sound> becretSound = Asset<Sound>("import/assets/sounds/piano.wav.import");
+	Asset<Sound> pianoSound = Asset<Sound>("import/assets/sounds/piano.wav.import");
 
 	Entity pianoEntity = scene->CreateEntity("Piano");
 	pianoEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	AudioSourceComponent& pianoSource = pianoEntity.AddComponent<AudioSourceComponent>();
 	pianoSource.SetSpatialBlend(1.0f);
-	pianoSource.SetSound(becretSound);
+	pianoSource.SetSound(pianoSound);
 	pianoSource.Play();
 
 
 	// Create vespa sound entity
-	Asset<Sound> fernSound = Asset<Sound>("import/assets/sounds/vespa.wav.import");
+	Asset<Sound> vespaSound = Asset<Sound>("import/assets/sounds/vespa.wav.import");
 
 	Entity vespaEntity = scene->CreateEntity("Vespa Sound");
 	vespaEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
 	AudioSourceComponent& vespaSource = vespaEntity.AddComponent<AudioSourceComponent>();
-	vespaSource.SetSound(fernSound);
+	vespaSource.SetSound(vespaSound);
 	vespaSource.Play();
 
 

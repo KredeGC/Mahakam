@@ -10,24 +10,23 @@
 #include "Components/ParticleSystemComponent.h"
 #include "Components/TagComponent.h"
 #include "Components/TransformComponent.h"
+#include "Entity.h"
 
 #include "Mahakam/Asset/AssetDatabase.h"
 
-#include "Mahakam/Core/Utility.h"
-
 #include "Mahakam/Audio/AudioEngine.h"
+
+#include "Mahakam/Core/Random.h"
+#include "Mahakam/Core/Utility.h"
 
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/Texture.h"
 
-#include "Entity.h"
-
 #include <yaml-cpp/yaml.h>
 
 #include <fstream>
-#include <filesystem>
 
 namespace Mahakam
 {
@@ -168,6 +167,8 @@ namespace Mahakam
 
 	void Scene::OnRender(Camera& camera, const glm::mat4& cameraTransform)
 	{
+		MH_PROFILE_FUNCTION();
+
 		// Recalculate all projection matrices, if they've changed
 		camera.RecalculateProjectionMatrix();
 
@@ -270,12 +271,20 @@ namespace Mahakam
 		}
 	}
 
+	Entity Scene::CreateEntity(uint64_t ID, uint64_t parentID, const std::string& name)
+	{
+		std::string tagName = name.empty() ? "Entity" : name;
+		Entity entity(registry.create(), this);
+		auto& tag = entity.AddComponent<TagComponent>(ID, parentID, tagName);
+		return entity;
+	}
+
 	Entity Scene::CreateEntity(const std::string& name)
 	{
+		uint64_t id = Random::GetRandomID64();
+		std::string tagName = name.empty() ? "Entity" : name;
 		Entity entity(registry.create(), this);
-		//entity.AddComponent<TransformComponent>();
-		auto& tag = entity.AddComponent<TagComponent>();
-		tag.tag = name.empty() ? "Entity" : name;
+		auto& tag = entity.AddComponent<TagComponent>(id, 0, tagName);
 		return entity;
 	}
 

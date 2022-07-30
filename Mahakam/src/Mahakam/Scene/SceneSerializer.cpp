@@ -22,7 +22,7 @@ namespace Mahakam
 		YAML::Emitter emitter;
 		emitter << YAML::BeginMap;
 		emitter << YAML::Key << "Scene";
-		emitter << YAML::Value << "Name";
+		emitter << YAML::Value << "Untitled";
 
 		emitter << YAML::Key << "Skybox";
 		emitter << YAML::Value << YAML::BeginMap;
@@ -104,11 +104,13 @@ namespace Mahakam
 		{
 			for (auto entity : entities)
 			{
-				uint64_t uuid = entity["Entity"].as<uint64_t>(); // ENTITY UUID GOES HERE
+				uint64_t id = entity["ID"].as<uint64_t>();
+
+				uint64_t parentID = entity["ParentID"].as<uint64_t>();
 
 				std::string name = entity["Tag"].as<std::string>();
 
-				Entity deserializedEntity = m_Scene->CreateEntity(name);
+				Entity deserializedEntity = m_Scene->CreateEntity(id, parentID, name);
 
 				DeserializeEntity(entity, deserializedEntity);
 			}
@@ -120,13 +122,17 @@ namespace Mahakam
 	void SceneSerializer::SerializeEntity(YAML::Emitter& emitter, Entity entity)
 	{
 		emitter << YAML::BeginMap;
-		emitter << YAML::Key << "Entity";
-		emitter << YAML::Value << 1234; // ENTITY UUID GOES HERE
 
 		if (entity.HasComponent<TagComponent>())
 		{
+			TagComponent& tag = entity.GetComponent<TagComponent>();
+
+			emitter << YAML::Key << "ID";
+			emitter << YAML::Value << tag.ID;
+			emitter << YAML::Key << "Parent";
+			emitter << YAML::Value << tag.ParentID;
 			emitter << YAML::Key << "Tag";
-			emitter << YAML::Value << entity.GetComponent<TagComponent>().tag;
+			emitter << YAML::Value << tag.Tag;
 		}
 
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())

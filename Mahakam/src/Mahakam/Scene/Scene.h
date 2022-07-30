@@ -38,6 +38,7 @@ namespace Mahakam
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
+		Entity CreateEntity(uint64_t ID, uint64_t parentID, const std::string& name = "Entity");
 		Entity CreateEntity(const std::string& name = "Entity");
 		void DestroyEntity(Entity entity);
 

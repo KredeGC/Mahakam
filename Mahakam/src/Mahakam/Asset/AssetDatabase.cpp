@@ -1,6 +1,7 @@
 #include "mhpch.h"
 #include "AssetDatabase.h"
 
+#include "Mahakam/Core/Random.h"
 #include "Mahakam/Core/Utility.h"
 
 #include "AssetImporter.h"
@@ -8,15 +9,10 @@
 #include <yaml-cpp/yaml.h>
 
 #include <algorithm>
-#include <random>
 #include <fstream>
 
 namespace Mahakam
 {
-	static std::random_device rd;
-	static std::default_random_engine generator(rd());
-	static std::uniform_int_distribution<uint64_t> distribution(0, 0xFFFFFFFFFFFFFFFF);
-
 	//void AssetDatabase::RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport)
 	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImporter)
 	{
@@ -196,8 +192,8 @@ namespace Mahakam
 			uint64_t id = 0;
 			if (std::filesystem::exists(importPath))
 				id = ReadAssetInfo(importPath).ID;
-			while (id == 0) // TODO: Check if this ID already exists
-				id = distribution(generator);
+			if (id == 0) // TODO: Check if this ID already exists
+				id = Random::GetRandomID64();
 
 			FileUtility::CreateDirectories(importPath.parent_path());
 

@@ -12,7 +12,7 @@ namespace Mahakam::Editor
 {
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity, Ref<Scene> context)
 	{
-		std::string& tag = entity.GetComponent<TagComponent>().tag;
+		std::string& tag = entity.GetComponent<TagComponent>().Tag;
 
 		ImGuiTreeNodeFlags flags = ((entity == EditorLayer::GetSelectedEntity()) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
@@ -49,7 +49,7 @@ namespace Mahakam::Editor
 		// Draw tag as the first component
 		if (entity.HasComponent<TagComponent>())
 		{
-			std::string& tag = entity.GetComponent<TagComponent>().tag;
+			std::string& tag = entity.GetComponent<TagComponent>().Tag;
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
@@ -135,6 +135,24 @@ namespace Mahakam::Editor
 			Ref<Scene> context = EditorLayer::GetActiveScene();
 			if (context)
 			{
+				std::vector<Entity> entities;
+
+				context->ForEachEntity([&](auto handle)
+				{
+					Entity entity(handle, context.get());
+
+					TagComponent& tag = entity.GetComponent<TagComponent>();
+
+					if (tag.ParentID)
+					{
+						// TODO: https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
+						// In short: Sort by the relationship between parent and child
+						// TODO: Find a way for the user to change the order?
+					}
+				});
+
+
+
 				context->ForEachEntity([&](auto handle)
 				{
 					Entity entity(handle, context.get());

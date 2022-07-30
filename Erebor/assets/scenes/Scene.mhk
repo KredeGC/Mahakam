@@ -1,1065 +1,833 @@
 Scene: Name
 Skybox:
-  Material: 1413214623375882268
-  Irradiance: 5839156319952352249
-  Specular: 14413137597893043784
+  Material: 0
+  Irradiance: 0
+  Specular: 0
 Entities:
-  - Entity: 1234
+  - ID: 15788322049538276813
+    Parent: 0
     Tag: Sphere 9,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 2315381967436513492
+    Parent: 0
     Tag: Sphere 8,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 17608065271036301502
+    Parent: 0
     Tag: Sphere 7,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11814166300643142054
+    Parent: 0
     Tag: Sphere 6,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 10900103802180284763
+    Parent: 0
     Tag: Sphere 5,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 12509133372918542115
+    Parent: 0
     Tag: Sphere 4,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 7681416843855129354
+    Parent: 0
     Tag: Sphere 3,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 117307296802389757
+    Parent: 0
     Tag: Sphere 2,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 18238940234211067219
+    Parent: 0
     Tag: Sphere 1,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [1, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 4113897931726507305
+    Parent: 0
     Tag: Sphere 0,9
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, 9, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 16932044106045286343
+    Parent: 0
     Tag: Sphere 9,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 5340413983253741047
+    Parent: 0
     Tag: Sphere 8,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 8835754686394552031
+    Parent: 0
     Tag: Sphere 7,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 4245604203180229135
+    Parent: 0
     Tag: Sphere 6,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 4107026085702336762
+    Parent: 0
     Tag: Sphere 5,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 14850717528043507498
+    Parent: 0
     Tag: Sphere 4,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11638125443640861253
+    Parent: 0
     Tag: Sphere 3,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 10136973276350847918
+    Parent: 0
     Tag: Sphere 2,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 9040187439658828215
+    Parent: 0
     Tag: Sphere 1,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [1, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 9599130938892544711
+    Parent: 0
     Tag: Sphere 0,8
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, 8, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 17966414626616013522
+    Parent: 0
     Tag: Sphere 9,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 1608605184752073139
+    Parent: 0
     Tag: Sphere 8,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 13147668819901802284
+    Parent: 0
     Tag: Sphere 7,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 86669790481876879
+    Parent: 0
     Tag: Sphere 6,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 10107493862742458915
+    Parent: 0
     Tag: Sphere 5,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 14426855324362178323
+    Parent: 0
     Tag: Sphere 4,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 2201929059603536102
+    Parent: 0
     Tag: Sphere 3,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 8270785496849954306
+    Parent: 0
     Tag: Sphere 2,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 6656395863196116886
+    Parent: 0
     Tag: Sphere 1,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [1, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 6656807716409865027
+    Parent: 0
     Tag: Sphere 0,7
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, 7, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11635571124824723308
+    Parent: 0
     Tag: Sphere 9,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 4956206708282200051
+    Parent: 0
     Tag: Sphere 8,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 12456803661302520539
+    Parent: 0
     Tag: Sphere 7,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 7049155456634848813
+    Parent: 0
     Tag: Sphere 6,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 9984330442565021360
+    Parent: 0
     Tag: Sphere 5,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 9684138277345051992
+    Parent: 0
     Tag: Sphere 4,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 14573062584239881307
+    Parent: 0
     Tag: Sphere 3,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 2702105274601792711
+    Parent: 0
     Tag: Sphere 2,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 255827704993455014
+    Parent: 0
     Tag: Sphere 1,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [1, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 16849773015284296807
+    Parent: 0
     Tag: Sphere 0,6
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, 6, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 99325966903694097
+    Parent: 0
     Tag: Sphere 9,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 3839806646898365741
+    Parent: 0
     Tag: Sphere 8,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 1729881107738999923
+    Parent: 0
     Tag: Sphere 7,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 8176461195668841112
+    Parent: 0
     Tag: Sphere 6,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 2293915984911613731
+    Parent: 0
     Tag: Sphere 5,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 10992690567940462589
+    Parent: 0
     Tag: Sphere 4,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 146967158914159870
+    Parent: 0
     Tag: Sphere 3,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 1520635663445548262
+    Parent: 0
     Tag: Sphere 2,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 5022058560607698699
+    Parent: 0
     Tag: Sphere 1,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [1, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 7883913718624112858
+    Parent: 0
     Tag: Sphere 0,5
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, 5, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 12824591799487818768
+    Parent: 0
     Tag: Sphere 9,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 16302175856142051116
+    Parent: 0
     Tag: Sphere 8,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 7150200405650685172
+    Parent: 0
     Tag: Sphere 7,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 7693912433817405998
+    Parent: 0
     Tag: Sphere 6,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11826291079932130986
+    Parent: 0
     Tag: Sphere 5,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 16736014716727871631
+    Parent: 0
     Tag: Sphere 4,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11451808248254145394
+    Parent: 0
     Tag: Sphere 3,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 768096279659940582
+    Parent: 0
     Tag: Sphere 2,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 4165178994428539210
+    Parent: 0
     Tag: Sphere 1,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [1, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 13787372970202801799
+    Parent: 0
     Tag: Sphere 0,4
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, 4, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 530659585062177018
+    Parent: 0
     Tag: Sphere 9,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 16025445589475463799
+    Parent: 0
     Tag: Sphere 8,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11968535653438124358
+    Parent: 0
     Tag: Sphere 7,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 2596888107494795822
+    Parent: 0
     Tag: Sphere 6,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11148725273717258649
+    Parent: 0
     Tag: Sphere 5,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 7575732200590014986
+    Parent: 0
     Tag: Sphere 4,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 17429844872496808012
+    Parent: 0
     Tag: Sphere 3,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 14284037872752785953
+    Parent: 0
     Tag: Sphere 2,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 6351231119692864193
+    Parent: 0
     Tag: Sphere 1,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [1, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 10755260213903615919
+    Parent: 0
     Tag: Sphere 0,3
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, 3, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 1995376148450681929
+    Parent: 0
     Tag: Sphere 9,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 13900954563043783943
+    Parent: 0
     Tag: Sphere 8,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 809643445737603998
+    Parent: 0
     Tag: Sphere 7,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 16735563271708141265
+    Parent: 0
     Tag: Sphere 6,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 1432115819747635700
+    Parent: 0
     Tag: Sphere 5,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 1295898347026051557
+    Parent: 0
     Tag: Sphere 4,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 6023935933732358016
+    Parent: 0
     Tag: Sphere 3,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 10924728293298848191
+    Parent: 0
     Tag: Sphere 2,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11090489310082938123
+    Parent: 0
     Tag: Sphere 1,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [1, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 14511033147467197471
+    Parent: 0
     Tag: Sphere 0,2
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, 2, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 13899366039055192777
+    Parent: 0
     Tag: Sphere 9,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 5393169312569966342
+    Parent: 0
     Tag: Sphere 8,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 7187498992216147768
+    Parent: 0
     Tag: Sphere 7,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 7044724018098721549
+    Parent: 0
     Tag: Sphere 6,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11753051989339232210
+    Parent: 0
     Tag: Sphere 5,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 12572989291139339767
+    Parent: 0
     Tag: Sphere 4,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 5836061965914926959
+    Parent: 0
     Tag: Sphere 3,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 11918590029049035849
+    Parent: 0
     Tag: Sphere 2,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 16803785097682528128
+    Parent: 0
     Tag: Sphere 1,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [1, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 18244765072249552554
+    Parent: 0
     Tag: Sphere 0,1
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, 1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 17686224067332003600
+    Parent: 0
     Tag: Sphere 9,0
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [9, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 12513641668406226610
+    Parent: 0
     Tag: Sphere 8,0
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [8, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 16247293801435348946
+    Parent: 0
     Tag: Sphere 7,0
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [7, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 14635973575391854549
+    Parent: 0
     Tag: Sphere 6,0
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [6, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 10417447791477075666
+    Parent: 0
     Tag: Sphere 5,0
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [5, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 15391457862125563508
+    Parent: 0
     Tag: Sphere 4,0
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [4, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 7977174068606649305
+    Parent: 0
     Tag: Sphere 3,0
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [3, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 4816734717586691313
+    Parent: 0
     Tag: Sphere 2,0
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [2, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 17281453281310365246
+    Parent: 0
     Tag: Sphere 1,0
     Transform:
       Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+      Static: true
+  - ID: 13393360224388872690
+    Parent: 0
     Tag: Sphere 0,0
     Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [1, 0, 0]
-      Rotation: [0, 0, 0, 1]
-      Scale: [0, 0, 0]
-  - Entity: 1234
-    Tag: Vespa Sound
-    Transform:
-      Translation: [0, 1, 2]
+      Translation: [0, 0, 0]
       Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
-    Transform:
-      Translation: [0, 1, 2]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    Audio Source:
-      Sound: 6500880741922569946
-      SpatialBlend: 1
-  - Entity: 1234
-    Tag: Piano
-    Transform:
-      Translation: [2.5, 4, 7.5]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    Transform:
-      Translation: [2.5, 4, 7.5]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    Audio Source:
-      Sound: 8193143289740505450
-      SpatialBlend: 1
-  - Entity: 1234
+      Static: true
+  - ID: 8027067021117951572
+    Parent: 0
     Tag: Particle System
     Transform:
       Translation: [0, 0, 1]
       Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
-    Transform:
-      Translation: [0, 0, 1]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-  - Entity: 1234
+      Static: false
+  - ID: 4831498183869396359
+    Parent: 0
     Tag: Plane
     Transform:
-      Translation: [30, 0, 0]
-      Rotation: [0, 0, 0, 30]
-      Scale: [0, 0, 0]
-    Transform:
-      Translation: [30, 0, 0]
-      Rotation: [0, 0, 0, 30]
-      Scale: [0, 0, 0]
-  - Entity: 1234
+      Translation: [0, -1, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [30, 30, 30]
+      Static: true
+  - ID: 5613918239016100046
+    Parent: 0
     Tag: Spot Light
     Transform:
       Translation: [1, 2.5, 4]
       Rotation: [-1.13133414e-08, 4.22219593e-08, 0.258819073, 0.965925813]
       Scale: [1, 1, 1]
-    Transform:
-      Translation: [1, 2.5, 4]
-      Rotation: [-1.13133414e-08, 4.22219593e-08, 0.258819073, 0.965925813]
-      Scale: [1, 1, 1]
+      Static: false
     Light:
       LightType: 2
       Range: 10
@@ -1067,16 +835,14 @@ Entities:
       Color: [1, 1, 1]
       ShadowCasting: true
       ShadowBias: 0
-  - Entity: 1234
+  - ID: 2318222692570602777
+    Parent: 0
     Tag: Main Light
     Transform:
       Translation: [0, 0, 0]
       Rotation: [0.0664485916, -0.0242556296, -0.937019587, -0.34203884]
       Scale: [1, 1, 1]
-    Transform:
-      Translation: [0, 0, 0]
-      Rotation: [0.0664485916, -0.0242556296, -0.937019587, -0.34203884]
-      Scale: [1, 1, 1]
+      Static: false
     Light:
       LightType: 0
       Range: 20
@@ -1084,16 +850,14 @@ Entities:
       Color: [1, 1, 1]
       ShadowCasting: true
       ShadowBias: 0.00499999989
-  - Entity: 1234
+  - ID: 3989912844749254357
+    Parent: 0
     Tag: Main Camera
     Transform:
-      Translation: [6.78496027, 5.88901854, 12.6850214]
+      Translation: [5.28094196, 5.74354553, 18.355381]
       Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
-    Transform:
-      Translation: [6.78496027, 5.88901854, 12.6850214]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
+      Static: false
     Camera:
       Projection: 0
       FOV: 0.785398185
@@ -1102,16 +866,46 @@ Entities:
       Size: 10
       Ratio: 1.63592231
       FixedRatio: false
-  - Entity: 1234
+  - ID: 3553216269067108806
+    Parent: 0
+    Tag: DLL Animated
+    Transform:
+      Translation: [5, 1.5, 10]
+      Rotation: [4.63287033e-05, 0, 1, 0]
+      Scale: [0.0199999996, 0.0199999996, 0.0199999996]
+      Static: false
+  - ID: 6139163327468533245
+    Parent: 0
+    Tag: DLL Animated
+    Transform:
+      Translation: [5, 1.5, 5]
+      Rotation: [1, 0, 0, 0]
+      Scale: [0.0199999996, 0.0199999996, 0.0199999996]
+      Static: false
+  - ID: 6470208875578251624
+    Parent: 0
+    Tag: DLL Animated
+    Transform:
+      Translation: [0, 1.5, 10]
+      Rotation: [4.63287033e-05, 0, 1, 0]
+      Scale: [0.0199999996, 0.0199999996, 0.0199999996]
+      Static: false
+  - ID: 8839061307789740654
+    Parent: 0
+    Tag: DLL Animated
+    Transform:
+      Translation: [0, 1.5, 5]
+      Rotation: [1, 0, 0, 0]
+      Scale: [0.0199999996, 0.0199999996, 0.0199999996]
+      Static: false
+  - ID: 10060134258871629899
+    Parent: 0
     Tag: DLL Light Test
     Transform:
       Translation: [0, 0, 1]
       Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
-    Transform:
-      Translation: [0, 0, 1]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
+      Static: false
     Light:
       LightType: 2
       Range: 10
