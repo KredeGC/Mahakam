@@ -1,7 +1,7 @@
 #include "ebpch.h"
 #include "DockSpace.h"
 
-#include "EditorLayer.h"
+#include <imgui.h>
 
 namespace Mahakam::Editor
 {
@@ -129,9 +129,9 @@ namespace Mahakam::Editor
 
 	void DockSpace::NewScene()
 	{
-		EditorLayer::SetSelectedEntity({});
+		Selection::SetSelectedEntity({});
 		Ref<Scene> scene = Scene::Create();
-		EditorLayer::SetActiveScene(scene);
+		SceneManager::SetActiveScene(scene);
 	}
 
 	void DockSpace::OpenScene()
@@ -140,9 +140,9 @@ namespace Mahakam::Editor
 
 		if (!filepath.empty())
 		{
-			EditorLayer::SetSelectedEntity({});
+			Selection::SetSelectedEntity({});
 			Ref<Scene> scene = Scene::Create();
-			EditorLayer::SetActiveScene(scene);
+			SceneManager::SetActiveScene(scene);
 
 			SceneSerializer serializer(scene);
 			serializer.Deserialize(filepath);
@@ -160,7 +160,7 @@ namespace Mahakam::Editor
 
 		if (!filepath.empty())
 		{
-			SceneSerializer serializer(EditorLayer::GetActiveScene());
+			SceneSerializer serializer(SceneManager::GetActiveScene());
 			serializer.Serialize(filepath);
 		}
 	}

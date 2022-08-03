@@ -34,6 +34,8 @@
 #ifndef MH_RUNTIME
 #include "Mahakam/Editor/EditorWindow.h"
 #include "Mahakam/Editor/EditorWindowRegistry.h"
+#include "Mahakam/Editor/SceneManager.h"
+#include "Mahakam/Editor/Selection.h"
 #endif
 
 // Events

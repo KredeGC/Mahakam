@@ -5,7 +5,8 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <assimp/scene.h>
+
+struct aiNodeAnim;
 
 namespace Mahakam
 {
@@ -48,7 +49,7 @@ namespace Mahakam
 
 		void Update(float animationTime);
 
-		inline glm::mat4 GetLocalTransform() { return m_LocalTransform; }
+		inline const glm::mat4& GetLocalTransform() { return m_LocalTransform; }
 
 		inline std::string GetBoneName() const { return m_Name; }
 

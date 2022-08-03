@@ -4,6 +4,8 @@
 
 #include "Bone.h"
 
+struct aiAnimation;
+
 namespace Mahakam
 {
 	class Animator

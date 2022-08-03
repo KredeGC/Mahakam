@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "Animator.h"
 
+#include "Assimp.h"
+
 namespace Mahakam
 {
 	Animator::Animator(Asset<Animation> animation)

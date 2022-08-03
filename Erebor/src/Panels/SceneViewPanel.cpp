@@ -1,9 +1,9 @@
 #include "ebpch.h"
 #include "SceneViewPanel.h"
 
-#include "EditorLayer.h"
-
 #include <glm/gtc/type_ptr.hpp>
+
+#include <imgui.h>
 
 #include <ImGuizmo.h>
 
@@ -17,7 +17,7 @@ namespace Mahakam::Editor
 
 			AudioEngine::UpdateSounds(m_EditorCamera.GetModelMatrix());
 
-			EditorLayer::GetActiveScene()->OnRender(m_EditorCamera, m_EditorCamera.GetModelMatrix());
+			SceneManager::GetActiveScene()->OnRender(m_EditorCamera, m_EditorCamera.GetModelMatrix());
 		}
 	}
 
@@ -74,7 +74,7 @@ namespace Mahakam::Editor
 			}
 
 			// Transform gizmo
-			Entity selectedEntity = EditorLayer::GetSelectedEntity();
+			Entity selectedEntity = Selection::GetSelectedEntity();
 			if (selectedEntity && m_GizmoType != -1)
 			{
 				const glm::mat4 viewMatrix = glm::inverse(m_EditorCamera.GetModelMatrix());

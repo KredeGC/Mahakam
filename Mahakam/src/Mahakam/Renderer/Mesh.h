@@ -4,7 +4,9 @@
 #include "Mahakam/Asset/Asset.h"
 #include "ShaderDataTypes.h"
 
-#include "Assimp.h"
+struct aiScene;
+struct aiNode;
+struct aiMesh;
 
 namespace Mahakam
 {

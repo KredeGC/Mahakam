@@ -14,12 +14,12 @@ namespace Mahakam::Editor
 	{
 		std::string& tag = entity.GetComponent<TagComponent>().Tag;
 
-		ImGuiTreeNodeFlags flags = ((entity == EditorLayer::GetSelectedEntity()) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+		ImGuiTreeNodeFlags flags = ((entity == Selection::GetSelectedEntity()) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 
 		if (ImGui::IsItemClicked())
-			EditorLayer::SetSelectedEntity(entity);
+			Selection::SetSelectedEntity(entity);
 
 		bool markedAsDeleted = false;
 		if (ImGui::BeginPopupContextItem())
@@ -37,8 +37,8 @@ namespace Mahakam::Editor
 
 		if (markedAsDeleted)
 		{
-			if (EditorLayer::GetSelectedEntity() == entity)
-				EditorLayer::SetSelectedEntity({});
+			if (Selection::GetSelectedEntity() == entity)
+				Selection::SetSelectedEntity({});
 
 			context->DestroyEntity(entity);
 		}
@@ -76,7 +76,7 @@ namespace Mahakam::Editor
 				{
 					if (ImGui::MenuItem(name.c_str()))
 					{
-						componentInterface.AddComponent(EditorLayer::GetSelectedEntity());
+						componentInterface.AddComponent(Selection::GetSelectedEntity());
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -132,7 +132,7 @@ namespace Mahakam::Editor
 		{
 			ImGui::Begin("Scene Hierarchy", &m_Open);
 
-			Ref<Scene> context = EditorLayer::GetActiveScene();
+			Ref<Scene> context = SceneManager::GetActiveScene();
 			if (context)
 			{
 				std::vector<Entity> entities;
@@ -161,7 +161,7 @@ namespace Mahakam::Editor
 				});
 
 				if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-					EditorLayer::SetSelectedEntity({});
+					Selection::SetSelectedEntity({});
 
 				// Blank space menu
 				if (ImGui::BeginPopupContextWindow(0, 1, false))
@@ -177,9 +177,9 @@ namespace Mahakam::Editor
 
 				ImGui::Begin("Inspector");
 
-				if (EditorLayer::GetSelectedEntity())
+				if (Selection::GetSelectedEntity())
 				{
-					DrawInspector(EditorLayer::GetSelectedEntity());
+					DrawInspector(Selection::GetSelectedEntity());
 				}
 			}
 

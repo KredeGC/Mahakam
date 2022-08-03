@@ -42,15 +42,10 @@ namespace Mahakam
 		// Preview stuff
 		m_PreviewSphereMesh = Mesh::CreateUVSphere(20, 20);
 
-		m_PreviewCamera = Camera(Camera::ProjectionType::Perspective, 45, 0.03f, 10.0f);
-
-		Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/internal/PreviewSky.material.import");
-		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/internal/previewirradiance.hdr.import");
-		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/internal/previewspecular.hdr.import");
+		m_PreviewCamera = Camera(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.03f, 5.0f);
 
 		// Setup scene data
 		m_SceneData = CreateRef<SceneData>();
-		m_SceneData->environment = EnvironmentData{ skyboxMaterial, skyboxIrradiance, skyboxSpecular };
 		m_SceneData->meshIDLookup[0] = m_PreviewSphereMesh;
 		m_SceneData->meshRefLookup[m_PreviewSphereMesh] = 0;
 		m_SceneData->transformIDLookup[0] = glm::mat4(1.0f);
@@ -82,6 +77,16 @@ namespace Mahakam
 
 	void MaterialAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& rootNode)
 	{
+		// Load the preview skybox
+		Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/internal/PreviewSky.material.import");
+		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/internal/previewirradiance.hdr.import");
+		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/internal/previewspecular.hdr.import");
+
+		m_SceneData->environment.skyboxMaterial = skyboxMaterial;
+		m_SceneData->environment.irradianceMap = skyboxIrradiance;
+		m_SceneData->environment.specularMap = skyboxSpecular;
+
+		// Reset orbit angles
 		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
 
 		YAML::Node shaderNode = rootNode["Shader"];

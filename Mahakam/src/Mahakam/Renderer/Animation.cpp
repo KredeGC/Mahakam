@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "Animation.h"
 
+#include "Assimp.h"
+
 #include "Mahakam/Core/SharedLibrary.h"
 
 namespace Mahakam

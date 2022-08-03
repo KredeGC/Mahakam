@@ -490,10 +490,12 @@ namespace Mahakam::Editor
 
 		AssetDatabase::ReloadAsset(skyboxMaterial.GetID());*/
 
-		s_ActiveScene = Scene::Create();
-		s_ActiveScene->SetSkyboxMaterial(skyboxMaterial);
-		s_ActiveScene->SetSkyboxIrradiance(skyboxIrradiance);
-		s_ActiveScene->SetSkyboxSpecular(skyboxSpecular);
+		Ref<Scene> activeScene = Scene::Create();
+		activeScene->SetSkyboxMaterial(skyboxMaterial);
+		activeScene->SetSkyboxIrradiance(skyboxIrradiance);
+		activeScene->SetSkyboxSpecular(skyboxSpecular);
+
+		SceneManager::SetActiveScene(activeScene);
 
 
 #if MH_PLATFORM_WINDOWS
@@ -504,13 +506,14 @@ namespace Mahakam::Editor
 
 		auto runPtr = lib->GetFunction<void, Scene*>("Run");
 
-		runPtr(s_ActiveScene.get());
+		runPtr(activeScene.get());
 	}
 
 	void EditorLayer::OnDetach()
 	{
 		// IMPORTANT: Unload the scene before unloading the runtime
-		s_ActiveScene = nullptr;
+		SceneManager::SetActiveScene(nullptr);
+		//s_ActiveScene = nullptr;
 
 		delete lib; // TODO: Make this better, why the fuck is it just a static field
 		blitShader = nullptr;
@@ -543,7 +546,7 @@ namespace Mahakam::Editor
 		// Call shared library update
 		auto updatePtr = lib->GetFunction<void, Scene*, Timestep>("Update");
 
-		updatePtr(s_ActiveScene.get(), dt);
+		updatePtr(SceneManager::GetActiveScene().get(), dt);
 
 #if MH_RUNTIME
 		// Only used during runtime
@@ -561,9 +564,9 @@ namespace Mahakam::Editor
 #else
 		static const bool m_PlayMode = false;
 		if (m_PlayMode)
-			s_ActiveScene->OnUpdate(dt);
+			SceneManager::GetActiveScene()->OnUpdate(dt);
 		else
-			s_ActiveScene->OnUpdate(dt, true); // TEMPORARY until play-mode is implemented
+			SceneManager::GetActiveScene()->OnUpdate(dt, true); // TEMPORARY until play-mode is implemented
 #endif
 
 		// Test compute shader
@@ -661,21 +664,23 @@ namespace Mahakam::Editor
 					MH_CORE_TRACE("Reloading runtime code");
 
 					// Unload old scene and runtime
-					s_ActiveScene = nullptr;
+					SceneManager::SetActiveScene(nullptr);
+					//s_ActiveScene = nullptr;
 					delete lib;
 
 					// Copy new runtime
 					CopyRuntime(binaryStream, binaryLength);
 
 					// Create new scene
-					s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
+					Ref<Scene> activeScene = Scene::Create("assets/textures/pines.hdr");
+					SceneManager::SetActiveScene(activeScene);
 
 					// Load new runtime
 					lib = new SharedLibrary("runtime/Sandbox-runtime.dll");
 
 					auto runPtr = lib->GetFunction<void, Scene*>("Run");
 
-					runPtr(s_ActiveScene.get());
+					runPtr(activeScene.get());
 				}
 			}
 			else
@@ -704,7 +709,7 @@ namespace Mahakam::Editor
 
 	bool EditorLayer::OnWindowResized(WindowResizeEvent& event)
 	{
-		s_ActiveScene->OnViewportResize(event.GetWidth(), event.GetHeight());
+		SceneManager::GetActiveScene()->OnViewportResize(event.GetWidth(), event.GetHeight());
 
 		return false;
 	}

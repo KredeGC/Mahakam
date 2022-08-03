@@ -2,8 +2,9 @@
 
 #include "Panels/ConsolePanel.h"
 
-#include "spdlog/sinks/base_sink.h"
-#include "spdlog/details/null_mutex.h"
+#include <spdlog/common.h>
+#include <spdlog/sinks/base_sink.h>
+#include <spdlog/details/null_mutex.h>
 #include <mutex>
 
 namespace Mahakam::Editor
@@ -23,7 +24,16 @@ namespace Mahakam::Editor
 
             std::string formattedString = fmt::to_string(formatted);
 
-            ConsolePanel::AddLog(formattedString);
+            if (msg.level == spdlog::level::level_enum::trace)
+                ConsolePanel::AddLog({ 1.0f, 1.0f, 1.0f, 1.0f }, formattedString);
+            else if (msg.level == spdlog::level::level_enum::info)
+                ConsolePanel::AddLog({ 0.5f, 0.5f, 0.5f, 1.0f }, formattedString);
+            else if (msg.level == spdlog::level::level_enum::warn)
+                ConsolePanel::AddLog({ 1.0f, 1.0f, 0.0f, 1.0f }, formattedString);
+            else if (msg.level == spdlog::level::level_enum::err)
+                ConsolePanel::AddLog({ 1.0f, 0.0f, 0.0f, 1.0f }, formattedString);
+            else if (msg.level == spdlog::level::level_enum::critical)
+                ConsolePanel::AddLog({ 1.0f, 0.0f, 0.0f, 1.0f }, formattedString);
         }
 
         void flush_() override

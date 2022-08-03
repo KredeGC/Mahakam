@@ -1,8 +1,6 @@
 #include "ebpch.h"
 #include "EditorCamera.h"
 
-#include "EditorLayer.h"
-
 namespace Mahakam::Editor
 {
 	void EditorCamera::OnUpdate(Timestep dt, bool focus, bool hover)
@@ -47,7 +45,7 @@ namespace Mahakam::Editor
 
 			UpdateRotationMatrix();
 
-			target = position + forward * zoom;
+			glm::vec3 target = position + forward * zoom;
 
 			float speed = Input::IsKeyPressed(MH_KEY_LEFT_SHIFT) ? moveSpeed * 0.1f : moveSpeed;
 
@@ -66,6 +64,8 @@ namespace Mahakam::Editor
 				target -= speed * dt * up;
 			else if (Input::IsKeyPressed(MH_KEY_E))
 				target += speed * dt * up;
+
+			Selection::SetOrbitTarget(target);
 		}
 		else if (noCapture && hover && altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_RIGHT)) // Right zoom
 		{
@@ -78,7 +78,10 @@ namespace Mahakam::Editor
 		{
 			float speed = GetZoomSpeed();
 
+			glm::vec3 target = Selection::GetOrbitTarget();
 			target += deltaY * speed * up - deltaX * speed * right;
+
+			Selection::SetOrbitTarget(target);
 		}
 		else if (!Application::GetInstance()->GetWindow().IsCursorVisible())
 		{
@@ -87,7 +90,7 @@ namespace Mahakam::Editor
 		}
 
 		zoom = glm::max(zoom + zoomDelta, 0.0f);
-		position = target - forward * zoom;
+		position = Selection::GetOrbitTarget() - forward * zoom;
 
 		UpdateModelMatrix();
 	}
@@ -104,13 +107,14 @@ namespace Mahakam::Editor
 		switch (event.GetKeyCode())
 		{
 		case MH_KEY_F:
-			Entity selectedEntity = EditorLayer::GetSelectedEntity();
+			Entity selectedEntity = Selection::GetSelectedEntity();
 
 			if (selectedEntity)
 			{
 				TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
 
-				target = transform.GetPosition();
+				const glm::vec3& target = transform.GetPosition();
+				Selection::SetOrbitTarget(target);
 				zoom = glm::length(target - position);
 			}
 			break;
@@ -125,7 +129,7 @@ namespace Mahakam::Editor
 
 		zoom -= delta;
 
-		position = target - forward * zoom;
+		position = Selection::GetOrbitTarget() - forward * zoom;
 
 		UpdateModelMatrix();
 

@@ -28,7 +28,6 @@ namespace Mahakam::Editor
 		glm::vec3 right = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 up = { 0.0f, 0.0f, 0.0f };
 
-		glm::vec3 target = { 0.0f, 0.0f, 0.0f };
 		float zoom = 0.0f;
 
 		glm::mat4 rotationMatrix;
@@ -61,9 +60,6 @@ namespace Mahakam::Editor
 		inline const glm::quat& GetRotation() const { return rotation; }
 		inline void SetRotation(const glm::quat& rot) { rotation = rot; eulerAngles = glm::eulerAngles(rotation); UpdateRotationMatrix(); UpdateModelMatrix(); }
 
-		inline void SetTarget(const glm::vec3& orbit) { target = orbit; }
-		inline const glm::vec3& GetTarget() const { return target; }
-		
 		inline Camera& GetCamera() { return camera; }
 		inline const glm::mat4& GetModelMatrix() const { return modelMatrix; }
 

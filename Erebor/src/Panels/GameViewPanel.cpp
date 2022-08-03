@@ -1,7 +1,7 @@
 #include "ebpch.h"
 #include "GameViewPanel.h"
 
-#include "EditorLayer.h"
+#include <imgui.h>
 
 namespace Mahakam::Editor
 {
@@ -21,7 +21,7 @@ namespace Mahakam::Editor
 				m_ViewportSize.x = size.x;
 				m_ViewportSize.y = size.y;
 
-				EditorLayer::GetActiveScene()->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
+				SceneManager::GetActiveScene()->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
 			}
 
 			Asset<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();

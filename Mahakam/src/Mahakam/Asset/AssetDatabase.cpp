@@ -40,7 +40,7 @@ namespace Mahakam
 	//void AssetDatabase::DeregisterAllAssetImporters()
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterAllAssetImporters, void) // TODO: Define the function
 	{
-		
+		m_AssetImporters.clear();
 	};
 
 	//Ref<AssetImporter> AssetDatabase::GetAssetImporter(const std::string& extension)
@@ -142,7 +142,7 @@ namespace Mahakam
 	{
 		if (std::filesystem::is_directory(importPath) || !std::filesystem::exists(importPath))
 		{
-			MH_CORE_WARN("The path {0} doesn't exist", importPath.string());
+			MH_CORE_WARN("The path '{0}' doesn't exist", importPath.string());
 			return {};
 		}
 
@@ -228,6 +228,8 @@ namespace Mahakam
 	//Ref<void> AssetDatabase::LoadAssetFromID(uint64_t id)
 	MH_DEFINE_FUNC(AssetDatabase::LoadAssetFromID, Ref<void>, uint64_t id)
 	{
+		MH_CORE_ASSERT(id, "Asset ID to be loaded cannot be 0");
+
 		// If the asset has already been loaded, just return it
 		auto cacheIter = m_CachedAssets.find(id);
 		if (cacheIter != m_CachedAssets.end() && cacheIter->second.Asset)
@@ -241,7 +243,7 @@ namespace Mahakam
 
 		if (!std::filesystem::exists(importPath))
 		{
-			MH_CORE_WARN("The path {0} doesn't exist", importPath.string());
+			MH_CORE_WARN("The path '{0}' doesn't exist", importPath.string());
 			return nullptr;
 		}
 

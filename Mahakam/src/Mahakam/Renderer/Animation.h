@@ -8,7 +8,8 @@
 #include <robin_hood.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <assimp/scene.h>
+
+struct aiNode;
 
 namespace Mahakam
 {

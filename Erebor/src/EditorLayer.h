@@ -13,10 +13,6 @@ namespace Mahakam::Editor
 	class EditorLayer : public Layer
 	{
 	private:
-		inline static Entity s_SelectedEntity;
-
-		inline static Ref<Scene> s_ActiveScene;
-
 #ifndef MH_RUNTIME
 		DockSpace m_DockSpace;
 #endif
@@ -33,12 +29,6 @@ namespace Mahakam::Editor
 		virtual void OnUpdate(Timestep dt) override;
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& event) override;
-
-		inline static void SetSelectedEntity(Entity entity) { s_SelectedEntity = entity; }
-		inline static Entity GetSelectedEntity() { return s_SelectedEntity; }
-
-		inline static void SetActiveScene(Ref<Scene> scene) { s_ActiveScene = scene; }
-		inline static Ref<Scene> GetActiveScene() { return s_ActiveScene; }
 
 	private:
 		void CopyRuntime(std::istream& binaryStream, size_t binaryLength);

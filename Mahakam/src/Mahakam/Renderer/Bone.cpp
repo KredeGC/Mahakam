@@ -1,6 +1,8 @@
 #include "mhpch.h"
 #include "Bone.h"
 
+#include <assimp/scene.h>
+
 namespace Mahakam
 {
 	Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)

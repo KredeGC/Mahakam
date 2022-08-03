@@ -3,6 +3,7 @@
 
 #include "RendererAPI.h"
 #include "Material.h"
+#include "Assimp.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
 

@@ -2,8 +2,6 @@
 
 #include <Mahakam.h>
 
-#include <imgui.h>
-
 namespace Mahakam::Editor
 {
 	class DockSpace
