@@ -142,7 +142,7 @@ namespace Mahakam
 	{
 		if (std::filesystem::is_directory(importPath) || !std::filesystem::exists(importPath))
 		{
-			MH_CORE_WARN("The path '{0}' doesn't exist", importPath.string());
+			MH_CORE_WARN("AssetDatabase::ReadAssetInfo: The path '{0}' doesn't exist", importPath.string());
 			return {};
 		}
 
@@ -183,18 +183,24 @@ namespace Mahakam
 	//uint64_t AssetDatabase::SaveAsset(Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, uint64_t, Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		std::string extension = filepath.extension().string();
+		// Read asset info and ID
+		std::string extension;
+		uint64_t id = 0;
+		if (std::filesystem::exists(importPath))
+		{
+			AssetInfo info = ReadAssetInfo(importPath);
+			extension = info.Extension;
+			id = info.ID;
+		}
+		else
+		{
+			std::string extension = filepath.extension().string();
+			id = Random::GetRandomID64();
+		}
 
 		auto iter = m_AssetImporters.find(extension);
 		if (iter != m_AssetImporters.end())
 		{
-			// Read the ID if it exists, otherwise generate
-			uint64_t id = 0;
-			if (std::filesystem::exists(importPath))
-				id = ReadAssetInfo(importPath).ID;
-			if (id == 0) // TODO: Check if this ID already exists
-				id = Random::GetRandomID64();
-
 			FileUtility::CreateDirectories(importPath.parent_path());
 
 			YAML::Emitter emitter;
@@ -243,7 +249,7 @@ namespace Mahakam
 
 		if (!std::filesystem::exists(importPath))
 		{
-			MH_CORE_WARN("The path '{0}' doesn't exist", importPath.string());
+			MH_CORE_WARN("AssetDatabase::LoadAssetFromID: The path '{0}' doesn't exist", importPath.string());
 			return nullptr;
 		}
 
@@ -323,6 +329,10 @@ namespace Mahakam
 
 					std::string filepathUnix = directory.path().string();
 					std::replace(filepathUnix.begin(), filepathUnix.end(), '/', seperator);
+
+					auto iter = m_AssetPaths.find(id);
+
+					MH_CORE_ASSERT(iter == m_AssetPaths.end(), "AssetDatabase::RecursiveCacheAssets: Asset with the given ID already exists");
 
 					m_AssetPaths[id] = filepathUnix;
 				}

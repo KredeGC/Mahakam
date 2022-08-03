@@ -17,6 +17,8 @@ namespace Mahakam::Editor
 		DockSpace m_DockSpace;
 #endif
 
+		Scope<SharedLibrary> m_Runtime;
+
 	public:
 #ifndef MH_RUNTIME
 		EditorLayer() : Layer("Editor"), m_DockSpace() {}

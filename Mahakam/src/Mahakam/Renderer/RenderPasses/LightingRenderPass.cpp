@@ -223,14 +223,6 @@ namespace Mahakam
 
 		for (uint64_t drawID : sceneData->renderQueue)
 		{
-			// Choose a shader
-			const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
-			Asset<Shader>& shader = sceneData->shaderIDLookup[shaderID];
-
-			// Choose a material
-			const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-			Asset<Material>& material = sceneData->materialIDLookup[materialID];
-
 			// Choose a mesh
 			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
 			Asset<Mesh>& mesh = sceneData->meshIDLookup[meshID];
@@ -244,6 +236,14 @@ namespace Mahakam
 
 			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
 			{
+				// Choose a shader
+				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
+				Asset<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+
+				// Choose a material
+				const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
+				Asset<Material>& material = sceneData->materialIDLookup[materialID];
+
 				// Hash shader
 				unsigned char shaderBytes[sizeof(Shader*)];
 				memcpy(shaderBytes, shader.Get().get(), sizeof(Shader*));
@@ -277,7 +277,7 @@ namespace Mahakam
 		return hash;
 	}
 
-	void LightingRenderPass::RenderShadowGeometry(SceneData* sceneData, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
+	void LightingRenderPass::RenderShadowGeometry(SceneData* sceneData, const Frustum& frustum, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -285,54 +285,62 @@ namespace Mahakam
 
 		for (uint64_t drawID : renderQueue)
 		{
-			// Choose a shader
-			const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
-			if (shaderID != *lastShaderID)
-			{
-				Asset<Shader>& shader = sceneData->shaderIDLookup[shaderID];
-				if (shader->HasShaderPass("SHADOW"))
-				{
-					*lastShaderID = shaderID;
-					shader->Bind("SHADOW");
-				}
-				else if (*lastShaderID != ~0)
-				{
-					*lastShaderID = ~0;
-					shadowShader->Bind("SHADOW");
-				}
-			}
-
-			// Choose a material
-			const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-			Asset<Material>& material = sceneData->materialIDLookup[materialID];
-			if (materialID != *lastMaterialID && *lastShaderID != ~0)
-			{
-				*lastMaterialID = materialID;
-				material->Bind();
-			}
-
 			// Choose a mesh
 			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
 			Asset<Mesh>& mesh = sceneData->meshIDLookup[meshID];
-			if (meshID != *lastMeshID)
-			{
-				*lastMeshID = meshID;
-				mesh->Bind();
-			}
 
 			// Choose a transform
 			const uint64_t transformID = drawID & 0xFFFFULL;
 			glm::mat4& transform = sceneData->transformIDLookup[transformID];
-
+			
 			// Perform AABB test
 			Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
 
-			// Render to depth map
-			material->SetTransform(transform);
+			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
+			{
+				// Choose and bind shader
+				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
+				Asset<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+				if (shaderID != *lastShaderID)
+				{
+					if (shader->HasShaderPass("SHADOW"))
+					{
+						*lastShaderID = shaderID;
+						shader->Bind("SHADOW");
+					}
+					else if (*lastShaderID != ~0)
+					{
+						*lastShaderID = ~0;
+						shadowShader->Bind("SHADOW");
+					}
+				}
 
-			Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+				// Choose and bind material
+				const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
+				Asset<Material>& material = sceneData->materialIDLookup[materialID];
+				if (materialID != *lastMaterialID && *lastShaderID != ~0)
+				{
+					*lastMaterialID = materialID;
+					material->Bind();
+				}
 
-			GL::DrawIndexed(mesh->GetIndexCount());
+				// Bind mesh
+				if (meshID != *lastMeshID)
+				{
+					*lastMeshID = meshID;
+					mesh->Bind();
+				}
+
+				// Render to depth map
+				if (*lastShaderID == ~0)
+					shadowShader->SetUniformMat4("u_m4_M", transform);
+				else
+					shader->SetUniformMat4("u_m4_M", transform);
+
+				Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+
+				GL::DrawIndexed(mesh->GetIndexCount());
+			}
 		}
 	}
 
@@ -402,7 +410,7 @@ namespace Mahakam
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
 
-				RenderShadowGeometry(sceneData, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
+				RenderShadowGeometry(sceneData, frustum, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
 			}
 
 			shadowMapMargin.x = shadowMapOffset.x;
@@ -477,7 +485,7 @@ namespace Mahakam
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
 
-				RenderShadowGeometry(sceneData, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
+				RenderShadowGeometry(sceneData, frustum, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
 			}
 		}
 	}

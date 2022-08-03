@@ -1,5 +1,9 @@
-#include "ebpch.h"
+#include "mhpch.h"
 #include "EditorCamera.h"
+
+#include "Selection.h"
+
+#include "Mahakam/Scene/Components/TransformComponent.h"
 
 namespace Mahakam::Editor
 {

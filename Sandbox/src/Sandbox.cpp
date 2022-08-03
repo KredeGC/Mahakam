@@ -78,14 +78,10 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	entity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 	entity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
+#if 1
 	// Create skinned material
-	// Asset<Material> skinnedMaterial = Material::Create(skinnedShader);
-	// skinnedMaterial->SetFloat3("u_Color", { 0.68f, 0.44f, 0.22f });
-	// skinnedMaterial->SetFloat("u_Metallic", 1.0f);
-	// skinnedMaterial->SetFloat("u_Roughness", 0.4f);
 	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
-#if 1
 	// Create animation and model
 	SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/mannequin_clap.fbx");
 	Asset<Animation> animation = Animation::Load("assets/models/mannequin_clap.fbx", skinnedModel);
@@ -130,24 +126,9 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<Texture2D> brickAlbedo = Asset<Texture2D>("import/assets/textures/brick/brick_albedo.png.import");
-	Asset<Texture> brickBump = Asset<Texture2D>("import/assets/textures/brick/brick_bump.png.import");
-	Asset<Texture> brickRoughness = Asset<Texture2D>("import/assets/textures/brick/brick_roughness.png.import");
-	/*Asset<Texture> brickAlbedo = Texture2D::Create("assets/textures/brick/brick_albedo.png", { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
-	Asset<Texture> brickBump = Texture2D::Create("assets/textures/brick/brick_bump.png", { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
-	Asset<Texture> brickRoughness = Texture2D::Create("assets/textures/brick/brick_roughness.png", { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });*/
-	/*Ref<Texture> brickAlbedo = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_albedo.png", false, { 128, 128, TextureFormat::SRGB_DXT1, TextureFilter::Point });
-	Ref<Texture> brickBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_bump.png", false, { 128, 128, TextureFormat::RG_BC5, TextureFilter::Point });
-	Ref<Texture> brickRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/brick/brick_roughness.png", false, { 128, 128, TextureFormat::R_BC4, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });*/
 	Asset<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
 
 	Asset<Material> planeMaterial = Asset<Material>("import/assets/materials/BrickPlane.material.import");
-	/*Asset<Material> planeMaterial = Material::Create(textureShader);
-	planeMaterial->SetTexture("u_Albedo", 0, brickAlbedo);
-	planeMaterial->SetTexture("u_Bump", 0, brickBump);
-	planeMaterial->SetTexture("u_Metallic", 0, GL::GetTexture2DBlack());
-	planeMaterial->SetTexture("u_Roughness", 0, brickRoughness);
-	planeMaterial->SetTexture("u_Occlussion", 0, GL::GetTexture2DWhite());*/
 
 	Entity planeEntity = scene->CreateEntity("Plane");
 	planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
@@ -162,29 +143,11 @@ EXTERN_EXPORTED void Run(Scene* scene)
 	particleEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
-#if 0
-	// Create backpack textures
-	Ref<Texture2D> backpackDiffuse = Texture2D::Create("assets/textures/backpack/diffuse.jpg", { 4096, 4096, TextureFormat::SRGB_DXT1 });
-	Ref<Texture2D> backpackOcclussion = Texture2D::Create("assets/textures/backpack/ao.jpg", { 4096, 4096, TextureFormat::R_BC4 });
-	Ref<Texture2D> backpackBump = Texture2D::Create("assets/textures/backpack/normal.png", { 4096, 4096, TextureFormat::RG_BC5 });
-	Ref<Texture2D> backpackMetallic = Texture2D::Create("assets/textures/backpack/specular.jpg", { 4096, 4096, TextureFormat::R_BC4 });
-	Ref<Texture2D> backpackRoughness = Texture2D::Create("assets/textures/backpack/roughness.jpg", { 4096, 4096, TextureFormat::R_BC4 });
-	/*Ref<Texture2D> backpackDiffuse = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/diffuse.jpg", false, { 4096, 4096, TextureFormat::SRGB_DXT1 });
-	Ref<Texture> backpackOcclussion = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/ao.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
-	Ref<Texture> backpackBump = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/normal.png", false, { 4096, 4096, TextureFormat::RG_BC5 });
-	Ref<Texture> backpackMetallic = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/specular.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });
-	Ref<Texture> backpackRoughness = AssetDatabase::CreateOrLoadAsset<Texture2D>("assets/textures/backpack/roughness.jpg", false, { 4096, 4096, TextureFormat::R_BC4 });*/
-
+#if 1
 	// Create backpack model
 	SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
 
-	// Create backpack material
-	Ref<Material> backpackMaterial = Material::Create(textureShader);
-	backpackMaterial->SetTexture("u_Albedo", 0, backpackDiffuse);
-	backpackMaterial->SetTexture("u_Bump", 0, backpackBump);
-	backpackMaterial->SetTexture("u_Metallic", 0, backpackMetallic);
-	backpackMaterial->SetTexture("u_Roughness", 0, backpackRoughness);
-	backpackMaterial->SetTexture("u_Occlussion", 0, backpackOcclussion);
+	Asset<Material> backpackMaterial = Asset<Material>("import/assets/materials/Backpack.material.import");
 
 	// Create backpack entity
 	Entity backpackEntity = scene->CreateEntity("Bacpack");
@@ -217,9 +180,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 
 	// Create mesh & base material
 	Asset<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
-	//Asset<Material> baseMaterial = Material::Create(colorShader);
 	Asset<Material> baseMaterial = Asset<Material>("import/assets/materials/WhiteDiffuse.material.import");
-	//baseMaterial->SetFloat3("u_Color", { 1.0f, 1.0f, 1.0f });
 
 	// Create scene entities
 	for (int y = 0; y < 10; y++)

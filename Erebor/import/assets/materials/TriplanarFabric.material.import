@@ -1,4 +1,4 @@
-Filepath: assets/shaders/default/LitTriplanarStochasticBump.shader
+Filepath: assets/shaders/default/LitTriplanarStochasticBump.material
 Extension: .material
 ID: 660037763508674260
 Shader: 13750326872447612574

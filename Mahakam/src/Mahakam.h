@@ -32,6 +32,7 @@
 
 // Editor
 #ifndef MH_RUNTIME
+#include "Mahakam/Editor/EditorCamera.h"
 #include "Mahakam/Editor/EditorWindow.h"
 #include "Mahakam/Editor/EditorWindowRegistry.h"
 #include "Mahakam/Editor/SceneManager.h"

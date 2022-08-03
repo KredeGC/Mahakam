@@ -1,6 +1,9 @@
 #pragma once
 
-#include <Mahakam.h>
+#include "Mahakam/Renderer/Camera.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace Mahakam::Editor
 {

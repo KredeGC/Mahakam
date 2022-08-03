@@ -20,8 +20,6 @@
 
 namespace Mahakam::Editor
 {
-	static SharedLibrary* lib;
-
 	static Asset<Shader> blitShader;
 
 	void EditorLayer::OnAttach()
@@ -499,12 +497,12 @@ namespace Mahakam::Editor
 
 
 #if MH_PLATFORM_WINDOWS
-		lib = new SharedLibrary("runtime/Sandbox.dll");
+		m_Runtime = CreateScope<SharedLibrary>("runtime/Sandbox.dll");
 #else
-		lib = new SharedLibrary("runtime/libSandbox.so");
+		m_Runtime = CreateScope<SharedLibrary>("runtime/libSandbox.so");
 #endif
 
-		auto runPtr = lib->GetFunction<void, Scene*>("Run");
+		auto runPtr = m_Runtime->GetFunction<void, Scene*>("Run");
 
 		runPtr(activeScene.get());
 	}
@@ -515,7 +513,7 @@ namespace Mahakam::Editor
 		SceneManager::SetActiveScene(nullptr);
 		//s_ActiveScene = nullptr;
 
-		delete lib; // TODO: Make this better, why the fuck is it just a static field
+		m_Runtime = nullptr;
 		blitShader = nullptr;
 
 #pragma region Assets
@@ -544,11 +542,11 @@ namespace Mahakam::Editor
 		UpdateRuntimeLibrary();
 
 		// Call shared library update
-		auto updatePtr = lib->GetFunction<void, Scene*, Timestep>("Update");
+		auto updatePtr = m_Runtime->GetFunction<void, Scene*, Timestep>("Update");
 
 		updatePtr(SceneManager::GetActiveScene().get(), dt);
 
-#if MH_RUNTIME
+#ifdef MH_RUNTIME
 		// Only used during runtime
 		s_ActiveScene->OnUpdate(dt);
 
@@ -666,7 +664,7 @@ namespace Mahakam::Editor
 					// Unload old scene and runtime
 					SceneManager::SetActiveScene(nullptr);
 					//s_ActiveScene = nullptr;
-					delete lib;
+					m_Runtime = nullptr;
 
 					// Copy new runtime
 					CopyRuntime(binaryStream, binaryLength);
@@ -676,9 +674,9 @@ namespace Mahakam::Editor
 					SceneManager::SetActiveScene(activeScene);
 
 					// Load new runtime
-					lib = new SharedLibrary("runtime/Sandbox-runtime.dll");
+					m_Runtime = CreateScope<SharedLibrary>("runtime/Sandbox-runtime.dll");
 
-					auto runPtr = lib->GetFunction<void, Scene*>("Run");
+					auto runPtr = m_Runtime->GetFunction<void, Scene*>("Run");
 
 					runPtr(activeScene.get());
 				}

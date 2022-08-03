@@ -1,0 +1,15 @@
+Filepath: assets/materials/default/LitABR2.material
+Extension: .material
+ID: 46003763570734560
+Shader: 11869644962294522068
+Properties:
+  u_EmissionColor: [0, 0, 0]
+  u_Occlussion: 4967946425892475307
+  u_RoughnessMul: 1
+  u_Roughness: 1646747611554353250
+  u_MetallicMul: 1
+  u_Bump: 5968966049936667336
+  u_Metallic: 9795171254709206469
+  u_Color: [1, 1, 1]
+  u_Albedo: 14377480984110579021
+  u_UVTransform: [1, 1, 0, 0]

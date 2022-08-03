@@ -1,7 +1,5 @@
 #pragma once
 
-#include "EditorCamera.h"
-
 #include <Mahakam.h>
 
 namespace Mahakam::Editor

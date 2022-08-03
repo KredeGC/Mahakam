@@ -28,7 +28,9 @@ namespace Mahakam::Editor
 
 				ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == s_AssetDirectory) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-				bool open = ImGui::TreeNodeEx(s_AssetDirectory.string().c_str(), flags | ImGuiTreeNodeFlags_DefaultOpen, s_AssetDirectory.string().c_str());
+				const char* label = s_AssetDirectory.string().c_str();
+
+				bool open = ImGui::TreeNodeEx(label, flags | ImGuiTreeNodeFlags_DefaultOpen, "%s", label);
 
 				if (ImGui::IsItemClicked())
 					m_CurrentDirectory = s_AssetDirectory;
@@ -69,7 +71,7 @@ namespace Mahakam::Editor
 
 				ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == path) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-				bool open = ImGui::TreeNodeEx(path.string().c_str(), flags, pathName.c_str());
+				bool open = ImGui::TreeNodeEx(path.string().c_str(), flags, "%s", pathName.c_str());
 
 				if (ImGui::IsItemClicked())
 					m_CurrentDirectory = path;
@@ -117,7 +119,7 @@ namespace Mahakam::Editor
 							m_CurrentDirectory = file.path();
 						}
 						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
-						ImGui::TextWrapped(pathName.c_str());
+						ImGui::TextWrapped("%s", pathName.c_str());
 						ImGui::PopID();
 					}
 				}
@@ -165,7 +167,7 @@ namespace Mahakam::Editor
 								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
 							}
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
-							ImGui::TextWrapped(pathName.c_str());
+							ImGui::TextWrapped("%s", pathName.c_str());
 							ImGui::PopID();
 						}
 					}
@@ -208,7 +210,7 @@ namespace Mahakam::Editor
 							ImportWizardPanel::ImportAsset(file.path(), file.path().extension().string(), importPath);
 						}
 						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
-						ImGui::TextWrapped(pathName.c_str());
+						ImGui::TextWrapped("%s", pathName.c_str());
 						ImGui::PopID();
 					}
 				}
