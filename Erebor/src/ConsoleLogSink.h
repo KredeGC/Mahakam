@@ -20,6 +20,7 @@ namespace Mahakam::Editor
 
             // If needed (very likely but not mandatory), the sink formats the message before sending it to its final destination:
             spdlog::memory_buf_t formatted;
+            spdlog::sinks::base_sink<Mutex>::set_pattern_("%^[%T] %n: %v%$");
             spdlog::sinks::base_sink<Mutex>::formatter_->format(msg, formatted);
 
             std::string formattedString = fmt::to_string(formatted);
@@ -27,7 +28,7 @@ namespace Mahakam::Editor
             if (msg.level == spdlog::level::level_enum::trace)
                 ConsolePanel::AddLog({ 1.0f, 1.0f, 1.0f, 1.0f }, formattedString);
             else if (msg.level == spdlog::level::level_enum::info)
-                ConsolePanel::AddLog({ 0.5f, 0.5f, 0.5f, 1.0f }, formattedString);
+                ConsolePanel::AddLog({ 0.0f, 0.8f, 0.0f, 1.0f }, formattedString);
             else if (msg.level == spdlog::level::level_enum::warn)
                 ConsolePanel::AddLog({ 1.0f, 1.0f, 0.0f, 1.0f }, formattedString);
             else if (msg.level == spdlog::level::level_enum::err)

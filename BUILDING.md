@@ -1,5 +1,5 @@
 # Building Mahakam
-Mahakam uses premake5 as build system.
+Mahakam uses [premake5](https://premake.github.io/download) as build system.
 Generating build-files can be done via the terminal from the project root directory.
 The engine currently only supports Windows and Linux operating systems.
 There are no plans to add Mac support, as I don't have a Mac myself.
