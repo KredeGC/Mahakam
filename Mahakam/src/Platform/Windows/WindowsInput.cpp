@@ -7,14 +7,14 @@
 namespace Mahakam
 {
 	//bool Input::IsKeyPressed(int keycode)
-	MH_DEFINE_FUNC(Input::IsKeyPressed, bool, int keycode)
+	MH_DEFINE_FUNC(Input::IsKeyPressed, bool, Key keycode)
 	{
 		Application* app = Application::GetInstance();
 		Window& w = app->GetWindow();
 		void* nativeW = w.GetNativeWindow();
 		auto window = static_cast<GLFWwindow*>(nativeW);
 
-		int state = glfwGetKey(window, keycode);
+		int state = glfwGetKey(window, (int)keycode);
 
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	};

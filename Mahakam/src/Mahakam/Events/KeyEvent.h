@@ -2,6 +2,8 @@
 
 #include "Event.h"
 
+#include "Mahakam/Core/KeyCodes.h"
+
 namespace Mahakam
 {
 	class KeyEvent : public Event
@@ -12,7 +14,7 @@ namespace Mahakam
 		KeyEvent(int keycode) : keycode(keycode) {}
 
 	public:
-		inline int GetKeyCode() const { return keycode; }
+		inline Key GetKeyCode() const { return (Key)keycode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	};

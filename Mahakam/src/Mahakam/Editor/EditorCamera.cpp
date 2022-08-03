@@ -14,7 +14,7 @@ namespace Mahakam::Editor
 		ImGuiIO& io = ImGui::GetIO();
 
 		bool noCapture = !io.WantCaptureKeyboard;
-		bool altHeld = Input::IsKeyPressed(MH_KEY_LEFT_ALT);
+		bool altHeld = Input::IsKeyPressed(Key::LEFT_ALT);
 
 		float zoomDelta = 0.0f;
 
@@ -51,22 +51,22 @@ namespace Mahakam::Editor
 
 			glm::vec3 target = position + forward * zoom;
 
-			float speed = Input::IsKeyPressed(MH_KEY_LEFT_SHIFT) ? moveSpeed * 0.1f : moveSpeed;
+			float speed = Input::IsKeyPressed(Key::LEFT_SHIFT) ? moveSpeed * 0.1f : moveSpeed;
 
 			// Movement
-			if (Input::IsKeyPressed(MH_KEY_A))
+			if (Input::IsKeyPressed(Key::A))
 				target -= speed * dt * right;
-			else if (Input::IsKeyPressed(MH_KEY_D))
+			else if (Input::IsKeyPressed(Key::D))
 				target += speed * dt * right;
 
-			if (Input::IsKeyPressed(MH_KEY_W))
+			if (Input::IsKeyPressed(Key::W))
 				target += speed * dt * forward;
-			else if (Input::IsKeyPressed(MH_KEY_S))
+			else if (Input::IsKeyPressed(Key::S))
 				target -= speed * dt * forward;
 
-			if (Input::IsKeyPressed(MH_KEY_Q))
+			if (Input::IsKeyPressed(Key::Q))
 				target -= speed * dt * up;
-			else if (Input::IsKeyPressed(MH_KEY_E))
+			else if (Input::IsKeyPressed(Key::E))
 				target += speed * dt * up;
 
 			Selection::SetOrbitTarget(target);
@@ -110,7 +110,7 @@ namespace Mahakam::Editor
 
 		switch (event.GetKeyCode())
 		{
-		case MH_KEY_F:
+		case Key::F:
 			Entity selectedEntity = Selection::GetSelectedEntity();
 
 			if (selectedEntity)

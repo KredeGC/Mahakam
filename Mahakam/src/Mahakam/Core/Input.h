@@ -13,7 +13,7 @@ namespace Mahakam
 		using MousePos = std::pair<float, float>;
 
 	public:
-		MH_DECLARE_FUNC(IsKeyPressed, bool, int keycode);
+		MH_DECLARE_FUNC(IsKeyPressed, bool, Key keycode);
 		
 		MH_DECLARE_FUNC(IsMouseButtonPressed, bool, int button);
 		MH_DECLARE_FUNC(GetMouseX, float);

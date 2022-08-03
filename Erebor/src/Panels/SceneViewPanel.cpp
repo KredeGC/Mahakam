@@ -89,7 +89,7 @@ namespace Mahakam::Editor
 				glm::mat4 modelMatrix = transform.GetModelMatrix();
 
 				// Setup snapping
-				bool snap = Input::IsKeyPressed(MH_KEY_LEFT_SHIFT);
+				bool snap = Input::IsKeyPressed(Key::LEFT_SHIFT);
 				float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5f;
 				float snapValues[3] = { snapValue, snapValue, snapValue };
 
@@ -142,19 +142,19 @@ namespace Mahakam::Editor
 
 		switch (event.GetKeyCode())
 		{
-		case MH_KEY_Q:
+		case Key::Q:
 			m_GizmoType = -1;
 			break;
-		case MH_KEY_W:
+		case Key::W:
 			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
 			break;
-		case MH_KEY_E:
+		case Key::E:
 			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
 			break;
-		case MH_KEY_R:
+		case Key::R:
 			m_GizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
-		case MH_KEY_G:
+		case Key::G:
 			m_LocalScope = !m_LocalScope;
 			break;
 		}

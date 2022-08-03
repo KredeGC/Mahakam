@@ -11,7 +11,7 @@ namespace Mahakam::Editor
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, 100.0f);
 
-		ImGui::Text(label);
+		ImGui::Text("%s", label);
 		ImGui::NextColumn();
 
 		// Show combo box

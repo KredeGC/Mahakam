@@ -220,48 +220,48 @@ EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
 		float speed = controller.moveSpeed * dt;
 		float rotationSpeed = controller.rotationSpeed * dt;
 
-		if (Input::IsKeyPressed(MH_KEY_LEFT_SHIFT))
+		if (Input::IsKeyPressed(Key::LEFT_SHIFT))
 			speed *= 0.01f;
 
 		glm::vec3 eulerAngles = transform.GetEulerAngles();
 
 		// Camera rotation
-		if (Input::IsKeyPressed(MH_KEY_LEFT))
+		if (Input::IsKeyPressed(Key::LEFT))
 		{
 			eulerAngles.y += rotationSpeed;
 			transform.SetEulerangles(eulerAngles);
 		}
-		else if (Input::IsKeyPressed(MH_KEY_RIGHT))
+		else if (Input::IsKeyPressed(Key::RIGHT))
 		{
 			eulerAngles.y -= rotationSpeed;
 			transform.SetEulerangles(eulerAngles);
 		}
 
-		if (Input::IsKeyPressed(MH_KEY_UP))
+		if (Input::IsKeyPressed(Key::UP))
 		{
 			eulerAngles.x += rotationSpeed;
 			transform.SetEulerangles(eulerAngles);
 		}
-		else if (Input::IsKeyPressed(MH_KEY_DOWN))
+		else if (Input::IsKeyPressed(Key::DOWN))
 		{
 			eulerAngles.x -= rotationSpeed;
 			transform.SetEulerangles(eulerAngles);
 		}
 
 		// Camera movement
-		if (Input::IsKeyPressed(MH_KEY_A))
+		if (Input::IsKeyPressed(Key::A))
 			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetRight());
-		else if (Input::IsKeyPressed(MH_KEY_D))
+		else if (Input::IsKeyPressed(Key::D))
 			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetRight());
 
-		if (Input::IsKeyPressed(MH_KEY_W))
+		if (Input::IsKeyPressed(Key::W))
 			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetForward());
-		else if (Input::IsKeyPressed(MH_KEY_S))
+		else if (Input::IsKeyPressed(Key::S))
 			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetForward());
 
-		if (Input::IsKeyPressed(MH_KEY_Q))
+		if (Input::IsKeyPressed(Key::Q))
 			transform.SetPosition(transform.GetPosition() - glm::vec3(speed) * transform.GetUp());
-		else if (Input::IsKeyPressed(MH_KEY_E))
+		else if (Input::IsKeyPressed(Key::E))
 			transform.SetPosition(transform.GetPosition() + glm::vec3(speed) * transform.GetUp());
 	});
 }

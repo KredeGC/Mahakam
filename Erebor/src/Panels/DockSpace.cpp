@@ -101,20 +101,20 @@ namespace Mahakam::Editor
 		if (event.GetRepeatCount() > 0) return false;
 
 		// Shortcuts
-		bool controlPressed = Input::IsKeyPressed(MH_KEY_LEFT_CONTROL) || Input::IsKeyPressed(MH_KEY_RIGHT_CONTROL);
-		bool shiftPressed = Input::IsKeyPressed(MH_KEY_LEFT_SHIFT) || Input::IsKeyPressed(MH_KEY_RIGHT_SHIFT);
+		bool controlPressed = Input::IsKeyPressed(Key::LEFT_CONTROL) || Input::IsKeyPressed(Key::RIGHT_CONTROL);
+		bool shiftPressed = Input::IsKeyPressed(Key::LEFT_SHIFT) || Input::IsKeyPressed(Key::RIGHT_SHIFT);
 
 		switch (event.GetKeyCode())
 		{
-		case MH_KEY_N:
+		case Key::N:
 			if (controlPressed)
 				NewScene();
 			break;
-		case MH_KEY_O:
+		case Key::O:
 			if (controlPressed)
 				OpenScene();
 			break;
-		case MH_KEY_S:
+		case Key::S:
 			if (controlPressed && shiftPressed)
 				SaveSceneAs();
 			else if (controlPressed)

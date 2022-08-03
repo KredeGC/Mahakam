@@ -18,7 +18,9 @@ int main(int argc, char** argv)
 	MH_CORE_INFO("Logging initialized");
 	MH_INFO("Logging initialized");
 
+#ifndef MH_RUNTIME
 	Mahakam::FileUtility::CreateDirectories("profiling/");
+#endif
 
 	MH_PROFILE_BEGIN_SESSION("startup", "profiling/Startup.json");
 	auto app = Mahakam::CreateApplication();

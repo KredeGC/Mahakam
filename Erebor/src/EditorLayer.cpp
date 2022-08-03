@@ -693,13 +693,13 @@ namespace Mahakam::Editor
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
 	{
-		if (event.GetKeyCode() == MH_KEY_F5)
+		if (event.GetKeyCode() == Key::F5)
 			Renderer::EnableWireframe(!Renderer::HasWireframeEnabled());
 
-		if (event.GetKeyCode() == MH_KEY_F6)
+		if (event.GetKeyCode() == Key::F6)
 			Renderer::EnableGBuffer(!Renderer::HasGBufferEnabled());
 
-		if (event.GetKeyCode() == MH_KEY_F7)
+		if (event.GetKeyCode() == Key::F7)
 			Renderer::EnableBoundingBox(!Renderer::HasBoundingBoxEnabled());
 
 		return false;
