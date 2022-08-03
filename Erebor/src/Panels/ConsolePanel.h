@@ -1,5 +1,9 @@
 #pragma once
 
+#include <Mahakam.h>
+
+#include <spdlog/common.h>
+
 #include <imgui.h>
 
 namespace Mahakam::Editor
@@ -15,14 +19,21 @@ namespace Mahakam::Editor
 
 	private:
 		bool m_Open = true;
+		bool m_ClearOnPlay = true;
 
-		static std::vector<ConsoleLine> m_Lines;
+		static inline bool s_ViewTrace = true;
+		static inline bool s_ViewInfo = true;
+		static inline bool s_ViewWarn = true;
+		static inline bool s_ViewError = true;
+		static inline bool s_ViewFatal = true;
+
+		static std::vector<ConsoleLine> s_Lines;
 
 	public:
 		virtual bool IsOpen() const override { return m_Open; }
 
 		virtual void OnImGuiRender() override;
 
-		static void AddLog(const ImVec4& color, const std::string& msg);
+		static void AddLog(spdlog::level::level_enum level, const std::string& msg);
 	};
 }

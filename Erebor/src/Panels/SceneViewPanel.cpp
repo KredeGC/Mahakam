@@ -28,86 +28,86 @@ namespace Mahakam::Editor
 		if (m_Open)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			ImGui::Begin("Scene View", &m_Open);
-
-			auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-			auto viewportOffset = ImGui::GetWindowPos();
-			m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
-			m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
-
-			m_Focused = ImGui::IsWindowFocused();
-			m_Hovered = ImGui::IsWindowHovered();
-			Application::GetInstance()->GetImGuiLayer()->BlockEvents(!m_Focused && !m_Hovered);
-			ImVec2 newViewportSize = ImGui::GetContentRegionAvail();
-			if (newViewportSize.x != m_ViewportSize.x || newViewportSize.y != m_ViewportSize.y)
+			if (ImGui::Begin("Scene View", &m_Open))
 			{
-				m_ViewportSize.x = newViewportSize.x;
-				m_ViewportSize.y = newViewportSize.y;
+				auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+				auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+				auto viewportOffset = ImGui::GetWindowPos();
+				m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+				m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
-				m_EditorCamera.GetCamera().SetRatio(m_ViewportSize.x / m_ViewportSize.y);
-			}
-
-			Asset<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
-			if (framebuffer)
-			{
-				Asset<Texture> viewportTexture = framebuffer->GetColorTexture(0);
-				if (viewportTexture)
-					ImGui::Image((void*)(uintptr_t)viewportTexture->GetRendererID(), newViewportSize, ImVec2(0, 1), ImVec2(1, 0));
-			}
-
-			// Setup ImGuizmo
-			ImVec2 pos = { m_ViewportBounds[0].x, m_ViewportBounds[0].y };
-			ImVec2 size = { m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y };
-
-			ImGuizmo::SetOrthographic(false);
-			ImGuizmo::SetDrawlist();
-
-			ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
-
-			// View manipulation
-			{
-				// FIXME: Gets clamped in the positive z-dome. Possibly due to interference in EditorCamera::OnUpdate
-				glm::mat4 viewMatrix = glm::inverse(m_EditorCamera.GetModelMatrix());
-
-				ImGuizmo::ViewManipulate(glm::value_ptr(viewMatrix), 5.0f, ImVec2(pos.x + size.x - 128, pos.y), ImVec2(128, 128), 0);
-			}
-
-			// Transform gizmo
-			Entity selectedEntity = Selection::GetSelectedEntity();
-			if (selectedEntity && m_GizmoType != -1)
-			{
-				const glm::mat4 viewMatrix = glm::inverse(m_EditorCamera.GetModelMatrix());
-
-				ImGuizmo::Enable(!m_EditorCamera.IsControlling());
-
-				// Setup camera matrices
-				const glm::mat4& projectionMatrix = m_EditorCamera.GetCamera().GetProjectionMatrix();
-
-				// Setup model matrix
-				TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
-				glm::mat4 modelMatrix = transform.GetModelMatrix();
-
-				// Setup snapping
-				bool snap = Input::IsKeyPressed(Key::LEFT_SHIFT);
-				float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5f;
-				float snapValues[3] = { snapValue, snapValue, snapValue };
-
-				// Draw transform gizmo
-				ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix),
-					(ImGuizmo::OPERATION)m_GizmoType, (ImGuizmo::MODE)m_LocalScope, glm::value_ptr(modelMatrix), 0, snap ? snapValues : 0);
-
-				if (ImGuizmo::IsUsing())
+				m_Focused = ImGui::IsWindowFocused();
+				m_Hovered = ImGui::IsWindowHovered();
+				Application::GetInstance()->GetImGuiLayer()->BlockEvents(!m_Focused && !m_Hovered);
+				ImVec2 newViewportSize = ImGui::GetContentRegionAvail();
+				if (newViewportSize.x != m_ViewportSize.x || newViewportSize.y != m_ViewportSize.y)
 				{
-					glm::vec3 position, eulerAngles, scale;
-					Math::DecomposeTransform(modelMatrix, position, eulerAngles, scale);
+					m_ViewportSize.x = newViewportSize.x;
+					m_ViewportSize.y = newViewportSize.y;
 
-					transform.SetPosition(position);
-					transform.SetEulerangles(eulerAngles);
-					transform.SetScale(scale);
+					m_EditorCamera.GetCamera().SetRatio(m_ViewportSize.x / m_ViewportSize.y);
+				}
+
+				Asset<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
+				if (framebuffer)
+				{
+					Asset<Texture> viewportTexture = framebuffer->GetColorTexture(0);
+					if (viewportTexture)
+						ImGui::Image((void*)(uintptr_t)viewportTexture->GetRendererID(), newViewportSize, ImVec2(0, 1), ImVec2(1, 0));
+				}
+
+				// Setup ImGuizmo
+				ImVec2 pos = { m_ViewportBounds[0].x, m_ViewportBounds[0].y };
+				ImVec2 size = { m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y };
+
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetDrawlist();
+
+				ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
+
+				// View manipulation
+				{
+					// FIXME: Gets clamped in the positive z-dome. Possibly due to interference in EditorCamera::OnUpdate
+					glm::mat4 viewMatrix = glm::inverse(m_EditorCamera.GetModelMatrix());
+
+					ImGuizmo::ViewManipulate(glm::value_ptr(viewMatrix), 5.0f, ImVec2(pos.x + size.x - 128, pos.y), ImVec2(128, 128), 0);
+				}
+
+				// Transform gizmo
+				Entity selectedEntity = Selection::GetSelectedEntity();
+				if (selectedEntity && m_GizmoType != -1)
+				{
+					const glm::mat4 viewMatrix = glm::inverse(m_EditorCamera.GetModelMatrix());
+
+					ImGuizmo::Enable(!m_EditorCamera.IsControlling());
+
+					// Setup camera matrices
+					const glm::mat4& projectionMatrix = m_EditorCamera.GetCamera().GetProjectionMatrix();
+
+					// Setup model matrix
+					TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
+					glm::mat4 modelMatrix = transform.GetModelMatrix();
+
+					// Setup snapping
+					bool snap = Input::IsKeyPressed(Key::LEFT_SHIFT);
+					float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 45.0f : 0.5f;
+					float snapValues[3] = { snapValue, snapValue, snapValue };
+
+					// Draw transform gizmo
+					ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix),
+						(ImGuizmo::OPERATION)m_GizmoType, (ImGuizmo::MODE)m_LocalScope, glm::value_ptr(modelMatrix), 0, snap ? snapValues : 0);
+
+					if (ImGuizmo::IsUsing())
+					{
+						glm::vec3 position, eulerAngles, scale;
+						Math::DecomposeTransform(modelMatrix, position, eulerAngles, scale);
+
+						transform.SetPosition(position);
+						transform.SetEulerangles(eulerAngles);
+						transform.SetScale(scale);
+					}
 				}
 			}
-
 
 			ImGui::End();
 			ImGui::PopStyleVar();

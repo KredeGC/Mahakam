@@ -8,32 +8,33 @@ namespace Mahakam::Editor
 		Ref<AssetImporter> importer;
 		if (m_Open && (importer = m_Importer.lock()))
 		{
-			ImGui::Begin("Import Asset", &m_Open);
-
-			importer->OnWizardRender(m_FilePath);
-
-			ImGui::Separator();
-
-			if (!importer->GetImporterProps().NoFilepath)
+			if (ImGui::Begin("Import Asset", &m_Open))
 			{
-				GUI::DrawDragDropField("File path", m_Extension, m_FilePath);
+				importer->OnWizardRender(m_FilePath);
 
-				std::string importString = m_ImportPath.string();
-				char importBuffer[256]{ 0 };
-				strncpy(importBuffer, importString.c_str(), importString.size() - 7);
-				if (ImGui::InputText("Import path", importBuffer, 256))
+				ImGui::Separator();
+
+				if (!importer->GetImporterProps().NoFilepath)
 				{
-					m_ImportPath = std::string(importBuffer) + ".import";
+					GUI::DrawDragDropField("File path", m_Extension, m_FilePath);
+
+					std::string importString = m_ImportPath.string();
+					char importBuffer[256]{ 0 };
+					strncpy(importBuffer, importString.c_str(), importString.size() - 7);
+					if (ImGui::InputText("Import path", importBuffer, 256))
+					{
+						m_ImportPath = std::string(importBuffer) + ".import";
+					}
 				}
-			}
 
-			if (ImGui::Button("Import"))
-			{
-				Asset<void> asset(m_ImportPath);
+				if (ImGui::Button("Import"))
+				{
+					Asset<void> asset(m_ImportPath);
 
-				importer->OnWizardImport(asset, m_FilePath, m_ImportPath);
+					importer->OnWizardImport(asset, m_FilePath, m_ImportPath);
 
-				m_Open = false;
+					m_Open = false;
+				}
 			}
 
 			ImGui::End();

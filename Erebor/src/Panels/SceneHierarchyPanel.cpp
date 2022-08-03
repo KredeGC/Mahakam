@@ -16,7 +16,7 @@ namespace Mahakam::Editor
 
 		ImGuiTreeNodeFlags flags = ((entity == Selection::GetSelectedEntity()) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		bool open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
+		bool open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.c_str());
 
 		if (ImGui::IsItemClicked())
 			Selection::SetSelectedEntity(entity);
@@ -130,56 +130,57 @@ namespace Mahakam::Editor
 	{
 		if (m_Open)
 		{
-			ImGui::Begin("Scene Hierarchy", &m_Open);
-
-			Ref<Scene> context = SceneManager::GetActiveScene();
-			if (context)
+			if (ImGui::Begin("Scene Hierarchy", &m_Open))
 			{
-				std::vector<Entity> entities;
-
-				context->ForEachEntity([&](auto handle)
+				Ref<Scene> context = SceneManager::GetActiveScene();
+				if (context)
 				{
-					Entity entity(handle, context.get());
+					std::vector<Entity> entities;
 
-					TagComponent& tag = entity.GetComponent<TagComponent>();
-
-					if (tag.ParentID)
+					context->ForEachEntity([&](auto handle)
 					{
-						// TODO: https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
-						// In short: Sort by the relationship between parent and child
-						// TODO: Find a way for the user to change the order?
+						Entity entity(handle, context.get());
+
+						TagComponent& tag = entity.GetComponent<TagComponent>();
+
+						if (tag.ParentID)
+						{
+							// TODO: https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
+							// In short: Sort by the relationship between parent and child
+							// TODO: Find a way for the user to change the order?
+						}
+					});
+
+
+
+					context->ForEachEntity([&](auto handle)
+					{
+						Entity entity(handle, context.get());
+
+						DrawEntityNode(entity, context);
+					});
+
+					if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+						Selection::SetSelectedEntity({});
+
+					// Blank space menu
+					if (ImGui::BeginPopupContextWindow(0, 1, false))
+					{
+						if (ImGui::MenuItem("Create empty entity"))
+							context->CreateEntity();
+
+						ImGui::EndPopup();
 					}
-				});
+
+					ImGui::End();
 
 
+					ImGui::Begin("Inspector");
 
-				context->ForEachEntity([&](auto handle)
-				{
-					Entity entity(handle, context.get());
-
-					DrawEntityNode(entity, context);
-				});
-
-				if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-					Selection::SetSelectedEntity({});
-
-				// Blank space menu
-				if (ImGui::BeginPopupContextWindow(0, 1, false))
-				{
-					if (ImGui::MenuItem("Create empty entity"))
-						context->CreateEntity();
-
-					ImGui::EndPopup();
-				}
-
-				ImGui::End();
-
-
-				ImGui::Begin("Inspector");
-
-				if (Selection::GetSelectedEntity())
-				{
-					DrawInspector(Selection::GetSelectedEntity());
+					if (Selection::GetSelectedEntity())
+					{
+						DrawInspector(Selection::GetSelectedEntity());
+					}
 				}
 			}
 

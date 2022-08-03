@@ -18,6 +18,7 @@ namespace Mahakam::Editor
 #endif
 
 		Scope<SharedLibrary> m_Runtime;
+		void (*m_UpdatePtr)(Mahakam::Scene*, Timestep);
 
 	public:
 #ifndef MH_RUNTIME

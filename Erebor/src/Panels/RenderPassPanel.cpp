@@ -53,9 +53,8 @@ namespace Mahakam::Editor
 	{
 		if (m_Open)
 		{
-			ImGui::Begin("Renderpasses", &m_Open);
-
-			RenderPanel();
+			if (ImGui::Begin("Renderpasses", &m_Open))
+				RenderPanel();
 
 			ImGui::End();
 		}

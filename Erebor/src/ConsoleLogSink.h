@@ -25,16 +25,7 @@ namespace Mahakam::Editor
 
             std::string formattedString = fmt::to_string(formatted);
 
-            if (msg.level == spdlog::level::level_enum::trace)
-                ConsolePanel::AddLog({ 1.0f, 1.0f, 1.0f, 1.0f }, formattedString);
-            else if (msg.level == spdlog::level::level_enum::info)
-                ConsolePanel::AddLog({ 0.0f, 0.8f, 0.0f, 1.0f }, formattedString);
-            else if (msg.level == spdlog::level::level_enum::warn)
-                ConsolePanel::AddLog({ 1.0f, 1.0f, 0.0f, 1.0f }, formattedString);
-            else if (msg.level == spdlog::level::level_enum::err)
-                ConsolePanel::AddLog({ 1.0f, 0.0f, 0.0f, 1.0f }, formattedString);
-            else if (msg.level == spdlog::level::level_enum::critical)
-                ConsolePanel::AddLog({ 1.0f, 0.0f, 0.0f, 1.0f }, formattedString);
+            ConsolePanel::AddLog(msg.level, formattedString);
         }
 
         void flush_() override

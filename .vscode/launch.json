@@ -24,19 +24,19 @@
                 "environment": [
                     {
                         "name": "LD_LIBRARY_PATH",
-                        "value": "${workspaceFolder}/bin/Debug-linux-x86_64/Erebor/"
+                        "value": "${workspaceFolder}/Erebor/bin/Debug-linux-x86_64/"
                     }
                 ],
-                "program": "${workspaceFolder}/bin/Debug-linux-x86_64/Erebor/Erebor",
+                "program": "${workspaceFolder}/Erebor/bin/Debug-linux-x86_64/Erebor",
                 "MIMode": "gdb",
                 "miDebuggerPath": "/usr/bin/gdb"
             },
             "osx": {
-                "program": "${workspaceFolder}/bin/Debug-osx-x86_64/BSTest/BSTest",
+                "program": "${workspaceFolder}/Erebor/bin/Debug-osx-x86_64/Erebor",
                 "MIMode": "lldb"
             },
             "windows": {
-                "program": "${workspaceFolder}/bin/Debug-windows-x86_64/Erebor/Erebor.exe",
+                "program": "${workspaceFolder}/Erebor/bin/Debug-windows-x86_64/Erebor.exe",
                 "MIMode": "gdb",
                 "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
             },

@@ -15,43 +15,44 @@ namespace Mahakam::Editor
 	{
 		if (m_Open)
 		{
-			ImGui::Begin("Content Browser", &m_Open);
-
-			ImVec2 size = ImGui::GetContentRegionAvail();
-
-			if (ImGui::BeginTable("Content Table", 2, ImGuiTableFlags_Resizable, size))
+			if (ImGui::Begin("Content Browser", &m_Open))
 			{
-				ImGui::TableNextRow();
-				ImGui::TableNextColumn();
+				ImVec2 size = ImGui::GetContentRegionAvail();
 
-				ImGui::BeginChild("File Browser Child", { 0, -2 }, false);
-
-				ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == s_AssetDirectory) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-
-				const char* label = s_AssetDirectory.string().c_str();
-
-				bool open = ImGui::TreeNodeEx(label, flags | ImGuiTreeNodeFlags_DefaultOpen, "%s", label);
-
-				if (ImGui::IsItemClicked())
-					m_CurrentDirectory = s_AssetDirectory;
-
-				if (open)
+				if (ImGui::BeginTable("Content Table", 2, ImGuiTableFlags_Resizable, size))
 				{
-					DrawDirectoryRecursive(s_AssetDirectory);
-					ImGui::TreePop();
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+
+					ImGui::BeginChild("File Browser Child", { 0, -2 }, false);
+
+					ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == s_AssetDirectory) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+					const char* label = s_AssetDirectory.string().c_str();
+
+					bool open = ImGui::TreeNodeEx(label, flags | ImGuiTreeNodeFlags_DefaultOpen, "%s", label);
+
+					if (ImGui::IsItemClicked())
+						m_CurrentDirectory = s_AssetDirectory;
+
+					if (open)
+					{
+						DrawDirectoryRecursive(s_AssetDirectory);
+						ImGui::TreePop();
+					}
+
+					ImGui::EndChild();
+
+					ImGui::TableNextColumn();
+
+					ImGui::BeginChild("Content Browser Child", { 0, -2 }, false);
+
+					DrawDirectoryContents(m_CurrentDirectory);
+
+					ImGui::EndChild();
+
+					ImGui::EndTable();
 				}
-
-				ImGui::EndChild();
-
-				ImGui::TableNextColumn();
-
-				ImGui::BeginChild("Content Browser Child", { 0, -2 }, false);
-
-				DrawDirectoryContents(m_CurrentDirectory);
-
-				ImGui::EndChild();
-
-				ImGui::EndTable();
 			}
 
 			ImGui::End();

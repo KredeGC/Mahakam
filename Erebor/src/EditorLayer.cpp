@@ -503,6 +503,7 @@ namespace Mahakam::Editor
 #endif
 
 		auto runPtr = m_Runtime->GetFunction<void, Scene*>("Run");
+		m_UpdatePtr = m_Runtime->GetFunction<void, Scene*, Timestep>("Update");
 
 		runPtr(activeScene.get());
 	}
@@ -514,6 +515,7 @@ namespace Mahakam::Editor
 		//s_ActiveScene = nullptr;
 
 		m_Runtime = nullptr;
+		m_UpdatePtr = nullptr;
 		blitShader = nullptr;
 
 #pragma region Assets
@@ -542,9 +544,7 @@ namespace Mahakam::Editor
 		UpdateRuntimeLibrary();
 
 		// Call shared library update
-		auto updatePtr = m_Runtime->GetFunction<void, Scene*, Timestep>("Update");
-
-		updatePtr(SceneManager::GetActiveScene().get(), dt);
+		m_UpdatePtr(SceneManager::GetActiveScene().get(), dt);
 
 #ifdef MH_RUNTIME
 		// Only used during runtime
@@ -679,6 +679,8 @@ namespace Mahakam::Editor
 					auto runPtr = m_Runtime->GetFunction<void, Scene*>("Run");
 
 					runPtr(activeScene.get());
+
+					m_UpdatePtr = m_Runtime->GetFunction<void, Scene*, Timestep>("Update");
 				}
 			}
 			else
