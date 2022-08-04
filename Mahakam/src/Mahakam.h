@@ -10,6 +10,7 @@
 #include "Mahakam/Math/Math.h"
 #include "Mahakam/Core/MouseButtonCodes.h"
 #include "Mahakam/Core/Profiler.h"
+#include "Mahakam/Core/SceneManager.h"
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Timestep.h"
 #include "Mahakam/Core/Utility.h"
@@ -35,7 +36,6 @@
 #include "Mahakam/Editor/EditorCamera.h"
 #include "Mahakam/Editor/EditorWindow.h"
 #include "Mahakam/Editor/EditorWindowRegistry.h"
-#include "Mahakam/Editor/SceneManager.h"
 #include "Mahakam/Editor/Selection.h"
 #endif
 

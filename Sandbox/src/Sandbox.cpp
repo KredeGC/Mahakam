@@ -1,7 +1,7 @@
 #include "sbpch.h"
 
-#define MH_STANDALONE_TITLE "Title"
-#define MH_STANDALONE_ICON "import/internal/icons/icon-editor.png"
+#define MH_STANDALONE_TITLE "Sandbox"
+#define MH_STANDALONE_ICON "internal/icons/icon-64.png"
 
 #include <MahakamRuntime.h>
 
@@ -11,7 +11,7 @@
 
 using namespace Mahakam;
 
-struct EXPORTED RotatorComponent
+struct MH_EXPORTED RotatorComponent
 {
 	float rotation = 0.0f;;
 	float rotationSpeed = 10.0f;
@@ -19,7 +19,7 @@ struct EXPORTED RotatorComponent
 	RotatorComponent() {}
 };
 
-struct EXPORTED CamerControllerComponent
+struct MH_EXPORTED CamerControllerComponent
 {
 	float moveSpeed = 5.0f;
 	float rotationSpeed = 2.0f;
@@ -27,16 +27,11 @@ struct EXPORTED CamerControllerComponent
 	CamerControllerComponent() {}
 };
 
-EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
+MH_EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 {
 	MH_RUNTIME_LOAD(context, funcPtrs);
 
-	// Setup render passes for the default renderer
-	/*Renderer::SetRenderPasses({
-		CreateRef<GeometryRenderPass>(),
-		CreateRef<LightingRenderPass>(),
-		CreateRef<ParticleRenderPass>(),
-		CreateRef<TonemappingRenderPass>() });*/
+	MH_CORE_TRACE("DLL Loaded!");
 
 	// Setup render passes for pixel renderer
 	/*Renderer::SetRenderPasses({
@@ -45,12 +40,6 @@ EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 		CreateRef<PixelationPass>(),
 		CreateRef<ParticleRenderPass>(),
 		CreateRef<TonemappingRenderPass>() });*/
-
-	Asset<Texture2D> testTex = Texture2D::Create("assets/textures/brick/brick_albedo.png", { TextureFormat::SRGB_DXT1, TextureFilter::Point });
-	testTex->GetRendererID();
-
-	MH_CORE_TRACE("DLL Loaded!");
-
 
 	// TestComponent
 	ComponentRegistry::ComponentInterface rotatorInterface;
@@ -71,7 +60,7 @@ EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 	// TODO: Add components to editor list for inspector
 }
 
-EXTERN_EXPORTED void Run(Scene* scene)
+MH_EXTERN_EXPORTED void Run(Scene* scene)
 {
 	// Create light entity
 	Entity entity = scene->CreateEntity("DLL Light Test");
@@ -202,7 +191,7 @@ EXTERN_EXPORTED void Run(Scene* scene)
 }
 
 
-EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
+MH_EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
 {
 	MH_PROFILE_FUNCTION();
 
@@ -266,12 +255,12 @@ EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
 	});
 }
 
-EXTERN_EXPORTED void Stop(Scene* scene)
+MH_EXTERN_EXPORTED void Stop(Scene* scene)
 {
 	// TODO: Remove entities again
 }
 
-EXTERN_EXPORTED void Unload()
+MH_EXTERN_EXPORTED void Unload()
 {
 	MH_CORE_TRACE("DLL Unloaded!");
 

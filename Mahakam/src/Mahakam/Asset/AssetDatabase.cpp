@@ -6,6 +6,12 @@
 
 #include "AssetImporter.h"
 
+#include "MaterialAssetImporter.h"
+#include "MeshAssetImporter.h"
+#include "ShaderAssetImporter.h"
+#include "SoundAssetImporter.h"
+#include "TextureAssetImporter.h"
+
 #include <yaml-cpp/yaml.h>
 
 #include <algorithm>
@@ -57,6 +63,54 @@ namespace Mahakam
 	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporters, const AssetDatabase::ImporterMap&)
 	{
 		return m_AssetImporters;
+	};
+
+	//void AssetDatabase::LoadDefaultAssetImporters()
+	MH_DEFINE_FUNC(AssetDatabase::LoadDefaultAssetImporters, void)
+	{
+		// Material
+		Ref<MaterialAssetImporter> materialAssetImporter = CreateRef<MaterialAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".material", materialAssetImporter);
+
+		// Shader
+		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);
+
+		// Sound
+		Ref<SoundAssetImporter> soundAssetImporter = CreateRef<SoundAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".wav", soundAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".mp3", soundAssetImporter);
+
+		// Texture
+		Ref<TextureAssetImporter> textureAssetImporter = CreateRef<TextureAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".png", textureAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".jpeg", textureAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".jpg", textureAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".hdr", textureAssetImporter);
+	};
+
+	//void AssetDatabase::UnloadDefaultAssetImporters()
+	MH_DEFINE_FUNC(AssetDatabase::UnloadDefaultAssetImporters, void)
+	{
+		// Material
+		AssetDatabase::DeregisterAssetImporter(".material");
+
+		// Shader
+		AssetDatabase::DeregisterAssetImporter(".shader");
+
+		// Sound
+		AssetDatabase::DeregisterAssetImporter(".wav");
+		AssetDatabase::DeregisterAssetImporter(".mp3");
+
+		// Texture
+		AssetDatabase::DeregisterAssetImporter(".png");
+		AssetDatabase::DeregisterAssetImporter(".jpeg");
+		AssetDatabase::DeregisterAssetImporter(".jpg");
+		AssetDatabase::DeregisterAssetImporter(".hdr");
 	};
 
 	//void AssetDatabase::ReloadAsset(uint64_t id)

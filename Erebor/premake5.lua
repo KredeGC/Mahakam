@@ -61,7 +61,7 @@ project "Erebor"
         
         defines {
             "MH_RELEASE",
-            "MH_RUNTIME"
+            "MH_STANDALONE"
         }
         
         removefiles { "**/Panels/**" }

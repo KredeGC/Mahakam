@@ -21,10 +21,6 @@ project "Sandbox"
     links { "Mahakam" }
 
     defines { "_CRT_SECURE_NO_WARNINGS" }
-    
-    postbuildcommands {
-        "{COPYDIR} \"bin/%{outputdir}/.\" \"../Erebor/runtime/\""
-    }
 
     filter "system:windows"
         systemversion "latest"
@@ -36,6 +32,10 @@ project "Sandbox"
         
         flags { "MultiProcessorCompile" }
 
+        postbuildcommands {
+            "{COPYDIR} \"bin/%{outputdir}/Sandbox.dll\" \"../Erebor/runtime/\""
+        }
+
     filter "system:linux"
         systemversion "latest"
         
@@ -44,6 +44,10 @@ project "Sandbox"
         libdirs { LinuxLibDirs }
         
         links { LinuxLinks }
+
+        postbuildcommands {
+            "{COPYDIR} \"bin/%{outputdir}/libSandbox.so\" \"../Erebor/runtime/\""
+        }
     
     filter "configurations:Debug"
         defines "MH_DEBUG"
@@ -56,11 +60,14 @@ project "Sandbox"
         optimize "on"
         
     filter "configurations:Release"
+        kind "ConsoleApp"
+        
         flags { "LinkTimeOptimization" }
         
         defines {
             "MH_RELEASE",
-            "MH_RUNTIME"
+            "MH_RUNTIME",
+            "MH_STANDALONE"
         }
         runtime "Release"
         optimize "on"

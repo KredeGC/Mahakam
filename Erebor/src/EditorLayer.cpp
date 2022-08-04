@@ -33,6 +33,8 @@ namespace Mahakam::Editor
 #endif
 
 #pragma region Components
+		// TODO: Seperate Inspector stuff from the component serialization
+		
 		// Transform
 		ComponentRegistry::ComponentInterface transformInterface;
 		transformInterface.SetComponent<TransformComponent>();
@@ -382,33 +384,7 @@ namespace Mahakam::Editor
 		ComponentRegistry::RegisterComponent("Mesh", meshInterface);
 #pragma endregion
 
-
-#pragma region Assets
-		// Material
-		Ref<MaterialAssetImporter> materialAssetImporter = CreateRef<MaterialAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".material", materialAssetImporter);
-
-		// Shader
-		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);
-
-		// Sound
-		Ref<SoundAssetImporter> soundAssetImporter = CreateRef<SoundAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".wav", soundAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".mp3", soundAssetImporter);
-
-		// Texture
-		Ref<TextureAssetImporter> textureAssetImporter = CreateRef<TextureAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".png", textureAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".jpeg", textureAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".jpg", textureAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".hdr", textureAssetImporter);
-#pragma endregion
-
+		AssetDatabase::LoadDefaultAssetImporters();
 
 #pragma region Windows
 #ifndef MH_RUNTIME
@@ -496,6 +472,7 @@ namespace Mahakam::Editor
 		SceneManager::SetActiveScene(activeScene);
 
 
+		// Load the runtime
 #if MH_PLATFORM_WINDOWS
 		m_Runtime = CreateScope<SharedLibrary>("runtime/Sandbox.dll");
 #else
@@ -505,36 +482,25 @@ namespace Mahakam::Editor
 		auto runPtr = m_Runtime->GetFunction<void, Scene*>("Run");
 		m_UpdatePtr = m_Runtime->GetFunction<void, Scene*, Timestep>("Update");
 
+		// Run the game
 		runPtr(activeScene.get());
 	}
 
 	void EditorLayer::OnDetach()
 	{
+		// Stop the game
+		auto stopPtr = m_Runtime->GetFunction<void, Scene*>("Stop");
+		stopPtr(SceneManager::GetActiveScene().get());
+		
 		// IMPORTANT: Unload the scene before unloading the runtime
 		SceneManager::SetActiveScene(nullptr);
-		//s_ActiveScene = nullptr;
 
+		// Unload the runtime
 		m_Runtime = nullptr;
 		m_UpdatePtr = nullptr;
 		blitShader = nullptr;
 
-#pragma region Assets
-		// Material
-		AssetDatabase::DeregisterAssetImporter(".material");
-
-		// Shader
-		AssetDatabase::DeregisterAssetImporter(".shader");
-
-		// Sound
-		AssetDatabase::DeregisterAssetImporter(".wav");
-		AssetDatabase::DeregisterAssetImporter(".mp3");
-
-		// Texture
-		AssetDatabase::DeregisterAssetImporter(".png");
-		AssetDatabase::DeregisterAssetImporter(".jpeg");
-		AssetDatabase::DeregisterAssetImporter(".jpg");
-		AssetDatabase::DeregisterAssetImporter(".hdr");
-#pragma endregion
+		AssetDatabase::UnloadDefaultAssetImporters();
 	}
 
 	void EditorLayer::OnUpdate(Timestep dt)

@@ -132,7 +132,8 @@ project "Mahakam"
         
         defines {
             "MH_RELEASE",
-            "MH_RUNTIME"
+            "MH_RUNTIME",
+            "MH_STANDALONE"
         }
         
         removefiles { "**/Editor/**" }

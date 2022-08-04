@@ -21,7 +21,7 @@
             "label": "Build Debug",
             "command": "make",
             "args": [
-                "-j4",
+                "-j8",
                 "config=debug"
             ],
             "options": {
@@ -40,7 +40,7 @@
             "label": "Build DebugOptimized",
             "command": "make",
             "args": [
-                "-j4",
+                "-j8",
                 "config=debugoptimized"
             ],
             "options": {
@@ -59,7 +59,7 @@
             "label": "Build Release",
             "command": "make",
             "args": [
-                "-j4",
+                "-j8",
                 "config=release"
             ],
             "options": {
