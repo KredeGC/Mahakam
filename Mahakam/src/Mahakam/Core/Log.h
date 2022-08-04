@@ -15,6 +15,7 @@ namespace Mahakam
 
 	public:
 		static void Init();
+		static void Shutdown();
 
 		MH_DECLARE_FUNC(GetEngineLogger, Ref<spdlog::logger>&);
 		MH_DECLARE_FUNC(GetGameLogger, Ref<spdlog::logger>&);

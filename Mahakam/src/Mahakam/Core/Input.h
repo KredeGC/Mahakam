@@ -15,7 +15,7 @@ namespace Mahakam
 	public:
 		MH_DECLARE_FUNC(IsKeyPressed, bool, Key keycode);
 		
-		MH_DECLARE_FUNC(IsMouseButtonPressed, bool, int button);
+		MH_DECLARE_FUNC(IsMouseButtonPressed, bool, MouseButton button);
 		MH_DECLARE_FUNC(GetMouseX, float);
 		MH_DECLARE_FUNC(GetMouseY, float);
 		MH_DECLARE_FUNC(GetMousePos, MousePos);

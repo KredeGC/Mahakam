@@ -31,6 +31,8 @@ int main(int argc, char** argv)
 	MH_PROFILE_BEGIN_SESSION("shutdown", "profiling/Shutdown.json");
 	delete app;
 	MH_PROFILE_END_SESSION();
+
+	Mahakam::Log::Shutdown();
 }
 
 #endif

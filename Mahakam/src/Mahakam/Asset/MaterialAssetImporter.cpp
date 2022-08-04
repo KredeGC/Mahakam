@@ -284,7 +284,7 @@ namespace Mahakam
 			m_MousePos.x = mouseX;
 			m_MousePos.y = mouseY;
 
-			if (focused && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_LEFT))
+			if (focused && Input::IsMouseButtonPressed(MouseButton::LEFT))
 			{
 				m_OrbitEulerAngles.y -= glm::radians(deltaX * m_DragSpeed);
 				m_OrbitEulerAngles.x = glm::clamp(m_OrbitEulerAngles.x - glm::radians(deltaY * m_DragSpeed), -1.5707f, 1.5707f);

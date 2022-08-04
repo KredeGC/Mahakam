@@ -13,7 +13,7 @@ using namespace Mahakam;
 
 struct MH_EXPORTED RotatorComponent
 {
-	float rotation = 0.0f;;
+	float rotation = 0.0f;
 	float rotationSpeed = 10.0f;
 
 	RotatorComponent() {}
@@ -41,11 +41,9 @@ MH_EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 		CreateRef<ParticleRenderPass>(),
 		CreateRef<TonemappingRenderPass>() });*/
 
-	// TestComponent
+#pragma region RotatorComponent
 	ComponentRegistry::ComponentInterface rotatorInterface;
-	rotatorInterface.HasComponent = [](Entity entity) { return entity.HasComponent<RotatorComponent>(); };
-	rotatorInterface.AddComponent = [](Entity entity) { entity.AddComponent<RotatorComponent>(); };
-	rotatorInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<RotatorComponent>(); };
+	rotatorInterface.SetComponent<RotatorComponent>();
 	rotatorInterface.OnInspector = [](Entity entity)
 	{
 		RotatorComponent& rotator = entity.GetComponent<RotatorComponent>();
@@ -54,7 +52,7 @@ MH_EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 	};
 
 	ComponentRegistry::RegisterComponent("Rotater", rotatorInterface);
-
+#pragma endregion
 
 	// TODO: Add components to scene list of serializable components
 	// TODO: Add components to editor list for inspector

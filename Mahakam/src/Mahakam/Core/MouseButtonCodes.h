@@ -1,15 +1,21 @@
 #pragma once
 
-// From glfw3.h
-#define MH_MOUSE_BUTTON_1         0
-#define MH_MOUSE_BUTTON_2         1
-#define MH_MOUSE_BUTTON_3         2
-#define MH_MOUSE_BUTTON_4         3
-#define MH_MOUSE_BUTTON_5         4
-#define MH_MOUSE_BUTTON_6         5
-#define MH_MOUSE_BUTTON_7         6
-#define MH_MOUSE_BUTTON_8         7
-#define MH_MOUSE_BUTTON_LAST      MH_MOUSE_BUTTON_8
-#define MH_MOUSE_BUTTON_LEFT      MH_MOUSE_BUTTON_1
-#define MH_MOUSE_BUTTON_RIGHT     MH_MOUSE_BUTTON_2
-#define MH_MOUSE_BUTTON_MIDDLE    MH_MOUSE_BUTTON_3
+namespace Mahakam
+{
+    enum class MouseButton
+    {
+        // From glfw3.h
+        ONE       = 0,
+        TWO       = 1,
+        THREE     = 2,
+        FOUR      = 3,
+        FIVE      = 4,
+        SIX       = 5,
+        SEVEN     = 6,
+        EIGHT     = 7,
+        LAST      = 7,
+        LEFT      = 0,
+        RIGHT     = 1,
+        MIDDLE    = 2
+    };
+}

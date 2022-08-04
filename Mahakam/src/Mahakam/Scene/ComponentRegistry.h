@@ -32,7 +32,7 @@ namespace Mahakam
 	private:
 		using ComponentMap = UnorderedMap<std::string, ComponentInterface>;
 
-		static ComponentMap componentInterfaces;
+		static ComponentMap s_ComponentInterfaces;
 
 	public:
 		MH_DECLARE_FUNC(RegisterComponent, void, const std::string& name, ComponentInterface componentInterface);

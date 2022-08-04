@@ -20,11 +20,11 @@ namespace Mahakam
 	};
 
 	//bool Input::IsMouseButtonPressed(int button)
-	MH_DEFINE_FUNC(Input::IsMouseButtonPressed, bool, int button)
+	MH_DEFINE_FUNC(Input::IsMouseButtonPressed, bool, MouseButton button)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::GetInstance()->GetWindow().GetNativeWindow());
 
-		int state = glfwGetMouseButton(window, button);
+		int state = glfwGetMouseButton(window, (int)button);
 
 		return state == GLFW_PRESS;
 	};

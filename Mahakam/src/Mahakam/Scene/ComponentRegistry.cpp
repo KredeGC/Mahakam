@@ -19,24 +19,24 @@
 
 namespace Mahakam
 {
-	ComponentRegistry::ComponentMap ComponentRegistry::componentInterfaces;
+	ComponentRegistry::ComponentMap ComponentRegistry::s_ComponentInterfaces;
 
 	//void ComponentRegistry::RegisterComponent(const std::string& name, ComponentInterface componentInterface)
 	MH_DEFINE_FUNC(ComponentRegistry::RegisterComponent, void, const std::string& name, ComponentInterface componentInterface)
 	{
-		componentInterfaces[name] = componentInterface;
+		s_ComponentInterfaces[name] = componentInterface;
 	};
 
 	//void ComponentRegistry::DeregisterComponent(const std::string& name)
 	MH_DEFINE_FUNC(ComponentRegistry::DeregisterComponent, void, const std::string& name)
 	{
-		componentInterfaces.erase(name);
+		s_ComponentInterfaces.erase(name);
 	};
 
 	//const ComponentMap& ComponentRegistry::GetComponents()
 	MH_DEFINE_FUNC(ComponentRegistry::GetComponents, const ComponentRegistry::ComponentMap&)
 	{
-		return componentInterfaces;
+		return s_ComponentInterfaces;
 	};
 
 	//void ComponentRegistry::RegisterDefaultComponents()
@@ -68,25 +68,25 @@ namespace Mahakam
 			return true;
 		};
 
-		ComponentRegistry::RegisterComponent("Transform", transformInterface);
+		RegisterComponent("Transform", transformInterface);
 #pragma endregion
 
 #pragma region Animator
-		ComponentRegistry::ComponentInterface animatorInterface;
+		ComponentInterface animatorInterface;
 		animatorInterface.SetComponent<AnimatorComponent>();
 
-		ComponentRegistry::RegisterComponent("Animator", animatorInterface);
+		RegisterComponent("Animator", animatorInterface);
 #pragma endregion
 
 #pragma region AudioListener
-		ComponentRegistry::ComponentInterface audioListenerInterface;
+		ComponentInterface audioListenerInterface;
 		audioListenerInterface.SetComponent<AudioListenerComponent>();
 
-		ComponentRegistry::RegisterComponent("Audio Listener", audioListenerInterface);
+		RegisterComponent("Audio Listener", audioListenerInterface);
 #pragma endregion
 
 #pragma region AudioSource
-		ComponentRegistry::ComponentInterface audioSourceInterface;
+		ComponentInterface audioSourceInterface;
 		audioSourceInterface.SetComponent<AudioSourceComponent>();
 		audioSourceInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{
@@ -120,11 +120,11 @@ namespace Mahakam
 			return true;
 		};
 
-		ComponentRegistry::RegisterComponent("Audio Source", audioSourceInterface);
+		RegisterComponent("Audio Source", audioSourceInterface);
 #pragma endregion
 
 #pragma region Camera
-		ComponentRegistry::ComponentInterface cameraInterface;
+		ComponentInterface cameraInterface;
 		cameraInterface.SetComponent<CameraComponent>();
 		cameraInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{
@@ -157,11 +157,11 @@ namespace Mahakam
 			return true;
 		};
 
-		ComponentRegistry::RegisterComponent("Camera", cameraInterface);
+		RegisterComponent("Camera", cameraInterface);
 #pragma endregion
 
 #pragma region Light
-		ComponentRegistry::ComponentInterface lightInterface;
+		ComponentInterface lightInterface;
 		lightInterface.SetComponent<LightComponent>();
 		lightInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{
@@ -190,26 +190,26 @@ namespace Mahakam
 			return true;
 		};
 
-		ComponentRegistry::RegisterComponent("Light", lightInterface);
+		RegisterComponent("Light", lightInterface);
 #pragma endregion
 
 #pragma region Mesh
-		ComponentRegistry::ComponentInterface meshInterface;
+		ComponentInterface meshInterface;
 		meshInterface.SetComponent<MeshComponent>();
 
-		ComponentRegistry::RegisterComponent("Mesh", meshInterface);
+		RegisterComponent("Mesh", meshInterface);
 #pragma endregion
 	};
 
 	//void ComponentRegistry::DeregisterDefaultComponents()
 	MH_DEFINE_FUNC(ComponentRegistry::DeregisterDefaultComponents, void)
 	{
-		ComponentRegistry::DeregisterComponent("Transform");
-		ComponentRegistry::DeregisterComponent("Animator");
-		ComponentRegistry::DeregisterComponent("AudioListener");
-		ComponentRegistry::DeregisterComponent("AudioSource");
-		ComponentRegistry::DeregisterComponent("Camera");
-		ComponentRegistry::DeregisterComponent("Light");
-		ComponentRegistry::DeregisterComponent("Mesh");
+		DeregisterComponent("Transform");
+		DeregisterComponent("Animator");
+		DeregisterComponent("AudioListener");
+		DeregisterComponent("AudioSource");
+		DeregisterComponent("Camera");
+		DeregisterComponent("Light");
+		DeregisterComponent("Mesh");
 	};
 }

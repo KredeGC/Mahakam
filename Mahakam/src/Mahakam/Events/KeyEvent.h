@@ -9,12 +9,12 @@ namespace Mahakam
 	class KeyEvent : public Event
 	{
 	protected:
-		int keycode;
+		Key keycode;
 
-		KeyEvent(int keycode) : keycode(keycode) {}
+		KeyEvent(int keycode) : keycode((Key)keycode) {}
 
 	public:
-		inline Key GetKeyCode() const { return (Key)keycode; }
+		inline Key GetKeyCode() const { return keycode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	};
@@ -33,7 +33,7 @@ namespace Mahakam
 		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << GetEventName() << ": " << keycode << " (" << repeatCount << " repeats)";
+			stream << GetEventName() << ": " << (int)keycode << " (" << repeatCount << " repeats)";
 			return stream.str();
 		}
 
@@ -49,7 +49,7 @@ namespace Mahakam
 		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << GetEventName() << ": " << keycode;
+			stream << GetEventName() << ": " << (int)keycode;
 			return stream.str();
 		}
 
@@ -65,7 +65,7 @@ namespace Mahakam
 		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << GetEventName() << ": " << keycode;
+			stream << GetEventName() << ": " << (int)keycode;
 			return stream.str();
 		}
 

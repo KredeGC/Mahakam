@@ -25,7 +25,7 @@ namespace Mahakam::Editor
 		oldMouseX = mouseX;
 		oldMouseY = mouseY;
 
-		if (focus && altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_LEFT)) // Orbit around target
+		if (focus && altHeld && Input::IsMouseButtonPressed(MouseButton::LEFT)) // Orbit around target
 		{
 			controlling = true;
 			Application::GetInstance()->GetWindow().SetCursorVisible(false);
@@ -37,7 +37,7 @@ namespace Mahakam::Editor
 
 			UpdateRotationMatrix();
 		}
-		else if (noCapture && hover && !altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_RIGHT)) // FPS Rotate
+		else if (noCapture && hover && !altHeld && Input::IsMouseButtonPressed(MouseButton::RIGHT)) // FPS Rotate
 		{
 			controlling = true;
 			Application::GetInstance()->GetWindow().SetCursorVisible(false);
@@ -71,14 +71,14 @@ namespace Mahakam::Editor
 
 			Selection::SetOrbitTarget(target);
 		}
-		else if (noCapture && hover && altHeld && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_RIGHT)) // Right zoom
+		else if (noCapture && hover && altHeld && Input::IsMouseButtonPressed(MouseButton::RIGHT)) // Right zoom
 		{
 			float speed = GetZoomSpeed();
 
 			zoomDelta -= deltaX * speed;
 			zoomDelta += deltaY * speed;
 		}
-		else if (noCapture && hover && Input::IsMouseButtonPressed(MH_MOUSE_BUTTON_MIDDLE)) // Panning
+		else if (noCapture && hover && Input::IsMouseButtonPressed(MouseButton::MIDDLE)) // Panning
 		{
 			float speed = GetZoomSpeed();
 

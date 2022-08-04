@@ -20,6 +20,12 @@ namespace Mahakam
 		gameLogger->set_level(spdlog::level::trace);
 	}
 
+	void Log::Shutdown()
+	{
+		engineLogger = nullptr;
+		gameLogger = nullptr;
+	}
+
 	//Ref<spdlog::logger>& Log::GetEngineLogger()
 	MH_DEFINE_FUNC(Log::GetEngineLogger, Ref<spdlog::logger>&)
 	{

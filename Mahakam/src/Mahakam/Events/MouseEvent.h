@@ -53,12 +53,12 @@ namespace Mahakam
 	class MouseButtonEvent : public Event
 	{
 	protected:
-		int button;
+		MouseButton button;
 
-		MouseButtonEvent(int button) : button(button) {}
+		MouseButtonEvent(int button) : button((MouseButton)button) {}
 
 	public:
-		inline int GetButton() const { return button; }
+		inline MouseButton GetButton() const { return button; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput);
 	};
@@ -69,12 +69,10 @@ namespace Mahakam
 	public:
 		MouseButtonPressedEvent(int button) : MouseButtonEvent(button) {}
 
-		inline int GetButton() const { return button; }
-
 		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << GetEventName() << ": " << button;
+			stream << GetEventName() << ": " << (int)button;
 			return stream.str();
 		}
 
@@ -87,12 +85,10 @@ namespace Mahakam
 	public:
 		MouseButtonReleasedEvent(int button) : MouseButtonEvent(button) {}
 
-		inline int GetButton() const { return button; }
-
 		std::string ToString() const override
 		{
 			std::stringstream stream;
-			stream << GetEventName() << ": " << button;
+			stream << GetEventName() << ": " << (int)button;
 			return stream.str();
 		}
 
