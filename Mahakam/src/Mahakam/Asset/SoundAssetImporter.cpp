@@ -12,23 +12,24 @@ namespace Mahakam
 		m_ImporterProps.Extension = ".sound";
 	}
 
+#ifndef MH_STANDALONE
 	void SoundAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
 	{
 		YAML::Node volumeNode = node["Volume"];
-		m_Props.volume = 1.0f;
+		m_Props.Volume = 1.0f;
 		if (volumeNode)
-			m_Props.volume = volumeNode.as<float>();
+			m_Props.Volume = volumeNode.as<float>();
 
 		YAML::Node loopNode = node["Loop"];
-		m_Props.loop = false;
+		m_Props.Loop = false;
 		if (loopNode)
-			m_Props.loop = loopNode.as<bool>();
+			m_Props.Loop = loopNode.as<bool>();
 	}
 
 	void SoundAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
-		ImGui::DragFloat("Sound Volume", &m_Props.volume, 0.01f, 0.0f);
-		ImGui::Checkbox("Sound Looping", &m_Props.loop);
+		ImGui::DragFloat("Sound Volume", &m_Props.Volume, 0.01f, 0.0f);
+		ImGui::Checkbox("Sound Looping", &m_Props.Loop);
 	}
 
 	void SoundAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
@@ -54,15 +55,16 @@ namespace Mahakam
 			AssetDatabase::ReloadAsset(sound.GetID());
 		}
 	}
+#endif
 
 	void SoundAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{
 		Asset<Sound> sound = asset;
 
 		emitter << YAML::Key << "Volume";
-		emitter << YAML::Value << sound->GetProps().volume;
+		emitter << YAML::Value << sound->GetProps().Volume;
 		emitter << YAML::Key << "Loop";
-		emitter << YAML::Value << sound->GetProps().loop;
+		emitter << YAML::Value << sound->GetProps().Loop;
 	}
 
 	Asset<void> SoundAssetImporter::Deserialize(YAML::Node& node)

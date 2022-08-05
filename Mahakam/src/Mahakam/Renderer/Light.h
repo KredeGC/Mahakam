@@ -17,14 +17,14 @@ namespace Mahakam
 		};
 
 	private:
-		LightType lightType = LightType::Directional;
-		glm::vec3 color = { 1.0f, 1.0f, 1.0f };
+		LightType m_LightType = LightType::Directional;
+		glm::vec3 m_Color = { 1.0f, 1.0f, 1.0f };
 
-		float range = 10.0f;
-		float fov = glm::radians(60.0f);
-		float shadowBias = 0.005f;
+		float m_Range = 10.0f;
+		float m_Fov = glm::radians(60.0f);
+		float m_ShadowBias = 0.005f;
 
-		bool shadowCasting = false;
+		bool m_ShadowCasting = false;
 
 	public:
 		Light() = default;
@@ -33,18 +33,18 @@ namespace Mahakam
 
 		Light(LightType lightType, float fov, float range, const glm::vec3& color, bool shadowCasting = false, float bias = 0.0f); // Spot
 
-		inline void SetLightType(LightType type) { lightType = type; }
-		inline void SetColor(const glm::vec3& col) { color = col; }
-		inline void SetRange(float dist) { range = dist; }
-		inline void SetFov(float fieldOfView) { fov = fieldOfView; }
-		inline void SetBias(float bias) { shadowBias = bias; }
-		inline void SetShadowCasting(bool shadows) { shadowCasting = shadows; }
+		inline void SetLightType(LightType type) { m_LightType = type; }
+		inline void SetColor(const glm::vec3& col) { m_Color = col; }
+		inline void SetRange(float dist) { m_Range = dist; }
+		inline void SetFov(float fieldOfView) { m_Fov = fieldOfView; }
+		inline void SetBias(float bias) { m_ShadowBias = bias; }
+		inline void SetShadowCasting(bool shadows) { m_ShadowCasting = shadows; }
 
-		inline LightType GetLightType() const { return lightType; }
-		inline const glm::vec3& GetColor() const { return color; }
-		inline float GetRange() const { return range; }
-		inline float GetFov() const { return fov; }
-		inline float GetBias() const { return shadowBias; }
-		inline bool IsShadowCasting() const { return shadowCasting; }
+		inline LightType GetLightType() const { return m_LightType; }
+		inline const glm::vec3& GetColor() const { return m_Color; }
+		inline float GetRange() const { return m_Range; }
+		inline float GetFov() const { return m_Fov; }
+		inline float GetBias() const { return m_ShadowBias; }
+		inline bool IsShadowCasting() const { return m_ShadowCasting; }
 	};
 }

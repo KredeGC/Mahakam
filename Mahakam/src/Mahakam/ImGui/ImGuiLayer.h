@@ -12,7 +12,7 @@ namespace Mahakam {
 	private:
 		float m_Time = 0;
 
-		bool blockEvents = false;
+		bool m_BlockEvents = false;
 
 	public:
 		ImGuiLayer();
@@ -22,7 +22,7 @@ namespace Mahakam {
 		virtual void OnDetach() override;
 		virtual void OnEvent(Event& event) override;
 
-		void BlockEvents(bool block) { blockEvents = block; }
+		void BlockEvents(bool block) { m_BlockEvents = block; }
 
 		void Begin();
 		void End();

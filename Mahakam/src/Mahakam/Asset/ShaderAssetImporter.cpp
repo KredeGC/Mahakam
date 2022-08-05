@@ -11,10 +11,8 @@ namespace Mahakam
 		m_ImporterProps.NoWizard = true;
 	}
 
-	void ShaderAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
-	{
-		
-	}
+#ifndef MH_STANDALONE
+	void ShaderAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node) { }
 
 	void ShaderAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
@@ -29,6 +27,7 @@ namespace Mahakam
 
 		AssetDatabase::ReloadAsset(shader.GetID());
 	}
+#endif
 
 	void ShaderAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{

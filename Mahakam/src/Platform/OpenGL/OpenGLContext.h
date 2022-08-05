@@ -9,8 +9,8 @@ namespace Mahakam
 	class OpenGLContext : public RenderingContext
 	{
 	private:
-		GLFWwindow* window;
-		void* procAddress;
+		GLFWwindow* m_Window;
+		void* m_ProcAddress;
 
 	public:
 		OpenGLContext(void* window, void* proc);

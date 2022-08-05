@@ -9,21 +9,21 @@ namespace Mahakam
 	class OpenGLComputeShader : public ComputeShader
 	{
 	private:
-		uint32_t rendererID;
-		std::string filepath;
-		std::string name;
+		uint32_t m_RendererID;
+		std::filesystem::path m_Filepath;
+		std::string m_Name;
 
-		UnorderedMap<std::string, int> uniformIDCache;
+		UnorderedMap<std::string, int> m_UniformIDCache;
 
 	public:
-		OpenGLComputeShader(const std::string& filepath);
+		OpenGLComputeShader(const std::filesystem::path& filepath);
 		virtual ~OpenGLComputeShader();
 
 		virtual void Bind() const;
 
 		virtual void Dispatch(uint32_t x, uint32_t y, uint32_t z);
 
-		virtual void SetTexture(const std::string & name, Asset<Texture> tex);
+		virtual void SetTexture(const std::string& name, Asset<Texture> tex);
 
 	private:
 		void CompileBinary(const std::filesystem::path& cachePath, const std::string& src);

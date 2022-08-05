@@ -27,7 +27,7 @@ namespace Mahakam
 	};
 
 	//Ref<Texture2D> Texture2D::Create(const std::string& filepath, const TextureProps& props)
-	MH_DEFINE_FUNC(Texture2D::CreateFilepath, Asset<Texture2D>, const std::string& filepath, const TextureProps& props)
+	MH_DEFINE_FUNC(Texture2D::CreateFilepath, Asset<Texture2D>, const std::filesystem::path& filepath, const TextureProps& props)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -62,7 +62,7 @@ namespace Mahakam
 	};
 
 	//Ref<TextureCube> TextureCube::Create(const std::string& filepath, const CubeTextureProps& props)
-	MH_DEFINE_FUNC(TextureCube::CreateFilepath, Asset<TextureCube>, const std::string& filepath, const CubeTextureProps& props)
+	MH_DEFINE_FUNC(TextureCube::CreateFilepath, Asset<TextureCube>, const std::filesystem::path& filepath, const CubeTextureProps& props)
 	{
 		switch (RendererAPI::GetAPI())
 		{

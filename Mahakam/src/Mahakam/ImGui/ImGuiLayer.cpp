@@ -100,7 +100,7 @@ namespace Mahakam
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
-		if (blockEvents)
+		if (m_BlockEvents)
 		{
 			ImGuiIO& io = ImGui::GetIO();
 			event.handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;

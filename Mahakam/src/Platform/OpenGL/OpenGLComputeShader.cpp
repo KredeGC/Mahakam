@@ -12,19 +12,21 @@
 
 namespace Mahakam
 {
-	OpenGLComputeShader::OpenGLComputeShader(const std::string& filepath)
-		: filepath(filepath)
+	OpenGLComputeShader::OpenGLComputeShader(const std::filesystem::path& filepath)
+		: m_Filepath(filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
+		std::string fileString = filepath.string();
+
 		// Naming
-		auto lastSlash = filepath.find_last_of("/\\");
+		auto lastSlash = fileString.find_last_of("/\\");
 		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
 
-		auto lastDot = filepath.rfind(".");
-		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
+		auto lastDot = fileString.rfind(".");
+		auto count = lastDot == std::string::npos ? fileString.size() - lastSlash : lastDot - lastSlash;
 
-		name = filepath.substr(lastSlash, count);
+		m_Name = fileString.substr(lastSlash, count);
 
 		//const std::string cachePath = "cache/compute/" + name + ".dat";
 		std::filesystem::path cachePath = FileUtility::GetCachePath(filepath);
@@ -38,12 +40,12 @@ namespace Mahakam
 
 	OpenGLComputeShader::~OpenGLComputeShader()
 	{
-		MH_GL_CALL(glDeleteProgram(rendererID));
+		MH_GL_CALL(glDeleteProgram(m_RendererID));
 	}
 
 	void OpenGLComputeShader::Bind() const
 	{
-		MH_GL_CALL(glUseProgram(rendererID));
+		MH_GL_CALL(glUseProgram(m_RendererID));
 	}
 
 	void OpenGLComputeShader::Dispatch(uint32_t x, uint32_t y, uint32_t z)
@@ -124,7 +126,7 @@ namespace Mahakam
 
 			MH_GL_CALL(glDetachShader(program, shader));
 
-			rendererID = program;
+			m_RendererID = program;
 
 			// Write to cache
 			int bufSize;
@@ -172,19 +174,19 @@ namespace Mahakam
 				return;
 			}
 
-			rendererID = program;
+			m_RendererID = program;
 		}
 	}
 
 	int OpenGLComputeShader::GetUniformLocation(const std::string& name)
 	{
-		if (uniformIDCache.find(name) != uniformIDCache.end())
-			return uniformIDCache[name];
+		if (m_UniformIDCache.find(name) != m_UniformIDCache.end())
+			return m_UniformIDCache[name];
 
-		int uniformID = glGetUniformLocation(rendererID, name.c_str());
+		int uniformID = glGetUniformLocation(m_RendererID, name.c_str());
 
 		if (uniformID != -1)
-			uniformIDCache[name] = uniformID;
+			m_UniformIDCache[name] = uniformID;
 		else
 			MH_CORE_WARN("Uniform {0} unused or optimized away", name);
 

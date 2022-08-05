@@ -11,7 +11,7 @@
 namespace Mahakam
 {
 	//Ref<ComputeShader> ComputeShader::Create(const std::string& filepath)
-	MH_DEFINE_FUNC(ComputeShader::Create, Asset<ComputeShader>, const std::string& filepath)
+	MH_DEFINE_FUNC(ComputeShader::Create, Asset<ComputeShader>, const std::filesystem::path& filepath)
 	{
 		switch (RendererAPI::GetAPI())
 		{

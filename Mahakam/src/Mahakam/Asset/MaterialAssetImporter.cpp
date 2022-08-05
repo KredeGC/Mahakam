@@ -75,6 +75,7 @@ namespace Mahakam
 		m_TonemapPass->Init(1, 1);
 	}
 
+#ifndef MH_STANDALONE
 	void MaterialAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& rootNode)
 	{
 		// Load the preview skybox
@@ -302,6 +303,7 @@ namespace Mahakam
 
 		AssetDatabase::ReloadAsset(m_Material.GetID());
 	}
+#endif
 
 	void MaterialAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{

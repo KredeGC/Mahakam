@@ -5,7 +5,7 @@
 #include "TextureFormats.h"
 #include "RenderBuffer.h"
 
-#include <string>
+#include <filesystem>
 
 namespace Mahakam
 {
@@ -71,11 +71,11 @@ namespace Mahakam
 		virtual const TextureProps& GetProps() const = 0;
 
 		inline static Asset<Texture2D> Create(const TextureProps& props = TextureProps()) { return CreateProps(props); }
-		inline static Asset<Texture2D> Create(const std::string& filepath, const TextureProps& props = TextureProps()) { return CreateFilepath(filepath, props); }
+		inline static Asset<Texture2D> Create(const std::filesystem::path& filepath, const TextureProps& props = TextureProps()) { return CreateFilepath(filepath, props); }
 
 	private:
 		MH_DECLARE_FUNC(CreateProps, Asset<Texture2D>, const TextureProps& props);
-		MH_DECLARE_FUNC(CreateFilepath, Asset<Texture2D>, const std::string& filepath, const TextureProps& props);
+		MH_DECLARE_FUNC(CreateFilepath, Asset<Texture2D>, const std::filesystem::path& filepath, const TextureProps& props);
 	};
 
 
@@ -95,7 +95,7 @@ namespace Mahakam
 
 		virtual uint32_t GetDepth() const = 0;
 
-		static Asset<Texture3D> Create(const std::string& filepath, const TextureProps& props = TextureProps());
+		static Asset<Texture3D> Create(const std::filesystem::path& filepath, const TextureProps& props = TextureProps());
 	};
 
 
@@ -107,10 +107,10 @@ namespace Mahakam
 		virtual const CubeTextureProps& GetProps() const = 0;
 
 		inline static Asset<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps()) { return CreateProps(props); }
-		inline static Asset<TextureCube> Create(const std::string& filepath, const CubeTextureProps& props = CubeTextureProps()) { return CreateFilepath(filepath, props); }
+		inline static Asset<TextureCube> Create(const std::filesystem::path& filepath, const CubeTextureProps& props = CubeTextureProps()) { return CreateFilepath(filepath, props); }
 		
 	private:
 		MH_DECLARE_FUNC(CreateProps, Asset<TextureCube>, const CubeTextureProps& props);
-		MH_DECLARE_FUNC(CreateFilepath, Asset<TextureCube>, const std::string& filepath, const CubeTextureProps& props);
+		MH_DECLARE_FUNC(CreateFilepath, Asset<TextureCube>, const std::filesystem::path& filepath, const CubeTextureProps& props);
 	};
 }

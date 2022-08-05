@@ -21,6 +21,7 @@ namespace Mahakam
 		m_PreviewBuffer = FrameBuffer::Create(gProps);
 	}
 
+#ifndef MH_STANDALONE
 	void TextureAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
 	{
 		m_Props2D = TextureProps{};
@@ -332,6 +333,7 @@ namespace Mahakam
 			AssetDatabase::ReloadAsset(texture.GetID());
 		}*/
 	}
+#endif
 
 	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{

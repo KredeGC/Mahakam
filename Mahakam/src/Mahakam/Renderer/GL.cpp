@@ -25,6 +25,7 @@ namespace Mahakam
 	Asset<Texture2D> GL::texture2DBlack;
 	Asset<Texture2D> GL::texture2DBump;
 	Asset<TextureCube> GL::textureCubeWhite;
+	Asset<TextureCube> GL::textureCubeGrey;
 
 	void GL::Init()
 	{
@@ -42,9 +43,6 @@ namespace Mahakam
 
 		uint8_t redData = 255;
 
-		texture2DRed = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		texture2DRed->SetData(&redData, 1);
-
 		uint8_t whiteData[3]
 		{
 			255,
@@ -52,13 +50,7 @@ namespace Mahakam
 			255
 		};
 
-		texture2DWhite = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		texture2DWhite->SetData(whiteData, 0);
-
 		uint8_t blackData = 0;
-
-		texture2DBlack = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		texture2DBlack->SetData(&blackData, 1);
 
 		uint8_t bumpData[3]
 		{
@@ -67,11 +59,30 @@ namespace Mahakam
 			255
 		};
 
+		uint8_t greyData[3]
+		{
+			127,
+			127,
+			127
+		};
+
+		texture2DRed = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		texture2DRed->SetData(&redData, 0);
+
+		texture2DWhite = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		texture2DWhite->SetData(whiteData, 0);
+
+		texture2DBlack = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		texture2DBlack->SetData(&blackData, 0);
+
 		texture2DBump = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		texture2DBump->SetData(&bumpData, 3);
+		texture2DBump->SetData(&bumpData, 0);
 
 		textureCubeWhite = TextureCube::Create({ 1, TextureFormat::RGB8, TextureFilter::Point, TextureCubePrefilter::None, false });
 		textureCubeWhite->SetData(whiteData, 0);
+
+		textureCubeGrey = TextureCube::Create({ 1, TextureFormat::RGB8, TextureFilter::Point, TextureCubePrefilter::None, false });
+		textureCubeGrey->SetData(greyData, 0);
 	}
 
 	void GL::Shutdown()
@@ -160,6 +171,12 @@ namespace Mahakam
 	MH_DEFINE_FUNC(GL::GetTextureCubeWhite, Asset<TextureCube>)
 	{
 		return textureCubeWhite;
+	};
+
+	//Ref<TextureCube> GL::GetTextureCubeGrey()
+	MH_DEFINE_FUNC(GL::GetTextureCubeGrey, Asset<TextureCube>)
+	{
+		return textureCubeGrey;
 	};
 #pragma endregion
 

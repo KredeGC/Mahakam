@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": ["MH_PLATFORM_LINUX", "MH_DEBUG", "MH_STANDALONE"],
+            "defines": ["MH_PLATFORM_LINUX", "MH_DEBUG"],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu17",
             "cppStandard": "c++17",
@@ -16,7 +16,7 @@
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": ["BS_PLATFORM_WINDOWS", "BS_DEBUG"],
+            "defines": ["MH_PLATFORM_WINDOWS", "MH_DEBUG"],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu17",
             "cppStandard": "c++17",
