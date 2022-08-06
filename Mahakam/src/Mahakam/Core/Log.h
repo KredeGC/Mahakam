@@ -10,8 +10,8 @@ namespace Mahakam
 	class Log
 	{
 	private:
-		static Ref<spdlog::logger> engineLogger;
-		static Ref<spdlog::logger> gameLogger;
+		static Ref<spdlog::logger> s_EngineLogger;
+		static Ref<spdlog::logger> s_GameLogger;
 
 	public:
 		static void Init();

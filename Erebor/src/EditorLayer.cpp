@@ -32,35 +32,15 @@ namespace Mahakam::Editor
 		Log::GetGameLogger()->sinks().push_back(sink);
 #endif
 
-#pragma region Components
-		// TODO: Seperate Inspector stuff from the component serialization
-		
+		ComponentRegistry::RegisterDefaultComponents();
+
+		AssetDatabase::LoadDefaultAssetImporters();
+
+		AssetDatabase::ReloadAssetImports();
+
+#pragma region Component properties
 		// Transform
-		ComponentRegistry::ComponentInterface transformInterface;
-		transformInterface.SetComponent<TransformComponent>();
-		transformInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
-		{
-			TransformComponent& transform = entity.GetComponent<TransformComponent>();
-
-			emitter << YAML::Key << "Translation" << YAML::Value << transform.GetPosition();
-			emitter << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
-			emitter << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
-			emitter << YAML::Key << "Static" << YAML::Value << transform.IsStatic();
-
-			return true;
-		};
-		transformInterface.Deserialize = [](YAML::Node& node, Entity entity)
-		{
-			TransformComponent& transform = entity.AddComponent<TransformComponent>();
-
-			transform.SetPosition(node["Translation"].as<glm::vec3>());
-			transform.SetRotation(node["Rotation"].as<glm::quat>());
-			transform.SetScale(node["Scale"].as<glm::vec3>());
-			transform.SetStatic(node["Static"].as<bool>());
-
-			return true;
-		};
-		transformInterface.OnInspector = [](Entity entity)
+		PropertyRegistry::PropertyPtr transformInspector = [](Entity entity)
 		{
 			TransformComponent& transform = entity.GetComponent<TransformComponent>();
 
@@ -81,12 +61,10 @@ namespace Mahakam::Editor
 				transform.SetScale(scale);
 		};
 
-		ComponentRegistry::RegisterComponent("Transform", transformInterface);
+		PropertyRegistry::Register("Transform", transformInspector);
 
 		// Animator
-		ComponentRegistry::ComponentInterface animatorInterface;
-		animatorInterface.SetComponent<AnimatorComponent>();
-		animatorInterface.OnInspector = [](Entity entity)
+		PropertyRegistry::PropertyPtr animatorInspector = [](Entity entity)
 		{
 			Animator& animator = entity.GetComponent<AnimatorComponent>();
 
@@ -107,49 +85,18 @@ namespace Mahakam::Editor
 			}
 		};
 
-		ComponentRegistry::RegisterComponent("Animator", animatorInterface);
+		PropertyRegistry::Register("Animator", animatorInspector);
 
 		// AudioListener
-		ComponentRegistry::ComponentInterface audioListenerInterface;
-		audioListenerInterface.SetComponent<AudioListenerComponent>();
+		PropertyRegistry::PropertyPtr listenerInspector = [](Entity entity)
+		{
 
-		ComponentRegistry::RegisterComponent("Audio Listener", audioListenerInterface);
+		};
+
+		PropertyRegistry::Register("Audio Listener", listenerInspector);
 
 		// AudioSource
-		ComponentRegistry::ComponentInterface audioSourceInterface;
-		audioSourceInterface.SetComponent<AudioSourceComponent>();
-		audioSourceInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
-		{
-			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
-
-			emitter << YAML::Key << "Sound" << YAML::Value << source.GetSound().GetID();
-			emitter << YAML::Key << "SpatialBlend" << YAML::Value << source.GetSpatialBlend();
-
-			return true;
-		};
-		audioSourceInterface.Deserialize = [](YAML::Node& node, Entity entity)
-		{
-			AudioSourceComponent& source = entity.AddComponent<AudioSourceComponent>();
-
-			YAML::Node soundNode = node["Sound"];
-			if (soundNode)
-			{
-				Asset<Sound> sound = Asset<Sound>(soundNode.as<uint64_t>());
-
-				if (sound)
-				{
-					source.SetSound(sound);
-					source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
-				}
-			}
-
-			YAML::Node spatialNode = node["SpatialBlend"];
-			if (spatialNode)
-				source.SetSpatialBlend(spatialNode.as<float>());
-
-			return true;
-		};
-		audioSourceInterface.OnInspector = [](Entity entity)
+		PropertyRegistry::PropertyPtr audioSourceInspector = [](Entity entity)
 		{
 			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
 			Asset<Sound> sound = source.GetSound();
@@ -170,42 +117,10 @@ namespace Mahakam::Editor
 				source.SetInterpolation(interpolate);
 		};
 
-		ComponentRegistry::RegisterComponent("Audio Source", audioSourceInterface);
+		PropertyRegistry::Register("Audio Source", audioSourceInspector);
 
 		// Camera
-		ComponentRegistry::ComponentInterface cameraInterface;
-		cameraInterface.SetComponent<CameraComponent>();
-		cameraInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
-		{
-			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
-			Camera& camera = cameraComponent;
-
-			emitter << YAML::Key << "Projection" << YAML::Value << (int)camera.GetProjectionType();
-			emitter << YAML::Key << "FOV" << YAML::Value << camera.GetFov();
-			emitter << YAML::Key << "NearZ" << YAML::Value << camera.GetNearPlane();
-			emitter << YAML::Key << "FarZ" << YAML::Value << camera.GetFarPlane();
-			emitter << YAML::Key << "Size" << YAML::Value << camera.GetSize();
-			emitter << YAML::Key << "Ratio" << YAML::Value << camera.GetRatio();
-			emitter << YAML::Key << "FixedRatio" << YAML::Value << cameraComponent.HasFixedAspectRatio();
-
-			return true;
-		};
-		cameraInterface.Deserialize = [](YAML::Node& node, Entity entity)
-		{
-			CameraComponent& cameraComponent = entity.AddComponent<CameraComponent>();
-			Camera& camera = cameraComponent;
-
-			camera.SetProjectionType((Camera::ProjectionType)node["Projection"].as<int>());
-			camera.SetFov(node["FOV"].as<float>());
-			camera.SetNearPlane(node["NearZ"].as<float>());
-			camera.SetFarPlane(node["FarZ"].as<float>());
-			camera.SetSize(node["Size"].as<float>());
-			camera.SetRatio(node["Ratio"].as<float>());
-			cameraComponent.SetFixedAspectRatio(node["FixedRatio"].as<bool>());
-
-			return true;
-		};
-		cameraInterface.OnInspector = [](Entity entity)
+		PropertyRegistry::PropertyPtr cameraInspector = [](Entity entity)
 		{
 			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
 			Camera& camera = cameraComponent;
@@ -257,38 +172,10 @@ namespace Mahakam::Editor
 				cameraComponent.SetFixedAspectRatio(fixedAspectRatio);
 		};
 
-		ComponentRegistry::RegisterComponent("Camera", cameraInterface);
+		PropertyRegistry::Register("Camera", cameraInspector);
 
 		// Light
-		ComponentRegistry::ComponentInterface lightInterface;
-		lightInterface.SetComponent<LightComponent>();
-		lightInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
-		{
-			Light& light = entity.GetComponent<LightComponent>();
-
-			emitter << YAML::Key << "LightType" << YAML::Value << (int)light.GetLightType();
-			emitter << YAML::Key << "Range" << YAML::Value << light.GetRange();
-			emitter << YAML::Key << "FOV" << YAML::Value << light.GetFov();
-			emitter << YAML::Key << "Color" << YAML::Value << light.GetColor();
-			emitter << YAML::Key << "ShadowCasting" << YAML::Value << light.IsShadowCasting();
-			emitter << YAML::Key << "ShadowBias" << YAML::Value << light.GetBias();
-
-			return true;
-		};
-		lightInterface.Deserialize = [](YAML::Node& node, Entity entity)
-		{
-			Light& light = entity.AddComponent<LightComponent>();
-
-			light.SetLightType((Light::LightType)node["LightType"].as<int>());
-			light.SetRange(node["Range"].as<float>());
-			light.SetFov(node["FOV"].as<float>());
-			light.SetColor(node["Color"].as<glm::vec3>());
-			light.SetShadowCasting(node["ShadowCasting"].as<bool>());
-			light.SetBias(node["ShadowBias"].as<float>());
-
-			return true;
-		};
-		lightInterface.OnInspector = [](Entity entity)
+		PropertyRegistry::PropertyPtr lightInspector = [](Entity entity)
 		{
 			Light& light = entity.GetComponent<LightComponent>();
 
@@ -340,12 +227,10 @@ namespace Mahakam::Editor
 			}
 		};
 
-		ComponentRegistry::RegisterComponent("Light", lightInterface);
+		PropertyRegistry::Register("Light", lightInspector);
 
 		// Mesh
-		ComponentRegistry::ComponentInterface meshInterface;
-		meshInterface.SetComponent<MeshComponent>();
-		meshInterface.OnInspector = [](Entity entity)
+		PropertyRegistry::PropertyPtr meshInspector = [](Entity entity)
 		{
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
 
@@ -381,10 +266,8 @@ namespace Mahakam::Editor
 			}
 		};
 
-		ComponentRegistry::RegisterComponent("Mesh", meshInterface);
+		PropertyRegistry::Register("Mesh", meshInspector);
 #pragma endregion
-
-		AssetDatabase::LoadDefaultAssetImporters();
 
 #pragma region Windows
 #ifndef MH_RUNTIME
@@ -433,9 +316,6 @@ namespace Mahakam::Editor
 		EditorWindowRegistry::OpenWindow("Stats");
 #endif
 #pragma endregion
-
-
-		AssetDatabase::ReloadAssetImports();
 
 		blitShader = Shader::Create("assets/shaders/internal/Blit.shader");
 
@@ -499,6 +379,8 @@ namespace Mahakam::Editor
 		m_Runtime = nullptr;
 		m_UpdatePtr = nullptr;
 		blitShader = nullptr;
+
+		ComponentRegistry::DeregisterDefaultComponents();
 
 		AssetDatabase::UnloadDefaultAssetImporters();
 	}

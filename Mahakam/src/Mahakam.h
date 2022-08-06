@@ -32,10 +32,11 @@
 #include "Mahakam/Audio/Sound.h"
 
 // Editor
-#ifndef MH_RUNTIME
+#ifndef MH_STANDALONE
 #include "Mahakam/Editor/EditorCamera.h"
 #include "Mahakam/Editor/EditorWindow.h"
 #include "Mahakam/Editor/EditorWindowRegistry.h"
+#include "Mahakam/Editor/PropertyRegistry.h"
 #include "Mahakam/Editor/Selection.h"
 #endif
 

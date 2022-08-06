@@ -9,8 +9,8 @@ namespace Mahakam
 	class LayerStack
 	{
 	private:
-		std::vector<Layer*> layers;
-		unsigned int layerInsertIndex;
+		std::vector<Layer*> m_Layers;
+		uint32_t m_LayerInsertIndex;
 
 	public:
 		LayerStack();
@@ -21,7 +21,7 @@ namespace Mahakam
 		void PopLayer(Layer* layer);
 		void PopOverlay(Layer* overlay);
 
-		std::vector<Layer*>::iterator begin() { return layers.begin(); }
-		std::vector<Layer*>::iterator end() { return layers.end(); }
+		std::vector<Layer*>::iterator begin() { return m_Layers.begin(); }
+		std::vector<Layer*>::iterator end() { return m_Layers.end(); }
 	};
 }

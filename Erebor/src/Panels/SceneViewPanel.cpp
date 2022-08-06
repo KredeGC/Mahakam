@@ -28,8 +28,61 @@ namespace Mahakam::Editor
 		if (m_Open)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			if (ImGui::Begin("Scene View", &m_Open))
+			if (ImGui::Begin("Scene View", &m_Open, ImGuiWindowFlags_MenuBar))
 			{
+				Camera& camera = m_EditorCamera.GetCamera();
+				Camera::ProjectionType projectionType = camera.GetProjectionType();
+
+				ImGui::PopStyleVar();
+
+				if (ImGui::BeginMenuBar())
+				{
+					if (ImGui::BeginMenu("Camera"))
+					{
+						if (ImGui::BeginMenu("Projection"))
+						{
+							if (ImGui::MenuItem("Perspective", nullptr, projectionType == Camera::ProjectionType::Perspective))
+								camera.SetProjectionType(Camera::ProjectionType::Perspective);
+
+							if (ImGui::MenuItem("Orthographic", nullptr, projectionType == Camera::ProjectionType::Orthographic))
+								camera.SetProjectionType(Camera::ProjectionType::Orthographic);
+							
+							ImGui::EndMenu();
+						}
+
+						ImGui::PushItemWidth(80.0f);
+
+						if (projectionType == Camera::ProjectionType::Perspective)
+						{
+							float fov = glm::degrees(camera.GetFov());
+							if (ImGui::DragFloat("Fov##Editor Camera Fov", &fov, 0.1f, 0.0f, 180.0f))
+								camera.SetFov(glm::radians(fov));
+						}
+						else
+						{
+							float size = camera.GetSize();
+							if (ImGui::DragFloat("Size##Editor Camera Size", &size, 0.1f, 0.0f))
+								camera.SetSize(size);
+						}
+
+						float nearZ = camera.GetNearPlane();
+						if (ImGui::DragFloat("Near Z##Editor Camera NearZ", &nearZ, 0.1f, 0.0f))
+							camera.SetNearPlane(nearZ);
+
+						float farZ = camera.GetFarPlane();
+						if (ImGui::DragFloat("Far Z##Editor Camera FarZ", &farZ, 0.1f, 0.0f))
+							camera.SetFarPlane(farZ);
+
+						ImGui::PopItemWidth();
+						
+						ImGui::EndMenu();
+					}
+					
+					ImGui::EndMenuBar();
+				}
+
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+
 				auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 				auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 				auto viewportOffset = ImGui::GetWindowPos();
@@ -60,7 +113,7 @@ namespace Mahakam::Editor
 				ImVec2 pos = { m_ViewportBounds[0].x, m_ViewportBounds[0].y };
 				ImVec2 size = { m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y };
 
-				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetOrthographic(projectionType == Camera::ProjectionType::Orthographic);
 				ImGuizmo::SetDrawlist();
 
 				ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);

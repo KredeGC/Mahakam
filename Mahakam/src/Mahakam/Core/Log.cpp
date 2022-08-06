@@ -6,35 +6,35 @@
 
 namespace Mahakam
 {
-	Ref<spdlog::logger> Log::engineLogger;
-	Ref<spdlog::logger> Log::gameLogger;
+	Ref<spdlog::logger> Log::s_EngineLogger;
+	Ref<spdlog::logger> Log::s_GameLogger;
 
 	void Log::Init()
 	{
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 
-		engineLogger = spdlog::stdout_color_mt("Mahakam");
-		engineLogger->set_level(spdlog::level::trace);
+		s_EngineLogger = spdlog::stdout_color_mt("Mahakam");
+		s_EngineLogger->set_level(spdlog::level::trace);
 
-		gameLogger = spdlog::stdout_color_mt("Game");
-		gameLogger->set_level(spdlog::level::trace);
+		s_GameLogger = spdlog::stdout_color_mt("Game");
+		s_GameLogger->set_level(spdlog::level::trace);
 	}
 
 	void Log::Shutdown()
 	{
-		engineLogger = nullptr;
-		gameLogger = nullptr;
+		s_EngineLogger = nullptr;
+		s_GameLogger = nullptr;
 	}
 
 	//Ref<spdlog::logger>& Log::GetEngineLogger()
 	MH_DEFINE_FUNC(Log::GetEngineLogger, Ref<spdlog::logger>&)
 	{
-		return engineLogger;
+		return s_EngineLogger;
 	};
 
 	//Ref<spdlog::logger>& Log::GetGameLogger()
 	MH_DEFINE_FUNC(Log::GetGameLogger, Ref<spdlog::logger>&)
 	{
-		return gameLogger;
+		return s_GameLogger;
 	};
 }

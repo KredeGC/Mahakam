@@ -116,8 +116,9 @@ namespace Mahakam::Editor
 						ImGui::EndPopup();
 					}
 
-					if (componentInterface.OnInspector)
-						componentInterface.OnInspector(entity);
+					PropertyRegistry::PropertyPtr onInspector = PropertyRegistry::GetProperty(name);
+					if (onInspector)
+						onInspector(entity);
 				}
 
 				if (markedForDeletion)

@@ -41,21 +41,23 @@ MH_EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 		CreateRef<ParticleRenderPass>(),
 		CreateRef<TonemappingRenderPass>() });*/
 
-#pragma region RotatorComponent
+#pragma region Rotator
 	ComponentRegistry::ComponentInterface rotatorInterface;
 	rotatorInterface.SetComponent<RotatorComponent>();
-	rotatorInterface.OnInspector = [](Entity entity)
+
+	ComponentRegistry::RegisterComponent("Rotator", rotatorInterface);
+
+#ifndef MH_STANDALONE
+	Editor::PropertyRegistry::PropertyPtr rotatorInspector = [](Entity entity)
 	{
 		RotatorComponent& rotator = entity.GetComponent<RotatorComponent>();
 
 		ImGui::DragFloat("Rotation speed", &rotator.rotationSpeed, 0.1f);
 	};
 
-	ComponentRegistry::RegisterComponent("Rotater", rotatorInterface);
+	Editor::PropertyRegistry::Register("Rotator", rotatorInspector);
+#endif
 #pragma endregion
-
-	// TODO: Add components to scene list of serializable components
-	// TODO: Add components to editor list for inspector
 }
 
 MH_EXTERN_EXPORTED void Run(Scene* scene)
@@ -262,8 +264,11 @@ MH_EXTERN_EXPORTED void Unload()
 {
 	MH_CORE_TRACE("DLL Unloaded!");
 
+#pragma region Rotator
 	ComponentRegistry::DeregisterComponent("Rotator");
 
-	// TODO: Remove components from scene list of serializable components
-	// TODO: Remove components from editor list for inspector
+#ifndef MH_STANDALONE
+	Editor::PropertyRegistry::Deregister("Rotator");
+#endif
+#pragma endregion
 }

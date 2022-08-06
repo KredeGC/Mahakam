@@ -4,19 +4,19 @@
 namespace Mahakam
 {
 	Camera::Camera()
-		: projectionMatrix({ 1.0f }), nearZ(0.03f), farZ(1000.0f)
+		: m_ProjectionMatrix({ 1.0f }), m_NearZ(0.03f), m_FarZ(1000.0f)
 	{
 		MH_PROFILE_FUNCTION();
 
-		SetPerspective(fov, nearZ, farZ);
+		SetPerspective(m_Fov, m_NearZ, m_FarZ);
 	}
 
 	Camera::Camera(ProjectionType projection, float fov, float nearPlane, float farPlane)
-		: projectionType(projection)
+		: m_ProjectionType(projection)
 	{
 		MH_PROFILE_FUNCTION();
 
-		if (projectionType == ProjectionType::Perspective)
+		if (m_ProjectionType == ProjectionType::Perspective)
 			SetPerspective(fov, nearPlane, farPlane);
 		else
 			SetOrthographic(fov, nearPlane, farPlane);
@@ -24,32 +24,32 @@ namespace Mahakam
 
 	void Camera::RecalculateProjectionMatrix()
 	{
-		if (changed)
+		if (m_Changed)
 		{
-			if (projectionType == ProjectionType::Perspective)
-				projectionMatrix = glm::perspective(fov, ratio, nearZ, farZ);
+			if (m_ProjectionType == ProjectionType::Perspective)
+				m_ProjectionMatrix = glm::perspective(m_Fov, m_Ratio, m_NearZ, m_FarZ);
 			else
-				projectionMatrix = glm::ortho(-ratio * size / 2, ratio * size / 2, -size / 2, size / 2, nearZ, farZ);
+				m_ProjectionMatrix = glm::ortho(-m_Ratio * m_Size / 2, m_Ratio * m_Size / 2, -m_Size / 2, m_Size / 2, m_NearZ, m_FarZ);
 		}
 	}
 
 	void Camera::SetPerspective(float fov, float nearPlane, float farPlane)
 	{
-		changed = true;
-		projectionType = ProjectionType::Perspective;
-		this->fov = fov;
-		this->nearZ = nearPlane;
-		this->farZ = farPlane;
+		m_Changed = true;
+		m_ProjectionType = ProjectionType::Perspective;
+		m_Fov = fov;
+		m_NearZ = nearPlane;
+		m_FarZ = farPlane;
 		RecalculateProjectionMatrix();
 	}
 
 	void Camera::SetOrthographic(float size, float nearPlane, float farPlane)
 	{
-		changed = true;
-		projectionType = ProjectionType::Orthographic;
-		this->size = size;
-		this->nearZ = nearPlane;
-		this->farZ = farPlane;
+		m_Changed = true;
+		m_ProjectionType = ProjectionType::Orthographic;
+		m_Size = size;
+		m_NearZ = nearPlane;
+		m_FarZ = farPlane;
 		RecalculateProjectionMatrix();
 	}
 }

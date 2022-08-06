@@ -9,10 +9,10 @@ namespace Mahakam
 	class Layer
 	{
 	protected:
-		std::string debugName;
+		std::string m_DebugName;
 
 	public:
-		Layer(const std::string& name = "Layer") : debugName(name) {}
+		Layer(const std::string& name = "Layer") : m_DebugName(name) {}
 		virtual ~Layer() {}
 
 		virtual void OnAttach() {}
@@ -21,6 +21,6 @@ namespace Mahakam
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 
-		inline const std::string& GetName() const { return debugName; }
+		inline const std::string& GetName() const { return m_DebugName; }
 	};
 }

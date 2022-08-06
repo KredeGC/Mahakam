@@ -3,41 +3,41 @@
 
 namespace Mahakam
 {
-	LayerStack::LayerStack() : layerInsertIndex(0)
+	LayerStack::LayerStack() : m_LayerInsertIndex(0)
 	{
 	}
 
 	LayerStack::~LayerStack()
 	{
-		for (Layer* layer : layers)
+		for (Layer* layer : m_Layers)
 			delete layer;
 	}
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		layers.emplace(layers.begin() + layerInsertIndex, layer);
-		layerInsertIndex++;
+		m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
+		m_LayerInsertIndex++;
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay)
 	{
-		layers.emplace_back(overlay);
+		m_Layers.emplace_back(overlay);
 	}
 
 	void LayerStack::PopLayer(Layer* layer)
 	{
-		auto iter = std::find(layers.begin(), layers.end(), layer);
-		if (iter != layers.end())
+		auto iter = std::find(m_Layers.begin(), m_Layers.end(), layer);
+		if (iter != m_Layers.end())
 		{
-			layers.erase(iter);
-			layerInsertIndex--;
+			m_Layers.erase(iter);
+			m_LayerInsertIndex--;
 		}
 	}
 
 	void LayerStack::PopOverlay(Layer* overlay)
 	{
-		auto iter = std::find(layers.begin(), layers.end(), overlay);
-		if (iter != layers.end())
-			layers.erase(iter);
+		auto iter = std::find(m_Layers.begin(), m_Layers.end(), overlay);
+		if (iter != m_Layers.end())
+			m_Layers.erase(iter);
 	}
 }

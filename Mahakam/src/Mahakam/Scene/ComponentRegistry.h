@@ -15,8 +15,6 @@ namespace Mahakam
 			void (*AddComponent)(Entity) = nullptr;
 			void (*RemoveComponent)(Entity) = nullptr;
 
-			void (*OnInspector)(Entity) = nullptr;
-
 			bool (*Serialize)(YAML::Emitter&, Entity) = nullptr;
 			bool (*Deserialize)(YAML::Node&, Entity) = nullptr;
 

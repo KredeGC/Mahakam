@@ -112,29 +112,29 @@ namespace Mahakam
 	{
 		//shader->bind();
 
-		for (auto& kv : m_Textures)
-			m_Shader->SetTexture(kv.first, kv.second);
+		for (auto& [name, texture] : m_Textures)
+			m_Shader->SetTexture(name, texture);
 
-		for (auto& kv : m_Mat3s)
-			m_Shader->SetUniformMat3(kv.first, kv.second);
+		for (auto& [name, mat] : m_Mat3s)
+			m_Shader->SetUniformMat3(name, mat);
 
-		for (auto& kv : m_Mat4s)
-			m_Shader->SetUniformMat4(kv.first, kv.second);
+		for (auto& [name, mat] : m_Mat4s)
+			m_Shader->SetUniformMat4(name, mat);
 
-		for (auto& kv : m_Ints)
-			m_Shader->SetUniformInt(kv.first, kv.second);
+		for (auto& [name, value] : m_Ints)
+			m_Shader->SetUniformInt(name, value);
 
-		for (auto& kv : m_Floats)
-			m_Shader->SetUniformFloat(kv.first, kv.second);
+		for (auto& [name, value] : m_Floats)
+			m_Shader->SetUniformFloat(name, value);
 
-		for (auto& kv : m_Float2s)
-			m_Shader->SetUniformFloat2(kv.first, kv.second);
-
-		for (auto& kv : m_Float3s)
-			m_Shader->SetUniformFloat3(kv.first, kv.second);
-
-		for (auto& kv : m_Float4s)
-			m_Shader->SetUniformFloat4(kv.first, kv.second);
+		for (auto& [name, value] : m_Float2s)
+			m_Shader->SetUniformFloat2(name, value);
+ 
+		for (auto& [name, value] : m_Float3s)
+			m_Shader->SetUniformFloat3(name, value);
+ 
+		for (auto& [name, value] : m_Float4s)
+			m_Shader->SetUniformFloat4(name, value);
 	}
 
 	void OpenGLMaterial::SetTransform(const glm::mat4& modelMatrix)
