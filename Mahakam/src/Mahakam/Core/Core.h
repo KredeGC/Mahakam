@@ -1,8 +1,11 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
+#ifndef MH_DEBUG
 #include <robin_hood.h>
+#else
+#include <unordered_map>
+#endif
 
 
 #ifdef MH_DEBUG

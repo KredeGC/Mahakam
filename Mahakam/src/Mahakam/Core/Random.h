@@ -13,5 +13,21 @@ namespace Mahakam
 
 	public:
 		static uint64_t GetRandomID64();
+
+		template<typename T>
+		static T GetRandomDiscrete(T min, T max)
+		{
+			std::uniform_int_distribution<T> distribution(min, max);
+
+			return distribution(generator);
+		}
+
+		template<typename T>
+		static T GetRandomContinuous(T min, T max)
+		{
+			std::uniform_real_distribution<T> distribution(min, max);
+
+			return distribution(generator);
+		}
 	};
 }

@@ -5,14 +5,14 @@ namespace Mahakam
 	class Timestep
 	{
 	private:
-		float time;
+		float m_Time;
 
 	public:
-		Timestep(float time = 0.0f) : time(time) {}
+		Timestep(float time = 0.0f) : m_Time(time) {}
 
-		inline operator float() const { return time; }
+		inline operator float() const { return m_Time; }
 
-		inline float GetSeconds() const { return time; }
-		inline float GetMilliSeconds() const { return time * 1000.0f; }
+		inline float GetSeconds() const { return m_Time; }
+		inline float GetMilliSeconds() const { return m_Time * 1000.0f; }
 	};
 }

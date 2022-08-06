@@ -4,13 +4,17 @@
 #include <algorithm>
 #include <functional>
 
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include <unordered_set>
+#ifndef MH_DEBUG
 #include <robin_hood.h>
+#else
+#include <unordered_map>
+#endif
 
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>

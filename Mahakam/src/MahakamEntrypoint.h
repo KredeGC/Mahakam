@@ -29,8 +29,6 @@ namespace Mahakam
 
 		virtual void OnAttach() override
 		{
-			// TODO: Load components, preferably without the editor stuff
-
 			// Load default asset importers
 			AssetDatabase::LoadDefaultAssetImporters();
 
@@ -50,8 +48,7 @@ namespace Mahakam
 				CreateRef<TonemappingRenderPass>() });
 
 			// Create scene?
-			// TODO: Use the SceneManager
-			// TODODO: Let the editor decide which scene to load
+			// TODO: Let the editor decide which scene to load via a settings panel
 			Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/Skybox.material.import");
 			Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/pines.irradiance.import");
 			Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/pines.specular.import");
