@@ -2,6 +2,7 @@
 #include "Mahakam/Core/Core.h"
 
 #include <string>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 
@@ -44,7 +45,7 @@ namespace Mahakam
 			return sourceStream.str();
 		}
 
-		inline static std::string ReadFile(const std::string& filepath)
+		inline static std::string ReadFile(const std::filesystem::path& filepath)
 		{
 			MH_PROFILE_FUNCTION();
 

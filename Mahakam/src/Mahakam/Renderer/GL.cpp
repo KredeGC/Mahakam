@@ -102,6 +102,7 @@ namespace Mahakam
 		texture2DBlack = nullptr;
 		texture2DBump = nullptr;
 		textureCubeWhite = nullptr;
+		textureCubeGrey = nullptr;
 	}
 
 #pragma region Mesh

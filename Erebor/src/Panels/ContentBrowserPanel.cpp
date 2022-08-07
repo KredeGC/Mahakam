@@ -28,9 +28,10 @@ namespace Mahakam::Editor
 
 					ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == s_AssetDirectory) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-					const char* label = s_AssetDirectory.string().c_str();
+					std::string fileString = s_AssetDirectory.string();
+					const char* fileCStr = fileString.c_str();
 
-					bool open = ImGui::TreeNodeEx(label, flags | ImGuiTreeNodeFlags_DefaultOpen, "%s", label);
+					bool open = ImGui::TreeNodeEx(fileCStr, flags | ImGuiTreeNodeFlags_DefaultOpen, "%s", fileCStr);
 
 					if (ImGui::IsItemClicked())
 						m_CurrentDirectory = s_AssetDirectory;

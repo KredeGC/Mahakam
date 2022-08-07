@@ -63,7 +63,7 @@ namespace Mahakam
         TAB                = 258,
         BACKSPACE          = 259,
         INSERT             = 260,
-        DELETE             = 261,
+        Delete             = 261, // TODO: Purge windows for wintt.h, wtf Microsoft
         RIGHT              = 262,
         LEFT               = 263,
         DOWN               = 264,

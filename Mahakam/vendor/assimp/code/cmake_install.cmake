@@ -1,8 +1,8 @@
-# Install script for directory: /home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code
+# Install script for directory: C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/usr/local")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Assimp")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -12,7 +12,7 @@ if(NOT DEFINED CMAKE_INSTALL_CONFIG_NAME)
     string(REGEX REPLACE "^[^A-Za-z0-9_]+" ""
            CMAKE_INSTALL_CONFIG_NAME "${BUILD_TYPE}")
   else()
-    set(CMAKE_INSTALL_CONFIG_NAME "")
+    set(CMAKE_INSTALL_CONFIG_NAME "Release")
   endif()
   message(STATUS "Install configuration: \"${CMAKE_INSTALL_CONFIG_NAME}\"")
 endif()
@@ -27,118 +27,128 @@ if(NOT CMAKE_INSTALL_COMPONENT)
   endif()
 endif()
 
-# Install shared libraries without execute permission?
-if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
-  set(CMAKE_INSTALL_SO_NO_EXE "1")
-endif()
-
 # Is this installation the result of a crosscompile?
 if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
-# Set default install directory permissions.
-if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/usr/bin/objdump")
-endif()
-
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/lib/libassimp.a")
+  if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/lib/Debug/assimp-vc142-mt.lib")
+  elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ee][Aa][Ss][Ee])$")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/lib/Release/assimp-vc142-mt.lib")
+  elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Mm][Ii][Nn][Ss][Ii][Zz][Ee][Rr][Ee][Ll])$")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/lib/MinSizeRel/assimp-vc142-mt.lib")
+  elseif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/lib/RelWithDebInfo/assimp-vc142-mt.lib")
+  endif()
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xassimp-devx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/assimp" TYPE FILE FILES
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/anim.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/aabb.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ai_assert.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/camera.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/color4.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/color4.inl"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/config.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ColladaMetaData.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/commonMetaData.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/defs.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/cfileio.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/light.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/material.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/material.inl"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/matrix3x3.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/matrix3x3.inl"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/matrix4x4.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/matrix4x4.inl"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/mesh.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/pbrmaterial.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/GltfMaterial.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/postprocess.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/quaternion.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/quaternion.inl"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/scene.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/metadata.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/texture.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/types.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/vector2.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/vector2.inl"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/vector3.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/vector3.inl"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/version.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/cimport.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/importerdesc.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Importer.hpp"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/DefaultLogger.hpp"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ProgressHandler.hpp"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/IOStream.hpp"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/IOSystem.hpp"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Logger.hpp"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/LogStream.hpp"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/NullLogger.hpp"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/cexport.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Exporter.hpp"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/DefaultIOStream.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/DefaultIOSystem.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ZipArchiveIOSystem.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SceneCombiner.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/fast_atof.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/qnan.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/BaseImporter.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Hash.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/MemoryIOWrapper.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ParsingUtils.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StreamReader.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StreamWriter.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StringComparison.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StringUtils.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SGSpatialSort.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/GenericProperty.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SpatialSort.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SkeletonMeshBuilder.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SmallVector.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SmoothingGroups.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SmoothingGroups.inl"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StandardShapes.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/RemoveComments.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Subdivision.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Vertex.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/LineSplitter.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/TinyFormatter.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Profiler.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/LogAux.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Bitmap.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/XMLTools.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/IOStreamBuffer.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/CreateAnimMesh.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/XmlParser.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/BlobIOSystem.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/MathFunctions.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Exceptional.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ByteSwapper.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/anim.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/aabb.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ai_assert.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/camera.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/color4.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/color4.inl"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/config.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ColladaMetaData.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/commonMetaData.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/defs.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/cfileio.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/light.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/material.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/material.inl"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/matrix3x3.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/matrix3x3.inl"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/matrix4x4.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/matrix4x4.inl"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/mesh.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/pbrmaterial.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/GltfMaterial.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/postprocess.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/quaternion.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/quaternion.inl"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/scene.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/metadata.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/texture.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/types.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/vector2.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/vector2.inl"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/vector3.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/vector3.inl"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/version.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/cimport.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/importerdesc.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Importer.hpp"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/DefaultLogger.hpp"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ProgressHandler.hpp"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/IOStream.hpp"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/IOSystem.hpp"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Logger.hpp"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/LogStream.hpp"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/NullLogger.hpp"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/cexport.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Exporter.hpp"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/DefaultIOStream.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/DefaultIOSystem.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ZipArchiveIOSystem.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SceneCombiner.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/fast_atof.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/qnan.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/BaseImporter.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Hash.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/MemoryIOWrapper.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ParsingUtils.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StreamReader.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StreamWriter.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StringComparison.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StringUtils.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SGSpatialSort.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/GenericProperty.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SpatialSort.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SkeletonMeshBuilder.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SmallVector.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SmoothingGroups.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/SmoothingGroups.inl"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/StandardShapes.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/RemoveComments.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Subdivision.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Vertex.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/LineSplitter.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/TinyFormatter.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Profiler.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/LogAux.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Bitmap.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/XMLTools.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/IOStreamBuffer.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/CreateAnimMesh.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/XmlParser.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/BlobIOSystem.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/MathFunctions.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Exceptional.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/ByteSwapper.h"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xassimp-devx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/assimp/Compiler" TYPE FILE FILES
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Compiler/pushpack1.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Compiler/poppack1.h"
-    "/home/krede/CPPProjects/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Compiler/pstdint.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Compiler/pushpack1.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Compiler/poppack1.h"
+    "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/../include/assimp/Compiler/pstdint.h"
     )
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE FILE FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/Debug/assimp-vc142-mt.pdb")
+  endif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE FILE FILES "C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/RelWithDebInfo/assimp-vc142-mt.pdb")
+  endif("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Rr][Ee][Ll][Ww][Ii][Tt][Hh][Dd][Ee][Bb][Ii][Nn][Ff][Oo])$")
 endif()
 
