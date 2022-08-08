@@ -1,7 +1,7 @@
 #include "ebpch.h"
 #include "EditorLayer.h"
 
-#ifndef MH_RUNTIME
+#ifndef MH_STANDALONE
 #include "Panels/AssetManagerPanel.h"
 #include "Panels/ConsolePanel.h"
 #include "Panels/ContentBrowserPanel.h"
@@ -395,18 +395,11 @@ namespace Mahakam::Editor
 		m_UpdatePtr(SceneManager::GetActiveScene().get(), dt);
 
 #ifdef MH_RUNTIME
+		// TODO: Remove this, as the Sandbox project itself will compile as an executable instead
 		// Only used during runtime
-		s_ActiveScene->OnUpdate(dt);
+		SceneManager::GetActiveScene()->OnUpdate(dt);
 
-		blitShader->Bind("POSTPROCESSING");
-		blitShader->SetTexture("u_Albedo", Renderer::GetFrameBuffer()->GetColorTexture(0));
-		blitShader->SetUniformInt("u_Depth", 0);
-
-		GL::EnableZTesting(false);
-		GL::EnableZWriting(false);
-		Renderer::DrawScreenQuad();
-		GL::EnableZWriting(true);
-		GL::EnableZTesting(true);
+		Renderer::GetFrameBuffer()->Blit(m_Framebuffer, true, false);
 #else
 		static const bool m_PlayMode = false;
 		if (m_PlayMode)

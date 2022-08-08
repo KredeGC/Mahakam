@@ -396,7 +396,7 @@ namespace Mahakam
 
 	void AssetDatabase::RecursiveImportAssets(const std::filesystem::path& filepath)
 	{
-		auto iter = std::filesystem::directory_iterator(filepath);
+		/*auto iter = std::filesystem::directory_iterator(filepath);
 
 		for (auto& directory : iter)
 		{
@@ -422,6 +422,6 @@ namespace Mahakam
 					}
 				}
 			}
-		}
+		}*/
 	}
 }

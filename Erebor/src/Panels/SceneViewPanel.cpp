@@ -98,6 +98,8 @@ namespace Mahakam::Editor
 					m_ViewportSize.x = newViewportSize.x;
 					m_ViewportSize.y = newViewportSize.y;
 
+					SceneManager::GetActiveScene()->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+
 					m_EditorCamera.GetCamera().SetRatio(m_ViewportSize.x / m_ViewportSize.y);
 				}
 

@@ -18,7 +18,8 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		Invalidate();
+		if (!props.swapChainTarget)
+			Invalidate();
 	}
 
 	OpenGLFrameBuffer::~OpenGLFrameBuffer()
@@ -65,7 +66,8 @@ namespace Mahakam
 		props.width = width;
 		props.height = height;
 
-		Invalidate();
+		if (!props.swapChainTarget)
+			Invalidate();
 	}
 
 	void OpenGLFrameBuffer::ReadColorPixels(void* pixels, int attachmentSlot) const

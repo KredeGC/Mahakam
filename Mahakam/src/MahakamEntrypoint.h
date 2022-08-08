@@ -1,13 +1,15 @@
 #pragma once
 
-#include "Mahakam/Core/SceneManager.h"
+#include <Mahakam.h>
 #include "Mahakam/Core/EntryPoint.h"
 
 #if !defined(MH_STANDALONE_TITLE)
+#define MH_STANDALONE_TITLE "" // Just so VS stops nagging me about this
 #error MH_STANDALONE_TITLE not defined
 #endif
 
 #if !defined(MH_STANDALONE_ICON)
+#define MH_STANDALONE_ICON ""
 #error MH_STANDALONE_ICON not defined
 #endif
 
@@ -23,6 +25,7 @@ namespace Mahakam
 	{
 	private:
 		Asset<Shader> m_BlitShader;
+		Asset<FrameBuffer> m_ViewportBuffer;
 
 	public:
 		StandaloneLayer() : Layer("Standalone") {}
@@ -39,6 +42,13 @@ namespace Mahakam
 			// TODO: Instead of blitting, just make the last FrameBuffer have ID 0, and thus be the window framebuffer
 			// Or just blit to 0 normally, instead of having a shader do it
 			m_BlitShader = Shader::Create("assets/shaders/internal/Blit.shader");
+
+			FrameBufferProps mProps;
+			mProps.width = 1600;
+			mProps.height = 900;
+			mProps.swapChainTarget = true;
+
+			m_ViewportBuffer = FrameBuffer::Create(mProps);
 
 			// Setup render passes for the default renderer
 			Renderer::SetRenderPasses({
@@ -89,8 +99,10 @@ namespace Mahakam
 
 			SceneManager::GetActiveScene()->OnUpdate(dt);
 
+			Renderer::GetFrameBuffer()->Blit(m_ViewportBuffer, true, false);
+
 			// Blit the framebuffer to the window
-			m_BlitShader->Bind("POSTPROCESSING");
+			/*m_BlitShader->Bind("POSTPROCESSING");
 			m_BlitShader->SetTexture("u_Albedo", Renderer::GetFrameBuffer()->GetColorTexture(0));
 			m_BlitShader->SetUniformInt("u_Depth", 0);
 
@@ -98,7 +110,7 @@ namespace Mahakam
 			GL::EnableZWriting(false);
 			Renderer::DrawScreenQuad();
 			GL::EnableZWriting(true);
-			GL::EnableZTesting(true);
+			GL::EnableZTesting(true);*/
 		}
 
 		virtual void OnImGuiRender() override
@@ -115,6 +127,8 @@ namespace Mahakam
 		bool OnWindowResized(WindowResizeEvent& event)
 		{
 			SceneManager::GetActiveScene()->OnViewportResize(event.GetWidth(), event.GetHeight());
+
+			m_ViewportBuffer->Resize(event.GetWidth(), event.GetHeight());
 
 			return false;
 		}
