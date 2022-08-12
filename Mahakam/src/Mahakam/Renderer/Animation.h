@@ -5,7 +5,6 @@
 #include "Bone.h"
 #include "Mesh.h"
 
-#include <robin_hood.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 

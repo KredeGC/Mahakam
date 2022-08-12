@@ -11,7 +11,7 @@
 #include <vector>
 #include <unordered_set>
 #ifndef MH_DEBUG
-#include <robin_hood.h>
+#include <robin_hood/robin_hood.h>
 #else
 #include <unordered_map>
 #endif
@@ -44,8 +44,8 @@
 #include "Mahakam/ImGui/GUI.h"
 #include "Mahakam/ImGui/ImGuiLayer.h"
 
-#include <imgui.h>
-#include <ImGuizmo.h>
+#include <imgui/imgui.h>
+#include <imguizmo/ImGuizmo.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>

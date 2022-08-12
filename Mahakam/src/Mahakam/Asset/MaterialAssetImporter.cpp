@@ -13,7 +13,7 @@
 
 #include "Mahakam/ImGui/GUI.h"
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 #define MH_CONDITIONAL_COLOR(Func, Type, Setter, Getter) { Type value = m_Material->Getter(propertyName); \
 	if (Func(propertyName, value, colorFlags)) \

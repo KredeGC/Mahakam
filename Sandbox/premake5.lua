@@ -16,7 +16,11 @@ project "Sandbox"
         "src/**.cpp"
     }
 
-    includedirs { VendorIncludes }
+    includedirs {
+        "src",
+        "../Mahakam/headers",
+        "../Mahakam/headers/Mahakam",
+    }
 
     links { "Mahakam" }
 

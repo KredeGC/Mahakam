@@ -63,6 +63,17 @@ project "Mahakam"
         "MH_BUILD"
     }
     
+    postbuildcommands {
+        "{COPYDIR} src/*.h headers/Mahakam",
+        "{COPYDIR} %{IncludeDir.entt}/*.hpp headers/",
+        "{COPYDIR} %{IncludeDir.glm}/glm/ headers/glm/",
+        "{COPYDIR} %{IncludeDir.imgui}/imgui/*.h headers/imgui/",
+        "{COPYDIR} %{IncludeDir.imguizmo}/imguizmo/*.h headers/imguizmo/",
+        "{COPYDIR} %{IncludeDir.robin_hood}/robin_hood/*.h headers/robin_hood/",
+        "{COPYDIR} %{IncludeDir.spdlog}/*.h headers/",
+        "{COPYDIR} %{IncludeDir.yaml}/*.h headers/"
+    }
+    
     -- Windows
     filter "system:windows"
         systemversion "latest"

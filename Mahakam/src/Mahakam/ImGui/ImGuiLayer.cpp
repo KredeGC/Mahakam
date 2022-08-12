@@ -3,12 +3,12 @@
 
 #include "Mahakam/Core/Application.h"
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
-#include <backends/imgui_impl_glfw.cpp>
-#include <backends/imgui_impl_opengl3.cpp>
+#include <imgui/backends/imgui_impl_glfw.cpp>
+#include <imgui/backends/imgui_impl_opengl3.cpp>
 
-#include <ImGuizmo.h>
+#include <imguizmo/ImGuizmo.h>
 
 namespace Mahakam
 {

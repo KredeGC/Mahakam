@@ -19,7 +19,20 @@ namespace Mahakam
 	//void PhysicsEngine::Update()
 	MH_DEFINE_FUNC(PhysicsEngine::Update, void, Timestep ts)
 	{
-		s_Context->Update(ts);
+		float dt = ts.GetSeconds();
+
+		// Clamp delta time
+		if (dt > 0.25)
+			dt = 0.25;
+
+		s_Accumulator += dt;
+
+		// Fixed timestep
+		while (s_Accumulator >= s_Timestep)
+		{
+			s_Accumulator -= s_Timestep;
+			s_Context->Update(dt);
+		}
 	};
 
 	//PhysicsContext* PhysicsEngine::GetContext()

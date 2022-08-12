@@ -8,6 +8,8 @@ Erebor/cache/
 Erebor/profiling/
 Erebor/runtime/
 
+Mahakam/headers/
+
 Mahakam/vendor/assimp/lib/
 Mahakam/vendor/assimp/generated/
 Mahakam/vendor/assimp/CMakeCache.txt

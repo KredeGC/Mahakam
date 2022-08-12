@@ -2,7 +2,7 @@
 
 #include <memory>
 #ifndef MH_DEBUG
-#include <robin_hood.h>
+#include <robin_hood/robin_hood.h>
 #else
 #include <unordered_map>
 #endif

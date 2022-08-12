@@ -10,6 +10,8 @@ namespace Mahakam
 	{
 	private:
 		static PhysicsContext* s_Context;
+		inline static float s_Timestep = 1.0f / 60.0f;
+		inline static float s_Accumulator = 0.0f;
 
 	public:
 		static void Init();

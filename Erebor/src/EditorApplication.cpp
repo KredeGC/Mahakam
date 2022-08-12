@@ -2,7 +2,7 @@
 #include "EditorApplication.h"
 #include <Mahakam/Core/EntryPoint.h>
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 namespace Mahakam::Editor
 {

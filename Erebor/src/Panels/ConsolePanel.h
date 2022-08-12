@@ -4,7 +4,7 @@
 
 #include <spdlog/common.h>
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 namespace Mahakam::Editor
 {

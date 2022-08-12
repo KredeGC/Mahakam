@@ -2,8 +2,6 @@
 
 #include "Mahakam/Renderer/ComputeShader.h"
 
-#include <robin_hood.h>
-
 namespace Mahakam
 {
 	class OpenGLComputeShader : public ComputeShader

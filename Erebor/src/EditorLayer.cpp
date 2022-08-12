@@ -24,7 +24,7 @@ namespace Mahakam::Editor
 
 	void EditorLayer::OnAttach()
 	{
-#ifndef MH_RUNTIME
+#ifndef MH_STANDALONE
 		// Add the console panel to the logger
 		auto sink = std::make_shared<ConsoleLogSinkMt>();
 
@@ -39,6 +39,7 @@ namespace Mahakam::Editor
 		AssetDatabase::ReloadAssetImports();
 
 #pragma region Component properties
+#ifndef MH_STANDALONE
 		// Transform
 		PropertyRegistry::PropertyPtr transformInspector = [](Entity entity)
 		{
@@ -267,10 +268,11 @@ namespace Mahakam::Editor
 		};
 
 		PropertyRegistry::Register("Mesh", meshInspector);
+#endif
 #pragma endregion
 
 #pragma region Windows
-#ifndef MH_RUNTIME
+#ifndef MH_STANDALONE
 		// AssetManagerPanel
 		EditorWindowRegistry::RegisterWindowClass<AssetManagerPanel>("Asset Manager");
 		//EditorWindowRegistry::OpenWindow("Asset Manager");
@@ -415,7 +417,7 @@ namespace Mahakam::Editor
 
 		m_SceneViewPanel.SetFrameBuffer(debugComputeTexture);*/
 
-#ifndef MH_RUNTIME
+#ifndef MH_STANDALONE
 		auto& windows = EditorWindowRegistry::GetWindows();
 		for (auto& window : windows)
 			window->OnUpdate(dt);
@@ -426,7 +428,7 @@ namespace Mahakam::Editor
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-#ifndef MH_RUNTIME
+#ifndef MH_STANDALONE
 		m_DockSpace.Begin();
 
 		auto& windows = EditorWindowRegistry::GetWindows();
@@ -455,7 +457,7 @@ namespace Mahakam::Editor
 		EventDispatcher dispatcher(event);
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::OnKeyPressed));
 
-#ifndef MH_RUNTIME
+#ifndef MH_STANDALONE
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(m_DockSpace.OnKeyPressed));
 
 		auto& windows = EditorWindowRegistry::GetWindows();

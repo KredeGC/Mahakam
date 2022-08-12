@@ -3,9 +3,9 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
-#include <ImGuizmo.h>
+#include <imguizmo/ImGuizmo.h>
 
 namespace Mahakam::Editor
 {
