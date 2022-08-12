@@ -24,7 +24,6 @@ namespace Mahakam
 	class StandaloneLayer : public Layer
 	{
 	private:
-		Asset<Shader> m_BlitShader;
 		Asset<FrameBuffer> m_ViewportBuffer;
 
 	public:
@@ -32,17 +31,16 @@ namespace Mahakam
 
 		virtual void OnAttach() override
 		{
+			// Load default component serializers
+			ComponentRegistry::RegisterDefaultComponents();
+
 			// Load default asset importers
 			AssetDatabase::LoadDefaultAssetImporters();
 
 			// Refresh asset imports
 			AssetDatabase::ReloadAssetImports();
 
-			// Create a blit shader
-			// TODO: Instead of blitting, just make the last FrameBuffer have ID 0, and thus be the window framebuffer
-			// Or just blit to 0 normally, instead of having a shader do it
-			m_BlitShader = Shader::Create("assets/shaders/internal/Blit.shader");
-
+			// Create a swapchain target for blitting
 			FrameBufferProps mProps;
 			mProps.width = 1600;
 			mProps.height = 900;
@@ -90,6 +88,8 @@ namespace Mahakam
 			// Unload the runtime
 			Unload();
 
+			ComponentRegistry::DeregisterDefaultComponents();
+			
 			AssetDatabase::UnloadDefaultAssetImporters();
 		}
 
