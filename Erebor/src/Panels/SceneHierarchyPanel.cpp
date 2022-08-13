@@ -34,8 +34,15 @@ namespace Mahakam::Editor
 
 		if (ImGui::BeginPopupContextItem())
 		{
-			std::string label = std::string("Delete ") + std::to_string(entity);
-			if (ImGui::MenuItem(label.c_str()))
+			ImGui::TextDisabled("%s", tagName);
+
+			if (ImGui::MenuItem("Create empty entity"))
+			{
+				Entity child = context->CreateEntity();
+				child.SetParent(entity);
+			}
+
+			if (ImGui::MenuItem("Delete"))
 			{
 				m_SafeContext = false;
 
@@ -163,8 +170,6 @@ namespace Mahakam::Editor
 				Ref<Scene> context = SceneManager::GetActiveScene();
 				if (context)
 				{
-					std::vector<Entity> entities;
-
 					m_SafeContext = true;
 					context->ForEachEntity([&](auto handle)
 					{
@@ -172,54 +177,37 @@ namespace Mahakam::Editor
 						{
 							Entity entity(handle, context.get());
 
+							// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
 							auto& relation = entity.GetComponent<RelationshipComponent>();
 
+							// Start by drawing the root entities
+							// Recursively draw their children
 							if (!relation.Parent)
 								DrawEntityNode(entity, context);
 						}
 					});
 
-
-					context->ForEachEntity([&](auto handle)
-					{
-						Entity entity(handle, context.get());
-
-						// TODO: https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
-						// In short: Sort by the relationship between parent and child
-						// TODO: Find a way for the user to change the order?
-					});
-
-
-
-					/*context->ForEachEntity([&](auto handle)
-					{
-						Entity entity(handle, context.get());
-
-						DrawEntityNode(entity, context);
-					});*/
-
 					if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 						Selection::SetSelectedEntity({});
 
 					// Blank space menu
-					if (ImGui::BeginPopupContextWindow(0, 1, false))
+					if (ImGui::BeginPopupContextWindow("Hierarchy Empty RMB", 1, false))
 					{
 						if (ImGui::MenuItem("Create empty entity"))
 							context->CreateEntity();
 
 						ImGui::EndPopup();
 					}
-
-					ImGui::End();
-
-
-					ImGui::Begin("Inspector");
-
-					if (Selection::GetSelectedEntity())
-					{
-						DrawInspector(Selection::GetSelectedEntity());
-					}
 				}
+			}
+
+			ImGui::End();
+
+			if (ImGui::Begin("Inspector"))
+			{
+				Entity selectedEntity = Selection::GetSelectedEntity();
+				if (selectedEntity)
+					DrawInspector(selectedEntity);
 			}
 
 			ImGui::End();

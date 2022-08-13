@@ -44,7 +44,7 @@ namespace Mahakam
 		}
 	}
 
-	Entity Entity::GetParent(Entity parent)
+	Entity Entity::GetParent(Entity parent) const
 	{
 		return GetComponent<RelationshipComponent>().Parent;
 	}

@@ -32,9 +32,14 @@ namespace Mahakam
 		}
 
 		void SetParent(Entity parent);
-		Entity GetParent(Entity parent);
+		Entity GetParent(Entity parent) const;
 		void RemoveParent();
 		void DestroyChildren();
+
+		inline bool IsValid() const
+		{
+			return scene->registry.valid(handle);
+		}
 
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args)

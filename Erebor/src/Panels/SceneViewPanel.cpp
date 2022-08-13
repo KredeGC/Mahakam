@@ -130,7 +130,7 @@ namespace Mahakam::Editor
 
 				// Transform gizmo
 				Entity selectedEntity = Selection::GetSelectedEntity();
-				if (selectedEntity && m_GizmoType != -1)
+				if (selectedEntity && selectedEntity.HasComponent<TransformComponent>() && m_GizmoType != -1)
 				{
 					const glm::mat4 viewMatrix = glm::inverse(m_EditorCamera.GetModelMatrix());
 

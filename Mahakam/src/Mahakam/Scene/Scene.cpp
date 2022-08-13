@@ -291,15 +291,18 @@ namespace Mahakam
 
 	void Scene::Sort()
 	{
-		/*registry.sort<RelationshipComponent>([&](const entt::entity lhs, const entt::entity rhs) {
-			const auto& clhs = registry.get<RelationshipComponent>(lhs);
-			const auto& crhs = registry.get<RelationshipComponent>(rhs);
+		registry.sort<RelationshipComponent>([&](const entt::entity _lhs, const entt::entity _rhs) {
+			Entity lhs{ _lhs, this };
+			Entity rhs{ _rhs, this };
 
-			return true;
+			const auto& clhs = lhs.GetComponent<RelationshipComponent>();
+			const auto& crhs = rhs.GetComponent<RelationshipComponent>();
 
-			return crhs.Parent == lhs || clhs.Next == rhs
-				|| (!(clhs.Parent == rhs || crhs.Next == lhs) && (uint32_t(clhs.Parent) < uint32_t(crhs.Parent) || (clhs.Parent == crhs.Parent && &clhs < &crhs)));
-		});*/
+			bool rightParent = crhs.Parent == lhs;
+			bool leftSide = clhs.Next == rhs;
+
+			return rightParent || leftSide;
+		});
 	}
 
 	//Ref<Scene> Scene::CreateEmpty()

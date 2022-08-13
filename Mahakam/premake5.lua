@@ -65,6 +65,12 @@ project "Mahakam"
     
     postbuildcommands {
         "{RMDIR} headers",
+        "{MKDIR} headers",
+        "{MKDIR} headers/Mahakam",
+        "{MKDIR} headers/glm",
+        "{MKDIR} headers/imgui",
+        "{MKDIR} headers/imguizmo",
+        "{MKDIR} headers/robin_hood",
         "{COPYDIR} src/*.h headers/Mahakam",
         "{COPYDIR} %{IncludeDir.entt}/*.hpp headers/",
         "{COPYDIR} %{IncludeDir.glm}/glm/ headers/glm/",
