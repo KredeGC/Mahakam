@@ -4,7 +4,7 @@
 #include "Panels/DockSpace.h"
 #endif
 
-#include <Mahakam.h>
+#include <Mahakam/Mahakam.h>
 
 #include <imgui/imgui.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Mahakam.h>
+#include <Mahakam/Mahakam.h>
 
 #ifdef MH_STANDALONE
 

@@ -8,8 +8,8 @@ project "Mahakam"
     targetdir ("bin/%{outputdir}")
     objdir ("bin-obj/%{outputdir}")
     
-    pchheader "mhpch.h"
-    pchsource "src/mhpch.cpp"
+    pchheader "Mahakam/mhpch.h"
+    pchsource "src/Mahakam/mhpch.cpp"
     
     files {
         "src/**.h",
@@ -71,14 +71,8 @@ project "Mahakam"
         "{MKDIR} headers/imgui",
         "{MKDIR} headers/imguizmo",
         "{MKDIR} headers/robin_hood",
-        "{COPYDIR} src/**.h headers/Mahakam",
         "{COPYDIR} %{IncludeDir.entt}/ headers/",
-        "{COPYDIR} %{IncludeDir.glm}/glm/ headers/glm/",
-        "{COPYDIR} %{IncludeDir.imgui}/imgui/**.h headers/imgui/",
-        "{COPYDIR} %{IncludeDir.imguizmo}/imguizmo/**.h headers/imguizmo/",
-        "{COPYDIR} %{IncludeDir.robin_hood}/robin_hood/**.h headers/robin_hood/",
-        "{COPYDIR} %{IncludeDir.spdlog}/**.h headers/",
-        "{COPYDIR} %{IncludeDir.yaml}/**.h headers/"
+        "{COPYDIR} %{IncludeDir.glm}/glm/ headers/glm/"
     }
     
     -- Windows
@@ -98,6 +92,15 @@ project "Mahakam"
             "opengl32.lib",
             "assimp-vc142-mt"
         }
+        
+        postbuildcommands {
+            "{COPYDIR} src/Mahakam/*.h headers/Mahakam",
+            "{COPYDIR} %{IncludeDir.imgui}/imgui/*.h headers/imgui/",
+            "{COPYDIR} %{IncludeDir.imguizmo}/imguizmo/*.h headers/imguizmo/",
+            "{COPYDIR} %{IncludeDir.robin_hood}/robin_hood/*.h headers/robin_hood/",
+            "{COPYDIR} %{IncludeDir.spdlog}/*.h headers/",
+            "{COPYDIR} %{IncludeDir.yaml}/*.h headers/"
+        }
 
     -- Linux
     filter "system:linux"
@@ -115,6 +118,15 @@ project "Mahakam"
         links {
             "assimp",
             "zlibstatic"
+        }
+        
+        postbuildcommands {
+            "{COPYDIR} src/Mahakam/**/*.h headers/Mahakam",
+            "{COPYDIR} %{IncludeDir.imgui}/imgui/**/*.h headers/imgui/",
+            "{COPYDIR} %{IncludeDir.imguizmo}/imguizmo/**/*.h headers/imguizmo/",
+            "{COPYDIR} %{IncludeDir.robin_hood}/robin_hood/**/*.h headers/robin_hood/",
+            "{COPYDIR} %{IncludeDir.spdlog}/**/*.h headers/",
+            "{COPYDIR} %{IncludeDir.yaml}/**/*.h headers/"
         }
     
     -- Windows Debug

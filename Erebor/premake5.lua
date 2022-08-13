@@ -19,7 +19,6 @@ project "Erebor"
     includedirs {
         "src",
         "../Mahakam/headers",
-        "../Mahakam/headers/Mahakam",
     }
 
     links { "Mahakam" }

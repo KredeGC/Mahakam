@@ -3,10 +3,10 @@
 #define MH_STANDALONE_TITLE "Sandbox"
 #define MH_STANDALONE_ICON "internal/icons/icon-64.png"
 
-#include <MahakamRuntime.h>
+#include <Mahakam/MahakamRuntime.h>
 
 #if MH_STANDALONE
-#include <MahakamEntrypoint.h>
+#include <Mahakam/MahakamEntrypoint.h>
 #endif
 
 using namespace Mahakam;

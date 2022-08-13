@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Mahakam.h>
+#include <Mahakam/Mahakam.h>
 #include "Mahakam/Core/EntryPoint.h"
 
 #if !defined(MH_STANDALONE_TITLE)

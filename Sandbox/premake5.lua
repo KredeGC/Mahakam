@@ -19,7 +19,6 @@ project "Sandbox"
     includedirs {
         "src",
         "../Mahakam/headers",
-        "../Mahakam/headers/Mahakam",
     }
 
     links { "Mahakam" }

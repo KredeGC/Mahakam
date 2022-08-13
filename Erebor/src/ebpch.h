@@ -21,4 +21,4 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
-#include <Mahakam.h>
+#include <Mahakam/Mahakam.h>
