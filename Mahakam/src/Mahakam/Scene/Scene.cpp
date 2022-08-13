@@ -8,6 +8,7 @@
 #include "Components/LightComponent.h"
 #include "Components/MeshComponent.h"
 #include "Components/ParticleSystemComponent.h"
+#include "Components/RelationshipComponent.h"
 #include "Components/TagComponent.h"
 #include "Components/TransformComponent.h"
 #include "Entity.h"
@@ -16,7 +17,6 @@
 
 #include "Mahakam/Audio/AudioEngine.h"
 
-#include "Mahakam/Core/Random.h"
 #include "Mahakam/Core/Utility.h"
 
 #include "Mahakam/Renderer/GL.h"
@@ -271,26 +271,35 @@ namespace Mahakam
 		}
 	}
 
-	Entity Scene::CreateEntity(uint64_t ID, uint64_t parentID, const std::string& name)
-	{
-		std::string tagName = name.empty() ? "Entity" : name;
-		Entity entity(registry.create(), this);
-		auto& tag = entity.AddComponent<TagComponent>(ID, parentID, tagName);
-		return entity;
-	}
-
 	Entity Scene::CreateEntity(const std::string& name)
 	{
-		uint64_t id = Random::GetRandomID64();
 		std::string tagName = name.empty() ? "Entity" : name;
 		Entity entity(registry.create(), this);
-		auto& tag = entity.AddComponent<TagComponent>(id, 0, tagName);
+		auto& tag = entity.AddComponent<TagComponent>(tagName);
+		auto& relation = entity.AddComponent<RelationshipComponent>();
 		return entity;
 	}
 
 	void Scene::DestroyEntity(Entity entity)
 	{
+		entity.DestroyChildren();
+
+		entity.RemoveParent();
+
 		registry.destroy(entity);
+	}
+
+	void Scene::Sort()
+	{
+		/*registry.sort<RelationshipComponent>([&](const entt::entity lhs, const entt::entity rhs) {
+			const auto& clhs = registry.get<RelationshipComponent>(lhs);
+			const auto& crhs = registry.get<RelationshipComponent>(rhs);
+
+			return true;
+
+			return crhs.Parent == lhs || clhs.Next == rhs
+				|| (!(clhs.Parent == rhs || crhs.Next == lhs) && (uint32_t(clhs.Parent) < uint32_t(crhs.Parent) || (clhs.Parent == crhs.Parent && &clhs < &crhs)));
+		});*/
 	}
 
 	//Ref<Scene> Scene::CreateEmpty()

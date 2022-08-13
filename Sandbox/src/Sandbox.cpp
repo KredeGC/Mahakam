@@ -67,7 +67,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	entity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 	entity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
-#if 1
+#if 0
 	// Create skinned material
 	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
@@ -132,7 +132,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	particleEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
-#if 1
+#if 0
 	// Create backpack model
 	SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
 
@@ -171,6 +171,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	Asset<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
 	Asset<Material> baseMaterial = Asset<Material>("import/assets/materials/WhiteDiffuse.material.import");
 
+	// Create base collection entity to store in
+	Entity sphereCollection = scene->CreateEntity("Spheres");
+
 	// Create scene entities
 	for (int y = 0; y < 10; y++)
 	{
@@ -183,11 +186,30 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 			// Create entity
 			Entity entity = scene->CreateEntity(std::string("Sphere ") + std::to_string(x) + std::string(",") + std::to_string(y));
+			entity.SetParent(sphereCollection);
 			entity.AddComponent<MeshComponent>(sphereMesh, material);
 			entity.AddComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
 			entity.GetComponent<TransformComponent>().SetStatic(true);
+
+			sphereCollection = entity; // TEMPORARY: Just to see the depth
 		}
 	}
+
+	Entity entity1 = scene->CreateEntity("ID 1");
+	Entity entity2 = scene->CreateEntity("ID 2");
+	Entity entity3 = scene->CreateEntity("ID 3");
+	Entity entity4 = scene->CreateEntity("ID 4");
+
+	entity1.SetParent(entity3);
+	entity4.SetParent(entity3);
+	entity2.SetParent(entity1);
+
+	MH_CORE_TRACE("ID 1 has entt: {0}", uint32_t(entity1));
+	MH_CORE_TRACE("ID 2 has entt: {0}", uint32_t(entity2));
+	MH_CORE_TRACE("ID 3 has entt: {0}", uint32_t(entity3));
+	MH_CORE_TRACE("ID 4 has entt: {0}", uint32_t(entity4));
+
+	scene->Sort();
 }
 
 

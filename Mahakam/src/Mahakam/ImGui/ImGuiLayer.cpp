@@ -69,7 +69,17 @@ namespace Mahakam
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
+		// Default fonts
 		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Roboto/Roboto-Regular.ttf", 18.0f);
+
+		// Font icons
+		ImFontConfig config;
+		config.MergeMode = true;
+		config.GlyphMinAdvanceX = 18.0f; // Use if you want to make the icon monospaced
+		static const ImWchar icon_ranges[] = { 0xe800, 0xf02e, 0 };
+		io.Fonts->AddFontFromFileTTF("assets/fonts/IcoFont/icofont.ttf", 18.0f, &config, icon_ranges);
+
+		io.Fonts->Build();
 
 		ImGui::StyleColorsDark();
 

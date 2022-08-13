@@ -64,6 +64,7 @@ project "Mahakam"
     }
     
     postbuildcommands {
+        "{RMDIR} headers",
         "{COPYDIR} src/*.h headers/Mahakam",
         "{COPYDIR} %{IncludeDir.entt}/*.hpp headers/",
         "{COPYDIR} %{IncludeDir.glm}/glm/ headers/glm/",

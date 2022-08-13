@@ -110,7 +110,7 @@ namespace Mahakam
 
 				std::string name = entity["Tag"].as<std::string>();
 
-				Entity deserializedEntity = m_Scene->CreateEntity(id, parentID, name);
+				Entity deserializedEntity = m_Scene->CreateEntity(name);
 
 				DeserializeEntity(entity, deserializedEntity);
 			}
@@ -127,10 +127,14 @@ namespace Mahakam
 		{
 			TagComponent& tag = entity.GetComponent<TagComponent>();
 
+			// TODO: Make an UnorderedMap<entt:entity, unit64_t> with random IDs for each entity
+			// Then go through each entity and serialize their ID and relationship
+			// NOTICE: It will probably need to be serialized in order of parent > child, otherwise child entities could be created before their parents
+
+			uint64_t id = Random::GetRandomID64();
+
 			emitter << YAML::Key << "ID";
-			emitter << YAML::Value << tag.ID;
-			emitter << YAML::Key << "Parent";
-			emitter << YAML::Value << tag.ParentID;
+			emitter << YAML::Value << id;
 			emitter << YAML::Key << "Tag";
 			emitter << YAML::Value << tag.Tag;
 		}

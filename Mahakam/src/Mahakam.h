@@ -91,6 +91,7 @@
 #include "Mahakam/Scene/Components/LightComponent.h"
 #include "Mahakam/Scene/Components/MeshComponent.h"
 #include "Mahakam/Scene/Components/ParticleSystemComponent.h"
+#include "Mahakam/Scene/Components/RelationshipComponent.h"
 #include "Mahakam/Scene/Components/TagComponent.h"
 #include "Mahakam/Scene/Components/TransformComponent.h"
 #include "Mahakam/Scene/ComponentRegistry.h"

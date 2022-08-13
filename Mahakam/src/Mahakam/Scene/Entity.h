@@ -31,6 +31,11 @@ namespace Mahakam
 			return !operator==(other);
 		}
 
+		void SetParent(Entity parent);
+		Entity GetParent(Entity parent);
+		void RemoveParent();
+		void DestroyChildren();
+
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args)
 		{
