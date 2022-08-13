@@ -71,8 +71,8 @@ project "Mahakam"
         "{MKDIR} headers/imgui",
         "{MKDIR} headers/imguizmo",
         "{MKDIR} headers/robin_hood",
-        "{COPYDIR} %{IncludeDir.entt}/ headers/",
-        "{COPYDIR} %{IncludeDir.glm}/glm/ headers/glm/"
+        "{COPYDIR} %{IncludeDir.entt} headers/",
+        "{COPYDIR} %{IncludeDir.glm}/glm headers/glm/"
     }
     
     -- Windows
