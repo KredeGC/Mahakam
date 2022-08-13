@@ -124,7 +124,7 @@ project "Mahakam"
             "{COPYDIR} src/Mahakam/**/*.h headers/Mahakam",
             "{COPYDIR} %{IncludeDir.imgui}/imgui/**/*.h headers/imgui/",
             "{COPYDIR} %{IncludeDir.imguizmo}/imguizmo/**/*.h headers/imguizmo/",
-            "{COPYDIR} %{IncludeDir.robin_hood}/robin_hood/**/*.h headers/robin_hood/",
+            "{COPYDIR} %{IncludeDir.robin_hood}/robin_hood/*.h headers/robin_hood/",
             "{COPYDIR} %{IncludeDir.spdlog}/**/*.h headers/",
             "{COPYDIR} %{IncludeDir.yaml}/**/*.h headers/"
         }
