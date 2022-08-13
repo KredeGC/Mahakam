@@ -46,6 +46,21 @@ namespace Mahakam
 		template<typename Fn>
 		void ForEachEntity(Fn func)
 		{
+			const entt::entity* data = registry.data();
+			for (size_t i = 0; i < registry.size(); i++)
+			{
+				const entt::entity& handle = data[i];
+				if (registry.valid(handle))
+				{
+					Entity entity{ handle, this };
+					func(entity);
+				}
+			}
+		}
+
+		template<typename Fn>
+		void ForEachEntityReverse(Fn func)
+		{
 			return registry.each(func);
 		}
 

@@ -6,6 +6,7 @@
 #include "Mahakam/Renderer/Material.h"
 
 #include "Components/TagComponent.h"
+#include "Components/RelationshipComponent.h"
 #include "Components/TransformComponent.h"
 
 #include "ComponentRegistry.h"
@@ -38,13 +39,23 @@ namespace Mahakam
 
 		emitter << YAML::Key << "Entities";
 		emitter << YAML::Value << YAML::BeginSeq;
-		m_Scene->registry.each([&](auto entityID)
+		m_Scene->ForEachEntity([&](Entity entity)
 		{
-			Entity entity = { entityID, m_Scene.get() };
 			if (!entity)
 				return;
 
-			SerializeEntity(emitter, entity);
+			// Serialize while sorting
+			if (entity.HasComponent<RelationshipComponent>())
+			{
+				auto& relation = entity.GetComponent<RelationshipComponent>();
+
+				if (!relation.Parent)
+					SerializeEntity(emitter, entity);
+			}
+			else
+			{
+				SerializeEntity(emitter, entity);
+			}
 		});
 		emitter << YAML::EndSeq;
 		emitter << YAML::EndMap;
@@ -55,6 +66,8 @@ namespace Mahakam
 
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
+		m_Entities.clear();
+
 		YAML::Node data;
 		try
 		{
@@ -102,15 +115,39 @@ namespace Mahakam
 		auto entities = data["Entities"];
 		if (entities)
 		{
+			m_Entities.reserve(entities.size());
+
 			for (auto entity : entities)
 			{
-				uint64_t id = entity["ID"].as<uint64_t>();
+				uint32_t id = entt::null;
+				auto idNode = entity["ID"];
+				if (idNode)
+					id = idNode.as<uint32_t>();
 
-				uint64_t parentID = entity["ParentID"].as<uint64_t>();
+				uint32_t parent = entt::null;
+				auto parentNode = entity["Parent"];
+				if (parentNode)
+					parent = parentNode.as<uint32_t>();
 
-				std::string name = entity["Tag"].as<std::string>();
+				std::string tag;
+				auto tagNode = entity["Tag"];
+				if (tagNode)
+					tag = tagNode.as<std::string>();
 
-				Entity deserializedEntity = m_Scene->CreateEntity(name);
+				MH_CORE_TRACE(tag);
+
+				Entity deserializedEntity = m_Scene->CreateEntity(tag);
+				if (parent)
+				{
+					auto iter = m_Entities.find(parent);
+					if (iter != m_Entities.end())
+					{
+						Entity parentEntity = { iter->second, m_Scene.get() };
+						deserializedEntity.SetParent(parentEntity);
+					}
+				}
+
+				m_Entities[id] = deserializedEntity;
 
 				DeserializeEntity(entity, deserializedEntity);
 			}
@@ -121,22 +158,29 @@ namespace Mahakam
 
 	void SceneSerializer::SerializeEntity(YAML::Emitter& emitter, Entity entity)
 	{
+		// m_Entities[entity] = uint32_t(entity);
+
 		emitter << YAML::BeginMap;
 
 		if (entity.HasComponent<TagComponent>())
 		{
 			TagComponent& tag = entity.GetComponent<TagComponent>();
 
-			// TODO: Make an UnorderedMap<entt:entity, unit64_t> with random IDs for each entity
-			// Then go through each entity and serialize their ID and relationship
-			// NOTICE: It will probably need to be serialized in order of parent > child, otherwise child entities could be created before their parents
-
-			uint64_t id = Random::GetRandomID64();
-
 			emitter << YAML::Key << "ID";
-			emitter << YAML::Value << id;
+			emitter << YAML::Value << uint32_t(entity);
 			emitter << YAML::Key << "Tag";
 			emitter << YAML::Value << tag.Tag;
+		}
+
+		if (entity.HasComponent<RelationshipComponent>())
+		{
+			RelationshipComponent& relation = entity.GetComponent<RelationshipComponent>();
+
+			if (relation.Parent)
+			{
+				emitter << YAML::Key << "Parent";
+				emitter << YAML::Value << uint32_t(relation.Parent);
+			}
 		}
 
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
@@ -153,6 +197,19 @@ namespace Mahakam
 		}
 
 		emitter << YAML::EndMap;
+
+		if (entity.HasComponent<RelationshipComponent>())
+		{
+			RelationshipComponent& relation = entity.GetComponent<RelationshipComponent>();
+
+			Entity current = relation.First;
+			while (current)
+			{
+				SerializeEntity(emitter, current);
+
+				current = current.GetComponent<RelationshipComponent>().Next;
+			}
+		}
 	}
 
 	void SceneSerializer::DeserializeEntity(YAML::Node& node, Entity entity)

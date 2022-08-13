@@ -26,7 +26,8 @@ namespace Mahakam::Editor
 
 					ImGui::BeginChild("File Browser Child", { 0, -2 }, false);
 
-					ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == s_AssetDirectory) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+					ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == s_AssetDirectory) ? ImGuiTreeNodeFlags_Selected : 0);
+					flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
 					std::string fileString = s_AssetDirectory.string();
 					const char* fileCStr = fileString.c_str();
@@ -71,7 +72,8 @@ namespace Mahakam::Editor
 				std::filesystem::path path = directory.path();
 				std::string pathName = directory.path().filename().string();
 
-				ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == path) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+				ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == path) ? ImGuiTreeNodeFlags_Selected : 0);
+				flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
 				bool open = ImGui::TreeNodeEx(path.string().c_str(), flags, "%s", pathName.c_str());
 

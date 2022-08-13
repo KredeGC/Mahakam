@@ -20,18 +20,28 @@ namespace Mahakam::Editor
 
 		auto& relation = entity.GetComponent<RelationshipComponent>();
 
+		// Remove leaf node on parents with no children
 		if (!relation.First)
 			flags |= ImGuiTreeNodeFlags_Leaf;
 
+		// Create tag
 		char tagName[256];
-		strcpy(tagName, u8"\ueea5");
-		strcat(tagName, tag.c_str());
+
+		// Choose icon to show
+		if (entity.HasComponent<TransformComponent>())
+			strcpy(tagName, u8"\ueef7"); // Cube icon
+		else
+			strcpy(tagName, u8"\ueea5"); // Archive icon
+
+		strncat(tagName, tag.c_str(), 252);
 
 		bool open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tagName);
 
-		if (ImGui::IsItemClicked())
+		// If entity is clicked (not the arrow)
+		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
 			Selection::SetSelectedEntity(entity);
 
+		// If entity is right-clicked
 		if (ImGui::BeginPopupContextItem())
 		{
 			ImGui::TextDisabled("%s", tagName);
@@ -55,6 +65,7 @@ namespace Mahakam::Editor
 			ImGui::EndPopup();
 		}
 
+		// If entity is open
 		if (open)
 		{
 			if (m_SafeContext)
@@ -171,11 +182,11 @@ namespace Mahakam::Editor
 				if (context)
 				{
 					m_SafeContext = true;
-					context->ForEachEntity([&](auto handle)
+					context->ForEachEntity([&](Entity entity)
 					{
 						if (m_SafeContext)
 						{
-							Entity entity(handle, context.get());
+							//Entity entity(handle, context.get());
 
 							// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
 							auto& relation = entity.GetComponent<RelationshipComponent>();
