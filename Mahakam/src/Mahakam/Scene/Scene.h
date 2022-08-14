@@ -70,6 +70,13 @@ namespace Mahakam
 			return registry.view<Args...>().each(func);
 		}
 
+		template<typename ... Args>
+		void DestroyAllEntities()
+		{
+			auto view = registry.view<Args...>();
+			registry.destroy(view.begin(), view.end());
+		}
+
 		void SetSkyboxMaterial(Asset<Material> material) { skyboxMaterial = material; }
 		void SetSkyboxIrradiance(Asset<TextureCube> irradiance) { skyboxIrradiance = irradiance; }
 		void SetSkyboxSpecular(Asset<TextureCube> specular) { skyboxSpecular = specular; }

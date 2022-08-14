@@ -3,22 +3,66 @@
 
 #include "Scene.h"
 
+#include "Components/DeleteComponent.h"
 #include "Components/RelationshipComponent.h"
 
 namespace Mahakam
 {
+	static void ClearParent(Entity entity, RelationshipComponent& relation)
+	{
+		if (relation.Parent)
+		{
+			auto& parentRelation = relation.Parent.GetComponent<RelationshipComponent>();
+
+			Entity prev = relation.Prev;
+			Entity next = relation.Next;
+
+			// Update the surrounding children
+			if (prev)
+				prev.GetComponent<RelationshipComponent>().Next = next;
+			if (next)
+				next.GetComponent<RelationshipComponent>().Prev = prev;
+			if (parentRelation.First == entity)
+				parentRelation.First = next;
+		}
+	}
+
+	static void MarkForDeletion(Entity entity, RelationshipComponent& relation)
+	{
+		// Recursively mark children for deletion
+		Entity current = relation.First;
+		while (current)
+		{
+			auto& currentRelation = current.GetComponent<RelationshipComponent>();
+
+			MarkForDeletion(current, currentRelation);
+
+			current = currentRelation.Next;
+		}
+
+		if (!entity.HasComponent<DeleteComponent>())
+			entity.AddComponent<DeleteComponent>();
+	}
+
 	Entity::Entity(entt::entity handle, Scene* scene)
 		: handle(handle), scene(scene) {}
 
 	void Entity::SetParent(Entity parent)
 	{
 		auto& relation = GetComponent<RelationshipComponent>();
-		auto& parentRelation = parent.GetComponent<RelationshipComponent>();
 
 		// Clear our current parent
-		RemoveParent();
+		ClearParent(*this, relation);
 
+		// Clear the relationship
+		relation.Prev = {};
+		relation.Next = {};
 		relation.Parent = parent;
+
+		// If the want-to-be parent isn't valid
+		if (!parent) return;
+
+		auto& parentRelation = parent.GetComponent<RelationshipComponent>();
 
 		// Get the last child of the parent
 		Entity current = parentRelation.First;
@@ -49,49 +93,15 @@ namespace Mahakam
 		return GetComponent<RelationshipComponent>().Parent;
 	}
 
-	void Entity::RemoveParent()
+	void Entity::Delete()
 	{
 		auto& relation = GetComponent<RelationshipComponent>();
 
-		if (relation.Parent)
-		{
-			auto& parentRelation = relation.Parent.GetComponent<RelationshipComponent>();
+		// Clear our current parent
+		ClearParent(*this, relation);
 
-			Entity prev = relation.Prev;
-			Entity next = relation.Next;
-
-			// Update the surrounding children
-			if (prev)
-				prev.GetComponent<RelationshipComponent>().Next = next;
-			if (next)
-				next.GetComponent<RelationshipComponent>().Prev = prev;
-			if (parentRelation.First == *this)
-				parentRelation.First = next;
-		}
-
-		// Clear the relationship
-		relation.Prev = {};
-		relation.Next = {};
-		relation.Parent = {};
-	}
-
-	void Entity::DestroyChildren()
-	{
-		auto& relation = GetComponent<RelationshipComponent>();
-
-		// Go through each child and destroy it
-		Entity current = relation.First;
-		while (current)
-		{
-			Entity next = current.GetComponent<RelationshipComponent>().Next;
-
-			current.DestroyChildren();
-
-			scene->registry.destroy(current.handle);
-
-			current = next;
-		}
-
-		relation.First = {};
+		// Mark children for deletion
+		// No need to reset their parents, they will soon be gone :)
+		MarkForDeletion(*this, relation);
 	}
 }

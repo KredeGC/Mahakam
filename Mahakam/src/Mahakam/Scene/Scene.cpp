@@ -5,6 +5,7 @@
 #include "Components/AudioListenerComponent.h"
 #include "Components/AudioSourceComponent.h"
 #include "Components/CameraComponent.h"
+#include "Components/DeleteComponent.h"
 #include "Components/LightComponent.h"
 #include "Components/MeshComponent.h"
 #include "Components/ParticleSystemComponent.h"
@@ -282,26 +283,27 @@ namespace Mahakam
 
 	void Scene::DestroyEntity(Entity entity)
 	{
-		entity.DestroyChildren();
-
-		entity.RemoveParent();
-
 		registry.destroy(entity);
 	}
 
 	void Scene::Sort()
 	{
-		registry.sort<RelationshipComponent>([&](const entt::entity _lhs, const entt::entity _rhs) {
-			Entity lhs{ _lhs, this };
-			Entity rhs{ _rhs, this };
+		registry.sort<RelationshipComponent>([&](const entt::entity lhs, const entt::entity rhs) {
+			const auto& clhs = registry.get<RelationshipComponent>(lhs);
+			const auto& crhs = registry.get<RelationshipComponent>(rhs);
 
-			const auto& clhs = lhs.GetComponent<RelationshipComponent>();
-			const auto& crhs = rhs.GetComponent<RelationshipComponent>();
-
-			bool rightParent = crhs.Parent == lhs;
+			/*bool rightParent = crhs.Parent == lhs;
 			bool leftSide = clhs.Next == rhs;
+			bool notRelated = !(clhs.Parent == rhs || crhs.Next == lhs);
+			bool lowerParent = entt::entity(clhs.Parent) < entt::entity(crhs.Parent);
+			bool lowerAddress = (clhs.Parent == crhs.Parent && &clhs < &crhs);
 
-			return rightParent || leftSide;
+			return rightParent || leftSide || (notRelated && (lowerParent || lowerAddress));*/
+
+			uint32_t weightL = clhs.Parent ? uint32_t(clhs.Parent) : 0;
+			uint32_t weightR = crhs.Parent ? uint32_t(crhs.Parent) : 0;
+
+			return weightL < weightR;
 		});
 	}
 

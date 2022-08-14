@@ -8,7 +8,6 @@ namespace Mahakam::Editor
 	{
 	private:
 		bool m_Open = true;
-		bool m_SafeContext = true;
 
 	public:
 		SceneHierarchyPanel() = default;

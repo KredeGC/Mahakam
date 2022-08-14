@@ -199,15 +199,18 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	Entity entity2 = scene->CreateEntity("ID 2");
 	Entity entity3 = scene->CreateEntity("ID 3");
 	Entity entity4 = scene->CreateEntity("ID 4");
+	Entity entity5 = scene->CreateEntity("ID 5");
+	Entity entity6 = scene->CreateEntity("ID 6");
+	Entity entity7 = scene->CreateEntity("ID 7");
+	Entity entity8 = scene->CreateEntity("ID 8");
 
-	entity1.SetParent(entity3);
-	entity4.SetParent(entity3);
+	entity1.SetParent(entity6);
 	entity2.SetParent(entity1);
-
-	MH_CORE_TRACE("ID 1 has entt: {0}", uint32_t(entity1));
-	MH_CORE_TRACE("ID 2 has entt: {0}", uint32_t(entity2));
-	MH_CORE_TRACE("ID 3 has entt: {0}", uint32_t(entity3));
-	MH_CORE_TRACE("ID 4 has entt: {0}", uint32_t(entity4));
+	entity3.SetParent(entity4);
+	entity4.SetParent(entity1);
+	entity5.SetParent(entity2);
+	entity7.SetParent(entity5);
+	entity8.SetParent(entity4);
 
 	scene->Sort();
 }

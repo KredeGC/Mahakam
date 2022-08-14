@@ -12,8 +12,6 @@ namespace Mahakam::Editor
 {
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity, Ref<Scene> context)
 	{
-		if (!m_SafeContext) return;
-
 		std::string& tag = entity.GetComponent<TagComponent>().Tag;
 
 		ImGuiTreeNodeFlags flags = ((entity == Selection::GetSelectedEntity()) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
@@ -54,12 +52,10 @@ namespace Mahakam::Editor
 
 			if (ImGui::MenuItem("Delete"))
 			{
-				m_SafeContext = false;
-
 				if (Selection::GetSelectedEntity() == entity)
 					Selection::SetSelectedEntity({});
 
-				context->DestroyEntity(entity);
+				entity.Delete();
 			}
 
 			ImGui::EndPopup();
@@ -68,21 +64,12 @@ namespace Mahakam::Editor
 		// If entity is open
 		if (open)
 		{
-			if (m_SafeContext)
+			Entity current = relation.First;
+			while (current)
 			{
-				Entity current = relation.First;
-				while (current)
-				{
-					DrawEntityNode(current, context);
+				DrawEntityNode(current, context);
 
-					if (!m_SafeContext)
-					{
-						ImGui::TreePop();
-						return;
-					}
-
-					current = current.GetComponent<RelationshipComponent>().Next;
-				}
+				current = current.GetComponent<RelationshipComponent>().Next;
 			}
 
 			ImGui::TreePop();
@@ -181,21 +168,26 @@ namespace Mahakam::Editor
 				Ref<Scene> context = SceneManager::GetActiveScene();
 				if (context)
 				{
-					m_SafeContext = true;
+					//context->ForEach<RelationshipComponent>([&](auto handle, RelationshipComponent& relation)
+					//{
+					//	// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
+					//	Entity entity{ handle, context.get() };
+
+					//	// Start by drawing the root entities
+					//	// Recursively draw their children
+					//	//if (!relation.Parent)
+					//		DrawEntityNode(entity, context);
+					//});
+
 					context->ForEachEntity([&](Entity entity)
 					{
-						if (m_SafeContext)
-						{
-							//Entity entity(handle, context.get());
+						// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
+						auto& relation = entity.GetComponent<RelationshipComponent>();
 
-							// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
-							auto& relation = entity.GetComponent<RelationshipComponent>();
-
-							// Start by drawing the root entities
-							// Recursively draw their children
-							if (!relation.Parent)
-								DrawEntityNode(entity, context);
-						}
+						// Start by drawing the root entities
+						// Recursively draw their children
+						if (!relation.Parent)
+							DrawEntityNode(entity, context);
 					});
 
 					if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())

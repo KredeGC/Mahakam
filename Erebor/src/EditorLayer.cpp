@@ -422,6 +422,9 @@ namespace Mahakam::Editor
 		for (auto& window : windows)
 			window->OnUpdate(dt);
 #endif
+
+		// Delete any entities marked for deletion
+		SceneManager::GetActiveScene()->DestroyAllEntities<DeleteComponent>();
 	}
 
 	void EditorLayer::OnImGuiRender()

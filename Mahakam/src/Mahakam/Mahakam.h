@@ -87,6 +87,7 @@
 #include "Mahakam/Scene/Components/AnimatorComponent.h"
 #include "Mahakam/Scene/Components/AudioListenerComponent.h"
 #include "Mahakam/Scene/Components/AudioSourceComponent.h"
+#include "Mahakam/Scene/Components/DeleteComponent.h"
 #include "Mahakam/Scene/Components/CameraComponent.h"
 #include "Mahakam/Scene/Components/LightComponent.h"
 #include "Mahakam/Scene/Components/MeshComponent.h"
