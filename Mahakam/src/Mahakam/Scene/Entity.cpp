@@ -3,7 +3,7 @@
 
 #include "Scene.h"
 
-#include "Components/DeleteComponent.h"
+#include "Components/FlagComponents.h"
 #include "Components/RelationshipComponent.h"
 
 namespace Mahakam
@@ -41,7 +41,7 @@ namespace Mahakam
 		}
 
 		if (!entity.HasComponent<DeleteComponent>())
-			entity.AddComponent<DeleteComponent>();
+			entity.AddEmptyComponent<DeleteComponent>();
 	}
 
 	Entity::Entity(entt::entity handle, Scene* scene)

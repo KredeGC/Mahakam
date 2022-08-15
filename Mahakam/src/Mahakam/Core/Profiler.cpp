@@ -46,9 +46,20 @@ namespace Mahakam
 
 		auto duration = end - start;
 
-		results.push_back({ name, start, duration, std::this_thread::get_id() });
+		ProfileResult result = { name, 1, start, duration, std::this_thread::get_id() };
 
-		Instrumentor::Get().WriteProfile({ name, start, duration, std::this_thread::get_id() });
+		Instrumentor::Get().WriteProfile(result);
+
+		auto iter = results.rbegin();
+		if (iter != results.rend() && iter->Name == name)
+		{
+			iter->Count++;
+			iter->ElapsedTime += duration;
+		}
+		else
+		{
+			results.push_back(result);
+		}
 #endif
 	}
 

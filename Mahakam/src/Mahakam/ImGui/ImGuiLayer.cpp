@@ -69,7 +69,7 @@ namespace Mahakam
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-		// Default fonts
+		// Default font
 		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Roboto/Roboto-Regular.ttf", 18.0f);
 
 		// Font icons
@@ -78,6 +78,12 @@ namespace Mahakam
 		config.GlyphMinAdvanceX = 18.0f; // Use if you want to make the icon monospaced
 		static const ImWchar icon_ranges[] = { 0xe800, 0xf02e, 0 };
 		io.Fonts->AddFontFromFileTTF("assets/fonts/IcoFont/icofont.ttf", 18.0f, &config, icon_ranges);
+
+		// Mono font
+		ImFontConfig monoConfig;
+		monoConfig.GlyphMinAdvanceX = 8.0f;
+		monoConfig.GlyphMaxAdvanceX = 8.0f;
+		m_MonoFont = io.Fonts->AddFontFromFileTTF("assets/fonts/ProggyVector/ProggyVector Regular.ttf", 15.0f, &monoConfig);
 
 		io.Fonts->Build();
 
@@ -120,8 +126,6 @@ namespace Mahakam
 
 	void ImGuiLayer::Begin()
 	{
-		MH_PROFILE_FUNCTION();
-
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -131,8 +135,6 @@ namespace Mahakam
 
 	void ImGuiLayer::End()
 	{
-		MH_PROFILE_FUNCTION();
-
 		ImGuiIO& io = ImGui::GetIO();
 		Application* app = Application::GetInstance();
 		io.DisplaySize = ImVec2((float)app->GetWindow().GetWidth(), (float)app->GetWindow().GetHeight());

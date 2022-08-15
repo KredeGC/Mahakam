@@ -5,7 +5,7 @@
 #include "Components/AudioListenerComponent.h"
 #include "Components/AudioSourceComponent.h"
 #include "Components/CameraComponent.h"
-#include "Components/DeleteComponent.h"
+#include "Components/FlagComponents.h"
 #include "Components/LightComponent.h"
 #include "Components/MeshComponent.h"
 #include "Components/ParticleSystemComponent.h"
@@ -70,6 +70,13 @@ namespace Mahakam
 
 
 
+	static uint16_t RecursiveDepth(entt::registry& registry, const RelationshipComponent& relation)
+	{
+		if (relation.Parent)
+			return 1 + RecursiveDepth(registry, registry.get<RelationshipComponent>(relation.Parent));
+		else
+			return 0;
+	}
 
 	Scene::Scene()
 	{
@@ -103,11 +110,31 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
+		// Update matrix transforms
+		{
+			MH_PROFILE_SCOPE("Scene::OnUpdate - TransformComponent");
+
+			registry.view<RelationshipComponent, TransformComponent>().each([=](RelationshipComponent& relation, TransformComponent& transform)
+			{
+				if (relation.Parent && relation.Parent.HasComponent<TransformComponent>())
+				{
+					auto& parentTransform = relation.Parent.GetComponent<TransformComponent>();
+					const glm::mat4& parentMatrix = parentTransform.GetModelMatrix();
+
+					transform.UpdateModelMatrix(parentMatrix);
+				}
+				else
+				{
+					transform.UpdateModelMatrix(glm::mat4{ 1.0f });
+				}
+			});
+		}
+
 		// Update sound positions
 		{
-			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - AudioSourceComponent");
+			MH_PROFILE_SCOPE("Scene::OnUpdate - AudioSourceComponent");
 
-			registry.view<TransformComponent, AudioSourceComponent>().each([=](auto entity, TransformComponent& transformComponent, AudioSourceComponent& audioSourceComponent)
+			registry.view<TransformComponent, AudioSourceComponent>().each([=](TransformComponent& transformComponent, AudioSourceComponent& audioSourceComponent)
 			{
 				auto source = audioSourceComponent.GetAudioSource();
 				source->SetPosition(transformComponent.GetPosition());
@@ -116,9 +143,9 @@ namespace Mahakam
 
 		// Update animators
 		{
-			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - AnimatorComponent");
+			MH_PROFILE_SCOPE("Scene::OnUpdate - AnimatorComponent");
 
-			registry.view<AnimatorComponent, MeshComponent>().each([=](auto entity, AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
+			registry.view<AnimatorComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
 			{
 				auto& animator = animatorComponent.GetAnimator();
 
@@ -136,9 +163,9 @@ namespace Mahakam
 		// Get the listening source
 		TransformComponent* listener = nullptr;
 		{
-			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - AudioListenerComponent");
+			MH_PROFILE_SCOPE("Scene::OnUpdate - AudioListenerComponent");
 
-			registry.view<TransformComponent, AudioListenerComponent>().each([&](auto entity, TransformComponent& transform, AudioListenerComponent& audio)
+			registry.view<TransformComponent, AudioListenerComponent>().each([&](TransformComponent& transform, AudioListenerComponent& audio)
 			{
 				listener = &transform;
 			});
@@ -152,9 +179,9 @@ namespace Mahakam
 		CameraComponent* mainCamera = nullptr;
 		TransformComponent* mainTransform = nullptr;
 		{
-			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - CameraComponent");
+			MH_PROFILE_SCOPE("Scene::OnUpdate - CameraComponent");
 
-			registry.view<TransformComponent, CameraComponent>().each([&](auto entity, TransformComponent& transformComponent, CameraComponent& cameraComponent)
+			registry.view<TransformComponent, CameraComponent>().each([&](TransformComponent& transformComponent, CameraComponent& cameraComponent)
 			{
 				mainCamera = &cameraComponent;
 				mainTransform = &transformComponent;
@@ -182,9 +209,9 @@ namespace Mahakam
 
 		// Setup scene lights
 		{
-			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - LightComponent");
+			MH_PROFILE_SCOPE("Scene::OnUpdate - LightComponent");
 
-			registry.view<TransformComponent, LightComponent>().each([&](auto entity, TransformComponent& transformComponent, LightComponent& lightComponent)
+			registry.view<TransformComponent, LightComponent>().each([&](TransformComponent& transformComponent, LightComponent& lightComponent)
 			{
 				glm::vec3 pos = transformComponent.GetPosition();
 				glm::quat rot = transformComponent.GetRotation();
@@ -220,14 +247,14 @@ namespace Mahakam
 
 		// Begin the render loop
 		{
-			MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Render loop");
+			MH_PROFILE_SCOPE("Scene::OnUpdate - Render loop");
 			Renderer::BeginScene(camera, cameraTransform, environment);
 
 			// Render each entity with a mesh
 			{
-				MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - Submit");
+				MH_PROFILE_SCOPE("Scene::OnUpdate - Submit");
 
-				registry.view<TransformComponent, MeshComponent>().each([&](auto entity, TransformComponent& transformComponent, MeshComponent& meshComponent)
+				registry.view<TransformComponent, MeshComponent>().each([&](TransformComponent& transformComponent, MeshComponent& meshComponent)
 				{
 					auto& meshes = meshComponent.GetMeshes();
 					auto& materials = meshComponent.GetMaterials();
@@ -242,9 +269,9 @@ namespace Mahakam
 
 			// Render particle systems
 			{
-				MH_PROFILE_SCOPE("Mahakam::Scene::OnUpdate - SubmitParticles");
+				MH_PROFILE_SCOPE("Scene::OnUpdate - SubmitParticles");
 
-				registry.view<TransformComponent, ParticleSystemComponent>().each([=](auto entity, TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
+				registry.view<TransformComponent, ParticleSystemComponent>().each([=](TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
 				{
 					Renderer::SubmitParticles(transformComponent, particleComponent);
 				});
@@ -288,22 +315,37 @@ namespace Mahakam
 
 	void Scene::Sort()
 	{
-		registry.sort<RelationshipComponent>([&](const entt::entity lhs, const entt::entity rhs) {
-			const auto& clhs = registry.get<RelationshipComponent>(lhs);
-			const auto& crhs = registry.get<RelationshipComponent>(rhs);
+		registry.sort<RelationshipComponent>([&](const RelationshipComponent& clhs, const RelationshipComponent& crhs)
+		{
+			uint16_t lhsDepth = RecursiveDepth(registry, clhs);
+			uint16_t rhsDepth = RecursiveDepth(registry, crhs);
 
-			/*bool rightParent = crhs.Parent == lhs;
-			bool leftSide = clhs.Next == rhs;
-			bool notRelated = !(clhs.Parent == rhs || crhs.Next == lhs);
-			bool lowerParent = entt::entity(clhs.Parent) < entt::entity(crhs.Parent);
+			// TODO: Store the depth somehow
+			// Possibly sort by parents as well
+
+			bool lowerParent = lhsDepth < rhsDepth;
 			bool lowerAddress = (clhs.Parent == crhs.Parent && &clhs < &crhs);
 
-			return rightParent || leftSide || (notRelated && (lowerParent || lowerAddress));*/
+			return lowerParent || lowerAddress;
+		});
 
-			uint32_t weightL = clhs.Parent ? uint32_t(clhs.Parent) : 0;
-			uint32_t weightR = crhs.Parent ? uint32_t(crhs.Parent) : 0;
+		//registry.sort<RelationshipComponent, TransformComponent>();
 
-			return weightL < weightR;
+		registry.sort<TransformComponent>([&](const entt::entity lhs, const entt::entity rhs)
+		{
+			auto& clhs = registry.get<RelationshipComponent>(lhs);
+			auto& crhs = registry.get<RelationshipComponent>(rhs);
+
+			uint16_t lhsDepth = RecursiveDepth(registry, clhs);
+			uint16_t rhsDepth = RecursiveDepth(registry, crhs);
+
+			// TODO: Store the depth somehow
+			// Possibly sort by parents as well
+
+			bool lowerParent = lhsDepth < rhsDepth;
+			bool lowerAddress = (clhs.Parent == crhs.Parent && &clhs < &crhs);
+
+			return lowerParent || lowerAddress;
 		});
 	}
 

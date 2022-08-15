@@ -15,6 +15,9 @@ namespace Mahakam
 		glm::quat m_Rotation{ 1.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_Scale{ 1.0f, 1.0f, 1.0f };
 
+		glm::mat4 m_ModelMatrix{ 1.0f };
+
+		uint32_t m_ParentHash = 0;
 		uint8_t m_Flags = 0;
 
 	public:
@@ -28,37 +31,40 @@ namespace Mahakam
 
 		operator glm::mat4() { return GetModelMatrix(); }
 
-		inline void SetPosition(const glm::vec3& pos) { m_Position = pos; }
-		inline void SetRotation(const glm::quat& rot) { m_Rotation = rot; }
-		inline void SetEulerangles(const glm::vec3& euler) { m_Rotation = glm::quat(euler); }
-		inline void SetScale(const glm::vec3& sc) { m_Scale = sc; }
-		inline void SetStatic(bool isStatic)
-		{
-			if (isStatic != IsStatic())
-				m_Flags ^= 0x01;
-		}
-		inline void SetDirty(bool dirty)
-		{
-			if (dirty != IsStatic())
-				m_Flags ^= 0x02;
-		}
+		inline void SetPosition(const glm::vec3& pos) { m_Position = pos; m_Flags = 0x01; }
+		inline void SetRotation(const glm::quat& rot) { m_Rotation = rot; m_Flags = 0x01; }
+		inline void SetEulerangles(const glm::vec3& euler) { m_Rotation = glm::quat(euler); m_Flags = 0x01; }
+		inline void SetScale(const glm::vec3& sc) { m_Scale = sc; m_Flags = 0x01; }
 
 		inline const glm::vec3& GetPosition() const { return m_Position; }
 		inline const glm::quat& GetRotation() const { return m_Rotation; }
 		inline glm::vec3 GetEulerAngles() const { return glm::eulerAngles(m_Rotation); }
 		inline const glm::vec3& GetScale() const { return m_Scale; }
-		inline bool IsStatic() const { return m_Flags & 0x01; }
-		inline bool IsDirty() const { return m_Flags & 0x02; }
 
-		inline glm::vec3 GetForward() const { return glm::mat4(m_Rotation) * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f); }
+		inline glm::vec3 GetForward() const { return glm::mat4(m_Rotation) * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f); } // TODO: Why not do quat*vec3 instead of mat4*vec4?
 		inline glm::vec3 GetRight() const { return glm::mat4(m_Rotation) * glm::vec4(1.0f, 0.0f, 0.0f, 0.0f); }
 		inline glm::vec3 GetUp() const { return glm::mat4(m_Rotation) * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f); }
 
-		inline glm::mat4 GetModelMatrix() const
+		inline void UpdateModelMatrix(const glm::mat4& modelMatrix)
 		{
-			return glm::translate(glm::mat4(1.0f), m_Position)
-				* glm::toMat4(m_Rotation)
-				* glm::scale(glm::mat4(1.0f), m_Scale);
+			uint32_t hash = 2166136261U;
+			uint8_t* modelPtr = (uint8_t*)glm::value_ptr(modelMatrix);
+			for (uint32_t i = 0; i < sizeof(glm::mat4); ++i)
+				hash = (hash * 16777619U) ^ *(modelPtr + i);
+
+			if (m_ParentHash != hash || (m_Flags & 0x01) != 0)
+			{
+				m_ParentHash = hash;
+				m_Flags ^= 0x01;
+				m_ModelMatrix = modelMatrix * glm::translate(glm::mat4(1.0f), m_Position)
+					* glm::toMat4(m_Rotation)
+					* glm::scale(glm::mat4(1.0f), m_Scale);
+			}
+		}
+
+		inline const glm::mat4& GetModelMatrix() const
+		{
+			return m_ModelMatrix;
 		}
 	};
 

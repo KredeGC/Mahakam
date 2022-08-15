@@ -27,13 +27,15 @@ namespace Mahakam::Editor
 					}
 				}
 
+				ImGui::PushFont(Application::GetInstance()->GetImGuiLayer()->GetMonoFont());
 				for (auto& result : Profiler::GetResults())
 				{
-					std::string viewName = "%.3fms  " + result.name;
-					float milliseconds = result.elapsedTime.count() * 0.001f;
+					const char* format = "%.3fms %3d %s";
+					float milliseconds = result.ElapsedTime.count() * 0.001f;
 
-					ImGui::Text(viewName.c_str(), milliseconds);
+					ImGui::Text(format, milliseconds, result.Count, result.Name.c_str());
 				}
+				ImGui::PopFont();
 			}
 
 			ImGui::End();

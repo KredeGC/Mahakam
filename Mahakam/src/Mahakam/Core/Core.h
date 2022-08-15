@@ -49,10 +49,10 @@
 #define MH_PROFILE_SCOPE_LINE(name, line, flushRenderer) MH_PROFILE_SCOPE_LINE2(name, line, flushRenderer)
 
 #define MH_PROFILE_SCOPE(name) MH_PROFILE_SCOPE_LINE(name, __LINE__, false)
-#define MH_PROFILE_FUNCTION() MH_PROFILE_SCOPE(__FUNCTION__)
+#define MH_PROFILE_FUNCTION() MH_PROFILE_SCOPE(((char*)__FUNCTION__) + 9)
 
 #define MH_PROFILE_RENDERING_SCOPE(name) MH_PROFILE_SCOPE_LINE(name, __LINE__, true)
-#define MH_PROFILE_RENDERING_FUNCTION() MH_PROFILE_RENDERING_SCOPE(__FUNCTION__)
+#define MH_PROFILE_RENDERING_FUNCTION() MH_PROFILE_RENDERING_SCOPE(((char*)__FUNCTION__) + 9)
 
 #define MH_PROFILE_BEGIN_SESSION(name, filepath) ::Mahakam::Instrumentor::Get().BeginSession(name, filepath)
 #define MH_PROFILE_END_SESSION() ::Mahakam::Instrumentor::Get().EndSession()

@@ -88,8 +88,6 @@ namespace Mahakam
 	//void Renderer::BeginSceneImpl(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
 	MH_DEFINE_FUNC(Renderer::BeginSceneImpl, void, const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
 	{
-		MH_PROFILE_FUNCTION();
-
 		sceneData->environment = environment;
 
 		// Setup camera matrices
@@ -107,8 +105,6 @@ namespace Mahakam
 	//void Renderer::EndSceneImpl()
 	MH_DEFINE_FUNC(Renderer::EndSceneImpl, void)
 	{
-		MH_PROFILE_FUNCTION();
-
 		// Sort the render queue
 		std::sort(sceneData->renderQueue.begin(), sceneData->renderQueue.end());
 		std::sort(sceneData->particleQueue.begin(), sceneData->particleQueue.end());
@@ -283,8 +279,6 @@ namespace Mahakam
 	//void Renderer::DrawSkyboxImpl(SceneData* sceneData)
 	MH_DEFINE_FUNC(Renderer::DrawSkyboxImpl, void, SceneData* sceneData)
 	{
-		MH_PROFILE_FUNCTION();
-
 		if (sceneData->environment.skyboxMaterial)
 		{
 			sceneData->environment.skyboxMaterial->BindShader("GEOMETRY");

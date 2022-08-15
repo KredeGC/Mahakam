@@ -13,11 +13,12 @@ namespace Mahakam
 	public:
 		struct ProfileResult
 		{
-			std::string name;
+			std::string Name;
+			uint16_t Count;
 
-			std::chrono::duration<double, std::micro> start;
-			std::chrono::microseconds elapsedTime;
-			std::thread::id threadID;
+			std::chrono::duration<double, std::micro> Start;
+			std::chrono::microseconds ElapsedTime;
+			std::thread::id ThreadID;
 		};
 
 	private:

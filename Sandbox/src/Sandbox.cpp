@@ -123,7 +123,6 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
 	planeEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
 	planeEntity.GetComponent<TransformComponent>().SetScale({ 30.0f, 30.0f, 30.0f });
-	planeEntity.GetComponent<TransformComponent>().SetStatic(true);
 
 
 	// Create particle system
@@ -189,7 +188,6 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 			entity.SetParent(sphereCollection);
 			entity.AddComponent<MeshComponent>(sphereMesh, material);
 			entity.AddComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
-			entity.GetComponent<TransformComponent>().SetStatic(true);
 
 			sphereCollection = entity; // TEMPORARY: Just to see the depth
 		}

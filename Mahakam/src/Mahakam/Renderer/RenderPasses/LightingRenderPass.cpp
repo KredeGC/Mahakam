@@ -245,29 +245,25 @@ namespace Mahakam
 				Asset<Material>& material = sceneData->materialIDLookup[materialID];
 
 				// Hash shader
-				unsigned char shaderBytes[sizeof(Shader*)];
-				memcpy(shaderBytes, shader.Get().get(), sizeof(Shader*));
+				uint8_t* shaderPtr = (uint8_t*)shader.Ptr();
 				for (uint64_t i = 0; i < sizeof(Shader*); ++i)
-					hash = (hash * 16777619ULL) ^ shaderBytes[i];
+					hash = (hash * 16777619ULL) ^ *(shaderPtr + i);
 
 				// Hash material
 				uint64_t materialHash = material->Hash();
-				unsigned char materialBytes[sizeof(uint64_t)];
-				memcpy(materialBytes, &materialHash, sizeof(uint64_t));
+				uint8_t* materialPtr = (uint8_t*)&materialHash;
 				for (uint64_t i = 0; i < sizeof(uint64_t); ++i)
-					hash = (hash * 16777619ULL) ^ materialBytes[i];
+					hash = (hash * 16777619ULL) ^ *(materialPtr + i);
 
 				// Hash mesh
-				unsigned char meshBytes[sizeof(Mesh*)];
-				memcpy(meshBytes, mesh.Get().get(), sizeof(Mesh*));
+				uint8_t* meshPtr = (uint8_t*)mesh.Ptr();
 				for (uint64_t i = 0; i < sizeof(Mesh*); ++i)
-					hash = (hash * 16777619ULL) ^ meshBytes[i];
+					hash = (hash * 16777619ULL) ^ *(meshPtr + i);
 
 				// Hash transform
-				unsigned char transformBytes[sizeof(glm::mat4)];
-				memcpy(transformBytes, &transform, sizeof(glm::mat4));
+				uint8_t* transformPtr = (uint8_t*)glm::value_ptr(transform);
 				for (uint64_t i = 0; i < sizeof(glm::mat4); ++i)
-					hash = (hash * 16777619ULL) ^ transformBytes[i];
+					hash = (hash * 16777619ULL) ^ *(transformPtr + i);
 
 				// Add to render queue
 				renderQueue.push_back(drawID);

@@ -74,12 +74,12 @@ namespace Mahakam
 			json << std::setprecision(3) << std::fixed;
 			json << ",{";
 			json << "\"cat\":\"function\",";
-			json << "\"dur\":" << (result.elapsedTime.count()) << ',';
-			json << "\"name\":\"" << result.name << "\",";
+			json << "\"dur\":" << (result.ElapsedTime.count()) << ',';
+			json << "\"name\":\"" << result.Name << "\",";
 			json << "\"ph\":\"X\",";
 			json << "\"pid\":0,";
-			json << "\"tid\":" << result.threadID << ",";
-			json << "\"ts\":" << result.start.count();
+			json << "\"tid\":" << result.ThreadID << ",";
+			json << "\"ts\":" << result.Start.count();
 			json << "}";
 
 			std::lock_guard lock(m_Mutex);

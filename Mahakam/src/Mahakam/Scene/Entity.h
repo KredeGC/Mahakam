@@ -43,6 +43,14 @@ namespace Mahakam
 		}
 
 		template<typename T, typename... Args>
+		void AddEmptyComponent(Args&&... args)
+		{
+			MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
+
+			scene->registry.template emplace<T>(handle, std::forward<Args>(args)...);
+		}
+
+		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args)
 		{
 			MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");

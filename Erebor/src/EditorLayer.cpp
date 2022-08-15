@@ -45,20 +45,16 @@ namespace Mahakam::Editor
 		{
 			TransformComponent& transform = entity.GetComponent<TransformComponent>();
 
-			bool isStatic = transform.IsStatic();
-			if (ImGui::Checkbox("Static", &isStatic))
-				transform.SetStatic(isStatic);
-
 			glm::vec3 pos = transform.GetPosition();
-			if (GUI::DrawVec3Control("Position", pos, 0.0f, isStatic))
+			if (GUI::DrawVec3Control("Position", pos, 0.0f))
 				transform.SetPosition(pos);
 
 			glm::vec3 eulerAngles = glm::degrees(transform.GetEulerAngles());
-			if (GUI::DrawVec3Control("Rotation", eulerAngles, 0.0f, isStatic))
+			if (GUI::DrawVec3Control("Rotation", eulerAngles, 0.0f))
 				transform.SetEulerangles(glm::radians(eulerAngles));
 
 			glm::vec3 scale = transform.GetScale();
-			if (GUI::DrawVec3Control("Scale", scale, 1.0f, isStatic))
+			if (GUI::DrawVec3Control("Scale", scale, 1.0f))
 				transform.SetScale(scale);
 		};
 

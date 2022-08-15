@@ -52,7 +52,6 @@ namespace Mahakam
 			emitter << YAML::Key << "Translation" << YAML::Value << transform.GetPosition();
 			emitter << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
 			emitter << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
-			emitter << YAML::Key << "Static" << YAML::Value << transform.IsStatic();
 
 			return true;
 		};
@@ -63,7 +62,6 @@ namespace Mahakam
 			transform.SetPosition(node["Translation"].as<glm::vec3>());
 			transform.SetRotation(node["Rotation"].as<glm::quat>());
 			transform.SetScale(node["Scale"].as<glm::vec3>());
-			transform.SetStatic(node["Static"].as<bool>());
 
 			return true;
 		};

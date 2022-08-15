@@ -57,17 +57,17 @@ namespace Mahakam
 		inline static void SetRenderPasses(const std::vector<Ref<RenderPass>>& renderPasses) { SetRenderPassesImpl(renderPasses); }
 		
 		// Scenes
-		inline static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment) { BeginSceneImpl(cam, transform, environment); }
-		inline static void EndScene() { EndSceneImpl(); }
+		inline static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment) { MH_PROFILE_FUNCTION(); BeginSceneImpl(cam, transform, environment); }
+		inline static void EndScene() { MH_PROFILE_FUNCTION(); EndSceneImpl(); }
 		
-		inline static void Submit(const glm::mat4& transform, Asset<Mesh> mesh, Asset<Material> material) { SubmitImpl(transform, mesh, material); }
-		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { SubmitParticlesImpl(transform, particles); }
+		inline static void Submit(const glm::mat4& transform, Asset<Mesh> mesh, Asset<Material> material) { MH_PROFILE_FUNCTION(); SubmitImpl(transform, mesh, material); }
+		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { MH_PROFILE_FUNCTION(); SubmitParticlesImpl(transform, particles); }
 		
 		// Drawing
-		inline static void DrawSkybox(SceneData* sceneData) { DrawSkyboxImpl(sceneData); }
-		inline static void DrawScreenQuad() { DrawScreenQuadImpl(); }
-		inline static void DrawInstancedSphere(uint32_t amount) { DrawInstancedSphereImpl(amount); }
-		inline static void DrawInstancedPyramid(uint32_t amount) { DrawInstancedPyramidImpl(amount); }
+		inline static void DrawSkybox(SceneData* sceneData) { MH_PROFILE_FUNCTION(); DrawSkyboxImpl(sceneData); }
+		inline static void DrawScreenQuad() { MH_PROFILE_FUNCTION(); DrawScreenQuadImpl(); }
+		inline static void DrawInstancedSphere(uint32_t amount) { MH_PROFILE_FUNCTION(); DrawInstancedSphereImpl(amount); }
+		inline static void DrawInstancedPyramid(uint32_t amount) { MH_PROFILE_FUNCTION(); DrawInstancedPyramidImpl(amount); }
 
 		// Settings (TODO: Use a struct or delete)
 		inline static void EnableWireframe(bool enable) { EnableWireframeImpl(enable); }

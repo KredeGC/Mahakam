@@ -168,27 +168,27 @@ namespace Mahakam::Editor
 				Ref<Scene> context = SceneManager::GetActiveScene();
 				if (context)
 				{
-					//context->ForEach<RelationshipComponent>([&](auto handle, RelationshipComponent& relation)
-					//{
-					//	// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
-					//	Entity entity{ handle, context.get() };
-
-					//	// Start by drawing the root entities
-					//	// Recursively draw their children
-					//	//if (!relation.Parent)
-					//		DrawEntityNode(entity, context);
-					//});
-
-					context->ForEachEntity([&](Entity entity)
+					context->ForEach<RelationshipComponent>([&](auto handle, RelationshipComponent& relation)
 					{
 						// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
-						auto& relation = entity.GetComponent<RelationshipComponent>();
+						Entity entity{ handle, context.get() };
 
 						// Start by drawing the root entities
 						// Recursively draw their children
-						if (!relation.Parent)
+						//if (!relation.Parent)
 							DrawEntityNode(entity, context);
 					});
+
+					//context->ForEachEntity([&](Entity entity)
+					//{
+					//	// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
+					//	auto& relation = entity.GetComponent<RelationshipComponent>();
+
+					//	// Start by drawing the root entities
+					//	// Recursively draw their children
+					//	if (!relation.Parent)
+					//		DrawEntityNode(entity, context);
+					//});
 
 					if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 						Selection::SetSelectedEntity({});
