@@ -63,18 +63,6 @@ project "Mahakam"
         "MH_BUILD"
     }
     
-    postbuildcommands {
-        "{RMDIR} headers",
-        "{MKDIR} headers",
-        "{MKDIR} headers/Mahakam",
-        "{MKDIR} headers/glm",
-        "{MKDIR} headers/imgui",
-        "{MKDIR} headers/imguizmo",
-        "{MKDIR} headers/robin_hood",
-        "{COPYDIR} %{IncludeDir.entt} headers/",
-        "{COPYDIR} %{IncludeDir.glm}/glm headers/glm/"
-    }
-    
     -- Windows
     filter "system:windows"
         systemversion "latest"
@@ -91,15 +79,6 @@ project "Mahakam"
         links {
             "opengl32.lib",
             "assimp-vc142-mt"
-        }
-        
-        postbuildcommands {
-            "{COPYDIR} src/Mahakam/*.h headers/Mahakam",
-            "{COPYDIR} %{IncludeDir.imgui}/imgui/*.h headers/imgui/",
-            "{COPYDIR} %{IncludeDir.imguizmo}/imguizmo/*.h headers/imguizmo/",
-            "{COPYDIR} %{IncludeDir.robin_hood}/robin_hood/*.h headers/robin_hood/",
-            "{COPYDIR} %{IncludeDir.spdlog}/*.h headers/",
-            "{COPYDIR} %{IncludeDir.yaml}/*.h headers/"
         }
 
     -- Linux
@@ -118,15 +97,6 @@ project "Mahakam"
         links {
             "assimp",
             "zlibstatic"
-        }
-        
-        postbuildcommands {
-            "{COPYDIR} src/Mahakam/**/*.h headers/Mahakam",
-            "{COPYDIR} %{IncludeDir.imgui}/imgui/**/*.h headers/imgui/",
-            "{COPYDIR} %{IncludeDir.imguizmo}/imguizmo/**/*.h headers/imguizmo/",
-            "{COPYDIR} %{IncludeDir.robin_hood}/robin_hood/*.h headers/robin_hood/",
-            "{COPYDIR} %{IncludeDir.spdlog}/**/*.h headers/",
-            "{COPYDIR} %{IncludeDir.yaml}/**/*.h headers/"
         }
     
     -- Windows Debug
