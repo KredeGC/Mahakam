@@ -78,11 +78,9 @@ namespace Mahakam::Math
 		return true;
 	}
 
-	bool DecomposeTransformRotation(const glm::mat4& transform, glm::quat& rotation)
+	bool DecomposeTransform(const glm::mat4& transform, glm::vec3& translation, glm::quat& rotation, glm::vec3& scale)
 	{
-		glm::vec3 Translation;
 		glm::vec3 Skew;
-		glm::vec3 Scale;
 
 		using namespace glm;
 		using T = float;
@@ -143,7 +141,7 @@ namespace Mahakam::Math
 		}
 
 		// Next take care of translation (easy).
-		Translation = vec<3, T, Q>(LocalMatrix[3]);
+		translation = vec<3, T, Q>(LocalMatrix[3]);
 		LocalMatrix[3] = vec<4, T, Q>(0, 0, 0, LocalMatrix[3].w);
 
 		vec<3, T, Q> Row[3], Pdum3;
@@ -154,7 +152,7 @@ namespace Mahakam::Math
 				Row[i][j] = LocalMatrix[i][j];
 
 		// Compute X scale factor and normalize first row.
-		Scale.x = length(Row[0]);// v3Length(Row[0]);
+		scale.x = length(Row[0]);// v3Length(Row[0]);
 
 		Row[0] = detail::scale(Row[0], static_cast<T>(1));
 
@@ -163,9 +161,9 @@ namespace Mahakam::Math
 		Row[1] = detail::combine(Row[1], Row[0], static_cast<T>(1), -Skew.z);
 
 		// Now, compute Y scale and normalize 2nd row.
-		Scale.y = length(Row[1]);
+		scale.y = length(Row[1]);
 		Row[1] = detail::scale(Row[1], static_cast<T>(1));
-		Skew.z /= Scale.y;
+		Skew.z /= scale.y;
 
 		// Compute XZ and YZ shears, orthogonalize 3rd row.
 		Skew.y = glm::dot(Row[0], Row[2]);
@@ -174,10 +172,10 @@ namespace Mahakam::Math
 		Row[2] = detail::combine(Row[2], Row[1], static_cast<T>(1), -Skew.x);
 
 		// Next, get Z scale and normalize 3rd row.
-		Scale.z = length(Row[2]);
+		scale.z = length(Row[2]);
 		Row[2] = detail::scale(Row[2], static_cast<T>(1));
-		Skew.y /= Scale.z;
-		Skew.x /= Scale.z;
+		Skew.y /= scale.z;
+		Skew.x /= scale.z;
 
 		// At this point, the matrix (in rows[]) is orthonormal.
 		// Check for a coordinate system flip.  If the determinant
@@ -187,7 +185,7 @@ namespace Mahakam::Math
 		{
 			for (length_t i = 0; i < 3; i++)
 			{
-				Scale[i] *= static_cast<T>(-1);
+				scale[i] *= static_cast<T>(-1);
 				Row[i] *= static_cast<T>(-1);
 			}
 		}

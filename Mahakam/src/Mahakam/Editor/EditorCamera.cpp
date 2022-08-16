@@ -115,11 +115,12 @@ namespace Mahakam::Editor
 
 			if (selectedEntity)
 			{
-				TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
-
-				const glm::vec3& target = transform.GetPosition();
-				Selection::SetOrbitTarget(target);
-				zoom = glm::length(target - position);
+				if (TransformComponent* transform = selectedEntity.TryGetComponent<TransformComponent>())
+				{
+					const glm::vec3& target = transform->GetModelMatrix()[3];
+					Selection::SetOrbitTarget(target);
+					zoom = glm::length(target - position);
+				}
 			}
 			break;
 		}

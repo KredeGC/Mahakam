@@ -172,6 +172,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 	// Create base collection entity to store in
 	Entity sphereCollection = scene->CreateEntity("Spheres");
+	sphereCollection.AddComponent<TransformComponent>().SetEulerangles({ 0.0f, 90.0f, 0.0f });
 
 	// Create scene entities
 	for (int y = 0; y < 10; y++)
@@ -189,7 +190,10 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 			entity.AddComponent<MeshComponent>(sphereMesh, material);
 			entity.AddComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
 
-			sphereCollection = entity; // TEMPORARY: Just to see the depth
+			if (x == 0 && y == 0)
+				entity.GetComponent<TransformComponent>().SetScale({ 2.0f, 1.0f, 1.0f });
+
+			//sphereCollection = entity; // TEMPORARY: Just to see the depth
 		}
 	}
 

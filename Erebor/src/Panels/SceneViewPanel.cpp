@@ -149,17 +149,33 @@ namespace Mahakam::Editor
 					float snapValues[3] = { snapValue, snapValue, snapValue };
 
 					// Draw transform gizmo
+					glm::mat4 deltaMatrix;
 					ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix),
-						(ImGuizmo::OPERATION)m_GizmoType, (ImGuizmo::MODE)m_LocalScope, glm::value_ptr(modelMatrix), 0, snap ? snapValues : 0);
+						(ImGuizmo::OPERATION)m_GizmoType, (ImGuizmo::MODE)m_LocalScope, glm::value_ptr(modelMatrix), glm::value_ptr(deltaMatrix), snap ? snapValues : 0);
 
 					if (ImGuizmo::IsUsing())
 					{
-						glm::vec3 position, eulerAngles, scale;
-						Math::DecomposeTransform(modelMatrix, position, eulerAngles, scale);
+						glm::mat4 parentMatrix{ 1.0f };
 
-						transform.SetPosition(position);
-						transform.SetEulerangles(eulerAngles);
-						transform.SetScale(scale);
+						if (RelationshipComponent* relation = selectedEntity.TryGetComponent<RelationshipComponent>())
+						{
+							if (relation->Parent && relation->Parent.HasComponent<TransformComponent>())
+								parentMatrix = glm::inverse(relation->Parent.GetComponent<TransformComponent>().GetModelMatrix());
+						}
+
+						glm::mat4 localMatrix = parentMatrix * modelMatrix;
+
+						glm::vec3 position, scale;
+						glm::quat rotation;
+
+						Math::DecomposeTransform(localMatrix, position, rotation, scale);
+
+						if (m_GizmoType == ImGuizmo::OPERATION::TRANSLATE)
+							transform.SetPosition(position);
+						else if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+							transform.SetRotation(rotation);
+						else if (m_GizmoType == ImGuizmo::OPERATION::SCALE)
+							transform.SetScale(scale);
 					}
 				}
 			}

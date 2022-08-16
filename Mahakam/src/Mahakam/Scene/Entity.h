@@ -63,6 +63,12 @@ namespace Mahakam
 		}
 
 		template<typename T>
+		T* TryGetComponent() const
+		{
+			return scene->registry.template try_get<T>(handle);
+		}
+
+		template<typename T>
 		T& GetComponent() const
 		{
 			MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
