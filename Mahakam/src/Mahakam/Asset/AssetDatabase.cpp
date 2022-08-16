@@ -2,7 +2,7 @@
 #include "AssetDatabase.h"
 
 #include "Mahakam/Core/Random.h"
-#include "Mahakam/Core/Utility.h"
+#include "Mahakam/Core/FileUtility.h"
 
 #include "AssetImporter.h"
 

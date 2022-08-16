@@ -29,7 +29,7 @@ namespace Mahakam
 			: m_Position(pos), m_Rotation(rot), m_Scale(scale)
 		{ }
 
-		operator glm::mat4() { return GetModelMatrix(); }
+		operator const glm::mat4&() const { return GetModelMatrix(); }
 
 		inline void SetPosition(const glm::vec3& pos) { m_Position = pos; m_Flags = 0x01; }
 		inline void SetRotation(const glm::quat& rot) { m_Rotation = rot; m_Flags = 0x01; }

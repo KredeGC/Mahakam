@@ -2,7 +2,7 @@
 #include "OpenGLBase.h"
 #include "OpenGLComputeShader.h"
 #include "OpenGLUtility.h"
-#include "Mahakam/Core/Utility.h"
+#include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Renderer/Texture.h"
 
 #include <filesystem>

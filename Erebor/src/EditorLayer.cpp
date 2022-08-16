@@ -5,6 +5,7 @@
 #include "Panels/AssetManagerPanel.h"
 #include "Panels/ConsolePanel.h"
 #include "Panels/ContentBrowserPanel.h"
+#include "Panels/EnvironmentPanel.h"
 #include "Panels/GameViewPanel.h"
 #include "Panels/ImportWizardPanel.h"
 #include "Panels/ProfilerPanel.h"
@@ -280,6 +281,10 @@ namespace Mahakam::Editor
 		// ContentBrowserPanel
 		EditorWindowRegistry::RegisterWindowClass<ContentBrowserPanel>("Content Browser");
 		EditorWindowRegistry::OpenWindow("Content Browser");
+
+		// EnvironmentPanel
+		EditorWindowRegistry::RegisterWindowClass<EnvironmentPanel>("Scene Environment");
+		EditorWindowRegistry::OpenWindow("Scene Environment");
 
 		// ImportWizardPanel
 		EditorWindowRegistry::EditorWindowProps panelProps;

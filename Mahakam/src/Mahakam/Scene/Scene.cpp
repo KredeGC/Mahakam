@@ -18,7 +18,9 @@
 
 #include "Mahakam/Audio/AudioEngine.h"
 
-#include "Mahakam/Core/Utility.h"
+#include "Mahakam/Core/FileUtility.h"
+
+#include "Mahakam/Math/Math.h"
 
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Material.h"
@@ -213,8 +215,13 @@ namespace Mahakam
 
 			registry.view<TransformComponent, LightComponent>().each([&](TransformComponent& transformComponent, LightComponent& lightComponent)
 			{
-				glm::vec3 pos = transformComponent.GetPosition();
-				glm::quat rot = transformComponent.GetRotation();
+				const glm::mat4& modelMatrix = transformComponent;
+
+				glm::vec3 pos = modelMatrix[3];
+				glm::quat rot;
+
+				Math::DecomposeRotation(modelMatrix, rot);
+
 				Light& light = lightComponent.GetLight();
 
 				switch (light.GetLightType())

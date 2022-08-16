@@ -28,7 +28,10 @@ namespace Mahakam
 
 		glm::ivec2 shadowMapOffset = { 0.0f, 0.0f };
 		glm::ivec2 shadowMapMargin = { 0.0f, 0.0f };
-		static constexpr uint32_t shadowMapSize = 8192;
+
+		static constexpr uint32_t s_ShadowMapSize = 8192;
+		static constexpr uint32_t s_DirectionalShadowSize = 4096;
+		static constexpr uint32_t s_SpotShadowSize = 512;
 
 	public:
 		virtual bool Init(uint32_t width, uint32_t height) override;

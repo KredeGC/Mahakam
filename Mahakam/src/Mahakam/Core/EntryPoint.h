@@ -2,7 +2,7 @@
 
 #include "Application.h"
 
-#include "Utility.h"
+#include "FileUtility.h"
 
 #if defined(MH_PLATFORM_WINDOWS) || defined(MH_PLATFORM_LINUX)
 

@@ -149,9 +149,8 @@ namespace Mahakam::Editor
 					float snapValues[3] = { snapValue, snapValue, snapValue };
 
 					// Draw transform gizmo
-					glm::mat4 deltaMatrix;
 					ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix),
-						(ImGuizmo::OPERATION)m_GizmoType, (ImGuizmo::MODE)m_LocalScope, glm::value_ptr(modelMatrix), glm::value_ptr(deltaMatrix), snap ? snapValues : 0);
+						(ImGuizmo::OPERATION)m_GizmoType, (ImGuizmo::MODE)m_LocalScope, glm::value_ptr(modelMatrix), nullptr, snap ? snapValues : 0);
 
 					if (ImGuizmo::IsUsing())
 					{

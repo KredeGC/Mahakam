@@ -13,7 +13,7 @@
 #include "Mahakam/Core/SceneManager.h"
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Timestep.h"
-#include "Mahakam/Core/Utility.h"
+#include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Core/Window.h"
 
 // Asset

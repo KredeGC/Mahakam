@@ -3,7 +3,7 @@
 #include "OpenGLShader.h"
 #include "OpenGLUtility.h"
 #include "OpenGLShaderDataTypes.h"
-#include "Mahakam/Core/Utility.h"
+#include "Mahakam/Core/FileUtility.h"
 
 #include "Mahakam/Math/Math.h"
 

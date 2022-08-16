@@ -2,7 +2,7 @@
 #include "LightingRenderPass.h"
 
 #include "Mahakam/Core/Frustum.h"
-#include "Mahakam/Core/Utility.h"
+#include "Mahakam/Core/FileUtility.h"
 
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/GL.h"
@@ -30,8 +30,8 @@ namespace Mahakam
 
 		// Create shadow map
 		FrameBufferProps shadowProps;
-		shadowProps.width = shadowMapSize;
-		shadowProps.height = shadowMapSize;
+		shadowProps.width = s_ShadowMapSize;
+		shadowProps.height = s_ShadowMapSize;
 		shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
 		shadowFramebuffer = FrameBuffer::Create(shadowProps);
 
@@ -348,8 +348,8 @@ namespace Mahakam
 		if (amount > 0)
 		{
 			// Choose size and offset of shadow texture
-			constexpr uint32_t size = 4096;
-			constexpr uint32_t ratio = shadowMapSize / size;
+			constexpr uint32_t size = s_DirectionalShadowSize;
+			constexpr uint32_t ratio = s_ShadowMapSize / size;
 			constexpr float texelSize = 2.0f / (float)size;
 
 			for (uint32_t i = 0; i < amount; i++)
@@ -361,7 +361,7 @@ namespace Mahakam
 					continue;
 
 				// Update current shadow map offset
-				if (shadowMapOffset.x + size > shadowMapSize)
+				if (shadowMapOffset.x + size > s_ShadowMapSize)
 				{
 					shadowMapOffset.y += size;
 
@@ -422,8 +422,8 @@ namespace Mahakam
 		if (amount > 0)
 		{
 			// Choose size and offset of shadow texture
-			constexpr uint32_t size = 512;
-			constexpr uint32_t ratio = shadowMapSize / size;
+			constexpr uint32_t size = s_SpotShadowSize;
+			constexpr uint32_t ratio = s_ShadowMapSize / size;
 
 			for (uint32_t i = 0; i < amount; i++)
 			{
@@ -440,7 +440,7 @@ namespace Mahakam
 					continue;
 
 				// Update current shadow map offset
-				if (shadowMapOffset.x + size > shadowMapSize)
+				if (shadowMapOffset.x + size > s_ShadowMapSize)
 				{
 					shadowMapOffset.y += size;
 
