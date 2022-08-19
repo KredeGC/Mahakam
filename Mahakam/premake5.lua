@@ -85,7 +85,7 @@ project "Mahakam"
     filter "system:linux"
         systemversion "latest"
         
-        removefiles { "**/Windows/WindowsUtility.cpp" }
+        removefiles { "**/Windows/WindowsFileUtility.cpp" }
         
         defines { "MH_PLATFORM_LINUX" }
         

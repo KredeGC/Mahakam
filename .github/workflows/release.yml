@@ -1,0 +1,76 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      tagName:
+        description: 'Release Tag'
+        type: string
+      changelog:
+        description: 'Changelog'
+        type: string
+      draft:
+        description: 'Draft'
+        type: boolean
+      prerelease:
+        description: 'Pre-release'
+        type: boolean
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup premake
+      uses: abel0b/setup-premake@v2
+      with:
+        version: "5.0.0-beta1"
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.12
+      with:
+        cmake-version: '3.16.x'
+    - name: Install X11
+      run: |
+          sudo apt update
+          sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+    - name: Run premake
+      run: premake5 gmake2
+    - name: Compile Mahakam
+      run: make -j2 config=debugoptimized Mahakam
+    - name: Compile Erebor
+      run: make -j2 config=debugoptimized Erebor
+    - name: Compile Sandbox
+      run: make -j2 config=debugoptimized Sandbox
+    - name: Upload build
+        uses: actions/upload-artifact@v3
+        with: 
+          name: build
+          if-no-files-found: error
+          path: |
+            Mahakam/bin/DebugOptimized-linux-x86_64/
+            Erebor/bin/DebugOptimized-linux-x86_64/
+            Erebor/assets/
+            Erebor/import/
+            Erebor/internal/
+            Erebor/runtime/
+            Erebor/EreborOptimized.sh
+  # Release:
+  #   runs-on: ubuntu-latest
+  #   needs: Build
+  #   steps:
+  #     - name: Download build
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: build
+  #         path: .
+  #     - name: Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: "**"
+  #         tag_name: ${{ inputs.tagName }}
+  #         body: ${{ inputs.changelog }}
+  #         draft: ${{ inputs.draft }}
+  #         prerelease: ${{ inputs.prerelease }}
+  #         generate_release_notes: true
+  #         fail_on_unmatched_files: true

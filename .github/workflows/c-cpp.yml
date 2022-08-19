@@ -7,10 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  Build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -32,3 +30,5 @@ jobs:
       run: make -j2 Mahakam
     - name: Compile Erebor
       run: make -j2 Erebor
+    - name: Compile Sandbox
+      run: make -j2 Sandbox
