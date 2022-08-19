@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: List 1
+      run: cd Mahakam && ls -al
     - name: Cache vendors
       id: cache-vendor
       uses: actions/cache@v3
@@ -34,6 +36,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-build-
           ${{ runner.os }}-
+    - name: List 2
+      run: cd Mahakam && ls -al
     - name: Setup premake
       uses: abel0b/setup-premake@v2
       with:
@@ -44,8 +48,12 @@ jobs:
       run: |
           sudo apt update
           sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libassimp-dev
+    - name: List 3
+      run: cd Mahakam && ls -al
     - name: Compile Mahakam
       run: make -j2 Mahakam
+    - name: List 4
+      run: cd Mahakam && ls -al
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
@@ -84,23 +92,17 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-    - name: List 1
-      run: cd Mahakam && ll
     - name: Download Mahakam
       uses: actions/download-artifact@v3
       with:
         name: Mahakam
         path: Mahakam
-    - name: List 2
-      run: cd Mahakam && ll
     - name: Install X11 & assimp
       run: |
           sudo apt update
           sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libassimp-dev
     - name: Compile Erebor
       run: make -j2 Erebor
-    - name: List 3
-      run: cd Mahakam && ll
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
