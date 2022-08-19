@@ -8,6 +8,11 @@ workspace "Mahakam"
         "Release"
     }
 
+newoption {
+   trigger = "no-assimp",
+   description = "Don't build assimp"
+}
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
@@ -79,9 +84,11 @@ LinuxLinks = {
 }
 
 -- Build ASSIMP for debug and release
-os.execute("cmake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
-os.execute("cmake --build \"Mahakam/vendor/assimp/\" --config debug")
-os.execute("cmake --build \"Mahakam/vendor/assimp/\" --config release")
+if (_OPTIONS["no-assimp"] == false) then
+    os.execute("cmake \"Mahakam/vendor/assimp/CMakeLists.txt\"")
+    os.execute("cmake --build \"Mahakam/vendor/assimp/\" --config debug")
+    os.execute("cmake --build \"Mahakam/vendor/assimp/\" --config release")
+end
 
 group "Dependencies"
     include "Mahakam/vendor/GLFW"
