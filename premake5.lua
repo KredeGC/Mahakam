@@ -55,11 +55,18 @@ VendorIncludes = {
     "%{IncludeDir.yaml}"
 }
 
-LinuxLibDirs = {
-    AssimpLibDir,
-    ZLibDir,
-    SteamAudioLibDir
-}
+if (_OPTIONS["no-assimp"]) then
+    LinuxLibDirs = {
+        "assimp",
+        SteamAudioLibDir
+    }
+else
+    LinuxLibDirs = {
+        AssimpLibDir,
+        ZLibDir,
+        SteamAudioLibDir
+    }
+end
 
 LinuxLinks = {
     "BulletDynamics",
