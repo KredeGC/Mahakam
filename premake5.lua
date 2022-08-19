@@ -60,35 +60,56 @@ if (_OPTIONS["no-assimp"]) then
         "assimp",
         SteamAudioLibDir
     }
+    
+    LinuxLinks = {
+        "BulletDynamics",
+        "BulletCollision",
+        "LinearMath",
+        "GLFW",
+        "glad",
+        "ImGui",
+        "ImGuizmo",
+        "Xrandr",
+        "Xi",
+        --"GLU",
+        --"GL",
+        "X11",
+        "dl",
+        "pthread",
+        "stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
+        "yaml-cpp",
+        "assimp",
+        "phonon"
+    }
 else
     LinuxLibDirs = {
         AssimpLibDir,
         ZLibDir,
         SteamAudioLibDir
     }
+    
+    LinuxLinks = {
+        "BulletDynamics",
+        "BulletCollision",
+        "LinearMath",
+        "GLFW",
+        "glad",
+        "ImGui",
+        "ImGuizmo",
+        "Xrandr",
+        "Xi",
+        --"GLU",
+        --"GL",
+        "X11",
+        "dl",
+        "pthread",
+        "stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
+        "yaml-cpp",
+        "assimp",
+        "zlibstatic",
+        "phonon"
+    }
 end
-
-LinuxLinks = {
-    "BulletDynamics",
-    "BulletCollision",
-    "LinearMath",
-    "GLFW",
-    "glad",
-    "ImGui",
-    "ImGuizmo",
-    "Xrandr",
-    "Xi",
-    --"GLU",
-    --"GL",
-    "X11",
-    "dl",
-    "pthread",
-    "stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
-    "yaml-cpp",
-    "assimp",
-    "zlibstatic",
-    "phonon"
-}
 
 -- Build ASSIMP for debug and release
 if (_OPTIONS["no-assimp"] == false) then

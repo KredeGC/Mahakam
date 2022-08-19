@@ -30,6 +30,18 @@ jobs:
         name: Mahakam
         if-no-files-found: error
         path: |
+          Mahakam/vendor/bullet/build3/bin/
+          Mahakam/vendor/bullet/build3/bin-obj/
+          Mahakam/vendor/GLFW/bin/
+          Mahakam/vendor/GLFW/bin-obj/
+          Mahakam/vendor/glad/bin/
+          Mahakam/vendor/glad/bin-obj/
+          Mahakam/vendor/imgui/bin/
+          Mahakam/vendor/imgui/bin-obj/
+          Mahakam/vendor/imguizmo/bin/
+          Mahakam/vendor/imguizmo/bin-obj/
+          Mahakam/vendor/yaml-cpp/bin/
+          Mahakam/vendor/yaml-cpp/bin-obj/
           Mahakam/bin/
           Mahakam/bin-obj/
   Build-Erebor:
