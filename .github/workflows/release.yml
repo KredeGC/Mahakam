@@ -1,4 +1,4 @@
-name: Build
+name: Release
 
 on:
   workflow_dispatch:
@@ -43,18 +43,18 @@ jobs:
     - name: Compile Sandbox
       run: make -j2 config=debugoptimized Sandbox
     - name: Upload build
-        uses: actions/upload-artifact@v3
-        with: 
-          name: build
-          if-no-files-found: error
-          path: |
-            Mahakam/bin/DebugOptimized-linux-x86_64/
-            Erebor/bin/DebugOptimized-linux-x86_64/
-            Erebor/assets/
-            Erebor/import/
-            Erebor/internal/
-            Erebor/runtime/
-            Erebor/EreborOptimized.sh
+      uses: actions/upload-artifact@v3
+      with: 
+        name: build
+        if-no-files-found: error
+        path: |
+          Mahakam/bin/DebugOptimized-linux-x86_64/
+          Erebor/bin/DebugOptimized-linux-x86_64/
+          Erebor/assets/
+          Erebor/import/
+          Erebor/internal/
+          Erebor/runtime/
+          Erebor/EreborOptimized.sh
   # Release:
   #   runs-on: ubuntu-latest
   #   needs: Build
