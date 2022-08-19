@@ -13,7 +13,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Cache vendors
-      id: cache-npm
+      id: cache-vendor
       uses: actions/cache@v3
       with:
         path: |
@@ -54,6 +54,7 @@ jobs:
         path: |
           Mahakam/bin/
           Mahakam/bin-obj/
+          Mahakam/Makefile
   Build-Erebor:
     runs-on: ubuntu-latest
     needs: Build-Mahakam
@@ -61,7 +62,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Cache vendors
-      id: cache-npm
+      id: cache-vendor
       uses: actions/cache@v3
       with:
         path: |
@@ -82,23 +83,23 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-build-
           ${{ runner.os }}-
+    - name: List 1
+      run: cd Mahakam && ls
     - name: Download Mahakam
       uses: actions/download-artifact@v3
       with:
         name: Mahakam
         path: Mahakam
-    - name: Setup premake
-      uses: abel0b/setup-premake@v2
-      with:
-        version: "5.0.0-beta1"
-    - name: Run premake
-      run: premake5 gmake2 --no-assimp
+    - name: List 2
+      run: cd Mahakam && ls
     - name: Install X11 & assimp
       run: |
           sudo apt update
           sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libassimp-dev
     - name: Compile Erebor
       run: make -j2 Erebor
+    - name: List 3
+      run: cd Mahakam && ls
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
