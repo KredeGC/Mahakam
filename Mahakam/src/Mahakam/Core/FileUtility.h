@@ -18,7 +18,7 @@ namespace Mahakam
 		static std::filesystem::path GetImportPath(const std::filesystem::path& filepath);
 
 		// Defined by each platform
-		static std::string OpenFile(const char* filter);
-		static std::string SaveFile(const char* filter);
+		static std::filesystem::path OpenFile(const char* filter);
+		static std::filesystem::path SaveFile(const char* filter);
 	};
 }

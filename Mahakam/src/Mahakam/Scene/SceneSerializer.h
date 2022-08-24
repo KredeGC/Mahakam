@@ -4,6 +4,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <filesystem>
+
 namespace Mahakam
 {
 	class SceneSerializer
@@ -15,10 +17,15 @@ namespace Mahakam
 	public:
 		SceneSerializer(Ref<Scene> scene);
 
-		void Serialize(const std::string& filepath);
-		bool Deserialize(const std::string& filepath);
+		std::string Serialize();
+		bool Deserialize(const std::string& src);
+
+		void Serialize(const std::filesystem::path& filepath);
+		bool Deserialize(const std::filesystem::path& filepath);
 
 	private:
+		bool DeserializeFromNode(YAML::Node& node);
+
 		void SerializeEntity(YAML::Emitter& emitter, Entity entity);
 		void DeserializeEntity(YAML::Node& node, Entity entity);
 	};

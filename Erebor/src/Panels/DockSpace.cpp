@@ -136,7 +136,7 @@ namespace Mahakam::Editor
 
 	void DockSpace::OpenScene()
 	{
-		std::string filepath = FileUtility::OpenFile("Mahakam Scene (*.mhk)\0*.mhk\0");
+		std::filesystem::path filepath = FileUtility::OpenFile("Mahakam Scene (*.mhk)\0*.mhk\0");
 
 		if (!filepath.empty())
 		{
@@ -156,7 +156,7 @@ namespace Mahakam::Editor
 
 	void DockSpace::SaveSceneAs()
 	{
-		std::string filepath = FileUtility::SaveFile("Mahakam Scene (*.mhk)\0*.mhk\0");
+		std::filesystem::path filepath = FileUtility::SaveFile("Mahakam Scene (*.mhk)\0*.mhk\0");
 
 		if (!filepath.empty())
 		{

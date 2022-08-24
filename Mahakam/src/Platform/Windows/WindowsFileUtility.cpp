@@ -10,7 +10,7 @@
 
 namespace Mahakam
 {
-	std::string FileUtility::OpenFile(const char* filter)
+	std::filesystem::path FileUtility::OpenFile(const char* filter)
 	{
 		OPENFILENAMEA ofn;
 		CHAR szFile[260] = { 0 };
@@ -29,10 +29,10 @@ namespace Mahakam
 		if (GetOpenFileNameA(&ofn) == TRUE)
 			return ofn.lpstrFile;
 
-		return std::string();
+		return std::filesystem::path();
 	}
 
-	std::string FileUtility::SaveFile(const char* filter)
+	std::filesystem::path FileUtility::SaveFile(const char* filter)
 	{
 		OPENFILENAMEA ofn;
 		CHAR szFile[260] = { 0 };
@@ -54,6 +54,6 @@ namespace Mahakam
 		if (GetSaveFileNameA(&ofn) == TRUE)
 			return ofn.lpstrFile;
 
-		return std::string();
+		return std::filesystem::path();
 	}
 }

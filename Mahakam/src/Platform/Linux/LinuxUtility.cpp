@@ -29,7 +29,7 @@ namespace Mahakam
 		return true;
 	}
 
-	std::string FileUtility::OpenFile(const char* filter)
+	std::filesystem::path FileUtility::OpenFile(const char* filter)
 	{
 		if (!FileDialogsUtilityCheck())
 			return std::string();
@@ -49,7 +49,7 @@ namespace Mahakam
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
 		{
 			pclose(fp);
-			return std::string();
+			return std::filesystem::path();
 		}
 
 		pclose(fp);
@@ -60,7 +60,7 @@ namespace Mahakam
 		return file_choice;
 	}
 
-	std::string FileUtility::SaveFile(const char* filter)
+	std::filesystem::path FileUtility::SaveFile(const char* filter)
 	{
 		if (!FileDialogsUtilityCheck())
 			return std::string();
@@ -82,7 +82,7 @@ namespace Mahakam
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
 		{
 			pclose(fp);
-			return std::string();
+			return std::filesystem::path();
 		}
 
 		pclose(fp);

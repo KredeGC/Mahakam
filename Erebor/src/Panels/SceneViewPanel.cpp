@@ -77,6 +77,10 @@ namespace Mahakam::Editor
 						
 						ImGui::EndMenu();
 					}
+
+					ImGui::MenuItem(u8"\ueca6");
+					ImGui::MenuItem(u8"\uecb1");
+					ImGui::MenuItem(u8"\ueca5");
 					
 					ImGui::EndMenuBar();
 				}

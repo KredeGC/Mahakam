@@ -18,7 +18,7 @@ namespace Mahakam
 		: m_Scene(scene)
 	{ }
 
-	void SceneSerializer::Serialize(const std::string& filepath)
+	std::string SceneSerializer::Serialize()
 	{
 		YAML::Emitter emitter;
 		emitter << YAML::BeginMap;
@@ -60,30 +60,57 @@ namespace Mahakam
 		emitter << YAML::EndSeq;
 		emitter << YAML::EndMap;
 
-		std::ofstream filestream(filepath);
-		filestream << emitter.c_str();
+		return emitter.c_str();
 	}
 
-	bool SceneSerializer::Deserialize(const std::string& filepath)
+	bool SceneSerializer::Deserialize(const std::string& src)
 	{
-		m_Entities.clear();
-
-		YAML::Node data;
+		YAML::Node node;
 		try
 		{
-			data = YAML::LoadFile(filepath);
+			node = YAML::Load(src);
 		}
 		catch (YAML::ParserException e)
 		{
 			return false;
 		}
 
-		if (!data["Scene"])
+		return DeserializeFromNode(node);
+	}
+
+	void SceneSerializer::Serialize(const std::filesystem::path& filepath)
+	{
+		std::string yamlString = Serialize();
+
+		std::ofstream filestream(filepath);
+		filestream << yamlString;
+	}
+
+	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath)
+	{
+		YAML::Node node;
+		try
+		{
+			node = YAML::LoadFile(filepath.string());
+		}
+		catch (YAML::ParserException e)
+		{
+			return false;
+		}
+
+		return DeserializeFromNode(node);
+	}
+
+	bool SceneSerializer::DeserializeFromNode(YAML::Node& node)
+	{
+		m_Entities.clear();
+
+		if (!node["Scene"])
 			return false;
 
-		std::string sceneName = data["Scene"].as<std::string>();
+		std::string sceneName = node["Scene"].as<std::string>();
 
-		YAML::Node skyboxNode = data["Skybox"];
+		YAML::Node skyboxNode = node["Skybox"];
 		if (skyboxNode)
 		{
 			Asset<Material> skyboxMaterial;
@@ -112,7 +139,7 @@ namespace Mahakam
 			}
 		}
 
-		auto entities = data["Entities"];
+		auto entities = node["Entities"];
 		if (entities)
 		{
 			m_Entities.reserve(entities.size());

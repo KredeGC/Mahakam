@@ -13,6 +13,7 @@ namespace Mahakam
 		{
 			bool (*HasComponent)(Entity) = nullptr;
 			void (*AddComponent)(Entity) = nullptr;
+			void (*CopyComponent)(Entity, Entity) = nullptr;
 			void (*RemoveComponent)(Entity) = nullptr;
 
 			bool (*Serialize)(YAML::Emitter&, Entity) = nullptr;
@@ -23,6 +24,7 @@ namespace Mahakam
 			{
 				HasComponent = [](Entity entity) { return entity.HasComponent<T>(); };
 				AddComponent = [](Entity entity) { entity.AddComponent<T>(); };
+				CopyComponent = [](Entity src, Entity dst) { dst.AddComponent<T>(src.GetComponent<T>()); };
 				RemoveComponent = [](Entity entity) { entity.RemoveComponent<T>(); };
 			}
 		};
