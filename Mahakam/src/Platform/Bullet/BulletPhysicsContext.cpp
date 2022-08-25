@@ -43,23 +43,23 @@ namespace Mahakam
 
 	void BulletPhysicsContext::Update(Timestep ts)
 	{
-		m_DynamicsWorld->stepSimulation(1.f / 60.f, 10);
+		m_DynamicsWorld->stepSimulation(ts, 1, 1.0f / 60.0f);
 
 		//print positions of all objects
-		for (int j = m_DynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
-		{
-			btCollisionObject* obj = m_DynamicsWorld->getCollisionObjectArray()[j];
-			btRigidBody* body = btRigidBody::upcast(obj);
-			btTransform trans;
-			if (body && body->getMotionState())
-			{
-				body->getMotionState()->getWorldTransform(trans);
-			}
-			else
-			{
-				trans = obj->getWorldTransform();
-			}
-			//printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
-		}
+		//for (int j = m_DynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
+		//{
+		//	btCollisionObject* obj = m_DynamicsWorld->getCollisionObjectArray()[j];
+		//	btRigidBody* body = btRigidBody::upcast(obj);
+		//	btTransform trans;
+		//	if (body && body->getMotionState())
+		//	{
+		//		body->getMotionState()->getWorldTransform(trans);
+		//	}
+		//	else
+		//	{
+		//		trans = obj->getWorldTransform();
+		//	}
+		//	//printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+		//}
 	}
 }

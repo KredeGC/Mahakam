@@ -5,11 +5,14 @@
 
 namespace Mahakam
 {
-	BulletBoxCollider::BulletBoxCollider(const glm::vec3& extents)
-		: m_Shape({ extents.x, extents.y, extents.z })
+	Ref<BoxCollider> BoxCollider::Create(const glm::vec3& extents)
 	{
-		m_Extents = extents;
+		return CreateRef<BulletBoxCollider>(extents);
 	}
+
+	BulletBoxCollider::BulletBoxCollider(const glm::vec3& extents)
+		: m_Shape({ extents.x, extents.y, extents.z }), m_Extents(extents)
+	{ }
 
 	BulletBoxCollider::~BulletBoxCollider()
 	{

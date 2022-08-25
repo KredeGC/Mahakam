@@ -11,8 +11,12 @@ namespace Mahakam
 		Ref<Rigidbody> m_Rigidbody;
 
 	public:
-		RigidbodyComponent() {}
+		RigidbodyComponent()
+			: m_Rigidbody(Rigidbody::Create())
+		{ }
 
 		RigidbodyComponent(const RigidbodyComponent&) = default;
+
+		Ref<Rigidbody> GetRigidbody() const { return m_Rigidbody; }
 	};
 }
