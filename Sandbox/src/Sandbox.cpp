@@ -67,7 +67,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	entity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 	entity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
-#if 1
+#if 0
+	GLTFLoadModel("assets/models/mannequin_clap.gltf");
+
 	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
 
 	// Create skinned material
@@ -134,9 +136,10 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	particleEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
-#if 0
+#if 1
 	// Create backpack model
-	SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
+	//SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
+	SkinnedMesh backpackModel = GLTFLoadModel("assets/models/backpack.gltf");
 
 	Asset<Material> backpackMaterial = Asset<Material>("import/assets/materials/Backpack.material.import");
 

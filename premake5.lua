@@ -43,17 +43,21 @@ IncludeDir["robin_hood"]        = "../Mahakam/vendor"
 IncludeDir["spdlog"]            = "../Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"]         = "../Mahakam/vendor/stb_image"
 IncludeDir["steamaudio"]        = "../Mahakam/vendor/steamaudio/include"
+IncludeDir["tiny_gltf"]         = "../Mahakam/vendor/tiny_gltf"
 IncludeDir["yaml"]              = "../Mahakam/vendor/yaml-cpp/include"
 
 
-if (_OPTIONS["target"] == "linux") then
-    SteamAudioLibDir = "../Mahakam/vendor/steamaudio/lib/linux-x64"
-else
-    SteamAudioLibDir = "../Mahakam/vendor/steamaudio/lib/windows-x64"
-end
+-- if (_OPTIONS["target"] == "linux") then
+--     SteamAudioLibDir = "../Mahakam/vendor/steamaudio/lib/linux-x64"
+-- else
+--     SteamAudioLibDir = "../Mahakam/vendor/steamaudio/lib/windows-x64"
+-- end
 
+-- TODO: Replace assimp with Tiny glTF
 AssimpLibDir = "../Mahakam/vendor/assimp/lib"
 ZLibDir = "../Mahakam/vendor/assimp/contrib/zlib"
+
+SteamAudioLibDir = "../Mahakam/vendor/steamaudio/lib/".._OPTIONS["target"].."-x64"
 
 VendorIncludes = {
     "src",
@@ -67,7 +71,12 @@ VendorIncludes = {
     "%{IncludeDir.yaml}"
 }
 
+VendorLibDirs = {
+    SteamAudioLibDir
+}
+
 VendorLinks = {
+    "Mahakam",
     "BulletDynamics",
     "BulletCollision",
     "LinearMath",
@@ -79,25 +88,21 @@ VendorLinks = {
     "phonon"
 }
 
-MinGWLinks = {
-    "gdi32",
-    "dwmapi"
-}
+-- MinGW requires some extra links
+if (os.host() == linux and _OPTIONS["target"] == "windows") then
+    MinGWLinks = {
+        "gdi32",
+        "dwmapi"
+    }
+end
 
 if (_OPTIONS["no-assimp"]) then
     LinuxLibDirs = {
-        "assimp",
-        SteamAudioLibDir
+        "assimp"
     }
     
+    -- X11 and unix-specific stuff
     LinuxLinks = {
-        "BulletDynamics",
-        "BulletCollision",
-        "LinearMath",
-        "GLFW",
-        "glad",
-        "ImGui",
-        "ImGuizmo",
         "Xrandr",
         "Xi",
         --"GLU",
@@ -106,25 +111,15 @@ if (_OPTIONS["no-assimp"]) then
         "dl",
         "pthread",
         "stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
-        "yaml-cpp",
-        "assimp",
-        "phonon"
+        "assimp"
     }
 else
     LinuxLibDirs = {
         AssimpLibDir,
-        ZLibDir,
-        SteamAudioLibDir
+        ZLibDir
     }
     
     LinuxLinks = {
-        "BulletDynamics",
-        "BulletCollision",
-        "LinearMath",
-        "GLFW",
-        "glad",
-        "ImGui",
-        "ImGuizmo",
         "Xrandr",
         "Xi",
         --"GLU",
@@ -133,10 +128,8 @@ else
         "dl",
         "pthread",
         "stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
-        "yaml-cpp",
         "assimp",
-        "zlibstatic",
-        "phonon"
+        "zlibstatic"
     }
 end
 

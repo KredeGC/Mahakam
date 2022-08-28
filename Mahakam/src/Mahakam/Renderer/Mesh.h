@@ -54,6 +54,9 @@ namespace Mahakam
 		SkinnedMeshProps(std::initializer_list<Asset<Material>> materials) : CreateMaterials(false), OverrideMaterials(materials) {}
 	};
 
+	// TODO: Merge with other stuff
+	SkinnedMesh GLTFLoadModel(const std::filesystem::path& filepath);
+
 	class Mesh
 	{
 	public:

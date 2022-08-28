@@ -9,6 +9,8 @@
 
 #include "Platform/OpenGL/OpenGLMesh.h"
 
+#include <tiny_gltf/tiny_gltf.h>
+
 namespace Mahakam
 {
 	static glm::vec3 CalculateCubeSphereVertex(const glm::vec3& v)
@@ -638,5 +640,183 @@ namespace Mahakam
 		// Go through any child nodes
 		for (uint32_t i = 0; i < node->mNumChildren; i++)
 			ProcessNode(skinnedMesh, node->mChildren[i], scene);
+	}
+
+	template<typename T>
+	void GLTFLoadAttribute(tinygltf::Model& model, tinygltf::Primitive& p, const std::string& attribute, size_t& offset, T* dst)
+	{
+		auto iter = p.attributes.find(attribute);
+		if (iter == p.attributes.end()) return;
+
+		const auto& accessor = model.accessors[iter->second];
+		const auto& bufferView = model.bufferViews[accessor.bufferView];
+		const auto& buffer = model.buffers[bufferView.buffer];
+
+		const void* bufferData = &buffer.data[bufferView.byteOffset + accessor.byteOffset];
+
+		memcpy(dst + offset, bufferData, accessor.count * sizeof(T));
+
+		offset += accessor.count;
+	}
+
+	SkinnedMesh GLTFLoadModel(const std::filesystem::path& filepath)
+	{
+		MH_PROFILE_FUNCTION();
+
+		tinygltf::Model model;
+		tinygltf::TinyGLTF loader;
+		std::string err;
+		std::string warn;
+
+		bool success = loader.LoadASCIIFromFile(&model, &err, &warn, filepath.string());
+
+		if (!warn.empty())
+			MH_CORE_WARN("[GLTF] Warning: {0}", warn);
+
+		if (!err.empty())
+			MH_CORE_WARN("[GLTF] Error: {0}", err);
+
+		if (!success) {
+			MH_CORE_ERROR("[GLTF] Failed to parse glTF model at {0}", filepath.string());
+			return {};
+		}
+
+		MH_CORE_ASSERT(!model.scenes.empty(), "GLTF scenes are empty!");
+
+		auto& scene = model.scenes[model.defaultScene];
+		auto& nodes = scene.nodes;
+
+		MH_CORE_ASSERT(!nodes.empty(), "GLTF nodes are empty!");
+
+
+		SkinnedMesh skinnedMesh;
+
+		// Extract vertex and index values
+		for (auto& m : model.meshes)
+		{
+			// Calculate index and vertex count
+			uint32_t indexCount = 0;
+			uint32_t vertexCount = 0;
+			for (auto& p : m.primitives)
+			{
+				const auto& posAccessor = model.accessors[p.attributes["POSITION"]];
+				const auto& indAccessor = model.accessors[p.indices];
+
+				vertexCount += (uint32_t)posAccessor.count;
+				indexCount += (uint32_t)indAccessor.count;
+			}
+
+			// Setup variables
+			glm::vec3* positions = new glm::vec3[vertexCount];
+			glm::vec2* texcoords = new glm::vec2[vertexCount];
+			glm::vec3* normals = new glm::vec3[vertexCount];
+			glm::vec3* tangents = new glm::vec3[vertexCount];
+			glm::vec4* colors = new glm::vec4[vertexCount];
+			glm::ivec4* boneIDs = new glm::ivec4[vertexCount];
+			glm::vec4* boneWeights = new glm::vec4[vertexCount];
+			uint32_t* indices = new uint32_t[indexCount]{ 0 };
+
+			size_t positionOffset = 0;
+			size_t texcoordOffset = 0;
+			size_t normalOffset = 0;
+			size_t tangentOffset = 0;
+			size_t colorOffset = 0;
+			size_t boneIDOffset = 0;
+			size_t boneWeightOffset = 0;
+			size_t indexOffset = 0;
+
+			for (uint32_t i = 0; i < vertexCount; i++)
+			{
+				boneIDs[i] = glm::ivec4(-1, -1, -1, -1);
+				boneWeights[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+
+			for (auto& p : m.primitives)
+			{
+				// Extract positions
+				GLTFLoadAttribute<glm::vec3>(model, p, "POSITION", positionOffset, positions);
+
+				// Extract texcoords
+				GLTFLoadAttribute<glm::vec2>(model, p, "TEXCOORD_0", texcoordOffset, texcoords);
+
+				// Extract normals
+				GLTFLoadAttribute<glm::vec3>(model, p, "NORMAL", normalOffset, normals);
+
+				// Extract tangents
+				GLTFLoadAttribute<glm::vec3>(model, p, "TANGENT", tangentOffset, tangents);
+
+				// Extract vertex colors
+				GLTFLoadAttribute<glm::vec4>(model, p, "COLOR_0", colorOffset, colors);
+
+				// Extract indices
+				{
+					const auto& accessor = model.accessors[p.indices];
+					const auto& bufferView = model.bufferViews[accessor.bufferView];
+					const auto& buffer = model.buffers[bufferView.buffer];
+
+					const uint8_t* indexData = &buffer.data[bufferView.byteOffset + accessor.byteOffset];
+
+					switch (accessor.componentType)
+					{
+					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+						MH_CORE_INFO("[GLTF] Loading indices with uint32_t");
+						memcpy(indices + indexOffset, indexData, accessor.count * sizeof(uint32_t));
+						break;
+					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+						MH_CORE_INFO("[GLTF] Loading indices with uint16_t");
+						for (size_t i = 0; i < accessor.count; i++)
+							memcpy(indices + i + indexOffset, indexData + i * sizeof(uint16_t), sizeof(uint16_t));
+						break;
+					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+						MH_CORE_INFO("[GLTF] Loading indices with uint8_t");
+						for (size_t i = 0; i < accessor.count; i++)
+							memcpy(indices + i + indexOffset, indexData + i * sizeof(uint8_t), sizeof(uint8_t));
+						break;
+					default:
+						MH_CORE_BREAK("[GLTF] Unsupported index format");
+						break;
+					}
+
+					indexOffset += accessor.count;
+				}
+			}
+
+			MH_CORE_ASSERT(vertexCount == positionOffset, "Vertex count mismatch");
+			MH_CORE_ASSERT(indexCount == indexOffset, "Index count mismatch");
+
+			// Interleave vertices
+			Mesh::InterleavedStruct interleavedVertices;
+
+			if (positionOffset)
+				interleavedVertices.positions = positions;
+			if (texcoordOffset)
+				interleavedVertices.texcoords = texcoords;
+			if (normalOffset)
+				interleavedVertices.normals = normals;
+			if (tangentOffset)
+				interleavedVertices.tangents = tangents;
+			if (colorOffset)
+				interleavedVertices.colors = colors;
+			/*if (mesh->HasBones())
+			{
+				interleavedVertices.boneIDs = boneIDs;
+				interleavedVertices.boneWeights = boneWeights;
+			}*/
+
+			Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+
+			delete[] positions;
+			delete[] texcoords;
+			delete[] normals;
+			delete[] tangents;
+			delete[] colors;
+			delete[] boneIDs;
+			delete[] boneWeights;
+			delete[] indices;
+
+			skinnedMesh.meshes.push_back(mesh);
+		}
+
+		return skinnedMesh;
 	}
 }

@@ -47,7 +47,7 @@ namespace Mahakam::Editor
 			TransformComponent& transform = entity.GetComponent<TransformComponent>();
 
 			bool noMatrix = transform.HasNoMatrix();
-			if (ImGui::Checkbox("Skip matrix update", &noMatrix));
+			if (ImGui::Checkbox("Skip matrix update", &noMatrix))
 				transform.SetNoMatrix(noMatrix);
 
 			glm::vec3 pos = transform.GetPosition();

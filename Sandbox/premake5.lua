@@ -17,8 +17,10 @@ project "Sandbox"
     }
 
     includedirs { VendorIncludes }
+    
+    libdirs { VendorLibDirs }
 
-    links { "Mahakam" }
+    links { VendorLinks }
 
     defines { "_CRT_SECURE_NO_WARNINGS" }
 
@@ -27,7 +29,8 @@ project "Sandbox"
         
         defines {
             "MH_PLATFORM_WINDOWS",
-            "WIN_EXPORT"
+            "WIN_EXPORT",
+            "NOMINMAX"
         }
         
         flags { "MultiProcessorCompile" }
