@@ -64,7 +64,7 @@ project "Mahakam"
     }
     
     -- Windows
-    filter "system:windows"
+    filter "options:target=windows"
         systemversion "latest"
         
         removefiles { "**/Linux/**" }
@@ -82,7 +82,7 @@ project "Mahakam"
         }
 
     -- Linux
-    filter "system:linux"
+    filter "options:target=linux"
         systemversion "latest"
         
         removefiles { "**/Windows/WindowsFileUtility.cpp" }
@@ -100,7 +100,7 @@ project "Mahakam"
         }
     
     -- Windows Debug
-    filter { "system:windows", "configurations:Debug" }
+    filter { "options:target=windows", "configurations:Debug" }
         libdirs {
             "%{AssimpLibDir}/Debug",
             "%{ZLibDir}/Debug"
@@ -109,7 +109,7 @@ project "Mahakam"
         links { "zlibstaticd" }
         
     -- Windows DebugOptimized and Release
-    filter { "system:windows", "configurations:DebugOptimized or Release" }
+    filter { "options:target=windows", "configurations:DebugOptimized or Release" }
         libdirs {
             "%{AssimpLibDir}/Release",
             "%{ZLibDir}/Release"

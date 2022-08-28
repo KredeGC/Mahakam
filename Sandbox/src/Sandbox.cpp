@@ -67,7 +67,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	entity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 	entity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
-#if 0
+#if 1
+	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
+
 	// Create skinned material
 	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
@@ -81,9 +83,10 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 		for (int z = 0; z < 2; z++)
 		{
 			Entity animatedEntity = scene->CreateEntity("DLL Animated");
-			animatedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
+			animatedEntity.SetParent(animatedArchive);
 			animatedEntity.AddComponent<TransformComponent>().SetPosition({ x * 5.0f, 1.5f, 5.0f + z * 5.0f });
 			animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
+			animatedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
 			animatedEntity.AddComponent<AnimatorComponent>(animation);
 
 			if (z == 1)

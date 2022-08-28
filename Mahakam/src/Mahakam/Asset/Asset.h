@@ -4,6 +4,8 @@
 
 #include "AssetDatabase.h"
 
+#include <cstddef>
+
 namespace Mahakam
 {
 	template<typename T>
@@ -20,7 +22,7 @@ namespace Mahakam
 	public:
 		Asset() : m_ID(0), m_Ptr(nullptr) {}
 
-		Asset(const nullptr_t&) {}
+		Asset(const std::nullptr_t&) {}
 
 		Asset(Ref<T> ptr)
 		{
@@ -109,7 +111,7 @@ namespace Mahakam
 			return *this;
 		}
 
-		Asset& operator=(const nullptr_t& rhs)
+		Asset& operator=(const std::nullptr_t& rhs)
 		{
 			if (m_ID)
 				AssetDatabase::DeregisterAsset(m_ID);
@@ -164,7 +166,7 @@ namespace Mahakam
 	};
 
 	template<typename T>
-	bool operator==(const Asset<T>& _Left, nullptr_t) noexcept
+	bool operator==(const Asset<T>& _Left, std::nullptr_t) noexcept
 	{
 		return _Left.Ptr() == nullptr;
 	}

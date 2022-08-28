@@ -22,7 +22,7 @@ project "Erebor"
 
     defines { "_CRT_SECURE_NO_WARNINGS" }
 
-    filter "system:windows"
+    filter "options:target=windows"
         systemversion "latest"
         
         defines { "MH_PLATFORM_WINDOWS" }
@@ -33,7 +33,7 @@ project "Erebor"
             "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/windows-x64/phonon.dll\" \"bin/%{outputdir}/\""
         }
 
-    filter "system:linux"
+    filter "options:target=linux"
         systemversion "latest"
         
         defines { "MH_PLATFORM_LINUX" }

@@ -22,7 +22,7 @@ project "Sandbox"
 
     defines { "_CRT_SECURE_NO_WARNINGS" }
 
-    filter "system:windows"
+    filter "options:target=windows"
         systemversion "latest"
         
         defines {
@@ -36,7 +36,7 @@ project "Sandbox"
             "{COPYDIR} \"bin/%{outputdir}/Sandbox.dll\" \"../Erebor/runtime/\""
         }
 
-    filter "system:linux"
+    filter "options:target=linux"
         systemversion "latest"
         
         defines { "MH_PLATFORM_LINUX" }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Version.h"
+
 #include <memory>
 #ifndef MH_DEBUG
 #include <robin_hood/robin_hood.h>

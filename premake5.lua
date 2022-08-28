@@ -13,6 +13,17 @@ newoption {
    description = "Don't build assimp"
 }
 
+newoption {
+    trigger = "target",
+    value = "Platform",
+    description = "The target platform to compile to",
+    default = os.host(),
+    allowed = {
+        { "windows", "Windows" },
+        { "linux", "Unix-based systems" }
+    }
+}
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
@@ -34,7 +45,8 @@ IncludeDir["stb_image"]         = "../Mahakam/vendor/stb_image"
 IncludeDir["steamaudio"]        = "../Mahakam/vendor/steamaudio/include"
 IncludeDir["yaml"]              = "../Mahakam/vendor/yaml-cpp/include"
 
-if os.host() == "linux" then
+
+if (_OPTIONS["target"] == "linux") then
     SteamAudioLibDir = "../Mahakam/vendor/steamaudio/lib/linux-x64"
 else
     SteamAudioLibDir = "../Mahakam/vendor/steamaudio/lib/windows-x64"

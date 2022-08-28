@@ -26,8 +26,22 @@ namespace Mahakam::Editor
 		char tagName[256];
 
 		// Choose icon to show
-		if (entity.HasComponent<TransformComponent>())
+		if (entity.HasComponent<CameraComponent>())
+			strcpy(tagName, u8"\ueece"); // Camera icon
+		else if (entity.HasComponent<AnimatorComponent>())
+			strcpy(tagName, u8"\uef89"); // Male icon
+		else if (entity.HasComponent<MeshComponent>())
 			strcpy(tagName, u8"\ueef7"); // Cube icon
+		else if (entity.HasComponent<AudioSourceComponent>())
+			strcpy(tagName, u8"\ueea8"); // Audio icon
+		else if (entity.HasComponent<AudioListenerComponent>())
+			strcpy(tagName, u8"\uea33"); // Headphone icon
+		else if (entity.HasComponent<LightComponent>())
+			strcpy(tagName, u8"\uef6b"); // Light-bulb icon
+		else if (entity.HasComponent<ParticleSystemComponent>())
+			strcpy(tagName, u8"\uefbe"); // Pixels icon
+		else if (entity.HasComponent<TransformComponent>())
+			strcpy(tagName, u8"\uf020"); // Vector icon
 		else
 			strcpy(tagName, u8"\ueea5"); // Archive icon
 

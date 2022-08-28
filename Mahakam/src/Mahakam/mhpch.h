@@ -61,5 +61,5 @@
 #endif
 
 #ifdef MH_PLATFORM_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #endif
