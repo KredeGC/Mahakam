@@ -25,7 +25,7 @@ project "Erebor"
     defines { "_CRT_SECURE_NO_WARNINGS" }
     
     postbuildcommands {
-        "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/".._OPTIONS["target"].."-x64/phonon.dll\" \"bin/%{outputdir}/\""
+        "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/".._OPTIONS["target"].."-x64/\" \"bin/%{outputdir}/\""
     }
 
     filter "options:target=windows"

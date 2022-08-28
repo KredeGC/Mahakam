@@ -54,12 +54,3 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <yaml-cpp/yaml.h>
-
-#ifdef MH_BUILD
-#include <miniaudio/miniaudio.h>
-#include <steamaudio/phonon.h>
-#endif
-
-#ifdef MH_PLATFORM_WINDOWS
-#include <windows.h>
-#endif
