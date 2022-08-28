@@ -2,14 +2,11 @@
 
 #include "Mahakam/Core/Core.h"
 
-#include "Mahakam/Renderer/Shader.h"
-
-#include "Mahakam/Renderer/FrameBuffer.h"
-
-#include "Mahakam/Renderer/RenderData.h"
-
 namespace Mahakam
 {
+	class FrameBuffer;
+	struct SceneData;
+
 	class RenderPass
 	{
 	private:

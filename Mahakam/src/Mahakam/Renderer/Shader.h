@@ -4,10 +4,10 @@
 
 #include "Mahakam/Asset/Asset.h"
 
+#include <glm/glm.hpp>
+
 #include <filesystem>
 #include <string>
-
-#include <glm/glm.hpp>
 
 namespace Mahakam
 {

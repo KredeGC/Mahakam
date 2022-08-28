@@ -1,8 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "Renderer.h"
 
-#include "Mahakam/Core/SharedLibrary.h"
-
 #include "Buffer.h"
 #include "Camera.h"
 #include "FrameBuffer.h"
@@ -11,6 +9,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "ParticleSystem.h"
+#include "Shader.h"
 #include "RenderData.h"
 
 #include "RenderPasses/GeometryRenderPass.h"

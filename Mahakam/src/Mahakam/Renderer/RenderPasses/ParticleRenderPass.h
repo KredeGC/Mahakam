@@ -2,10 +2,10 @@
 
 #include "RenderPass.h"
 
-#include "Mahakam/Renderer/ComputeShader.h"
-
 namespace Mahakam
 {
+	class ComputeShader;
+
 	class ParticleRenderPass : public RenderPass
 	{
 	private:

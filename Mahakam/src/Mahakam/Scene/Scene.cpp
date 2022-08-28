@@ -24,7 +24,9 @@
 
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Material.h"
+#include "Mahakam/Renderer/RenderData.h"
 #include "Mahakam/Renderer/Renderer.h"
+#include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 
 #include <yaml-cpp/yaml.h>

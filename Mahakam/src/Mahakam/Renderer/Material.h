@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Mahakam/Asset/Asset.h"
-#include "Shader.h"
-#include "Texture.h"
 
 #include <glm/glm.hpp>
 
 namespace Mahakam
 {
+	class Shader;
+	class Texture;
+
 	class Material
 	{
 	public:

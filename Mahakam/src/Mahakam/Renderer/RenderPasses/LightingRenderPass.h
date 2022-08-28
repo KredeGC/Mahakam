@@ -2,12 +2,16 @@
 
 #include "RenderPass.h"
 
+#include "Mahakam/Renderer/TextureFormats.h"
+
 #include <glm/gtx/hash.hpp>
-#include <robin_hood/robin_hood.h>
 
 namespace Mahakam
 {
 	class Frustum;
+	class Shader;
+	class Texture;
+	class UniformBuffer;
 
 	class LightingRenderPass : public RenderPass
 	{
@@ -24,7 +28,7 @@ namespace Mahakam
 
 		Asset<UniformBuffer> shadowMatrixBuffer = nullptr;
 
-		robin_hood::unordered_map<glm::ivec2, uint64_t> lightHashes;
+		UnorderedMap<glm::ivec2, uint64_t> lightHashes;
 
 		glm::ivec2 shadowMapOffset = { 0.0f, 0.0f };
 		glm::ivec2 shadowMapMargin = { 0.0f, 0.0f };

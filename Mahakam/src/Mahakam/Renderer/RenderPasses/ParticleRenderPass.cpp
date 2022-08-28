@@ -1,7 +1,10 @@
 #include "Mahakam/mhpch.h"
 #include "ParticleRenderPass.h"
 
+#include "Mahakam/Renderer/ComputeShader.h"
 #include "Mahakam/Renderer/GL.h"
+#include "Mahakam/Renderer/FrameBuffer.h"
+#include "Mahakam/Renderer/RenderData.h"
 #include "Mahakam/Renderer/Renderer.h"
 
 namespace Mahakam

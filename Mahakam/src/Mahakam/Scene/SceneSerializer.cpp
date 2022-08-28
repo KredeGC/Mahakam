@@ -4,6 +4,7 @@
 #include "Mahakam/Math/Math.h"
 
 #include "Mahakam/Renderer/Material.h"
+#include "Mahakam/Renderer/Shader.h"
 
 #include "Components/TagComponent.h"
 #include "Components/RelationshipComponent.h"

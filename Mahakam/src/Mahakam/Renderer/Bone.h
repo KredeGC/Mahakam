@@ -2,9 +2,10 @@
 
 #include "Mahakam/Core/Core.h"
 
-#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
+
+#include <vector>
 
 struct aiNodeAnim;
 

@@ -4,6 +4,8 @@
 
 namespace Mahakam
 {
+	class Shader;
+
 	class TonemappingRenderPass : public RenderPass
 	{
 	private:

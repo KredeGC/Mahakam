@@ -2,7 +2,6 @@
 
 #include "Mahakam/Core/Core.h"
 
-#include "Bone.h"
 #include "Mesh.h"
 
 #include <glm/glm.hpp>

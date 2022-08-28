@@ -1,11 +1,6 @@
 #pragma once
 
-#include "RenderPasses/RenderPass.h"
-
 #include <glm/glm.hpp>
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
 
 namespace Mahakam
 {

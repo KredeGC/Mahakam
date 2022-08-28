@@ -5,10 +5,13 @@
 #include "Mahakam/Core/FileUtility.h"
 
 #include "Mahakam/Renderer/Buffer.h"
+#include "Mahakam/Renderer/FrameBuffer.h"
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Mesh.h"
+#include "Mahakam/Renderer/RenderData.h"
 #include "Mahakam/Renderer/Renderer.h"
+#include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 
 #include <filesystem>

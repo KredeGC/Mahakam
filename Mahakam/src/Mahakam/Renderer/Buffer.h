@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
-#include "ShaderDataTypes.h"
 
 #include <vector>
 

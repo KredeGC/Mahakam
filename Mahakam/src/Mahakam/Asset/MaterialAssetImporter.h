@@ -1,10 +1,12 @@
 #pragma once
 
 #include "AssetImporter.h"
-#include "Mahakam/Renderer/Material.h"
-#include "Mahakam/Renderer/FrameBuffer.h"
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/Camera.h"
+#include "Mahakam/Renderer/FrameBuffer.h"
+#include "Mahakam/Renderer/Material.h"
+#include "Mahakam/Renderer/Mesh.h"
+#include "Mahakam/Renderer/Shader.h"
 
 namespace Mahakam
 {
