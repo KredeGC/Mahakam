@@ -19,7 +19,7 @@ jobs:
     - name: Install X11 & assimp
       run: |
           sudo apt update
-          sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libassimp-dev mingw-w64-x86-64
+          sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libassimp-dev mingw-w64
     - name: Run premake
       run: premake5 gmake2 --no-assimp
     - name: Compile Mahakam
