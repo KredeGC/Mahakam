@@ -4,8 +4,8 @@ project "yaml-cpp"
     staticruntime "off"
     pic "on"
 
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+	targetdir ("bin/%{outputdir}")
+    objdir ("bin-obj/%{outputdir}")
 
 	files
 	{
@@ -20,12 +20,11 @@ project "yaml-cpp"
 		"include"
 	}
 
-	filter "system:windows"
+	filter "options:target=windows"
 		systemversion "latest"
 		cppdialect "C++17"
 
-	filter "system:linux"
-		pic "On"
+	filter "options:target=linux"
 		systemversion "latest"
 		cppdialect "C++17"
 

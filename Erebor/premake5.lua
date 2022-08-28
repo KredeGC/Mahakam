@@ -27,6 +27,25 @@ project "Erebor"
         
         defines { "MH_PLATFORM_WINDOWS" }
         
+        libdirs { LinuxLibDirs }
+        
+        links {
+            "BulletDynamics",
+            "BulletCollision",
+            "LinearMath",
+            "GLFW",
+            "glad",
+            "ImGui",
+            "ImGuizmo",
+            "pthread",
+            "gdi32",
+            "dwmapi",
+            "stdc++fs",	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
+            "yaml-cpp",
+            "assimp",
+            "phonon"
+        }
+        
         flags { "MultiProcessorCompile" }
         
         postbuildcommands {

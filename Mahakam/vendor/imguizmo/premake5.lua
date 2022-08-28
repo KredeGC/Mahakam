@@ -5,8 +5,8 @@ project "ImGuizmo"
     staticruntime "off"
     pic "on"
 
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+    targetdir ("bin/%{outputdir}")
+    objdir ("bin-obj/%{outputdir}")
 
     files {
         "GraphEditor.h",
@@ -34,11 +34,10 @@ project "ImGuizmo"
         "ImGui"
     }]]
 
-    filter "system:linux"
-        pic "on"
+    filter "options:target=linux"
         systemversion "latest"
 
-    filter "system:windows"
+    filter "options:target=windows"
         systemversion "latest"
 
     filter "configurations:Debug"

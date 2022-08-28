@@ -4,8 +4,8 @@ project "glad"
 	staticruntime "off"
     pic "on"
 
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+	targetdir ("bin/%{outputdir}")
+    objdir ("bin-obj/%{outputdir}")
 
 	files {
 		"include/glad/glad.h",

@@ -19,12 +19,12 @@ newoption {
     description = "The target platform to compile to",
     default = os.host(),
     allowed = {
-        { "windows", "Windows" },
+        { "windows", "Windows system" },
         { "linux", "Unix-based systems" }
     }
 }
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+outputdir = "%{cfg.buildcfg}-%{_OPTIONS['target']}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["assimp"]            = "../Mahakam/vendor/assimp/include"
@@ -65,6 +65,23 @@ VendorIncludes = {
     "%{IncludeDir.robin_hood}",
     "%{IncludeDir.spdlog}",
     "%{IncludeDir.yaml}"
+}
+
+VendorLinks = {
+    "BulletDynamics",
+    "BulletCollision",
+    "LinearMath",
+    "GLFW",
+    "glad",
+    "ImGui",
+    "ImGuizmo",
+    "yaml-cpp",
+    "phonon"
+}
+
+MinGWLinks = {
+    "gdi32",
+    "dwmapi"
 }
 
 if (_OPTIONS["no-assimp"]) then

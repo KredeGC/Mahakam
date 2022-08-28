@@ -4,11 +4,10 @@ project "GLFW"
     staticruntime "off"
     pic "on"
 
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+    targetdir ("bin/%{outputdir}")
+    objdir ("bin-obj/%{outputdir}")
 
-    files
-    {
+    files {
         "include/GLFW/glfw3.h",
         "include/GLFW/glfw3native.h",
         "src/glfw_config.h",
@@ -20,11 +19,10 @@ project "GLFW"
         "src/window.c"
     }
 
-    filter "system:windows"
+    filter "options:target=windows"
         systemversion "latest"
 
-        files
-        {
+        files {
             "src/win32_init.c",
             "src/win32_joystick.c",
             "src/win32_monitor.c",
@@ -36,24 +34,19 @@ project "GLFW"
             "src/osmesa_context.c"
         }
 
-        defines 
-        { 
+        defines { 
             "_GLFW_WIN32",
             "_CRT_SECURE_NO_WARNINGS"
         }
 
-        links
-        {
+        links {
             "Dwmapi.lib"
         }
     
-    filter "system:linux"
-        pic "on"
-
+    filter "options:target=linux"
         systemversion "latest"
         
-        files
-        {
+        files {
             "src/x11_init.c",
             "src/x11_monitor.c",
             "src/x11_window.c",
@@ -66,8 +59,7 @@ project "GLFW"
             "src/linux_joystick.c"
         }
 
-        defines
-        {
+        defines {
             "_GLFW_X11"
         }
 

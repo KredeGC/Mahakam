@@ -5,8 +5,8 @@ project "ImGui"
     staticruntime "off"
     pic "on"
 
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
+    targetdir ("bin/%{outputdir}")
+    objdir ("bin-obj/%{outputdir}")
 
     files {
         "imconfig.h",
@@ -26,11 +26,11 @@ project "ImGui"
         "_CRT_SECURE_NO_WARNINGS"
     }
 
-    filter "system:linux"
+    filter "options:target=linux"
         pic "on"
         systemversion "latest"
 
-    filter "system:windows"
+    filter "options:target=windows"
         systemversion "latest"
 
     filter "configurations:Debug"
