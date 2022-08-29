@@ -396,7 +396,7 @@ namespace Mahakam::Editor
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		UpdateRuntimeLibrary();
+		//UpdateRuntimeLibrary();
 
 		// Call shared library update
 		m_UpdatePtr(SceneManager::GetActiveScene().get(), dt);

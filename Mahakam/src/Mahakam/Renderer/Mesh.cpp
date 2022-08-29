@@ -251,7 +251,7 @@ namespace Mahakam
 		glm::vec3* positions = new glm::vec3[vertexCount];
 		glm::vec2* uvs = new glm::vec2[vertexCount];
 		glm::vec3* normals = new glm::vec3[vertexCount];
-		glm::vec3* tangents = new glm::vec3[vertexCount];
+		glm::vec4* tangents = new glm::vec4[vertexCount];
 
 		uint32_t* indices = new uint32_t[indexCount];
 
@@ -273,7 +273,7 @@ namespace Mahakam
 				positions[index] = pointOnCube;
 				uvs[index] = percent;
 				normals[index] = { 0.0f, 1.0f, 0.0f };
-				tangents[index] = { -1.0f, 0.0f, 0.0f }; // Positive or negative?
+				tangents[index] = { -1.0f, 0.0f, 0.0f, 1.0f }; // Positive or negative?
 
 				if (x != rows - 1 && y != columns - 1)
 				{
@@ -320,7 +320,7 @@ namespace Mahakam
 		glm::vec3* positions = new glm::vec3[vertexCount];
 		glm::vec2* uvs = new glm::vec2[vertexCount];
 		glm::vec3* normals = new glm::vec3[vertexCount];
-		glm::vec3* tangents = new glm::vec3[vertexCount];
+		glm::vec4* tangents = new glm::vec4[vertexCount];
 
 		uint32_t* indices = new uint32_t[indexCount];
 
@@ -343,7 +343,7 @@ namespace Mahakam
 				positions[index] = pointOnSphereCenter * 0.5f;
 				uvs[index] = { percentCenter.x, 1.0f - percentCenter.y };
 				normals[index] = pointOnSphereCenter;
-				tangents[index] = glm::normalize(pointOnSphereRight - pointOnSphereCenter);
+				tangents[index] = { glm::normalize(pointOnSphereRight - pointOnSphereCenter), 1.0f };
 
 				if (x != rows - 1 && y != columns - 1)
 				{
@@ -400,7 +400,7 @@ namespace Mahakam
 		glm::vec3* positions = new glm::vec3[vertexCount];
 		glm::vec2* uvs = new glm::vec2[vertexCount];
 		glm::vec3* normals = new glm::vec3[vertexCount];
-		glm::vec3* tangents = new glm::vec3[vertexCount];
+		glm::vec4* tangents = new glm::vec4[vertexCount];
 
 		uint32_t* indices = new uint32_t[indexCount];
 
@@ -435,7 +435,7 @@ namespace Mahakam
 					else
 						uvs[index] = percent;
 					normals[index] = pointOnSphere;
-					tangents[index] = glm::normalize(pointOnSphereRight - pointOnSphere);
+					tangents[index] = { glm::normalize(pointOnSphereRight - pointOnSphere), 1.0f };
 
 					if (x != tessellation - 1 && y != tessellation - 1)
 					{
@@ -501,14 +501,14 @@ namespace Mahakam
 		glm::vec3* positions = new glm::vec3[mesh->mNumVertices];
 		glm::vec2* texcoords = new glm::vec2[mesh->mNumVertices];
 		glm::vec3* normals = new glm::vec3[mesh->mNumVertices];
-		glm::vec3* tangents = new glm::vec3[mesh->mNumVertices];
+		glm::vec4* tangents = new glm::vec4[mesh->mNumVertices];
 		glm::vec4* colors = new glm::vec4[mesh->mNumVertices];
 		glm::ivec4* boneIDs = new glm::ivec4[mesh->mNumVertices];
 		glm::vec4* boneWeights = new glm::vec4[mesh->mNumVertices];
 
 		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
 		{
-			boneIDs[i] = glm::ivec4(-1, -1, -1, -1);
+			boneIDs[i] = glm::vec4(-1.0, -1.0, -1.0, -1.0);
 			boneWeights[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 		}
 
@@ -654,9 +654,43 @@ namespace Mahakam
 
 		const void* bufferData = &buffer.data[bufferView.byteOffset + accessor.byteOffset];
 
-		memcpy(dst + offset, bufferData, accessor.count * sizeof(T));
+		size_t componentCount = tinygltf::GetNumComponentsInType(accessor.type);
+		size_t componentSize = tinygltf::GetComponentSizeInBytes(accessor.componentType);
+
+		if (componentSize * componentCount > sizeof(T))
+		{
+			MH_CORE_BREAK("[GLTF] Downscaling attributes is not currently supported");
+		}
+		else if (componentSize * componentCount < sizeof(T)) // Ex: the file uses 8 bits, but the buffer we allocate uses 32 bits
+		{
+			// Assume that the type is the same for both the file and buffer (eg. vec3)
+			size_t outComponentSize = sizeof(T) / componentCount;
+
+			// Copy each component of the type individually
+			memset(dst + offset, 0, accessor.count * sizeof(T));
+			for (size_t i = 0; i < accessor.count * componentCount; i++)
+				memcpy(((uint8_t*)dst) + offset * sizeof(T) + i * outComponentSize, ((uint8_t*)bufferData) + i * componentSize, componentSize);
+		}
+		else // Copy straight, no mismatch. Type should be interpreted, so it doesn't matter
+		{
+			memcpy(dst + offset, bufferData, accessor.count * sizeof(T));
+		}
 
 		offset += accessor.count;
+	}
+
+	void GLTFReadNodeHierarchy(tinygltf::Model& model, int id, int parentID, SkinnedMesh& skinnedMesh)
+	{
+		const tinygltf::Node& node = model.nodes[id];
+
+		BoneNode bone;
+		bone.name = node.name;
+		bone.id = id;
+		bone.parentID = parentID;
+		skinnedMesh.BoneHierarchy.push_back(bone);
+
+		for (auto& child : node.children)
+			GLTFReadNodeHierarchy(model, child, id, skinnedMesh);
 	}
 
 	SkinnedMesh GLTFLoadModel(const std::filesystem::path& filepath)
@@ -684,9 +718,8 @@ namespace Mahakam
 		MH_CORE_ASSERT(!model.scenes.empty(), "GLTF scenes are empty!");
 
 		auto& scene = model.scenes[model.defaultScene];
-		auto& nodes = scene.nodes;
 
-		MH_CORE_ASSERT(!nodes.empty(), "GLTF nodes are empty!");
+		MH_CORE_ASSERT(!scene.nodes.empty(), "GLTF nodes are empty!");
 
 
 		SkinnedMesh skinnedMesh;
@@ -710,7 +743,7 @@ namespace Mahakam
 			glm::vec3* positions = new glm::vec3[vertexCount];
 			glm::vec2* texcoords = new glm::vec2[vertexCount];
 			glm::vec3* normals = new glm::vec3[vertexCount];
-			glm::vec3* tangents = new glm::vec3[vertexCount];
+			glm::vec4* tangents = new glm::vec4[vertexCount];
 			glm::vec4* colors = new glm::vec4[vertexCount];
 			glm::ivec4* boneIDs = new glm::ivec4[vertexCount];
 			glm::vec4* boneWeights = new glm::vec4[vertexCount];
@@ -727,10 +760,11 @@ namespace Mahakam
 
 			for (uint32_t i = 0; i < vertexCount; i++)
 			{
-				boneIDs[i] = glm::ivec4(-1, -1, -1, -1);
+				boneIDs[i] = glm::vec4(-1.0, -1.0, -1.0, -1.0);
 				boneWeights[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 			}
 
+			// Load attributes and indices
 			for (auto& p : m.primitives)
 			{
 				// Extract positions
@@ -743,10 +777,26 @@ namespace Mahakam
 				GLTFLoadAttribute<glm::vec3>(model, p, "NORMAL", normalOffset, normals);
 
 				// Extract tangents
-				GLTFLoadAttribute<glm::vec3>(model, p, "TANGENT", tangentOffset, tangents);
+				GLTFLoadAttribute<glm::vec4>(model, p, "TANGENT", tangentOffset, tangents);
 
 				// Extract vertex colors
 				GLTFLoadAttribute<glm::vec4>(model, p, "COLOR_0", colorOffset, colors);
+
+				// Extract joint information
+				GLTFLoadAttribute<glm::ivec4>(model, p, "JOINTS_0", boneIDOffset, boneIDs);
+
+				// Extract weight information
+				GLTFLoadAttribute<glm::vec4>(model, p, "WEIGHTS_0", boneWeightOffset, boneWeights);
+
+				// Normalize weights
+				{
+					/*for (size_t i = 0; i < boneWeightOffset; i++)
+					{
+						glm::vec4& weight = boneWeights[i];
+
+						float sum = weight.x + weight.y + weight.z + weight.w;
+					}*/
+				}
 
 				// Extract indices
 				{
@@ -781,6 +831,72 @@ namespace Mahakam
 				}
 			}
 
+			// Extract bone transformations
+			for (auto& skinNode : model.nodes)
+			{
+				if (skinNode.skin > -1)
+				{
+					// Get the skin from the node
+					auto& skin = model.skins[skinNode.skin];
+
+					auto& skinPos = skinNode.translation;
+					auto& skinRot = skinNode.rotation;
+					auto& skinScale = skinNode.scale;
+
+					glm::mat4 skinnedTransform{ 1.0f };
+					if (!skinPos.empty())
+						skinnedTransform *= glm::translate(glm::mat4(1.0f), glm::vec3{ (float)skinPos[0], (float)skinPos[1], (float)skinPos[2] });
+					if (!skinRot.empty())
+						skinnedTransform *= glm::toMat4(glm::quat{ (float)skinRot[0], (float)skinRot[1], (float)skinRot[2], (float)skinRot[3] });
+					if (!skinScale.empty())
+						skinnedTransform *= glm::scale(glm::mat4(1.0f), glm::vec3{ (float)skinScale[0], (float)skinScale[1], (float)skinScale[2] });
+
+					glm::mat4 invSkinnedTransform = glm::inverse(skinnedTransform);
+
+					// Get the affected nodes and their bind matrices
+					auto& joints = skin.joints;
+					const auto& accessor = model.accessors[skin.inverseBindMatrices];
+					const auto& bufferView = model.bufferViews[accessor.bufferView];
+					const auto& buffer = model.buffers[bufferView.buffer];
+
+					const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
+
+					// Extract hierarchy data
+					skinnedMesh.boneCount = joints.size();
+					skinnedMesh.BoneHierarchy.reserve(joints.size());
+					GLTFReadNodeHierarchy(model, joints[0], -1,  skinnedMesh);
+
+					MH_CORE_ASSERT(skinnedMesh.BoneHierarchy.size() == skinnedMesh.boneCount, "Bone hierarchy count doesn't match skeleton");
+
+					// Add the bones to the skinned mesh
+					for (uint32_t i = 0; i < joints.size(); i++)
+					{
+						const auto& node = model.nodes[joints[i]];
+
+						std::string boneName = node.name;
+
+						auto& nodePos = node.translation;
+						auto& nodeRot = node.rotation;
+						auto& nodeScale = node.scale;
+
+						glm::mat4 jointTransform{ 1.0f };
+						if (!nodePos.empty())
+							jointTransform *= glm::translate(glm::mat4(1.0f), glm::vec3{ (float)nodePos[0], (float)nodePos[1], (float)nodePos[2] });
+						if (!nodeRot.empty())
+							jointTransform *= glm::toMat4(glm::quat{ (float)nodeRot[0], (float)nodeRot[1], (float)nodeRot[2], (float)nodeRot[3] });
+						if (!nodeScale.empty())
+							jointTransform *= glm::scale(glm::mat4(1.0f), glm::vec3{ (float)nodeScale[0], (float)nodeScale[1], (float)nodeScale[2] });
+
+						BoneInfo bone;
+						bone.id = i;
+						bone.offset = invSkinnedTransform * jointTransform * invMatrices[i];
+						skinnedMesh.boneInfo[boneName] = bone;
+					}
+				}
+			}
+
+			MH_CORE_TRACE(skinnedMesh.boneCount);
+
 			MH_CORE_ASSERT(vertexCount == positionOffset, "Vertex count mismatch");
 			MH_CORE_ASSERT(indexCount == indexOffset, "Index count mismatch");
 
@@ -797,11 +913,11 @@ namespace Mahakam
 				interleavedVertices.tangents = tangents;
 			if (colorOffset)
 				interleavedVertices.colors = colors;
-			/*if (mesh->HasBones())
+			if (boneIDOffset && boneWeightOffset)
 			{
 				interleavedVertices.boneIDs = boneIDs;
 				interleavedVertices.boneWeights = boneWeights;
-			}*/
+			}
 
 			Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 

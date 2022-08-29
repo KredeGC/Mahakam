@@ -60,6 +60,11 @@ MH_EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 #pragma endregion
 }
 
+// TEMPORARY
+std::unordered_map<uint32_t, Entity> boneEntities;
+std::unordered_map<uint32_t, uint32_t> boneIDs;
+Asset<Material> skinnedMaterial;
+
 MH_EXTERN_EXPORTED void Run(Scene* scene)
 {
 	// Create light entity
@@ -136,7 +141,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	particleEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
-#if 1
+#if 0
 	// Create backpack model
 	//SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
 	SkinnedMesh backpackModel = GLTFLoadModel("assets/models/backpack.gltf");
@@ -148,6 +153,48 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
 	backpackEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	backpackEntity.AddComponent<RotatorComponent>();
+#endif
+
+
+#if 1
+	// Create glTF skinned model
+	SkinnedMesh skinnedModel = GLTFLoadModel("assets/models/mannequin_clap.gltf");
+
+	skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
+
+	// Create backpack entity
+	Entity skinnedEntity = scene->CreateEntity("Skinned glTF");
+	skinnedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
+	skinnedEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
+
+	boneEntities.reserve(skinnedModel.boneCount);
+
+	for (auto& node : skinnedModel.BoneHierarchy)
+	{
+		Entity boneEntity = scene->CreateEntity(node.name);
+
+		if (node.parentID > -1)
+		{
+			boneEntity.SetParent(boneEntities[node.parentID]);
+		}
+
+		glm::vec3 pos, scale;
+		glm::quat rot;
+
+		auto& bone = skinnedModel.boneInfo[node.name];
+
+		Math::DecomposeTransform(bone.offset, pos, rot, scale);
+
+		pos /= scale;
+
+		boneEntity.AddComponent<TransformComponent>();
+
+		/*boneEntity.AddComponent<TransformComponent>().SetPosition(pos);
+		boneEntity.GetComponent<TransformComponent>().SetRotation(rot);*/
+
+		boneEntities[node.id] = boneEntity;
+		boneIDs[node.id] = bone.id;
+	}
 #endif
 
 
@@ -234,6 +281,13 @@ MH_EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
 		rotator.rotation += dt * rotator.rotationSpeed;
 		transform.SetRotation(glm::quat(glm::vec3{ 0.0f, glm::radians(rotator.rotation), 0.0f }));
 	});
+
+
+	// Update bone entities
+	for (auto& [id, boneEntity] : boneEntities)
+	{
+		skinnedMaterial->SetMat4("finalBonesMatrices[" + std::to_string(boneIDs[id]) + "]", boneEntity.GetComponent<TransformComponent>());
+	}
 
 
 	// Update Camera controller

@@ -21,7 +21,7 @@
 layout(location = 0) in vec3 i_Pos;
 layout(location = 1) in vec2 i_UV;
 layout(location = 2) in vec3 i_Normal;
-layout(location = 3) in vec3 i_Tangent;
+layout(location = 3) in vec4 i_Tangent;
 layout(location = 5) in ivec4 i_BoneIDs;
 layout(location = 6) in vec4 i_BoneWeights;
 
@@ -45,7 +45,7 @@ void main() {
     
     #if defined(GEOMETRY)
         vec3 normal = mat3(boneTransform) * i_Normal;
-        vec3 tangent = mat3(boneTransform) * i_Tangent;
+        vec3 tangent = mat3(boneTransform) * i_Tangent.xyz;
         
         gl_Position = MATRIX_MVP * pos; //vec4(i_Pos, 1.0)
         

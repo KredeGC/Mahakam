@@ -16,8 +16,15 @@ namespace Mahakam
 
 	struct BoneInfo
 	{
-		int id;
+		int id; // Joint ID
 		glm::mat4 offset;
+	};
+
+	struct BoneNode
+	{
+		std::string name;
+		int id; // Node ID
+		int parentID;
 	};
 
 	struct SkinnedMesh
@@ -25,6 +32,7 @@ namespace Mahakam
 		std::vector<Asset<Mesh>> meshes;
 		std::vector<Asset<Material>> materials;
 		UnorderedMap<std::string, BoneInfo> boneInfo;
+		std::vector<BoneNode> BoneHierarchy;
 		int boneCount = 0;
 
 		SkinnedMesh() = default;
@@ -65,7 +73,7 @@ namespace Mahakam
 			glm::vec3* positions = nullptr;
 			glm::vec2* texcoords = nullptr;
 			glm::vec3* normals = nullptr;
-			glm::vec3* tangents = nullptr;
+			glm::vec4* tangents = nullptr;
 			glm::vec4* colors = nullptr;
 			glm::ivec4* boneIDs = nullptr;
 			glm::vec4* boneWeights = nullptr;

@@ -17,7 +17,7 @@ layout(location = 0) out v2f o;
 layout(location = 0) in vec3 i_Pos;
 layout(location = 1) in vec2 i_UV;
 layout(location = 2) in vec3 i_Normal;
-layout(location = 3) in vec3 i_Tangent;
+layout(location = 3) in vec4 i_Tangent;
 
 #ifndef USE_TRIPLANAR
     layout(location = 0) uniform vec4 u_UVTransform;
@@ -30,8 +30,8 @@ void main() {
     //o.v_WorldNormal = (MATRIX_M * vec4(i_Normal, 0.0)).xyz; // Correct for uniformly scaled objects
     o.v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
     #ifndef USE_TRIPLANAR
-        o.v_WorldTangent = (MATRIX_M * vec4(i_Tangent, 0.0)).xyz;
-        o.v_WorldBinormal = cross(o.v_WorldNormal, o.v_WorldTangent);
+        o.v_WorldTangent = (MATRIX_M * vec4(i_Tangent.xyz, 0.0)).xyz;
+        o.v_WorldBinormal = cross(o.v_WorldNormal, o.v_WorldTangent.xyz);
         o.v_UV = u_UVTransform.xy * i_UV + u_UVTransform.zw;
     #endif
 }
