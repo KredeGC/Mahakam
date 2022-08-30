@@ -145,7 +145,7 @@ namespace Mahakam::GUI
 				Entity dragEntity = *((Entity*)payload->Data);
 
 				auto& components = ComponentRegistry::GetComponents();
-				auto& iter = components.find(component);
+				auto iter = components.find(component);
 				if (iter != components.end())
 				{
 					if (iter->second.HasComponent(dragEntity))

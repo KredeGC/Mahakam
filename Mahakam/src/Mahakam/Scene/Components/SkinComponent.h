@@ -9,9 +9,6 @@ namespace Mahakam
 	struct SkinComponent
 	{
 	private:
-		/*UnorderedMap<uint32_t, Entity> m_BoneEntities;
-		UnorderedMap<uint32_t, BoneInfo> m_Bones;*/
-
 		std::vector<Entity> m_BoneEntities;
 		std::vector<BoneInfo> m_Bones;
 
@@ -20,16 +17,22 @@ namespace Mahakam
 
 		SkinComponent(const SkinComponent&) = default;
 
-		inline void AddBoneEntity(const SkinnedMesh& skinnedMesh, const std::string& name, Entity entity)
+		inline void SetSkin(const SkinnedMesh& skinnedMesh)
 		{
-			m_BoneEntities.push_back(entity);
-			m_Bones.push_back(skinnedMesh.boneInfo.at(name));
+			m_BoneEntities.reserve(skinnedMesh.boneCount);
+			m_Bones.reserve(skinnedMesh.boneCount);
+
+			for (auto& node : skinnedMesh.BoneHierarchy)
+			{
+				auto& bone = skinnedMesh.boneInfo.at(node.name);
+
+				m_Bones.push_back(bone);
+			}
 		}
 
-		inline void AddBoneEntity(const BoneInfo& bone, Entity entity)
+		inline void AddBoneEntity(Entity entity)
 		{
 			m_BoneEntities.push_back(entity);
-			m_Bones.push_back(bone);
 		}
 
 		inline std::vector<Entity>& GetBoneEntities() { return m_BoneEntities; }

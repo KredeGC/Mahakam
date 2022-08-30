@@ -62,9 +62,6 @@ MH_EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 
 // TEMPORARY
 std::unordered_map<uint32_t, Entity> boneEntities;
-std::unordered_map<uint32_t, BoneInfo> boneIDs;
-Entity skinnedEntity;
-Asset<Material> skinnedMaterial;
 
 MH_EXTERN_EXPORTED void Run(Scene* scene)
 {
@@ -161,13 +158,15 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	// Create glTF skinned model
 	SkinnedMesh skinnedModel = GLTFLoadModel("assets/models/mannequin_clap.gltf");
 
-	skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
+	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
 	// Create backpack entity
-	skinnedEntity = scene->CreateEntity("Skinned glTF");
+	Entity skinnedEntity = scene->CreateEntity("Skinned glTF");
 	skinnedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
 	skinnedEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	SkinComponent& skin = skinnedEntity.AddComponent<SkinComponent>();
+
+	skin.SetSkin(skinnedModel);
 
 	boneEntities.reserve(skinnedModel.boneCount);
 
@@ -204,10 +203,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 		else
 			boneEntity.GetComponent<TransformComponent>().UpdateModelMatrix(glm::mat4(1.0f));
 
-		skin.AddBoneEntity(bone, boneEntity);
+		skin.AddBoneEntity(boneEntity);
 
 		boneEntities[node.id] = boneEntity;
-		boneIDs[node.id] = bone;
 	}
 #endif
 

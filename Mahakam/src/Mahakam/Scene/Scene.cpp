@@ -181,10 +181,13 @@ namespace Mahakam
 					auto& boneEntity = boneEntities.at(i);
 					auto& bone = bones.at(i);
 
-					glm::mat4 transform = glm::inverse(registry.get<TransformComponent>(entity).GetModelMatrix())
-						* boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
-						* bone.offset;
-					material->SetMat4("finalBonesMatrices[" + std::to_string(bone.id) + "]", transform);
+					if (boneEntity)
+					{
+						glm::mat4 transform = glm::inverse(registry.get<TransformComponent>(entity).GetModelMatrix())
+							* boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
+							* bone.offset;
+						material->SetMat4("finalBonesMatrices[" + std::to_string(bone.id) + "]", transform);
+					}
 				}
 			});
 		}
