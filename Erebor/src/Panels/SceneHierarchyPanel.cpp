@@ -47,16 +47,24 @@ namespace Mahakam::Editor
 
 		strncat(tagName, tag.c_str(), 252);
 
-		bool open = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tagName);
+		bool open = ImGui::TreeNodeEx((void*)(uint64_t)uint32_t(entity), flags, "%s", tagName);
 
 		// If entity is clicked (not the arrow)
-		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+		if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen())
 			Selection::SetSelectedEntity(entity);
+
+		// Set as drag source for all it's components
+		if (ImGui::BeginDragDropSource())
+		{
+			ImGui::SetDragDropPayload("Entity", &entity, sizeof(Entity));
+			ImGui::Text("(%d) %s", uint32_t(entity), tagName);
+			ImGui::EndDragDropSource();
+		}
 
 		// If entity is right-clicked
 		if (ImGui::BeginPopupContextItem())
 		{
-			ImGui::TextDisabled("%s", tagName);
+			ImGui::TextDisabled("(%d) %s", uint32_t(entity), tagName);
 
 			if (ImGui::MenuItem("Create empty entity"))
 			{

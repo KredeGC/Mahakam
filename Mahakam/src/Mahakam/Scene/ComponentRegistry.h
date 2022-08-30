@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "SceneSerializer.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -17,7 +18,7 @@ namespace Mahakam
 			void (*RemoveComponent)(Entity) = nullptr;
 
 			bool (*Serialize)(YAML::Emitter&, Entity) = nullptr;
-			bool (*Deserialize)(YAML::Node&, Entity) = nullptr;
+			bool (*Deserialize)(YAML::Node&, SceneSerializer::EntityMap&, Entity) = nullptr;
 
 			template<typename T>
 			void SetComponent()

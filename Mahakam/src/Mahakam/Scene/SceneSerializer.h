@@ -10,9 +10,12 @@ namespace Mahakam
 {
 	class SceneSerializer
 	{
+	public:
+		using EntityMap = UnorderedMap<uint32_t, entt::entity>;
+
 	private:
 		Ref<Scene> m_Scene;
-		UnorderedMap<uint32_t, entt::entity> m_Entities;
+		EntityMap m_Entities;
 
 	public:
 		SceneSerializer(Ref<Scene> scene);

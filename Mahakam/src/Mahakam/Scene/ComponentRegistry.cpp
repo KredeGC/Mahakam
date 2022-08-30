@@ -9,6 +9,7 @@
 #include "Components/MeshComponent.h"
 #include "Components/ParticleSystemComponent.h"
 #include "Components/RigidbodyComponent.h"
+#include "Components/SkinComponent.h"
 #include "Components/TagComponent.h"
 #include "Components/TransformComponent.h"
 #include "Entity.h"
@@ -55,7 +56,7 @@ namespace Mahakam
 
 			return true;
 		};
-		transformInterface.Deserialize = [](YAML::Node& node, Entity entity)
+		transformInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			TransformComponent& transform = entity.AddComponent<TransformComponent>();
 
@@ -95,7 +96,7 @@ namespace Mahakam
 
 			return true;
 		};
-		audioSourceInterface.Deserialize = [](YAML::Node& node, Entity entity)
+		audioSourceInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			AudioSourceComponent& source = entity.AddComponent<AudioSourceComponent>();
 
@@ -139,7 +140,7 @@ namespace Mahakam
 
 			return true;
 		};
-		cameraInterface.Deserialize = [](YAML::Node& node, Entity entity)
+		cameraInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			CameraComponent& cameraComponent = entity.AddComponent<CameraComponent>();
 			Camera& camera = cameraComponent;
@@ -174,7 +175,7 @@ namespace Mahakam
 
 			return true;
 		};
-		lightInterface.Deserialize = [](YAML::Node& node, Entity entity)
+		lightInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			Light& light = entity.AddComponent<LightComponent>();
 
@@ -197,6 +198,43 @@ namespace Mahakam
 
 		RegisterComponent("Mesh", meshInterface);
 #pragma endregion
+
+#pragma region Skin
+		ComponentInterface skinInterface;
+		skinInterface.SetComponent<SkinComponent>();
+		skinInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		{
+			SkinComponent& skin = entity.GetComponent<SkinComponent>();
+
+			emitter << YAML::Key << "Bones" << YAML::Value << YAML::BeginSeq;
+			std::vector<Entity> bones = skin.GetBoneEntities();
+			for (auto& bone : bones)
+			{
+				emitter << YAML::Value << uint32_t(bone);
+			}
+			emitter << YAML::EndSeq;
+
+			return true;
+		};
+		skinInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
+		{
+			SkinComponent& skin = entity.AddComponent<SkinComponent>();
+			std::vector<Entity>& bones = skin.GetBoneEntities();
+
+			YAML::Node nodes = node["Bones"];
+			bones.reserve(nodes.size());
+			for (auto boneNode : nodes)
+			{
+				uint32_t entityID = boneNode.as<uint32_t>();
+				Entity translatedEntity{ translation[entityID], entity };
+				bones.push_back(translatedEntity);
+			}
+
+			return true;
+		};
+
+		RegisterComponent("Skin", skinInterface);
+#pragma endregion
 	};
 
 	//void ComponentRegistry::DeregisterDefaultComponents()
@@ -209,5 +247,6 @@ namespace Mahakam
 		DeregisterComponent("Camera");
 		DeregisterComponent("Light");
 		DeregisterComponent("Mesh");
+		DeregisterComponent("Skin");
 	};
 }

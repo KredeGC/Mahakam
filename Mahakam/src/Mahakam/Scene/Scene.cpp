@@ -10,6 +10,7 @@
 #include "Components/MeshComponent.h"
 #include "Components/ParticleSystemComponent.h"
 #include "Components/RelationshipComponent.h"
+#include "Components/SkinComponent.h"
 #include "Components/TagComponent.h"
 #include "Components/TransformComponent.h"
 #include "Entity.h"
@@ -161,6 +162,30 @@ namespace Mahakam
 				for (auto& material : materials)
 					for (int j = 0; j < Animator::MAX_BONES; ++j)
 						material->SetMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
+			});
+		}
+
+		// Update SkinComponent
+		{
+			MH_PROFILE_SCOPE("Scene::OnUpdate - SkinComponent");
+
+			registry.view<SkinComponent, MeshComponent>().each([=](entt::entity entity, SkinComponent& skinComponent, MeshComponent& meshComponent)
+			{
+				auto& boneEntities = skinComponent.GetBoneEntities();
+				auto& bones = skinComponent.GetBoneInfo();
+
+				Asset<Material> material = meshComponent.GetMaterial();
+
+				for (size_t i = 0; i < bones.size(); i++)
+				{
+					auto& boneEntity = boneEntities.at(i);
+					auto& bone = bones.at(i);
+
+					glm::mat4 transform = glm::inverse(registry.get<TransformComponent>(entity).GetModelMatrix())
+						* boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
+						* bone.offset;
+					material->SetMat4("finalBonesMatrices[" + std::to_string(bone.id) + "]", transform);
+				}
 			});
 		}
 

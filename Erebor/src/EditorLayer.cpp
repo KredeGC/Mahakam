@@ -269,6 +269,21 @@ namespace Mahakam::Editor
 		};
 
 		PropertyRegistry::Register("Mesh", meshInspector);
+
+		// Skin
+		PropertyRegistry::PropertyPtr skinInspector = [](Entity entity)
+		{
+			SkinComponent& skinComponent = entity.GetComponent<SkinComponent>();
+
+			auto& bones = skinComponent.GetBoneEntities();
+			
+			for (auto& bone : bones)
+			{
+				GUI::DrawDragDropEntity("Bone", "Transform", bone);
+			}
+		};
+
+		PropertyRegistry::Register("Skin", skinInspector);
 #endif
 #pragma endregion
 

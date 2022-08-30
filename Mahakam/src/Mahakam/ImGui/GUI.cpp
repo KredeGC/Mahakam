@@ -1,6 +1,13 @@
 #include "Mahakam/mhpch.h"
 #include "GUI.h"
 
+#ifndef MH_STANDALONE
+#include "Mahakam/Editor/Selection.h"
+#endif
+
+#include "Mahakam/Scene/ComponentRegistry.h"
+#include "Mahakam/Scene/Components/TagComponent.h"
+
 #include <imgui/imgui_internal.h>
 
 namespace Mahakam::GUI
@@ -103,6 +110,107 @@ namespace Mahakam::GUI
 		ImGui::Columns(1);
 
 		return changed;
+	}
+
+	bool DrawDragDropEntity(const std::string& label, const std::string& component, Entity& entity)
+	{
+		std::string entityLabel = "undefined";
+
+		if (entity && entity.IsValid())
+		{
+			if (TagComponent* tag = entity.TryGetComponent<TagComponent>())
+				entityLabel = tag->Tag;
+			else
+				entityLabel = std::to_string(uint32_t(entity));
+		}
+
+		ImGui::Button(entityLabel.c_str());
+
+		// Select entity on double click
+#ifndef MH_STANDALONE
+		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			Editor::Selection::SetSelectedEntity(entity);
+#endif
+
+		// Remove entity reference
+		if ((ImGui::IsItemFocused() && Input::IsKeyPressed(Key::Delete))
+			|| (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
+			entity = {};
+
+		// Set as drop target
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity", ImGuiDragDropFlags_AcceptPeekOnly))
+			{
+				Entity dragEntity = *((Entity*)payload->Data);
+
+				auto& components = ComponentRegistry::GetComponents();
+				auto& iter = components.find(component);
+				if (iter != components.end())
+				{
+					if (iter->second.HasComponent(dragEntity))
+					{
+						ImGui::AcceptDragDropPayload("Entity");
+
+						if (payload->IsDelivery())
+						{
+							entity = dragEntity;
+							return true;
+						}
+					}
+				}
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		ImGui::SameLine();
+		ImGui::Text("%s", label.c_str());
+
+		return false;
+	}
+
+	bool DrawDragDropEntity(const std::string& label, Entity& entity)
+	{
+		std::string entityLabel = "undefined";
+
+		if (entity && entity.IsValid())
+		{
+			if (TagComponent* tag = entity.TryGetComponent<TagComponent>())
+				entityLabel = tag->Tag;
+			else
+				entityLabel = std::to_string(uint32_t(entity));
+		}
+
+		ImGui::Button(entityLabel.c_str());
+
+		// Select entity on double click
+#ifndef MH_STANDALONE
+		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			Editor::Selection::SetSelectedEntity(entity);
+#endif
+
+		// Remove entity reference
+		if ((ImGui::IsItemFocused() && Input::IsKeyPressed(Key::Delete))
+			|| (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
+			entity = {};
+
+		// Set as drop target
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity"))
+			{
+				entity = *((Entity*)payload->Data);
+				return true;
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		ImGui::SameLine();
+		ImGui::Text("%s", label.c_str());
+
+		return false;
 	}
 
 	bool DrawDragDropField(const std::string& label, const std::string& extension, std::filesystem::path& importPath)

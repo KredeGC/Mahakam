@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Scene/Entity.h"
+
 #include <imgui/imgui.h>
 
 #include <glm/glm.hpp>
@@ -13,8 +15,10 @@ namespace Mahakam::GUI
 
 	bool DrawColor3Edit(const char* label, glm::vec3& value, ImGuiColorEditFlags flags = 0);
 
-	bool DrawDragDropField(const std::string& label, const std::string& extension, std::filesystem::path& importPath);
+	bool DrawDragDropEntity(const std::string& label, const std::string& component, Entity& entity);
+	bool DrawDragDropEntity(const std::string& label, Entity& entity);
 
+	bool DrawDragDropField(const std::string& label, const std::string& extension, std::filesystem::path& importPath);
 	bool DrawDragDropTarget(const std::vector<std::string>& extensions, std::filesystem::path& importPath);
 
 	bool DrawColor3Edit(const std::string& label, glm::vec3& value, ImGuiColorEditFlags flags = ImGuiColorEditFlags_None);

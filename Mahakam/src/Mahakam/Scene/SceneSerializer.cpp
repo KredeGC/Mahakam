@@ -145,6 +145,7 @@ namespace Mahakam
 		{
 			m_Entities.reserve(entities.size());
 
+			// Create entities and their relationships
 			for (auto entity : entities)
 			{
 				uint32_t id = entt::null;
@@ -162,8 +163,6 @@ namespace Mahakam
 				if (tagNode)
 					tag = tagNode.as<std::string>();
 
-				MH_CORE_TRACE(tag);
-
 				Entity deserializedEntity = m_Scene->CreateEntity(tag);
 				if (parent)
 				{
@@ -176,6 +175,17 @@ namespace Mahakam
 				}
 
 				m_Entities[id] = deserializedEntity;
+			}
+
+			// Deserialize other components
+			for (auto entity : entities)
+			{
+				uint32_t id = entt::null;
+				auto idNode = entity["ID"];
+				if (idNode)
+					id = idNode.as<uint32_t>();
+
+				Entity deserializedEntity{ m_Entities[id], m_Scene.get() };
 
 				DeserializeEntity(entity, deserializedEntity);
 			}
@@ -246,7 +256,7 @@ namespace Mahakam
 		{
 			YAML::Node component = node[name];
 			if (component && componentInterface.Deserialize)
-				componentInterface.Deserialize(component, entity);
+				componentInterface.Deserialize(component, m_Entities, entity);
 		}
 	}
 }

@@ -889,13 +889,11 @@ namespace Mahakam
 
 						BoneInfo bone;
 						bone.id = i;
-						bone.offset = invSkinnedTransform * jointTransform * invMatrices[i];
+						bone.offset = /*invSkinnedTransform * jointTransform */ invMatrices[i];
 						skinnedMesh.boneInfo[boneName] = bone;
 					}
 				}
 			}
-
-			MH_CORE_TRACE(skinnedMesh.boneCount);
 
 			MH_CORE_ASSERT(vertexCount == positionOffset, "Vertex count mismatch");
 			MH_CORE_ASSERT(indexCount == indexOffset, "Index count mismatch");

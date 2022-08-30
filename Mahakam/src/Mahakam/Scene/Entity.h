@@ -16,6 +16,7 @@ namespace Mahakam
 	public:
 		Entity() = default;
 		Entity(entt::entity handle, Scene* scene);
+		Entity(entt::entity handle, const Entity& entity);
 		Entity(const Entity& ent) = default;
 
 		operator bool() const { return handle != entt::null; }
@@ -32,7 +33,7 @@ namespace Mahakam
 		}
 
 		void SetParent(Entity parent);
-		Entity GetParent(Entity parent) const;
+		Entity GetParent() const;
 		void Delete();
 
 		inline bool IsValid() const

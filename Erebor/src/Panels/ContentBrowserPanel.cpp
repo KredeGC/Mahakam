@@ -161,6 +161,12 @@ namespace Mahakam::Editor
 								const char* importBuffer = importString.c_str();
 
 								ImGui::SetDragDropPayload(info.Extension.c_str(), importBuffer, strlen(importBuffer) + 1);
+								
+								ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+								ImGui::Image((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+								ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+								ImGui::TextWrapped("%s", pathName.c_str());
+
 								ImGui::EndDragDropSource();
 							}
 
@@ -205,6 +211,12 @@ namespace Mahakam::Editor
 							const char* importBuffer = importString.c_str();
 
 							ImGui::SetDragDropPayload(extension.c_str(), importBuffer, strlen(importBuffer) + 1);
+
+							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+							ImGui::Image((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+							ImGui::TextWrapped("%s", pathName.c_str());
+
 							ImGui::EndDragDropSource();
 						}
 						
