@@ -47,9 +47,6 @@ namespace Mahakam
 	Entity::Entity(entt::entity handle, Scene* scene)
 		: handle(handle), scene(scene) {}
 
-	Entity::Entity(entt::entity handle, const Entity& entity)
-		: handle(handle), scene(entity.scene) {}
-
 	void Entity::SetParent(Entity parent)
 	{
 		auto& relation = GetComponent<RelationshipComponent>();

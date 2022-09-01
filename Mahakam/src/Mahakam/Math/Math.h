@@ -115,6 +115,58 @@ namespace YAML
 		}
 	};
 
+	template<>
+	struct convert<glm::mat3>
+	{
+		static Node encode(const glm::mat3& rhs)
+		{
+			Node node;
+			node.push_back(rhs[0]);
+			node.push_back(rhs[1]);
+			node.push_back(rhs[2]);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::mat3& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+
+			rhs[0] = node[0].as<glm::vec3>();
+			rhs[1] = node[1].as<glm::vec3>();
+			rhs[2] = node[2].as<glm::vec3>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::mat4>
+	{
+		static Node encode(const glm::mat4& rhs)
+		{
+			Node node;
+			node.push_back(rhs[0]);
+			node.push_back(rhs[1]);
+			node.push_back(rhs[2]);
+			node.push_back(rhs[3]);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::mat4& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 4)
+				return false;
+
+			rhs[0] = node[0].as<glm::vec4>();
+			rhs[1] = node[1].as<glm::vec4>();
+			rhs[2] = node[2].as<glm::vec4>();
+			rhs[3] = node[3].as<glm::vec4>();
+			return true;
+		}
+	};
+
 	Emitter& operator<<(Emitter& out, const glm::vec2& v);
 
 	Emitter& operator<<(Emitter& out, const glm::vec3& v);
@@ -122,4 +174,8 @@ namespace YAML
 	Emitter& operator<<(Emitter& out, const glm::vec4& v);
 
 	Emitter& operator<<(Emitter& out, const glm::quat& q);
+
+	Emitter& operator<<(Emitter& out, const glm::mat3& q);
+
+	Emitter& operator<<(Emitter& out, const glm::mat4& q);
 }

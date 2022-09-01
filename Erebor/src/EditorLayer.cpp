@@ -276,10 +276,11 @@ namespace Mahakam::Editor
 			SkinComponent& skinComponent = entity.GetComponent<SkinComponent>();
 
 			auto& bones = skinComponent.GetBoneEntities();
+			auto& names = skinComponent.GetBoneNames();
 			
-			for (auto& bone : bones)
+			for (size_t i = 0; i < bones.size(); i++)
 			{
-				GUI::DrawDragDropEntity("Bone", "Transform", bone);
+				GUI::DrawDragDropEntity(names[i], "Transform", bones[i]);
 			}
 		};
 

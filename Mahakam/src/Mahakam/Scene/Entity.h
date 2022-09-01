@@ -16,12 +16,12 @@ namespace Mahakam
 	public:
 		Entity() = default;
 		Entity(entt::entity handle, Scene* scene);
-		Entity(entt::entity handle, const Entity& entity);
 		Entity(const Entity& ent) = default;
 
 		operator bool() const { return handle != entt::null; }
 		operator entt::entity() const { return handle; }
 		operator uint32_t() const { return (uint32_t)handle; }
+		operator Scene*() const { return scene; }
 
 		bool operator==(const Entity& other) const
 		{
@@ -91,4 +91,17 @@ namespace Mahakam
 			return scene->registry.template any_of<T>(handle);
 		}
 	};
+}
+
+namespace std {
+	template <>
+	struct hash<Mahakam::Entity>
+	{
+		size_t operator()(const Mahakam::Entity& k) const
+		{
+			return hash<Mahakam::Scene*>()(k)
+				^ (hash<uint32_t>()(k) << 1);
+		}
+	};
+
 }

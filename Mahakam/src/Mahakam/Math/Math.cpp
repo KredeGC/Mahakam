@@ -403,4 +403,18 @@ namespace YAML
 		out << YAML::BeginSeq << q.w << q.x << q.y << q.z << YAML::EndSeq;
 		return out;
 	}
+
+	Emitter& operator<<(Emitter& out, const glm::mat3& m)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << m[0] << m[1] << m[2] << YAML::EndSeq;
+		return out;
+	}
+
+	Emitter& operator<<(Emitter& out, const glm::mat4& m)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << m[0] << m[1] << m[2] << m[3] << YAML::EndSeq;
+		return out;
+	}
 }

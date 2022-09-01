@@ -207,10 +207,17 @@ namespace Mahakam
 			SkinComponent& skin = entity.GetComponent<SkinComponent>();
 
 			emitter << YAML::Key << "Bones" << YAML::Value << YAML::BeginSeq;
-			std::vector<Entity> bones = skin.GetBoneEntities();
-			for (auto& bone : bones)
+			const std::vector<BoneInfo>& bones = skin.GetBoneInfo();
+			const std::vector<std::string>& boneNames = skin.GetBoneNames();
+			const std::vector<Entity>& boneEntities = skin.GetBoneEntities();
+			for (size_t i = 0; i < bones.size(); i++)
 			{
-				emitter << YAML::Value << uint32_t(bone);
+				emitter << YAML::BeginMap;
+				emitter << YAML::Key << "Name" << YAML::Value << boneNames[i];
+				emitter << YAML::Key << "JointID" << YAML::Value << bones[i].id;
+				emitter << YAML::Key << "Offset" << YAML::Value << bones[i].offset;
+				emitter << YAML::Key << "EntityID" << YAML::Value << uint32_t(boneEntities[i]);
+				emitter << YAML::EndMap;
 			}
 			emitter << YAML::EndSeq;
 
@@ -219,15 +226,32 @@ namespace Mahakam
 		skinInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			SkinComponent& skin = entity.AddComponent<SkinComponent>();
-			std::vector<Entity>& bones = skin.GetBoneEntities();
+			std::vector<BoneInfo>& bones = skin.GetBoneInfo();
+			std::vector<std::string>& boneNames = skin.GetBoneNames();
+			std::vector<Entity>& boneEntities = skin.GetBoneEntities();
 
 			YAML::Node nodes = node["Bones"];
-			bones.reserve(nodes.size());
+			boneEntities.reserve(nodes.size());
 			for (auto boneNode : nodes)
 			{
-				uint32_t entityID = boneNode.as<uint32_t>();
-				Entity translatedEntity{ translation[entityID], entity };
-				bones.push_back(translatedEntity);
+				uint32_t entityID = boneNode["EntityID"].as<uint32_t>();
+				auto entityIter = translation.find(entityID);
+				if (entityIter != translation.end())
+				{
+					Entity translatedEntity{ entityIter->second, entity };
+					boneEntities.push_back(translatedEntity);
+				}
+				else
+				{
+					boneEntities.push_back({});
+				}
+
+				std::string name = boneNode["Name"].as<std::string>();
+				int jointID = boneNode["JointID"].as<int>();
+				glm::mat4 offset = boneNode["Offset"].as<glm::mat4>();
+
+				bones.push_back({ jointID, offset });
+				boneNames.push_back(name);
 			}
 
 			return true;
