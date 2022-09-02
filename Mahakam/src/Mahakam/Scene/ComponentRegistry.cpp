@@ -199,7 +199,7 @@ namespace Mahakam
 		{
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
 
-			auto& mesh = meshComponent.GetMesh();
+			Asset<Mesh> mesh = meshComponent.GetMesh();
 
 			emitter << YAML::Key << "Mesh" << YAML::Value << mesh.GetID();
 
