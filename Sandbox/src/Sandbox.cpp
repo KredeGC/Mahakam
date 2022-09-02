@@ -156,7 +156,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 1
 	// Create glTF skinned model
-	SkinnedMesh skinnedModel = GLTFLoadModel("assets/models/mannequin_clap.gltf");
+	Asset<SkinnedMesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.gltf");
 
 	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
@@ -166,13 +166,11 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	skinnedEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	SkinComponent& skin = skinnedEntity.AddComponent<SkinComponent>();
 
-	skin.SetSkin(skinnedModel);
+	boneEntities.reserve(skinnedModel->boneCount);
 
-	boneEntities.reserve(skinnedModel.boneCount);
-
-	for (auto& node : skinnedModel.BoneHierarchy)
+	for (auto& node : skinnedModel->BoneHierarchy)
 	{
-		auto& bone = skinnedModel.boneInfo[node.name];
+		auto& bone = skinnedModel->boneInfo[node.name];
 
 		Entity boneEntity = scene->CreateEntity(node.name);
 

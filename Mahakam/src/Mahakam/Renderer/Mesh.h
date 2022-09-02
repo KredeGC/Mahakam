@@ -63,7 +63,7 @@ namespace Mahakam
 	};
 
 	// TODO: Merge with other stuff
-	SkinnedMesh GLTFLoadModel(const std::filesystem::path& filepath);
+	Asset<SkinnedMesh> GLTFLoadModel(const std::filesystem::path& filepath);
 
 	class Mesh
 	{
@@ -152,6 +152,7 @@ namespace Mahakam
 
 		inline static Asset<Mesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
 		inline static SkinnedMesh LoadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps()) { return LoadModelImpl(filepath, props); }
+		inline static Asset<SkinnedMesh> LoadMesh(const std::filesystem::path& filepath, const SkinnedMeshProps& props = SkinnedMeshProps()) { return GLTFLoadModel(filepath); }
 
 		static Asset<Mesh> CreateCube(int tessellation, bool reverse = false);
 		static Asset<Mesh> CreatePlane(int rows, int columns);

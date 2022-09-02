@@ -693,7 +693,7 @@ namespace Mahakam
 			GLTFReadNodeHierarchy(model, child, id, skinnedMesh);
 	}
 
-	SkinnedMesh GLTFLoadModel(const std::filesystem::path& filepath)
+	Asset<SkinnedMesh> GLTFLoadModel(const std::filesystem::path& filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -722,7 +722,7 @@ namespace Mahakam
 		MH_CORE_ASSERT(!scene.nodes.empty(), "GLTF nodes are empty!");
 
 
-		SkinnedMesh skinnedMesh;
+		Ref<SkinnedMesh> skinnedMesh = CreateRef<SkinnedMesh>();
 
 		// Extract vertex and index values
 		for (auto& m : model.meshes)
@@ -862,11 +862,11 @@ namespace Mahakam
 					const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
 
 					// Extract hierarchy data
-					skinnedMesh.boneCount = joints.size();
-					skinnedMesh.BoneHierarchy.reserve(joints.size());
-					GLTFReadNodeHierarchy(model, joints[0], -1,  skinnedMesh);
+					skinnedMesh->boneCount = joints.size();
+					skinnedMesh->BoneHierarchy.reserve(joints.size());
+					GLTFReadNodeHierarchy(model, joints[0], -1, *skinnedMesh);
 
-					MH_CORE_ASSERT(skinnedMesh.BoneHierarchy.size() == skinnedMesh.boneCount, "Bone hierarchy count doesn't match skeleton");
+					MH_CORE_ASSERT(skinnedMesh->BoneHierarchy.size() == skinnedMesh->boneCount, "Bone hierarchy count doesn't match skeleton");
 
 					// Add the bones to the skinned mesh
 					for (uint32_t i = 0; i < joints.size(); i++)
@@ -890,7 +890,7 @@ namespace Mahakam
 						BoneInfo bone;
 						bone.id = i;
 						bone.offset = /*invSkinnedTransform * jointTransform */ invMatrices[i];
-						skinnedMesh.boneInfo[boneName] = bone;
+						skinnedMesh->boneInfo[boneName] = bone;
 					}
 				}
 			}
@@ -928,9 +928,9 @@ namespace Mahakam
 			delete[] boneWeights;
 			delete[] indices;
 
-			skinnedMesh.meshes.push_back(mesh);
+			skinnedMesh->meshes.push_back(mesh);
 		}
 
-		return skinnedMesh;
+		return Asset<SkinnedMesh>(skinnedMesh);
 	}
 }

@@ -171,22 +171,28 @@ namespace Mahakam
 
 			registry.view<SkinComponent, MeshComponent>().each([=](entt::entity entity, SkinComponent& skinComponent, MeshComponent& meshComponent)
 			{
-				auto& boneEntities = skinComponent.GetBoneEntities();
-				auto& bones = skinComponent.GetBoneInfo();
+				if (!meshComponent.HasMesh()) return;
 
-				Asset<Material> material = meshComponent.GetMaterial();
+				const auto& boneEntities = skinComponent.GetBoneEntities();
+				const auto& hierarchy = meshComponent.GetBoneHierarchy();
+				const auto& bones = meshComponent.GetBoneInfo();
+				const auto& materials = meshComponent.GetMaterials();
 
-				for (size_t i = 0; i < bones.size(); i++)
+				for (auto& material : materials)
 				{
-					auto& boneEntity = boneEntities.at(i);
-					auto& bone = bones.at(i);
-
-					if (boneEntity)
+					for (size_t i = 0; i < bones.size(); i++)
 					{
-						glm::mat4 transform = glm::inverse(registry.get<TransformComponent>(entity).GetModelMatrix())
-							* boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
-							* bone.offset;
-						material->SetMat4("finalBonesMatrices[" + std::to_string(bone.id) + "]", transform);
+						auto& boneEntity = boneEntities.at(i);
+						auto& index = hierarchy.at(i);
+						auto& bone = bones.at(index.name);
+
+						if (boneEntity)
+						{
+							glm::mat4 transform = glm::inverse(registry.get<TransformComponent>(entity).GetModelMatrix())
+								* boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
+								* bone.offset;
+							material->SetMat4("finalBonesMatrices[" + std::to_string(bone.id) + "]", transform);
+						}
 					}
 				}
 			});
@@ -293,13 +299,15 @@ namespace Mahakam
 
 				registry.view<TransformComponent, MeshComponent>().each([&](TransformComponent& transformComponent, MeshComponent& meshComponent)
 				{
-					auto& meshes = meshComponent.GetMeshes();
+					if (!meshComponent.HasMesh()) return;
+
+					auto& meshes = meshComponent.GetSubMeshes();
 					auto& materials = meshComponent.GetMaterials();
 					int materialCount = (int)materials.size() - 1;
 
 					glm::mat4 modelMatrix = transformComponent.GetModelMatrix();
 
-					for (int i = 0; i < meshComponent.GetMeshCount(); i++)
+					for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
 						Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
 				});
 			}

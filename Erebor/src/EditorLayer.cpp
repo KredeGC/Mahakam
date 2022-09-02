@@ -235,8 +235,9 @@ namespace Mahakam::Editor
 		PropertyRegistry::PropertyPtr meshInspector = [](Entity entity)
 		{
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
+			if (!meshComponent.HasMesh()) return;
 
-			auto& meshes = meshComponent.GetMeshes();
+			auto& meshes = meshComponent.GetSubMeshes();
 			Asset<Material> material = meshComponent.GetMaterial();
 
 			uint32_t vertexCount = 0;
@@ -275,12 +276,30 @@ namespace Mahakam::Editor
 		{
 			SkinComponent& skinComponent = entity.GetComponent<SkinComponent>();
 
-			auto& bones = skinComponent.GetBoneEntities();
-			auto& names = skinComponent.GetBoneNames();
-			
-			for (size_t i = 0; i < bones.size(); i++)
+			if (MeshComponent* meshComponent = entity.TryGetComponent<MeshComponent>())
 			{
-				GUI::DrawDragDropEntity(names[i], "Transform", bones[i]);
+				if (meshComponent->HasMesh())
+				{
+					auto& bones = skinComponent.GetBoneEntities();
+					auto& hierarchy = meshComponent->GetBoneHierarchy();
+
+					ImGui::Button("Create bone entities");
+					ImGui::SameLine();
+					ImGui::Button("Set bones from Mesh");
+
+					for (size_t i = 0; i < bones.size(); i++)
+					{
+						GUI::DrawDragDropEntity(hierarchy[i].name, "Transform", bones[i]);
+					}
+				}
+				else
+				{
+					ImGui::Text("Skin requires a Mesh");
+				}
+			}
+			else
+			{
+				ImGui::Text("Skin requires a Mesh Component");
 			}
 		};
 

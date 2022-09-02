@@ -9,16 +9,29 @@ namespace Mahakam
 	}
 
 #ifndef MH_STANDALONE
-	void MeshAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node) { }
+	void MeshAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
+	{
 
-	void MeshAssetImporter::OnWizardRender(const std::filesystem::path& filepath) { }
+	}
 
-	void MeshAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) { }
+	void MeshAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
+	{
+
+	}
+
+	void MeshAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	{
+		Asset<SkinnedMesh> meshAsset = Mesh::LoadMesh(filepath);
+
+		meshAsset.Save(filepath, importPath);
+
+		AssetDatabase::ReloadAsset(meshAsset.GetID());
+	}
 #endif
 
 	void MeshAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{
-
+		// TODO: Properties
 	}
 
 	Asset<void> MeshAssetImporter::Deserialize(YAML::Node& node)

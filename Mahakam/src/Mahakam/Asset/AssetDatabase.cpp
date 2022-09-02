@@ -73,6 +73,11 @@ namespace Mahakam
 
 		AssetDatabase::RegisterAssetImporter(".material", materialAssetImporter);
 
+		// Mesh
+		Ref<MeshAssetImporter> meshAssetImporter = CreateRef<MeshAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".gltf", meshAssetImporter);
+
 		// Shader
 		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
 
@@ -98,6 +103,9 @@ namespace Mahakam
 	{
 		// Material
 		AssetDatabase::DeregisterAssetImporter(".material");
+
+		// Mesh
+		AssetDatabase::DeregisterAssetImporter(".gltf");
 
 		// Shader
 		AssetDatabase::DeregisterAssetImporter(".shader");
