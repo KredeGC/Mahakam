@@ -21,7 +21,7 @@ namespace Mahakam
 
 	void MeshAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<SkinnedMesh> meshAsset = Mesh::LoadMesh(filepath);
+		Asset<Mesh> meshAsset = SubMesh::LoadMesh(filepath);
 
 		meshAsset.Save(filepath, importPath);
 

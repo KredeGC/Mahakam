@@ -6,7 +6,7 @@
 
 namespace Mahakam
 {
-	class Mesh;
+	class SubMesh;
 	class Texture2D;
 	class TextureCube;
 
@@ -15,12 +15,12 @@ namespace Mahakam
 	private:
 		static RendererAPI* rendererAPI;
 		
-		static Asset<Mesh> staticScreenQuad;
-		static Asset<Mesh> staticSphereMesh;
-		static Asset<Mesh> staticInvertedPyramid;
-		static Asset<Mesh> staticInvertedSphereMesh;
-		static Asset<Mesh> staticInvertedCubemapMesh;
-		static Asset<Mesh> staticCube;
+		static Asset<SubMesh> staticScreenQuad;
+		static Asset<SubMesh> staticSphereMesh;
+		static Asset<SubMesh> staticInvertedPyramid;
+		static Asset<SubMesh> staticInvertedSphereMesh;
+		static Asset<SubMesh> staticInvertedCubemapMesh;
+		static Asset<SubMesh> staticCube;
 
 		static Asset<Texture2D> texture2DRed;
 		static Asset<Texture2D> texture2DWhite;
@@ -33,12 +33,12 @@ namespace Mahakam
 		static void Init();
 		static void Shutdown();
 
-		MH_DECLARE_FUNC(GetScreenQuad, Asset<Mesh>);
-		MH_DECLARE_FUNC(GetSphere, Asset<Mesh>);
-		MH_DECLARE_FUNC(GetInvertedPyramid, Asset<Mesh>);
-		MH_DECLARE_FUNC(GetInvertedSphere, Asset<Mesh>);
-		MH_DECLARE_FUNC(GetInvertedCube, Asset<Mesh>);
-		MH_DECLARE_FUNC(GetCube, Asset<Mesh>);
+		MH_DECLARE_FUNC(GetScreenQuad, Asset<SubMesh>);
+		MH_DECLARE_FUNC(GetSphere, Asset<SubMesh>);
+		MH_DECLARE_FUNC(GetInvertedPyramid, Asset<SubMesh>);
+		MH_DECLARE_FUNC(GetInvertedSphere, Asset<SubMesh>);
+		MH_DECLARE_FUNC(GetInvertedCube, Asset<SubMesh>);
+		MH_DECLARE_FUNC(GetCube, Asset<SubMesh>);
 
 		MH_DECLARE_FUNC(GetTexture2DRed, Asset<Texture2D>);
 		MH_DECLARE_FUNC(GetTexture2DWhite, Asset<Texture2D>);
@@ -69,8 +69,8 @@ namespace Mahakam
 		MH_DECLARE_FUNC(DrawInstanced, void, uint32_t indexCount, uint32_t count);
 
 	private:
-		static Asset<Mesh> CreateScreenQuad();
-		static Asset<Mesh> CreatePyramid();
+		static Asset<SubMesh> CreateScreenQuad();
+		static Asset<SubMesh> CreatePyramid();
 
 		MH_DECLARE_FUNC(SetViewportImpl, void, uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor);
 

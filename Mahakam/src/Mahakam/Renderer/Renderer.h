@@ -11,7 +11,7 @@ namespace Mahakam
 	class Camera;
 	class FrameBuffer;
 	class Material;
-	class Mesh;
+	class SubMesh;
 	class ParticleSystem;
 	class RenderPass;
 
@@ -60,7 +60,7 @@ namespace Mahakam
 		inline static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment) { MH_PROFILE_FUNCTION(); BeginSceneImpl(cam, transform, environment); }
 		inline static void EndScene() { MH_PROFILE_FUNCTION(); EndSceneImpl(); }
 		
-		inline static void Submit(const glm::mat4& transform, Asset<Mesh> mesh, Asset<Material> material) { MH_PROFILE_FUNCTION(); SubmitImpl(transform, mesh, material); }
+		inline static void Submit(const glm::mat4& transform, Asset<SubMesh> mesh, Asset<Material> material) { MH_PROFILE_FUNCTION(); SubmitImpl(transform, mesh, material); }
 		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { MH_PROFILE_FUNCTION(); SubmitParticlesImpl(transform, particles); }
 		
 		// Drawing
@@ -98,7 +98,7 @@ namespace Mahakam
 		MH_DECLARE_FUNC(BeginSceneImpl, void, const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
 		MH_DECLARE_FUNC(EndSceneImpl, void);
 
-		MH_DECLARE_FUNC(SubmitImpl, void, const glm::mat4& transform, Asset<Mesh> mesh, Asset<Material> material);
+		MH_DECLARE_FUNC(SubmitImpl, void, const glm::mat4& transform, Asset<SubMesh> mesh, Asset<Material> material);
 		MH_DECLARE_FUNC(SubmitParticlesImpl, void, const glm::mat4& transform, const ParticleSystem& particles);
 		
 		// Drawing

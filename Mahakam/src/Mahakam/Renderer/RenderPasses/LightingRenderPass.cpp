@@ -228,14 +228,14 @@ namespace Mahakam
 		{
 			// Choose a mesh
 			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-			Asset<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+			Asset<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
 
 			// Choose a transform
 			const uint64_t transformID = drawID & 0xFFFFULL;
 			const glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
 			// Perform AABB test
-			const Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
+			const SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(mesh->GetBounds(), transform);
 
 			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
 			{
@@ -260,7 +260,7 @@ namespace Mahakam
 
 				// Hash mesh
 				uint8_t* meshPtr = (uint8_t*)mesh.Ptr();
-				for (uint64_t i = 0; i < sizeof(Mesh*); ++i)
+				for (uint64_t i = 0; i < sizeof(SubMesh*); ++i)
 					hash = (hash * 16777619ULL) ^ *(meshPtr + i);
 
 				// Hash transform
@@ -286,14 +286,14 @@ namespace Mahakam
 		{
 			// Choose a mesh
 			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-			Asset<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+			Asset<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
 
 			// Choose a transform
 			const uint64_t transformID = drawID & 0xFFFFULL;
 			glm::mat4& transform = sceneData->transformIDLookup[transformID];
 			
 			// Perform AABB test
-			Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
+			SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(mesh->GetBounds(), transform);
 
 			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
 			{
@@ -437,7 +437,7 @@ namespace Mahakam
 					continue;
 
 				// Perform AABB test
-				Mesh::Bounds transformedBounds = Mesh::TransformBounds(GL::GetInvertedPyramid()->GetBounds(), light.objectToWorld);
+				SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(GL::GetInvertedPyramid()->GetBounds(), light.objectToWorld);
 
 				if (!cameraFrustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
 					continue;

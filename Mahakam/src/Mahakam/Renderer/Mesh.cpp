@@ -58,7 +58,7 @@ namespace Mahakam
 		));
 	}
 
-	Mesh::Bounds Mesh::CalculateBounds(const glm::vec3* positions, uint32_t vertexCount)
+	SubMesh::Bounds SubMesh::CalculateBounds(const glm::vec3* positions, uint32_t vertexCount)
 	{
 		glm::vec3 min = positions[0];
 		glm::vec3 max = positions[0];
@@ -84,7 +84,7 @@ namespace Mahakam
 		return { min, max };
 	}
 
-	Mesh::Bounds Mesh::TransformBounds(const Bounds& bounds, const glm::mat4& transform)
+	SubMesh::Bounds SubMesh::TransformBounds(const Bounds& bounds, const glm::mat4& transform)
 	{
 		glm::vec3 positions[8] = {
 			glm::vec3{ transform * glm::vec4{ bounds.positions[0], 1.0f } },
@@ -97,11 +97,11 @@ namespace Mahakam
 			glm::vec3{ transform * glm::vec4{ bounds.positions[7], 1.0f } }
 		};
 
-		return Mesh::CalculateBounds(positions, 8);
+		return SubMesh::CalculateBounds(positions, 8);
 	}
 
 	//Ref<Mesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
-	MH_DEFINE_FUNC(Mesh::CreateImpl, Asset<Mesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	MH_DEFINE_FUNC(SubMesh::CreateImpl, Asset<SubMesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -118,7 +118,7 @@ namespace Mahakam
 	};
 
 	//SkinnedMesh Mesh::LoadModelImpl(const std::string& filepath, const SkinnedMeshProps& props)
-	MH_DEFINE_FUNC(Mesh::LoadModelImpl, SkinnedMesh, const std::string& filepath, const SkinnedMeshProps& props)
+	MH_DEFINE_FUNC(SubMesh::LoadModelImpl, Mesh, const std::string& filepath, const SkinnedMeshProps& props)
 	{
 		// TODO: Use SkinnedMeshProps to determine if we should load textures and create materials, or use the provided materials
 
@@ -136,7 +136,7 @@ namespace Mahakam
 			aiProcess_OptimizeMeshes |
 			aiProcess_JoinIdenticalVertices);
 
-		SkinnedMesh skinnedMesh;
+		Mesh skinnedMesh;
 
 		// Process nodes in mesh
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -149,7 +149,7 @@ namespace Mahakam
 		return skinnedMesh;
 	};
 
-	Asset<Mesh> Mesh::CreateCube(int tessellation, bool reverse)
+	Asset<SubMesh> SubMesh::CreateCube(int tessellation, bool reverse)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -231,7 +231,7 @@ namespace Mahakam
 		interleavedVertices.texcoords = uvs;
 		interleavedVertices.normals = normals;
 
-		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -241,7 +241,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Asset<Mesh> Mesh::CreatePlane(int rows, int columns)
+	Asset<SubMesh> SubMesh::CreatePlane(int rows, int columns)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -299,7 +299,7 @@ namespace Mahakam
 		interleavedVertices.normals = normals;
 		interleavedVertices.tangents = tangents;
 
-		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -310,7 +310,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Asset<Mesh> Mesh::CreateUVSphere(int rows, int columns)
+	Asset<SubMesh> SubMesh::CreateUVSphere(int rows, int columns)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -369,7 +369,7 @@ namespace Mahakam
 		interleavedVertices.normals = normals;
 		interleavedVertices.tangents = tangents;
 
-		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -380,7 +380,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Asset<Mesh> Mesh::CreateCubeSphere(int tessellation, bool reverse, bool equirectangular)
+	Asset<SubMesh> SubMesh::CreateCubeSphere(int tessellation, bool reverse, bool equirectangular)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -475,7 +475,7 @@ namespace Mahakam
 		interleavedVertices.normals = normals;
 		interleavedVertices.tangents = tangents;
 
-		Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] uvs;
@@ -486,7 +486,7 @@ namespace Mahakam
 		return mesh;
 	}
 
-	Asset<Mesh> Mesh::ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
+	Asset<SubMesh> SubMesh::ProcessMesh(Mesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -546,18 +546,18 @@ namespace Mahakam
 			{
 				int boneID = -1;
 				std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-				if (skinnedMesh.boneInfo.find(boneName) == skinnedMesh.boneInfo.end())
+				if (skinnedMesh.BoneInfoMap.find(boneName) == skinnedMesh.BoneInfoMap.end())
 				{
 					BoneInfo newBoneInfo;
-					newBoneInfo.id = skinnedMesh.boneCount;
+					newBoneInfo.id = skinnedMesh.BoneCount;
 					newBoneInfo.offset = AssimpToMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
-					skinnedMesh.boneInfo[boneName] = newBoneInfo;
-					boneID = skinnedMesh.boneCount;
-					skinnedMesh.boneCount++;
+					skinnedMesh.BoneInfoMap[boneName] = newBoneInfo;
+					boneID = skinnedMesh.BoneCount;
+					skinnedMesh.BoneCount++;
 				}
 				else
 				{
-					boneID = skinnedMesh.boneInfo[boneName].id;
+					boneID = skinnedMesh.BoneInfoMap[boneName].id;
 				}
 
 				MH_CORE_ASSERT(boneID != -1, "Invalid bone!");
@@ -611,7 +611,7 @@ namespace Mahakam
 			interleavedVertices.boneWeights = boneWeights;
 		}
 
-		Asset<Mesh> m = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		Asset<SubMesh> m = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 		delete[] positions;
 		delete[] texcoords;
@@ -626,7 +626,7 @@ namespace Mahakam
 		return m;
 	}
 
-	void Mesh::ProcessNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene)
+	void SubMesh::ProcessNode(Mesh& skinnedMesh, aiNode* node, const aiScene* scene)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -634,7 +634,7 @@ namespace Mahakam
 		for (uint32_t i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			skinnedMesh.meshes.push_back(ProcessMesh(skinnedMesh, mesh, scene));
+			skinnedMesh.Meshes.push_back(ProcessMesh(skinnedMesh, mesh, scene));
 		}
 
 		// Go through any child nodes
@@ -679,7 +679,7 @@ namespace Mahakam
 		offset += accessor.count;
 	}
 
-	void GLTFReadNodeHierarchy(tinygltf::Model& model, int id, int parentID, SkinnedMesh& skinnedMesh)
+	void GLTFReadNodeHierarchy(tinygltf::Model& model, int id, int parentID, Mesh& skinnedMesh)
 	{
 		const tinygltf::Node& node = model.nodes[id];
 
@@ -693,7 +693,7 @@ namespace Mahakam
 			GLTFReadNodeHierarchy(model, child, id, skinnedMesh);
 	}
 
-	Asset<SkinnedMesh> GLTFLoadModel(const std::filesystem::path& filepath)
+	Asset<Mesh> GLTFLoadModel(const std::filesystem::path& filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -722,7 +722,7 @@ namespace Mahakam
 		MH_CORE_ASSERT(!scene.nodes.empty(), "GLTF nodes are empty!");
 
 
-		Ref<SkinnedMesh> skinnedMesh = CreateRef<SkinnedMesh>();
+		Ref<Mesh> skinnedMesh = CreateRef<Mesh>();
 
 		// Extract vertex and index values
 		for (auto& m : model.meshes)
@@ -862,11 +862,11 @@ namespace Mahakam
 					const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
 
 					// Extract hierarchy data
-					skinnedMesh->boneCount = joints.size();
+					skinnedMesh->BoneCount = joints.size();
 					skinnedMesh->BoneHierarchy.reserve(joints.size());
 					GLTFReadNodeHierarchy(model, joints[0], -1, *skinnedMesh);
 
-					MH_CORE_ASSERT(skinnedMesh->BoneHierarchy.size() == skinnedMesh->boneCount, "Bone hierarchy count doesn't match skeleton");
+					MH_CORE_ASSERT(skinnedMesh->BoneHierarchy.size() == skinnedMesh->BoneCount, "Bone hierarchy count doesn't match skeleton");
 
 					// Add the bones to the skinned mesh
 					for (uint32_t i = 0; i < joints.size(); i++)
@@ -890,7 +890,7 @@ namespace Mahakam
 						BoneInfo bone;
 						bone.id = i;
 						bone.offset = /*invSkinnedTransform * jointTransform */ invMatrices[i];
-						skinnedMesh->boneInfo[boneName] = bone;
+						skinnedMesh->BoneInfoMap[boneName] = bone;
 					}
 				}
 			}
@@ -899,7 +899,7 @@ namespace Mahakam
 			MH_CORE_ASSERT(indexCount == indexOffset, "Index count mismatch");
 
 			// Interleave vertices
-			Mesh::InterleavedStruct interleavedVertices;
+			SubMesh::InterleavedStruct interleavedVertices;
 
 			if (positionOffset)
 				interleavedVertices.positions = positions;
@@ -917,7 +917,7 @@ namespace Mahakam
 				interleavedVertices.boneWeights = boneWeights;
 			}
 
-			Asset<Mesh> mesh = Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+			Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 
 			delete[] positions;
 			delete[] texcoords;
@@ -928,9 +928,9 @@ namespace Mahakam
 			delete[] boneWeights;
 			delete[] indices;
 
-			skinnedMesh->meshes.push_back(mesh);
+			skinnedMesh->Meshes.push_back(mesh);
 		}
 
-		return Asset<SkinnedMesh>(skinnedMesh);
+		return Asset<Mesh>(skinnedMesh);
 	}
 }

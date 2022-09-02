@@ -4,7 +4,7 @@
 
 namespace Mahakam
 {
-	class OpenGLMesh : public Mesh
+	class OpenGLMesh : public SubMesh
 	{
 	private:
 		uint32_t rendererID;

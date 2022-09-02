@@ -12,7 +12,7 @@ namespace Mahakam
 {
 	// Forward declare most things, don't want to pollute the header files too much
 	class Camera;
-	class Mesh;
+	class SubMesh;
 	class Light;
 	class Shader;
 	class Material;
@@ -131,11 +131,11 @@ namespace Mahakam
 
 		UnorderedMap<Asset<Shader>, uint64_t> shaderRefLookup;
 		UnorderedMap<Asset<Material>, uint64_t> materialRefLookup;
-		UnorderedMap<Asset<Mesh>, uint64_t> meshRefLookup;
+		UnorderedMap<Asset<SubMesh>, uint64_t> meshRefLookup;
 
 		UnorderedMap<uint64_t, Asset<Shader>> shaderIDLookup;
 		UnorderedMap<uint64_t, Asset<Material>> materialIDLookup;
-		UnorderedMap<uint64_t, Asset<Mesh>> meshIDLookup;
+		UnorderedMap<uint64_t, Asset<SubMesh>> meshIDLookup;
 		UnorderedMap<uint64_t, glm::mat4> transformIDLookup;
 
 		// Particle queue ID

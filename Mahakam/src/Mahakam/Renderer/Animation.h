@@ -34,7 +34,7 @@ namespace Mahakam
     public:
         Animation() = default;
 
-        Animation(const std::string& filepath, SkinnedMesh& skinnedMesh);
+        Animation(const std::string& filepath, Mesh& skinnedMesh);
 
         inline const std::string& GetName() const { return m_Name; }
 
@@ -50,7 +50,7 @@ namespace Mahakam
 
         inline const std::vector<BoneTransform>& GetBoneHierarchy() { return m_BoneHierarchy; }
 
-        static Asset<Animation> Load(const std::string& filepath, SkinnedMesh& skinnedMesh);
+        static Asset<Animation> Load(const std::string& filepath, Mesh& skinnedMesh);
 
     private:
         void ReadHierarchyData(int parentIndex, const aiNode* src);

@@ -301,8 +301,8 @@ namespace Mahakam
 				{
 					if (!meshComponent.HasMesh()) return;
 
-					auto& meshes = meshComponent.GetSubMeshes();
-					auto& materials = meshComponent.GetMaterials();
+					const auto& meshes = meshComponent.GetSubMeshes();
+					const auto& materials = meshComponent.GetMaterials();
 					int materialCount = (int)materials.size() - 1;
 
 					glm::mat4 modelMatrix = transformComponent.GetModelMatrix();

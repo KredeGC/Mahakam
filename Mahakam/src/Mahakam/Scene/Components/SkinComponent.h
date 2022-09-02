@@ -14,8 +14,6 @@ namespace Mahakam
 	public:
 		SkinComponent() {}
 
-		SkinComponent(const SkinComponent&) = default;
-
 		inline void AddBoneEntity(Entity entity)
 		{
 			m_BoneEntities.push_back(entity);

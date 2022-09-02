@@ -7,12 +7,12 @@
 
 namespace Mahakam
 {
-    Asset<Animation> Animation::Load(const std::string& filepath, SkinnedMesh& skinnedMesh)
+    Asset<Animation> Animation::Load(const std::string& filepath, Mesh& skinnedMesh)
     {
         return Asset<Animation>(CreateRef<Animation>(filepath, skinnedMesh));
     }
 
-    Animation::Animation(const std::string& filepath, SkinnedMesh& skinnedMesh)
+    Animation::Animation(const std::string& filepath, Mesh& skinnedMesh)
         : m_Filepath(filepath)
     {
         MH_PROFILE_FUNCTION();
@@ -30,7 +30,7 @@ namespace Mahakam
             m_Duration = (float)animation->mDuration;
             m_TicksPerSecond = (int)animation->mTicksPerSecond;
 
-            m_BoneInfoMap = skinnedMesh.boneInfo;
+            m_BoneInfoMap = skinnedMesh.BoneInfoMap;
 
             ReadHierarchyData(-1, scene->mRootNode);
         }

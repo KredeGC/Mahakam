@@ -13,12 +13,12 @@ namespace Mahakam
 {
 	RendererAPI* GL::rendererAPI;
 
-	Asset<Mesh> GL::staticScreenQuad;
-	Asset<Mesh> GL::staticSphereMesh;
-	Asset<Mesh> GL::staticInvertedPyramid;
-	Asset<Mesh> GL::staticInvertedSphereMesh;
-	Asset<Mesh> GL::staticInvertedCubemapMesh;
-	Asset<Mesh> GL::staticCube;
+	Asset<SubMesh> GL::staticScreenQuad;
+	Asset<SubMesh> GL::staticSphereMesh;
+	Asset<SubMesh> GL::staticInvertedPyramid;
+	Asset<SubMesh> GL::staticInvertedSphereMesh;
+	Asset<SubMesh> GL::staticInvertedCubemapMesh;
+	Asset<SubMesh> GL::staticCube;
 
 	Asset<Texture2D> GL::texture2DRed;
 	Asset<Texture2D> GL::texture2DWhite;
@@ -35,11 +35,11 @@ namespace Mahakam
 		rendererAPI->Init();
 
 		staticScreenQuad = CreateScreenQuad();
-		staticSphereMesh = Mesh::CreateUVSphere(10, 10);
+		staticSphereMesh = SubMesh::CreateUVSphere(10, 10);
 		staticInvertedPyramid = CreatePyramid();
-		staticInvertedSphereMesh = Mesh::CreateCubeSphere(5, true);
-		staticInvertedCubemapMesh = Mesh::CreateCube(2, true);
-		staticCube = Mesh::CreateCube(2);
+		staticInvertedSphereMesh = SubMesh::CreateCubeSphere(5, true);
+		staticInvertedCubemapMesh = SubMesh::CreateCube(2, true);
+		staticCube = SubMesh::CreateCube(2);
 
 		uint8_t redData = 255;
 
@@ -107,37 +107,37 @@ namespace Mahakam
 
 #pragma region Mesh
 	//Ref<Mesh> GL::GetScreenQuad()
-	MH_DEFINE_FUNC(GL::GetScreenQuad, Asset<Mesh>)
+	MH_DEFINE_FUNC(GL::GetScreenQuad, Asset<SubMesh>)
 	{
 		return staticScreenQuad;
 	};
 
 	//Ref<Mesh> GL::GetSphere()
-	MH_DEFINE_FUNC(GL::GetSphere, Asset<Mesh>)
+	MH_DEFINE_FUNC(GL::GetSphere, Asset<SubMesh>)
 	{
 		return staticSphereMesh;
 	};
 
 	//Ref<Mesh> GL::GetInvertedPyramid()
-	MH_DEFINE_FUNC(GL::GetInvertedPyramid, Asset<Mesh>)
+	MH_DEFINE_FUNC(GL::GetInvertedPyramid, Asset<SubMesh>)
 	{
 		return staticInvertedPyramid;
 	};
 
 	//Ref<Mesh> GL::GetInvertedSphere()
-	MH_DEFINE_FUNC(GL::GetInvertedSphere, Asset<Mesh>)
+	MH_DEFINE_FUNC(GL::GetInvertedSphere, Asset<SubMesh>)
 	{
 		return staticInvertedSphereMesh;
 	};
 
 	//Ref<Mesh> GL::GetInvertedCube()
-	MH_DEFINE_FUNC(GL::GetInvertedCube, Asset<Mesh>)
+	MH_DEFINE_FUNC(GL::GetInvertedCube, Asset<SubMesh>)
 	{
 		return staticInvertedCubemapMesh;
 	};
 
 	//Ref<Mesh> GL::GetCube()
-	MH_DEFINE_FUNC(GL::GetCube, Asset<Mesh>)
+	MH_DEFINE_FUNC(GL::GetCube, Asset<SubMesh>)
 	{
 		return staticCube;
 	};
@@ -262,7 +262,7 @@ namespace Mahakam
 	};
 #pragma endregion
 
-	Asset<Mesh> GL::CreateScreenQuad()
+	Asset<SubMesh> GL::CreateScreenQuad()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -286,14 +286,14 @@ namespace Mahakam
 		};
 
 		// Interleave vertices
-		Mesh::InterleavedStruct interleavedVertices;
+		SubMesh::InterleavedStruct interleavedVertices;
 		interleavedVertices.positions = positions;
 		interleavedVertices.texcoords = uvs;
 
-		return Mesh::Create(4, 6, interleavedVertices, indices);
+		return SubMesh::Create(4, 6, interleavedVertices, indices);
 	}
 
-	Asset<Mesh> GL::CreatePyramid()
+	Asset<SubMesh> GL::CreatePyramid()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -334,9 +334,9 @@ namespace Mahakam
 		indices[17] = 4;
 
 		// Interleave vertices
-		Mesh::InterleavedStruct interleavedVertices;
+		SubMesh::InterleavedStruct interleavedVertices;
 		interleavedVertices.positions = positions;
 
-		return Mesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		return SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
 	}
 }

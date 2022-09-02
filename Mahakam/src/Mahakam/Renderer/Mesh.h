@@ -12,7 +12,7 @@ namespace Mahakam
 {
 	class Material;
 	class Shader;
-	class Mesh;
+	class SubMesh;
 
 	struct BoneInfo
 	{
@@ -27,24 +27,24 @@ namespace Mahakam
 		int parentID;
 	};
 
-	struct SkinnedMesh
+	struct Mesh
 	{
-		std::vector<Asset<Mesh>> meshes;
-		std::vector<Asset<Material>> materials;
-		UnorderedMap<std::string, BoneInfo> boneInfo;
+		std::vector<Asset<SubMesh>> Meshes;
+		std::vector<Asset<Material>> Materials;
+		UnorderedMap<std::string, BoneInfo> BoneInfoMap;
 		std::vector<BoneNode> BoneHierarchy;
-		int boneCount = 0;
+		int BoneCount = 0;
 
-		SkinnedMesh() = default;
+		Mesh() = default;
 
-		SkinnedMesh(const std::vector<Asset<Mesh>>& meshes, const std::vector<Asset<Material>>& materials, const UnorderedMap<std::string, BoneInfo>& boneInfo, int boneCount = 0)
-			: meshes(meshes), materials(materials), boneInfo(boneInfo), boneCount(boneCount)
+		Mesh(const std::vector<Asset<SubMesh>>& meshes, const std::vector<Asset<Material>>& materials, const UnorderedMap<std::string, BoneInfo>& boneInfo, int boneCount = 0)
+			: Meshes(meshes), Materials(materials), BoneInfoMap(boneInfo), BoneCount(boneCount)
 		{ }
 
-		SkinnedMesh(Asset<Mesh> mesh, Asset<Material> material)
+		Mesh(Asset<SubMesh> mesh, Asset<Material> material)
 		{
-			meshes.push_back(mesh);
-			materials.push_back(material);
+			Meshes.push_back(mesh);
+			Materials.push_back(material);
 		}
 	};
 
@@ -63,9 +63,9 @@ namespace Mahakam
 	};
 
 	// TODO: Merge with other stuff
-	Asset<SkinnedMesh> GLTFLoadModel(const std::filesystem::path& filepath);
+	Asset<Mesh> GLTFLoadModel(const std::filesystem::path& filepath);
 
-	class Mesh
+	class SubMesh
 	{
 	public:
 		struct InterleavedStruct
@@ -118,7 +118,7 @@ namespace Mahakam
 		};
 
 	public:
-		virtual ~Mesh() = default;
+		virtual ~SubMesh() = default;
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
@@ -150,21 +150,21 @@ namespace Mahakam
 		static Bounds CalculateBounds(const glm::vec3* positions, uint32_t vertexCount);
 		static Bounds TransformBounds(const Bounds& bounds, const glm::mat4& transform);
 
-		inline static Asset<Mesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
-		inline static SkinnedMesh LoadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps()) { return LoadModelImpl(filepath, props); }
-		inline static Asset<SkinnedMesh> LoadMesh(const std::filesystem::path& filepath, const SkinnedMeshProps& props = SkinnedMeshProps()) { return GLTFLoadModel(filepath); }
+		inline static Asset<SubMesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
+		inline static Mesh LoadModel(const std::string& filepath, const SkinnedMeshProps& props = SkinnedMeshProps()) { return LoadModelImpl(filepath, props); }
+		inline static Asset<Mesh> LoadMesh(const std::filesystem::path& filepath, const SkinnedMeshProps& props = SkinnedMeshProps()) { return GLTFLoadModel(filepath); }
 
-		static Asset<Mesh> CreateCube(int tessellation, bool reverse = false);
-		static Asset<Mesh> CreatePlane(int rows, int columns);
-		static Asset<Mesh> CreateUVSphere(int rows, int columns);
-		static Asset<Mesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
+		static Asset<SubMesh> CreateCube(int tessellation, bool reverse = false);
+		static Asset<SubMesh> CreatePlane(int rows, int columns);
+		static Asset<SubMesh> CreateUVSphere(int rows, int columns);
+		static Asset<SubMesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<Mesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
-		MH_DECLARE_FUNC(LoadModelImpl, SkinnedMesh, const std::string& filepath, const SkinnedMeshProps& props);
+		MH_DECLARE_FUNC(CreateImpl, Asset<SubMesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
+		MH_DECLARE_FUNC(LoadModelImpl, Mesh, const std::string& filepath, const SkinnedMeshProps& props);
 
-		static Asset<Mesh> ProcessMesh(SkinnedMesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
+		static Asset<SubMesh> ProcessMesh(Mesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
 
-		static void ProcessNode(SkinnedMesh& skinnedMesh, aiNode* node, const aiScene* scene);
+		static void ProcessNode(Mesh& skinnedMesh, aiNode* node, const aiScene* scene);
 	};
 }

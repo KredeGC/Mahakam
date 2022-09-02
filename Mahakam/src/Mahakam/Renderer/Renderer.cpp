@@ -135,12 +135,12 @@ namespace Mahakam
 			for (uint64_t drawID : sceneData->renderQueue)
 			{
 				const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-				Asset<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+				Asset<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
 
 				const uint64_t transformID = drawID & 0xFFFFULL;
 				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
-				const Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
+				const SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(mesh->GetBounds(), transform);
 
 				const glm::vec3 scale = transformedBounds.max - transformedBounds.min;
 				const glm::vec3 center = transformedBounds.min + scale / 2.0f;
@@ -176,7 +176,7 @@ namespace Mahakam
 	};
 
 	//void Renderer::SubmitImpl(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
-	MH_DEFINE_FUNC(Renderer::SubmitImpl, void, const glm::mat4& transform, Asset<Mesh> mesh, Asset<Material> material)
+	MH_DEFINE_FUNC(Renderer::SubmitImpl, void, const glm::mat4& transform, Asset<SubMesh> mesh, Asset<Material> material)
 	{
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
@@ -297,7 +297,7 @@ namespace Mahakam
 	//void Renderer::DrawInstancedSphereImpl(uint32_t amount)
 	MH_DEFINE_FUNC(Renderer::DrawInstancedSphereImpl, void, uint32_t amount)
 	{
-		Asset<Mesh> invertedSphere = GL::GetInvertedSphere();
+		Asset<SubMesh> invertedSphere = GL::GetInvertedSphere();
 
 		AddPerformanceResult(amount * invertedSphere->GetVertexCount(), amount * invertedSphere->GetIndexCount());
 
@@ -309,7 +309,7 @@ namespace Mahakam
 	//void Renderer::DrawInstancedPyramidImpl(uint32_t amount)
 	MH_DEFINE_FUNC(Renderer::DrawInstancedPyramidImpl, void, uint32_t amount)
 	{
-		Asset<Mesh> invertedPyramid = GL::GetInvertedPyramid();
+		Asset<SubMesh> invertedPyramid = GL::GetInvertedPyramid();
 
 		AddPerformanceResult(amount * invertedPyramid->GetVertexCount(), amount * invertedPyramid->GetIndexCount());
 

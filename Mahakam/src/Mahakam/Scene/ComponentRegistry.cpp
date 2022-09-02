@@ -214,7 +214,7 @@ namespace Mahakam
 			if (meshNode)
 			{
 				uint64_t meshID = meshNode.as<uint64_t>();
-				Asset<SkinnedMesh> mesh = Asset<SkinnedMesh>(meshID);
+				Asset<Mesh> mesh = Asset<Mesh>(meshID);
 
 				MeshComponent& meshComponent = entity.AddComponent<MeshComponent>(mesh);
 			}

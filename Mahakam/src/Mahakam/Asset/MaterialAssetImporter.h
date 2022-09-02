@@ -29,7 +29,7 @@ namespace Mahakam
 		UnorderedMap<std::string, Asset<Texture>> m_DefaultTextures;
 
 		// Preview
-		Asset<Mesh> m_PreviewSphereMesh;
+		Asset<SubMesh> m_PreviewSphereMesh;
 		Camera m_PreviewCamera;
 		Ref<SceneData> m_SceneData;
 		glm::ivec2 m_ViewportSize{ 0 };

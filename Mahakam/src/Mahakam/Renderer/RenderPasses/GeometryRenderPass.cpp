@@ -77,14 +77,14 @@ namespace Mahakam
 			{
 				// Choose a mesh
 				const uint16_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-				Asset<Mesh>& mesh = sceneData->meshIDLookup[meshID];
+				Asset<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
 
 				// Choose a transform
 				const uint16_t transformID = drawID & 0xFFFFULL;
 				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
 				// Perform AABB test
-				const Mesh::Bounds transformedBounds = Mesh::TransformBounds(mesh->GetBounds(), transform);
+				const SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(mesh->GetBounds(), transform);
 
 				if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
 				{

@@ -123,7 +123,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<Mesh> planeMesh = Mesh::CreatePlane(2, 2);
+	Asset<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
 
 	Asset<Material> planeMaterial = Asset<Material>("import/assets/materials/BrickPlane.material.import");
 
@@ -142,7 +142,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 #if 0
 	// Create backpack model
 	//SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
-	SkinnedMesh backpackModel = GLTFLoadModel("assets/models/backpack.gltf");
+	Mesh backpackModel = GLTFLoadModel("assets/models/backpack.gltf");
 
 	Asset<Material> backpackMaterial = Asset<Material>("import/assets/materials/Backpack.material.import");
 
@@ -156,7 +156,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 1
 	// Create glTF skinned model
-	Asset<SkinnedMesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.gltf");
+	Asset<Mesh> skinnedModel = SubMesh::LoadMesh("assets/models/mannequin_clap.gltf");
 
 	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
@@ -166,11 +166,11 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	skinnedEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	SkinComponent& skin = skinnedEntity.AddComponent<SkinComponent>();
 
-	boneEntities.reserve(skinnedModel->boneCount);
+	boneEntities.reserve(skinnedModel->BoneCount);
 
 	for (auto& node : skinnedModel->BoneHierarchy)
 	{
-		auto& bone = skinnedModel->boneInfo[node.name];
+		auto& bone = skinnedModel->BoneInfoMap[node.name];
 
 		Entity boneEntity = scene->CreateEntity(node.name);
 
@@ -230,7 +230,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create mesh & base material
-	Asset<Mesh> sphereMesh = Mesh::CreateCubeSphere(9);
+	Asset<SubMesh> sphereMesh = SubMesh::CreateCubeSphere(9);
 	Asset<Material> baseMaterial = Asset<Material>("import/assets/materials/WhiteDiffuse.material.import");
 
 	// Create base collection entity to store in
