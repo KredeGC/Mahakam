@@ -259,8 +259,8 @@ namespace Mahakam::Editor
 			const auto& materials = meshComponent.GetMaterials();
 			for (size_t i = 0; i < materials.size(); i++)
 			{
-				const auto& material = materials[i];
-				GUI::DrawDragDropField("Material " + std::to_string(i), ".material", material.GetImportPath());
+				std::filesystem::path importPath = materials[i].GetImportPath();
+				GUI::DrawDragDropField("Material " + std::to_string(i), ".material", importPath);
 				// TODO: Change if updated
 			}
 		};

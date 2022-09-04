@@ -16,7 +16,7 @@ namespace Mahakam
 
 		virtual void FinishRendering() override;
 
-		virtual void SetClearColor(const glm::vec4 color) override;
+		virtual void SetClearColor(const glm::vec4& color) override;
 		virtual void Clear(bool color, bool depth) override;
 
 		virtual void EnableCulling(bool enable, bool cullFront) override;

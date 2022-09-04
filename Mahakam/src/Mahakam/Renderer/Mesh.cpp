@@ -109,7 +109,8 @@ namespace Mahakam
 			GLTFReadNodeHierarchy(model, child, id, skinnedMesh);
 	}
 
-	Asset<Mesh> Mesh::LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props)
+	//Asset<Mesh> Mesh::LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props)
+	MH_DEFINE_FUNC(Mesh::LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -118,7 +119,11 @@ namespace Mahakam
 		std::string err;
 		std::string warn;
 
-		bool success = loader.LoadASCIIFromFile(&model, &err, &warn, filepath.string());
+		bool success;
+		if (filepath.extension().string() == ".gltf")
+			success = loader.LoadASCIIFromFile(&model, &err, &warn, filepath.string());
+		else
+			success = loader.LoadBinaryFromFile(&model, &err, &warn, filepath.string());
 
 		if (!warn.empty())
 			MH_CORE_WARN("[GLTF] Warning: {0}", warn);
@@ -350,10 +355,10 @@ namespace Mahakam
 		}
 
 		return Asset<Mesh>(skinnedMesh);
-	}
+	};
 
-	//Ref<Mesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
-	MH_DEFINE_FUNC(SubMesh::CreateImpl, Asset<SubMesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	//Ref<Mesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	MH_DEFINE_FUNC(SubMesh::CreateImpl, Asset<SubMesh>, uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	{
 		switch (RendererAPI::GetAPI())
 		{

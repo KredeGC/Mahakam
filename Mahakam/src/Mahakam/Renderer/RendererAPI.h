@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <glm/ext/vector_float4.hpp>
 
 namespace Mahakam
 {
@@ -34,7 +34,7 @@ namespace Mahakam
 
 		virtual void FinishRendering() = 0;
 
-		virtual void SetClearColor(const glm::vec4 color) = 0;
+		virtual void SetClearColor(const glm::vec4& color) = 0;
 		virtual void Clear(bool color, bool depth) = 0;
 
 		virtual void EnableCulling(bool enable, bool cullFront) = 0;

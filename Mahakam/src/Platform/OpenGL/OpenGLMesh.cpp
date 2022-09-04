@@ -102,7 +102,7 @@ namespace Mahakam
 		return 0;
 	}
 
-	OpenGLMesh::OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	OpenGLMesh::OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 		: vertexCount(vertexCount), indexCount(indexCount), indices(new uint32_t[indexCount])
 	{
 		std::memcpy(this->indices, indices, indexCount * sizeof(uint32_t));

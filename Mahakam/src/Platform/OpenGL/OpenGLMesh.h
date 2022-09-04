@@ -25,7 +25,7 @@ namespace Mahakam
 		uint32_t indexBufferID;
 
 	public:
-		OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
+		OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
 		virtual ~OpenGLMesh() override;
 
 		virtual void Bind() const override;

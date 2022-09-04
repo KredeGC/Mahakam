@@ -72,7 +72,7 @@ namespace Mahakam
 
 	private:
 		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, int id, int parentID, Ref<Mesh> skinnedMesh);
-		static Asset<Mesh> LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props);
+		MH_DECLARE_FUNC(LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
 	};
 
 	class SubMesh
@@ -89,6 +89,7 @@ namespace Mahakam
 			glm::vec4* boneWeights = nullptr;
 
 			operator void** () { return (void**)this; }
+			operator const void** () const { return (const void**)this; }
 		};
 
 		static constexpr uint32_t BUFFER_ELEMENTS_SIZE = 7U;
@@ -122,18 +123,18 @@ namespace Mahakam
 		virtual bool HasVertices(int index) const = 0;
 		virtual const void* GetVertices(int index) const = 0;
 
-		const glm::vec3* GetPositions() const { return (glm::vec3*)GetVertices(0); }
-		const glm::vec2* GetTexcoords() const { return (glm::vec2*)GetVertices(1); }
-		const glm::vec3* GetNormals() const { return (glm::vec3*)GetVertices(2); }
-		const glm::vec4* GetTangents() const { return (glm::vec4*)GetVertices(3); }
-		const glm::vec4* GetColors() const { return (glm::vec4*)GetVertices(4); }
-		const glm::ivec4* GetBoneIDs() const { return (glm::ivec4*)GetVertices(5); }
-		const glm::vec4* GetBoneWeights() const { return (glm::vec4*)GetVertices(6); }
+		const glm::vec3* GetPositions() const { return (const glm::vec3*)GetVertices(0); }
+		const glm::vec2* GetTexcoords() const { return (const glm::vec2*)GetVertices(1); }
+		const glm::vec3* GetNormals() const { return (const glm::vec3*)GetVertices(2); }
+		const glm::vec4* GetTangents() const { return (const glm::vec4*)GetVertices(3); }
+		const glm::vec4* GetColors() const { return (const glm::vec4*)GetVertices(4); }
+		const glm::ivec4* GetBoneIDs() const { return (const glm::ivec4*)GetVertices(5); }
+		const glm::vec4* GetBoneWeights() const { return (const glm::vec4*)GetVertices(6); }
 
 		virtual const uint32_t* GetIndices() const = 0;
 		virtual uint32_t GetIndexCount() const = 0;
 
-		inline static Asset<SubMesh> Create(uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
+		inline static Asset<SubMesh> Create(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
 		inline static Mesh LoadModel(const std::string& filepath, const MeshProps& props = MeshProps()) { return LoadModelImpl(filepath, props); }
 
 		static Asset<SubMesh> CreateCube(int tessellation, bool reverse = false);
@@ -142,7 +143,7 @@ namespace Mahakam
 		static Asset<SubMesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<SubMesh>, uint32_t vertexCount, uint32_t indexCount, void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
+		MH_DECLARE_FUNC(CreateImpl, Asset<SubMesh>, uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
 		MH_DECLARE_FUNC(LoadModelImpl, Mesh, const std::string& filepath, const MeshProps& props);
 
 		static Asset<SubMesh> ProcessMesh(Mesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
