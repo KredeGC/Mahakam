@@ -238,7 +238,6 @@ namespace Mahakam::Editor
 			if (!meshComponent.HasMesh()) return;
 
 			auto& meshes = meshComponent.GetSubMeshes();
-			Asset<Material> material = meshComponent.GetMaterial();
 
 			uint32_t vertexCount = 0;
 			uint32_t indexCount = 0;
@@ -257,15 +256,12 @@ namespace Mahakam::Editor
 				ImGui::Text("Triangle count: %d", indexCount / 3);
 			}
 
-			if (material)
+			const auto& materials = meshComponent.GetMaterials();
+			for (size_t i = 0; i < materials.size(); i++)
 			{
-				if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
-				{
-					// TODO: Show the material inspector instead?
-					glm::vec3 color = material->GetFloat3("u_Color");
-					if (ImGui::ColorEdit3("Color", glm::value_ptr(color)))
-						material->SetFloat3("u_Color", color);
-				}
+				const auto& material = materials[i];
+				GUI::DrawDragDropField("Material " + std::to_string(i), ".material", material.GetImportPath());
+				// TODO: Change if updated
 			}
 		};
 

@@ -305,10 +305,13 @@ namespace Mahakam
 					const auto& materials = meshComponent.GetMaterials();
 					int materialCount = (int)materials.size() - 1;
 
-					glm::mat4 modelMatrix = transformComponent.GetModelMatrix();
+					if (materialCount >= 0)
+					{
+						glm::mat4 modelMatrix = transformComponent.GetModelMatrix();
 
-					for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
-						Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
+						for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
+							Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
+					}
 				});
 			}
 

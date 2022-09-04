@@ -3,6 +3,8 @@
 
 #include "Mahakam/Core/Frustum.h"
 
+#include "Mahakam/Math/Bounds.h"
+
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/FrameBuffer.h"
 #include "Mahakam/Renderer/GL.h"
@@ -84,9 +86,9 @@ namespace Mahakam
 				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
 				// Perform AABB test
-				const SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(mesh->GetBounds(), transform);
+				const Bounds transformedBounds = Bounds::TransformBounds(mesh->GetBounds(), transform);
 
-				if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
+				if (frustum.IsBoxVisible(transformedBounds.Min, transformedBounds.Max))
 				{
 					// Choose a shader
 					const uint16_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;

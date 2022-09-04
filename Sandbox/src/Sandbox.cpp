@@ -139,10 +139,10 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	particleEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
-#if 0
+#if 1
 	// Create backpack model
 	//SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
-	Mesh backpackModel = GLTFLoadModel("assets/models/backpack.gltf");
+	Asset<Mesh> backpackModel = Mesh::LoadMesh("assets/models/backpack.gltf");
 
 	Asset<Material> backpackMaterial = Asset<Material>("import/assets/materials/Backpack.material.import");
 
@@ -156,7 +156,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 1
 	// Create glTF skinned model
-	Asset<Mesh> skinnedModel = SubMesh::LoadMesh("assets/models/mannequin_clap.gltf");
+	Asset<Mesh> skinnedModel = Asset<Mesh>("import/assets/models/mannequin_clap.gltf.import");
 
 	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 

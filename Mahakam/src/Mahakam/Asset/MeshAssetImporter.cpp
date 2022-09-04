@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "MeshAssetImporter.h"
 
+#include <imgui/imgui.h>
+
 namespace Mahakam
 {
 	MeshAssetImporter::MeshAssetImporter()
@@ -16,12 +18,12 @@ namespace Mahakam
 
 	void MeshAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
-
+		ImGui::Text("No options yet");
 	}
 
 	void MeshAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Mesh> meshAsset = SubMesh::LoadMesh(filepath);
+		Asset<Mesh> meshAsset = Mesh::LoadMesh(filepath);
 
 		meshAsset.Save(filepath, importPath);
 
@@ -36,6 +38,14 @@ namespace Mahakam
 
 	Asset<void> MeshAssetImporter::Deserialize(YAML::Node& node)
 	{
+		YAML::Node filepathNode = node["Filepath"];
+		if (filepathNode)
+		{
+			std::string filepath = filepathNode.as<std::string>();
+
+			return Mesh::LoadMesh(filepath);
+		}
+
 		return nullptr;
 	}
 }

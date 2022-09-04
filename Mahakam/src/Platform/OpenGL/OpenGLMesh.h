@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Mahakam/Math/Bounds.h"
 #include "Mahakam/Renderer/Mesh.h"
 
 namespace Mahakam

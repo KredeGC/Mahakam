@@ -160,7 +160,7 @@ namespace Mahakam
 
 	void OpenGLMesh::RecalculateBounds()
 	{
-		bounds = SubMesh::CalculateBounds(GetPositions(), vertexCount);
+		bounds = Bounds::CalculateBounds(GetPositions(), vertexCount);
 	}
 
 	void OpenGLMesh::RecalculateNormals()

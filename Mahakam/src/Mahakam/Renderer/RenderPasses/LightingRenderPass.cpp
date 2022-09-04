@@ -4,6 +4,8 @@
 #include "Mahakam/Core/Frustum.h"
 #include "Mahakam/Core/FileUtility.h"
 
+#include "Mahakam/Math/Bounds.h"
+
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/FrameBuffer.h"
 #include "Mahakam/Renderer/GL.h"
@@ -235,9 +237,9 @@ namespace Mahakam
 			const glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
 			// Perform AABB test
-			const SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(mesh->GetBounds(), transform);
+			const Bounds transformedBounds = Bounds::TransformBounds(mesh->GetBounds(), transform);
 
-			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
+			if (frustum.IsBoxVisible(transformedBounds.Min, transformedBounds.Max))
 			{
 				// Choose a shader
 				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
@@ -293,9 +295,9 @@ namespace Mahakam
 			glm::mat4& transform = sceneData->transformIDLookup[transformID];
 			
 			// Perform AABB test
-			SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(mesh->GetBounds(), transform);
+			Bounds transformedBounds = Bounds::TransformBounds(mesh->GetBounds(), transform);
 
-			if (frustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
+			if (frustum.IsBoxVisible(transformedBounds.Min, transformedBounds.Max))
 			{
 				// Choose and bind shader
 				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
@@ -437,9 +439,9 @@ namespace Mahakam
 					continue;
 
 				// Perform AABB test
-				SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(GL::GetInvertedPyramid()->GetBounds(), light.objectToWorld);
+				Bounds transformedBounds = Bounds::TransformBounds(GL::GetInvertedPyramid()->GetBounds(), light.objectToWorld);
 
-				if (!cameraFrustum.IsBoxVisible(transformedBounds.min, transformedBounds.max))
+				if (!cameraFrustum.IsBoxVisible(transformedBounds.Min, transformedBounds.Max))
 					continue;
 
 				// Update current shadow map offset

@@ -256,7 +256,7 @@ namespace Mahakam
 		}
 		else
 		{
-			std::string extension = filepath.extension().string();
+			extension = filepath.extension().string();
 			id = Random::GetRandomID64();
 		}
 

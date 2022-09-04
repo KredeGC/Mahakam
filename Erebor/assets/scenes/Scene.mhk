@@ -29,7 +29,7 @@ Entities:
       NearZ: 0.00999999978
       FarZ: 100
       Size: 10
-      Ratio: 1.7542088
+      Ratio: 1.68608415
       FixedRatio: false
   - ID: 2
     Tag: Main Light
@@ -78,7 +78,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
     Mesh:
-      Mesh: 0
+      Mesh: 18125702349753934158
     Skin:
       Bones:
         - 7

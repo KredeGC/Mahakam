@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "Renderer.h"
 
+#include "Mahakam/Math/Bounds.h"
+
 #include "Buffer.h"
 #include "Camera.h"
 #include "FrameBuffer.h"
@@ -140,10 +142,10 @@ namespace Mahakam
 				const uint64_t transformID = drawID & 0xFFFFULL;
 				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
 
-				const SubMesh::Bounds transformedBounds = SubMesh::TransformBounds(mesh->GetBounds(), transform);
+				const Bounds transformedBounds = Bounds::TransformBounds(mesh->GetBounds(), transform);
 
-				const glm::vec3 scale = transformedBounds.max - transformedBounds.min;
-				const glm::vec3 center = transformedBounds.min + scale / 2.0f;
+				const glm::vec3 scale = transformedBounds.Max - transformedBounds.Min;
+				const glm::vec3 center = transformedBounds.Min + scale / 2.0f;
 
 				const glm::mat4 wireTransform = glm::translate(glm::mat4(1.0f), center)
 					* glm::scale(glm::mat4(1.0f), scale);
