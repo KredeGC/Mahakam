@@ -2,13 +2,7 @@
 
 #include "Mahakam/Asset/Asset.h"
 
-namespace std
-{
-	namespace filesystem
-	{
-		class path;
-	}
-}
+#include <filesystem>
 
 namespace Mahakam
 {

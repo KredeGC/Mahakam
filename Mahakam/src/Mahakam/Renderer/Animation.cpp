@@ -5,8 +5,6 @@
 
 #include <tiny_gltf/tiny_gltf.h>
 
-#include <filesystem>
-
 namespace Mahakam
 {
 	Animation::Animation(const std::filesystem::path& filepath)
