@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ShaderDataTypes.h"
+#include "ShaderProps.h"
 
 #include "Mahakam/Asset/Asset.h"
 
@@ -19,27 +20,7 @@ namespace Mahakam
 	class Texture;
 
 	extern template class Asset<Shader>;
-
-	enum class ShaderPropertyType
-	{
-		Color,
-		HDR,
-		Vector,
-		Range,
-		Drag,
-		Texture,
-		Normal,
-		Default
-	};
-
-	struct ShaderProperty
-	{
-		ShaderPropertyType PropertyType;
-		ShaderDataType DataType;
-		float Min = 0;
-		float Max = 0;
-		std::string DefaultString;
-	};
+	extern template class Asset<Texture>;
 
 	class Shader
 	{

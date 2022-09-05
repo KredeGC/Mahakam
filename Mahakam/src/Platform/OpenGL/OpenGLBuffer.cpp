@@ -99,6 +99,3 @@ namespace Mahakam
 	}
 #pragma endregion
 }
-
-template class Mahakam::Asset<Mahakam::OpenGLStorageBuffer>;
-template class Mahakam::Asset<Mahakam::OpenGLUniformBuffer>;

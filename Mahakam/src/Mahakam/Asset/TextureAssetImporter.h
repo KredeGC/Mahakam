@@ -1,11 +1,16 @@
 #pragma once
 
 #include "AssetImporter.h"
-#include "Mahakam/Renderer/Texture.h"
+
+#include "Mahakam/Renderer/TextureProps.h"
 
 namespace Mahakam
 {
 	class FrameBuffer;
+	class Texture;
+
+	extern template class Asset<FrameBuffer>;
+	extern template class Asset<Texture>;
 
 	class TextureAssetImporter : public AssetImporter
 	{

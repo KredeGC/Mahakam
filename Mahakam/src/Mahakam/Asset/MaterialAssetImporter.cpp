@@ -6,16 +6,23 @@
 
 #include "Mahakam/ImGui/GUI.h"
 
+#include "Mahakam/Math/Math.h"
+
 #include "Mahakam/Renderer/RenderPasses/GeometryRenderPass.h"
 #include "Mahakam/Renderer/RenderPasses/LightingRenderPass.h"
 #include "Mahakam/Renderer/RenderPasses/TonemappingRenderPass.h"
+#include "Mahakam/Renderer/Buffer.h"
+#include "Mahakam/Renderer/Camera.h"
+#include "Mahakam/Renderer/FrameBuffer.h"
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Light.h"
+#include "Mahakam/Renderer/Material.h"
+#include "Mahakam/Renderer/Mesh.h"
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/RenderData.h"
 #include "Mahakam/Renderer/Mesh.h"
+#include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
-#include "Mahakam/Math/Math.h"
 
 #include <imgui/imgui.h>
 

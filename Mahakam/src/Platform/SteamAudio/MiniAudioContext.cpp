@@ -2,6 +2,8 @@
 #include "MiniAudioContext.h"
 #include "MiniAudioSource.h"
 
+#include "Mahakam/Core/Log.h"
+
 #include <algorithm>
 
 namespace Mahakam

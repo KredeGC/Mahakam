@@ -1,7 +1,6 @@
 #pragma once
 
 #include "AssetImporter.h"
-#include "Mahakam/Renderer/Mesh.h"
 
 namespace Mahakam
 {

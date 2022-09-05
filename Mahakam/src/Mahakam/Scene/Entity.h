@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Log.h"
+
 #include "Scene.h"
 
 #include <entt/entt.hpp>

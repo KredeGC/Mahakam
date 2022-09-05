@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "MeshAssetImporter.h"
 
+#include "Mahakam/Renderer/Mesh.h"
+
 #include <imgui/imgui.h>
 
 namespace Mahakam

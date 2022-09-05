@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
-
-#include "Mahakam/Asset/Asset.h"
+#include "Mahakam/Core/SharedLibrary.h"
 
 namespace Mahakam
 {

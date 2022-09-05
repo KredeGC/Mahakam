@@ -1,11 +1,10 @@
 #include "Mahakam/mhpch.h"
 #include "Profiler.h"
 
+#include "Instrumentor.h"
 #include "SharedLibrary.h"
 
 #include "Mahakam/Renderer/GL.h"
-
-#include "Instrumentor.h"
 
 namespace Mahakam
 {

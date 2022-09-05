@@ -12,10 +12,6 @@
 #include <glm/ext/vector_int4.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 
-struct aiScene;
-struct aiNode;
-struct aiMesh;
-
 namespace tinygltf
 {
 	class Model;

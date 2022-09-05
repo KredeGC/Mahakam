@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Log.h"
 #include "Profiler.h"
 
 #include <algorithm>
@@ -30,42 +29,9 @@ namespace Mahakam
 		Instrumentor(const Instrumentor&) = delete;
 		Instrumentor(Instrumentor&&) = delete;
 
-		void BeginSession(const std::string& name, const std::string& filepath = "results.json")
-		{
-			std::lock_guard lock(m_Mutex);
-			if (m_CurrentSession)
-			{
-				// If there is already a current session, then close it before beginning new one.
-				// Subsequent profiling output meant for the original session will end up in the
-				// newly opened session instead.  That's better than having badly formatted
-				// profiling output.
-				if (Log::GetEngineLogger()) // Edge case: BeginSession() might be before Log::Init()
-				{
-					MH_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, m_CurrentSession->Name);
-				}
-				InternalEndSession();
-			}
-			m_OutputStream.open(filepath);
+		void BeginSession(const std::string& name, const std::string& filepath = "results.json");
 
-			if (m_OutputStream.is_open())
-			{
-				m_CurrentSession = new InstrumentationSession({ name });
-				WriteHeader();
-			}
-			else
-			{
-				if (Log::GetEngineLogger()) // Edge case: BeginSession() might be before Log::Init()
-				{
-					MH_CORE_ERROR("Instrumentor could not open results file '{0}'.", filepath);
-				}
-			}
-		}
-
-		void EndSession()
-		{
-			std::lock_guard lock(m_Mutex);
-			InternalEndSession();
-		}
+		void EndSession();
 
 		void WriteProfile(const Profiler::ProfileResult& result)
 		{

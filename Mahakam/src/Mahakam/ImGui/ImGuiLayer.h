@@ -6,6 +6,8 @@
 #include "Mahakam/Events/KeyEvent.h"
 #include "Mahakam/Events/ApplicationEvent.h"
 
+struct ImFont;
+
 namespace Mahakam {
 	class ImGuiLayer : public Layer
 	{

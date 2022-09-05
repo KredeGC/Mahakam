@@ -1,5 +1,4 @@
 #pragma once
-#include "Mahakam/mhpch.h"
 #include "Core.h"
 #include "Mahakam/Events/Event.h"
 

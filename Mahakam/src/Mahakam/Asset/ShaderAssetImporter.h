@@ -2,8 +2,6 @@
 
 #include "AssetImporter.h"
 
-#include "Mahakam/Renderer/Shader.h"
-
 namespace Mahakam
 {
 	class ShaderAssetImporter : public AssetImporter

@@ -1,11 +1,12 @@
 #pragma once
 #include "Core.h"
-#include "Layer.h"
 
 #include <vector>
 
 namespace Mahakam
 {
+	class Layer;
+
 	class LayerStack
 	{
 	private:

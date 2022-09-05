@@ -9,6 +9,7 @@
 
 #include "Mahakam/Scene/ComponentRegistry.h"
 #include "Mahakam/Scene/Components/TagComponent.h"
+#include "Mahakam/Scene/Entity.h"
 
 #include <imgui/imgui_internal.h>
 

@@ -4,6 +4,7 @@
 #include "RendererAPI.h"
 #include "Material.h"
 
+#include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 

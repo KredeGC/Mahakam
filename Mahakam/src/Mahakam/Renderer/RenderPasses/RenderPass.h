@@ -9,6 +9,8 @@ namespace Mahakam
 	class FrameBuffer;
 	struct SceneData;
 
+	extern template class Asset<FrameBuffer>;
+
 	class RenderPass
 	{
 	private:

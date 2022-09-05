@@ -1,11 +1,11 @@
 #include "Mahakam/mhpch.h"
 #include "AssetDatabase.h"
 
-#include "Mahakam/Core/Random.h"
 #include "Mahakam/Core/FileUtility.h"
+#include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/Random.h"
 
 #include "AssetImporter.h"
-
 #include "MaterialAssetImporter.h"
 #include "MeshAssetImporter.h"
 #include "ShaderAssetImporter.h"

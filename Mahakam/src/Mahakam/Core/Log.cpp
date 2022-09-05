@@ -1,8 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "Log.h"
 
-#include "SharedLibrary.h"
-
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace Mahakam

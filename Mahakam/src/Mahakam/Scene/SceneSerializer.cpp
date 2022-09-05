@@ -6,9 +6,8 @@
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Shader.h"
 
-#include "Components/TagComponent.h"
 #include "Components/RelationshipComponent.h"
-#include "Components/TransformComponent.h"
+#include "Components/TagComponent.h"
 
 #include "ComponentRegistry.h"
 #include "Entity.h"

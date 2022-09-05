@@ -3,6 +3,7 @@
 
 #include "RendererAPI.h"
 
+#include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include "Platform/OpenGL/OpenGLBuffer.h"

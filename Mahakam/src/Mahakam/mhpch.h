@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
 #include <filesystem>
 #include <functional>
 #include <fstream>
@@ -19,36 +20,37 @@
 #include <unordered_set>
 #endif
 
-#include "Mahakam/Asset/AssetImporter.h"
-#include "Mahakam/Asset/AssetDatabase.h"
-
-#include "Mahakam/Core/Core.h"
-#include "Mahakam/Core/Application.h"
-#include "Mahakam/Core/Frustum.h"
-#include "Mahakam/Core/Input.h"
-#include "Mahakam/Core/Instrumentor.h"
-#include "Mahakam/Core/KeyCodes.h"
-#include "Mahakam/Core/Layer.h"
-#include "Mahakam/Core/LayerStack.h"
-#include "Mahakam/Core/Log.h"
-#include "Mahakam/Core/MouseButtonCodes.h"
-#include "Mahakam/Core/Profiler.h"
-#include "Mahakam/Core/Random.h"
-#include "Mahakam/Core/SharedLibrary.h"
-#include "Mahakam/Core/Timestep.h"
-#include "Mahakam/Core/FileUtility.h"
-#include "Mahakam/Core/Window.h"
-
-#include "Mahakam/Events/ApplicationEvent.h"
-#include "Mahakam/Events/Event.h"
-#include "Mahakam/Events/KeyEvent.h"
-#include "Mahakam/Events/MouseEvent.h"
-
-#include "Mahakam/ImGui/GUI.h"
-#include "Mahakam/ImGui/ImGuiLayer.h"
-
-#include "Mahakam/Math/Bounds.h"
-#include "Mahakam/Math/Math.h"
+//#include "Mahakam/Asset/Asset.h"
+//
+//#include "Mahakam/Core/Core.h"
+//#include "Mahakam/Core/Application.h"
+//#include "Mahakam/Core/Frustum.h"
+//#include "Mahakam/Core/Input.h"
+//#include "Mahakam/Core/Instrumentor.h"
+//#include "Mahakam/Core/KeyCodes.h"
+//#include "Mahakam/Core/Layer.h"
+//#include "Mahakam/Core/LayerStack.h"
+//#include "Mahakam/Core/Log.h"
+//#include "Mahakam/Core/MouseButtonCodes.h"
+//#include "Mahakam/Core/Profiler.h"
+//#include "Mahakam/Core/Random.h"
+//#include "Mahakam/Core/SharedLibrary.h"
+//#include "Mahakam/Core/Timestep.h"
+//#include "Mahakam/Core/FileUtility.h"
+//#include "Mahakam/Core/Window.h"
+//
+//#include "Mahakam/Events/ApplicationEvent.h"
+//#include "Mahakam/Events/Event.h"
+//#include "Mahakam/Events/KeyEvent.h"
+//#include "Mahakam/Events/MouseEvent.h"
+//
+//#include "Mahakam/ImGui/GUI.h"
+//#include "Mahakam/ImGui/ImGuiLayer.h"
+//
+//#include "Mahakam/Math/Bounds.h"
+//#include "Mahakam/Math/Math.h"
+//
+//#include "Mahakam/Renderer/RendererAPI.h"
 
 #include <entt/entt.hpp>
 
@@ -70,13 +72,9 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <spdlog/spdlog.h>
-#include <spdlog/fmt/ostr.h>
-
 #include <yaml-cpp/yaml.h>
 
 #ifdef MH_BUILD
 #include <miniaudio/miniaudio.h>
 #include <steamaudio/phonon.h>
-#include <tiny_gltf/tiny_gltf.h>
 #endif

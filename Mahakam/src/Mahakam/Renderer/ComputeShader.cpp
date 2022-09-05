@@ -4,6 +4,7 @@
 #include "RendererAPI.h"
 #include "Mahakam/Asset/Asset.h"
 
+#include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include "Platform/OpenGL/OpenGLComputeShader.h"

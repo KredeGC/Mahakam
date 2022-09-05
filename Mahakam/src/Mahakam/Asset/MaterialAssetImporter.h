@@ -1,16 +1,29 @@
 #pragma once
 
 #include "AssetImporter.h"
-#include "Mahakam/Renderer/Buffer.h"
+
 #include "Mahakam/Renderer/Camera.h"
-#include "Mahakam/Renderer/FrameBuffer.h"
-#include "Mahakam/Renderer/Material.h"
-#include "Mahakam/Renderer/Mesh.h"
-#include "Mahakam/Renderer/Shader.h"
+
+#include "Mahakam/Renderer/ShaderProps.h"
 
 namespace Mahakam
 {
+	class Buffer;
+	class Camera;
+	class FrameBuffer;
+	class Material;
 	class RenderPass;
+	class Shader;
+	class SubMesh;
+	class Texture;
+
+	extern template Asset<Buffer>;
+	extern template Asset<FrameBuffer>;
+	extern template Asset<Material>;
+	extern template Asset<Shader>;
+	extern template Asset<SubMesh>;
+	extern template Asset<Texture>;
+
 	struct SceneData;
 
 	class MaterialAssetImporter : public AssetImporter

@@ -2,6 +2,7 @@
 #include "Application.h"
 
 #include "Input.h"
+#include "Log.h"
 #include "Profiler.h"
 #include "SharedLibrary.h"
 

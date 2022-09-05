@@ -2,7 +2,9 @@
 #include "TextureAssetImporter.h"
 
 #include "Mahakam/ImGui/GUI.h"
+
 #include "Mahakam/Renderer/FrameBuffer.h"
+#include "Mahakam/Renderer/Texture.h"
 
 #include <imgui/imgui.h>
 

@@ -1,6 +1,7 @@
 #include "Mahakam/mhpch.h"
 #include "OpenGLMaterial.h"
 
+#include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Profiler.h"
 
 #include "Mahakam/Renderer/GL.h"

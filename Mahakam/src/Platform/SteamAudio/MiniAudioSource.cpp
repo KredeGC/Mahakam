@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "MiniAudioSource.h"
 
+#include "Mahakam/Core/Log.h"
+
 namespace Mahakam
 {
 	//Ref<AudioSource> AudioSource::Create(AudioContext* context)
