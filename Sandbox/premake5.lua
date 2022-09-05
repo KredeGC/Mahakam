@@ -24,6 +24,7 @@ project "Sandbox"
 
     defines { "_CRT_SECURE_NO_WARNINGS" }
 
+    -- Windows
     filter "options:target=windows"
         systemversion "latest"
         
@@ -38,7 +39,12 @@ project "Sandbox"
         postbuildcommands {
             "{COPYDIR} \"bin/%{outputdir}/Sandbox.dll\" \"../Erebor/runtime/\""
         }
+    
+    -- MinGW
+    filter { "system:linux", "options:target=windows" }
+        links { MinGWLinks }
 
+    -- Linux
     filter "options:target=linux"
         systemversion "latest"
         

@@ -27,7 +27,8 @@ project "Erebor"
     postbuildcommands {
         "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/".._OPTIONS["target"].."-x64/.\" \"bin/%{outputdir}/\""
     }
-
+    
+    -- Windows
     filter "options:target=windows"
         systemversion "latest"
         
@@ -37,7 +38,12 @@ project "Erebor"
         }
         
         flags { "MultiProcessorCompile" }
+    
+    -- MinGW
+    filter { "system:linux", "options:target=windows" }
+        links { MinGWLinks }
 
+    -- Linux
     filter "options:target=linux"
         systemversion "latest"
         

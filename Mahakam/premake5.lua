@@ -66,6 +66,7 @@ project "Mahakam"
         "MH_BUILD"
     }
     
+    -- Windows
     filter "options:target=windows"
         systemversion "latest"
         
@@ -80,6 +81,11 @@ project "Mahakam"
         
         links { "opengl32.lib" }
     
+    -- MinGW
+    filter { "system:linux", "options:target=windows" }
+        buildoptions { "-Wa,-mbig-obj" }
+    
+    -- Linux
     filter "options:target=linux"
         systemversion "latest"
         
