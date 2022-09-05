@@ -43,7 +43,6 @@ project "Sandbox"
     -- MinGW
     filter { "system:linux", "options:target=windows" }
         links { MinGWLinks }
-        flags { "LinkTimeOptimization" }
         buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition" }
 
     -- Linux

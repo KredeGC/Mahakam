@@ -83,7 +83,6 @@ project "Mahakam"
     
     -- MinGW
     filter { "system:linux", "options:target=windows" }
-        flags { "LinkTimeOptimization" }
         buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition" }
     
     -- Linux
