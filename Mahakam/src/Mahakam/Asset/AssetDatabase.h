@@ -2,8 +2,6 @@
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
-#include "Asset.h"
-
 #include <filesystem>
 #include <string>
 
