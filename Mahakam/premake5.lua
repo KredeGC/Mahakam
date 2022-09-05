@@ -84,6 +84,7 @@ project "Mahakam"
     -- MinGW
     filter { "system:linux", "options:target=windows" }
         buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition", "-flto", "-fuse-linker-plugin", "-fno-fat-lto-objects" }
+        linkoptions { "-flto", "-fuse-linker-plugin", "--plugin=$(gcc --print-file-name=liblto_plugin.so)" }
     
     -- Linux
     filter "options:target=linux"
