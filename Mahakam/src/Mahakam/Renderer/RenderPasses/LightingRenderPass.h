@@ -13,6 +13,9 @@ namespace Mahakam
 	class Texture;
 	class UniformBuffer;
 
+	extern template class Asset<Shader>;
+	extern template class Asset<Texture>;
+
 	class LightingRenderPass : public RenderPass
 	{
 	protected:
@@ -26,7 +29,7 @@ namespace Mahakam
 		Asset<FrameBuffer> shadowFramebuffer = nullptr;
 		Asset<Shader> shadowShader = nullptr;
 
-		Asset<UniformBuffer> shadowMatrixBuffer = nullptr;
+		Ref<UniformBuffer> shadowMatrixBuffer = nullptr;
 
 		UnorderedMap<glm::ivec2, uint64_t> lightHashes;
 

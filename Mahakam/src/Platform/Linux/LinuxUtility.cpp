@@ -1,7 +1,8 @@
 #include "Mahakam/mhpch.h"
-#include "Mahakam/Core/FileUtility.h"
 
 #include "Mahakam/Core/Application.h"
+#include "Mahakam/Core/FileUtility.h"
+#include "Mahakam/Core/Log.h"
 
 #include <GLFW/glfw3.h>
 

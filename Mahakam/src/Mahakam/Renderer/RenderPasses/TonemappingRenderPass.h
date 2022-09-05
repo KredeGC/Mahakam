@@ -6,6 +6,8 @@ namespace Mahakam
 {
 	class Shader;
 
+	extern template class Asset<Shader>;
+
 	class TonemappingRenderPass : public RenderPass
 	{
 	private:
