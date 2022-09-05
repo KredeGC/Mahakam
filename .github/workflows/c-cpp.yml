@@ -25,10 +25,12 @@ jobs:
     - name: Compile Mahakam
       run: |
           cd Scripts
+          chmod +x build-linux.sh
           ./build-linux.sh -j2 Mahakam
     - name: Compile Erebor
       run: |
           cd Scripts
+          chmod +x build-linux.sh
           ./build-linux.sh -j2 Erebor
     - name: Upload build
       uses: actions/upload-artifact@v3
@@ -60,10 +62,12 @@ jobs:
     - name: Compile Mahakam
       run: |
           cd Scripts
+          chmod +x build-win.sh
           ./build-win.sh -j2 Mahakam
     - name: Compile Erebor
       run: |
           cd Scripts
+          chmod +x build-win.sh
           ./build-win.sh -j2 Erebor
     - name: Upload build
       uses: actions/upload-artifact@v3
