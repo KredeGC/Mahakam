@@ -27,7 +27,6 @@ project "Mahakam"
     
     includedirs {
         "src",
-        "%{IncludeDir.assimp}",
         "%{IncludeDir.bullet}",
         "%{IncludeDir.bullet_dynamics}",
         "%{IncludeDir.bullet_collision}",
@@ -67,7 +66,6 @@ project "Mahakam"
         "MH_BUILD"
     }
     
-    -- Windows
     filter "options:target=windows"
         systemversion "latest"
         
@@ -80,46 +78,14 @@ project "Mahakam"
             "NOMINMAX"
         }
         
-        links {
-            "opengl32.lib",
-            "assimp-vc142-mt"
-        }
-
-    -- Linux
+        links { "opengl32.lib" }
+    
     filter "options:target=linux"
         systemversion "latest"
         
         removefiles { "**/Windows/WindowsFileUtility.cpp" }
         
         defines { "MH_PLATFORM_LINUX" }
-        
-        libdirs {
-            "%{AssimpLibDir}",
-            "%{ZLibDir}"
-        }
-        
-        links {
-            "assimp",
-            "zlibstatic"
-        }
-    
-    -- Windows Debug
-    filter { "options:target=windows", "configurations:Debug" }
-        libdirs {
-            "%{AssimpLibDir}/Debug",
-            "%{ZLibDir}/Debug"
-        }
-        
-        links { "zlibstaticd" }
-        
-    -- Windows DebugOptimized and Release
-    filter { "options:target=windows", "configurations:DebugOptimized or Release" }
-        libdirs {
-            "%{AssimpLibDir}/Release",
-            "%{ZLibDir}/Release"
-        }
-        
-        links { "zlibstatic" }
     
     filter "configurations:Debug"
         defines "MH_DEBUG"

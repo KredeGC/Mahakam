@@ -16,7 +16,7 @@ namespace Mahakam
 
 		AnimatorComponent(Asset<Animation> animation)
 		{
-			animator.LoadAnimation(animation);
+			//animator.LoadAnimation(animation);
 		}
 
 		operator Animator& () { return animator; }

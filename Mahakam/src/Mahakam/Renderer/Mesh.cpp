@@ -3,7 +3,6 @@
 
 #include "RendererAPI.h"
 #include "Material.h"
-#include "Assimp.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
 
@@ -129,7 +128,7 @@ namespace Mahakam
 			MH_CORE_WARN("[GLTF] Warning: {0}", warn);
 
 		if (!err.empty())
-			MH_CORE_WARN("[GLTF] Error: {0}", err);
+			MH_CORE_ERROR("[GLTF] Error: {0}", err);
 
 		if (!success) {
 			MH_CORE_ERROR("[GLTF] Failed to parse glTF model at {0}", filepath.string());
@@ -372,38 +371,6 @@ namespace Mahakam
 		MH_CORE_BREAK("Unknown renderer API!");
 
 		return nullptr;
-	};
-
-	//SkinnedMesh Mesh::LoadModelImpl(const std::string& filepath, const SkinnedMeshProps& props)
-	MH_DEFINE_FUNC(SubMesh::LoadModelImpl, Mesh, const std::string& filepath, const MeshProps& props)
-	{
-		// TODO: Use SkinnedMeshProps to determine if we should load textures and create materials, or use the provided materials
-
-		MH_PROFILE_FUNCTION();
-
-		// Read model
-		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(filepath,
-			aiProcess_LimitBoneWeights |
-			aiProcess_Triangulate |
-			aiProcess_FlipUVs |
-			aiProcess_GenSmoothNormals |
-			aiProcess_CalcTangentSpace |
-			aiProcess_ImproveCacheLocality |
-			aiProcess_OptimizeMeshes |
-			aiProcess_JoinIdenticalVertices);
-
-		Mesh skinnedMesh;
-
-		// Process nodes in mesh
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-			MH_CORE_WARN("Could not load model \"{0}\": {1}", filepath, importer.GetErrorString());
-		else
-			ProcessNode(skinnedMesh, scene->mRootNode, scene);
-
-		//skinnedMesh.RecalculateBounds();
-
-		return skinnedMesh;
 	};
 
 	Asset<SubMesh> SubMesh::CreateCube(int tessellation, bool reverse)
@@ -741,161 +708,5 @@ namespace Mahakam
 		delete[] indices;
 
 		return mesh;
-	}
-
-	Asset<SubMesh> SubMesh::ProcessMesh(Mesh& skinnedMesh, aiMesh* mesh, const aiScene* scene)
-	{
-		MH_PROFILE_FUNCTION();
-
-		unsigned int numFaces = mesh->mNumFaces;
-
-		uint32_t vertexCount = mesh->mNumVertices;
-
-		uint32_t indexCount = 0;
-		for (unsigned int i = 0; i < numFaces; i++)
-			indexCount += mesh->mFaces[i].mNumIndices;
-
-		glm::vec3* positions = new glm::vec3[mesh->mNumVertices];
-		glm::vec2* texcoords = new glm::vec2[mesh->mNumVertices];
-		glm::vec3* normals = new glm::vec3[mesh->mNumVertices];
-		glm::vec4* tangents = new glm::vec4[mesh->mNumVertices];
-		glm::vec4* colors = new glm::vec4[mesh->mNumVertices];
-		glm::ivec4* boneIDs = new glm::ivec4[mesh->mNumVertices];
-		glm::vec4* boneWeights = new glm::vec4[mesh->mNumVertices];
-
-		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
-		{
-			boneIDs[i] = glm::vec4(-1.0, -1.0, -1.0, -1.0);
-			boneWeights[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-		}
-
-		uint32_t* indices = new uint32_t[indexCount];
-
-		// Extract vertex values
-		for (uint32_t i = 0; i < mesh->mNumVertices; i++)
-		{
-			if (mesh->HasPositions())
-				memcpy(positions + i, mesh->mVertices + i, sizeof(glm::vec3));
-			if (mesh->HasTextureCoords(0))
-				memcpy(texcoords + i, mesh->mTextureCoords[0] + i, sizeof(glm::vec2));
-			if (mesh->HasNormals())
-				memcpy(normals + i, mesh->mNormals + i, sizeof(glm::vec3));
-			if (mesh->HasTangentsAndBitangents())
-				memcpy(tangents + i, mesh->mTangents + i, sizeof(glm::vec3));
-			if (mesh->HasVertexColors(0))
-				memcpy(colors + i, mesh->mColors[0] + i, sizeof(glm::vec4));
-		}
-
-		// Extract indices
-		uint32_t indexOffset = 0;
-		for (uint32_t i = 0; i < mesh->mNumFaces; i++)
-		{
-			aiFace face = mesh->mFaces[i];
-			memcpy(indices + indexOffset, face.mIndices, sizeof(uint32_t) * face.mNumIndices);
-
-			indexOffset += face.mNumIndices;
-		}
-
-		// Extract bone information
-		if (mesh->HasBones())
-		{
-			for (unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
-			{
-				int boneID = -1;
-				std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-				if (skinnedMesh.BoneInfoMap.find(boneName) == skinnedMesh.BoneInfoMap.end())
-				{
-					BoneInfo newBoneInfo;
-					newBoneInfo.id = skinnedMesh.BoneCount;
-					newBoneInfo.offset = AssimpToMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
-					skinnedMesh.BoneInfoMap[boneName] = newBoneInfo;
-					boneID = skinnedMesh.BoneCount;
-					skinnedMesh.BoneCount++;
-				}
-				else
-				{
-					boneID = skinnedMesh.BoneInfoMap[boneName].id;
-				}
-
-				MH_CORE_ASSERT(boneID != -1, "Invalid bone!");
-				auto weights = mesh->mBones[boneIndex]->mWeights;
-				int numWeights = mesh->mBones[boneIndex]->mNumWeights;
-
-				for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
-				{
-					uint32_t vertexId = weights[weightIndex].mVertexId;
-					float weight = weights[weightIndex].mWeight;
-					MH_CORE_ASSERT(vertexId <= vertexCount, "Invalid vertex index!");
-
-					for (int i = 0; i < 4; ++i)
-					{
-						if (boneIDs[vertexId][i] < 0)
-						{
-							boneWeights[vertexId][i] = weight;
-							boneIDs[vertexId][i] = boneID;
-							break;
-						}
-					}
-				}
-			}
-
-			// Normalize bone weights, because FBX is a bitch
-			for (unsigned int vertIndex = 0; vertIndex < mesh->mNumVertices; ++vertIndex)
-			{
-				glm::vec4& weight = boneWeights[vertIndex];
-				float length = weight.x + weight.y + weight.z + weight.w;
-
-				boneWeights[vertIndex] = weight / length;
-			}
-		}
-
-		// Interleave vertices
-		InterleavedStruct interleavedVertices;
-
-		if (mesh->HasPositions())
-			interleavedVertices.positions = positions;
-		if (mesh->HasTextureCoords(0))
-			interleavedVertices.texcoords = texcoords;
-		if (mesh->HasNormals())
-			interleavedVertices.normals = normals;
-		if (mesh->HasTangentsAndBitangents())
-			interleavedVertices.tangents = tangents;
-		if (mesh->HasVertexColors(0))
-			interleavedVertices.colors = colors;
-		if (mesh->HasBones())
-		{
-			interleavedVertices.boneIDs = boneIDs;
-			interleavedVertices.boneWeights = boneWeights;
-		}
-
-		Asset<SubMesh> m = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
-
-		delete[] positions;
-		delete[] texcoords;
-		delete[] normals;
-		delete[] tangents;
-		delete[] colors;
-		delete[] boneIDs;
-		delete[] boneWeights;
-
-		delete[] indices;
-
-		return m;
-	}
-
-	void SubMesh::ProcessNode(Mesh& skinnedMesh, aiNode* node, const aiScene* scene)
-	{
-		MH_PROFILE_FUNCTION();
-
-		// Go through each mesh in this node
-		for (uint32_t i = 0; i < node->mNumMeshes; i++)
-		{
-			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			skinnedMesh.Meshes.push_back(ProcessMesh(skinnedMesh, mesh, scene));
-		}
-
-		// Go through any child nodes
-		for (uint32_t i = 0; i < node->mNumChildren; i++)
-			ProcessNode(skinnedMesh, node->mChildren[i], scene);
 	}
 }

@@ -72,7 +72,7 @@ namespace Mahakam::Editor
 
 			Asset<Animation> animation = animator.GetAnimation();
 
-			if (animation)
+			/*if (animation)
 			{
 				float duration = animation->GetDuration() / animation->GetTicksPerSecond();
 
@@ -84,7 +84,7 @@ namespace Mahakam::Editor
 				float realtime = animator.GetTime() / animation->GetTicksPerSecond();
 
 				ImGui::ProgressBar(progress, ImVec2(-FLT_MIN, 0), std::to_string(realtime).c_str());
-			}
+			}*/
 		};
 
 		PropertyRegistry::Register("Animator", animatorInspector);

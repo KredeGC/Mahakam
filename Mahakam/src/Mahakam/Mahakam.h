@@ -68,7 +68,6 @@
 #include "Mahakam/Renderer/RenderPasses/TonemappingRenderPass.h"
 #include "Mahakam/Renderer/Animation.h"
 #include "Mahakam/Renderer/Animator.h"
-#include "Mahakam/Renderer/Bone.h"
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/Camera.h"
 #include "Mahakam/Renderer/ComputeShader.h"

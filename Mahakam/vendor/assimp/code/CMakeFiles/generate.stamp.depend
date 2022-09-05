@@ -1,5 +1,0 @@
-# CMake generation dependency list for this directory.
-C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/cmake-modules/FindRT.cmake
-C:/Users/krede/source/repos/Mahakam/Mahakam/vendor/assimp/code/CMakeLists.txt
-D:/CMake/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake
-D:/CMake/share/cmake-3.22/Modules/FindPackageMessage.cmake

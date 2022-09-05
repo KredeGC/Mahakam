@@ -135,8 +135,7 @@ namespace Mahakam
 		virtual uint32_t GetIndexCount() const = 0;
 
 		inline static Asset<SubMesh> Create(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
-		inline static Mesh LoadModel(const std::string& filepath, const MeshProps& props = MeshProps()) { return LoadModelImpl(filepath, props); }
-
+		
 		static Asset<SubMesh> CreateCube(int tessellation, bool reverse = false);
 		static Asset<SubMesh> CreatePlane(int rows, int columns);
 		static Asset<SubMesh> CreateUVSphere(int rows, int columns);
@@ -144,10 +143,5 @@ namespace Mahakam
 
 	private:
 		MH_DECLARE_FUNC(CreateImpl, Asset<SubMesh>, uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
-		MH_DECLARE_FUNC(LoadModelImpl, Mesh, const std::string& filepath, const MeshProps& props);
-
-		static Asset<SubMesh> ProcessMesh(Mesh& skinnedMesh, aiMesh* mesh, const aiScene* scene);
-
-		static void ProcessNode(Mesh& skinnedMesh, aiNode* node, const aiScene* scene);
 	};
 }

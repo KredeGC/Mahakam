@@ -160,6 +160,8 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
+	Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.gltf");
+
 	// Create backpack entity
 	Entity skinnedEntity = scene->CreateEntity("Skinned glTF");
 	skinnedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);

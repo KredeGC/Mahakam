@@ -152,7 +152,7 @@ namespace Mahakam
 
 			registry.view<AnimatorComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
 			{
-				auto& animator = animatorComponent.GetAnimator();
+				/*auto& animator = animatorComponent.GetAnimator();
 
 				animator.UpdateAnimation(ts);
 
@@ -161,7 +161,7 @@ namespace Mahakam
 
 				for (auto& material : materials)
 					for (int j = 0; j < Animator::MAX_BONES; ++j)
-						material->SetMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
+						material->SetMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);*/
 			});
 		}
 

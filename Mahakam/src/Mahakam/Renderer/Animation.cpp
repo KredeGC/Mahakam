@@ -1,58 +1,82 @@
 #include "Mahakam/mhpch.h"
 #include "Animation.h"
 
-#include "Assimp.h"
-
 #include "Mahakam/Core/SharedLibrary.h"
+
+#include <tiny_gltf/tiny_gltf.h>
+
+#include <filesystem>
 
 namespace Mahakam
 {
-    Asset<Animation> Animation::Load(const std::string& filepath, Mesh& skinnedMesh)
-    {
-        return Asset<Animation>(CreateRef<Animation>(filepath, skinnedMesh));
-    }
+	Animation::Animation(const std::filesystem::path& filepath)
+	{
+		MH_PROFILE_FUNCTION();
 
-    Animation::Animation(const std::string& filepath, Mesh& skinnedMesh)
-        : m_Filepath(filepath)
-    {
-        MH_PROFILE_FUNCTION();
+		tinygltf::Model model;
+		tinygltf::TinyGLTF loader;
+		std::string err;
+		std::string warn;
 
-        Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate);
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-        {
-            MH_CORE_WARN("Could not load animation \"{0}\": {1}", filepath, importer.GetErrorString());
-        }
-        else
-        {
-            auto animation = scene->mAnimations[0];
-            m_Name = animation->mName.C_Str();
-            m_Duration = (float)animation->mDuration;
-            m_TicksPerSecond = (int)animation->mTicksPerSecond;
+		bool success;
+		if (filepath.extension().string() == ".gltf")
+			success = loader.LoadASCIIFromFile(&model, &err, &warn, filepath.string());
+		else
+			success = loader.LoadBinaryFromFile(&model, &err, &warn, filepath.string());
 
-            m_BoneInfoMap = skinnedMesh.BoneInfoMap;
+		if (!warn.empty())
+			MH_CORE_WARN("[GLTF] Warning: {0}", warn);
 
-            ReadHierarchyData(-1, scene->mRootNode);
-        }
-    }
+		if (!err.empty())
+			MH_CORE_ERROR("[GLTF] Error: {0}", err);
 
-    void Animation::ReadHierarchyData(int parentIndex, const aiNode* src)
-    {
-        MH_PROFILE_FUNCTION();
+		if (!success) {
+			MH_CORE_ERROR("[GLTF] Failed to parse glTF model at {0}", filepath.string());
+			return;
+		}
 
-        MH_CORE_ASSERT(src, "Invalid bone!");
+		auto& animations = model.animations;
+		for (auto& animation : animations)
+		{
+			for (auto& channel : animation.channels)
+			{
+				auto& sampler = animation.samplers[channel.sampler];
 
-        int index = (int)m_BoneHierarchy.size();
+				// Input data
+				const auto& inputAccessor = model.accessors[sampler.input];
+				const auto& inputBufferView = model.bufferViews[inputAccessor.bufferView];
+				const auto& inputBuffer = model.buffers[inputBufferView.buffer];
 
-        BoneTransform dest;
+				const float* times = reinterpret_cast<const float*>(&inputBuffer.data[inputBufferView.byteOffset + inputAccessor.byteOffset]);
 
-        dest.name = src->mName.data;
-        dest.transformation = AssimpToMat4(src->mTransformation);
-        dest.parentIndex = parentIndex;
+				// Output data
+				const auto& outputAccessor = model.accessors[sampler.input];
+				const auto& outputBufferView = model.bufferViews[outputAccessor.bufferView];
+				const auto& outputBuffer = model.buffers[outputBufferView.buffer];
 
-        m_BoneHierarchy.push_back(dest);
+				if (channel.target_path == "translation")
+				{
+					const glm::vec3* values = reinterpret_cast<const glm::vec3*>(&inputBuffer.data[outputBufferView.byteOffset + outputAccessor.byteOffset]);
+				}
+				else if (channel.target_path == "rotation")
+				{
+					const glm::quat* values = reinterpret_cast<const glm::quat*>(&inputBuffer.data[outputBufferView.byteOffset + outputAccessor.byteOffset]);
+				}
+				else if (channel.target_path == "scale")
+				{
+					const glm::vec3* values = reinterpret_cast<const glm::vec3*>(&inputBuffer.data[outputBufferView.byteOffset + outputAccessor.byteOffset]);
+				}
+				else if (channel.target_path == "weights")
+				{
+					MH_CORE_BREAK("Weight animations are not yet supported");
+				}
+			}
+		}
+	}
 
-        for (unsigned int i = 0; i < src->mNumChildren; i++)
-            ReadHierarchyData(index, src->mChildren[i]);
-    }
+	//Asset<Animation> Animation::LoadImpl(const std::filesystem::path& filepath)
+	MH_DEFINE_FUNC(Animation::LoadImpl, Asset<Animation>, const std::filesystem::path& filepath)
+	{
+		return Asset<Animation>(CreateRef<Animation>(filepath));
+	};
 }

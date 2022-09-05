@@ -12,7 +12,6 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 
 # Libraries and technologies
 * Uses OpenGL for rendering. No other rendering APIs are supported currently, but may in the future.
-* [assimp](https://github.com/assimp/assimp) for model and animation loading.
 * [Bullet Physics SDK](https://github.com/bulletphysics/bullet3) for physics and collision detection.
 * [EnTT](https://github.com/skypjack/entt) as entity-component-system.
 * [glad](https://github.com/Dav1dde/glad) for interfacing with OpenGL.
@@ -25,6 +24,7 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 * [spdlog](https://github.com/gabime/spdlog) for easy and fast logging.
 * [stb_image](https://github.com/nothings/stb) for loading various image files.
 * [Steam Audio](https://valvesoftware.github.io/steam-audio/) for audio spatialization.
+* [tinygltf](https://github.com/syoyo/tinygltf/tree/skinning) for model and animation loading.
 * [yaml-cpp](https://github.com/jbeder/yaml-cpp) for serializaing and deserializing various YAML files.
 
 # Usage
