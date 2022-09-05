@@ -2,6 +2,8 @@
 
 #include "Event.h"
 
+#include "Mahakam/Core/MouseButtonCodes.h"
+
 namespace Mahakam
 {
 	class MouseMovedEvent : public Event

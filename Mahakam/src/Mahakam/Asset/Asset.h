@@ -20,43 +20,21 @@ namespace Mahakam
 		Ref<T> m_Ptr = nullptr;
 
 	public:
-		Asset() : m_ID(0), m_Ptr(nullptr) {}
+		Asset();
 
 		Asset(const std::nullptr_t&) {}
 
-		Asset(Ref<T> ptr)
-		{
-			m_Ptr = ptr;
-		}
+		Asset(Ref<T> ptr);
 
-		Asset(uint64_t id) : m_ID(id)
-		{
-			if (m_ID)
-				AssetDatabase::RegisterAsset(m_ID);
-		}
+		Asset(uint64_t id);
 
-		Asset(const std::filesystem::path& importPath)
-		{
-			m_ID = AssetDatabase::ReadAssetInfo(importPath).ID;
-			if (m_ID)
-				AssetDatabase::RegisterAsset(m_ID);
-		}
+		Asset(const std::filesystem::path& importPath);
 
-		Asset(Asset&& other) noexcept
-			: m_ID(other.m_ID), m_Ptr(other.m_Ptr) {}
+		Asset(Asset&& other) noexcept;
 
-		Asset(const Asset& other) noexcept
-			: m_ID(other.m_ID), m_Ptr(other.m_Ptr)
-		{
-			if (m_ID)
-				AssetDatabase::RegisterAsset(m_ID);
-		}
+		Asset(const Asset& other) noexcept;
 
-		~Asset()
-		{
-			if (m_ID)
-				AssetDatabase::DeregisterAsset(m_ID);
-		}
+		~Asset();
 
 		template<typename T2>
 		operator Asset<T2>() const
@@ -79,14 +57,7 @@ namespace Mahakam
 			return *this;
 		}
 
-		Asset& operator=(Asset&& rhs) noexcept
-		{
-			m_Ptr = rhs.m_Ptr;
-			m_ID = rhs.m_ID;
-			if (m_ID)
-				AssetDatabase::RegisterAsset(m_ID);
-			return *this;
-		}
+		Asset<T>& operator=(Asset<T>&& rhs) noexcept;
 
 		template<typename T2>
 		Asset& operator=(const Asset<T2>& rhs)
@@ -100,70 +71,31 @@ namespace Mahakam
 			return *this;
 		}
 
-		Asset& operator=(const Asset& rhs)
-		{
-			if (m_ID)
-				AssetDatabase::DeregisterAsset(m_ID);
-			m_Ptr = rhs.m_Ptr;
-			m_ID = rhs.m_ID;
-			if (m_ID)
-				AssetDatabase::RegisterAsset(m_ID);
-			return *this;
-		}
+		Asset<T>& operator=(const Asset<T>& rhs);
 
-		Asset& operator=(const std::nullptr_t& rhs)
-		{
-			if (m_ID)
-				AssetDatabase::DeregisterAsset(m_ID);
-			m_Ptr = nullptr;
-			m_ID = 0;
-			return *this;
-		}
+		Asset& operator=(const std::nullptr_t& rhs);
 
-		void Save(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-		{
-			m_ID = AssetDatabase::SaveAsset(Get(), filepath, importPath);
-			if (m_Ptr)
-			{
-				AssetDatabase::RegisterAsset(m_ID);
-				m_Ptr = nullptr;
-			}
-		}
+		void Save(const std::filesystem::path& filepath, const std::filesystem::path& importPath);
 
-		uint64_t GetID() const { return m_ID; }
+		uint64_t GetID() const;
 
-		std::filesystem::path GetImportPath() const { return AssetDatabase::GetAssetImportPath(m_ID); }
+		std::filesystem::path GetImportPath() const;
 
-		Ref<T> Get()
-		{
-			if (m_ID != 0)
-				return AssetDatabase::LoadAsset<T>(m_ID);
-			return m_Ptr;
-		}
+		Ref<T> Get();
 
-		Ref<T> Get() const
-		{
-			if (m_ID != 0)
-				return AssetDatabase::LoadAsset<T>(m_ID);
-			return m_Ptr;
-		}
+		Ref<T> Get() const;
 
-		T* Ptr()
-		{
-			return Get().get();
-		}
+		T* Ptr();
 
-		T* Ptr() const
-		{
-			return Get().get();
-		}
+		T* Ptr() const;
 
-		Ref<T> operator->() noexcept { return Get(); }
+		Ref<T> operator->() noexcept;
 
-		Ref<T> operator->() const noexcept { return Get(); }
+		Ref<T> operator->() const noexcept;
 
-		explicit operator bool() const noexcept { return Get() != nullptr; }
+		explicit operator bool() const noexcept;
 	};
+
 
 	template<typename T>
 	bool operator==(const Asset<T>& _Left, std::nullptr_t) noexcept
@@ -175,6 +107,150 @@ namespace Mahakam
 	bool operator==(const Asset<T1>& _Left, const Asset<T2>& _Right) noexcept
 	{
 		return _Left.Ptr() == _Right.Ptr();
+	}
+
+	template<typename T>
+	Asset<T>::Asset() : m_ID(0), m_Ptr(nullptr) {}
+
+	template<typename T>
+	Asset<T>::Asset(Ref<T> ptr)
+	{
+		m_Ptr = ptr;
+	}
+
+	template<typename T>
+	Asset<T>::Asset(uint64_t id) : m_ID(id)
+	{
+		if (m_ID)
+			AssetDatabase::RegisterAsset(m_ID);
+	}
+
+	template<typename T>
+	Asset<T>::Asset(const std::filesystem::path& importPath)
+	{
+		m_ID = AssetDatabase::ReadAssetInfo(importPath).ID;
+		if (m_ID)
+			AssetDatabase::RegisterAsset(m_ID);
+	}
+
+	template<typename T>
+	Asset<T>::Asset(Asset&& other) noexcept
+		: m_ID(other.m_ID), m_Ptr(other.m_Ptr) {}
+
+	template<typename T>
+	Asset<T>::Asset(const Asset& other) noexcept
+		: m_ID(other.m_ID), m_Ptr(other.m_Ptr)
+	{
+		if (m_ID)
+			AssetDatabase::RegisterAsset(m_ID);
+	}
+
+	template<typename T>
+	Asset<T>::~Asset()
+	{
+		if (m_ID)
+			AssetDatabase::DeregisterAsset(m_ID);
+	}
+
+	template<typename T>
+	Asset<T>& Asset<T>::operator=(Asset<T>&& rhs) noexcept
+	{
+		m_Ptr = rhs.m_Ptr;
+		m_ID = rhs.m_ID;
+		if (m_ID)
+			AssetDatabase::RegisterAsset(m_ID);
+		return *this;
+	}
+
+	template<typename T>
+	Asset<T>& Asset<T>::operator=(const Asset<T>& rhs)
+	{
+		if (m_ID)
+			AssetDatabase::DeregisterAsset(m_ID);
+		m_Ptr = rhs.m_Ptr;
+		m_ID = rhs.m_ID;
+		if (m_ID)
+			AssetDatabase::RegisterAsset(m_ID);
+		return *this;
+	}
+
+	template<typename T>
+	Asset<T>& Asset<T>::operator=(const std::nullptr_t& rhs)
+	{
+		if (m_ID)
+			AssetDatabase::DeregisterAsset(m_ID);
+		m_Ptr = nullptr;
+		m_ID = 0;
+		return *this;
+	}
+
+	template<typename T>
+	void Asset<T>::Save(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	{
+		m_ID = AssetDatabase::SaveAsset(Get(), filepath, importPath);
+		if (m_Ptr)
+		{
+			AssetDatabase::RegisterAsset(m_ID);
+			m_Ptr = nullptr;
+		}
+	}
+
+	template<typename T>
+	uint64_t Asset<T>::GetID() const
+	{
+		return m_ID;
+	}
+
+	template<typename T>
+	std::filesystem::path Asset<T>::GetImportPath() const
+	{
+		return AssetDatabase::GetAssetImportPath(m_ID);
+	}
+
+	template<typename T>
+	Ref<T> Asset<T>::Get()
+	{
+		if (m_ID != 0)
+			return AssetDatabase::LoadAsset<T>(m_ID);
+		return m_Ptr;
+	}
+
+	template<typename T>
+	Ref<T> Asset<T>::Get() const
+	{
+		if (m_ID != 0)
+			return AssetDatabase::LoadAsset<T>(m_ID);
+		return m_Ptr;
+	}
+
+	template<typename T>
+	T* Asset<T>::Ptr()
+	{
+		return Get().get();
+	}
+
+	template<typename T>
+	T* Asset<T>::Ptr() const
+	{
+		return Get().get();
+	}
+
+	template<typename T>
+	Ref<T> Asset<T>::operator->() noexcept
+	{
+		return Get();
+	}
+
+	template<typename T>
+	Ref<T> Asset<T>::operator->() const noexcept
+	{
+		return Get();
+	}
+
+	template<typename T>
+	Asset<T>::operator bool() const noexcept
+	{
+		return Get() != nullptr;
 	}
 }
 

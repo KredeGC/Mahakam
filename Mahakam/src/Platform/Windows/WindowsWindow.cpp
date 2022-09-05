@@ -1,11 +1,18 @@
 #include "Mahakam/mhpch.h"
 #include "WindowsWindow.h"
 
+#include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/Profiler.h"
+
 #include "Mahakam/Events/ApplicationEvent.h"
 #include "Mahakam/Events/MouseEvent.h"
 #include "Mahakam/Events/KeyEvent.h"
 
 #include "Platform/OpenGL/OpenGLContext.h"
+
+#if MH_PLATFORM_WINDOWS
+#include <windows.h>
+#endif
 
 #include <stb_image.h>
 

@@ -35,3 +35,5 @@ namespace Mahakam
 		MH_GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, m_InternalFormat, m_Width, m_Height));
 	}
 }
+
+template class Mahakam::Asset<Mahakam::OpenGLRenderBuffer>;

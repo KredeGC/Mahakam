@@ -1,5 +1,4 @@
 #pragma once
-#include "Mahakam/Core/Core.h"
 
 #include <glm/glm.hpp>
 

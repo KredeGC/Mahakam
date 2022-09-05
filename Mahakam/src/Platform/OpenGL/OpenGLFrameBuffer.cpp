@@ -4,6 +4,8 @@
 
 #include "OpenGLTextureFormats.h"
 
+#include "Mahakam/Core/Profiler.h"
+
 #include "Mahakam/Renderer/RenderBuffer.h"
 #include "Mahakam/Renderer/Texture.h"
 
@@ -180,3 +182,5 @@ namespace Mahakam
 		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 }
+
+template class Mahakam::Asset<Mahakam::OpenGLFrameBuffer>;

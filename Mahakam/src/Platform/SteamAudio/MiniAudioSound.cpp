@@ -20,3 +20,6 @@ namespace Mahakam
         m_Props = props;
     }
 }
+
+template class Mahakam::Asset<Mahakam::Sound>;
+template class Mahakam::Asset<Mahakam::MiniAudioSound>;

@@ -1,7 +1,7 @@
 #include "Mahakam/mhpch.h"
 #include "GL.h"
 
-#include "Mahakam/Asset/Asset.h"
+#include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include "Platform/OpenGL/OpenGLRendererAPI.h"

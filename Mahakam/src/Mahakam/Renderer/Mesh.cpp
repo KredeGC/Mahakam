@@ -4,6 +4,7 @@
 #include "RendererAPI.h"
 #include "Material.h"
 
+#include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include "Platform/OpenGL/OpenGLMesh.h"
@@ -710,3 +711,6 @@ namespace Mahakam
 		return mesh;
 	}
 }
+
+template class Mahakam::Asset<Mahakam::Mesh>;
+template class Mahakam::Asset<Mahakam::SubMesh>;

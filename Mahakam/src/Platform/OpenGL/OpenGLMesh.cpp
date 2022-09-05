@@ -2,6 +2,8 @@
 #include "OpenGLBase.h"
 #include "OpenGLMesh.h"
 
+#include "Mahakam/Core/Profiler.h"
+
 namespace Mahakam
 {
 	static uint32_t ShaderDataTypeComponentCount(ShaderDataType type)
@@ -274,3 +276,5 @@ namespace Mahakam
 		}
 	}
 }
+
+template class Mahakam::Asset<Mahakam::OpenGLMesh>;

@@ -2,6 +2,8 @@
 #include "OpenGLBase.h"
 #include "OpenGLBuffer.h"
 
+#include "Mahakam/Core/Profiler.h"
+
 #include <glad/glad.h>
 
 namespace Mahakam
@@ -97,3 +99,6 @@ namespace Mahakam
 	}
 #pragma endregion
 }
+
+template class Mahakam::Asset<Mahakam::OpenGLStorageBuffer>;
+template class Mahakam::Asset<Mahakam::OpenGLUniformBuffer>;

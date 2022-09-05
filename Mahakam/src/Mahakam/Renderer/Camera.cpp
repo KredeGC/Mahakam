@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "Camera.h"
 
+#include "Mahakam/Core/Profiler.h"
+
 namespace Mahakam
 {
 	Camera::Camera()

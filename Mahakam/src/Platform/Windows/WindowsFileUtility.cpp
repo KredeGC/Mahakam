@@ -3,6 +3,10 @@
 
 #include "Mahakam/Core/Application.h"
 
+#if MH_PLATFORM_WINDOWS
+#include <windows.h>
+#endif
+
 #include <commdlg.h>
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32

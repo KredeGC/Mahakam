@@ -1,5 +1,6 @@
 #pragma once
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Log.h"
 
 #include <glad/glad.h>
 

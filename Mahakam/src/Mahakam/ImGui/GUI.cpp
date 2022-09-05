@@ -5,6 +5,8 @@
 #include "Mahakam/Editor/Selection.h"
 #endif
 
+#include "Mahakam/Core/Input.h"
+
 #include "Mahakam/Scene/ComponentRegistry.h"
 #include "Mahakam/Scene/Components/TagComponent.h"
 

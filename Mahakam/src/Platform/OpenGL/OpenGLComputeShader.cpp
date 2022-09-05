@@ -2,7 +2,10 @@
 #include "OpenGLBase.h"
 #include "OpenGLComputeShader.h"
 #include "OpenGLUtility.h"
+
 #include "Mahakam/Core/FileUtility.h"
+#include "Mahakam/Core/Profiler.h"
+
 #include "Mahakam/Renderer/Texture.h"
 
 #include <filesystem>
@@ -193,3 +196,5 @@ namespace Mahakam
 		return uniformID;
 	}
 }
+
+template class Mahakam::Asset<Mahakam::OpenGLComputeShader>;

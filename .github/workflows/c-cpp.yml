@@ -23,9 +23,13 @@ jobs:
     - name: Run premake
       run: premake5 gmake2
     - name: Compile Mahakam
-      run: make -j2 Mahakam
+      run: |
+          cd Scripts
+          build-linux.sh -j2 Mahakam
     - name: Compile Erebor
-      run: make -j2 Erebor
+      run: |
+          cd Scripts
+          build-linux.sh -j2 Erebor
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
@@ -54,9 +58,13 @@ jobs:
     - name: Run premake
       run: premake5 gmake2 --target=windows
     - name: Compile Mahakam
-      run: ./build-win.sh -j2 Mahakam
+      run: |
+          cd Scripts
+          build-win.sh -j2 Mahakam
     - name: Compile Erebor
-      run: ./build-win.sh -j2 Erebor
+      run: |
+          cd Scripts
+          build-win.sh -j2 Erebor
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 

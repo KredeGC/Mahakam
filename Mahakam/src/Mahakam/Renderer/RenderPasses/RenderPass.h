@@ -2,6 +2,8 @@
 
 #include "Mahakam/Core/Core.h"
 
+#include "Mahakam/Asset/Asset.h"
+
 namespace Mahakam
 {
 	class FrameBuffer;

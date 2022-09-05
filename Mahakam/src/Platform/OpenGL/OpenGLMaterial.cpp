@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "OpenGLMaterial.h"
 
+#include "Mahakam/Core/Profiler.h"
+
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Texture.h"
@@ -270,3 +272,5 @@ namespace Mahakam
 		}
 	}
 }
+
+template class Mahakam::Asset<Mahakam::OpenGLMaterial>;

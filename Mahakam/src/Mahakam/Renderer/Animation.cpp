@@ -1,6 +1,7 @@
 #include "Mahakam/mhpch.h"
 #include "Animation.h"
 
+#include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include <tiny_gltf/tiny_gltf.h>
@@ -78,3 +79,5 @@ namespace Mahakam
 		return Asset<Animation>(CreateRef<Animation>(filepath));
 	};
 }
+
+template class Mahakam::Asset<Mahakam::Animation>;

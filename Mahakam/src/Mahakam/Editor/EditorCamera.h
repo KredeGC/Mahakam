@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Mahakam/Events/KeyEvent.h"
+#include "Mahakam/Events/MouseEvent.h"
+#include "Mahakam/Core/Timestep.h"
+
 #include "Mahakam/Renderer/Camera.h"
 
 #include <glm/glm.hpp>

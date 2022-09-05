@@ -1,5 +1,10 @@
 #include "Mahakam/mhpch.h"
 #include "OpenGLContext.h"
+
+#include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/Profiler.h"
+
 #include <GLFW/glfw3.h>
 
 #include <glad/glad.h>

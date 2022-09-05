@@ -2,8 +2,6 @@
 
 #include "Mahakam/Core/Core.h"
 
-#include "Texture.h"
-
 namespace Mahakam
 {
 	struct ParticleProps

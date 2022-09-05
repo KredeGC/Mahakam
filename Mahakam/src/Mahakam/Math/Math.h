@@ -3,6 +3,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace Mahakam::Math
 {

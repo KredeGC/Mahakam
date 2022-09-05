@@ -1,14 +1,18 @@
 #pragma once
 
-#include "Mahakam/Asset/Asset.h"
-
 #include "RendererAPI.h"
+
+#include "Mahakam/Asset/Asset.h"
 
 namespace Mahakam
 {
 	class SubMesh;
 	class Texture2D;
 	class TextureCube;
+
+	extern template class Asset<SubMesh>;
+	extern template class Asset<Texture2D>;
+	extern template class Asset<TextureCube>;
 
 	class GL
 	{

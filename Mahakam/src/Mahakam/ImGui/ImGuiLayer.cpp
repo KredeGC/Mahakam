@@ -2,6 +2,7 @@
 #include "ImGuiLayer.h"
 
 #include "Mahakam/Core/Application.h"
+#include "Mahakam/Core/Profiler.h"
 
 #include <imgui/imgui.h>
 

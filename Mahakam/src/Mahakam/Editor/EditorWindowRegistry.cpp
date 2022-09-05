@@ -1,8 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "EditorWindowRegistry.h"
 
-#include "Mahakam/Core/SharedLibrary.h"
-
 #include "EditorWindow.h"
 
 namespace Mahakam::Editor

@@ -2,6 +2,8 @@
 #include "OpenGLBase.h"
 #include "OpenGLRendererAPI.h"
 
+#include "Mahakam/Core/Profiler.h"
+
 #include <glad/glad.h>
 
 namespace Mahakam

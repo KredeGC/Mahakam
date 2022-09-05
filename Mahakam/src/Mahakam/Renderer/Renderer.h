@@ -1,7 +1,10 @@
 #pragma once
 
-#include "Mahakam/Asset/Asset.h"
 #include "Mahakam/Core/SharedLibrary.h"
+
+#include "Mahakam/Core/Profiler.h"
+
+#include "Mahakam/Asset/Asset.h"
 
 #include <vector>
 #include <string>
@@ -17,6 +20,10 @@ namespace Mahakam
 
 	struct EnvironmentData;
 	struct SceneData;
+
+	extern template class Asset<FrameBuffer>;
+	extern template class Asset<Material>;
+	extern template class Asset<SubMesh>;
 
 	// IDEA: Move the AABB visuals to a renderpass in Erebor, which can then be injected at will
 

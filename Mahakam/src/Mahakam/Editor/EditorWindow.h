@@ -2,6 +2,8 @@
 
 #include "Mahakam/Core/Timestep.h"
 
+#include "Mahakam/Events/Event.h"
+
 namespace Mahakam::Editor
 {
 	class EditorWindow

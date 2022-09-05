@@ -1,15 +1,20 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+
 #include "Mahakam/Asset/Asset.h"
+
 #include "TextureFormats.h"
 
 #include <vector>
 
 namespace Mahakam
 {
+	class FrameBuffer;
 	class RenderBuffer;
 	class Texture;
+
+	extern template class Asset<FrameBuffer>;
 
 	struct FrameBufferAttachmentProps
 	{

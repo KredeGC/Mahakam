@@ -43,3 +43,5 @@ namespace Mahakam
 		return nullptr;
 	};
 }
+
+template class Mahakam::Asset<Mahakam::Material>;

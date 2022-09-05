@@ -2,6 +2,8 @@
 
 #include "Mahakam/Core/Core.h"
 
+#include "Mahakam/Asset/Asset.h"
+
 #include "ParticleSystem.h"
 
 #include <glm/glm.hpp>
@@ -19,6 +21,11 @@ namespace Mahakam
 	class UniformBuffer;
 	class StorageBuffer;
 	class Texture;
+
+	extern template class Asset<Material>;
+	extern template class Asset<Shader>;
+	extern template class Asset<SubMesh>;
+	extern template class Asset<Texture>;
 
 	struct DirectionalLight
 	{
@@ -151,11 +158,11 @@ namespace Mahakam
 
 		// Render camera matrices
 		CameraData cameraData;
-		Asset<UniformBuffer> cameraBuffer;
+		Ref<UniformBuffer> cameraBuffer;
 
 		// Lighting buffers
-		Asset<StorageBuffer> directionalLightBuffer;
-		Asset<StorageBuffer> pointLightBuffer;
-		Asset<StorageBuffer> spotLightBuffer;
+		Ref<StorageBuffer> directionalLightBuffer;
+		Ref<StorageBuffer> pointLightBuffer;
+		Ref<StorageBuffer> spotLightBuffer;
 	};
 }

@@ -11,7 +11,10 @@
 
 namespace Mahakam
 {
+	class Shader;
 	class Texture;
+
+	extern template class Asset<Shader>;
 
 	enum class ShaderPropertyType
 	{

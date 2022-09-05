@@ -3,6 +3,9 @@
 
 #include "Selection.h"
 
+#include "Mahakam/Core/Application.h"
+#include "Mahakam/Core/Input.h"
+
 #include "Mahakam/Scene/Components/TransformComponent.h"
 
 namespace Mahakam::Editor

@@ -16,10 +16,10 @@
 #include <unordered_map>
 #endif
 
-#include "Mahakam/Asset/Asset.h"
 #include "Mahakam/Asset/AssetImporter.h"
 #include "Mahakam/Asset/AssetDatabase.h"
 
+#include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/Application.h"
 #include "Mahakam/Core/Frustum.h"
 #include "Mahakam/Core/Input.h"
@@ -43,6 +43,9 @@
 
 #include "Mahakam/ImGui/GUI.h"
 #include "Mahakam/ImGui/ImGuiLayer.h"
+
+#include "Mahakam/Math/Bounds.h"
+#include "Mahakam/Math/Math.h"
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>

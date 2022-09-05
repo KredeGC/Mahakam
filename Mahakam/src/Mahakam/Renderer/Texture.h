@@ -1,13 +1,27 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+
 #include "Mahakam/Asset/Asset.h"
+
 #include "RenderBuffer.h"
 
 #include <filesystem>
 
 namespace Mahakam
 {
+	class Texture;
+	class Texture2D;
+	class Texture2DArray;
+	class Texture3D;
+	class TextureCube;
+
+	extern template class Asset<Texture>;
+	extern template class Asset<Texture2D>;
+	extern template class Asset<Texture2DArray>;
+	extern template class Asset<Texture3D>;
+	extern template class Asset<TextureCube>;
+
 	struct TextureProps
 	{
 		uint32_t width;

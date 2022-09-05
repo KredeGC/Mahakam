@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+
 #include "Mahakam/Asset/Asset.h"
 
 #include <filesystem>
@@ -10,6 +11,11 @@
 
 namespace Mahakam
 {
+	template<typename T>
+	class Asset;
+
+	extern template class Asset<void>;
+
 	class AssetImporter
 	{
 	public:

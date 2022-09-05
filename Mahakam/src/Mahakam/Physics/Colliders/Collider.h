@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Core/Core.h"
+
 namespace Mahakam
 {
 	class PhysicsContext;

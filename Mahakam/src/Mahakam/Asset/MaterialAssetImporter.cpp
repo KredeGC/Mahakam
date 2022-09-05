@@ -1,6 +1,11 @@
 #include "Mahakam/mhpch.h"
 #include "MaterialAssetImporter.h"
 
+#include "Mahakam/Core/Input.h"
+#include "Mahakam/Core/Log.h"
+
+#include "Mahakam/ImGui/GUI.h"
+
 #include "Mahakam/Renderer/RenderPasses/GeometryRenderPass.h"
 #include "Mahakam/Renderer/RenderPasses/LightingRenderPass.h"
 #include "Mahakam/Renderer/RenderPasses/TonemappingRenderPass.h"
@@ -9,9 +14,8 @@
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/RenderData.h"
 #include "Mahakam/Renderer/Mesh.h"
+#include "Mahakam/Renderer/Texture.h"
 #include "Mahakam/Math/Math.h"
-
-#include "Mahakam/ImGui/GUI.h"
 
 #include <imgui/imgui.h>
 

@@ -1,11 +1,16 @@
 #pragma once
 
-#include "Mahakam/Asset/Asset.h"
 #include "AudioEngine.h"
 #include "SoundProps.h"
 
+#include "Mahakam/Asset/Asset.h"
+
 namespace Mahakam
 {
+	class Sound;
+
+	extern template class Asset<Sound>;
+
 	class Sound
 	{
 	public:

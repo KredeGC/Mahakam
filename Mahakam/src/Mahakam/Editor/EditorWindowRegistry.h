@@ -2,6 +2,8 @@
 
 #include "Mahakam/Core/Core.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+
 #include <unordered_set>
 
 namespace Mahakam::Editor

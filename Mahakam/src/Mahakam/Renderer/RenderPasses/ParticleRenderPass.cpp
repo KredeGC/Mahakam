@@ -6,6 +6,7 @@
 #include "Mahakam/Renderer/FrameBuffer.h"
 #include "Mahakam/Renderer/RenderData.h"
 #include "Mahakam/Renderer/Renderer.h"
+#include "Mahakam/Renderer/Texture.h"
 
 namespace Mahakam
 {

@@ -2,14 +2,14 @@
 #include "Application.h"
 
 #include "Input.h"
+#include "Profiler.h"
+#include "SharedLibrary.h"
 
 #include "Mahakam/Audio/AudioEngine.h"
 
 #include "Mahakam/Physics/PhysicsEngine.h"
 
 #include "Mahakam/Renderer/Renderer.h"
-
-#include "SharedLibrary.h"
 
 namespace Mahakam
 {

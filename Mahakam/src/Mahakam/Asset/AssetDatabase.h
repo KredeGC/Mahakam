@@ -2,6 +2,8 @@
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/Log.h"
 
+#include "Asset.h"
+
 #include <filesystem>
 #include <string>
 
@@ -12,7 +14,7 @@ namespace Mahakam
 	class AssetDatabase
 	{
 	public:
-		template <class T>
+		template<typename T>
 		friend class Asset;
 
 		struct AssetInfo
