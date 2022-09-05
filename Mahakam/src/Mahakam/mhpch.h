@@ -20,37 +20,37 @@
 #include <unordered_set>
 #endif
 
-//#include "Mahakam/Asset/Asset.h"
-//
-//#include "Mahakam/Core/Core.h"
-//#include "Mahakam/Core/Application.h"
-//#include "Mahakam/Core/Frustum.h"
-//#include "Mahakam/Core/Input.h"
-//#include "Mahakam/Core/Instrumentor.h"
-//#include "Mahakam/Core/KeyCodes.h"
-//#include "Mahakam/Core/Layer.h"
-//#include "Mahakam/Core/LayerStack.h"
-//#include "Mahakam/Core/Log.h"
-//#include "Mahakam/Core/MouseButtonCodes.h"
-//#include "Mahakam/Core/Profiler.h"
-//#include "Mahakam/Core/Random.h"
-//#include "Mahakam/Core/SharedLibrary.h"
-//#include "Mahakam/Core/Timestep.h"
-//#include "Mahakam/Core/FileUtility.h"
-//#include "Mahakam/Core/Window.h"
-//
-//#include "Mahakam/Events/ApplicationEvent.h"
-//#include "Mahakam/Events/Event.h"
-//#include "Mahakam/Events/KeyEvent.h"
-//#include "Mahakam/Events/MouseEvent.h"
-//
-//#include "Mahakam/ImGui/GUI.h"
-//#include "Mahakam/ImGui/ImGuiLayer.h"
-//
-//#include "Mahakam/Math/Bounds.h"
-//#include "Mahakam/Math/Math.h"
-//
-//#include "Mahakam/Renderer/RendererAPI.h"
+#include "Mahakam/Asset/Asset.h"
+
+#include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Application.h"
+#include "Mahakam/Core/Frustum.h"
+#include "Mahakam/Core/Input.h"
+#include "Mahakam/Core/Instrumentor.h"
+#include "Mahakam/Core/KeyCodes.h"
+#include "Mahakam/Core/Layer.h"
+#include "Mahakam/Core/LayerStack.h"
+#include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/MouseButtonCodes.h"
+#include "Mahakam/Core/Profiler.h"
+#include "Mahakam/Core/Random.h"
+#include "Mahakam/Core/SharedLibrary.h"
+#include "Mahakam/Core/Timestep.h"
+#include "Mahakam/Core/FileUtility.h"
+#include "Mahakam/Core/Window.h"
+
+#include "Mahakam/Events/ApplicationEvent.h"
+#include "Mahakam/Events/Event.h"
+#include "Mahakam/Events/KeyEvent.h"
+#include "Mahakam/Events/MouseEvent.h"
+
+#include "Mahakam/ImGui/GUI.h"
+#include "Mahakam/ImGui/ImGuiLayer.h"
+
+#include "Mahakam/Math/Bounds.h"
+#include "Mahakam/Math/Math.h"
+
+#include "Mahakam/Renderer/RendererAPI.h"
 
 #include <entt/entt.hpp>
 
@@ -61,6 +61,7 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float4.hpp>
+#include <glm/ext/vector_int2.hpp>
 #include <glm/ext/vector_int4.hpp>
 #include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>

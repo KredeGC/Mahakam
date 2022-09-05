@@ -2,7 +2,7 @@
 #include <functional>
 #include <vector>
 
-#include <glm/glm.hpp>
+#include <glm/ext/vector_float3.hpp>
 
 namespace Mahakam
 {
