@@ -83,7 +83,7 @@ project "Mahakam"
     
     -- MinGW
     filter { "system:linux", "options:target=windows" }
-        buildoptions { "-Wa,-mbig-obj" }
+        buildoptions { "-Wa,-mbig-obj", "-flto", "-fno-fat-lto-objects" }
     
     -- Linux
     filter "options:target=linux"
