@@ -4,8 +4,6 @@
 
 #include "Mahakam/Core/SharedLibrary.h"
 
-#include <unordered_set>
-
 namespace Mahakam::Editor
 {
 	class EditorWindow;
@@ -36,17 +34,17 @@ namespace Mahakam::Editor
 		using WindowPropsMap = UnorderedMap<std::string, EditorWindowProps>;
 
 		static WindowPropsMap windowProps;
-		static std::unordered_set<EditorWindow*> windows;
+		static UnorderedSet<EditorWindow*> windows;
 
 	public:
 		MH_DECLARE_FUNC(RegisterWindow, void, EditorWindowProps props); // TODO: Use const &
 		MH_DECLARE_FUNC(DeregisterWindow, void, const std::string& name);
 
 		MH_DECLARE_FUNC(OpenWindow, EditorWindow*, const std::string& name);
-		MH_DECLARE_FUNC(CloseWindow, std::unordered_set<EditorWindow*>::iterator, EditorWindow* window);
+		MH_DECLARE_FUNC(CloseWindow, UnorderedSet<EditorWindow*>::iterator, EditorWindow* window);
 
 		MH_DECLARE_FUNC(GetWindowProps, const WindowPropsMap&);
-		MH_DECLARE_FUNC(GetWindows, std::unordered_set<EditorWindow*>&);
+		MH_DECLARE_FUNC(GetWindows, UnorderedSet<EditorWindow*>&);
 
 		template<typename T>
 		static void RegisterWindowClass(const std::string& name)

@@ -7,6 +7,7 @@
 #include <robin_hood/robin_hood.h>
 #else
 #include <unordered_map>
+#include <unordered_set>
 #endif
 
 
@@ -93,9 +94,15 @@ namespace Mahakam
 #ifdef MH_DEBUG
 	template<typename K, typename V>
 	using UnorderedMap = std::unordered_map<K, V>;
+
+	template<typename K>
+	using UnorderedSet = std::unordered_set<K>;
 #else
 	template<typename K, typename V>
 	using UnorderedMap = robin_hood::unordered_map<K, V>;
+
+	template<typename K>
+	using UnorderedSet = robin_hood::unordered_set<K>;
 #endif
 
 	typedef void** FuncPtr;

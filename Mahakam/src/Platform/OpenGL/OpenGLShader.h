@@ -2,8 +2,6 @@
 
 #include "Mahakam/Renderer/Shader.h"
 
-#include <glm/glm.hpp>
-
 namespace Mahakam
 {
 	class OpenGLShader : public Shader

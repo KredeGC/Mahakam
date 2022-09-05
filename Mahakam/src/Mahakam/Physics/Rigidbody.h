@@ -2,7 +2,8 @@
 
 #include "PhysicsEngine.h"
 
-#include <glm/glm.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace Mahakam
 {

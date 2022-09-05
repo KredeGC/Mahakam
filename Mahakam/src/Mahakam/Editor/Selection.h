@@ -2,7 +2,7 @@
 
 #include "Mahakam/Scene/Entity.h"
 
-#include <glm/glm.hpp>
+#include <glm/ext/vector_float3.hpp>
 
 namespace Mahakam::Editor
 {

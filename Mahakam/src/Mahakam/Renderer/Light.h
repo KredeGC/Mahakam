@@ -1,6 +1,8 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace Mahakam
 {

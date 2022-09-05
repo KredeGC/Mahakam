@@ -8,10 +8,10 @@
 
 #include "Mahakam/Renderer/Texture.h"
 
+#include <glad/glad.h>
+
 #include <filesystem>
 #include <fstream>
-
-#include <glad/glad.h>
 
 namespace Mahakam
 {

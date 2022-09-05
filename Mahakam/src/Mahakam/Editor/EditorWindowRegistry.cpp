@@ -5,8 +5,8 @@
 
 namespace Mahakam::Editor
 {
-	std::unordered_map<std::string, EditorWindowRegistry::EditorWindowProps> EditorWindowRegistry::windowProps;
-	std::unordered_set<EditorWindow*> EditorWindowRegistry::windows;
+	UnorderedMap<std::string, EditorWindowRegistry::EditorWindowProps> EditorWindowRegistry::windowProps;
+	UnorderedSet<EditorWindow*> EditorWindowRegistry::windows;
 
 	//void EditorWindowRegistry::RegisterWindow(EditorWindowProps props)
 	MH_DEFINE_FUNC(EditorWindowRegistry::RegisterWindow, void, EditorWindowProps props)
@@ -43,7 +43,7 @@ namespace Mahakam::Editor
 	};
 
 	//void EditorWindowRegistry::CloseWindow(EditorWindow* window)
-	MH_DEFINE_FUNC(EditorWindowRegistry::CloseWindow, std::unordered_set<EditorWindow*>::iterator, EditorWindow* window)
+	MH_DEFINE_FUNC(EditorWindowRegistry::CloseWindow, UnorderedSet<EditorWindow*>::iterator, EditorWindow* window)
 	{
 		for (auto& props : windowProps)
 		{
@@ -66,7 +66,7 @@ namespace Mahakam::Editor
 	};
 
 	//std::unordered_set<EditorWindow*>& EditorWindowRegistry::GetWindows()
-	MH_DEFINE_FUNC(EditorWindowRegistry::GetWindows, std::unordered_set<EditorWindow*>&)
+	MH_DEFINE_FUNC(EditorWindowRegistry::GetWindows, UnorderedSet<EditorWindow*>&)
 	{
 		return windows;
 	};

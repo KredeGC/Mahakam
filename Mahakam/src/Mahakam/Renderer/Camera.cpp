@@ -3,6 +3,8 @@
 
 #include "Mahakam/Core/Profiler.h"
 
+#include <glm/ext/matrix_clip_space.hpp>
+
 namespace Mahakam
 {
 	Camera::Camera()

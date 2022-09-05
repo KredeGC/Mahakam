@@ -5,6 +5,9 @@
 #include "MiniAudioContext.h"
 #include "MiniAudioSound.h"
 
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+
 namespace Mahakam
 {
 	class MiniAudioSource : public AudioSource

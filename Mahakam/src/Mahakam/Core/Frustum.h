@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/matrix.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
 
 namespace Mahakam
 {

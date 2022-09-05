@@ -11,14 +11,14 @@
 
 #include "Mahakam/Renderer/Texture.h"
 
-#include <filesystem>
-#include <fstream>
-
 #include <glad/glad.h>
 
 #include <glm/gtc/type_ptr.hpp>
 
 #include <yaml-cpp/yaml.h>
+
+#include <filesystem>
+#include <fstream>
 
 namespace Mahakam
 {
