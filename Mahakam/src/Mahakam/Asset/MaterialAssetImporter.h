@@ -8,7 +8,6 @@
 
 namespace Mahakam
 {
-	class Buffer;
 	class Camera;
 	class FrameBuffer;
 	class Material;
@@ -17,12 +16,11 @@ namespace Mahakam
 	class SubMesh;
 	class Texture;
 
-	extern template Asset<Buffer>;
-	extern template Asset<FrameBuffer>;
-	extern template Asset<Material>;
-	extern template Asset<Shader>;
-	extern template Asset<SubMesh>;
-	extern template Asset<Texture>;
+	extern template class Asset<FrameBuffer>;
+	extern template class Asset<Material>;
+	extern template class Asset<Shader>;
+	extern template class Asset<SubMesh>;
+	extern template class Asset<Texture>;
 
 	struct SceneData;
 
