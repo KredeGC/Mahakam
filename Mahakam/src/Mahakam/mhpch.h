@@ -61,4 +61,5 @@
 #ifdef MH_BUILD
 #include <miniaudio/miniaudio.h>
 #include <steamaudio/phonon.h>
+#include <tiny_gltf/tiny_gltf.h>
 #endif
