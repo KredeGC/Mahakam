@@ -42,7 +42,7 @@ project "Erebor"
     -- MinGW
     filter { "system:linux", "options:target=windows" }
         links { MinGWLinks }
-        buildoptions { "-Wa,-mbig-obj", "-flto", "-fno-fat-lto-objects" }
+        buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition", "-flto", "-fuse-linker-plugin", "-fno-fat-lto-objects" }
 
     -- Linux
     filter "options:target=linux"
