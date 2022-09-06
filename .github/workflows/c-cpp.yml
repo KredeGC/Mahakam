@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  Build-Linux:
+  Build-Linux-GCC:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -41,7 +41,50 @@ jobs:
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
-        name: Build-Linux
+        name: Build-Linux-GCC
+        if-no-files-found: error
+        path: |
+          Mahakam/bin/
+          Erebor/bin/
+          Erebor/assets/
+          Erebor/import/
+          Erebor/internal/
+          Erebor/*.sh
+  Build-Linux-Clang:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup premake
+      uses: abel0b/setup-premake@v2
+      with:
+        version: "5.0.0-beta1"
+    - name: Install X11
+      run: |
+          sudo apt update
+          sudo apt install -y clang-10 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+    - name: Run premake
+      run: premake5 gmake2
+    - name: Compile Mahakam
+      run: |
+          cd Scripts
+          chmod +x build-linux.sh
+          ./build-linux.sh -j2 Mahakam
+      env:
+        CC: clang-10
+        CXX: clang++-10
+    - name: Compile Erebor
+      run: |
+          cd Scripts
+          chmod +x build-linux.sh
+          ./build-linux.sh -j2 Erebor
+      env:
+        CC: clang-10
+        CXX: clang++-10
+    - name: Upload build
+      uses: actions/upload-artifact@v3
+      with: 
+        name: Build-Linux-Clang
         if-no-files-found: error
         path: |
           Mahakam/bin/
