@@ -62,7 +62,7 @@ jobs:
     - name: Install X11
       run: |
           sudo apt update
-          sudo apt install -y clang-10 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+          sudo apt install -y clang-10 llvm-10 lld-10 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
     - name: Run premake
       run: premake5 gmake2
     - name: Compile Mahakam
@@ -73,8 +73,8 @@ jobs:
       env:
         CC: clang-10
         CXX: clang++-10
-        LD: lld
-        AR: llvm-ar
+        LD: ld.lld-10
+        AR: llvm-ar-10
     - name: Compile Erebor
       run: |
           cd Scripts
@@ -83,8 +83,8 @@ jobs:
       env:
         CC: clang-10
         CXX: clang++-10
-        LD: lld
-        AR: llvm-ar
+        LD: ld.lld-10
+        AR: llvm-ar-10
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
@@ -109,7 +109,7 @@ jobs:
     - name: Install MinGW
       run: |
           sudo apt update
-          sudo apt install -y clang-10 gcc-10 g++-10 mingw-w64
+          sudo apt install -y llvm-10 lld-10 gcc-10 g++-10 mingw-w64
     - name: Run premake
       run: premake5 gmake2 --target=windows
     - name: Compile Mahakam
@@ -120,8 +120,8 @@ jobs:
       env:
         CC: gcc-10
         CXX: g++-10
-        LD: lld
-        AR: llvm-ar
+        LD: ld.lld-10
+        AR: llvm-ar-10
     - name: Compile Erebor
       run: |
           cd Scripts
@@ -130,8 +130,8 @@ jobs:
       env:
         CC: gcc-10
         CXX: g++-10
-        LD: lld
-        AR: llvm-ar
+        LD: ld.lld-10
+        AR: llvm-ar-10
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
