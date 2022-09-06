@@ -84,6 +84,7 @@ project "Mahakam"
     -- MinGW
     filter { "system:linux", "options:target=windows" }
         buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition", "-fuse-ld=lld" }
+        linkoptions { "-fuse-ld=lld" }
     
     -- Linux
     filter "options:target=linux"
