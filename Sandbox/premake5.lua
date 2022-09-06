@@ -43,7 +43,7 @@ project "Sandbox"
     -- MinGW
     filter { "system:linux", "options:target=windows" }
         links { MinGWLinks }
-        buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition", "-fuse-ld=ld.lld-10" }
+        buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition", "-fuse-ld=lld" }
 
     -- Linux
     filter "options:target=linux"
