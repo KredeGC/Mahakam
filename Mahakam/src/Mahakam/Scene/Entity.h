@@ -3,12 +3,12 @@
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/Log.h"
 
-#include "Scene.h"
-
 #include <entt/entt.hpp>
 
 namespace Mahakam
 {
+	class Scene;
+
 	class Entity
 	{
 	private:
@@ -38,61 +38,79 @@ namespace Mahakam
 		Entity GetParent() const;
 		void Delete();
 
-		inline bool IsValid() const
-		{
-			if (scene)
-				return scene->registry.valid(handle);
-			return false;
-		}
+		bool IsValid() const;
 
 		template<typename T, typename... Args>
-		void AddEmptyComponent(Args&&... args)
-		{
-			MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
-
-			scene->registry.template emplace<T>(handle, std::forward<Args>(args)...);
-		}
+		void AddEmptyComponent(Args&&... args);
 
 		template<typename T, typename... Args>
-		T& AddComponent(Args&&... args)
-		{
-			MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
-
-			T& component = scene->registry.template emplace<T>(handle, std::forward<Args>(args)...);
-
-			scene->OnComponentAdded<T>(*this, component);
-
-			return component;
-		}
+		T& AddComponent(Args&&... args);
 
 		template<typename T>
-		T* TryGetComponent() const
-		{
-			return scene->registry.template try_get<T>(handle);
-		}
+		T* TryGetComponent() const;
 
 		template<typename T>
-		T& GetComponent() const
-		{
-			MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
-
-			return scene->registry.template get<T>(handle);
-		}
+		T& GetComponent() const;
 
 		template<typename T>
-		bool RemoveComponent()
-		{
-			MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
-
-			return scene->registry.template remove<T>(handle);
-		}
+		bool RemoveComponent();
 
 		template<typename T>
-		bool HasComponent() const
-		{
-			return scene->registry.template any_of<T>(handle);
-		}
+		bool HasComponent() const;
 	};
+}
+
+#include "Scene.h"
+
+namespace Mahakam
+{
+	template<typename T, typename... Args>
+	void Entity::AddEmptyComponent(Args&&... args)
+	{
+		MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
+
+		scene->registry.template emplace<T>(handle, std::forward<Args>(args)...);
+	}
+
+	template<typename T, typename... Args>
+	T& Entity::AddComponent(Args&&... args)
+	{
+		MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
+
+		T& component = scene->registry.template emplace<T>(handle, std::forward<Args>(args)...);
+
+		scene->OnComponentAdded<T>(*this, component);
+
+		return component;
+	}
+
+	template<typename T>
+	T* Entity::TryGetComponent() const
+	{
+		return scene->registry.template try_get<T>(handle);
+	}
+
+	template<typename T>
+	T& Entity::GetComponent() const
+	{
+		MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
+
+		return scene->registry.template get<T>(handle);
+	}
+
+	template<typename T>
+	bool Entity::RemoveComponent()
+	{
+		MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
+
+		return scene->registry.template remove<T>(handle);
+	}
+
+	template<typename T>
+	bool Entity::HasComponent() const
+	{
+		return scene->registry.template any_of<T>(handle);
+	}
 }
 
 namespace std {

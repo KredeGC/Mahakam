@@ -5,7 +5,7 @@
 
 #include "Mahakam/Asset/Asset.h"
 
-#include "Components/CameraComponent.h"
+#include "Mahakam/Renderer/Camera.h"
 
 #include <entt/entt.hpp>
 
@@ -49,38 +49,16 @@ namespace Mahakam
 		void Sort();
 
 		template<typename Fn>
-		void ForEachEntity(Fn func)
-		{
-			const entt::entity* data = registry.data();
-			for (size_t i = 0; i < registry.size(); i++)
-			{
-				const entt::entity& handle = data[i];
-				if (registry.valid(handle))
-				{
-					Entity entity{ handle, this };
-					func(entity);
-				}
-			}
-		}
+		void ForEachEntity(Fn func);
 
 		template<typename Fn>
-		void ForEachEntityReverse(Fn func)
-		{
-			return registry.each(func);
-		}
+		void ForEachEntityReverse(Fn func);
 
 		template<typename ... Args, typename Fn>
-		void ForEach(Fn func)
-		{
-			return registry.view<Args...>().each(func);
-		}
+		void ForEach(Fn func);
 
 		template<typename ... Args>
-		void DestroyAllEntities()
-		{
-			auto view = registry.view<Args...>();
-			registry.destroy(view.begin(), view.end());
-		}
+		void DestroyAllEntities();
 
 		void SetSkyboxMaterial(Asset<Material> material) { skyboxMaterial = material; }
 		void SetSkyboxIrradiance(Asset<TextureCube> irradiance) { skyboxIrradiance = irradiance; }
@@ -103,6 +81,46 @@ namespace Mahakam
 			//static_assert(false);
 		}
 	};
+}
+
+#include "Entity.h"
+#include "Components/CameraComponent.h"
+
+namespace Mahakam
+{
+	template<typename Fn>
+	void Scene::ForEachEntity(Fn func)
+	{
+		const entt::entity* data = registry.data();
+		for (size_t i = 0; i < registry.size(); i++)
+		{
+			const entt::entity& handle = data[i];
+			if (registry.valid(handle))
+			{
+				Entity entity{ handle, this };
+				func(entity);
+			}
+		}
+	}
+
+	template<typename Fn>
+	void Scene::ForEachEntityReverse(Fn func)
+	{
+		return registry.each(func);
+	}
+
+	template<typename ... Args, typename Fn>
+	void Scene::ForEach(Fn func)
+	{
+		return registry.view<Args...>().each(func);
+	}
+
+	template<typename ... Args>
+	void Scene::DestroyAllEntities()
+	{
+		auto view = registry.view<Args...>();
+		registry.destroy(view.begin(), view.end());
+	}
 
 	template<>
 	inline void Scene::OnComponentAdded<CameraComponent>(const Entity& entity, CameraComponent& component)

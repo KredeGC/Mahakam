@@ -104,4 +104,11 @@ namespace Mahakam
 		// No need to reset their parents, they will soon be gone :)
 		MarkForDeletion(*this, relation);
 	}
+
+	bool Entity::IsValid() const
+	{
+		if (scene)
+			return scene->registry.valid(handle);
+		return false;
+	}
 }
