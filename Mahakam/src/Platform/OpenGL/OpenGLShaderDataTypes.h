@@ -71,10 +71,10 @@ namespace Mahakam
 			return GL_SAMPLER_2D;
 		case ShaderDataType::SamplerCube:
 			return GL_SAMPLER_CUBE;
+		default:
+			MH_CORE_BREAK("Unknown ShaderDataType provided!");
+			return 0;
 		}
-
-		MH_CORE_BREAK("Unknown ShaderDataType provided!");
-		return 0;
 	}
 
 	static ShaderDataType OpenGLDataTypeToShaderDataType(GLenum type)
@@ -109,9 +109,9 @@ namespace Mahakam
 			return ShaderDataType::SamplerCube;
 		case GL_SAMPLER_2D_SHADOW:
 			return ShaderDataType::Sampler2D;
+		default:
+			MH_CORE_BREAK("Unknown OpenGL data type provided!");
+			return ShaderDataType::None;
 		}
-
-		MH_CORE_BREAK("Unknown OpenGL data type provided!");
-		return ShaderDataType::None;
 	}
 }

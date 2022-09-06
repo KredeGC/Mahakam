@@ -136,9 +136,13 @@ namespace Mahakam
 							case ShaderDataType::Int:			m_Material->SetInt(propertyName, propertyNode.second.as<int>()); break;
 							case ShaderDataType::Sampler2D:
 							case ShaderDataType::SamplerCube:
+							{
 								uint64_t textureID = propertyNode.second.as<uint64_t>();
 								if (textureID)
 									m_Material->SetTexture(propertyName, 0, Asset<Texture>(textureID));
+								break;
+							}
+							default:
 								break;
 							}
 						}
@@ -197,6 +201,9 @@ namespace Mahakam
 			float dragSpeed = glm::max(property.Max - property.Min, 1.0f) / 100.0f;
 			ImGuiColorEditFlags colorFlags = ImGuiColorEditFlags_None;
 
+			std::filesystem::path texturePath;
+			Asset<Texture> texture;
+
 			switch (propertyType)
 			{
 			case ShaderPropertyType::HDR: // Color edit is the same for HDR, just with some extra flags
@@ -230,8 +237,7 @@ namespace Mahakam
 				break;
 			case ShaderPropertyType::Texture: // Textures and normals are handled the same, for now
 			case ShaderPropertyType::Normal:
-				std::filesystem::path texturePath;
-				Asset<Texture> texture = m_Material->GetTexture(propertyName);
+				texture = m_Material->GetTexture(propertyName);
 				if (texture)
 					texturePath = texture.GetImportPath();
 				if (GUI::DrawDragDropField(propertyName, ".texture", texturePath))
@@ -249,6 +255,8 @@ namespace Mahakam
 					ImGui::EndTooltip();
 				}
 
+				break;
+			default:
 				break;
 			}
 		}
@@ -345,6 +353,7 @@ namespace Mahakam
 			case ShaderDataType::Int:			emitter << material->GetInt(kv.first); break;
 			case ShaderDataType::Sampler2D:		emitter << material->GetTexture(kv.first).GetID(); break;
 			case ShaderDataType::SamplerCube:	emitter << material->GetTexture(kv.first).GetID(); break;
+			default: break;
 			}
 		}
 
@@ -373,23 +382,26 @@ namespace Mahakam
 					auto iter = properties.find(propertyName);
 					if (iter != properties.end())
 					{
+						uint64_t textureID;
 						switch (iter->second.DataType)
 						{
 						case ShaderDataType::Float:			material->SetFloat(propertyName, propertyNode.second.as<float>()); break;
 						case ShaderDataType::Float2:		material->SetFloat2(propertyName, propertyNode.second.as<glm::vec2>()); break;
 						case ShaderDataType::Float3:		material->SetFloat3(propertyName, propertyNode.second.as<glm::vec3>()); break;
 						case ShaderDataType::Float4:		material->SetFloat4(propertyName, propertyNode.second.as<glm::vec4>()); break;
-							//case ShaderDataType::Mat3:			material->SetMat3(propertyName, propertyNode.second.as<glm::mat3>()); break;
-							//case ShaderDataType::Mat4:			material->SetMat4(propertyName, propertyNode.second.as<glm::mat4>()); break;
+						case ShaderDataType::Mat3:			material->SetMat3(propertyName, propertyNode.second.as<glm::mat3>()); break;
+						case ShaderDataType::Mat4:			material->SetMat4(propertyName, propertyNode.second.as<glm::mat4>()); break;
 						case ShaderDataType::Int:			material->SetInt(propertyName, propertyNode.second.as<int>()); break;
 						case ShaderDataType::Sampler2D:
 						case ShaderDataType::SamplerCube:
-							uint64_t textureID = propertyNode.second.as<uint64_t>();
+							textureID = propertyNode.second.as<uint64_t>();
 							if (textureID)
 								material->SetTexture(propertyName, 0, Asset<Texture>(textureID));
 							else
 								material->SetTexture(propertyName, 0, GetDefaultTexture(iter->second));
 
+							break;
+						default:
 							break;
 						}
 					}
@@ -445,6 +457,8 @@ namespace Mahakam
 					MH_CORE_WARN("Could not find default TextureCube of type: {0}", defaultString);
 
 				break;
+			default:
+				break;
 			}
 		}
 
@@ -483,8 +497,8 @@ namespace Mahakam
 			case ShaderDataType::Float3:		m_Material->SetFloat3(propertyName, defaultNode.as<glm::vec3>()); break;
 			case ShaderDataType::Float4:		m_Material->SetFloat4(propertyName, defaultNode.as<glm::vec4>()); break;
 			case ShaderDataType::Int:			m_Material->SetInt(propertyName, defaultNode.as<int>()); break;
-			case ShaderDataType::Mat3:			break; // TODO: Support these types
-			case ShaderDataType::Mat4:			break;
+			case ShaderDataType::Mat3:			m_Material->SetMat3 (propertyName, defaultNode.as<glm::mat3>()); break;
+			case ShaderDataType::Mat4:			m_Material->SetMat4(propertyName, defaultNode.as<glm::mat4>()); break;
 			case ShaderDataType::Sampler2D:
 				defaultString = defaultNode.as<std::string>();
 
@@ -512,6 +526,8 @@ namespace Mahakam
 
 				m_Material->SetTexture(propertyName, 0, m_DefaultTextures[propertyName]);
 
+				break;
+			default:
 				break;
 			}
 		}

@@ -28,6 +28,8 @@ namespace Mahakam
 		static API api;
 
 	public:
+		~RendererAPI() = default;
+
 		virtual void Init() = 0;
 		virtual const char* GetGraphicsVendor() = 0;
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor) = 0;

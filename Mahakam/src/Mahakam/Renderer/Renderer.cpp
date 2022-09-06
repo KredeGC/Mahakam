@@ -249,7 +249,7 @@ namespace Mahakam
 
 			float depth = (sceneData->cameraData.u_m4_VP * transform[3]).z;
 
-			uint64_t depthInt = (uint64_t)(depth * ((1ULL << 31ULL) - 1ULL));
+			uint64_t depthInt = (uint64_t)(depth * (1ULL << 31ULL));
 
 			drawID |= ((depthInt & 0xFFFFFFFFULL) << 30ULL);
 		}

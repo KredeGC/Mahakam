@@ -66,17 +66,17 @@ namespace Mahakam
 		virtual glm::vec4 GetFloat4(const std::string& name) const override;
 
 
-		virtual const UnorderedMap<std::string, Asset<Texture>>& GetTextures() const { return m_Textures; }
+		virtual const UnorderedMap<std::string, Asset<Texture>>& GetTextures() const override { return m_Textures; }
 
-		virtual const UnorderedMap<std::string, glm::mat3>& GetMat3s() const { return m_Mat3s; }
-		virtual const UnorderedMap<std::string, glm::mat4>& GetMat4s() const { return m_Mat4s; }
+		virtual const UnorderedMap<std::string, glm::mat3>& GetMat3s() const override { return m_Mat3s; }
+		virtual const UnorderedMap<std::string, glm::mat4>& GetMat4s() const override { return m_Mat4s; }
 
-		virtual const UnorderedMap<std::string, int32_t>& GetInts() const { return m_Ints; }
+		virtual const UnorderedMap<std::string, int32_t>& GetInts() const override { return m_Ints; }
 
-		virtual const UnorderedMap<std::string, float>& GetFloats() const { return m_Floats; }
-		virtual const UnorderedMap<std::string, glm::vec2>& GetFloat2s() const { return m_Float2s; }
-		virtual const UnorderedMap<std::string, glm::vec3>& GetFloat3s() const { return m_Float3s; }
-		virtual const UnorderedMap<std::string, glm::vec4>& GetFloat4s() const { return m_Float4s; }
+		virtual const UnorderedMap<std::string, float>& GetFloats() const override { return m_Floats; }
+		virtual const UnorderedMap<std::string, glm::vec2>& GetFloat2s() const override { return m_Float2s; }
+		virtual const UnorderedMap<std::string, glm::vec3>& GetFloat3s() const override { return m_Float3s; }
+		virtual const UnorderedMap<std::string, glm::vec4>& GetFloat4s() const override { return m_Float4s; }
 
 	private:
 		void ResetShaderProperties(const UnorderedMap<std::string, ShaderProperty>& properties);

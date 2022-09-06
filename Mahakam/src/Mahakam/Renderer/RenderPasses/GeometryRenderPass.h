@@ -17,6 +17,6 @@ namespace Mahakam
 
 		virtual bool Render(SceneData* sceneData, Asset<FrameBuffer> src) override;
 
-		virtual Asset<FrameBuffer> GetFrameBuffer() { return gBuffer; }
+		virtual Asset<FrameBuffer> GetFrameBuffer() override { return gBuffer; };
 	};
 }
