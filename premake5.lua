@@ -76,7 +76,8 @@ VendorLinks = {
 if (os.host() == linux and _OPTIONS["target"] == "windows") then
     MinGWLinks = {
         "gdi32",
-        "dwmapi"
+        "dwmapi",
+        "comdlg32"
     }
 end
 

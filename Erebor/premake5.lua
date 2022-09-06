@@ -32,12 +32,13 @@ project "Erebor"
     filter "options:target=windows"
         systemversion "latest"
         
+        flags { "MultiProcessorCompile" }
+        
         defines {
             "MH_PLATFORM_WINDOWS",
+            "WIN32_LEAN_AND_MEAN",
             "NOMINMAX"
         }
-        
-        flags { "MultiProcessorCompile" }
     
     -- MinGW
     filter { "system:linux", "options:target=windows" }

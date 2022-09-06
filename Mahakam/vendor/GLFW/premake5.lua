@@ -19,6 +19,7 @@ project "GLFW"
         "src/window.c"
     }
 
+    -- Windows
     filter "options:target=windows"
         systemversion "latest"
 
@@ -43,6 +44,13 @@ project "GLFW"
             "Dwmapi.lib"
         }
     
+    -- MinGW
+    filter { "system:linux", "options:target=windows" }
+        links { MinGWLinks }
+        buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition", "-fuse-ld=lld" }
+        linkoptions { "-fuse-ld=lld" }
+    
+    -- Linux
     filter "options:target=linux"
         systemversion "latest"
         

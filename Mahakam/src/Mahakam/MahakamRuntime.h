@@ -11,7 +11,7 @@
 #else // MH_STANDALONE
 
 #if defined _WIN32 || defined __CYGWIN__
-#ifdef WIN_EXPORT
+#ifdef MH_WIN_EXPORT
 #ifdef __GNUC__
 #define MH_EXPORTED __attribute__ ((dllexport))
 #else

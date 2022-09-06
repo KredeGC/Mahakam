@@ -28,13 +28,14 @@ project "Sandbox"
     filter "options:target=windows"
         systemversion "latest"
         
+        flags { "MultiProcessorCompile" }
+        
         defines {
             "MH_PLATFORM_WINDOWS",
-            "WIN_EXPORT",
+            "MH_WIN_EXPORT",
+            "WIN32_LEAN_AND_MEAN",
             "NOMINMAX"
         }
-        
-        flags { "MultiProcessorCompile" }
 
         postbuildcommands {
             "{COPYDIR} \"bin/%{outputdir}/Sandbox.dll\" \"../Erebor/runtime/\""
