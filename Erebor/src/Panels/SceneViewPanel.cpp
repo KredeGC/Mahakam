@@ -231,6 +231,8 @@ namespace Mahakam::Editor
 		case Key::G:
 			m_LocalScope = !m_LocalScope;
 			break;
+		default:
+			break;
 		}
 
 		return false;

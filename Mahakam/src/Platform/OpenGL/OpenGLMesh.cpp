@@ -32,10 +32,10 @@ namespace Mahakam
 			return 4;
 		case ShaderDataType::Bool:
 			return 1;
+		default:
+			MH_CORE_BREAK("Unknown shader data type!");
+			return 0;
 		}
-
-		MH_CORE_BREAK("Unknown shader data type!");
-		return 0;
 	}
 
 	static uint32_t ShaderDataTypeSize(ShaderDataType type)
@@ -64,10 +64,10 @@ namespace Mahakam
 			return 16;
 		case ShaderDataType::Bool:
 			return 1;
+		default:
+			MH_CORE_BREAK("Unknown shader data type!");
+			return 0;
 		}
-
-		MH_CORE_BREAK("Unknown shader data type!");
-		return 0;
 	}
 
 	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
@@ -98,10 +98,10 @@ namespace Mahakam
 			return GL_INT;
 		case Mahakam::ShaderDataType::Bool:
 			return GL_BOOL;
+		default:
+			MH_CORE_BREAK("Unknown shader data type!");
+			return 0;
 		}
-
-		MH_CORE_BREAK("Unknown shader data type!");
-		return 0;
 	}
 
 	OpenGLMesh::OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)

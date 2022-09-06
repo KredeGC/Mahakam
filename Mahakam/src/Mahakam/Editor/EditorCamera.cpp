@@ -111,10 +111,11 @@ namespace Mahakam::Editor
 		if (io.WantCaptureKeyboard)
 			return false;
 
+		Entity selectedEntity;
 		switch (event.GetKeyCode())
 		{
 		case Key::F:
-			Entity selectedEntity = Selection::GetSelectedEntity();
+			selectedEntity = Selection::GetSelectedEntity();
 
 			if (selectedEntity)
 			{
@@ -125,6 +126,8 @@ namespace Mahakam::Editor
 					zoom = glm::length(target - position);
 				}
 			}
+			break;
+		default:
 			break;
 		}
 

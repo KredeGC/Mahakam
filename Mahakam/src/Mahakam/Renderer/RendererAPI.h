@@ -28,7 +28,7 @@ namespace Mahakam
 		static API api;
 
 	public:
-		~RendererAPI() = default;
+		virtual ~RendererAPI() = default;
 
 		virtual void Init() = 0;
 		virtual const char* GetGraphicsVendor() = 0;

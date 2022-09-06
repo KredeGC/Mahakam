@@ -213,6 +213,7 @@ namespace Mahakam
 				{
 				case ShaderDataType::Float3:	MH_CONDITIONAL_COLOR(GUI::DrawColor3Edit, glm::vec3, SetFloat3, GetFloat3);
 				case ShaderDataType::Float4:	MH_CONDITIONAL_COLOR(GUI::DrawColor4Edit, glm::vec4, SetFloat4, GetFloat4);
+				default: break;
 				}
 				break;
 			case ShaderPropertyType::Vector: // TODO: Vector visualization
@@ -224,6 +225,7 @@ namespace Mahakam
 				case ShaderDataType::Float2:	MH_CONDITIONAL_SLIDER(GUI::DrawFloat2Slider, glm::vec2, SetFloat2, GetFloat2);
 				case ShaderDataType::Float3:	MH_CONDITIONAL_SLIDER(GUI::DrawFloat3Slider, glm::vec3, SetFloat3, GetFloat3);
 				case ShaderDataType::Float4:	MH_CONDITIONAL_SLIDER(GUI::DrawFloat4Slider, glm::vec4, SetFloat4, GetFloat4);
+				default: break;
 				}
 				break;
 			case ShaderPropertyType::Drag: // Drag editor
@@ -233,6 +235,7 @@ namespace Mahakam
 				case ShaderDataType::Float2:	MH_CONDITIONAL_DRAG(GUI::DrawFloat2Drag, glm::vec2, SetFloat2, GetFloat2);
 				case ShaderDataType::Float3:	MH_CONDITIONAL_DRAG(GUI::DrawFloat3Drag, glm::vec3, SetFloat3, GetFloat3);
 				case ShaderDataType::Float4:	MH_CONDITIONAL_DRAG(GUI::DrawFloat4Drag, glm::vec4, SetFloat4, GetFloat4);
+				default: break;
 				}
 				break;
 			case ShaderPropertyType::Texture: // Textures and normals are handled the same, for now

@@ -69,6 +69,8 @@ namespace Mahakam::Editor
 			if (s_ViewFatal)
 				s_Lines.push_back({ { 1.0f, 0.0f, 0.0f, 1.0f }, msg });
 			break;
+		default:
+			break;
 		}
 	}
 }

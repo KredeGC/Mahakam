@@ -28,7 +28,7 @@ namespace Mahakam::Editor
 
 		virtual void OnImGuiRender() override;
 
-		bool OnEvent(Event& event);
+		bool OnEvent(Event& event) override;
 		bool OnKeyPressed(KeyPressedEvent& event);
 
 		EditorCamera& GetCamera() { return m_EditorCamera; }
