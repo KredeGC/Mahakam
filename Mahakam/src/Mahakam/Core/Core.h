@@ -89,6 +89,8 @@
 #define MH_DEFINE_FUNC(func, returnType, ...) returnType func(__VA_ARGS__)
 #endif
 
+template class std::shared_ptr<void>;
+
 namespace Mahakam
 {
 #ifdef MH_DEBUG
