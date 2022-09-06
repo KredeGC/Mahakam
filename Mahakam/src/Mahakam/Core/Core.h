@@ -89,8 +89,6 @@
 #define MH_DEFINE_FUNC(func, returnType, ...) returnType func(__VA_ARGS__)
 #endif
 
-template class std::shared_ptr<void>;
-
 namespace Mahakam
 {
 #ifdef MH_DEBUG
@@ -121,14 +119,14 @@ namespace Mahakam
 	template<typename T>
 	using Ref = std::shared_ptr<T>;
 
-	template<typename T>
-	constexpr Ref<T> DynamicCastRef(Ref<void> ptr)
+	template<typename T, typename T2>
+	constexpr Ref<T> DynamicCastRef(Ref<T2> ptr)
 	{
 		return std::dynamic_pointer_cast<T>(ptr);
 	}
 
-	template<typename T>
-	constexpr Ref<T> StaticCastRef(Ref<void> ptr)
+	template<typename T, typename T2>
+	constexpr Ref<T> StaticCastRef(Ref<T2> ptr)
 	{
 		return std::static_pointer_cast<T>(ptr);
 	}
