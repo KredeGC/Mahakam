@@ -7,8 +7,32 @@ on:
     branches: [ master ]
 
 jobs:
-  Build-Linux-GCC:
-    runs-on: ubuntu-latest
+  Build:
+    strategy:
+      matrix:
+        tool:
+        - os: ubuntu-latest
+          action: gmake2
+          toolset: gcc
+          cc: gcc
+          cxx: g++
+          ld: ld
+          ar: ar
+        - os: ubuntu-latest
+          action: gmake2
+          toolset: clang
+          cc: clang
+          cxx: clang++
+          ld: ld.lld
+          ar: llvm-ar
+        - os: windows-latest
+          action: vs2019
+          toolset: msc
+          cc: cl
+          cxx: cl
+          ld: link
+          ar: cl
+    runs-on: ${{ matrix.tool.os }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -17,25 +41,29 @@ jobs:
       with:
         version: "5.0.0-beta1"
     - name: Install X11
+      if: matrix.tool.os == 'ubuntu-latest'
       run: |
           sudo apt update
-          sudo apt install -y gcc-10 g++-10 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+          sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+    - name: Install GCC
+      if: matrix.tool.os == 'ubuntu-latest' && matrix.tool.toolset == 'gcc'
+      run: sudo apt install -y gcc g++
+    - name: Install Clang & LLVM
+      if: matrix.tool.os == 'ubuntu-latest' && matrix.tool.toolset == 'clang'
+      run: sudo apt install -y clang llvm lld
     - name: Run premake
-      run: premake5 gmake2 --toolset=gcc
-    - name: Compile Mahakam
-      run: make -j2 Mahakam
+      run: premake5 ${{ matrix.tool.action }} --toolset=${{ matrix.tool.toolset }}
+    - name: Build
+      run: premake5 build --toolset=${{ matrix.tool.toolset }}
       env:
-        CC: gcc-10
-        CXX: g++-10
-    - name: Compile Erebor
-      run: make -j2 Erebor
-      env:
-        CC: gcc-10
-        CXX: g++-10
+        CC: ${{ matrix.tool.cc }}
+        CXX: ${{ matrix.tool.cxx }}
+        LD: ${{ matrix.tool.ld }}
+        AR: ${{ matrix.tool.ar }}
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
-        name: Build-Linux-GCC
+        name: Build-${{ matrix.tool.os }}-${{ matrix.tool.toolset }}
         if-no-files-found: error
         path: |
           Mahakam/bin/
@@ -46,89 +74,90 @@ jobs:
           Erebor/runtime/
           Erebor/imgui.ini
           Erebor/*.sh
-  Build-Linux-Clang:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Setup premake
-      uses: abel0b/setup-premake@v2
-      with:
-        version: "5.0.0-beta1"
-    - name: Install X11
-      run: |
-          sudo apt update
-          sudo apt install -y clang-10 llvm-10 lld-10 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
-    - name: Run premake
-      run: premake5 gmake2 --toolset=clang
-    - name: Compile Mahakam
-      run: make -j2 Mahakam
-      env:
-        CC: clang-10
-        CXX: clang++-10
-        LD: ld.lld-10
-        AR: llvm-ar-10
-    - name: Compile Erebor
-      run: make -j2 Erebor
-      env:
-        CC: clang-10
-        CXX: clang++-10
-        LD: ld.lld-10
-        AR: llvm-ar-10
-    - name: Compile Sandbox
-      run: make -j2 Sandbox
-      env:
-        CC: clang-10
-        CXX: clang++-10
-        LD: ld.lld-10
-        AR: llvm-ar-10
-    - name: Upload build
-      uses: actions/upload-artifact@v3
-      with: 
-        name: Build-Linux-Clang
-        if-no-files-found: error
-        path: |
-          Mahakam/bin/
-          Erebor/bin/
-          Erebor/assets/
-          Erebor/import/
-          Erebor/internal/
-          Erebor/runtime/
-          Erebor/imgui.ini
-          Erebor/*.sh
-  Build-Windows-MSVC:
-    runs-on: windows-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Setup premake
-      uses: abel0b/setup-premake@v2
-      with:
-        version: "5.0.0-beta1"
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.1
-    - name: Run premake
-      run: premake5 vs2019 --toolset=msc
-    - name: Compile Mahakam
-      run: msbuild Mahakam\Mahakam.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
-    - name: Compile Erebor
-      run: msbuild Erebor\Erebor.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
-    - name: Compile Sandbox
-      run: msbuild Sandbox\Sandbox.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
-    - name: Upload build
-      uses: actions/upload-artifact@v3
-      with: 
-        name: Build-Windows-MSVC
-        if-no-files-found: error
-        path: |
-          Mahakam\bin\
-          Erebor\bin\
-          Erebor\assets\
-          Erebor\import\
-          Erebor\internal\
-          Erebor\runtime\
-          Erebor\imgui.ini
-          Erebor\*.bat
+          Erebor/*.bat
+  # Build-Linux-Clang:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v3
+  #   - name: Setup premake
+  #     uses: abel0b/setup-premake@v2
+  #     with:
+  #       version: "5.0.0-beta1"
+  #   - name: Install X11
+  #     run: |
+  #         sudo apt update
+  #         sudo apt install -y clang-10 llvm-10 lld-10 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+  #   - name: Run premake
+  #     run: premake5 gmake2 --toolset=clang
+  #   - name: Compile Mahakam
+  #     run: make -j2 Mahakam
+  #     env:
+  #       CC: clang-10
+  #       CXX: clang++-10
+  #       LD: ld.lld-10
+  #       AR: llvm-ar-10
+  #   - name: Compile Erebor
+  #     run: make -j2 Erebor
+  #     env:
+  #       CC: clang-10
+  #       CXX: clang++-10
+  #       LD: ld.lld-10
+  #       AR: llvm-ar-10
+  #   - name: Compile Sandbox
+  #     run: make -j2 Sandbox
+  #     env:
+  #       CC: clang-10
+  #       CXX: clang++-10
+  #       LD: ld.lld-10
+  #       AR: llvm-ar-10
+  #   - name: Upload build
+  #     uses: actions/upload-artifact@v3
+  #     with: 
+  #       name: Build-Linux-Clang
+  #       if-no-files-found: error
+  #       path: |
+  #         Mahakam/bin/
+  #         Erebor/bin/
+  #         Erebor/assets/
+  #         Erebor/import/
+  #         Erebor/internal/
+  #         Erebor/runtime/
+  #         Erebor/imgui.ini
+  #         Erebor/*.sh
+  # Build-Windows-MSVC:
+  #   runs-on: windows-latest
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v3
+  #   - name: Setup premake
+  #     uses: abel0b/setup-premake@v2
+  #     with:
+  #       version: "5.0.0-beta1"
+  #   - name: Add msbuild to PATH
+  #     uses: microsoft/setup-msbuild@v1.1
+  #   - name: Run premake
+  #     run: premake5 vs2019 --toolset=msc
+  #   - name: Compile Mahakam
+  #     run: msbuild Mahakam\Mahakam.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
+  #   - name: Compile Erebor
+  #     run: msbuild Erebor\Erebor.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
+  #   - name: Compile Sandbox
+  #     run: msbuild Sandbox\Sandbox.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
+  #   - name: Upload build
+  #     uses: actions/upload-artifact@v3
+  #     with: 
+  #       name: Build-Windows-MSVC
+  #       if-no-files-found: error
+  #       path: |
+  #         Mahakam\bin\
+  #         Erebor\bin\
+  #         Erebor\assets\
+  #         Erebor\import\
+  #         Erebor\internal\
+  #         Erebor\runtime\
+  #         Erebor\imgui.ini
+  #         Erebor\*.bat
   # Build-MinGW:
   #   runs-on: ubuntu-latest
   #   steps:

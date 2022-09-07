@@ -21,6 +21,20 @@ newoption {
     }
 }
 
+newaction {
+    trigger = "build",
+    description = "Builds the project using whatever toolset is chosen",
+    onProject = function(prj)
+        printf("Building project '%s'", prj.name)
+        
+        if (os.host() == "windows") then
+            os.execute("msbuild %{prj.name}\\%{prj.name}.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64")
+        elseif (os.host() == "linux") then
+            os.execute("make -j2 %{prj.name}")
+        end
+    end
+}
+
 outputdir = "%{cfg.buildcfg}-%{_OPTIONS['target']}-%{cfg.architecture}"
 
 IncludeDir = {}
@@ -105,6 +119,12 @@ workspace "Mahakam"
         "DebugOptimized",
         "Release"
     }
+    
+    filter "toolset:clang"
+        buildoptions { "-fuse-ld=lld" }
+        linkoptions { "-fuse-ld=lld" }
+        
+filter {}
 
 group "Dependencies"
     include "Mahakam/vendor/GLFW"

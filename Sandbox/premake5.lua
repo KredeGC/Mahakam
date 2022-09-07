@@ -25,7 +25,7 @@ project "Sandbox"
     defines { "_CRT_SECURE_NO_WARNINGS" }
     
     postbuildcommands {
-        "{MKDIR} \"bin/%{outputdir}/\"",
+        "{MKDIR} \"../Erebor/runtime/\"",
         "{COPYDIR} \"bin/%{outputdir}/.\" \"../Erebor/runtime/\""
     }
 
