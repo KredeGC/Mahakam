@@ -110,14 +110,10 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
     - name: Run premake
       run: premake5 vs2019
-    - name: DIR 1
-      run: dir
-    - name: DIR 2
-      run: cd Mahakam && dir
     - name: Compile Mahakam
-      run: msbuild Mahakam\Mahakam.vcxproj -t:rebuild -verbosity:normal -property:Configuration=Debug -property:Platform=x64
+      run: msbuild Mahakam\Mahakam.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
     - name: Compile Erebor
-      run: msbuild Erebor\Erebor.vcxproj -t:rebuild -verbosity:normal -property:Configuration=Debug -property:Platform=x64
+      run: msbuild Erebor\Erebor.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
