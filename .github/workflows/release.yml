@@ -78,24 +78,34 @@ jobs:
           Erebor/imgui.ini
           Erebor/EreborOptimized.sh
           Erebor/EreborOptimized.bat
+          LICENSE
+          README.md
   Release:
     runs-on: ubuntu-latest
     needs: Build
     steps:
-    - name: Download build
+    - name: Download linux build
       uses: actions/download-artifact@v3
       with:
         name: Build-ubuntu-latest
         path: .
-    - name: Download build
+    - name: Download windows build
       uses: actions/download-artifact@v3
       with:
         name: Build-windows-latest
         path: .
+    - name: Install zip
+      run: |
+        sudo apt update
+        sudo apt install -y zip
+    - name: Zip binaries
+      run: zip -r Mahakam.zip .
+    - name: Tar binaries
+      run: echo "TODO; Tar"
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: "**"
+        files: "Mahakam.zip"
         tag_name: ${{ inputs.tagName }}
         body: ${{ inputs.changelog }}
         draft: ${{ inputs.draft }}
