@@ -97,8 +97,8 @@ jobs:
           Erebor/import/
           Erebor/internal/
           Erebor/*.sh
-  Build-MinGW:
-    runs-on: ubuntu-latest
+  Build-Windows-MSVC:
+    runs-on: windows-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -106,41 +106,70 @@ jobs:
       uses: abel0b/setup-premake@v2
       with:
         version: "5.0.0-beta1"
-    - name: Install MinGW
-      run: |
-          sudo apt update
-          sudo apt install -y llvm-10 lld-10 gcc-10 g++-10 mingw-w64
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
     - name: Run premake
-      run: premake5 gmake2 --target=windows
+      run: premake5 gmake2
     - name: Compile Mahakam
-      run: |
-          cd Scripts
-          chmod +x build-win.sh
-          ./build-win.sh -j2 Mahakam
-      env:
-        CC: gcc-10
-        CXX: g++-10
-        LD: ld.lld-10
-        AR: llvm-ar-10
+      run: msbuild Mahakam\Mahakam.vcxproj -t:rebuild -verbosity:diag -property:Configuration=Debug
     - name: Compile Erebor
-      run: |
-          cd Scripts
-          chmod +x build-win.sh
-          ./build-win.sh -j2 Erebor
-      env:
-        CC: gcc-10
-        CXX: g++-10
-        LD: ld.lld-10
-        AR: llvm-ar-10
+      run: msbuild Erebor\Erebor.vcxproj -t:rebuild -verbosity:diag -property:Configuration=Debug
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
-        name: Build-MinGW
+        name: Build-Windows-MSVC
         if-no-files-found: error
         path: |
-          Mahakam/bin/
-          Erebor/bin/
-          Erebor/assets/
-          Erebor/import/
-          Erebor/internal/
-          Erebor/*.sh
+          Mahakam\bin\
+          Erebor\bin\
+          Erebor\assets\
+          Erebor\import\
+          Erebor\internal\
+          Erebor\*.sh
+  # Build-MinGW:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v3
+  #   - name: Setup premake
+  #     uses: abel0b/setup-premake@v2
+  #     with:
+  #       version: "5.0.0-beta1"
+  #   - name: Install MinGW
+  #     run: |
+  #         sudo apt update
+  #         sudo apt install -y llvm-10 lld-10 gcc-10 g++-10 mingw-w64
+  #   - name: Run premake
+  #     run: premake5 gmake2 --target=windows
+  #   - name: Compile Mahakam
+  #     run: |
+  #         cd Scripts
+  #         chmod +x build-win.sh
+  #         ./build-win.sh -j2 Mahakam
+  #     env:
+  #       CC: gcc-10
+  #       CXX: g++-10
+  #       LD: ld.lld-10
+  #       AR: llvm-ar-10
+  #   - name: Compile Erebor
+  #     run: |
+  #         cd Scripts
+  #         chmod +x build-win.sh
+  #         ./build-win.sh -j2 Erebor
+  #     env:
+  #       CC: gcc-10
+  #       CXX: g++-10
+  #       LD: ld.lld-10
+  #       AR: llvm-ar-10
+  #   - name: Upload build
+  #     uses: actions/upload-artifact@v3
+  #     with: 
+  #       name: Build-MinGW
+  #       if-no-files-found: error
+  #       path: |
+  #         Mahakam/bin/
+  #         Erebor/bin/
+  #         Erebor/assets/
+  #         Erebor/import/
+  #         Erebor/internal/
+  #         Erebor/*.sh
