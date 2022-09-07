@@ -66,7 +66,7 @@ jobs:
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
-        name: Build
+        name: Build-${{ matrix.tool.os }}
         if-no-files-found: error
         path: |
           Mahakam/bin/
@@ -85,7 +85,12 @@ jobs:
     - name: Download build
       uses: actions/download-artifact@v3
       with:
-        name: Release
+        name: Build-ubuntu-latest
+        path: .
+    - name: Download build
+      uses: actions/download-artifact@v3
+      with:
+        name: Build-windows-latest
         path: .
     - name: Release
       uses: softprops/action-gh-release@v1

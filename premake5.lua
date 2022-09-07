@@ -40,7 +40,7 @@ newaction {
         printf("Building project '%s'", prj.name)
         
         if (os.host() == "windows") then
-            os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:normal -p:Configuration=".._OPTIONS["config"].." -p:Platform=x64")
+            os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:minimal -p:Configuration=".._OPTIONS["config"].." -p:Platform=x64")
         elseif (os.host() == "linux") then
             os.execute("make -j3 "..prj.name.." config=".._OPTIONS["config"])
         end
