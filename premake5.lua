@@ -33,6 +33,11 @@ newoption {
     }
 }
 
+newoption {
+    trigger = "standalone",
+    description = "Standalone executable build"
+}
+
 newaction {
     trigger = "build",
     description = "Builds the project using whatever toolset is chosen",
@@ -61,7 +66,6 @@ IncludeDir["glm"]               = "../Mahakam/vendor/glm"
 IncludeDir["imgui"]             = "../Mahakam/vendor"
 IncludeDir["imguizmo"]          = "../Mahakam/vendor"
 IncludeDir["miniaudio"]         = "../Mahakam/vendor/miniaudio/include"
-IncludeDir["robin_hood"]        = "../Mahakam/vendor"
 IncludeDir["spdlog"]            = "../Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"]         = "../Mahakam/vendor/stb_image"
 IncludeDir["steamaudio"]        = "../Mahakam/vendor/steamaudio/include"
@@ -78,7 +82,6 @@ VendorIncludes = {
     "%{IncludeDir.glm}",
     "%{IncludeDir.imgui}",
     "%{IncludeDir.imguizmo}",
-    "%{IncludeDir.robin_hood}",
     "%{IncludeDir.spdlog}",
     "%{IncludeDir.yaml}"
 }

@@ -54,6 +54,11 @@ project "Erebor"
         libdirs { LinuxLibDirs }
         
         links { LinuxLinks }
+        
+    -- Standalone
+    filter "options:standalone"
+        removefiles { "**/Panels/**" }
+        defines { "MH_STANDALONE" }
     
     filter "configurations:Debug"
         defines "MH_DEBUG"
@@ -68,12 +73,7 @@ project "Erebor"
     filter "configurations:Release"
         flags { "LinkTimeOptimization" }
         
-        defines {
-            "MH_RELEASE",
-            "MH_STANDALONE"
-        }
-        
-        removefiles { "**/Panels/**" }
+        defines { "MH_RELEASE" }
         
         runtime "Release"
         optimize "on"

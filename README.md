@@ -20,7 +20,6 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 * [Dear ImGui](https://github.com/ocornut/imgui) for GUI interaction and rendering.
 * [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) for editor interaction and rendering.
 * [miniaudio](https://github.com/mackron/miniaudio) for audio playback.
-* [robin_hood](https://github.com/martinus/robin-hood-hashing) for fast unordered sets and maps.
 * [spdlog](https://github.com/gabime/spdlog) for easy and fast logging.
 * [stb_image](https://github.com/nothings/stb) for loading various image files.
 * [Steam Audio](https://valvesoftware.github.io/steam-audio/) for audio spatialization.

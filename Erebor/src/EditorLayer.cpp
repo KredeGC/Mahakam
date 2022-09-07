@@ -432,19 +432,11 @@ namespace Mahakam::Editor
 		// Call shared library update
 		m_UpdatePtr(SceneManager::GetActiveScene().get(), dt);
 
-#ifdef MH_RUNTIME
-		// TODO: Remove this, as the Sandbox project itself will compile as an executable instead
-		// Only used during runtime
-		SceneManager::GetActiveScene()->OnUpdate(dt);
-
-		Renderer::GetFrameBuffer()->Blit(m_Framebuffer, true, false);
-#else
 		static const bool m_PlayMode = false;
 		if (m_PlayMode)
 			SceneManager::GetActiveScene()->OnUpdate(dt);
 		else
 			SceneManager::GetActiveScene()->OnUpdate(dt, true); // TEMPORARY until play-mode is implemented
-#endif
 
 		// Test compute shader
 		/*debugComputeShader->Bind();

@@ -17,7 +17,6 @@ project "Mahakam"
         "vendor/glm/glm/**.hpp",
         "vendor/glm/glm/**.inl",
         "vendor/miniaudio/**.h",
-        "vendor/robin_hood/**.h",
         "vendor/stb_image/**.h",
         "vendor/stb_image/**.cpp",
         "vendor/tiny_gltf/tiny_gltf/**.h",
@@ -38,7 +37,6 @@ project "Mahakam"
         "%{IncludeDir.imgui}",
         "%{IncludeDir.imguizmo}",
         "%{IncludeDir.miniaudio}",
-        "%{IncludeDir.robin_hood}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.steamaudio}",
@@ -93,6 +91,11 @@ project "Mahakam"
         removefiles { "**/Windows/WindowsFileUtility.cpp" }
         
         defines { "MH_PLATFORM_LINUX" }
+        
+    -- Standalone
+    filter "options:standalone"
+        removefiles { "**/Editor/**" }
+        defines { "MH_STANDALONE" }
     
     filter "configurations:Debug"
         defines "MH_DEBUG"
@@ -107,13 +110,7 @@ project "Mahakam"
     filter "configurations:Release"
         flags { "LinkTimeOptimization" }
         
-        defines {
-            "MH_RELEASE",
-            "MH_RUNTIME",
-            "MH_STANDALONE"
-        }
-        
-        removefiles { "**/Editor/**" }
+        defines { "MH_RELEASE" }
         
         runtime "Release"
         optimize "on"

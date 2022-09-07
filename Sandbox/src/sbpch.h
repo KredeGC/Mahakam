@@ -9,12 +9,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <unordered_set>
-#ifndef MH_DEBUG
-#include <robin_hood/robin_hood.h>
-#else
 #include <unordered_map>
-#endif
+#include <unordered_set>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>

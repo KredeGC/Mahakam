@@ -3,23 +3,18 @@
 #include "Mahakam/Version.h"
 
 #include <memory>
-#ifndef MH_DEBUG
-#include <robin_hood/robin_hood.h>
-#else
 #include <unordered_map>
 #include <unordered_set>
-#endif
 
 
+#ifndef MH_STANDALONE
+#define MH_ENABLE_PROFILING // Enable profiling in builds
+#define MH_ENABLE_RENDER_PROFILING // Enable render profiling in builds
 #ifdef MH_DEBUG
-#define MH_ENABLE_PROFILING // Enable profiling in debug builds
-#define MH_ENABLE_RENDER_PROFILING // Enable render profiling in debug builds
 #define MH_ENABLE_ASSERT // Enable asserts in debug builds
-#define MH_ENABLE_GL_ERRORS // Enable render API errors in debug builds
-#endif // MH_DEBUG
-
-//#define MH_ENABLE_RENDER_PROFILING // Enable render profiling in all builds
-//#define MH_ENABLE_PROFILING // Enable profiling in all builds
+#define MH_ENABLE_GL_ERRORS // Enable render API error logging in debug builds
+#endif // MH_RELEASE
+#endif // MH_STANDALONE
 
 
 #ifdef MH_ENABLE_ASSERT
@@ -91,19 +86,11 @@
 
 namespace Mahakam
 {
-#ifdef MH_DEBUG
 	template<typename K, typename V>
 	using UnorderedMap = std::unordered_map<K, V>;
 
 	template<typename K>
 	using UnorderedSet = std::unordered_set<K>;
-#else
-	template<typename K, typename V>
-	using UnorderedMap = robin_hood::unordered_map<K, V>;
-
-	template<typename K>
-	using UnorderedSet = robin_hood::unordered_set<K>;
-#endif
 
 	typedef void** FuncPtr;
 

@@ -56,7 +56,18 @@ project "Sandbox"
         libdirs { LinuxLibDirs }
         
         links { LinuxLinks }
+        
+    -- Standalone
+    filter "options:standalone"
+        kind "ConsoleApp"
+        
+        defines { "MH_STANDALONE" }
     
+        postbuildcommands {
+            "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/".._OPTIONS["target"].."-x64/.\" \"bin/%{outputdir}/\""
+        }
+    
+    -- Configs
     filter "configurations:Debug"
         defines "MH_DEBUG"
         runtime "Debug"
@@ -68,14 +79,9 @@ project "Sandbox"
         optimize "on"
         
     filter "configurations:Release"
-        kind "ConsoleApp"
-        
         flags { "LinkTimeOptimization" }
         
-        defines {
-            "MH_RELEASE",
-            "MH_RUNTIME",
-            "MH_STANDALONE"
-        }
+        defines { "MH_RELEASE" }
+        
         runtime "Release"
         optimize "on"
