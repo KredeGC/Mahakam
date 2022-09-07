@@ -23,6 +23,11 @@ project "Sandbox"
     links { VendorLinks }
 
     defines { "_CRT_SECURE_NO_WARNINGS" }
+    
+    postbuildcommands {
+        "{MKDIR} \"bin/%{outputdir}/\"",
+        "{COPYDIR} \"bin/%{outputdir}/.\" \"../Erebor/runtime/\""
+    }
 
     -- Windows
     filter "options:target=windows"
@@ -35,10 +40,6 @@ project "Sandbox"
             "MH_WIN_EXPORT",
             "WIN32_LEAN_AND_MEAN",
             "NOMINMAX"
-        }
-
-        postbuildcommands {
-            "{COPYDIR} \"bin/%{outputdir}/Sandbox.dll\" \"../Erebor/runtime/\""
         }
     
     -- MinGW
@@ -56,10 +57,6 @@ project "Sandbox"
         libdirs { LinuxLibDirs }
         
         links { LinuxLinks }
-
-        postbuildcommands {
-            "{COPYDIR} \"bin/%{outputdir}/libSandbox.so\" \"../Erebor/runtime/\""
-        }
     
     filter "configurations:Debug"
         defines "MH_DEBUG"
