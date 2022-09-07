@@ -110,6 +110,10 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
     - name: Run premake
       run: premake5 gmake2
+    - name: DIR 1
+      run: dir
+    - name: DIR 2
+      run: cd Mahakam && dir
     - name: Compile Mahakam
       run: msbuild Mahakam\Mahakam.vcxproj -t:rebuild -verbosity:diag -property:Configuration=Debug
     - name: Compile Erebor
