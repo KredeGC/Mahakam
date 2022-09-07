@@ -21,20 +21,14 @@ jobs:
           sudo apt update
           sudo apt install -y gcc-10 g++-10 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
     - name: Run premake
-      run: premake5 gmake2
+      run: premake5 gmake2 --toolset=gcc
     - name: Compile Mahakam
-      run: |
-          cd Scripts
-          chmod +x build-linux.sh
-          ./build-linux.sh -j2 Mahakam
+      run: make -j2 Mahakam
       env:
         CC: gcc-10
         CXX: g++-10
     - name: Compile Erebor
-      run: |
-          cd Scripts
-          chmod +x build-linux.sh
-          ./build-linux.sh -j2 Erebor
+      run: make -j2 Erebor
       env:
         CC: gcc-10
         CXX: g++-10
@@ -49,6 +43,8 @@ jobs:
           Erebor/assets/
           Erebor/import/
           Erebor/internal/
+          Erebor/runtime/
+          Erebor/imgui.ini
           Erebor/*.sh
   Build-Linux-Clang:
     runs-on: ubuntu-latest
@@ -64,22 +60,23 @@ jobs:
           sudo apt update
           sudo apt install -y clang-10 llvm-10 lld-10 libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
     - name: Run premake
-      run: premake5 gmake2
+      run: premake5 gmake2 --toolset=clang
     - name: Compile Mahakam
-      run: |
-          cd Scripts
-          chmod +x build-linux.sh
-          ./build-linux.sh -j2 Mahakam
+      run: make -j2 Mahakam
       env:
         CC: clang-10
         CXX: clang++-10
         LD: ld.lld-10
         AR: llvm-ar-10
     - name: Compile Erebor
-      run: |
-          cd Scripts
-          chmod +x build-linux.sh
-          ./build-linux.sh -j2 Erebor
+      run: make -j2 Erebor
+      env:
+        CC: clang-10
+        CXX: clang++-10
+        LD: ld.lld-10
+        AR: llvm-ar-10
+    - name: Compile Sandbox
+      run: make -j2 Sandbox
       env:
         CC: clang-10
         CXX: clang++-10
@@ -96,6 +93,8 @@ jobs:
           Erebor/assets/
           Erebor/import/
           Erebor/internal/
+          Erebor/runtime/
+          Erebor/imgui.ini
           Erebor/*.sh
   Build-Windows-MSVC:
     runs-on: windows-latest
@@ -109,11 +108,13 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.1
     - name: Run premake
-      run: premake5 vs2019
+      run: premake5 vs2019 --toolset=msc
     - name: Compile Mahakam
       run: msbuild Mahakam\Mahakam.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
     - name: Compile Erebor
       run: msbuild Erebor\Erebor.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
+    - name: Compile Sandbox
+      run: msbuild Sandbox\Sandbox.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64
     - name: Upload build
       uses: actions/upload-artifact@v3
       with: 
@@ -125,7 +126,9 @@ jobs:
           Erebor\assets\
           Erebor\import\
           Erebor\internal\
-          Erebor\*.sh
+          Erebor\runtime\
+          Erebor\imgui.ini
+          Erebor\*.bat
   # Build-MinGW:
   #   runs-on: ubuntu-latest
   #   steps:

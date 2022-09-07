@@ -1,12 +1,14 @@
-workspace "Mahakam"
-    architecture "x64"
-    startproject "Erebor"
-    
-    configurations {
-        "Debug",
-        "DebugOptimized",
-        "Release"
+newoption {
+    trigger = "toolset",
+    value = "Toolset (eg. gcc, clang, msc)",
+    description = "The toolset to use to compile with",
+    default = "gcc",
+    allowed = {
+        { "gcc", "gcc and g++ using ld and ar" },
+        { "clang", "clang and clang++ using lld and llvm-ar" },
+        { "msc", "msbuild and cl using link.exe" }
     }
+}
 
 newoption {
     trigger = "target",
@@ -92,6 +94,17 @@ LinuxLinks = {
     "pthread",
     "stdc++fs"	--GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
 }
+
+workspace "Mahakam"
+    architecture "x64"
+    startproject "Erebor"
+    toolset(_OPTIONS["toolset"])
+    
+    configurations {
+        "Debug",
+        "DebugOptimized",
+        "Release"
+    }
 
 group "Dependencies"
     include "Mahakam/vendor/GLFW"
