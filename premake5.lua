@@ -21,6 +21,18 @@ newoption {
     }
 }
 
+newoption {
+    trigger = "config",
+    value = "Configuration",
+    description = "The configuration to compile",
+    default = "debug",
+    allowed = {
+        { "debug", "Debug build with symbols turned on" },
+        { "debugoptimized", "Debug build with symbols and optimizations turned on" },
+        { "release", "Release build without symbols, but with optimizations" }
+    }
+}
+
 newaction {
     trigger = "build",
     description = "Builds the project using whatever toolset is chosen",
@@ -28,9 +40,9 @@ newaction {
         printf("Building project '%s'", prj.name)
         
         if (os.host() == "windows") then
-            os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64")
+            os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:normal -p:Configuration=".._OPTIONS["config"].." -p:Platform=x64")
         elseif (os.host() == "linux") then
-            os.execute("make -j2 "..prj.name)
+            os.execute("make -j3 "..prj.name.." config=".._OPTIONS["config"])
         end
     end
 }
