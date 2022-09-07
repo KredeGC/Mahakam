@@ -28,7 +28,7 @@ newaction {
         printf("Building project '%s'", prj.name)
         
         if (os.host() == "windows") then
-            os.execute("msbuild "..prj.name.."\\"..prj.name..".vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64")
+            os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64")
         elseif (os.host() == "linux") then
             os.execute("make -j2 "..prj.name)
         end
@@ -121,7 +121,6 @@ workspace "Mahakam"
     }
     
     filter "toolset:clang"
-        buildoptions { "-fuse-ld=lld" }
         linkoptions { "-fuse-ld=lld" }
         
 filter {}
