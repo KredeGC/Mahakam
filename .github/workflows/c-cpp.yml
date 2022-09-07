@@ -51,6 +51,9 @@ jobs:
     - name: Install Clang & LLVM
       if: matrix.tool.os == 'ubuntu-latest' && matrix.tool.toolset == 'clang'
       run: sudo apt install -y clang llvm lld
+    - name: Add msbuild to PATH
+      if: matrix.tool.os == 'windows-latest' && matrix.tool.toolset == 'msc'
+      uses: microsoft/setup-msbuild@v1.1
     - name: Run premake
       run: premake5 ${{ matrix.tool.action }} --toolset=${{ matrix.tool.toolset }}
     - name: Build

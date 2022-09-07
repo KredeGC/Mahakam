@@ -43,8 +43,7 @@ project "Erebor"
     -- MinGW
     filter { "system:linux", "options:target=windows" }
         links { MinGWLinks }
-        buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition", "-fuse-ld=lld" }
-        linkoptions { "-fuse-ld=lld" }
+        buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition" }
 
     -- Linux
     filter "options:target=linux"

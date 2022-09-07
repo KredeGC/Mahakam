@@ -28,9 +28,9 @@ newaction {
         printf("Building project '%s'", prj.name)
         
         if (os.host() == "windows") then
-            os.execute("msbuild %{prj.name}\\%{prj.name}.vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64")
+            os.execute("msbuild "..prj.name.."\\"..prj.name..".vcxproj -t:Build -verbosity:normal -property:Configuration=Debug -property:Platform=x64")
         elseif (os.host() == "linux") then
-            os.execute("make -j2 %{prj.name}")
+            os.execute("make -j2 "..prj.name)
         end
     end
 }
