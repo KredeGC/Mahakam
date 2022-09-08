@@ -8,13 +8,19 @@ if not p.modules.unity then
         scope = "project",
         kind = "string"
     }
+    
+    p.api.register {
+        name = "unityexclude",
+        scope = "config",
+        kind = "file"
+    }
 
-    function _write_unity_file(prj, files)
+    function write_unity_file(prj, files)
         local filename = path.join(prj.location, "Unity-Build."..(p.project.iscpp(prj) and "cpp" or "c"))
         local location = path.getdirectory(filename)
 
         local buf = buffered.new()
-        buffered.writeln(buf, "// GENERATED, DON'T MODIFY")
+        buffered.writeln(buf, "// GENERATED UNITY BUILD. CHANGES WON'T BE PRESERVED")
         buffered.writeln(buf, "")
 
         local pch = {}
@@ -46,9 +52,16 @@ if not p.modules.unity then
     end
 
 
-    function _generate_unity_files(prj, files)
+    function generate_unity_files(prj, files)
 
         local fileList = {}
+        local excludeList = {}
+        
+        if prj.unityexclude then
+            table.foreachi(prj.unityexclude, function(pattern)
+                excludeList = table.join(excludeList, os.matchfiles(pattern))
+            end)
+        end
 
         local addFile = function(cfg, fname)
             if not files[fname] then
@@ -79,6 +92,12 @@ if not p.modules.unity then
                 if cfg.pchsource == fcfg.abspath and not cfg.flags.NoPCH then
                     return
                 end
+                
+                -- if the file is in the unityexclude directive, ignore it
+                if table.contains(excludeList, fcfg.abspath) then
+                    printf("Excluding %s", p.workspace.getrelative(prj.workspace, fcfg.abspath))
+                    return
+                end
             end
 
             -- add to the list.
@@ -92,10 +111,12 @@ if not p.modules.unity then
         end)
 
         if (#fileList >= 0) then
-            local unityName = _write_unity_file(prj, fileList)
+            local unityName = write_unity_file(prj, fileList)
             for cfg in p.project.eachconfig(prj) do
                 addFile(cfg, unityName)
             end
+        else
+            error("No files found for unity build", 0)
         end
 
 
@@ -114,7 +135,7 @@ if not p.modules.unity then
         local files = base(prj)
 
         if prj.unity and type(prj.unity) == 'string' and prj.unity == 'on' then
-            files = _generate_unity_files(prj, files)
+            files = generate_unity_files(prj, files)
         end
 
         return files

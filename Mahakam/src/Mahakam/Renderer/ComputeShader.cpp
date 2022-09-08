@@ -2,7 +2,6 @@
 #include "ComputeShader.h"
 
 #include "RendererAPI.h"
-#include "Mahakam/Asset/Asset.h"
 
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/SharedLibrary.h"
@@ -28,5 +27,3 @@ namespace Mahakam
 		return nullptr;
 	};
 }
-
-template class Mahakam::Asset<Mahakam::ComputeShader>;

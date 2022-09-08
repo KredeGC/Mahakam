@@ -79,9 +79,3 @@ namespace Mahakam
 		return nullptr;
 	};
 }
-
-template class Mahakam::Asset<Mahakam::Texture>;
-template class Mahakam::Asset<Mahakam::Texture2D>;
-template class Mahakam::Asset<Mahakam::Texture2DArray>;
-template class Mahakam::Asset<Mahakam::Texture3D>;
-template class Mahakam::Asset<Mahakam::TextureCube>;

@@ -4,6 +4,10 @@
 
 namespace Mahakam
 {
+	class OpenGLShader;
+
+	extern template class Asset<OpenGLShader>;
+
 	class OpenGLShader : public Shader
 	{
 	private:

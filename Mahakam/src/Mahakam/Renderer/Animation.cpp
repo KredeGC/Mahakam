@@ -80,5 +80,3 @@ namespace Mahakam
 		return Asset<Animation>(CreateRef<Animation>(filepath));
 	};
 }
-
-template class Mahakam::Asset<Mahakam::Animation>;

@@ -689,6 +689,3 @@ namespace Mahakam
 		m_TotalSize = 6 * CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, m_Compressed, m_Props.mipmaps, m_Props.resolution, m_Props.resolution);
 	}
 }
-
-template class Mahakam::Asset<Mahakam::OpenGLTexture2D>;
-template class Mahakam::Asset<Mahakam::OpenGLTextureCube>;

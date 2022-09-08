@@ -5,6 +5,10 @@
 
 namespace Mahakam
 {
+	class OpenGLMesh;
+
+	extern template class Asset<OpenGLMesh>;
+
 	class OpenGLMesh : public SubMesh
 	{
 	private:

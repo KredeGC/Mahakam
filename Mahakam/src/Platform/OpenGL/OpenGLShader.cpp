@@ -514,5 +514,3 @@ namespace Mahakam
 		return uniformID;
 	}
 }
-
-template class Mahakam::Asset<Mahakam::OpenGLShader>;

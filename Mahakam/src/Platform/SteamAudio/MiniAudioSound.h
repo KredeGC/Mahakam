@@ -5,6 +5,10 @@
 
 namespace Mahakam
 {
+	class MiniAudioSound;
+
+	extern template class Asset<MiniAudioSound>;
+
 	class MiniAudioSound : public Sound
 	{
 	private:

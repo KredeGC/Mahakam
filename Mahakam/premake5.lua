@@ -94,6 +94,8 @@ project "Mahakam"
     filter "options:unity"
         unity "on"
         
+        unityexclude { "**/Asset/AssetDefinitions.cpp" }
+        
     -- Standalone
     filter "options:standalone"
         removefiles { "**/Editor/**" }

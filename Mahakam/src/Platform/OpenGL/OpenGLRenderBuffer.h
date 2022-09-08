@@ -4,6 +4,10 @@
 
 namespace Mahakam
 {
+	class OpenGLRenderBuffer;
+
+	extern template class Asset<OpenGLRenderBuffer>;
+
 	class OpenGLRenderBuffer : public RenderBuffer
 	{
 	private:

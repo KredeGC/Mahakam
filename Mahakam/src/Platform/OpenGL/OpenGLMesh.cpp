@@ -276,5 +276,3 @@ namespace Mahakam
 		}
 	}
 }
-
-template class Mahakam::Asset<Mahakam::OpenGLMesh>;
