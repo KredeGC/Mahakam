@@ -49,22 +49,16 @@ newaction {
     onProject = function(prj)
         printf("Building project '%s'", prj.name)
         
+        local res,msg,sig;
+        
         if (os.host() == "windows") then
-            local res,msg,sig = os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:minimal -p:Configuration=".._OPTIONS["config"].." -p:Platform=x64")
-            print(res)
-            print(msg)
-            print(sig)
-            if (res ~= nil and res ~= null and res ~= NULL and res ~= 0) then
-                error(res, 0)
-            end
+            res,msg,sig = os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:minimal -p:Configuration=".._OPTIONS["config"].." -p:Platform=x64")
         elseif (os.host() == "linux") then
-            local res,msg,sig = os.execute("make -j3 "..prj.name.." config=".._OPTIONS["config"])
-            print(res)
-            print(msg)
-            print(sig)
-            if (res ~= nil and res ~= null and res ~= NULL and res ~= 0) then
-                error(res, 0)
-            end
+            res,msg,sig = os.execute("make -j3 "..prj.name.." config=".._OPTIONS["config"])
+        end
+        
+        if (not res and msg == "exit") then
+            error("Build "..msg.." with code: "..sig, 0)
         end
     end
 }
