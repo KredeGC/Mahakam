@@ -7,7 +7,7 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 
 [![License](https://img.shields.io/github/license/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/issues)
-[![Build](https://img.shields.io/github/workflow/status/KredeGC/Mahakam/Build?style=flat-square)](https://github.com/KredeGC/Mahakam/actions/workflows/c-cpp.yml)
+[![Build](https://img.shields.io/github/workflow/status/KredeGC/Mahakam/Build?style=flat-square)](https://github.com/KredeGC/Mahakam/actions/workflows/main.yml)
 </div>
 
 # Libraries and technologies

@@ -1,0 +1,82 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  Build:
+    strategy:
+      matrix:
+        config: [debug, debugoptimized, release]
+        tool:
+        - os: ubuntu-latest
+          action: gmake2
+          toolset: gcc
+          cc: gcc
+          cxx: g++
+          ld: ld
+          ar: ar
+        - os: ubuntu-latest
+          action: gmake2
+          toolset: clang
+          cc: clang
+          cxx: clang++
+          ld: ld.lld
+          ar: llvm-ar
+        - os: windows-latest
+          action: vs2019
+          toolset: msc
+          cc: cl
+          cxx: cl
+          ld: link
+          ar: cl
+    runs-on: ${{ matrix.tool.os }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup premake
+      uses: abel0b/setup-premake@v2
+      with:
+        version: "5.0.0-beta1"
+    - name: Install X11
+      if: matrix.tool.os == 'ubuntu-latest'
+      run: |
+          sudo apt update
+          sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+    - name: Install GCC
+      if: matrix.tool.os == 'ubuntu-latest' && matrix.tool.toolset == 'gcc'
+      run: sudo apt install -y gcc g++
+    - name: Install Clang & LLVM
+      if: matrix.tool.os == 'ubuntu-latest' && matrix.tool.toolset == 'clang'
+      run: sudo apt install -y clang llvm lld
+    - name: Install msbuild to PATH
+      if: matrix.tool.os == 'windows-latest' && matrix.tool.toolset == 'msc'
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Run premake
+      run: premake5 ${{ matrix.tool.action }} --toolset=${{ matrix.tool.toolset }} --config=${{ matrix.config }}
+    - name: Build
+      run: premake5 build --toolset=${{ matrix.tool.toolset }} --config=${{ matrix.config }}
+      env:
+        CC: ${{ matrix.tool.cc }}
+        CXX: ${{ matrix.tool.cxx }}
+        LD: ${{ matrix.tool.ld }}
+        AR: ${{ matrix.tool.ar }}
+    - name: Upload build
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with: 
+        name: Build-${{ matrix.tool.os }}-${{ matrix.tool.toolset }}
+        if-no-files-found: error
+        path: |
+          Mahakam/bin/
+          Erebor/bin/
+          Erebor/assets/
+          Erebor/import/
+          Erebor/internal/
+          Erebor/runtime/
+          Erebor/imgui.ini
+          Erebor/*.sh
+          Erebor/*.bat

@@ -57,7 +57,7 @@ jobs:
     - name: Run premake
       run: premake5 ${{ matrix.tool.action }} --toolset=${{ matrix.tool.toolset }}
     - name: Build
-      run: premake5 build --toolset=${{ matrix.tool.toolset }} --config=debugoptimized
+      run: premake5 build --toolset=${{ matrix.tool.toolset }} --config=release
       env:
         CC: ${{ matrix.tool.cc }}
         CXX: ${{ matrix.tool.cxx }}
@@ -84,28 +84,32 @@ jobs:
     runs-on: ubuntu-latest
     needs: Build
     steps:
+    - name: Create Mahakam dir
+      run: mkdir Mahakam
     - name: Download linux build
       uses: actions/download-artifact@v3
       with:
         name: Build-ubuntu-latest
-        path: .
+        path: Mahakam
     - name: Download windows build
       uses: actions/download-artifact@v3
       with:
         name: Build-windows-latest
-        path: .
+        path: Mahakam
     - name: Install zip
       run: |
         sudo apt update
         sudo apt install -y zip
     - name: Zip binaries
-      run: zip -r Mahakam.zip .
+      run: zip -r Mahakam.zip Mahakam
     - name: Tar binaries
-      run: echo "TODO; Tar"
+      run: tar czvf Mahakam.tar.gz Mahakam
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: "Mahakam.zip"
+        files: |
+          Mahakam.zip
+          Mahakam.tar.gz
         tag_name: ${{ inputs.tagName }}
         body: ${{ inputs.changelog }}
         draft: ${{ inputs.draft }}

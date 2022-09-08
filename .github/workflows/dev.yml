@@ -1,0 +1,29 @@
+name: Dev
+
+on:
+  push:
+    branches-ignore: [ master ]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup premake
+      uses: abel0b/setup-premake@v2
+      with:
+        version: "5.0.0-beta1"
+    - name: Install X11 & Clang
+      run: |
+          sudo apt update
+          sudo apt install -y clang llvm lld libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+    - name: Run premake
+      run: premake5 gmake2 --toolset=clang --config=debug
+    - name: Build
+      run: premake5 build --toolset=clang --config=debug
+      env:
+        CC: clang
+        CXX: clang++
+        LD: ld.lld
+        AR: llvm-ar
