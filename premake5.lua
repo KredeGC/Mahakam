@@ -50,9 +50,15 @@ newaction {
         printf("Building project '%s'", prj.name)
         
         if (os.host() == "windows") then
-            os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:minimal -p:Configuration=".._OPTIONS["config"].." -p:Platform=x64")
+            local res = os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:minimal -p:Configuration=".._OPTIONS["config"].." -p:Platform=x64")
+            if (res) then
+                error(res, 0)
+            end
         elseif (os.host() == "linux") then
-            os.execute("make -j3 "..prj.name.." config=".._OPTIONS["config"])
+            local res = os.execute("make -j3 "..prj.name.." config=".._OPTIONS["config"])
+            if (res) then
+                error(res, 0)
+            end
         end
     end
 }
