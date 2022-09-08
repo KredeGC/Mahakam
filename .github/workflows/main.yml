@@ -73,10 +73,3 @@ jobs:
         path: |
           Mahakam/bin/
           Erebor/bin/
-          Erebor/assets/
-          Erebor/import/
-          Erebor/internal/
-          Erebor/runtime/
-          Erebor/imgui.ini
-          Erebor/*.sh
-          Erebor/*.bat
