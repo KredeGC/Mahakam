@@ -47,13 +47,10 @@ project "Sandbox"
     -- MinGW
     filter { "system:linux", "options:target=windows" }
         links { MinGWLinks }
-        buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition" }
 
     -- Linux
     filter "options:target=linux"
         systemversion "latest"
-        
-        buildoptions { "-Wa,-mbig-obj" }
         
         defines { "MH_PLATFORM_LINUX" }
         

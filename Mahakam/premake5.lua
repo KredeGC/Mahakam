@@ -82,15 +82,9 @@ project "Mahakam"
         
         links { "opengl32.lib" }
     
-    -- MinGW
-    filter { "system:linux", "options:target=windows" }
-        buildoptions { "-Wa,-mbig-obj", "-Wl,-allow-multiple-definition" }
-    
     -- Linux
     filter "options:target=linux"
         systemversion "latest"
-        
-        buildoptions { "-Wa,-mbig-obj" }
         
         removefiles { "**/Windows/WindowsFileUtility.cpp" }
         
