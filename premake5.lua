@@ -51,12 +51,12 @@ newaction {
         
         if (os.host() == "windows") then
             local res = os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:minimal -p:Configuration=".._OPTIONS["config"].." -p:Platform=x64")
-            if (res ~= nil) then
+            if (res ~= nil and res ~= null and res ~= NULL and res ~= 0) then
                 error(res, 0)
             end
         elseif (os.host() == "linux") then
             local res = os.execute("make -j3 "..prj.name.." config=".._OPTIONS["config"])
-            if (res ~= nil) then
+            if (res ~= nil and res ~= null and res ~= NULL and res ~= 0) then
                 error(res, 0)
             end
         end
