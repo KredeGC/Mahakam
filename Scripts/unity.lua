@@ -130,7 +130,7 @@ if not p.modules.unity then
         return files
     end
 
-
+    -- Override the bakeFiles process, when files are being listed
     p.override(p.oven, "bakeFiles", function(base, prj)
         local files = base(prj)
 

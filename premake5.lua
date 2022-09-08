@@ -12,7 +12,7 @@ newoption {
 
 newoption {
     trigger = "target",
-    value = "Platform",
+    value = "Platform (eg. windows, linux)",
     description = "The target platform to compile to",
     default = os.host(),
     allowed = {
@@ -43,26 +43,7 @@ newoption {
     description = "Standalone executable build"
 }
 
-newaction {
-    trigger = "build",
-    description = "Builds the project using whatever toolset is chosen",
-    onProject = function(prj)
-        printf("Building project '%s'", prj.name)
-        
-        local res,msg,sig;
-        
-        if (os.host() == "windows") then
-            res,msg,sig = os.execute("msbuild "..prj.location.."\\"..prj.name..".vcxproj -t:Build -verbosity:minimal -p:Configuration=".._OPTIONS["config"].." -p:Platform=x64")
-        elseif (os.host() == "linux") then
-            res,msg,sig = os.execute("make -j3 "..prj.name.." config=".._OPTIONS["config"])
-        end
-        
-        if (not res and msg == "exit") then
-            error("Build "..msg.." with code: "..sig, 0)
-        end
-    end
-}
-
+require "Scripts/build"
 require "Scripts/unity"
 
 outputdir = "%{cfg.buildcfg}-%{_OPTIONS['target']}-%{cfg.architecture}"
@@ -73,7 +54,7 @@ IncludeDir["bullet_dynamics"]   = "../Mahakam/vendor/bullet/src/BulletDynamics"
 IncludeDir["bullet_collision"]  = "../Mahakam/vendor/bullet/src/BulletCollision"
 IncludeDir["linear_math"]       = "../Mahakam/vendor/bullet/src/LinearMath"
 IncludeDir["entt"]              = "../Mahakam/vendor/entt/include"
-IncludeDir["GLFW"]              = "../Mahakam/vendor/GLFW/include"
+IncludeDir["glfw"]              = "../Mahakam/vendor/glfw/include"
 IncludeDir["glad"]              = "../Mahakam/vendor/glad/include"
 IncludeDir["glm"]               = "../Mahakam/vendor/glm"
 IncludeDir["imgui"]             = "../Mahakam/vendor"
@@ -154,7 +135,7 @@ workspace "Mahakam"
 filter {}
 
 group "Dependencies"
-    include "Mahakam/vendor/GLFW"
+    include "Mahakam/vendor/glfw"
     include "Mahakam/vendor/imgui"
     include "Mahakam/vendor/imguizmo"
     include "Mahakam/vendor/glad"

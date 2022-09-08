@@ -31,7 +31,7 @@ project "Mahakam"
         "%{IncludeDir.bullet_collision}",
         "%{IncludeDir.linear_math}",
         "%{IncludeDir.entt}",
-        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.glfw}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.imgui}",

@@ -1,6 +1,13 @@
 <div align="center">
 <img width=218 height=218 alt="Mahakam" src="/.github/Mahakam.png?raw=true" />
 <h1>Mahakam</h1>
+
+![Windows supported](https://img.shields.io/badge/Windows-win--64-green?style=flat-square)
+![Linux supported](https://img.shields.io/badge/Linux-Ubuntu-green?style=flat-square)
+![MacOS not supported](https://img.shields.io/badge/MacOS-Not%20Supported-red?style=flat-square)
+![Android not supported](https://img.shields.io/badge/Android-Not%20Supported-red?style=flat-square)
+![IOS not supported](https://img.shields.io/badge/IOS-Not%20Supported-red?style=flat-square)
+
 <p>A somewhat functional game engine with suppport for rendering and sound (currently).
 More functionality will be added as I find the will to work on it.
 Physics will be handled by Bullet3 once integrated fully.</p>
@@ -8,6 +15,7 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 [![License](https://img.shields.io/github/license/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/issues)
 [![Build](https://img.shields.io/github/workflow/status/KredeGC/Mahakam/Build?style=flat-square)](https://github.com/KredeGC/Mahakam/actions/workflows/main.yml)
+
 </div>
 
 # Libraries and technologies
