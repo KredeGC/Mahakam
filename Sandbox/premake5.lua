@@ -33,6 +33,8 @@ project "Sandbox"
     filter "options:target=windows"
         systemversion "latest"
         
+        buildoptions { "/bigobj" }
+        
         flags { "MultiProcessorCompile" }
         
         defines {
@@ -51,11 +53,17 @@ project "Sandbox"
     filter "options:target=linux"
         systemversion "latest"
         
+        buildoptions { "-Wa,-mbig-obj" }
+        
         defines { "MH_PLATFORM_LINUX" }
         
         libdirs { LinuxLibDirs }
         
         links { LinuxLinks }
+    
+    -- Unity build
+    filter "options:unity"
+        unity "on"
         
     -- Standalone
     filter "options:standalone"

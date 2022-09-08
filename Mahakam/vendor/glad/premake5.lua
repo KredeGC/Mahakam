@@ -17,16 +17,25 @@ project "glad"
 		"include"
 	}
 
-	filter "system:linux"
-		pic "on"
-		systemversion "latest"
-
+    -- Windows
 	filter "system:windows"
 		systemversion "latest"
+    
+    -- Linux
+	filter "system:linux"
+		systemversion "latest"
+    
+    -- Unity build
+    filter "options:unity"
+        unity "on"
 
     filter "configurations:Debug"
         runtime "Debug"
         symbols "on"
+
+    filter "configurations:DebugOptimized"
+        runtime "Release"
+        optimize "on"
 
     filter "configurations:Release"
         runtime "Release"

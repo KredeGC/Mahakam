@@ -26,6 +26,8 @@ Mahakam/vendor/assimp/contrib/zlib/Release/
 *.log
 *.user
 Makefile
+Unity-Build.cpp
+Unity-Build.c
 
 # Visual Studio files and folder
 .vs/

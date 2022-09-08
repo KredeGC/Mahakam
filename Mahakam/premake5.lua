@@ -68,6 +68,8 @@ project "Mahakam"
     filter "options:target=windows"
         systemversion "latest"
         
+        buildoptions { "/bigobj" }
+        
         removefiles { "**/Linux/**" }
         
         flags { "MultiProcessorCompile" }
@@ -88,9 +90,15 @@ project "Mahakam"
     filter "options:target=linux"
         systemversion "latest"
         
+        buildoptions { "-Wa,-mbig-obj" }
+        
         removefiles { "**/Windows/WindowsFileUtility.cpp" }
         
         defines { "MH_PLATFORM_LINUX" }
+    
+    -- Unity build
+    filter "options:unity"
+        unity "on"
         
     -- Standalone
     filter "options:standalone"

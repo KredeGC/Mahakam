@@ -34,6 +34,11 @@ newoption {
 }
 
 newoption {
+    trigger = "unity",
+    description = "Create a unity build. Recommended for full compilation"
+}
+
+newoption {
     trigger = "standalone",
     description = "Standalone executable build"
 }
@@ -51,6 +56,8 @@ newaction {
         end
     end
 }
+
+require "Scripts/unity"
 
 outputdir = "%{cfg.buildcfg}-%{_OPTIONS['target']}-%{cfg.architecture}"
 

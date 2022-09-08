@@ -227,7 +227,7 @@ void tomatrix(void) {
     }
 }
 
-int main(int argc, char** argv) {
+int main_unused(int argc, char** argv) {
 
     int i, j, k;
     char* filename;

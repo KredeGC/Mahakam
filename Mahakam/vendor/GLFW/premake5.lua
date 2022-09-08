@@ -70,10 +70,18 @@ project "GLFW"
         defines {
             "_GLFW_X11"
         }
+    
+    -- Unity build
+    filter "options:unity"
+        unity "on"
 
     filter "configurations:Debug"
         runtime "Debug"
         symbols "on"
+
+    filter "configurations:DebugOptimized"
+        runtime "Release"
+        optimize "on"
 
     filter "configurations:Release"
         runtime "Release"
