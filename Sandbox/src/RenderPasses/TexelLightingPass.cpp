@@ -12,10 +12,10 @@ namespace Mahakam
 	{
 		// Create HDR lighting framebuffer
 		FrameBufferProps lightingProps;
-		lightingProps.width = width;
-		lightingProps.height = height;
-		lightingProps.colorAttachments = { TextureFormat::RG11B10F };
-		lightingProps.depthAttachment = { TextureFormat::Depth24 };
+		lightingProps.Width = width;
+		lightingProps.Height = height;
+		lightingProps.ColorAttachments = { TextureFormat::RG11B10F };
+		lightingProps.DepthAttachment = { TextureFormat::Depth24 };
 
 		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
 	}

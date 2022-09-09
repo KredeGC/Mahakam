@@ -42,9 +42,9 @@ namespace Mahakam
 
 			// Create a swapchain target for blitting
 			FrameBufferProps mProps;
-			mProps.width = 1600;
-			mProps.height = 900;
-			mProps.swapChainTarget = true;
+			mProps.Width = 1600;
+			mProps.Height = 900;
+			mProps.SwapChainTarget = true;
 
 			m_ViewportBuffer = FrameBuffer::Create(mProps);
 

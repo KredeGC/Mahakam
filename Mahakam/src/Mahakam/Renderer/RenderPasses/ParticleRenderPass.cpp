@@ -19,9 +19,9 @@ namespace Mahakam
 
 		// Create viewport framebuffer
 		FrameBufferProps viewportProps;
-		viewportProps.width = width;
-		viewportProps.height = height;
-		viewportProps.colorAttachments = { TextureFormat::RG11B10F };
+		viewportProps.Width = width;
+		viewportProps.Height = height;
+		viewportProps.ColorAttachments = { TextureFormat::RG11B10F };
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 

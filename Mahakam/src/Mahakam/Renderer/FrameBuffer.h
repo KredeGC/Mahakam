@@ -20,32 +20,32 @@ namespace Mahakam
 
 	struct FrameBufferAttachmentProps
 	{
-		TextureFormat format = TextureFormat::RGBA8;
-		TextureFilter filterMode = TextureFilter::Bilinear;
-		bool immutable = false;
+		TextureFormat Format = TextureFormat::RGBA8;
+		TextureFilter FilterMode = TextureFilter::Bilinear;
+		bool Immutable = false;
 
 		FrameBufferAttachmentProps(TextureFormat format)
-			: format(format) {}
+			: Format(format) {}
 
 		FrameBufferAttachmentProps(TextureFormat format, TextureFilter filterMode, bool immutable = false)
-			: format(format), filterMode(filterMode), immutable(immutable) {}
+			: Format(format), FilterMode(filterMode), Immutable(immutable) {}
 	};
 
 	struct FrameBufferProps
 	{
-		uint32_t width;
-		uint32_t height;
-		std::vector<FrameBufferAttachmentProps> colorAttachments;
-		FrameBufferAttachmentProps depthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, true };
+		uint32_t Width;
+		uint32_t Height;
+		std::vector<FrameBufferAttachmentProps> ColorAttachments;
+		FrameBufferAttachmentProps DepthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, true };
 
-		bool dontUseDepth = false;
-		bool swapChainTarget = false;
+		bool DontUseDepth = false;
+		bool SwapChainTarget = false;
 
 		FrameBufferProps() = default;
 
 		FrameBufferProps(uint32_t width, uint32_t height, std::initializer_list<FrameBufferAttachmentProps> colorAttachments,
 			FrameBufferAttachmentProps depthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, true }, bool dontUseDepth = false, bool swapChainTarget = false)
-			: width(width), height(height), colorAttachments(colorAttachments), depthAttachment(depthAttachment), dontUseDepth(dontUseDepth), swapChainTarget(swapChainTarget) {}
+			: Width(width), Height(height), ColorAttachments(colorAttachments), DepthAttachment(depthAttachment), DontUseDepth(dontUseDepth), SwapChainTarget(swapChainTarget) {}
 	};
 
 	class FrameBuffer

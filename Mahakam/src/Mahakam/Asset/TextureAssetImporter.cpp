@@ -16,9 +16,9 @@ namespace Mahakam
 
 		// Create preview buffer
 		FrameBufferProps gProps;
-		gProps.width = 128;
-		gProps.height = 128;
-		gProps.colorAttachments = { TextureFormat::RGBA8 };
+		gProps.Width = 128;
+		gProps.Height = 128;
+		gProps.ColorAttachments = { TextureFormat::RGBA8 };
 
 		m_PreviewBuffer = FrameBuffer::Create(gProps);
 	}
@@ -38,48 +38,48 @@ namespace Mahakam
 		if (formatNode)
 		{
 			if (m_TextureType == 0)
-				m_Props2D.format = (TextureFormat)formatNode.as<int>();
+				m_Props2D.Format = (TextureFormat)formatNode.as<int>();
 			else
-				m_PropsCube.format = (TextureFormat)formatNode.as<int>();
+				m_PropsCube.Format = (TextureFormat)formatNode.as<int>();
 		}
 
 		YAML::Node filterNode = node["Filter"];
 		if (filterNode)
 		{
 			if (m_TextureType == 0)
-				m_Props2D.filterMode = (TextureFilter)filterNode.as<int>();
+				m_Props2D.FilterMode = (TextureFilter)filterNode.as<int>();
 			else
-				m_PropsCube.filterMode = (TextureFilter)filterNode.as<int>();
+				m_PropsCube.FilterMode = (TextureFilter)filterNode.as<int>();
 		}
 
 		if (m_TextureType == 0)
 		{
 			YAML::Node wrapXNode = node["WrapX"];
 			if (wrapXNode)
-				m_Props2D.wrapX = (TextureWrapMode)wrapXNode.as<int>();
+				m_Props2D.WrapX = (TextureWrapMode)wrapXNode.as<int>();
 
 			YAML::Node wrapYNode = node["WrapY"];
 			if (wrapYNode)
-				m_Props2D.wrapY = (TextureWrapMode)wrapYNode.as<int>();
+				m_Props2D.WrapY = (TextureWrapMode)wrapYNode.as<int>();
 		}
 		else
 		{
 			YAML::Node resolutionNode = node["Resolution"];
 			if (resolutionNode)
-				m_PropsCube.resolution = resolutionNode.as<uint32_t>();
+				m_PropsCube.Resolution = resolutionNode.as<uint32_t>();
 
 			YAML::Node prefilterNode = node["Prefilter"];
 			if (prefilterNode)
-				m_PropsCube.prefilter = (TextureCubePrefilter)prefilterNode.as<int>();
+				m_PropsCube.Prefilter = (TextureCubePrefilter)prefilterNode.as<int>();
 		}
 
 		YAML::Node mipmapsNode = node["Mipmaps"];
 		if (mipmapsNode)
 		{
 			if (m_TextureType == 0)
-				m_Props2D.mipmaps = mipmapsNode.as<bool>();
+				m_Props2D.Mipmaps = mipmapsNode.as<bool>();
 			else
-				m_PropsCube.mipmaps = mipmapsNode.as<bool>();
+				m_PropsCube.Mipmaps = mipmapsNode.as<bool>();
 		}
 
 		if (m_TextureType == 0)
@@ -118,7 +118,7 @@ namespace Mahakam
 		for (int i = 0; i < (int)TextureFormat::Count; i++)
 			textureFormatStrings[i] = GetStringTextureFormat((TextureFormat)i);
 
-		const char* currentTextureFormat = textureFormatStrings[(int)(m_TextureType == 0 ? m_Props2D.format : m_PropsCube.format)];
+		const char* currentTextureFormat = textureFormatStrings[(int)(m_TextureType == 0 ? m_Props2D.Format : m_PropsCube.Format)];
 
 		if (ImGui::BeginCombo("Texture Format", currentTextureFormat))
 		{
@@ -128,9 +128,9 @@ namespace Mahakam
 				if (ImGui::Selectable(textureFormatStrings[i], selected))
 				{
 					if (m_TextureType == 0)
-						m_Props2D.format = (TextureFormat)i;
+						m_Props2D.Format = (TextureFormat)i;
 					else
-						m_PropsCube.format = (TextureFormat)i;
+						m_PropsCube.Format = (TextureFormat)i;
 					CreateTexture(filepath);
 				}
 
@@ -147,7 +147,7 @@ namespace Mahakam
 		for (int i = 0; i < (int)TextureFilter::Count; i++)
 			textureFilterStrings[i] = GetStringTextureFilter((TextureFilter)i);
 
-		const char* currentTextureFilter = textureFilterStrings[(int)(m_TextureType == 0 ? m_Props2D.filterMode : m_PropsCube.filterMode)];
+		const char* currentTextureFilter = textureFilterStrings[(int)(m_TextureType == 0 ? m_Props2D.FilterMode : m_PropsCube.FilterMode)];
 
 		if (ImGui::BeginCombo("Texture Filter", currentTextureFilter))
 		{
@@ -157,9 +157,9 @@ namespace Mahakam
 				if (ImGui::Selectable(textureFilterStrings[i], selected))
 				{
 					if (m_TextureType == 0)
-						m_Props2D.filterMode = (TextureFilter)i;
+						m_Props2D.FilterMode = (TextureFilter)i;
 					else
-						m_PropsCube.filterMode = (TextureFilter)i;
+						m_PropsCube.FilterMode = (TextureFilter)i;
 					CreateTexture(filepath);
 				}
 
@@ -178,8 +178,8 @@ namespace Mahakam
 			for (int i = 0; i < (int)TextureWrapMode::Count; i++)
 				textureWrapStrings[i] = GetStringTextureWrapMode((TextureWrapMode)i);
 
-			const char* currentWrapX = textureWrapStrings[(int)m_Props2D.wrapX];
-			const char* currentWrapY = textureWrapStrings[(int)m_Props2D.wrapY];
+			const char* currentWrapX = textureWrapStrings[(int)m_Props2D.WrapX];
+			const char* currentWrapY = textureWrapStrings[(int)m_Props2D.WrapY];
 
 			if (ImGui::BeginCombo("Texture Wrap X", currentWrapX))
 			{
@@ -188,7 +188,7 @@ namespace Mahakam
 					bool selected = currentWrapX == textureWrapStrings[i];
 					if (ImGui::Selectable(textureWrapStrings[i], selected))
 					{
-						m_Props2D.wrapX = (TextureWrapMode)i;
+						m_Props2D.WrapX = (TextureWrapMode)i;
 						CreateTexture(filepath);
 					}
 
@@ -206,7 +206,7 @@ namespace Mahakam
 					bool selected = currentWrapY == textureWrapStrings[i];
 					if (ImGui::Selectable(textureWrapStrings[i], selected))
 					{
-						m_Props2D.wrapY = (TextureWrapMode)i;
+						m_Props2D.WrapY = (TextureWrapMode)i;
 						CreateTexture(filepath);
 					}
 
@@ -219,16 +219,16 @@ namespace Mahakam
 		}
 		else
 		{
-			int32_t resolution = (int32_t)m_PropsCube.resolution;
+			int32_t resolution = (int32_t)m_PropsCube.Resolution;
 			if (GUI::DrawIntDrag("Size", resolution, 32, 32, 8192))
-				m_PropsCube.resolution = (uint32_t)resolution;
+				m_PropsCube.Resolution = (uint32_t)resolution;
 
 			const char* prefilterStrings[(int)TextureCubePrefilter::Count];
 
 			for (int i = 0; i < (int)TextureCubePrefilter::Count; i++)
 				prefilterStrings[i] = GetStringTextureCubePrefilter((TextureCubePrefilter)i);
 
-			const char* currentPrefilter = prefilterStrings[(int)m_PropsCube.prefilter];
+			const char* currentPrefilter = prefilterStrings[(int)m_PropsCube.Prefilter];
 
 			if (ImGui::BeginCombo("Prefilter", currentPrefilter))
 			{
@@ -237,7 +237,7 @@ namespace Mahakam
 					bool selected = currentPrefilter == prefilterStrings[i];
 					if (ImGui::Selectable(prefilterStrings[i], selected))
 					{
-						m_PropsCube.prefilter = (TextureCubePrefilter)i;
+						m_PropsCube.Prefilter = (TextureCubePrefilter)i;
 						CreateTexture(filepath);
 					}
 
@@ -250,13 +250,13 @@ namespace Mahakam
 		}
 
 		// Mips
-		bool* mipmaps = m_TextureType == 0 ? &m_Props2D.mipmaps : &m_PropsCube.mipmaps;
+		bool* mipmaps = m_TextureType == 0 ? &m_Props2D.Mipmaps : &m_PropsCube.Mipmaps;
 		if (ImGui::Checkbox("Mipmaps", mipmaps))
 		{
 			if (m_TextureType == 0)
-				m_Props2D.mipmaps = *mipmaps;
+				m_Props2D.Mipmaps = *mipmaps;
 			else
-				m_PropsCube.mipmaps = *mipmaps;
+				m_PropsCube.Mipmaps = *mipmaps;
 			CreateTexture(filepath);
 		}
 
@@ -348,15 +348,15 @@ namespace Mahakam
 			emitter << YAML::Key << "Type";
 			emitter << YAML::Value << 0;
 			emitter << YAML::Key << "Format";
-			emitter << YAML::Value << (int)texture2D->GetProps().format;
+			emitter << YAML::Value << (int)texture2D->GetProps().Format;
 			emitter << YAML::Key << "Filter";
-			emitter << YAML::Value << (int)texture2D->GetProps().filterMode;
+			emitter << YAML::Value << (int)texture2D->GetProps().FilterMode;
 			emitter << YAML::Key << "WrapX";
-			emitter << YAML::Value << (int)texture2D->GetProps().wrapX;
+			emitter << YAML::Value << (int)texture2D->GetProps().WrapX;
 			emitter << YAML::Key << "WrapY";
-			emitter << YAML::Value << (int)texture2D->GetProps().wrapY;
+			emitter << YAML::Value << (int)texture2D->GetProps().WrapY;
 			emitter << YAML::Key << "Mipmaps";
-			emitter << YAML::Value << texture2D->GetProps().mipmaps;
+			emitter << YAML::Value << texture2D->GetProps().Mipmaps;
 		}
 		else
 		{
@@ -365,15 +365,15 @@ namespace Mahakam
 			emitter << YAML::Key << "Type";
 			emitter << YAML::Value << 1;
 			emitter << YAML::Key << "Format";
-			emitter << YAML::Value << (int)textureCube->GetProps().format;
+			emitter << YAML::Value << (int)textureCube->GetProps().Format;
 			emitter << YAML::Key << "Filter";
-			emitter << YAML::Value << (int)textureCube->GetProps().filterMode;
+			emitter << YAML::Value << (int)textureCube->GetProps().FilterMode;
 			emitter << YAML::Key << "Resolution";
-			emitter << YAML::Value << textureCube->GetProps().resolution;
+			emitter << YAML::Value << textureCube->GetProps().Resolution;
 			emitter << YAML::Key << "Prefilter";
-			emitter << YAML::Value << (int)textureCube->GetProps().prefilter;
+			emitter << YAML::Value << (int)textureCube->GetProps().Prefilter;
 			emitter << YAML::Key << "Mipmaps";
-			emitter << YAML::Value << textureCube->GetProps().mipmaps;
+			emitter << YAML::Value << textureCube->GetProps().Mipmaps;
 		}
 	}
 
@@ -396,48 +396,48 @@ namespace Mahakam
 		if (formatNode)
 		{
 			if (textureType == 0)
-				props2D.format = (TextureFormat)formatNode.as<int>();
+				props2D.Format = (TextureFormat)formatNode.as<int>();
 			else
-				propsCube.format = (TextureFormat)formatNode.as<int>();
+				propsCube.Format = (TextureFormat)formatNode.as<int>();
 		}
 
 		YAML::Node filterNode = node["Filter"];
 		if (filterNode)
 		{
 			if (textureType == 0)
-				props2D.filterMode = (TextureFilter)filterNode.as<int>();
+				props2D.FilterMode = (TextureFilter)filterNode.as<int>();
 			else
-				propsCube.filterMode = (TextureFilter)filterNode.as<int>();
+				propsCube.FilterMode = (TextureFilter)filterNode.as<int>();
 		}
 
 		if (textureType == 0)
 		{
 			YAML::Node wrapXNode = node["WrapX"];
 			if (wrapXNode)
-				props2D.wrapX = (TextureWrapMode)wrapXNode.as<int>();
+				props2D.WrapX = (TextureWrapMode)wrapXNode.as<int>();
 
 			YAML::Node wrapYNode = node["WrapY"];
 			if (wrapYNode)
-				props2D.wrapY = (TextureWrapMode)wrapYNode.as<int>();
+				props2D.WrapY = (TextureWrapMode)wrapYNode.as<int>();
 		}
 		else
 		{
 			YAML::Node resolutionNode = node["Resolution"];
 			if (resolutionNode)
-				propsCube.resolution = resolutionNode.as<uint32_t>();
+				propsCube.Resolution = resolutionNode.as<uint32_t>();
 
 			YAML::Node prefilterNode = node["Prefilter"];
 			if (prefilterNode)
-				propsCube.prefilter = (TextureCubePrefilter)prefilterNode.as<int>();
+				propsCube.Prefilter = (TextureCubePrefilter)prefilterNode.as<int>();
 		}
 
 		YAML::Node mipmapsNode = node["Mipmaps"];
 		if (mipmapsNode)
 		{
 			if (textureType == 0)
-				props2D.mipmaps = mipmapsNode.as<bool>();
+				props2D.Mipmaps = mipmapsNode.as<bool>();
 			else
-				propsCube.mipmaps = mipmapsNode.as<bool>();
+				propsCube.Mipmaps = mipmapsNode.as<bool>();
 		}
 
 		if (textureType == 0)

@@ -10,15 +10,15 @@ namespace Mahakam
 
 		// Create gbuffer
 		FrameBufferProps gProps;
-		gProps.width = width;
-		gProps.height = height;
-		gProps.colorAttachments = {
+		gProps.Width = width;
+		gProps.Height = height;
+		gProps.ColorAttachments = {
 			TextureFormat::RGBA8, // RGB - Albedo, A - Occlussion
 			TextureFormat::RGBA8, // RG - Unused, B - Metallic, A - Roughness
 			TextureFormat::RG11B10F, // RGB - Emission (not affected by light)
 			TextureFormat::RGB10A2, // RGB - World normal, A - Unused
 			TextureFormat::RGB10A2 }; // RGB - World position offset, A - Unused
-		gProps.depthAttachment = TextureFormat::Depth24; // Mutable
+		gProps.DepthAttachment = TextureFormat::Depth24; // Mutable
 
 		gBuffer = FrameBuffer::Create(gProps);
 

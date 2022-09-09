@@ -34,8 +34,8 @@ namespace Mahakam {
 
 		virtual const TextureProps& GetProps() const override { return m_Props; }
 
-		virtual uint32_t GetWidth() const override { return m_Props.width; }
-		virtual uint32_t GetHeight() const override { return m_Props.height; }
+		virtual uint32_t GetWidth() const override { return m_Props.Width; }
+		virtual uint32_t GetHeight() const override { return m_Props.Height; }
 		virtual uint32_t GetRendererID() const override { return m_RendererID; }
 
 		virtual uint32_t GetSize() const override { return m_Size; }
@@ -81,8 +81,8 @@ namespace Mahakam {
 
 		virtual const CubeTextureProps& GetProps() const override { return m_Props; };
 
-		virtual uint32_t GetWidth() const override { return m_Props.resolution; }
-		virtual uint32_t GetHeight() const override { return m_Props.resolution; }
+		virtual uint32_t GetWidth() const override { return m_Props.Resolution; }
+		virtual uint32_t GetHeight() const override { return m_Props.Resolution; }
 		virtual uint32_t GetRendererID() const override { return m_RendererID; }
 
 		virtual uint32_t GetSize() const override { return m_Size; }

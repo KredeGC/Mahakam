@@ -16,11 +16,11 @@ namespace Mahakam
 	static const uint32_t MAX_FRAMEBUFFER_SIZE = 8192;
 
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferProps& props)
-		: props(props)
+		: m_Props(props)
 	{
 		MH_PROFILE_FUNCTION();
 
-		if (!props.swapChainTarget)
+		if (!props.SwapChainTarget)
 			Invalidate();
 	}
 
@@ -28,13 +28,13 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_GL_CALL(glDeleteFramebuffers(1, &rendererID));
+		MH_GL_CALL(glDeleteFramebuffers(1, &m_RendererID));
 	}
 
 	void OpenGLFrameBuffer::Bind()
 	{
-		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, rendererID));
-		MH_GL_CALL(glViewport(0, 0, props.width, props.height));
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID));
+		MH_GL_CALL(glViewport(0, 0, m_Props.Width, m_Props.Height));
 	}
 
 	void OpenGLFrameBuffer::Unbind()
@@ -46,13 +46,13 @@ namespace Mahakam
 	{
 		Asset<OpenGLFrameBuffer> fbo = dest;
 
-		MH_GL_CALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, rendererID));
-		MH_GL_CALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->rendererID));
+		MH_GL_CALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID));
+		MH_GL_CALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->m_RendererID));
 
 		if (color)
-			MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+			MH_GL_CALL(glBlitFramebuffer(0, 0, m_Props.Width, m_Props.Height, 0, 0, fbo->m_Props.Width, fbo->m_Props.Height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
 		if (depth)
-			MH_GL_CALL(glBlitFramebuffer(0, 0, props.width, props.height, 0, 0, fbo->props.width, fbo->props.height, GL_DEPTH_BUFFER_BIT, GL_NEAREST));
+			MH_GL_CALL(glBlitFramebuffer(0, 0, m_Props.Width, m_Props.Height, 0, 0, fbo->m_Props.Width, fbo->m_Props.Height, GL_DEPTH_BUFFER_BIT, GL_NEAREST));
 
 		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
@@ -65,21 +65,21 @@ namespace Mahakam
 			return;
 		}
 
-		props.width = width;
-		props.height = height;
+		m_Props.Width = width;
+		m_Props.Height = height;
 
-		if (!props.swapChainTarget)
+		if (!m_Props.SwapChainTarget)
 			Invalidate();
 	}
 
 	Asset<Texture> OpenGLFrameBuffer::GetColorTexture(int index) const
 	{
-		return colorAttachments[index];
+		return m_ColorAttachments[index];
 	}
 
 	Asset<Texture> OpenGLFrameBuffer::GetDepthTexture() const
 	{
-		return depthAttachment;
+		return m_DepthAttachment;
 	}
 
 	void OpenGLFrameBuffer::ReadColorPixels(void* pixels, int attachmentSlot) const
@@ -88,40 +88,40 @@ namespace Mahakam
 
 		MH_CORE_ASSERT(attachmentSlot < colorAttachments.size(), "Index outside range of framebuffer textures!");
 
-		auto& spec = props.colorAttachments[attachmentSlot];
+		auto& spec = m_Props.ColorAttachments[attachmentSlot];
 
-		GLenum format = TextureFormatToOpenGLInternalFormat(spec.format);
-		GLenum type = TextureFormatToOpenGLType(spec.format);
+		GLenum format = TextureFormatToOpenGLInternalFormat(spec.Format);
+		GLenum type = TextureFormatToOpenGLType(spec.Format);
 
 		MH_GL_CALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentSlot));
 
-		MH_GL_CALL(glReadPixels(0, 0, props.width, props.height, format, type, pixels));
+		MH_GL_CALL(glReadPixels(0, 0, m_Props.Width, m_Props.Height, format, type, pixels));
 	}
 
 	void OpenGLFrameBuffer::Invalidate()
 	{
 		MH_PROFILE_FUNCTION();
 
-		if (rendererID)
+		if (m_RendererID)
 		{
-			MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, rendererID));
+			MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID));
 
-			for (int i = 0; i < colorAttachments.size(); i++)
+			for (int i = 0; i < m_ColorAttachments.size(); i++)
 			{
-				colorAttachments[i]->Resize(props.width, props.height);
-				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorAttachments[i]->GetRendererID(), 0));
+				m_ColorAttachments[i]->Resize(m_Props.Width, m_Props.Height);
+				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_ColorAttachments[i]->GetRendererID(), 0));
 			}
 
-			if (!props.dontUseDepth && depthAttachment)
+			if (!m_Props.DontUseDepth && m_DepthAttachment)
 			{
-				depthAttachment->Resize(props.width, props.height);
+				m_DepthAttachment->Resize(m_Props.Width, m_Props.Height);
 
-				uint32_t attachment = TextureFormatToOpenGLAttachment(props.depthAttachment.format);
+				uint32_t attachment = TextureFormatToOpenGLAttachment(m_Props.DepthAttachment.Format);
 
-				if (props.depthAttachment.immutable)
-					MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depthAttachment->GetRendererID()))
+				if (m_Props.DepthAttachment.Immutable)
+					MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, m_DepthAttachment->GetRendererID()))
 				else
-					MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, depthAttachment->GetRendererID(), 0))
+					MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, m_DepthAttachment->GetRendererID(), 0))
 			}
 
 			// Check framebuffer
@@ -132,55 +132,55 @@ namespace Mahakam
 			return;
 		}
 
-		MH_GL_CALL(glGenFramebuffers(1, &rendererID));
-		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, rendererID));
+		MH_GL_CALL(glGenFramebuffers(1, &m_RendererID));
+		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID));
 
 		// Color buffers
-		for (int i = 0; i < props.colorAttachments.size(); i++)
+		for (int i = 0; i < m_Props.ColorAttachments.size(); i++)
 		{
-			FrameBufferAttachmentProps& spec = props.colorAttachments[i];
+			FrameBufferAttachmentProps& spec = m_Props.ColorAttachments[i];
 
-			Asset<Texture> tex = Texture2D::Create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+			Asset<Texture> tex = Texture2D::Create({ m_Props.Width, m_Props.Height, spec.Format, spec.FilterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
 
-			colorAttachments.push_back(tex);
+			m_ColorAttachments.push_back(tex);
 
 			MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, tex->GetRendererID(), 0));
 		}
 
 		// Depth buffer
-		if (!props.dontUseDepth)
+		if (!m_Props.DontUseDepth)
 		{
-			FrameBufferAttachmentProps& spec = props.depthAttachment;
+			FrameBufferAttachmentProps& spec = m_Props.DepthAttachment;
 
 			/*uint32_t internalFormat = TextureFormatToOpenGLInternalFormat(spec.format);
 			uint32_t type = TextureFormatToOpenGLType(spec.format);*/
-			uint32_t attachment = TextureFormatToOpenGLAttachment(spec.format);
+			uint32_t attachment = TextureFormatToOpenGLAttachment(spec.Format);
 
-			if (spec.immutable)
+			if (spec.Immutable)
 			{
-				depthAttachment = RenderBuffer::Create(props.width, props.height, spec.format);
+				m_DepthAttachment = RenderBuffer::Create(m_Props.Width, m_Props.Height, spec.Format);
 
-				MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, depthAttachment->GetRendererID()));
+				MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, m_DepthAttachment->GetRendererID()));
 			}
 			else
 			{
-				depthAttachment = Texture2D::Create({ props.width, props.height, spec.format, spec.filterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+				m_DepthAttachment = Texture2D::Create({ m_Props.Width, m_Props.Height, spec.Format, spec.FilterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
 
-				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, depthAttachment->GetRendererID(), 0));
+				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, m_DepthAttachment->GetRendererID(), 0));
 			}
 		}
 
-		if (colorAttachments.size() > 1)
+		if (m_ColorAttachments.size() > 1)
 		{
-			GLenum* buffers = new GLenum[colorAttachments.size()];
-			for (GLenum i = 0; i < colorAttachments.size(); i++)
+			GLenum* buffers = new GLenum[m_ColorAttachments.size()];
+			for (GLenum i = 0; i < m_ColorAttachments.size(); i++)
 				buffers[i] = GL_COLOR_ATTACHMENT0 + i;
 
-			MH_GL_CALL(glDrawBuffers((GLsizei)colorAttachments.size(), buffers));
+			MH_GL_CALL(glDrawBuffers((GLsizei)m_ColorAttachments.size(), buffers));
 
 			delete[] buffers;
 		}
-		else if (colorAttachments.empty())
+		else if (m_ColorAttachments.empty())
 		{
 			MH_GL_CALL(glDrawBuffer(GL_NONE));
 			MH_GL_CALL(glReadBuffer(GL_NONE));

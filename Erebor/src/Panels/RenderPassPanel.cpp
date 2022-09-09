@@ -39,10 +39,10 @@ namespace Mahakam::Editor
 	RenderPassPanel::RenderPassPanel()
 	{
 		FrameBufferProps viewportProps;
-		viewportProps.width = 1024;
-		viewportProps.height = 1024;
-		viewportProps.colorAttachments = { TextureFormat::RGB8 };
-		viewportProps.depthAttachment = TextureFormat::Depth24;
+		viewportProps.Width = 1024;
+		viewportProps.Height = 1024;
+		viewportProps.ColorAttachments = { TextureFormat::RGB8 };
+		viewportProps.DepthAttachment = TextureFormat::Depth24;
 
 		m_ViewportFramebuffer = FrameBuffer::Create(viewportProps);
 
@@ -84,17 +84,17 @@ namespace Mahakam::Editor
 			// Get a list of mutable rendertextures
 			std::vector<std::string> textureNames;
 			std::vector<int> textures;
-			int colorCount = (int)spec.colorAttachments.size();
+			int colorCount = (int)spec.ColorAttachments.size();
 			for (int i = 0; i < colorCount; i++)
 			{
-				if (!spec.colorAttachments[i].immutable)
+				if (!spec.ColorAttachments[i].Immutable)
 				{
 					textures.push_back(i);
 					textureNames.push_back("Color-" + std::to_string(i));
 				}
 			}
 
-			if (!spec.dontUseDepth && !spec.depthAttachment.immutable)
+			if (!spec.DontUseDepth && !spec.DepthAttachment.Immutable)
 			{
 				textures.push_back(-1);
 				textureNames.push_back("Depth");

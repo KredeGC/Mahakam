@@ -35,9 +35,9 @@ namespace Mahakam
 
 		// Create shadow map
 		FrameBufferProps shadowProps;
-		shadowProps.width = s_ShadowMapSize;
-		shadowProps.height = s_ShadowMapSize;
-		shadowProps.depthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
+		shadowProps.Width = s_ShadowMapSize;
+		shadowProps.Height = s_ShadowMapSize;
+		shadowProps.DepthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
 		shadowFramebuffer = FrameBuffer::Create(shadowProps);
 
 		Renderer::AddFrameBuffer("Shadow Atlas", shadowFramebuffer.Get());
@@ -108,9 +108,9 @@ namespace Mahakam
 
 		// Create HDR lighting framebuffer
 		FrameBufferProps lightingProps;
-		lightingProps.width = width;
-		lightingProps.height = height;
-		lightingProps.colorAttachments = { TextureFormat::RG11B10F };
+		lightingProps.Width = width;
+		lightingProps.Height = height;
+		lightingProps.ColorAttachments = { TextureFormat::RG11B10F };
 		//lightingProps.depthAttachment = { TextureFormat::Depth24 };
 
 		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
@@ -181,7 +181,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		GL::SetViewport(0, 0, hdrFrameBuffer->GetSpecification().width, hdrFrameBuffer->GetSpecification().height);
+		GL::SetViewport(0, 0, hdrFrameBuffer->GetSpecification().Width, hdrFrameBuffer->GetSpecification().Height);
 
 		// Blit depth buffer from gBuffer
 		src->Blit(hdrFrameBuffer, false, true);
@@ -583,10 +583,10 @@ namespace Mahakam
 		{
 			// Setup LUT shader and framebuffer for capturing
 			FrameBufferProps framebufferProps;
-			framebufferProps.width = width;
-			framebufferProps.height = height;
-			framebufferProps.colorAttachments = { format };
-			framebufferProps.dontUseDepth = true;
+			framebufferProps.Width = width;
+			framebufferProps.Height = height;
+			framebufferProps.ColorAttachments = { format };
+			framebufferProps.DontUseDepth = true;
 			Asset<FrameBuffer> framebuffer = FrameBuffer::Create(framebufferProps);
 
 			Asset<Shader> shader = Shader::Create(shaderPath);
