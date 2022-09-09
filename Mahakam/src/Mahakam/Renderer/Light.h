@@ -1,13 +1,14 @@
 #pragma once
 
+#define GLM_FORCE_INLINE
+#define GLM_FORCE_INTRINSICS
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/trigonometric.hpp>
 
 namespace Mahakam
 {
-	class FrameBuffer;
-
 	class Light
 	{
 	public:

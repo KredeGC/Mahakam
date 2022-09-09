@@ -58,7 +58,7 @@ jobs:
     - name: Run premake
       run: premake5 ${{ matrix.tool.action }} --toolset=${{ matrix.tool.toolset }} --unity
     - name: Build
-      run: premake5 build --toolset=${{ matrix.tool.toolset }} --config=${{ matrix.config }}
+      run: premake5 build --config=${{ matrix.config }}
       env:
         CC: ${{ matrix.tool.cc }}
         CXX: ${{ matrix.tool.cxx }}

@@ -170,11 +170,11 @@ namespace Mahakam
 		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
 		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
 
-		if (sceneData->environment.irradianceMap)
-			deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.irradianceMap);
+		if (sceneData->environment.IrradianceMap)
+			deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap);
 
-		if (sceneData->environment.specularMap)
-			deferredShader->SetTexture("u_SpecularMap", sceneData->environment.specularMap);
+		if (sceneData->environment.SpecularMap)
+			deferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap);
 	}
 
 	void LightingRenderPass::RenderLighting(SceneData* sceneData, Asset<FrameBuffer> src)
@@ -349,7 +349,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		uint32_t amount = (uint32_t)sceneData->environment.directionalLights.size();
+		uint32_t amount = (uint32_t)sceneData->environment.DirectionalLights.size();
 		if (amount > 0)
 		{
 			// Choose size and offset of shadow texture
@@ -359,7 +359,7 @@ namespace Mahakam
 
 			for (uint32_t i = 0; i < amount; i++)
 			{
-				DirectionalLight& light = sceneData->environment.directionalLights[i];
+				DirectionalLight& light = sceneData->environment.DirectionalLights[i];
 
 				// Check if light is disabled
 				if (light.offset.z == 0.0f)
@@ -423,7 +423,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		uint32_t amount = (uint32_t)sceneData->environment.spotLights.size();
+		uint32_t amount = (uint32_t)sceneData->environment.SpotLights.size();
 		if (amount > 0)
 		{
 			// Choose size and offset of shadow texture
@@ -432,7 +432,7 @@ namespace Mahakam
 
 			for (uint32_t i = 0; i < amount; i++)
 			{
-				SpotLight& light = sceneData->environment.spotLights[i];
+				SpotLight& light = sceneData->environment.SpotLights[i];
 
 				// Check if light is disabled
 				if (light.offset.z == 0.0f)
@@ -496,7 +496,7 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		uint32_t amountSize = 16;
-		uint32_t amount = (uint32_t)sceneData->environment.directionalLights.size();
+		uint32_t amount = (uint32_t)sceneData->environment.DirectionalLights.size();
 
 		if (sceneData->directionalLightBuffer)
 			sceneData->directionalLightBuffer->Bind(1);
@@ -510,7 +510,7 @@ namespace Mahakam
 				sceneData->directionalLightBuffer = StorageBuffer::Create(bufferSize);
 
 			sceneData->directionalLightBuffer->SetData(&amount, 0, sizeof(int));
-			sceneData->directionalLightBuffer->SetData(&sceneData->environment.directionalLights[0], amountSize, amount * lightSize);
+			sceneData->directionalLightBuffer->SetData(&sceneData->environment.DirectionalLights[0], amountSize, amount * lightSize);
 		}
 		else if (!sceneData->directionalLightBuffer || sceneData->directionalLightBuffer->GetSize() != amountSize)
 		{
@@ -526,7 +526,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		uint32_t amount = (uint32_t)sceneData->environment.pointLights.size();
+		uint32_t amount = (uint32_t)sceneData->environment.PointLights.size();
 
 		if (amount > 0)
 		{
@@ -537,7 +537,7 @@ namespace Mahakam
 				sceneData->pointLightBuffer = StorageBuffer::Create(bufferSize);
 
 			sceneData->pointLightBuffer->Bind(1);
-			sceneData->pointLightBuffer->SetData(&sceneData->environment.pointLights[0], 0, bufferSize);
+			sceneData->pointLightBuffer->SetData(&sceneData->environment.PointLights[0], 0, bufferSize);
 
 			if (sceneData->gBuffer)
 				deferredShader->Bind("POINT", "DEBUG");
@@ -553,7 +553,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		uint32_t amount = (uint32_t)sceneData->environment.spotLights.size();
+		uint32_t amount = (uint32_t)sceneData->environment.SpotLights.size();
 
 		if (amount > 0)
 		{
@@ -564,7 +564,7 @@ namespace Mahakam
 				sceneData->spotLightBuffer = StorageBuffer::Create(bufferSize);
 
 			sceneData->spotLightBuffer->Bind(1);
-			sceneData->spotLightBuffer->SetData(&sceneData->environment.spotLights[0], 0, bufferSize);
+			sceneData->spotLightBuffer->SetData(&sceneData->environment.SpotLights[0], 0, bufferSize);
 
 			if (sceneData->gBuffer)
 				deferredShader->Bind("SPOT", "DEBUG");

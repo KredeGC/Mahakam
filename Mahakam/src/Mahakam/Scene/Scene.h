@@ -6,6 +6,7 @@
 #include "Mahakam/Asset/Asset.h"
 
 #include "Mahakam/Renderer/Camera.h"
+#include "Mahakam/Renderer/RenderData.h"
 
 #include <entt/entt.hpp>
 
@@ -24,14 +25,11 @@ namespace Mahakam
 		friend class Entity;
 		friend class SceneSerializer;
 
-		Asset<Material> skyboxMaterial;
-		Asset<TextureCube> skyboxTexture;
-		Asset<TextureCube> skyboxIrradiance;
-		Asset<TextureCube> skyboxSpecular;
+		EnvironmentData m_Environment;
 
-		entt::registry registry;
+		entt::registry m_Registry;
 
-		float viewportRatio = 1.0f;
+		float m_ViewportRatio = 1.0f;
 
 	public:
 		Scene();
@@ -60,13 +58,13 @@ namespace Mahakam
 		template<typename ... Args>
 		void DestroyAllEntities();
 
-		void SetSkyboxMaterial(Asset<Material> material) { skyboxMaterial = material; }
-		void SetSkyboxIrradiance(Asset<TextureCube> irradiance) { skyboxIrradiance = irradiance; }
-		void SetSkyboxSpecular(Asset<TextureCube> specular) { skyboxSpecular = specular; }
+		void SetSkyboxMaterial(Asset<Material> material) { m_Environment.SkyboxMaterial = material; }
+		void SetSkyboxIrradiance(Asset<TextureCube> irradiance) { m_Environment.IrradianceMap = irradiance; }
+		void SetSkyboxSpecular(Asset<TextureCube> specular) { m_Environment.SpecularMap = specular; }
 
-		Asset<Material> GetSkyboxMaterial() const { return skyboxMaterial; }
-		Asset<TextureCube> GetSkyboxIrradiance() const { return skyboxIrradiance; }
-		Asset<TextureCube> GetSkyboxSpecular() const { return skyboxSpecular; }
+		Asset<Material> GetSkyboxMaterial() const { return m_Environment.SkyboxMaterial; }
+		Asset<TextureCube> GetSkyboxIrradiance() const { return m_Environment.IrradianceMap; }
+		Asset<TextureCube> GetSkyboxSpecular() const { return m_Environment.SpecularMap; }
 
 		inline static Ref<Scene> Create() { return CreateEmpty(); }
 		inline static Ref<Scene> Create(const std::string& filepath) { return CreateFilepath(filepath); }
@@ -91,11 +89,11 @@ namespace Mahakam
 	template<typename Fn>
 	void Scene::ForEachEntity(Fn func)
 	{
-		const entt::entity* data = registry.data();
-		for (size_t i = 0; i < registry.size(); i++)
+		const entt::entity* data = m_Registry.data();
+		for (size_t i = 0; i < m_Registry.size(); i++)
 		{
 			const entt::entity& handle = data[i];
-			if (registry.valid(handle))
+			if (m_Registry.valid(handle))
 			{
 				Entity entity{ handle, this };
 				func(entity);
@@ -106,25 +104,25 @@ namespace Mahakam
 	template<typename Fn>
 	void Scene::ForEachEntityReverse(Fn func)
 	{
-		return registry.each(func);
+		return m_Registry.each(func);
 	}
 
 	template<typename ... Args, typename Fn>
 	void Scene::ForEach(Fn func)
 	{
-		return registry.view<Args...>().each(func);
+		return m_Registry.view<Args...>().each(func);
 	}
 
 	template<typename ... Args>
 	void Scene::DestroyAllEntities()
 	{
-		auto view = registry.view<Args...>();
-		registry.destroy(view.begin(), view.end());
+		auto view = m_Registry.view<Args...>();
+		m_Registry.destroy(view.begin(), view.end());
 	}
 
 	template<>
 	inline void Scene::OnComponentAdded<CameraComponent>(const Entity& entity, CameraComponent& component)
 	{
-		component.GetCamera().SetRatio(viewportRatio);
+		component.GetCamera().SetRatio(m_ViewportRatio);
 	}
 }

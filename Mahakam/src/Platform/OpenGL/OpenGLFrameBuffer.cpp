@@ -72,6 +72,16 @@ namespace Mahakam
 			Invalidate();
 	}
 
+	Asset<Texture> OpenGLFrameBuffer::GetColorTexture(int index) const
+	{
+		return colorAttachments[index];
+	}
+
+	Asset<Texture> OpenGLFrameBuffer::GetDepthTexture() const
+	{
+		return depthAttachment;
+	}
+
 	void OpenGLFrameBuffer::ReadColorPixels(void* pixels, int attachmentSlot) const
 	{
 		MH_PROFILE_FUNCTION();

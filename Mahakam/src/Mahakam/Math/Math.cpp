@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "Math.h"
 
+#define GLM_FORCE_INLINE
+#define GLM_FORCE_INTRINSICS
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 

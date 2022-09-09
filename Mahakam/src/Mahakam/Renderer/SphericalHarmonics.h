@@ -2,6 +2,9 @@
 #include <functional>
 #include <vector>
 
+#define GLM_FORCE_INLINE
+#define GLM_FORCE_INTRINSICS
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext/vector_float3.hpp>
 
 namespace Mahakam

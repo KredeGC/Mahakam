@@ -4,6 +4,9 @@
 
 #include "Mahakam/Renderer/TextureFormats.h"
 
+#define GLM_FORCE_INLINE
+#define GLM_FORCE_INTRINSICS
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
 namespace Mahakam
@@ -15,6 +18,8 @@ namespace Mahakam
 
 	extern template class Asset<Shader>;
 	extern template class Asset<Texture>;
+
+	extern template class ::std::shared_ptr<UniformBuffer>;
 
 	class LightingRenderPass : public RenderPass
 	{

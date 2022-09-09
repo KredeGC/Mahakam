@@ -160,10 +160,14 @@ namespace Mahakam::Editor
 					{
 						glm::mat4 parentMatrix{ 1.0f };
 
-						if (RelationshipComponent* relation = selectedEntity.TryGetComponent<RelationshipComponent>())
+						if (selectedEntity.HasComponent<RelationshipComponent>())
 						{
-							if (relation->Parent && relation->Parent.HasComponent<TransformComponent>())
-								parentMatrix = glm::inverse(relation->Parent.GetComponent<TransformComponent>().GetModelMatrix());
+							Entity parentEntity = selectedEntity.GetParent();
+							if (parentEntity)
+							{
+								if (TransformComponent* parentTransform = parentEntity.TryGetComponent<TransformComponent>())
+									parentMatrix = glm::inverse(parentTransform->GetModelMatrix());
+							}
 						}
 
 						glm::mat4 localMatrix = parentMatrix * modelMatrix;

@@ -19,7 +19,7 @@ namespace Mahakam::Editor
 		auto& relation = entity.GetComponent<RelationshipComponent>();
 
 		// Remove leaf node on parents with no children
-		if (!relation.First)
+		if (relation.First == entt::null)
 			flags |= ImGuiTreeNodeFlags_Leaf;
 
 		// Create tag
@@ -86,12 +86,12 @@ namespace Mahakam::Editor
 		// If entity is open
 		if (open)
 		{
-			Entity current = relation.First;
+			Entity current = entity.GetFirstChild();
 			while (current)
 			{
 				DrawEntityNode(current, context);
 
-				current = current.GetComponent<RelationshipComponent>().Next;
+				current = current.GetNext();
 			}
 
 			ImGui::TreePop();
@@ -208,7 +208,7 @@ namespace Mahakam::Editor
 
 						// Start by drawing the root entities
 						// Recursively draw their children
-						if (!relation.Parent)
+						if (relation.Parent == entt::null)
 							DrawEntityNode(entity, context);
 					});
 

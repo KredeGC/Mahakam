@@ -10,6 +10,8 @@
 
 #include "Platform/OpenGL/OpenGLMesh.h"
 
+#include <glm/gtx/fast_square_root.hpp>
+
 #include <tiny_gltf/tiny_gltf.h>
 
 namespace Mahakam
@@ -20,9 +22,9 @@ namespace Mahakam
 		float y2 = v.y * v.y;
 		float z2 = v.z * v.z;
 		glm::vec3 s;
-		s.x = v.x * glm::sqrt(1.0f - y2 / 2.0f - z2 / 2.0f + y2 * z2 / 3.0f);
-		s.y = v.y * glm::sqrt(1.0f - x2 / 2.0f - z2 / 2.0f + x2 * z2 / 3.0f);
-		s.z = v.z * glm::sqrt(1.0f - x2 / 2.0f - y2 / 2.0f + x2 * y2 / 3.0f);
+		s.x = v.x * glm::fastSqrt(1.0f - y2 / 2.0f - z2 / 2.0f + y2 * z2 / 3.0f);
+		s.y = v.y * glm::fastSqrt(1.0f - x2 / 2.0f - z2 / 2.0f + x2 * z2 / 3.0f);
+		s.z = v.z * glm::fastSqrt(1.0f - x2 / 2.0f - y2 / 2.0f + x2 * y2 / 3.0f);
 		return s;
 	}
 
@@ -52,7 +54,7 @@ namespace Mahakam
 
 		// Usual formula for a vector in spherical coordinates.
 		// You can exchange x & z to wind the opposite way around the sphere.
-		return glm::normalize(glm::vec3(
+		return glm::fastNormalize(glm::vec3(
 			c * glm::cos(theta),
 			glm::sin(phi),
 			c * glm::sin(theta)
@@ -569,7 +571,7 @@ namespace Mahakam
 				positions[index] = pointOnSphereCenter * 0.5f;
 				uvs[index] = { percentCenter.x, 1.0f - percentCenter.y };
 				normals[index] = pointOnSphereCenter;
-				tangents[index] = { glm::normalize(pointOnSphereRight - pointOnSphereCenter), 1.0f };
+				tangents[index] = { glm::fastNormalize(pointOnSphereRight - pointOnSphereCenter), 1.0f };
 
 				if (x != rows - 1 && y != columns - 1)
 				{
@@ -661,7 +663,7 @@ namespace Mahakam
 					else
 						uvs[index] = percent;
 					normals[index] = pointOnSphere;
-					tangents[index] = { glm::normalize(pointOnSphereRight - pointOnSphere), 1.0f };
+					tangents[index] = { glm::fastNormalize(pointOnSphereRight - pointOnSphere), 1.0f };
 
 					if (x != tessellation - 1 && y != tessellation - 1)
 					{

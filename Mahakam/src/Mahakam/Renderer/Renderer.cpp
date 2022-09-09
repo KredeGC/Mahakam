@@ -280,10 +280,10 @@ namespace Mahakam
 	//void Renderer::DrawSkyboxImpl(SceneData* sceneData)
 	MH_DEFINE_FUNC(Renderer::DrawSkyboxImpl, void, SceneData* sceneData)
 	{
-		if (sceneData->environment.skyboxMaterial)
+		if (sceneData->environment.SkyboxMaterial)
 		{
-			sceneData->environment.skyboxMaterial->BindShader("GEOMETRY");
-			sceneData->environment.skyboxMaterial->Bind();
+			sceneData->environment.SkyboxMaterial->BindShader("GEOMETRY");
+			sceneData->environment.SkyboxMaterial->Bind();
 			DrawScreenQuad();
 		}
 	};

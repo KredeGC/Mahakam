@@ -1,5 +1,6 @@
 # Building Mahakam
 Mahakam uses [premake5](https://premake.github.io/download) as build system which will need to be installed and added to ($)PATH.
+The build process is characterized by first generating the project files, and then building the project using these files.
 Generating build-files can be done via the terminal from the project root directory.
 The engine currently only supports Windows and Linux operating systems.
 There are currently no plans to add Mac support, as I don't have a Mac myself.
@@ -56,19 +57,19 @@ premake5 build --config=[CONFIG]
 In addition to the `--config` flag, several more build options are available.
 
 ### --target
-Used during project file generation.
 ```bash
+# Used during project file generation
 # This will specify the target platform
 # Possible targets are: 'windows' and 'linux'
-# Currently only works when cross-compiling from linux to windows using MinGW
+# Currently only works when cross-compiling to windows on a linux machine using MinGW
 --target=[TARGET]
 # Example, when generating files on a linux host machine
 premake5 gmake2 --target=windows
 ```
 
 ### --toolset
-Used during project file generation.
 ```bash
+# Used during project file generation
 # This will specify what toolset to use when building
 # Possible values are: 'gcc', 'clang' and 'msc'
 # Currently msc is only supported on windows, and gcc and clang are only supported on linux
@@ -78,8 +79,8 @@ premake5 gmake2 --toolset=clang
 ```
 
 ### --config
-Used during project build.
 ```bash
+# Used during project build
 # This will specify which configuration to build, when using the build command in premake
 # Possible values are: 'debug', 'debugoptimized' and 'release'
 config=[CONFIG]
@@ -88,8 +89,8 @@ premake5 build --config=debugoptimized
 ```
 
 ### --unity
-Used during project file generation.
 ```bash
+# Used during project file generation
 # This will create a unity build of the entire solution
 # This option is recommended for full builds of the engine, but may not be practical for incremental changes
 --unity
@@ -98,8 +99,8 @@ premake5 vs2019 --unity
 ```
 
 ### --standalone
-Used during project file generation.
 ```bash
+# Used during project file generation
 # *Currently not complete*
 # This will generate a binary without profiling or dynamic library linking
 # This also strips Editor-related functionality from the engine
@@ -107,4 +108,33 @@ Used during project file generation.
 --standalone
 # Example, when generating files on windows
 premake5 vs2019 --standalone
+```
+
+## Windows examples
+MSC plain build in debug
+```bash
+premake5 vs2019 --toolset=msc
+premake5 build --config=debug
+```
+MSC unity build in release
+```bash
+premake5 vs2019 --toolset=msc --unity
+premake5 build --config=release
+```
+
+## Linux examples
+GCC plain build in debug
+```bash
+premake5 gmake2 --toolset=gcc
+premake5 build --config=debug
+```
+Clang plain build in debugoptimized
+```bash
+premake5 gmake2 --toolset=clang
+premake5 build --config=debugoptimized
+```
+Clang unity build in release
+```bash
+premake5 gmake2 --toolset=clang --unity
+premake5 build --config=release
 ```

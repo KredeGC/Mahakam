@@ -16,13 +16,13 @@ namespace Mahakam
 	class SubMesh;
 	class Texture;
 
+	struct SceneData;
+
 	extern template class Asset<FrameBuffer>;
 	extern template class Asset<Material>;
 	extern template class Asset<Shader>;
 	extern template class Asset<SubMesh>;
 	extern template class Asset<Texture>;
-
-	struct SceneData;
 
 	class MaterialAssetImporter : public AssetImporter
 	{

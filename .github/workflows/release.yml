@@ -55,9 +55,9 @@ jobs:
       if: matrix.tool.os == 'windows-latest' && matrix.tool.toolset == 'msc'
       uses: microsoft/setup-msbuild@v1.1
     - name: Run premake
-      run: premake5 ${{ matrix.tool.action }} --toolset=${{ matrix.tool.toolset }}
+      run: premake5 ${{ matrix.tool.action }} --toolset=${{ matrix.tool.toolset }} --unity
     - name: Build
-      run: premake5 build --toolset=${{ matrix.tool.toolset }} --config=release
+      run: premake5 build --config=release
       env:
         CC: ${{ matrix.tool.cc }}
         CXX: ${{ matrix.tool.cxx }}

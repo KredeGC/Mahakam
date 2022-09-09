@@ -1,8 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "Light.h"
 
-#include "FrameBuffer.h"
-
 namespace Mahakam
 {
 	Light::Light(LightType lightType, float range, const glm::vec3& color, bool shadowCasting, float bias)

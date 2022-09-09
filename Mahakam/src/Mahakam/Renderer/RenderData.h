@@ -4,10 +4,14 @@
 
 #include "Mahakam/Asset/Asset.h"
 
+#include "EnvironmentData.h"
 #include "ParticleSystem.h"
 
+#define GLM_FORCE_INLINE
+#define GLM_FORCE_INTRINSICS
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
-#include <glm/ext/vector_float4.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 
 #include <vector>
@@ -17,73 +21,15 @@ namespace Mahakam
 	// Forward declare most things, don't want to pollute the header files too much
 	class Camera;
 	class SubMesh;
-	class Light;
 	class Shader;
-	class Material;
 	class UniformBuffer;
 	class StorageBuffer;
-	class Texture;
 
-	extern template class Asset<Material>;
 	extern template class Asset<Shader>;
 	extern template class Asset<SubMesh>;
-	extern template class Asset<Texture>;
 
-	struct DirectionalLight
-	{
-	public:
-		glm::vec3 direction;
-	private:
-		float padding01 = 0.0f;
-	public:
-		glm::vec3 color;
-	private:
-		float padding02 = 0.0f;
-	public:
-		glm::mat4 worldToLight;
-		glm::vec4 offset = { 0.0f, 0.0f, 0.0f, 0.0f }; // xy - offset, z - size, w - bias
-
-	public:
-		DirectionalLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);
-
-		uint64_t Hash();
-	};
-
-	struct PointLight
-	{
-	public:
-		glm::vec4 position; // w - range
-		glm::vec4 color; // w - 1.0 / (range * range)
-
-	public:
-		PointLight(const glm::vec3& position, const Light& light);
-
-		uint64_t Hash();
-	};
-
-	struct SpotLight
-	{
-	public:
-		glm::mat4 objectToWorld;
-		glm::vec4 color; // w - 1.0 / (range * range)
-		glm::mat4 worldToLight;
-		glm::vec4 offset = { 0.0f, 0.0f, 0.0f, 0.0f }; // xy - offset, z - size, w - bias
-
-	public:
-		SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);
-
-		uint64_t Hash();
-	};
-
-	struct EnvironmentData
-	{
-		Asset<Material> skyboxMaterial;
-		Asset<Texture> irradianceMap;
-		Asset<Texture> specularMap;
-		std::vector<DirectionalLight> directionalLights;
-		std::vector<PointLight> pointLights;
-		std::vector<SpotLight> spotLights;
-	};
+	extern template class ::std::shared_ptr<StorageBuffer>;
+	extern template class ::std::shared_ptr<UniformBuffer>;
 
 	struct CameraData
 	{

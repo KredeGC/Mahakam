@@ -49,7 +49,7 @@ namespace Mahakam
 			{
 				auto& relation = entity.GetComponent<RelationshipComponent>();
 
-				if (!relation.Parent)
+				if (relation.Parent == entt::null)
 					SerializeEntity(emitter, entity);
 			}
 			else
@@ -213,7 +213,7 @@ namespace Mahakam
 		{
 			RelationshipComponent& relation = entity.GetComponent<RelationshipComponent>();
 
-			if (relation.Parent)
+			if (relation.Parent != entt::null)
 			{
 				emitter << YAML::Key << "Parent";
 				emitter << YAML::Value << uint32_t(relation.Parent);
@@ -239,12 +239,12 @@ namespace Mahakam
 		{
 			RelationshipComponent& relation = entity.GetComponent<RelationshipComponent>();
 
-			Entity current = relation.First;
+			Entity current = entity.GetFirstChild();
 			while (current)
 			{
 				SerializeEntity(emitter, current);
 
-				current = current.GetComponent<RelationshipComponent>().Next;
+				current = current.GetNext();
 			}
 		}
 	}

@@ -66,7 +66,7 @@ namespace Mahakam
 		// Lights
 		glm::quat rot = glm::quat({ -0.7f, -glm::radians(45.0f), 0.0f });
 		Light light(Light::LightType::Directional, 10.0f, { 1.0f, 1.0f, 1.0f });
-		m_SceneData->environment.directionalLights.push_back({ glm::vec3{ 0.0f }, rot, light });
+		m_SceneData->environment.DirectionalLights.push_back({ glm::vec3{ 0.0f }, rot, light });
 
 		// Camera
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 0, 2 });
@@ -94,9 +94,9 @@ namespace Mahakam
 		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/internal/previewirradiance.hdr.import");
 		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/internal/previewspecular.hdr.import");
 
-		m_SceneData->environment.skyboxMaterial = skyboxMaterial;
-		m_SceneData->environment.irradianceMap = skyboxIrradiance;
-		m_SceneData->environment.specularMap = skyboxSpecular;
+		m_SceneData->environment.SkyboxMaterial = skyboxMaterial;
+		m_SceneData->environment.IrradianceMap = skyboxIrradiance;
+		m_SceneData->environment.SpecularMap = skyboxSpecular;
 
 		// Reset orbit angles
 		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };

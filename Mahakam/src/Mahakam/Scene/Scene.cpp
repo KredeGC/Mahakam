@@ -77,7 +77,7 @@ namespace Mahakam
 
 	static uint16_t RecursiveDepth(entt::registry& registry, const RelationshipComponent& relation)
 	{
-		if (relation.Parent)
+		if (relation.Parent != entt::null)
 			return 1 + RecursiveDepth(registry, registry.get<RelationshipComponent>(relation.Parent));
 		else
 			return 0;
@@ -88,25 +88,24 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
-		skyboxMaterial = Material::Create(skyboxShader);
-		skyboxMaterial->SetTexture("u_Environment", 0, GL::GetTextureCubeWhite());
+		m_Environment.SkyboxMaterial = Material::Create(skyboxShader);
+		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, GL::GetTextureCubeWhite());
 	}
 
 	Scene::Scene(const std::string& filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
-		// Idea:: Use RG11B10f instead, should halve memory usage
-		skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F });
-		skyboxIrradiance = TextureCube::Create(filepath, { 64, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false });
-		skyboxSpecular = TextureCube::Create(filepath, { 512, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true });
+		Asset<Texture> skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F });
+		m_Environment.IrradianceMap = TextureCube::Create(filepath, { 64, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false });
+		m_Environment.SpecularMap = TextureCube::Create(filepath, { 512, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true });
 
 		//skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
 		//skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
 
 		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
-		skyboxMaterial = Material::Create(skyboxShader);
-		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
+		m_Environment.SkyboxMaterial = Material::Create(skyboxShader);
+		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
 	}
 
 	Scene::~Scene() {}
@@ -119,11 +118,11 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - TransformComponent");
 
-			registry.view<RelationshipComponent, TransformComponent>().each([=](RelationshipComponent& relation, TransformComponent& transform)
+			m_Registry.view<RelationshipComponent, TransformComponent>().each([=](RelationshipComponent& relation, TransformComponent& transform)
 			{
-				if (relation.Parent && relation.Parent.HasComponent<TransformComponent>())
+				if (relation.Parent != entt::null && m_Registry.any_of<TransformComponent>(relation.Parent))
 				{
-					auto& parentTransform = relation.Parent.GetComponent<TransformComponent>();
+					auto& parentTransform = m_Registry.get<TransformComponent>(relation.Parent);
 					const glm::mat4& parentMatrix = parentTransform.GetModelMatrix();
 
 					transform.UpdateModelMatrix(parentMatrix);
@@ -139,7 +138,7 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - AudioSourceComponent");
 
-			registry.view<TransformComponent, AudioSourceComponent>().each([=](TransformComponent& transformComponent, AudioSourceComponent& audioSourceComponent)
+			m_Registry.view<TransformComponent, AudioSourceComponent>().each([=](TransformComponent& transformComponent, AudioSourceComponent& audioSourceComponent)
 			{
 				auto source = audioSourceComponent.GetAudioSource();
 				source->SetPosition(transformComponent.GetPosition());
@@ -150,7 +149,7 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - AnimatorComponent");
 
-			registry.view<AnimatorComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
+			m_Registry.view<AnimatorComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
 			{
 				/*auto& animator = animatorComponent.GetAnimator();
 
@@ -169,7 +168,7 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - SkinComponent");
 
-			registry.view<SkinComponent, MeshComponent>().each([=](entt::entity entity, SkinComponent& skinComponent, MeshComponent& meshComponent)
+			m_Registry.view<SkinComponent, MeshComponent>().each([=](entt::entity entity, SkinComponent& skinComponent, MeshComponent& meshComponent)
 			{
 				if (!meshComponent.HasMesh()) return;
 
@@ -188,7 +187,7 @@ namespace Mahakam
 
 						if (boneEntity)
 						{
-							glm::mat4 transform = glm::inverse(registry.get<TransformComponent>(entity).GetModelMatrix())
+							glm::mat4 transform = glm::inverse(m_Registry.get<TransformComponent>(entity).GetModelMatrix())
 								* boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
 								* bone.offset;
 							material->SetMat4("finalBonesMatrices[" + std::to_string(bone.id) + "]", transform);
@@ -203,7 +202,7 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - AudioListenerComponent");
 
-			registry.view<TransformComponent, AudioListenerComponent>().each([&](TransformComponent& transform, AudioListenerComponent& audio)
+			m_Registry.view<TransformComponent, AudioListenerComponent>().each([&](TransformComponent& transform, AudioListenerComponent& audio)
 			{
 				listener = &transform;
 			});
@@ -219,7 +218,7 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - CameraComponent");
 
-			registry.view<TransformComponent, CameraComponent>().each([&](TransformComponent& transformComponent, CameraComponent& cameraComponent)
+			m_Registry.view<TransformComponent, CameraComponent>().each([&](TransformComponent& transformComponent, CameraComponent& cameraComponent)
 			{
 				mainCamera = &cameraComponent;
 				mainTransform = &transformComponent;
@@ -238,18 +237,16 @@ namespace Mahakam
 		// Recalculate all projection matrices, if they've changed
 		camera.RecalculateProjectionMatrix();
 
-		EnvironmentData environment
-		{
-			skyboxMaterial,
-			skyboxIrradiance,
-			skyboxSpecular
-		};
-
 		// Setup scene lights
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - LightComponent");
 
-			registry.view<TransformComponent, LightComponent>().each([&](TransformComponent& transformComponent, LightComponent& lightComponent)
+			// Clear previous lights
+			m_Environment.DirectionalLights.clear();
+			m_Environment.PointLights.clear();
+			m_Environment.SpotLights.clear();
+
+			m_Registry.view<TransformComponent, LightComponent>().each([&](TransformComponent& transformComponent, LightComponent& lightComponent)
 			{
 				const glm::mat4& modelMatrix = transformComponent;
 
@@ -263,20 +260,20 @@ namespace Mahakam
 				switch (light.GetLightType())
 				{
 				case Light::LightType::Directional:
-					environment.directionalLights.push_back({ glm::vec3{ cameraTransform[3] }, rot, light });
+					m_Environment.DirectionalLights.push_back({ glm::vec3{ cameraTransform[3] }, rot, light });
 					break;
 				case Light::LightType::Point:
-					environment.pointLights.push_back({ pos, light });
+					m_Environment.PointLights.push_back({ pos, light });
 					break;
 				case Light::LightType::Spot:
-					environment.spotLights.push_back({ pos, rot, light });
+					m_Environment.SpotLights.push_back({ pos, rot, light });
 					break;
 				}
 			});
 		}
 
 		// Update particle systems
-		/*auto particleView = registry.view<TransformComponent, ParticleSystemComponent>();
+		/*auto particleView = m_Registry.view<TransformComponent, ParticleSystemComponent>();
 		{
 			MH_PROFILE_RENDERING_SCOPE("Mahakam::Scene::OnUpdate - ParticleSystemComponent");
 
@@ -291,13 +288,13 @@ namespace Mahakam
 		// Begin the render loop
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - Render loop");
-			Renderer::BeginScene(camera, cameraTransform, environment);
+			Renderer::BeginScene(camera, cameraTransform, m_Environment);
 
 			// Render each entity with a mesh
 			{
 				MH_PROFILE_SCOPE("Scene::OnUpdate - Submit");
 
-				registry.view<TransformComponent, MeshComponent>().each([&](TransformComponent& transformComponent, MeshComponent& meshComponent)
+				m_Registry.view<TransformComponent, MeshComponent>().each([&](TransformComponent& transformComponent, MeshComponent& meshComponent)
 				{
 					if (!meshComponent.HasMesh()) return;
 
@@ -319,7 +316,7 @@ namespace Mahakam
 			{
 				MH_PROFILE_SCOPE("Scene::OnUpdate - SubmitParticles");
 
-				registry.view<TransformComponent, ParticleSystemComponent>().each([=](TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
+				m_Registry.view<TransformComponent, ParticleSystemComponent>().each([=](TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
 				{
 					Renderer::SubmitParticles(transformComponent, particleComponent);
 				});
@@ -333,16 +330,16 @@ namespace Mahakam
 	{
 		// In editor this is called by SceneViewPanel / GameViewPanel
 		// In release this is called by EditorLayer.OnWindowResize
-		viewportRatio = (float)width / (float)height;
+		m_ViewportRatio = (float)width / (float)height;
 
-		auto cameras = registry.view<CameraComponent>();
+		auto cameras = m_Registry.view<CameraComponent>();
 		for (auto& entity : cameras)
 		{
 			CameraComponent& cameraComponent = cameras.get<CameraComponent>(entity);
 
 			if (!cameraComponent.HasFixedAspectRatio())
 			{
-				cameraComponent.GetCamera().SetRatio(viewportRatio);
+				cameraComponent.GetCamera().SetRatio(m_ViewportRatio);
 			}
 		}
 	}
@@ -350,7 +347,7 @@ namespace Mahakam
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		std::string tagName = name.empty() ? "Entity" : name;
-		Entity entity(registry.create(), this);
+		Entity entity(m_Registry.create(), this);
 		auto& tag = entity.AddComponent<TagComponent>(tagName);
 		auto& relation = entity.AddComponent<RelationshipComponent>();
 		return entity;
@@ -358,15 +355,15 @@ namespace Mahakam
 
 	void Scene::DestroyEntity(Entity entity)
 	{
-		registry.destroy(entity);
+		m_Registry.destroy(entity);
 	}
 
 	void Scene::Sort()
 	{
-		registry.sort<RelationshipComponent>([&](const RelationshipComponent& clhs, const RelationshipComponent& crhs)
+		m_Registry.sort<RelationshipComponent>([&](const RelationshipComponent& clhs, const RelationshipComponent& crhs)
 		{
-			uint16_t lhsDepth = RecursiveDepth(registry, clhs);
-			uint16_t rhsDepth = RecursiveDepth(registry, crhs);
+			uint16_t lhsDepth = RecursiveDepth(m_Registry, clhs);
+			uint16_t rhsDepth = RecursiveDepth(m_Registry, crhs);
 
 			// TODO: Store the depth somehow
 			// Possibly sort by parents as well
@@ -379,13 +376,13 @@ namespace Mahakam
 
 		//registry.sort<RelationshipComponent, TransformComponent>();
 
-		registry.sort<TransformComponent>([&](const entt::entity lhs, const entt::entity rhs)
+		m_Registry.sort<TransformComponent>([&](const entt::entity lhs, const entt::entity rhs)
 		{
-			auto& clhs = registry.get<RelationshipComponent>(lhs);
-			auto& crhs = registry.get<RelationshipComponent>(rhs);
+			auto& clhs = m_Registry.get<RelationshipComponent>(lhs);
+			auto& crhs = m_Registry.get<RelationshipComponent>(rhs);
 
-			uint16_t lhsDepth = RecursiveDepth(registry, clhs);
-			uint16_t rhsDepth = RecursiveDepth(registry, crhs);
+			uint16_t lhsDepth = RecursiveDepth(m_Registry, clhs);
+			uint16_t rhsDepth = RecursiveDepth(m_Registry, crhs);
 
 			// TODO: Store the depth somehow
 			// Possibly sort by parents as well

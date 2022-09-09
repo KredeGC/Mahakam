@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Mahakam/Renderer/FrameBuffer.h"
-#include "Mahakam/Renderer/RenderBuffer.h"
-#include "Mahakam/Renderer/Texture.h"
 
 namespace Mahakam
 {
@@ -30,10 +28,10 @@ namespace Mahakam
 
 		virtual const std::vector<Asset<RenderBuffer>>& GetColorBuffers() const override { return colorAttachments; }
 		virtual Asset<RenderBuffer> GetColorBuffer(int index) const override { return colorAttachments[index]; }
-		virtual Asset<Texture> GetColorTexture(int index) const override { return colorAttachments[index]; }
+		virtual Asset<Texture> GetColorTexture(int index) const override;
 
 		virtual Asset<RenderBuffer> GetDepthBuffer() const override { return depthAttachment; }
-		virtual Asset<Texture> GetDepthTexture() const override { return depthAttachment; }
+		virtual Asset<Texture> GetDepthTexture() const override;
 
 		virtual const FrameBufferProps& GetSpecification() const override { return props; }
 

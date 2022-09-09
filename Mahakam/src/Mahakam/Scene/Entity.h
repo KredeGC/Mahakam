@@ -9,25 +9,27 @@ namespace Mahakam
 {
 	class Scene;
 
+	struct RelationshipComponent;
+
 	class Entity
 	{
 	private:
-		entt::entity handle = entt::null;
-		Scene* scene = nullptr;
+		entt::entity m_Handle = entt::null;
+		Scene* m_Scene = nullptr;
 
 	public:
 		Entity() = default;
 		Entity(entt::entity handle, Scene* scene);
 		Entity(const Entity& ent) = default;
 
-		operator bool() const { return handle != entt::null; }
-		operator entt::entity() const { return handle; }
-		operator uint32_t() const { return (uint32_t)handle; }
-		operator Scene*() const { return scene; }
+		operator bool() const { return m_Handle != entt::null; }
+		operator entt::entity() const { return m_Handle; }
+		operator uint32_t() const { return (uint32_t)m_Handle; }
+		operator Scene*() const { return m_Scene; }
 
 		bool operator==(const Entity& other) const
 		{
-			return handle == other.handle && scene == other.scene;
+			return m_Handle == other.m_Handle && m_Scene == other.m_Scene;
 		}
 		bool operator!=(const Entity& other) const
 		{
@@ -36,6 +38,9 @@ namespace Mahakam
 
 		void SetParent(Entity parent);
 		Entity GetParent() const;
+		Entity GetFirstChild() const;
+		Entity GetNext() const;
+		Entity GetPrev() const;
 		void Delete();
 
 		bool IsValid() const;
@@ -57,6 +62,10 @@ namespace Mahakam
 
 		template<typename T>
 		bool HasComponent() const;
+
+	private:
+		static void ClearParent(Entity entity, RelationshipComponent& relation);
+		static void MarkForDeletion(Entity entity, RelationshipComponent& relation);
 	};
 }
 
@@ -69,7 +78,7 @@ namespace Mahakam
 	{
 		MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
 
-		scene->registry.template emplace<T>(handle, std::forward<Args>(args)...);
+		m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
 	}
 
 	template<typename T, typename... Args>
@@ -77,9 +86,9 @@ namespace Mahakam
 	{
 		MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
 
-		T& component = scene->registry.template emplace<T>(handle, std::forward<Args>(args)...);
+		T& component = m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
 
-		scene->OnComponentAdded<T>(*this, component);
+		m_Scene->OnComponentAdded<T>(*this, component);
 
 		return component;
 	}
@@ -87,7 +96,7 @@ namespace Mahakam
 	template<typename T>
 	T* Entity::TryGetComponent() const
 	{
-		return scene->registry.template try_get<T>(handle);
+		return m_Scene->m_Registry.template try_get<T>(m_Handle);
 	}
 
 	template<typename T>
@@ -95,7 +104,7 @@ namespace Mahakam
 	{
 		MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
 
-		return scene->registry.template get<T>(handle);
+		return m_Scene->m_Registry.template get<T>(m_Handle);
 	}
 
 	template<typename T>
@@ -103,13 +112,13 @@ namespace Mahakam
 	{
 		MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
 
-		return scene->registry.template remove<T>(handle);
+		return m_Scene->m_Registry.template remove<T>(m_Handle);
 	}
 
 	template<typename T>
 	bool Entity::HasComponent() const
 	{
-		return scene->registry.template any_of<T>(handle);
+		return m_Scene->m_Registry.template any_of<T>(m_Handle);
 	}
 }
 
@@ -123,5 +132,4 @@ namespace std {
 				^ (hash<uint32_t>()(k) << 1);
 		}
 	};
-
 }

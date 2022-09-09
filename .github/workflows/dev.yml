@@ -21,7 +21,7 @@ jobs:
     - name: Run premake
       run: premake5 gmake2 --toolset=clang --unity
     - name: Build
-      run: premake5 build --toolset=clang --config=debug --unity
+      run: premake5 build --config=debug
       env:
         CC: clang
         CXX: clang++
