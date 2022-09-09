@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <iterator>
 #include <memory>
 #include <utility>
