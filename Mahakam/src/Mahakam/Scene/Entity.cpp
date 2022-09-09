@@ -125,9 +125,6 @@ namespace Mahakam
 		}
 
 		if (!entity.m_Scene->m_Registry.any_of<DeleteComponent>(entity))
-		{
-			entity.AddEmptyComponent<DeleteComponent>();
 			entity.m_Scene->m_Registry.emplace<DeleteComponent>(entity);
-		}
 	}
 }

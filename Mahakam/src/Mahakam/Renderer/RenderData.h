@@ -22,14 +22,13 @@ namespace Mahakam
 	class Camera;
 	class SubMesh;
 	class Shader;
+	class Material;
 	class UniformBuffer;
 	class StorageBuffer;
 
+	extern template class Asset<Material>;
 	extern template class Asset<Shader>;
 	extern template class Asset<SubMesh>;
-
-	extern template class ::std::shared_ptr<StorageBuffer>;
-	extern template class ::std::shared_ptr<UniformBuffer>;
 
 	struct CameraData
 	{
@@ -82,7 +81,7 @@ namespace Mahakam
 		//  30 bits - Depth
 		//  16 bits - Mesh index
 		//  16 bits - Transform index
-		std::vector<uint64_t> renderQueue;
+		TrivialVector<uint64_t> renderQueue;
 
 		UnorderedMap<Asset<Shader>, uint64_t> shaderRefLookup;
 		UnorderedMap<Asset<Material>, uint64_t> materialRefLookup;
@@ -97,7 +96,7 @@ namespace Mahakam
 		// 32 bits - Depth
 		// 16 bits - ParticleSystem index
 		// 16 bits - Transform index
-		std::vector<uint64_t> particleQueue;
+		TrivialVector<uint64_t> particleQueue;
 
 		UnorderedMap<uint64_t, ParticleSystem> particleIDLookup;
 

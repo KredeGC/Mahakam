@@ -6,6 +6,8 @@ namespace Mahakam::Editor
 	void StatsPanel::OnUpdate(Timestep dt)
 	{
 		m_Frametime = dt;
+
+		m_SmoothDelta = 0.99f * m_SmoothDelta + 0.01f * dt;
 	}
 
 	void StatsPanel::OnImGuiRender()
@@ -16,11 +18,12 @@ namespace Mahakam::Editor
 
 			if (ImGui::Begin("Performance Stats", &m_Open))
 			{
-				ImGui::Text("Graphics unit: %s", GL::GetGraphicsVendor());
-				ImGui::Text("Drawcalls: %d", results.drawCalls);
-				ImGui::Text("Vertex count: %d", results.vertexCount);
-				ImGui::Text("Tri count: %d", results.triCount);
-				ImGui::Text("Frametime: %.3d fps (%.3f ms)", (int)(1.0f / m_Frametime), m_Frametime.GetMilliSeconds());
+				ImGui::TextWrapped("Graphics unit: %s", GL::GetGraphicsVendor());
+				ImGui::TextWrapped("Drawcalls: %d", results.drawCalls);
+				ImGui::TextWrapped("Vertex count: %d", results.vertexCount);
+				ImGui::TextWrapped("Tri count: %d", results.triCount);
+				ImGui::TextWrapped("Frametime: %.3d fps (%.3f ms)", (int)(1.0f / m_Frametime), m_Frametime.GetMilliSeconds());
+				ImGui::TextWrapped("Smooth Frametime: %.3d fps (%.3f ms)", (int)(1.0f / m_SmoothDelta), m_SmoothDelta.GetMilliSeconds());
 			}
 			ImGui::End();
 		}

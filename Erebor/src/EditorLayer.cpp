@@ -477,10 +477,6 @@ namespace Mahakam::Editor
 
 		m_DockSpace.End();
 #endif
-
-#ifdef MH_ENABLE_PROFILING
-		Profiler::ClearResults();
-#endif
 	}
 
 	void EditorLayer::OnEvent(Event& event)

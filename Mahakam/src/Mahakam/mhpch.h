@@ -33,6 +33,7 @@
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Timestep.h"
 #include "Mahakam/Core/FileUtility.h"
+#include "Mahakam/Core/tri_vector.h"
 #include "Mahakam/Core/Window.h"
 
 #include "Mahakam/Events/ApplicationEvent.h"

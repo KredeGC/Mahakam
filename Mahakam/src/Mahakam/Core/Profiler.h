@@ -3,7 +3,6 @@
 #include "Core.h"
 
 #include <chrono>
-#include <vector>
 #include <thread>
 
 namespace Mahakam
@@ -13,7 +12,7 @@ namespace Mahakam
 	public:
 		struct ProfileResult
 		{
-			std::string Name;
+			const char* Name;
 			uint16_t Count;
 
 			std::chrono::duration<double, std::micro> Start;
@@ -22,34 +21,29 @@ namespace Mahakam
 		};
 
 	private:
-		const char* name;
-		std::chrono::steady_clock::time_point startPoint;
-		bool stopped;
-		bool flushRenderer;
-		static std::vector<ProfileResult> results;
+		const char* m_Name;
+		bool m_FlushRenderer;
+		bool m_Stopped;
+		std::chrono::steady_clock::time_point m_StartPoint;
+		inline static TrivialVector<ProfileResult> s_ResultsFwd;
+		inline static TrivialVector<ProfileResult> s_ResultsBck;
 
 	public:
 		Profiler(const char* name, bool flushRenderer)
-			: name(name), stopped(false), flushRenderer(flushRenderer)
+			: m_Name(name), m_FlushRenderer(flushRenderer), m_Stopped(false)
 		{
 #ifdef MH_ENABLE_PROFILING
-			startPoint = std::chrono::steady_clock::now();
+			m_StartPoint = std::chrono::steady_clock::now();
 #endif
 		}
 
 #ifdef MH_ENABLE_PROFILING
-		~Profiler()
-		{
-			if (!stopped)
-				Stop();
-		}
-#endif
-
-		void Stop();
+		~Profiler();
 
 		static void AddResult(const char* name, std::chrono::time_point<std::chrono::steady_clock> startTime, std::chrono::time_point<std::chrono::steady_clock> endTime);
+#endif
 
 		static void ClearResults();
-		static const std::vector<ProfileResult>& GetResults();
+		static const TrivialVector<ProfileResult>& GetResults();
 	};
 }

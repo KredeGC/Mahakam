@@ -24,19 +24,19 @@ namespace Mahakam
 
 	struct DirectionalLight
 	{
-	public:
 		glm::vec3 direction;
-	private:
 		float padding01 = 0.0f;
-	public:
 		glm::vec3 color;
-	private:
 		float padding02 = 0.0f;
-	public:
 		glm::mat4 worldToLight;
 		glm::vec4 offset = { 0.0f, 0.0f, 0.0f, 0.0f }; // xy - offset, z - size, w - bias
 
+		DirectionalLight() = default;
+		DirectionalLight(const DirectionalLight&) = default;
+		DirectionalLight(DirectionalLight&&) = default;
 		DirectionalLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);
+
+		DirectionalLight& operator=(const DirectionalLight&) = default;
 
 		uint64_t Hash();
 	};
@@ -46,7 +46,12 @@ namespace Mahakam
 		glm::vec4 position; // w - range
 		glm::vec4 color; // w - 1.0 / (range * range)
 
+		PointLight() = default;
+		PointLight(const PointLight&) = default;
+		PointLight(PointLight&&) = default;
 		PointLight(const glm::vec3& position, const Light& light);
+
+		PointLight& operator=(const PointLight&) = default;
 
 		uint64_t Hash();
 	};
@@ -58,7 +63,12 @@ namespace Mahakam
 		glm::mat4 worldToLight;
 		glm::vec4 offset = { 0.0f, 0.0f, 0.0f, 0.0f }; // xy - offset, z - size, w - bias
 
+		SpotLight() = default;
+		SpotLight(const SpotLight&) = default;
+		SpotLight(SpotLight&&) = default;
 		SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light);
+
+		SpotLight& operator=(const SpotLight&) = default;
 
 		uint64_t Hash();
 	};
@@ -68,8 +78,8 @@ namespace Mahakam
 		Asset<Material> SkyboxMaterial;
 		Asset<TextureCube> IrradianceMap;
 		Asset<TextureCube> SpecularMap;
-		std::vector<DirectionalLight> DirectionalLights;
-		std::vector<PointLight> PointLights;
-		std::vector<SpotLight> SpotLights;
+		TrivialVector<DirectionalLight> DirectionalLights;
+		TrivialVector<PointLight> PointLights;
+		TrivialVector<SpotLight> SpotLights;
 	};
 }

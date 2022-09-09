@@ -5,13 +5,6 @@
 
 namespace Mahakam
 {
-	class StorageBuffer;
-	class UniformBuffer;
-
-	extern template class ::std::shared_ptr<StorageBuffer>;
-	extern template class ::std::shared_ptr<UniformBuffer>;
-
-
 	class StorageBuffer
 	{
 	public:

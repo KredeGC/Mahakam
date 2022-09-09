@@ -10,6 +10,8 @@ namespace Mahakam::Editor
 	{
 	private:
 		Timestep m_Frametime = 0.0f;
+		Timestep m_SmoothDelta = 0.0f;
+
 		bool m_Open = true;
 
 	public:

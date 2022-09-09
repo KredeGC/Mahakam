@@ -8,38 +8,35 @@
 
 namespace Mahakam
 {
-	std::vector<Profiler::ProfileResult> Profiler::results;
-
-	void Profiler::Stop()
-	{
 #ifdef MH_ENABLE_PROFILING
-		stopped = true;
+	Profiler::~Profiler()
+	{
+		if (!m_Stopped)
+		{
+			m_Stopped = true;
 
-		auto endPoint = std::chrono::steady_clock::now();
+			auto endPoint = std::chrono::steady_clock::now();
 
 #ifdef MH_ENABLE_RENDER_PROFILING
-		if (flushRenderer)
-		{
-			GL::FinishRendering();
+			if (m_FlushRenderer)
+			{
+				GL::FinishRendering();
 
-			auto renderPoint = std::chrono::steady_clock::now();
+				auto renderPoint = std::chrono::steady_clock::now();
 
-			AddResult(name, startPoint, renderPoint);
-			AddResult("Waiting on GPU", endPoint, renderPoint);
-		}
-		else
-		{
-			AddResult(name, startPoint, endPoint);
-		}
-#else
-		AddResult(name, startPoint, endPoint);
+				AddResult(m_Name, m_StartPoint, renderPoint);
+				AddResult("Waiting on GPU", endPoint, renderPoint);
+			}
+			else
 #endif
-#endif
+			{
+				AddResult(m_Name, m_StartPoint, endPoint);
+			}
+		}
 	}
 
 	void Profiler::AddResult(const char* name, std::chrono::time_point<std::chrono::steady_clock> startTime, std::chrono::time_point<std::chrono::steady_clock> endTime)
 	{
-#ifdef MH_ENABLE_PROFILING
 		auto start = std::chrono::time_point_cast<std::chrono::microseconds>(startTime).time_since_epoch();
 		auto end = std::chrono::time_point_cast<std::chrono::microseconds>(endTime).time_since_epoch();
 
@@ -49,26 +46,32 @@ namespace Mahakam
 
 		Instrumentor::Get().WriteProfile(result);
 
-		auto iter = results.rbegin();
-		if (iter != results.rend() && iter->Name == name)
+		auto iter = s_ResultsBck.rbegin();
+		if (iter != s_ResultsBck.rend() && iter->Name == name)
 		{
 			iter->Count++;
 			iter->ElapsedTime += duration;
 		}
 		else
 		{
-			results.push_back(result);
+			s_ResultsBck.push_back(result);
 		}
-#endif
 	}
+#endif
 
 	void Profiler::ClearResults()
 	{
-		results.clear();
+#ifdef MH_ENABLE_PROFILING
+		s_ResultsFwd.resize(s_ResultsBck.size());
+
+		s_ResultsFwd = s_ResultsBck;
+
+		s_ResultsBck.clear();
+#endif
 	}
 
-	const std::vector<Profiler::ProfileResult>& Profiler::GetResults()
+	const TrivialVector<Profiler::ProfileResult>& Profiler::GetResults()
 	{
-		return results;
+		return s_ResultsFwd;
 	}
 }

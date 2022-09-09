@@ -70,6 +70,10 @@ namespace Mahakam
 			imGuiLayer->End();
 
 			window->OnUpdate();
+
+#ifdef MH_ENABLE_PROFILING
+			Profiler::ClearResults();
+#endif
 		}
 	}
 
