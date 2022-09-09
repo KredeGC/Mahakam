@@ -8,12 +8,12 @@ namespace Mahakam
 
 	struct WindowProps
 	{
-		std::string title;
-		std::string iconpath;
-		uint32_t width, height;
+		std::string Title;
+		std::string Iconpath;
+		uint32_t Width, Height;
 
 		WindowProps(const std::string& title = "Mahakam", const std::string& iconpath = "", uint32_t width = 1600, uint32_t height = 900)
-			: title(title), iconpath(iconpath), width(width), height(height) {}
+			: Title(title), Iconpath(iconpath), Width(width), Height(height) {}
 	};
 
 	class Window

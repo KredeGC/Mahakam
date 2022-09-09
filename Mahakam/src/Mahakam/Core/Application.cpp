@@ -18,13 +18,15 @@ namespace Mahakam
 
 	Application::Application(const WindowProps& props)
 	{
+		MH_PROFILE_FUNCTION();
+
 		MH_CORE_ASSERT(!instance, "Application instance already created!");
 		instance = this;
 
 		window = Window::Create(props);
 		window->SetEventCallback(MH_BIND_EVENT(Application::OnEvent));
 
-		Renderer::Init(props.width, props.height);
+		Renderer::Init(props.Width, props.Height);
 
 		AudioEngine::Init();
 
@@ -50,8 +52,6 @@ namespace Mahakam
 
 	void Application::Run()
 	{
-		MH_PROFILE_FUNCTION();
-
 		while (running)
 		{
 			double time = window->GetTime();

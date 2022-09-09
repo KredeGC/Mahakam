@@ -86,7 +86,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_ASSERT(attachmentSlot < colorAttachments.size(), "Index outside range of framebuffer textures!");
+		MH_CORE_ASSERT(attachmentSlot < m_ColorAttachments.size(), "Index outside range of framebuffer textures!");
 
 		auto& spec = m_Props.ColorAttachments[attachmentSlot];
 

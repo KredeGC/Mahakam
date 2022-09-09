@@ -3,10 +3,6 @@
 #include "Mahakam/Core/Core.h"
 
 #if MH_PLATFORM_WINDOWS
-// #ifndef _WINDEF_
-// struct HINSTANCE__; // Forward or never
-// typedef HINSTANCE__* HINSTANCE;
-// #endif
 #include <windows.h>
 #elif MH_PLATFORM_LINUX
 #include <dlfcn.h>

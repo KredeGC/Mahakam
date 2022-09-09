@@ -34,9 +34,9 @@ namespace Mahakam {
 	{
 		MH_PROFILE_FUNCTION();
 
-		data.title = props.title;
-		data.width = props.width;
-		data.height = props.height;
+		m_Data.Title = props.Title;
+		m_Data.Width = props.Width;
+		m_Data.Height = props.Height;
 
 		if (!glfwInitialized)
 		{
@@ -54,7 +54,7 @@ namespace Mahakam {
 			MH_CORE_INFO("Initialized GLFW version {0}.{1}.{2}", major, minor, rev);
 		}
 
-		MH_CORE_INFO("Creating GLFW window {0} ({1}, {2})", props.title, props.width, props.height);
+		MH_CORE_INFO("Creating GLFW window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -65,7 +65,7 @@ namespace Mahakam {
 		// Loading the window icon
 		stbi_set_flip_vertically_on_load(0);
 		int width, height;
-		unsigned char* pixels = stbi_load(props.iconpath.c_str(), &width, &height, 0, 4);
+		unsigned char* pixels = stbi_load(props.Iconpath.c_str(), &width, &height, 0, 4);
 		GLFWimage* icon = new GLFWimage
 		{
 			width,
@@ -77,7 +77,7 @@ namespace Mahakam {
 		// Creating the window
 #ifndef MH_RUNTIME
 		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-		window = glfwCreateWindow((int)data.width, (int)data.height, data.title.c_str(), nullptr, nullptr);
+		m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 #else
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
@@ -86,37 +86,37 @@ namespace Mahakam {
 
 		window = glfwCreateWindow(width, height, data.title.c_str(), glfwGetPrimaryMonitor(), nullptr);
 #endif
-		context = RenderingContext::Create(window, (void*)glfwGetProcAddress);
-		context->Init();
-		glfwSetWindowUserPointer(window, &data);
+		m_Context = RenderingContext::Create(m_Window, (void*)glfwGetProcAddress);
+		m_Context->Init();
+		glfwSetWindowUserPointer(m_Window, &m_Data);
 		if (pixels)
-			glfwSetWindowIcon(window, 1, icon);
+			glfwSetWindowIcon(m_Window, 1, icon);
 		SetVSync(false);
 
-		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+		glfwSetInputMode(m_Window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 		// Callbacks
-		glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-			data.width = width;
-			data.height = height;
+			data.Width = width;
+			data.Height = height;
 
 			WindowResizeEvent event(width, height);
 
-			data.eventCallback(event);
+			data.EventCallback(event);
 		});
 
-		glfwSetWindowCloseCallback(window, [](GLFWwindow* window)
+		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			WindowCloseEvent event;
 
-			data.eventCallback(event);
+			data.EventCallback(event);
 		});
 
-		glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -125,34 +125,34 @@ namespace Mahakam {
 			case GLFW_PRESS:
 			{
 				KeyPressedEvent event(key, 0);
-				data.eventCallback(event);
+				data.EventCallback(event);
 				break;
 			}
 			case GLFW_RELEASE:
 			{
 				KeyReleasedEvent event(key);
-				data.eventCallback(event);
+				data.EventCallback(event);
 				break;
 			}
 			case GLFW_REPEAT:
 			{
 				KeyPressedEvent event(key, 1);
-				data.eventCallback(event);
+				data.EventCallback(event);
 				break;
 			}
 			}
 		});
 
-		glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int key)
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int key)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			KeyTypedEvent event(key);
 
-			data.eventCallback(event);
+			data.EventCallback(event);
 		});
 
-		glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods)
+		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -161,32 +161,32 @@ namespace Mahakam {
 			case GLFW_PRESS:
 			{
 				MouseButtonPressedEvent event(button);
-				data.eventCallback(event);
+				data.EventCallback(event);
 				break;
 			}
 			case GLFW_RELEASE:
 			{
 				MouseButtonReleasedEvent event(button);
-				data.eventCallback(event);
+				data.EventCallback(event);
 				break;
 			}
 			}
 		});
 
-		glfwSetScrollCallback(window, [](GLFWwindow* window, double xOffset, double yOffset)
+		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			MouseScrolledEvent event((float)xOffset, (float)yOffset);
-			data.eventCallback(event);
+			data.EventCallback(event);
 		});
 
-		glfwSetCursorPosCallback(window, [](GLFWwindow* window, double posX, double posY)
+		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double posX, double posY)
 		{
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 			MouseMovedEvent event((float)posX, (float)posY);
-			data.eventCallback(event);
+			data.EventCallback(event);
 		});
 	}
 
@@ -194,7 +194,7 @@ namespace Mahakam {
 	{
 		MH_PROFILE_FUNCTION();
 
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(m_Window);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
@@ -212,7 +212,7 @@ namespace Mahakam {
 		MH_PROFILE_FUNCTION();
 
 		glfwPollEvents();
-		context->SwapBuffers();
+		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
@@ -221,7 +221,7 @@ namespace Mahakam {
 
 		glfwSwapInterval(enabled ? 1 : 0);
 
-		data.vsync = enabled;
+		m_Data.VSync = enabled;
 	}
 
 	void WindowsWindow::SetCursorVisible(bool visible)
@@ -229,10 +229,10 @@ namespace Mahakam {
 		MH_PROFILE_FUNCTION();
 
 		if (visible)
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		else
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-		data.cursorVisible = visible;
+		m_Data.CursorVisible = visible;
 	}
 }
