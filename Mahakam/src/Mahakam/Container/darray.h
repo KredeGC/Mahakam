@@ -48,6 +48,15 @@ namespace Mahakam
 			}
 		}
 
+		darray(T* first, T* last, const Alloc& allocator = Alloc()) :
+			Alloc(allocator),
+			m_Begin(Alloc::allocate(size_t(last - first))),
+			m_End(m_Begin + size_t(last - first))
+		{
+			const size_t n = last - first;
+			memcpy(m_Begin, first, n * sizeof(T));
+		}
+
 		darray(const darray<T, Alloc>& other) :
 			Alloc(std::allocator_traits<Alloc>::select_on_container_copy_construction(static_cast<Alloc>(other))),
 			m_Begin(Alloc::allocate(other.size())),
@@ -58,7 +67,7 @@ namespace Mahakam
 			m_Begin(other.m_Begin),
 			m_End(other.m_End)
 		{
-			other.m_Begin = nullptr;
+			other.m_Begin = nullptr; // Is this a memory leak?
 			other.m_End = nullptr;
 		}
 
@@ -72,7 +81,8 @@ namespace Mahakam
 		{
 			const size_t n = other.size();
 
-			if (n > size()) {
+			if (n != size())
+			{
 				T* alBlock = Alloc::allocate(n);
 
 				if (m_Begin != nullptr)
@@ -131,5 +141,25 @@ namespace Mahakam
 		T& operator[](size_t index) noexcept { return m_Begin[index]; }
 
 		const T& operator[](size_t index) const noexcept { return m_Begin[index]; }
+
+
+		void assign(T* first, T* last)
+		{
+			const size_t n = last - first;
+
+			if (n != size())
+			{
+				T* alBlock = Alloc::allocate(n);
+
+				if (m_Begin != nullptr)
+					Alloc::deallocate(m_Begin, size());
+
+				m_Begin = alBlock;
+				m_End = m_Begin + n;
+			}
+
+			memcpy(m_Begin, other.m_Begin, n * sizeof(T));
+			return *this;
+		}
 	};
 }

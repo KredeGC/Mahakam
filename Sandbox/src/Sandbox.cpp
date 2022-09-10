@@ -139,7 +139,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	particleEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
-#if 1
+#if 0
 	// Create backpack model
 	//SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
 	Asset<Mesh> backpackModel = Mesh::LoadMesh("assets/models/backpack.gltf");
@@ -157,15 +157,16 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 #if 1
 	// Create glTF skinned model
 	Asset<Mesh> skinnedModel = Asset<Mesh>("import/assets/models/mannequin_clap.gltf.import");
+	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_twerk.gltf");
+	Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.gltf");
 
 	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
-
-	Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.gltf");
 
 	// Create backpack entity
 	Entity skinnedEntity = scene->CreateEntity("Skinned glTF");
 	skinnedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
 	skinnedEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
+	skinnedEntity.AddComponent<AnimatorComponent>().GetAnimator().SetAnimation(skinnedAnimation);
 	SkinComponent& skin = skinnedEntity.AddComponent<SkinComponent>();
 
 	boneEntities.reserve(skinnedModel->BoneCount);

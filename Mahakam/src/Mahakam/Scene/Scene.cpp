@@ -149,9 +149,42 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - AnimatorComponent");
 
-			m_Registry.view<AnimatorComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
+			m_Registry.view<AnimatorComponent, SkinComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
 			{
-				/*auto& animator = animatorComponent.GetAnimator();
+				auto& animator = animatorComponent.GetAnimator();
+
+				animator.Update(ts);
+
+				const auto& translations = animator.GetTranslations();
+				const auto& rotations = animator.GetRotations();
+				const auto& scales = animator.GetScales();
+
+				const auto& boneEntities = skinComponent.GetBoneEntities();
+				const auto& hierarchy = meshComponent.GetBoneHierarchy();
+				const auto& bones = meshComponent.GetBoneInfo();
+
+				//MH_CORE_ASSERT(translations.size() == boneEntities.size(), "H"); // TODO: Number of bones doesn't match?
+
+				for (size_t i = 0; i < boneEntities.size(); i++)
+				{
+					auto& index = hierarchy.at(i);
+					auto& boneEntity = boneEntities.at(i);
+
+					if (boneEntity)
+					{
+						if (TransformComponent* transform = boneEntity.TryGetComponent<TransformComponent>())
+						{
+							transform->SetPosition(translations.at(index.id));
+							transform->SetRotation(rotations.at(index.id));
+							transform->SetScale(scales.at(index.id));
+						}
+					}
+				}
+			});
+
+			/*m_Registry.view<AnimatorComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
+			{
+				auto& animator = animatorComponent.GetAnimator();
 
 				animator.UpdateAnimation(ts);
 
@@ -160,8 +193,8 @@ namespace Mahakam
 
 				for (auto& material : materials)
 					for (int j = 0; j < Animator::MAX_BONES; ++j)
-						material->SetMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);*/
-			});
+						material->SetMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
+			});*/
 		}
 
 		// Update SkinComponent
