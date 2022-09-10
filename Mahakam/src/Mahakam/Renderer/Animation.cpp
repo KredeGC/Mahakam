@@ -73,9 +73,6 @@ namespace Mahakam
 				const glm::vec3* values = reinterpret_cast<const glm::vec3*>(&outputBuffer.data[outputBufferView.byteOffset + outputAccessor.byteOffset]);
 
 				m_Translations[channel.target_node] = std::vector<glm::vec3>(values, values + outputAccessor.count);
-
-				/*MH_CORE_TRACE("{0}", model.nodes[channel.target_node].name);
-				MH_CORE_TRACE("{0}, {1}, {2}", (*values).x, (*values).y, (*values).z);*/
 			}
 			else if (channel.target_path == "rotation")
 			{

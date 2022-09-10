@@ -48,7 +48,7 @@ namespace Mahakam
 			}
 		}
 
-		darray(T* first, T* last, const Alloc& allocator = Alloc()) :
+		darray(const T* first, const T* last, const Alloc& allocator = Alloc()) :
 			Alloc(allocator),
 			m_Begin(Alloc::allocate(size_t(last - first))),
 			m_End(m_Begin + size_t(last - first))
@@ -137,13 +137,15 @@ namespace Mahakam
 
 		const T* data() const noexcept { return m_Begin; }
 
+		T& at(size_t index) const noexcept { return m_Begin[index]; }
+
 
 		T& operator[](size_t index) noexcept { return m_Begin[index]; }
 
 		const T& operator[](size_t index) const noexcept { return m_Begin[index]; }
 
 
-		void assign(T* first, T* last)
+		void assign(const T* first, const T* last)
 		{
 			const size_t n = last - first;
 
@@ -158,8 +160,7 @@ namespace Mahakam
 				m_End = m_Begin + n;
 			}
 
-			memcpy(m_Begin, other.m_Begin, n * sizeof(T));
-			return *this;
+			memcpy(m_Begin, first, n * sizeof(T));
 		}
 	};
 }

@@ -2,6 +2,8 @@
 
 #include "Mahakam/Asset/Asset.h"
 
+#include "Mahakam/Container/darray.h"
+
 #include <filesystem>
 #include <string>
 
@@ -26,7 +28,7 @@ namespace Mahakam
 		int m_AnimationIndex;
 
 		// TODO: Use darrays instead
-		std::vector<float> m_Timestamps;
+		darray<float> m_Timestamps;
 
 		UnorderedMap<int, std::vector<glm::vec3>> m_Translations;
 		UnorderedMap<int, std::vector<glm::quat>> m_Rotations;
@@ -36,9 +38,9 @@ namespace Mahakam
 		Animation(const std::filesystem::path& filepath, int index);
 
 		const std::string& GetName() const { return m_Name; }
-		float GetDuration() const { return *m_Timestamps.crbegin(); }
+		float GetDuration() const { return *m_Timestamps.rbegin(); }
 
-		const std::vector<float>& GetTimestamps() const { return m_Timestamps; }
+		const darray<float>& GetTimestamps() const { return m_Timestamps; }
 
 		const UnorderedMap<int, std::vector<glm::vec3>>& GetTranslations() const { return m_Translations; }
 		const UnorderedMap<int, std::vector<glm::quat>>& GetRotations() const { return m_Rotations; }
