@@ -72,7 +72,7 @@ namespace Mahakam
 		{
 			const size_t n = other.size();
 
-			if (n > capacity()) {
+			if (n > size()) {
 				T* alBlock = Alloc::allocate(n);
 
 				if (m_Begin != nullptr)
