@@ -11,7 +11,8 @@ jobs:
     strategy:
       matrix:
         config: [debug, debugoptimized, release]
-        tool:
+        option: [~, --standalone]
+        machine:
         - os: ubuntu-latest
           action: gmake2
           toolset: gcc
@@ -33,7 +34,12 @@ jobs:
           cxx: cl
           ld: link
           ar: cl
-    runs-on: ${{ matrix.tool.os }}
+        exclude:
+        - config: debug
+          option: --standalone
+        - config: debugoptimized
+          option: --standalone
+    runs-on: ${{ matrix.machine.os }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -42,33 +48,33 @@ jobs:
       with:
         version: "5.0.0-beta1"
     - name: Install X11
-      if: matrix.tool.os == 'ubuntu-latest'
+      if: matrix.machine.os == 'ubuntu-latest'
       run: |
           sudo apt update
           sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
     - name: Install GCC
-      if: matrix.tool.os == 'ubuntu-latest' && matrix.tool.toolset == 'gcc'
+      if: matrix.machine.os == 'ubuntu-latest' && matrix.machine.toolset == 'gcc'
       run: sudo apt install -y gcc g++
     - name: Install Clang & LLVM
-      if: matrix.tool.os == 'ubuntu-latest' && matrix.tool.toolset == 'clang'
+      if: matrix.machine.os == 'ubuntu-latest' && matrix.machine.toolset == 'clang'
       run: sudo apt install -y clang llvm lld
     - name: Install msbuild to PATH
-      if: matrix.tool.os == 'windows-latest' && matrix.tool.toolset == 'msc'
+      if: matrix.machine.os == 'windows-latest' && matrix.machine.toolset == 'msc'
       uses: microsoft/setup-msbuild@v1.1
     - name: Run premake
-      run: premake5 ${{ matrix.tool.action }} --toolset=${{ matrix.tool.toolset }} --unity
+      run: premake5 ${{ matrix.machine.action }} --toolset=${{ matrix.machine.toolset }} --unity
     - name: Build
-      run: premake5 build --config=${{ matrix.config }}
+      run: premake5 build --config=${{ matrix.config }} ${{ matrix.option }}
       env:
-        CC: ${{ matrix.tool.cc }}
-        CXX: ${{ matrix.tool.cxx }}
-        LD: ${{ matrix.tool.ld }}
-        AR: ${{ matrix.tool.ar }}
+        CC: ${{ matrix.machine.cc }}
+        CXX: ${{ matrix.machine.cxx }}
+        LD: ${{ matrix.machine.ld }}
+        AR: ${{ matrix.machine.ar }}
     - name: Upload build
       if: failure()
       uses: actions/upload-artifact@v3
       with: 
-        name: Build-${{ matrix.tool.os }}-${{ matrix.tool.toolset }}
+        name: Fail-${{ matrix.machine.os }}-${{ matrix.machine.toolset }}-${{ matrix.config }}
         if-no-files-found: error
         path: |
           Mahakam/bin/

@@ -6,7 +6,31 @@ on:
 
 jobs:
   Build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        machine:
+        - os: ubuntu-latest
+          action: gmake2
+          toolset: gcc
+          cc: gcc
+          cxx: g++
+          ld: ld
+          ar: ar
+        - os: ubuntu-latest
+          action: gmake2
+          toolset: clang
+          cc: clang
+          cxx: clang++
+          ld: ld.lld
+          ar: llvm-ar
+        - os: windows-latest
+          action: vs2019
+          toolset: msc
+          cc: cl
+          cxx: cl
+          ld: link
+          ar: cl
+    runs-on: ${{ matrix.machine.os }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -14,16 +38,26 @@ jobs:
       uses: abel0b/setup-premake@v2
       with:
         version: "5.0.0-beta1"
-    - name: Install X11 & Clang
+    - name: Install X11
+      if: matrix.machine.os == 'ubuntu-latest'
       run: |
           sudo apt update
-          sudo apt install -y clang llvm lld libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+          sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+    - name: Install GCC
+      if: matrix.machine.os == 'ubuntu-latest' && matrix.machine.toolset == 'gcc'
+      run: sudo apt install -y gcc g++
+    - name: Install Clang & LLVM
+      if: matrix.machine.os == 'ubuntu-latest' && matrix.machine.toolset == 'clang'
+      run: sudo apt install -y clang llvm lld
+    - name: Install msbuild to PATH
+      if: matrix.machine.os == 'windows-latest' && matrix.machine.toolset == 'msc'
+      uses: microsoft/setup-msbuild@v1.1
     - name: Run premake
-      run: premake5 gmake2 --toolset=clang --unity
+      run: premake5 ${{ matrix.machine.action }} --toolset=${{ matrix.machine.toolset }} --unity
     - name: Build
       run: premake5 build --config=debug
       env:
-        CC: clang
-        CXX: clang++
-        LD: ld.lld
-        AR: llvm-ar
+        CC: ${{ matrix.machine.cc }}
+        CXX: ${{ matrix.machine.cxx }}
+        LD: ${{ matrix.machine.ld }}
+        AR: ${{ matrix.machine.ar }}
