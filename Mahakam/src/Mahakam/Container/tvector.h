@@ -8,7 +8,7 @@
 namespace Mahakam
 {
 	template<typename T, typename Alloc = std::allocator<T>>
-	class tri_vector : private Alloc
+	class tvector : private Alloc
 	{
 		static_assert(std::is_standard_layout<T>(), "Template class needs standard layout");
 	private:
@@ -17,19 +17,28 @@ namespace Mahakam
 		T* m_EndMax;
 
 	public:
-		tri_vector(const Alloc& allocator = Alloc()) noexcept :
+		tvector(const Alloc& allocator = Alloc()) noexcept :
 			Alloc(allocator),
 			m_Begin(nullptr),
 			m_End(nullptr),
 			m_EndMax(nullptr) {}
 
-		tri_vector(size_t n, const Alloc& allocator = Alloc()) :
+		tvector(size_t n, const Alloc& allocator = Alloc()) :
 			Alloc(allocator),
 			m_Begin(Alloc::allocate(n)),
 			m_End(m_Begin + n),
 			m_EndMax(m_End) {}
 
-		tri_vector(std::initializer_list<T> initializer, const Alloc& allocator = Alloc()) :
+		tvector(size_t n, const T& value, const Alloc& allocator = Alloc()) :
+			Alloc(allocator),
+			m_Begin(Alloc::allocate(n)),
+			m_End(m_Begin + n),
+			m_EndMax(m_End)
+		{
+			std::uninitialized_fill_n<T*, size_t>(m_Begin, n, value);
+		}
+
+		tvector(std::initializer_list<T> initializer, const Alloc& allocator = Alloc()) :
 			Alloc(allocator),
 			m_Begin(Alloc::allocate(initializer.size())),
 			m_End(m_Begin + initializer.size()),
@@ -44,14 +53,13 @@ namespace Mahakam
 			}
 		}
 
-		tri_vector(const tri_vector<T, Alloc>& other) :
+		tvector(const tvector<T, Alloc>& other) :
 			Alloc(std::allocator_traits<Alloc>::select_on_container_copy_construction(static_cast<Alloc>(other))),
 			m_Begin(Alloc::allocate(other.size())),
 			m_End(m_Begin + other.size()),
 			m_EndMax(m_End) {}
 
-
-		tri_vector(tri_vector<T, Alloc>&& other) :
+		tvector(tvector<T, Alloc>&& other) :
 			Alloc(std::move(other)),
 			m_Begin(other.m_Begin),
 			m_End(other.m_End),
@@ -62,13 +70,13 @@ namespace Mahakam
 			other.m_EndMax = nullptr;
 		}
 
-		~tri_vector() noexcept
+		~tvector() noexcept
 		{
 			if (m_Begin != nullptr)
 				Alloc::deallocate(m_Begin, capacity());
 		}
 
-		tri_vector& operator=(const tri_vector<T, Alloc>& other)
+		tvector& operator=(const tvector<T, Alloc>& other)
 		{
 			const size_t n = other.size();
 
@@ -87,7 +95,7 @@ namespace Mahakam
 			return *this;
 		}
 
-		tri_vector& operator=(tri_vector<T, Alloc>&& other) noexcept
+		tvector& operator=(tvector<T, Alloc>&& other) noexcept
 		{
 			if (m_Begin != nullptr)
 				Alloc::deallocate(m_Begin, capacity());

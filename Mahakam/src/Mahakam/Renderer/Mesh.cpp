@@ -8,6 +8,8 @@
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Mahakam/Container/darray.h"
+
 #include "Platform/OpenGL/OpenGLMesh.h"
 
 #include <glm/gtx/fast_square_root.hpp>
@@ -62,7 +64,7 @@ namespace Mahakam
 	}
 
 	template<typename T>
-	void GLTFLoadAttribute(tinygltf::Model& model, tinygltf::Primitive& p, const std::string& attribute, size_t& offset, T* dst)
+	void GLTFLoadAttribute(tinygltf::Model& model, tinygltf::Primitive& p, const std::string& attribute, size_t& offset, darray<T>& dst)
 	{
 		auto iter = p.attributes.find(attribute);
 		if (iter == p.attributes.end()) return;
@@ -86,13 +88,13 @@ namespace Mahakam
 			size_t outComponentSize = sizeof(T) / componentCount;
 
 			// Copy each component of the type individually
-			memset(dst + offset, 0, accessor.count * sizeof(T));
+			memset(dst.data() + offset, 0, accessor.count * sizeof(T));
 			for (size_t i = 0; i < accessor.count * componentCount; i++)
-				memcpy(((uint8_t*)dst) + offset * sizeof(T) + i * outComponentSize, ((uint8_t*)bufferData) + i * componentSize, componentSize);
+				memcpy(reinterpret_cast<uint8_t*>(dst.data()) + offset * sizeof(T) + i * outComponentSize, ((uint8_t*)bufferData) + i * componentSize, componentSize);
 		}
 		else // Copy straight, no mismatch. Type should be interpreted, so it doesn't matter
 		{
-			memcpy(dst + offset, bufferData, accessor.count * sizeof(T));
+			memcpy(dst.data() + offset, bufferData, accessor.count * sizeof(T));
 		}
 
 		offset += accessor.count;
@@ -164,14 +166,14 @@ namespace Mahakam
 			}
 
 			// Setup variables
-			glm::vec3* positions = new glm::vec3[vertexCount];
-			glm::vec2* texcoords = new glm::vec2[vertexCount];
-			glm::vec3* normals = new glm::vec3[vertexCount];
-			glm::vec4* tangents = new glm::vec4[vertexCount];
-			glm::vec4* colors = new glm::vec4[vertexCount];
-			glm::ivec4* boneIDs = new glm::ivec4[vertexCount];
-			glm::vec4* boneWeights = new glm::vec4[vertexCount];
-			uint32_t* indices = new uint32_t[indexCount]{ 0 };
+			darray<glm::vec3> positions(vertexCount);
+			darray<glm::vec2> texcoords(vertexCount);
+			darray<glm::vec3> normals(vertexCount);
+			darray<glm::vec4> tangents(vertexCount);
+			darray<glm::vec4> colors(vertexCount);
+			darray<glm::ivec4> boneIDs(vertexCount, { -1, -1, -1, -1 });
+			darray<glm::vec4> boneWeights(vertexCount, { 0.0f, 0.0f, 0.0f, 0.0f });
+			darray<uint32_t> indices(indexCount, 0);
 
 			size_t positionOffset = 0;
 			size_t texcoordOffset = 0;
@@ -181,12 +183,6 @@ namespace Mahakam
 			size_t boneIDOffset = 0;
 			size_t boneWeightOffset = 0;
 			size_t indexOffset = 0;
-
-			for (uint32_t i = 0; i < vertexCount; i++)
-			{
-				boneIDs[i] = glm::vec4(-1.0, -1.0, -1.0, -1.0);
-				boneWeights[i] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-			}
 
 			// Load attributes and indices
 			for (auto& p : m.primitives)
@@ -234,17 +230,17 @@ namespace Mahakam
 					{
 					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
 						MH_CORE_INFO("[GLTF] Loading indices with uint32_t");
-						memcpy(indices + indexOffset, indexData, accessor.count * sizeof(uint32_t));
+						memcpy(indices.data() + indexOffset, indexData, accessor.count * sizeof(uint32_t));
 						break;
 					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
 						MH_CORE_INFO("[GLTF] Loading indices with uint16_t");
 						for (size_t i = 0; i < accessor.count; i++)
-							memcpy(indices + i + indexOffset, indexData + i * sizeof(uint16_t), sizeof(uint16_t));
+							memcpy(indices.data() + i + indexOffset, indexData + i * sizeof(uint16_t), sizeof(uint16_t));
 						break;
 					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
 						MH_CORE_INFO("[GLTF] Loading indices with uint8_t");
 						for (size_t i = 0; i < accessor.count; i++)
-							memcpy(indices + i + indexOffset, indexData + i * sizeof(uint8_t), sizeof(uint8_t));
+							memcpy(indices.data() + i + indexOffset, indexData + i * sizeof(uint8_t), sizeof(uint8_t));
 						break;
 					default:
 						MH_CORE_BREAK("[GLTF] Unsupported index format");
@@ -328,31 +324,22 @@ namespace Mahakam
 			SubMesh::InterleavedStruct interleavedVertices;
 
 			if (positionOffset)
-				interleavedVertices.positions = positions;
+				interleavedVertices.positions = positions.data();
 			if (texcoordOffset)
-				interleavedVertices.texcoords = texcoords;
+				interleavedVertices.texcoords = texcoords.data();
 			if (normalOffset)
-				interleavedVertices.normals = normals;
+				interleavedVertices.normals = normals.data();
 			if (tangentOffset)
-				interleavedVertices.tangents = tangents;
+				interleavedVertices.tangents = tangents.data();
 			if (colorOffset)
-				interleavedVertices.colors = colors;
+				interleavedVertices.colors = colors.data();
 			if (boneIDOffset && boneWeightOffset)
 			{
-				interleavedVertices.boneIDs = boneIDs;
-				interleavedVertices.boneWeights = boneWeights;
+				interleavedVertices.boneIDs = boneIDs.data();
+				interleavedVertices.boneWeights = boneWeights.data();
 			}
 
-			Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
-
-			delete[] positions;
-			delete[] texcoords;
-			delete[] normals;
-			delete[] tangents;
-			delete[] colors;
-			delete[] boneIDs;
-			delete[] boneWeights;
-			delete[] indices;
+			Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 			skinnedMesh->Meshes.push_back(mesh);
 		}
@@ -394,11 +381,12 @@ namespace Mahakam
 			{  0.0f,  0.0f, -1.0f }
 		};
 
-		glm::vec3* positions = new glm::vec3[vertexCount];
-		glm::vec2* uvs = new glm::vec2[vertexCount];
-		glm::vec3* normals = new glm::vec3[vertexCount];
+		darray<glm::vec3> positions(vertexCount);
+		darray<glm::vec2> uvs(vertexCount);
+		darray<glm::vec3> normals(vertexCount);
+		darray<glm::vec4> tangents(vertexCount);
 
-		uint32_t* indices = new uint32_t[indexCount];
+		darray<uint32_t> indices(indexCount);
 
 		int index = 0;
 		int triIndex = 0;
@@ -455,16 +443,12 @@ namespace Mahakam
 
 		// Interleave vertices
 		InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions;
-		interleavedVertices.texcoords = uvs;
-		interleavedVertices.normals = normals;
+		interleavedVertices.positions = positions.data();
+		interleavedVertices.texcoords = uvs.data();
+		interleavedVertices.normals = normals.data();
+		//interleavedVertices.tangents = tangents.data(); // TODO
 
-		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
-
-		delete[] positions;
-		delete[] uvs;
-		delete[] normals;
-		delete[] indices;
+		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 		return mesh;
 	}
@@ -476,12 +460,12 @@ namespace Mahakam
 		uint32_t vertexCount = rows * columns;
 		uint32_t indexCount = 6 * (rows - 1) * (columns - 1);
 
-		glm::vec3* positions = new glm::vec3[vertexCount];
-		glm::vec2* uvs = new glm::vec2[vertexCount];
-		glm::vec3* normals = new glm::vec3[vertexCount];
-		glm::vec4* tangents = new glm::vec4[vertexCount];
+		darray<glm::vec3> positions(vertexCount);
+		darray<glm::vec2> uvs(vertexCount);
+		darray<glm::vec3> normals(vertexCount);
+		darray<glm::vec4> tangents(vertexCount);
 
-		uint32_t* indices = new uint32_t[indexCount];
+		darray<uint32_t> indices(indexCount);
 
 		glm::vec3 upwards = { 0.0f, 1.0f, 0.0f };
 		glm::vec3 axisA(upwards.y, upwards.z, upwards.x);
@@ -522,18 +506,12 @@ namespace Mahakam
 
 		// Interleave vertices
 		InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions;
-		interleavedVertices.texcoords = uvs;
-		interleavedVertices.normals = normals;
-		interleavedVertices.tangents = tangents;
+		interleavedVertices.positions = positions.data();
+		interleavedVertices.texcoords = uvs.data();
+		interleavedVertices.normals = normals.data();
+		interleavedVertices.tangents = tangents.data();
 
-		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
-
-		delete[] positions;
-		delete[] uvs;
-		delete[] normals;
-		delete[] tangents;
-		delete[] indices;
+		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 		return mesh;
 	}
@@ -545,12 +523,12 @@ namespace Mahakam
 		uint32_t vertexCount = rows * columns;
 		uint32_t indexCount = 6 * (rows - 1) * (columns - 1);
 
-		glm::vec3* positions = new glm::vec3[vertexCount];
-		glm::vec2* uvs = new glm::vec2[vertexCount];
-		glm::vec3* normals = new glm::vec3[vertexCount];
-		glm::vec4* tangents = new glm::vec4[vertexCount];
+		darray<glm::vec3> positions(vertexCount);
+		darray<glm::vec2> uvs(vertexCount);
+		darray<glm::vec3> normals(vertexCount);
+		darray<glm::vec4> tangents(vertexCount);
 
-		uint32_t* indices = new uint32_t[indexCount];
+		darray<uint32_t> indices(indexCount);
 
 		glm::vec3 upwards = { 0.0f, 1.0f, 0.0f };
 		glm::vec3 axisA(upwards.y, upwards.z, upwards.x);
@@ -592,18 +570,12 @@ namespace Mahakam
 
 		// Interleave vertices
 		InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions;
-		interleavedVertices.texcoords = uvs;
-		interleavedVertices.normals = normals;
-		interleavedVertices.tangents = tangents;
+		interleavedVertices.positions = positions.data();
+		interleavedVertices.texcoords = uvs.data();
+		interleavedVertices.normals = normals.data();
+		interleavedVertices.tangents = tangents.data();
 
-		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
-
-		delete[] positions;
-		delete[] uvs;
-		delete[] normals;
-		delete[] tangents;
-		delete[] indices;
+		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 		return mesh;
 	}
@@ -625,12 +597,12 @@ namespace Mahakam
 			{  0.0f,  0.0f, -1.0f }
 		};
 
-		glm::vec3* positions = new glm::vec3[vertexCount];
-		glm::vec2* uvs = new glm::vec2[vertexCount];
-		glm::vec3* normals = new glm::vec3[vertexCount];
-		glm::vec4* tangents = new glm::vec4[vertexCount];
+		darray<glm::vec3> positions(vertexCount);
+		darray<glm::vec2> uvs(vertexCount);
+		darray<glm::vec3> normals(vertexCount);
+		darray<glm::vec4> tangents(vertexCount);
 
-		uint32_t* indices = new uint32_t[indexCount];
+		darray<uint32_t> indices(indexCount);
 
 		int index = 0;
 		int triIndex = 0;
@@ -698,18 +670,12 @@ namespace Mahakam
 
 		// Interleave vertices
 		InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions;
-		interleavedVertices.texcoords = uvs;
-		interleavedVertices.normals = normals;
-		interleavedVertices.tangents = tangents;
+		interleavedVertices.positions = positions.data();
+		interleavedVertices.texcoords = uvs.data();
+		interleavedVertices.normals = normals.data();
+		interleavedVertices.tangents = tangents.data();
 
-		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
-
-		delete[] positions;
-		delete[] uvs;
-		delete[] normals;
-		delete[] tangents;
-		delete[] indices;
+		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 		return mesh;
 	}

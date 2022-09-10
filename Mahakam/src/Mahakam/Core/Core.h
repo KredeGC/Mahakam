@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Mahakam/Version.h"
-#include "tri_vector.h"
+#include "Mahakam/Container/tvector.h"
 
 #include <memory>
 #include <unordered_map>
@@ -88,7 +88,7 @@
 namespace Mahakam
 {
 	template<typename T>
-	using TrivialVector = tri_vector<T>;
+	using TrivialVector = tvector<T>;
 
 	template<typename K, typename V>
 	using UnorderedMap = std::unordered_map<K, V>;
