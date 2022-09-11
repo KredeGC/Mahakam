@@ -10,6 +10,7 @@ namespace Mahakam
 	{
 	private:
 		std::vector<Entity> m_BoneEntities;
+		bool m_TargetOrigin;
 
 	public:
 		SkinComponent() {}
@@ -18,6 +19,9 @@ namespace Mahakam
 		{
 			m_BoneEntities.push_back(entity);
 		}
+
+		inline void EnableTargetOrigin(bool enable) { m_TargetOrigin = enable; }
+		inline bool HasTargetOrigin() const { return m_TargetOrigin; }
 
 		inline std::vector<Entity>& GetBoneEntities() { return m_BoneEntities; }
 	};

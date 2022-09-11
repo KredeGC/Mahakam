@@ -31,7 +31,7 @@ namespace Mahakam
 		int m_AnimationIndex;
 		float m_Duration;
 
-		UnorderedMap<int, Sampler> m_Samplers;
+		std::vector<Sampler> m_Samplers;
 
 	public:
 		Animation(const std::filesystem::path& filepath, int index);
@@ -39,7 +39,7 @@ namespace Mahakam
 		const std::string& GetName() const { return m_Name; }
 		float GetDuration() const { return m_Duration; }
 
-		const UnorderedMap<int, Sampler>& GetSamplers() const { return m_Samplers; }
+		const std::vector<Sampler>& GetSamplers() const { return m_Samplers; }
 
 		inline static Asset<Animation> Load(const std::filesystem::path& filepath, int index = 0) { return LoadImpl(filepath, index); }
 

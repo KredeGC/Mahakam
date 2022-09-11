@@ -57,7 +57,10 @@ namespace Mahakam
 			Alloc(std::allocator_traits<Alloc>::select_on_container_copy_construction(static_cast<Alloc>(other))),
 			m_Begin(Alloc::allocate(other.size())),
 			m_End(m_Begin + other.size()),
-			m_EndMax(m_End) {}
+			m_EndMax(m_End)
+		{
+			memcpy(m_Begin, other.m_Begin, other.size() * sizeof(T));
+		}
 
 		tvector(tvector<T, Alloc>&& other) :
 			Alloc(std::move(other)),

@@ -60,7 +60,10 @@ namespace Mahakam
 		darray(const darray<T, Alloc>& other) :
 			Alloc(std::allocator_traits<Alloc>::select_on_container_copy_construction(static_cast<Alloc>(other))),
 			m_Begin(Alloc::allocate(other.size())),
-			m_End(m_Begin + other.size()) {}
+			m_End(m_Begin + other.size())
+		{
+			memcpy(m_Begin, other.m_Begin, other.size() * sizeof(T));
+		}
 
 		darray(darray<T, Alloc>&& other) :
 			Alloc(std::move(other)),

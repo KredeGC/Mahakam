@@ -37,7 +37,7 @@ namespace Mahakam
 		inline Asset<Material> GetMaterial() { return m_SkinnedMesh->Materials.at(0); }
 		inline const std::vector<Asset<Material>>& GetMaterials() { return m_SkinnedMesh->Materials; }
 
-		inline const std::vector<BoneNode>& GetBoneHierarchy() const { return m_SkinnedMesh->BoneHierarchy; }
-		inline const UnorderedMap<std::string, BoneInfo>& GetBoneInfo() const { return m_SkinnedMesh->BoneInfoMap; }
+		inline const std::vector<MeshNode>& GetNodeHierarchy() const { return m_SkinnedMesh->NodeHierarchy; }
+		inline const UnorderedMap<std::string, int>& GetBoneInfo() const { return m_SkinnedMesh->BoneInfoMap; }
 	};
 }

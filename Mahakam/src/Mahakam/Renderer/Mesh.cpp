@@ -100,18 +100,48 @@ namespace Mahakam
 		offset += accessor.count;
 	}
 
-	void Mesh::GLTFReadNodeHierarchy(const tinygltf::Model& model, int id, int parentID, Ref<Mesh> skinnedMesh)
+	void Mesh::GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Ref<Mesh> skinnedMesh)
 	{
 		const tinygltf::Node& node = model.nodes[id];
 
-		BoneNode bone;
+		MeshNode bone;
 		bone.name = node.name;
 		bone.id = id;
+		bone.mesh = node.mesh;
 		bone.parentID = parentID;
-		skinnedMesh->BoneHierarchy.push_back(bone);
+
+		if (node.matrix.size() > 0)
+		{
+			auto& m = node.matrix;
+			glm::mat4 matrix = glm::mat4{
+				m[0], m[1], m[2], m[3],
+				m[4], m[5], m[6], m[7],
+				m[8], m[9], m[10], m[11],
+				m[12], m[13], m[14], m[15] };
+			bone.offset = glm::inverse(matrix);
+		}
+		else
+		{
+			auto& nodePos = node.translation;
+			auto& nodeRot = node.rotation;
+			auto& nodeScale = node.scale;
+
+			glm::mat4 matrix{ 1.0f };
+			if (!nodePos.empty())
+				matrix *= glm::translate(glm::mat4(1.0f), glm::vec3{ (float)nodePos[0], (float)nodePos[1], (float)nodePos[2] });
+			if (!nodeRot.empty())
+				matrix *= glm::toMat4(glm::quat{ (float)nodeRot[0], (float)nodeRot[1], (float)nodeRot[2], (float)nodeRot[3] });
+			if (!nodeScale.empty())
+				matrix *= glm::scale(glm::mat4(1.0f), glm::vec3{ (float)nodeScale[0], (float)nodeScale[1], (float)nodeScale[2] });
+
+			bone.offset = glm::inverse(matrix);
+		}
+
+		nodeIndex[id] = skinnedMesh->NodeHierarchy.size();
+		skinnedMesh->NodeHierarchy.push_back(bone);
 
 		for (auto& child : node.children)
-			GLTFReadNodeHierarchy(model, child, id, skinnedMesh);
+			GLTFReadNodeHierarchy(model, nodeIndex, child, id, skinnedMesh);
 	}
 
 	//Asset<Mesh> Mesh::LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props)
@@ -145,7 +175,13 @@ namespace Mahakam
 
 		auto& scene = model.scenes[model.defaultScene];
 
+		if (model.scenes.size() > 1)
+			MH_CORE_WARN("The model loader only supports 1 scene. Other scenes will be ignored");
+
 		MH_CORE_ASSERT(!scene.nodes.empty(), "[GLTF] Model nodes are empty!");
+
+
+		// TODO: Support interleaved data
 
 
 		Ref<Mesh> skinnedMesh = CreateRef<Mesh>();
@@ -223,6 +259,7 @@ namespace Mahakam
 					const auto& accessor = model.accessors[p.indices];
 					const auto& bufferView = model.bufferViews[accessor.bufferView];
 					const auto& buffer = model.buffers[bufferView.buffer];
+					const auto byteStride = accessor.ByteStride(bufferView);
 
 					const uint8_t* indexData = &buffer.data[bufferView.byteOffset + accessor.byteOffset];
 
@@ -248,72 +285,6 @@ namespace Mahakam
 					}
 
 					indexOffset += accessor.count;
-				}
-			}
-
-			// Extract bone transformations
-			for (auto& skinNode : model.nodes)
-			{
-				if (skinNode.skin > -1)
-				{
-					// Get the skin from the node
-					auto& skin = model.skins[skinNode.skin];
-
-					// TODO: The spec says to use it, but the results are weird
-					// Currently works better without, but be wary
-					auto& skinPos = skinNode.translation;
-					auto& skinRot = skinNode.rotation;
-					auto& skinScale = skinNode.scale;
-
-					glm::mat4 skinnedTransform{ 1.0f };
-					if (!skinPos.empty())
-						skinnedTransform *= glm::translate(glm::mat4(1.0f), glm::vec3{ (float)skinPos[0], (float)skinPos[1], (float)skinPos[2] });
-					if (!skinRot.empty())
-						skinnedTransform *= glm::toMat4(glm::quat{ (float)skinRot[0], (float)skinRot[1], (float)skinRot[2], (float)skinRot[3] });
-					if (!skinScale.empty())
-						skinnedTransform *= glm::scale(glm::mat4(1.0f), glm::vec3{ (float)skinScale[0], (float)skinScale[1], (float)skinScale[2] });
-
-					glm::mat4 invSkinnedTransform = glm::inverse(skinnedTransform);
-
-					// Get the affected nodes and their bind matrices
-					auto& joints = skin.joints;
-					const auto& accessor = model.accessors[skin.inverseBindMatrices];
-					const auto& bufferView = model.bufferViews[accessor.bufferView];
-					const auto& buffer = model.buffers[bufferView.buffer];
-
-					const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
-
-					// Extract hierarchy data
-					skinnedMesh->BoneCount = joints.size();
-					skinnedMesh->BoneHierarchy.reserve(joints.size());
-					GLTFReadNodeHierarchy(model, joints[0], -1, skinnedMesh);
-
-					MH_CORE_ASSERT(skinnedMesh->BoneHierarchy.size() == skinnedMesh->BoneCount, "Bone hierarchy count doesn't match skeleton");
-
-					// Add the bones to the skinned mesh
-					for (uint32_t i = 0; i < joints.size(); i++)
-					{
-						const auto& node = model.nodes[joints[i]];
-
-						std::string boneName = node.name;
-
-						auto& nodePos = node.translation;
-						auto& nodeRot = node.rotation;
-						auto& nodeScale = node.scale;
-
-						glm::mat4 jointTransform{ 1.0f };
-						if (!nodePos.empty())
-							jointTransform *= glm::translate(glm::mat4(1.0f), glm::vec3{ (float)nodePos[0], (float)nodePos[1], (float)nodePos[2] });
-						if (!nodeRot.empty())
-							jointTransform *= glm::toMat4(glm::quat{ (float)nodeRot[0], (float)nodeRot[1], (float)nodeRot[2], (float)nodeRot[3] });
-						if (!nodeScale.empty())
-							jointTransform *= glm::scale(glm::mat4(1.0f), glm::vec3{ (float)nodeScale[0], (float)nodeScale[1], (float)nodeScale[2] });
-
-						BoneInfo bone;
-						bone.id = i;
-						bone.offset = /*invSkinnedTransform * jointTransform */ invMatrices[i];
-						skinnedMesh->BoneInfoMap[boneName] = bone;
-					}
 				}
 			}
 
@@ -343,6 +314,53 @@ namespace Mahakam
 
 			skinnedMesh->Meshes.push_back(mesh);
 		}
+
+		// Extract nodes and bones
+		for (int rootNode : scene.nodes)
+		{
+			UnorderedMap<int, size_t> nodeIndex; // Node ID to hierarchy index
+
+			// Populate node hierarchy
+			GLTFReadNodeHierarchy(model, nodeIndex, rootNode, -1, skinnedMesh);
+
+			// Extract bone transformations
+			for (auto& skinNode : model.nodes)
+			{
+				if (skinNode.skin > -1)
+				{
+					// Get the skin from the node
+					auto& skin = model.skins[skinNode.skin];
+
+					// Get the affected nodes and their bind matrices
+					auto& joints = skin.joints;
+					const auto& accessor = model.accessors[skin.inverseBindMatrices];
+					const auto& bufferView = model.bufferViews[accessor.bufferView];
+					const auto& buffer = model.buffers[bufferView.buffer];
+
+					const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
+
+					// Extract joint data
+					skinnedMesh->BoneCount = joints.size();
+					skinnedMesh->BoneInfoMap.reserve(joints.size());
+
+					// Add the bones to the skinned mesh
+					for (size_t i = 0; i < joints.size(); i++)
+					{
+						int nodeID = joints[i];
+						const auto& node = model.nodes[nodeID];
+
+						// TODO: The spec is vague on when to do 'inv(parentMat) * nodeMat * invBindMatrix'
+						// For now it is done inside the Scene, once per frame
+						skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].offset = invMatrices[i]; // Override offset to be the bone's inverse matrix
+						skinnedMesh->BoneInfoMap[node.name] = i;
+					}
+
+					MH_CORE_ASSERT(joints.size() == accessor.count, "Bone count doesn't match joint count");
+				}
+			}
+		}
+
+		MH_CORE_ASSERT(skinnedMesh->NodeHierarchy.size() == model.nodes.size(), "Node hierarchy doesn't match model");
 
 		return Asset<Mesh>(skinnedMesh);
 	};

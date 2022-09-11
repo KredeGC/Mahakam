@@ -33,17 +33,19 @@ namespace Mahakam
 	extern template class Asset<Shader>;
 	extern template class Asset<SubMesh>;
 
-	struct BoneInfo
-	{
-		int id; // Joint ID
-		glm::mat4 offset;
-	};
+	//struct BoneInfo
+	//{
+	//	int id; // Joint ID
+	//	glm::mat4 offset;
+	//};
 
-	struct BoneNode
+	struct MeshNode
 	{
-		std::string name;
+		std::string name; // Node name
 		int id; // Node ID
-		int parentID;
+		int parentID; // Parent node ID
+		int mesh; // Index of the submesh
+		glm::mat4 offset; // Offset. In order of priority: invMatrix, matrix, TRS
 	};
 
 	// TODO: Use this prop struct when loading a model
@@ -65,13 +67,13 @@ namespace Mahakam
 	public:
 		std::vector<Asset<SubMesh>> Meshes;
 		std::vector<Asset<Material>> Materials;
-		UnorderedMap<std::string, BoneInfo> BoneInfoMap;
-		std::vector<BoneNode> BoneHierarchy;
+		std::vector<MeshNode> NodeHierarchy;
+		UnorderedMap<std::string, int> BoneInfoMap; // name to Joint ID
 		int BoneCount = 0;
 
 		Mesh() = default;
 
-		Mesh(const std::vector<Asset<SubMesh>>& meshes, const std::vector<Asset<Material>>& materials, const UnorderedMap<std::string, BoneInfo>& boneInfo, int boneCount = 0)
+		Mesh(const std::vector<Asset<SubMesh>>& meshes, const std::vector<Asset<Material>>& materials, const UnorderedMap<std::string, int>& boneInfo, int boneCount = 0)
 			: Meshes(meshes), Materials(materials), BoneInfoMap(boneInfo), BoneCount(boneCount)
 		{ }
 
@@ -84,7 +86,7 @@ namespace Mahakam
 		inline static Asset<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
 
 	private:
-		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, int id, int parentID, Ref<Mesh> skinnedMesh);
+		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Ref<Mesh> skinnedMesh);
 		MH_DECLARE_FUNC(LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
 	};
 

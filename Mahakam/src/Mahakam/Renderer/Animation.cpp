@@ -40,6 +40,8 @@ namespace Mahakam
 		auto& animation = animations[m_AnimationIndex];
 		m_Name = animation.name;
 
+		UnorderedMap<int, Sampler> samplers;
+
 		// Each channel refers to a node/bone's target
 		// channels.size() ~= bones.size() * [translation, rotation, scale, weights].size()
 		for (auto& channel : animation.channels)
@@ -47,7 +49,7 @@ namespace Mahakam
 			auto& sampler = animation.samplers[channel.sampler];
 
 			// Input data (timestamps)
-			if (m_Samplers.find(sampler.input) == m_Samplers.end())
+			if (samplers.find(sampler.input) == samplers.end())
 			{
 				const auto& inputAccessor = model.accessors[sampler.input];
 				const auto& inputBufferView = model.bufferViews[inputAccessor.bufferView];
@@ -59,7 +61,7 @@ namespace Mahakam
 				if (duration > m_Duration)
 					m_Duration = duration;
 
-				m_Samplers[sampler.input].Timestamps.assign(times, times + inputAccessor.count);
+				samplers[sampler.input].Timestamps.assign(times, times + inputAccessor.count);
 			}
 
 			// Output data (the actual values)
@@ -74,27 +76,31 @@ namespace Mahakam
 				// Extract translations from the buffer
 				const glm::vec3* values = reinterpret_cast<const glm::vec3*>(&outputBuffer.data[outputBufferView.byteOffset + outputAccessor.byteOffset]);
 
-				m_Samplers[sampler.input].Translations[channel.target_node].assign(values, values + outputAccessor.count);
+				samplers[sampler.input].Translations[channel.target_node].assign(values, values + outputAccessor.count);
 			}
 			else if (channel.target_path == "rotation")
 			{
 				// Extract rotations from the buffer
 				const glm::quat* values = reinterpret_cast<const glm::quat*>(&outputBuffer.data[outputBufferView.byteOffset + outputAccessor.byteOffset]);
 
-				m_Samplers[sampler.input].Rotations[channel.target_node].assign(values, values + outputAccessor.count);
+				samplers[sampler.input].Rotations[channel.target_node].assign(values, values + outputAccessor.count);
 			}
 			else if (channel.target_path == "scale")
 			{
 				// Extract scales from the buffer
 				const glm::vec3* values = reinterpret_cast<const glm::vec3*>(&outputBuffer.data[outputBufferView.byteOffset + outputAccessor.byteOffset]);
 
-				m_Samplers[sampler.input].Scales[channel.target_node].assign(values, values + outputAccessor.count);
+				samplers[sampler.input].Scales[channel.target_node].assign(values, values + outputAccessor.count);
 			}
 			else if (channel.target_path == "weights")
 			{
 				MH_CORE_BREAK("Weight animations are not yet supported");
 			}
 		}
+
+		m_Samplers.reserve(samplers.size());
+		for (auto& kv : samplers)
+			m_Samplers.push_back(kv.second);
 	}
 
 	//Asset<Animation> Animation::LoadImpl(const std::filesystem::path& filepath)

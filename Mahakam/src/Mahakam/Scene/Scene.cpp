@@ -114,6 +114,49 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
+		// Update animators
+		{
+			MH_PROFILE_SCOPE("Scene::OnUpdate - AnimatorComponent");
+
+			m_Registry.view<AnimatorComponent, SkinComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
+			{
+				auto& animator = animatorComponent.GetAnimator();
+
+				animator.Update(ts);
+
+				const auto& translations = animator.GetTranslations();
+				const auto& rotations = animator.GetRotations();
+				const auto& scales = animator.GetScales();
+
+				const auto& boneEntities = skinComponent.GetBoneEntities();
+				const auto& hierarchy = meshComponent.GetNodeHierarchy();
+
+				for (size_t i = 0; i < boneEntities.size(); i++)
+				{
+					auto& index = hierarchy.at(i);
+					auto& boneEntity = boneEntities.at(i);
+
+					if (boneEntity)
+					{
+						if (TransformComponent* transform = boneEntity.TryGetComponent<TransformComponent>())
+						{
+							auto tranIter = translations.find(index.id);
+							if (tranIter != translations.end())
+								transform->SetPosition(tranIter->second);
+
+							auto rotIter = rotations.find(index.id);
+							if (rotIter != rotations.end())
+								transform->SetRotation(rotIter->second);
+
+							auto sclIter = scales.find(index.id);
+							if (sclIter != scales.end())
+								transform->SetScale(sclIter->second);
+						}
+					}
+				}
+			});
+		}
+
 		// Update matrix transforms
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - TransformComponent");
@@ -122,7 +165,7 @@ namespace Mahakam
 			{
 				if (relation.Parent != entt::null && m_Registry.any_of<TransformComponent>(relation.Parent))
 				{
-					auto& parentTransform = m_Registry.get<TransformComponent>(relation.Parent);
+					const auto& parentTransform = m_Registry.get<TransformComponent>(relation.Parent);
 					const glm::mat4& parentMatrix = parentTransform.GetModelMatrix();
 
 					transform.UpdateModelMatrix(parentMatrix);
@@ -140,90 +183,48 @@ namespace Mahakam
 
 			m_Registry.view<TransformComponent, AudioSourceComponent>().each([=](TransformComponent& transformComponent, AudioSourceComponent& audioSourceComponent)
 			{
+				// TODO: Use the model matrix instead. Helps with parenting
 				auto source = audioSourceComponent.GetAudioSource();
 				source->SetPosition(transformComponent.GetPosition());
 			});
-		}
-
-		// Update animators
-		{
-			MH_PROFILE_SCOPE("Scene::OnUpdate - AnimatorComponent");
-
-			m_Registry.view<AnimatorComponent, SkinComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
-			{
-				auto& animator = animatorComponent.GetAnimator();
-
-				animator.Update(ts);
-
-				const auto& translations = animator.GetTranslations();
-				const auto& rotations = animator.GetRotations();
-				const auto& scales = animator.GetScales();
-
-				const auto& boneEntities = skinComponent.GetBoneEntities();
-				const auto& hierarchy = meshComponent.GetBoneHierarchy();
-				const auto& bones = meshComponent.GetBoneInfo();
-
-				//MH_CORE_ASSERT(translations.size() == boneEntities.size(), "H"); // TODO: Number of bones doesn't match?
-
-				for (size_t i = 0; i < boneEntities.size(); i++)
-				{
-					auto& index = hierarchy.at(i);
-					auto& boneEntity = boneEntities.at(i);
-
-					if (boneEntity)
-					{
-						if (TransformComponent* transform = boneEntity.TryGetComponent<TransformComponent>())
-						{
-							transform->SetPosition(translations.at(index.id));
-							transform->SetRotation(rotations.at(index.id));
-							transform->SetScale(scales.at(index.id));
-						}
-					}
-				}
-			});
-
-			/*m_Registry.view<AnimatorComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, MeshComponent& meshComponent)
-			{
-				auto& animator = animatorComponent.GetAnimator();
-
-				animator.UpdateAnimation(ts);
-
-				auto& materials = meshComponent.GetMaterials();
-				auto transforms = animator.GetFinalBoneMatrices();
-
-				for (auto& material : materials)
-					for (int j = 0; j < Animator::MAX_BONES; ++j)
-						material->SetMat4("finalBonesMatrices[" + std::to_string(j) + "]", transforms[j]);
-			});*/
 		}
 
 		// Update SkinComponent
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - SkinComponent");
 
-			m_Registry.view<SkinComponent, MeshComponent>().each([=](entt::entity entity, SkinComponent& skinComponent, MeshComponent& meshComponent)
+			m_Registry.view<TransformComponent, SkinComponent, MeshComponent>().each([=](TransformComponent& transformComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
 			{
 				if (!meshComponent.HasMesh()) return;
 
 				const auto& boneEntities = skinComponent.GetBoneEntities();
-				const auto& hierarchy = meshComponent.GetBoneHierarchy();
+				const auto& hierarchy = meshComponent.GetNodeHierarchy();
 				const auto& bones = meshComponent.GetBoneInfo();
 				const auto& materials = meshComponent.GetMaterials();
 
+				glm::mat4 invTransform = glm::inverse(transformComponent.GetModelMatrix());
+
 				for (auto& material : materials)
 				{
-					for (size_t i = 0; i < bones.size(); i++)
+					for (size_t i = 0; i < boneEntities.size(); i++)
 					{
 						auto& boneEntity = boneEntities.at(i);
-						auto& index = hierarchy.at(i);
-						auto& bone = bones.at(index.name);
-
 						if (boneEntity)
 						{
-							glm::mat4 transform = glm::inverse(m_Registry.get<TransformComponent>(entity).GetModelMatrix())
-								* boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
-								* bone.offset;
-							material->SetMat4("finalBonesMatrices[" + std::to_string(bone.id) + "]", transform);
+							if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
+							{
+								auto& node = hierarchy.at(i);
+
+								// TODO: Replace the mat4 array with a UniformBuffer
+								auto boneIter = bones.find(node.name);
+								if (boneIter != bones.end())
+								{
+									glm::mat4 transform = invTransform
+										* boneTransform->GetModelMatrix()
+										* node.offset;
+									material->SetMat4("finalBonesMatrices[" + std::to_string(boneIter->second) + "]", transform);
+								}
+							}
 						}
 					}
 				}
@@ -327,7 +328,7 @@ namespace Mahakam
 			{
 				MH_PROFILE_SCOPE("Scene::OnUpdate - Submit");
 
-				m_Registry.view<TransformComponent, MeshComponent>().each([&](TransformComponent& transformComponent, MeshComponent& meshComponent)
+				m_Registry.view<TransformComponent, MeshComponent>().each([&](entt::entity entity, TransformComponent& transformComponent, MeshComponent& meshComponent)
 				{
 					if (!meshComponent.HasMesh()) return;
 
@@ -337,10 +338,41 @@ namespace Mahakam
 
 					if (materialCount >= 0)
 					{
-						glm::mat4 modelMatrix = transformComponent.GetModelMatrix();
+						if (SkinComponent* skinComponent = m_Registry.try_get<SkinComponent>(entity))
+						{
+							const auto& boneEntities = skinComponent->GetBoneEntities();
+							const auto& hierarchy = meshComponent.GetNodeHierarchy();
 
-						for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
-							Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
+							for (size_t i = 0; i < hierarchy.size(); i++)
+							{
+								auto& index = hierarchy.at(i);
+								auto& boneEntity = boneEntities.at(i);
+
+								if (boneEntity && index.mesh > -1)
+								{
+									if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
+									{
+										// TODO: Undo the skin transformation instead. This doesn't actually seem to work though
+										// I've yet to make the inverse skin transform to work. For now it has a toggle instead
+										glm::mat4 transform;
+										if (skinComponent->HasTargetOrigin())
+											transform = boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
+											* index.offset;
+										else
+											transform = transformComponent.GetModelMatrix();
+
+										Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount]);
+									}
+								}
+							}
+						}
+						else
+						{
+							glm::mat4 modelMatrix = transformComponent.GetModelMatrix();
+
+							for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
+								Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
+						}
 					}
 				});
 			}

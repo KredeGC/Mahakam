@@ -157,8 +157,8 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 #if 1
 	// Create glTF skinned model
 	//Asset<Mesh> skinnedModel = Asset<Mesh>("import/assets/models/mannequin_clap.gltf.import");
-	Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/CesiumMan.glb");
-	Asset<Animation> skinnedAnimation = Animation::Load("assets/models/CesiumMan.glb");
+	Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.glb");
+	Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.glb");
 
 	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
@@ -171,10 +171,8 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 	boneEntities.reserve(skinnedModel->BoneCount);
 
-	for (auto& node : skinnedModel->BoneHierarchy)
+	for (auto& node : skinnedModel->NodeHierarchy)
 	{
-		auto& bone = skinnedModel->BoneInfoMap[node.name];
-
 		Entity boneEntity = scene->CreateEntity(node.name);
 
 		if (node.parentID > -1)
@@ -190,7 +188,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 		glm::mat4 transform{ 1.0f };
 		if (node.parentID > -1)
 			transform *= glm::inverse(parent.GetComponent<TransformComponent>().GetModelMatrix());
-		transform *= glm::inverse(bone.offset);
+		transform *= glm::inverse(node.offset);
 
 		Math::DecomposeTransform(transform, pos, rot, scale);
 
@@ -211,6 +209,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 #endif
 
 
+#if 0
 	// Create piano sound entity
 	Asset<Sound> pianoSound = Asset<Sound>("import/assets/sounds/piano.wav.import");
 
@@ -230,6 +229,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	AudioSourceComponent& vespaSource = vespaEntity.AddComponent<AudioSourceComponent>();
 	vespaSource.SetSound(vespaSound);
 	vespaSource.Play();
+#endif
 
 
 	// Create mesh & base material

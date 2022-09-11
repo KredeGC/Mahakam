@@ -276,7 +276,7 @@ namespace Mahakam::Editor
 				if (meshComponent->HasMesh())
 				{
 					auto& bones = skinComponent.GetBoneEntities();
-					auto& hierarchy = meshComponent->GetBoneHierarchy();
+					auto& hierarchy = meshComponent->GetNodeHierarchy();
 
 					ImGui::Button("Create bone entities");
 					ImGui::SameLine();
