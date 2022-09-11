@@ -80,7 +80,8 @@ namespace Mahakam
 		{
 			const size_t n = other.size();
 
-			if (n > capacity()) {
+			if (n > capacity())
+			{
 				T* alBlock = Alloc::allocate(n);
 
 				if (m_Begin != nullptr)
@@ -144,7 +145,7 @@ namespace Mahakam
 		{
 			if (capacity() < n)
 			{
-				size_t alSize = size() + std::max(size(), n);
+				size_t alSize = n;
 				T* alBlock = Alloc::allocate(alSize);
 				memcpy(alBlock, m_Begin, size() * sizeof(T));
 
@@ -163,7 +164,9 @@ namespace Mahakam
 			{
 				size_t curSize = size();
 				T* alBlock = Alloc::allocate(n);
-				memcpy(alBlock, m_Begin, curSize * sizeof(T));
+
+				if (m_Begin != nullptr)
+					memcpy(alBlock, m_Begin, curSize * sizeof(T));
 
 				if (m_Begin != nullptr)
 					Alloc::deallocate(m_Begin, capacity());
@@ -177,7 +180,7 @@ namespace Mahakam
 		void push_back(const T& element)
 		{
 			if (m_End == m_EndMax)
-				expand();
+				expand(1);
 			*m_End = element;
 			m_End++;
 		}
@@ -185,16 +188,35 @@ namespace Mahakam
 		void push_back(T&& element)
 		{
 			if (m_End == m_EndMax)
-				expand();
+				expand(1);
 			*m_End = std::move(element);
 			m_End++;
+		}
+
+		void push_back(const T* first, const T* last)
+		{
+			const size_t n = size_t(last - first) + size();
+
+			if (capacity() < n)
+			{
+				T* alBlock = Alloc::allocate(n);
+
+				if (m_Begin != nullptr)
+					Alloc::deallocate(m_Begin, size());
+
+				m_Begin = alBlock;
+				m_End = m_Begin + n;
+				m_EndMax = m_Begin + n;
+			}
+
+			memcpy(m_End, first, n * sizeof(T));
 		}
 
 		template<typename... Args>
 		void emplace_back(Args&&... args)
 		{
 			if (m_End == m_EndMax)
-				expand();
+				expand(1);
 			*m_End = T(std::forward<Args>(args)...);
 			m_End++;
 		}
@@ -204,10 +226,10 @@ namespace Mahakam
 		void clear() { m_End = m_Begin; }
 
 	private:
-		void expand()
+		void expand(size_t n)
 		{
 			size_t curSize = size();
-			size_t alSize = curSize + std::max(curSize, size_t(1UL));
+			size_t alSize = curSize + std::max(curSize, n);
 
 			T* alBlock = Alloc::allocate(alSize);
 			memcpy(alBlock, m_Begin, curSize * sizeof(T));

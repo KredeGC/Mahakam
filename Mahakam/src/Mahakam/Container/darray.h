@@ -145,6 +145,24 @@ namespace Mahakam
 		const T& operator[](size_t index) const noexcept { return m_Begin[index]; }
 
 
+		void resize(size_t n)
+		{
+			if (size() != n)
+			{
+				size_t curSize = size();
+				T* alBlock = Alloc::allocate(n);
+
+				if (m_Begin != nullptr)
+				{
+					memcpy(alBlock, m_Begin, std::min(curSize, n) * sizeof(T));
+					Alloc::deallocate(m_Begin, curSize);
+				}
+
+				m_Begin = alBlock;
+				m_End = m_Begin + n;
+			}
+		}
+
 		void assign(const T* first, const T* last)
 		{
 			const size_t n = last - first;

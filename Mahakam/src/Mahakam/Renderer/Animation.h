@@ -16,35 +16,30 @@ namespace Mahakam
 	class Animation
 	{
 	private:
-		struct AnimPos
+		struct Sampler
 		{
-			float Time;
-			glm::vec3 Translation;
+			darray<float> Timestamps;
+
+			UnorderedMap<int, darray<glm::vec3>> Translations;
+			UnorderedMap<int, darray<glm::quat>> Rotations;
+			UnorderedMap<int, darray<glm::vec3>> Scales;
 		};
 
 		std::filesystem::path m_Filepath;
 		std::string m_Name;
 
 		int m_AnimationIndex;
+		float m_Duration;
 
-		// TODO: Use darrays instead
-		darray<float> m_Timestamps;
-
-		UnorderedMap<int, std::vector<glm::vec3>> m_Translations;
-		UnorderedMap<int, std::vector<glm::quat>> m_Rotations;
-		UnorderedMap<int, std::vector<glm::vec3>> m_Scales;
+		UnorderedMap<int, Sampler> m_Samplers;
 
 	public:
 		Animation(const std::filesystem::path& filepath, int index);
 
 		const std::string& GetName() const { return m_Name; }
-		float GetDuration() const { return *m_Timestamps.rbegin(); }
+		float GetDuration() const { return m_Duration; }
 
-		const darray<float>& GetTimestamps() const { return m_Timestamps; }
-
-		const UnorderedMap<int, std::vector<glm::vec3>>& GetTranslations() const { return m_Translations; }
-		const UnorderedMap<int, std::vector<glm::quat>>& GetRotations() const { return m_Rotations; }
-		const UnorderedMap<int, std::vector<glm::vec3>>& GetScales() const { return m_Scales; }
+		const UnorderedMap<int, Sampler>& GetSamplers() const { return m_Samplers; }
 
 		inline static Asset<Animation> Load(const std::filesystem::path& filepath, int index = 0) { return LoadImpl(filepath, index); }
 
