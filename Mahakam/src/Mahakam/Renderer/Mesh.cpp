@@ -369,9 +369,9 @@ namespace Mahakam
 					}
 				}
 			}
-		}
 
-		MH_CORE_ASSERT(skinnedMesh->NodeHierarchy.size() == model.nodes.size(), "Node hierarchy doesn't match model");
+			MH_CORE_ASSERT(skinnedMesh->NodeHierarchy.size() == model.nodes.size(), "Node hierarchy doesn't match model");
+		}
 
 		return skinnedMesh;
 	};

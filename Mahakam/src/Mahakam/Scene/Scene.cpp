@@ -128,8 +128,14 @@ namespace Mahakam
 				const auto& rotations = animator.GetRotations();
 				const auto& scales = animator.GetScales();
 
-				const auto& boneEntities = skinComponent.GetBoneEntities();
+				auto& boneEntities = skinComponent.GetBoneEntities();
 				const auto& hierarchy = meshComponent.GetNodeHierarchy();
+
+				if (boneEntities.size() != hierarchy.size())
+				{
+					boneEntities.resize(hierarchy.size());
+					return;
+				}
 
 				for (size_t i = 0; i < boneEntities.size(); i++)
 				{

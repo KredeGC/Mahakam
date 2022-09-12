@@ -4,6 +4,7 @@
 
 #include "Mahakam/Asset/Asset.h"
 
+#include "MeshProps.h"
 #include "ShaderDataTypes.h"
 
 #define GLM_FORCE_INLINE
@@ -33,22 +34,6 @@ namespace Mahakam
 	extern template class Asset<Shader>;
 	extern template class Asset<SubMesh>;
 
-	struct MeshNode
-	{
-		std::string name; // Node name
-		int id; // Node ID
-		int parentID; // Parent node ID
-		int mesh; // Index of the submesh
-		glm::mat4 offset; // Offset. In order of priority: invMatrix, matrix, TRS
-	};
-
-	struct MeshProps
-	{
-		std::vector<Asset<Material>> Materials;
-		bool IncludeNodes = true;
-		bool IncludeBones = true;
-	};
-
 	class Mesh
 	{
 	public:
@@ -59,19 +44,23 @@ namespace Mahakam
 
 		Mesh() = default;
 
+		explicit Mesh(const MeshProps & props) :
+			Props(props) {}
+
 		Mesh(Ref<SubMesh> mesh, Asset<Material> material)
 		{
 			Meshes.push_back(mesh);
 			Props.Materials.push_back(material);
 		}
 
-		Mesh(Ref<SubMesh> mesh, const MeshProps& props)
+		Mesh(Ref<SubMesh> mesh, const MeshProps& props) :
+			Props(props)
 		{
 			Meshes.push_back(mesh);
-			Props.Materials = props.Materials;
 		}
 
 		inline static Ref<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
+		static Asset<Mesh> Copy(Asset<Mesh> copy) { return Asset<Mesh>(CreateRef<Mesh>(*copy.Ptr())); }
 
 	private:
 		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Ref<Mesh> skinnedMesh);

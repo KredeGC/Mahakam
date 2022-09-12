@@ -280,7 +280,7 @@ namespace Mahakam::Editor
 					ImGui::SameLine();
 					ImGui::Button("Set bones from Mesh");
 
-					for (size_t i = 0; i < hierarchy.size(); i++)
+					for (size_t i = 0; i < bones.size(); i++)
 					{
 						GUI::DrawDragDropEntity(hierarchy[i].name, "Transform", bones[i]);
 					}

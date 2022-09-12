@@ -123,12 +123,14 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Ref<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
+	Asset<Mesh> planeMesh = Asset<Mesh>("import/assets/models/Plane.gltf.import");
 
-	Asset<Material> planeMaterial = Asset<Material>("import/assets/materials/BrickPlane.material.import");
+	/*Ref<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
+
+	Asset<Material> planeMaterial = Asset<Material>("import/assets/materials/BrickPlane.material.import");*/
 
 	Entity planeEntity = scene->CreateEntity("Plane");
-	planeEntity.AddComponent<MeshComponent>(planeMesh, planeMaterial);
+	planeEntity.AddComponent<MeshComponent>(planeMesh);
 	planeEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, -1.0f, 0.0f });
 	planeEntity.GetComponent<TransformComponent>().SetScale({ 30.0f, 30.0f, 30.0f });
 
@@ -157,7 +159,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 #if 1
 	// Create glTF skinned model
 	Asset<Mesh> skinnedModel = Asset<Mesh>("import/assets/models/mannequin_clap.glb.import");
-	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.glb");
+	//Asset<Mesh> skinnedModel = Asset<Mesh>(Mesh::LoadMesh("assets/models/mannequin_clap.glb"));
 	Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.glb");
 
 	//Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
@@ -233,8 +235,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create mesh & base material
-	Ref<SubMesh> sphereMesh = SubMesh::CreateCubeSphere(9);
-	Asset<Material> baseMaterial = Asset<Material>("import/assets/materials/WhiteDiffuse.material.import");
+	//Ref<SubMesh> sphereMesh = SubMesh::CreateCubeSphere(9);
+	//Asset<Material> baseMaterial = Asset<Material>("import/assets/materials/WhiteDiffuse.material.import");
+	Asset<Mesh> sphereMesh = Asset<Mesh>("import/assets/models/CubeSphere.gltf.import");
 
 	// Create base collection entity to store in
 	Entity sphereCollection = scene->CreateEntity("Spheres");
@@ -246,14 +249,14 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 		for (int x = 0; x < 10; x++)
 		{
 			// Setup material with texture
-			Asset<Material> material = Material::Copy(baseMaterial);
+			Asset<Material> material = Material::Copy(sphereMesh->Props.Materials[0]);
 			material->SetFloat("u_MetallicMul", y / 10.0f);
 			material->SetFloat("u_RoughnessMul", x / 10.0f);
 
 			// Create entity
 			Entity entity = scene->CreateEntity(std::string("Sphere ") + std::to_string(x) + std::string(",") + std::to_string(y));
 			entity.SetParent(sphereCollection);
-			entity.AddComponent<MeshComponent>(sphereMesh, material);
+			entity.AddComponent<MeshComponent>(Mesh::Copy(sphereMesh), material);
 			entity.AddComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
 
 			if (x == 0 && y == 0)

@@ -2,16 +2,22 @@
 
 #include "AssetImporter.h"
 
-#include "Mahakam/Renderer/Mesh.h"
+#include "Mahakam/Renderer/MeshProps.h"
 
 namespace Mahakam
 {
+	class Mesh;
+
 	class MeshAssetImporter : public AssetImporter
 	{
 	private:
 		ImporterProps m_ImporterProps;
 
+#ifndef MH_STANDALONE
 		MeshProps m_MeshProps;
+
+		Ref<Mesh> m_PreviewMesh;
+#endif
 
 	public:
 		MeshAssetImporter();

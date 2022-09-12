@@ -107,6 +107,12 @@ namespace Mahakam
 		return std::make_unique<T>(std::forward<Args>(args)...);
 	}
 
+	template<typename T, typename T2>
+	constexpr Scope<T> StaticCastScope(Scope<T2> ptr)
+	{
+		return std::static_pointer_cast<T>(ptr);
+	}
+
 	template<typename T>
 	using Ref = std::shared_ptr<T>;
 

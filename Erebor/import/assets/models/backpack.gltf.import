@@ -1,3 +1,8 @@
 Filepath: assets/models/backpack.gltf
 Extension: .mesh
 ID: 13155307824895996659
+Materials:
+  []
+Primitive: 0
+IncludeNodes: true
+IncludeBones: false
