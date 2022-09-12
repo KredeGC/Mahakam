@@ -119,8 +119,8 @@ namespace Mahakam
 				skyboxMaterial = Asset<Material>(materialNode.as<uint64_t>());
 			if (!skyboxMaterial)
 			{
-				Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
-				skyboxMaterial = Material::Create(skyboxShader);
+				Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/Skybox.shader"));
+				skyboxMaterial = Asset<Material>(Material::Create(skyboxShader));
 			}
 			m_Scene->SetSkyboxMaterial(skyboxMaterial);
 

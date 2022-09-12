@@ -15,6 +15,7 @@ namespace Mahakam
 		template<typename T2>
 		friend class Asset;
 
+		// 0 is guaranteed to be invalid
 		uint64_t m_ID = 0;
 
 		Ref<T> m_Ptr = nullptr;
@@ -23,10 +24,10 @@ namespace Mahakam
 		Asset();
 
 		Asset(const std::nullptr_t&) {}
-
-		Asset(Ref<T> ptr);
-
-		Asset(uint64_t id);
+		
+		explicit Asset(Ref<T> ptr);
+		
+		explicit Asset(uint64_t id);
 
 		Asset(const std::filesystem::path& importPath);
 
@@ -50,10 +51,14 @@ namespace Mahakam
 		template<typename T2>
 		Asset& operator=(Asset<T2>&& rhs)
 		{
+			// Remember to clear if we already have something
+			if (m_ID)
+				AssetDatabase::DeregisterAsset(m_ID);
 			m_Ptr = rhs.m_Ptr;
 			m_ID = rhs.m_ID;
-			if (m_ID)
-				AssetDatabase::RegisterAsset(m_ID);
+			// Invalidate the rhs, as it's destructor is still called
+			rhs.m_Ptr = nullptr;
+			rhs.m_ID = 0;
 			return *this;
 		}
 
@@ -62,10 +67,12 @@ namespace Mahakam
 		template<typename T2>
 		Asset& operator=(const Asset<T2>& rhs)
 		{
+			// Remember to clear if we already have something
 			if (m_ID)
 				AssetDatabase::DeregisterAsset(m_ID);
 			m_Ptr = rhs.m_Ptr;
 			m_ID = rhs.m_ID;
+			// Register our new ID
 			if (m_ID)
 				AssetDatabase::RegisterAsset(m_ID);
 			return *this;
@@ -121,6 +128,7 @@ namespace Mahakam
 	template<typename T>
 	Asset<T>::Asset(uint64_t id) : m_ID(id)
 	{
+		// Register if the ID is valid
 		if (m_ID)
 			AssetDatabase::RegisterAsset(m_ID);
 	}
@@ -128,6 +136,7 @@ namespace Mahakam
 	template<typename T>
 	Asset<T>::Asset(const std::filesystem::path& importPath)
 	{
+		// Register if the ID is valid
 		m_ID = AssetDatabase::ReadAssetInfo(importPath).ID;
 		if (m_ID)
 			AssetDatabase::RegisterAsset(m_ID);
@@ -135,12 +144,18 @@ namespace Mahakam
 
 	template<typename T>
 	Asset<T>::Asset(Asset&& other) noexcept
-		: m_ID(other.m_ID), m_Ptr(other.m_Ptr) {}
+		: m_ID(other.m_ID), m_Ptr(other.m_Ptr)
+	{
+		// Invalidate the other, as it's destructor is still called
+		other.m_ID = 0;
+		other.m_Ptr = nullptr;
+	}
 
 	template<typename T>
 	Asset<T>::Asset(const Asset& other) noexcept
 		: m_ID(other.m_ID), m_Ptr(other.m_Ptr)
 	{
+		// Register if the ID is valid
 		if (m_ID)
 			AssetDatabase::RegisterAsset(m_ID);
 	}
@@ -148,6 +163,7 @@ namespace Mahakam
 	template<typename T>
 	Asset<T>::~Asset()
 	{
+		// Remember to clear on delete
 		if (m_ID)
 			AssetDatabase::DeregisterAsset(m_ID);
 	}
@@ -155,20 +171,26 @@ namespace Mahakam
 	template<typename T>
 	Asset<T>& Asset<T>::operator=(Asset<T>&& rhs) noexcept
 	{
+		// Remember to clear if we already have something
+		if (m_ID)
+			AssetDatabase::DeregisterAsset(m_ID);
 		m_Ptr = rhs.m_Ptr;
 		m_ID = rhs.m_ID;
-		if (m_ID)
-			AssetDatabase::RegisterAsset(m_ID);
+		// Invalidate the rhs, as it's destructor is still called
+		rhs.m_Ptr = nullptr;
+		rhs.m_ID = 0;
 		return *this;
 	}
 
 	template<typename T>
 	Asset<T>& Asset<T>::operator=(const Asset<T>& rhs)
 	{
+		// Remember to clear if we already have something
 		if (m_ID)
 			AssetDatabase::DeregisterAsset(m_ID);
 		m_Ptr = rhs.m_Ptr;
 		m_ID = rhs.m_ID;
+		// Register our new ID
 		if (m_ID)
 			AssetDatabase::RegisterAsset(m_ID);
 		return *this;
@@ -177,6 +199,7 @@ namespace Mahakam
 	template<typename T>
 	Asset<T>& Asset<T>::operator=(const std::nullptr_t& rhs)
 	{
+		// Remember to clear if we already have something
 		if (m_ID)
 			AssetDatabase::DeregisterAsset(m_ID);
 		m_Ptr = nullptr;

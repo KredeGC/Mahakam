@@ -7,8 +7,8 @@ namespace Mahakam::Editor
 {
 	ContentBrowserPanel::ContentBrowserPanel()
 	{
-		m_DirectoryIcon = Texture2D::Create("internal/icons/icon-directory.png", { TextureFormat::RGBA8 });
-		m_FileIcon = Texture2D::Create("internal/icons/icon-file.png", { TextureFormat::RGBA8 });
+		m_DirectoryIcon = Asset<Texture2D>(Texture2D::Create("internal/icons/icon-directory.png", { TextureFormat::RGBA8 }));
+		m_FileIcon = Asset<Texture2D>(Texture2D::Create("internal/icons/icon-file.png", { TextureFormat::RGBA8 }));
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()

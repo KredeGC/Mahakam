@@ -27,12 +27,12 @@ namespace Mahakam
 	}
 #endif
 
-	void AnimationAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
+	void AnimationAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
 	{
 		// TODO: Properties
 	}
 
-	Asset<void> AnimationAssetImporter::Deserialize(YAML::Node& node)
+	Ref<void> AnimationAssetImporter::Deserialize(YAML::Node& node)
 	{
 		return nullptr;
 	}

@@ -107,7 +107,7 @@ namespace Mahakam::Editor
 					m_EditorCamera.GetCamera().SetRatio(m_ViewportSize.x / m_ViewportSize.y);
 				}
 
-				Asset<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
+				Ref<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
 				if (framebuffer)
 				{
 					Asset<Texture> viewportTexture = framebuffer->GetColorTexture(0);

@@ -11,7 +11,7 @@
 namespace Mahakam
 {
 	//Ref<ComputeShader> ComputeShader::Create(const std::string& filepath)
-	MH_DEFINE_FUNC(ComputeShader::Create, Asset<ComputeShader>, const std::filesystem::path& filepath)
+	MH_DEFINE_FUNC(ComputeShader::Create, Ref<ComputeShader>, const std::filesystem::path& filepath)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -19,7 +19,7 @@ namespace Mahakam
 			MH_CORE_BREAK("Renderer API not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGL:
-			return Asset<OpenGLComputeShader>(CreateRef<OpenGLComputeShader>(filepath));
+			return CreateRef<OpenGLComputeShader>(filepath);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

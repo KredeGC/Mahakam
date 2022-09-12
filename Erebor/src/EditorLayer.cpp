@@ -21,8 +21,6 @@
 
 namespace Mahakam::Editor
 {
-	static Asset<Shader> blitShader;
-
 	void EditorLayer::OnAttach()
 	{
 #ifndef MH_STANDALONE
@@ -282,7 +280,7 @@ namespace Mahakam::Editor
 					ImGui::SameLine();
 					ImGui::Button("Set bones from Mesh");
 
-					for (size_t i = 0; i < bones.size(); i++)
+					for (size_t i = 0; i < hierarchy.size(); i++)
 					{
 						GUI::DrawDragDropEntity(hierarchy[i].name, "Transform", bones[i]);
 					}
@@ -354,8 +352,6 @@ namespace Mahakam::Editor
 #endif
 #pragma endregion
 
-		blitShader = Shader::Create("assets/shaders/internal/Blit.shader");
-
 		// Setup render passes for the default renderer
 		Renderer::SetRenderPasses({
 			CreateRef<GeometryRenderPass>(),
@@ -415,7 +411,6 @@ namespace Mahakam::Editor
 		// Unload the runtime
 		m_Runtime = nullptr;
 		m_UpdatePtr = nullptr;
-		blitShader = nullptr;
 
 		ComponentRegistry::DeregisterDefaultComponents();
 

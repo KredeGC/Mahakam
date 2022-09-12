@@ -6,7 +6,7 @@ namespace Mahakam
 	class PixelationPass : public RenderPass
 	{
 	protected:
-		Asset<FrameBuffer> viewportFramebuffer = nullptr;
+		Ref<FrameBuffer> viewportFramebuffer = nullptr;
 		Asset<Shader> pixelationShader = nullptr;
 
 	public:
@@ -15,8 +15,8 @@ namespace Mahakam
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 
-		virtual bool Render(SceneData* sceneData, Asset<FrameBuffer> src) override;
+		virtual bool Render(SceneData* sceneData, Ref<FrameBuffer> src) override;
 
-		virtual Asset<FrameBuffer> GetFrameBuffer() override { return viewportFramebuffer; }
+		virtual Ref<FrameBuffer> GetFrameBuffer() override { return viewportFramebuffer; }
 	};
 }

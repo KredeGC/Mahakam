@@ -13,19 +13,19 @@ namespace Mahakam
 {
 	RendererAPI* GL::rendererAPI;
 
-	Asset<SubMesh> GL::staticScreenQuad;
-	Asset<SubMesh> GL::staticSphereMesh;
-	Asset<SubMesh> GL::staticInvertedPyramid;
-	Asset<SubMesh> GL::staticInvertedSphereMesh;
-	Asset<SubMesh> GL::staticInvertedCubemapMesh;
-	Asset<SubMesh> GL::staticCube;
-
-	Asset<Texture2D> GL::texture2DRed;
-	Asset<Texture2D> GL::texture2DWhite;
-	Asset<Texture2D> GL::texture2DBlack;
-	Asset<Texture2D> GL::texture2DBump;
-	Asset<TextureCube> GL::textureCubeWhite;
-	Asset<TextureCube> GL::textureCubeGrey;
+	Ref<SubMesh> GL::staticScreenQuad;
+	Ref<SubMesh> GL::staticSphereMesh;
+	Ref<SubMesh> GL::staticInvertedPyramid;
+	Ref<SubMesh> GL::staticInvertedSphereMesh;
+	Ref<SubMesh> GL::staticInvertedCubemapMesh;
+	Ref<SubMesh> GL::staticCube;
+	
+	Ref<Texture2D> GL::texture2DRed;
+	Ref<Texture2D> GL::texture2DWhite;
+	Ref<Texture2D> GL::texture2DBlack;
+	Ref<Texture2D> GL::texture2DBump;
+	Ref<TextureCube> GL::textureCubeWhite;
+	Ref<TextureCube> GL::textureCubeGrey;
 
 	void GL::Init()
 	{
@@ -107,37 +107,37 @@ namespace Mahakam
 
 #pragma region Mesh
 	//Ref<Mesh> GL::GetScreenQuad()
-	MH_DEFINE_FUNC(GL::GetScreenQuad, Asset<SubMesh>)
+	MH_DEFINE_FUNC(GL::GetScreenQuad, Ref<SubMesh>)
 	{
 		return staticScreenQuad;
 	};
 
 	//Ref<Mesh> GL::GetSphere()
-	MH_DEFINE_FUNC(GL::GetSphere, Asset<SubMesh>)
+	MH_DEFINE_FUNC(GL::GetSphere, Ref<SubMesh>)
 	{
 		return staticSphereMesh;
 	};
 
 	//Ref<Mesh> GL::GetInvertedPyramid()
-	MH_DEFINE_FUNC(GL::GetInvertedPyramid, Asset<SubMesh>)
+	MH_DEFINE_FUNC(GL::GetInvertedPyramid, Ref<SubMesh>)
 	{
 		return staticInvertedPyramid;
 	};
 
 	//Ref<Mesh> GL::GetInvertedSphere()
-	MH_DEFINE_FUNC(GL::GetInvertedSphere, Asset<SubMesh>)
+	MH_DEFINE_FUNC(GL::GetInvertedSphere, Ref<SubMesh>)
 	{
 		return staticInvertedSphereMesh;
 	};
 
 	//Ref<Mesh> GL::GetInvertedCube()
-	MH_DEFINE_FUNC(GL::GetInvertedCube, Asset<SubMesh>)
+	MH_DEFINE_FUNC(GL::GetInvertedCube, Ref<SubMesh>)
 	{
 		return staticInvertedCubemapMesh;
 	};
 
 	//Ref<Mesh> GL::GetCube()
-	MH_DEFINE_FUNC(GL::GetCube, Asset<SubMesh>)
+	MH_DEFINE_FUNC(GL::GetCube, Ref<SubMesh>)
 	{
 		return staticCube;
 	};
@@ -145,37 +145,37 @@ namespace Mahakam
 
 #pragma region Texture
 	//Ref<Texture2D> GL::GetTexture2DRed()
-	MH_DEFINE_FUNC(GL::GetTexture2DRed, Asset<Texture2D>)
+	MH_DEFINE_FUNC(GL::GetTexture2DRed, Ref<Texture2D>)
 	{
 		return texture2DRed;
 	};
 
 	//Ref<Texture2D> GL::GetTexture2DWhite()
-	MH_DEFINE_FUNC(GL::GetTexture2DWhite, Asset<Texture2D>)
+	MH_DEFINE_FUNC(GL::GetTexture2DWhite, Ref<Texture2D>)
 	{
 		return texture2DWhite;
 	};
 
 	//Ref<Texture2D> GL::GetTexture2DBlack()
-	MH_DEFINE_FUNC(GL::GetTexture2DBlack, Asset<Texture2D>)
+	MH_DEFINE_FUNC(GL::GetTexture2DBlack, Ref<Texture2D>)
 	{
 		return texture2DBlack;
 	};
 
 	//Ref<Texture2D> GL::GetTexture2DBump()
-	MH_DEFINE_FUNC(GL::GetTexture2DBump, Asset<Texture2D>)
+	MH_DEFINE_FUNC(GL::GetTexture2DBump, Ref<Texture2D>)
 	{
 		return texture2DBump;
 	};
 
 	//Ref<TextureCube> GL::GetTextureCubeWhite()
-	MH_DEFINE_FUNC(GL::GetTextureCubeWhite, Asset<TextureCube>)
+	MH_DEFINE_FUNC(GL::GetTextureCubeWhite, Ref<TextureCube>)
 	{
 		return textureCubeWhite;
 	};
 
 	//Ref<TextureCube> GL::GetTextureCubeGrey()
-	MH_DEFINE_FUNC(GL::GetTextureCubeGrey, Asset<TextureCube>)
+	MH_DEFINE_FUNC(GL::GetTextureCubeGrey, Ref<TextureCube>)
 	{
 		return textureCubeGrey;
 	};
@@ -262,7 +262,7 @@ namespace Mahakam
 	};
 #pragma endregion
 
-	Asset<SubMesh> GL::CreateScreenQuad()
+	Ref<SubMesh> GL::CreateScreenQuad()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -293,7 +293,7 @@ namespace Mahakam
 		return SubMesh::Create(4, 6, interleavedVertices, indices);
 	}
 
-	Asset<SubMesh> GL::CreatePyramid()
+	Ref<SubMesh> GL::CreatePyramid()
 	{
 		MH_PROFILE_FUNCTION();
 

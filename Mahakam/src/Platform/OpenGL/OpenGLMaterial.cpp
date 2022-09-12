@@ -240,10 +240,10 @@ namespace Mahakam
 			switch (prop.second.DataType)
 			{
 			case ShaderDataType::Sampler2D:
-				m_Textures[prop.first] = GL::GetTexture2DWhite();
+				m_Textures[prop.first] = Asset<Texture2D>(GL::GetTexture2DWhite());
 				break;
 			case ShaderDataType::SamplerCube:
-				m_Textures[prop.first] = GL::GetTextureCubeWhite();
+				m_Textures[prop.first] = Asset<TextureCube>(GL::GetTextureCubeWhite());
 				break;
 			case ShaderDataType::Float:
 				m_Floats[prop.first] = 0.0f;

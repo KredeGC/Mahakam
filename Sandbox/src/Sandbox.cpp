@@ -123,7 +123,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
+	Ref<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
 
 	Asset<Material> planeMaterial = Asset<Material>("import/assets/materials/BrickPlane.material.import");
 
@@ -156,20 +156,20 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 1
 	// Create glTF skinned model
-	//Asset<Mesh> skinnedModel = Asset<Mesh>("import/assets/models/mannequin_clap.gltf.import");
-	Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.glb");
+	Asset<Mesh> skinnedModel = Asset<Mesh>("import/assets/models/mannequin_clap.glb.import");
+	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.glb");
 	Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.glb");
 
-	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
+	//Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 
 	// Create backpack entity
 	Entity skinnedEntity = scene->CreateEntity("Skinned glTF");
-	skinnedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
+	skinnedEntity.AddComponent<MeshComponent>(skinnedModel);
 	skinnedEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	skinnedEntity.AddComponent<AnimatorComponent>().GetAnimator().SetAnimation(skinnedAnimation);
 	SkinComponent& skin = skinnedEntity.AddComponent<SkinComponent>();
 
-	boneEntities.reserve(skinnedModel->BoneCount);
+	boneEntities.reserve(skinnedModel->NodeHierarchy.size());
 
 	for (auto& node : skinnedModel->NodeHierarchy)
 	{
@@ -233,7 +233,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create mesh & base material
-	Asset<SubMesh> sphereMesh = SubMesh::CreateCubeSphere(9);
+	Ref<SubMesh> sphereMesh = SubMesh::CreateCubeSphere(9);
 	Asset<Material> baseMaterial = Asset<Material>("import/assets/materials/WhiteDiffuse.material.import");
 
 	// Create base collection entity to store in

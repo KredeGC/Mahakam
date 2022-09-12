@@ -46,8 +46,8 @@ namespace Mahakam
 
 		// Initialize default material
 		// TODO: Move to a seperate pass
-		Asset<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.shader"); // TODO: Use the asset system to load it
-		rendererData->unlitMaterial = Material::Create(unlitColorShader);
+		Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.shader"); // TODO: Use the asset system to load it
+		rendererData->unlitMaterial = Material::Create(Asset<Shader>(unlitColorShader));
 		rendererData->unlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
 	}
 
@@ -113,7 +113,7 @@ namespace Mahakam
 		// Render each render pass
 		rendererData->gBuffer = rendererData->renderPasses[0]->GetFrameBuffer();
 
-		Asset<FrameBuffer> prevBuffer = nullptr;
+		Ref<FrameBuffer> prevBuffer = nullptr;
 		for (uint32_t i = 0; i < rendererData->renderPasses.size(); i++)
 		{
 			if (rendererData->renderPasses[i]->Render(sceneData, prevBuffer))
@@ -137,7 +137,7 @@ namespace Mahakam
 			for (uint64_t drawID : sceneData->renderQueue)
 			{
 				const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-				Asset<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
+				Ref<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
 
 				const uint64_t transformID = drawID & 0xFFFFULL;
 				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
@@ -178,11 +178,11 @@ namespace Mahakam
 	};
 
 	//void Renderer::SubmitImpl(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
-	MH_DEFINE_FUNC(Renderer::SubmitImpl, void, const glm::mat4& transform, Asset<SubMesh> mesh, Asset<Material> material)
+	MH_DEFINE_FUNC(Renderer::SubmitImpl, void, const glm::mat4& transform, Ref<SubMesh> mesh, Ref<Material> material)
 	{
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
-		Asset<Shader> shader = material->GetShader();
+		Ref<Shader> shader = material->GetShader().Get();
 		auto shaderIter = sceneData->shaderRefLookup.find(shader);
 		if (shaderIter == sceneData->shaderRefLookup.end())
 		{
@@ -299,7 +299,7 @@ namespace Mahakam
 	//void Renderer::DrawInstancedSphereImpl(uint32_t amount)
 	MH_DEFINE_FUNC(Renderer::DrawInstancedSphereImpl, void, uint32_t amount)
 	{
-		Asset<SubMesh> invertedSphere = GL::GetInvertedSphere();
+		Ref<SubMesh> invertedSphere = GL::GetInvertedSphere();
 
 		AddPerformanceResult(amount * invertedSphere->GetVertexCount(), amount * invertedSphere->GetIndexCount());
 
@@ -311,7 +311,7 @@ namespace Mahakam
 	//void Renderer::DrawInstancedPyramidImpl(uint32_t amount)
 	MH_DEFINE_FUNC(Renderer::DrawInstancedPyramidImpl, void, uint32_t amount)
 	{
-		Asset<SubMesh> invertedPyramid = GL::GetInvertedPyramid();
+		Ref<SubMesh> invertedPyramid = GL::GetInvertedPyramid();
 
 		AddPerformanceResult(amount * invertedPyramid->GetVertexCount(), amount * invertedPyramid->GetIndexCount());
 
@@ -378,13 +378,13 @@ namespace Mahakam
 	};
 
 	//Ref<FrameBuffer> Renderer::GetGBufferImpl()
-	MH_DEFINE_FUNC(Renderer::GetGBufferImpl, Asset<FrameBuffer>)
+	MH_DEFINE_FUNC(Renderer::GetGBufferImpl, Ref<FrameBuffer>)
 	{
 		return rendererData->gBuffer;
 	};
 
 	//Ref<FrameBuffer> Renderer::GetFrameBufferImpl()
-	MH_DEFINE_FUNC(Renderer::GetFrameBufferImpl, Asset<FrameBuffer>)
+	MH_DEFINE_FUNC(Renderer::GetFrameBufferImpl, Ref<FrameBuffer>)
 	{
 		return rendererData->viewportFramebuffer;
 	};

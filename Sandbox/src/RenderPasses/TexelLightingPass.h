@@ -10,6 +10,6 @@ namespace Mahakam
 		virtual void SetupFrameBuffer(uint32_t width, uint32_t height) override;
 		virtual void SetupShaders() override;
 
-		virtual void SetupTextures(SceneData* sceneData, Asset<FrameBuffer> src) override;
+		virtual void SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src) override;
 	};
 }

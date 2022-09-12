@@ -3,6 +3,7 @@ Extension: .material
 ID: 7079340428320316353
 Shader: 9447544911046152283
 Properties:
-  u_Roughness: 0.404000014
   u_Metallic: 0
   u_Color: [0.678431392, 0.43921569, 0.219607845]
+  u_Roughness: 0.430999994
+  u_Emission: [0, 0, 0]

@@ -13,7 +13,7 @@ namespace Mahakam::Editor
 		int m_FrameBufferIndex = 0;
 		int m_TextureIndex = 0;
 
-		Asset<FrameBuffer> m_ViewportFramebuffer;
+		Ref<FrameBuffer> m_ViewportFramebuffer;
 
 		Asset<Shader> m_BlitShader;
 
@@ -27,6 +27,6 @@ namespace Mahakam::Editor
 	private:
 		void RenderPanel();
 
-		void RenderImage(Asset<FrameBuffer> frameBuffer, int index, bool depth);
+		void RenderImage(Ref<FrameBuffer> frameBuffer, int index, bool depth);
 	};
 }

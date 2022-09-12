@@ -40,7 +40,7 @@ namespace Mahakam
 		shadowProps.DepthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
 		shadowFramebuffer = FrameBuffer::Create(shadowProps);
 
-		Renderer::AddFrameBuffer("Shadow Atlas", shadowFramebuffer.Get());
+		Renderer::AddFrameBuffer("Shadow Atlas", shadowFramebuffer);
 
 		shadowMatrixBuffer = UniformBuffer::Create(sizeof(glm::mat4));
 
@@ -67,7 +67,7 @@ namespace Mahakam
 		hdrFrameBuffer->Resize(width, height);
 	}
 
-	bool LightingRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
+	bool LightingRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -115,7 +115,7 @@ namespace Mahakam
 
 		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
 
-		Renderer::AddFrameBuffer("Lighting", hdrFrameBuffer.Get());
+		Renderer::AddFrameBuffer("Lighting", hdrFrameBuffer);
 	}
 
 	void LightingRenderPass::SetupShaders()
@@ -153,7 +153,7 @@ namespace Mahakam
 		shadowFramebuffer->Unbind();
 	}
 
-	void LightingRenderPass::SetupTextures(SceneData* sceneData, Asset<FrameBuffer> src)
+	void LightingRenderPass::SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -167,7 +167,7 @@ namespace Mahakam
 		deferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3));
 		deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
 
-		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
+		deferredShader->SetTexture("u_BRDFLUT", Asset<Texture>(brdfLut));
 		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
 
 		if (sceneData->environment.IrradianceMap)
@@ -177,14 +177,14 @@ namespace Mahakam
 			deferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap);
 	}
 
-	void LightingRenderPass::RenderLighting(SceneData* sceneData, Asset<FrameBuffer> src)
+	void LightingRenderPass::RenderLighting(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		GL::SetViewport(0, 0, hdrFrameBuffer->GetSpecification().Width, hdrFrameBuffer->GetSpecification().Height);
 
 		// Blit depth buffer from gBuffer
-		src->Blit(hdrFrameBuffer, false, true);
+		src->Blit(Asset<FrameBuffer>(hdrFrameBuffer), false, true);
 
 		// Bind and clear lighting buffer
 		hdrFrameBuffer->Bind();
@@ -230,7 +230,7 @@ namespace Mahakam
 		{
 			// Choose a mesh
 			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-			Asset<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
+			Ref<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
 
 			// Choose a transform
 			const uint64_t transformID = drawID & 0xFFFFULL;
@@ -243,14 +243,14 @@ namespace Mahakam
 			{
 				// Choose a shader
 				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
-				Asset<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+				Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
 
 				// Choose a material
 				const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-				Asset<Material>& material = sceneData->materialIDLookup[materialID];
+				Ref<Material>& material = sceneData->materialIDLookup[materialID];
 
 				// Hash shader
-				uint8_t* shaderPtr = (uint8_t*)shader.Ptr();
+				uint8_t* shaderPtr = (uint8_t*)shader.get();
 				for (uint64_t i = 0; i < sizeof(Shader*); ++i)
 					hash = (hash * 16777619ULL) ^ *(shaderPtr + i);
 
@@ -261,7 +261,7 @@ namespace Mahakam
 					hash = (hash * 16777619ULL) ^ *(materialPtr + i);
 
 				// Hash mesh
-				uint8_t* meshPtr = (uint8_t*)mesh.Ptr();
+				uint8_t* meshPtr = (uint8_t*)mesh.get();
 				for (uint64_t i = 0; i < sizeof(SubMesh*); ++i)
 					hash = (hash * 16777619ULL) ^ *(meshPtr + i);
 
@@ -288,7 +288,7 @@ namespace Mahakam
 		{
 			// Choose a mesh
 			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-			Asset<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
+			Ref<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
 
 			// Choose a transform
 			const uint64_t transformID = drawID & 0xFFFFULL;
@@ -301,7 +301,7 @@ namespace Mahakam
 			{
 				// Choose and bind shader
 				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
-				Asset<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+				Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
 				if (shaderID != *lastShaderID)
 				{
 					if (shader->HasShaderPass("SHADOW"))
@@ -318,7 +318,7 @@ namespace Mahakam
 
 				// Choose and bind material
 				const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-				Asset<Material>& material = sceneData->materialIDLookup[materialID];
+				Ref<Material>& material = sceneData->materialIDLookup[materialID];
 				if (materialID != *lastMaterialID && *lastShaderID != ~0)
 				{
 					*lastMaterialID = materialID;
@@ -543,7 +543,7 @@ namespace Mahakam
 				deferredShader->Bind("POINT", "DEBUG");
 			else
 				deferredShader->Bind("POINT");
-			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
+			deferredShader->SetTexture("u_AttenuationLUT", Asset<Texture>(falloffLut));
 
 			Renderer::DrawInstancedSphere(amount);
 		}
@@ -570,14 +570,14 @@ namespace Mahakam
 				deferredShader->Bind("SPOT", "DEBUG");
 			else
 				deferredShader->Bind("SPOT");
-			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
-			deferredShader->SetTexture("u_LightCookie", spotlightTexture);
+			deferredShader->SetTexture("u_AttenuationLUT", Asset<Texture>(falloffLut));
+			deferredShader->SetTexture("u_LightCookie", Asset<Texture>(spotlightTexture));
 
 			Renderer::DrawInstancedPyramid(amount);
 		}
 	}
 
-	Asset<Texture> LightingRenderPass::LoadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height)
+	Ref<Texture> LightingRenderPass::LoadOrCreateLUTTexture(const std::string& cachePath, const std::string& shaderPath, TextureFormat format, uint32_t width, uint32_t height)
 	{
 		if (!FileUtility::Exists(cachePath))
 		{
@@ -587,9 +587,9 @@ namespace Mahakam
 			framebufferProps.Height = height;
 			framebufferProps.ColorAttachments = { format };
 			framebufferProps.DontUseDepth = true;
-			Asset<FrameBuffer> framebuffer = FrameBuffer::Create(framebufferProps);
+			Ref<FrameBuffer> framebuffer = FrameBuffer::Create(framebufferProps);
 
-			Asset<Shader> shader = Shader::Create(shaderPath);
+			Ref<Shader> shader = Shader::Create(shaderPath);
 
 			framebuffer->Bind();
 
@@ -612,7 +612,7 @@ namespace Mahakam
 
 			delete[] pixels;
 
-			return lut;
+			return lut.Get();
 		}
 		else
 		{
@@ -620,7 +620,7 @@ namespace Mahakam
 			std::ifstream inStream(cachePath, std::ios::binary);
 			std::stringstream ss;
 			ss << inStream.rdbuf();
-			Asset<Texture> lut = Texture2D::Create({ width, height, format, TextureFilter::Bilinear, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+			Ref<Texture> lut = Texture2D::Create({ width, height, format, TextureFilter::Bilinear, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
 			lut->SetData((void*)ss.str().c_str(), 512 * 512 * 4); // TODO: Un-hardcode this value
 
 			return lut;

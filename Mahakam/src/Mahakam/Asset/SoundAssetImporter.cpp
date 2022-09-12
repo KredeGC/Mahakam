@@ -48,7 +48,7 @@ namespace Mahakam
 		else
 		{
 			// If the sound doesn't exist, or the filepath has changed, reload everything
-			Asset<Sound> sound = Sound::Create(filepath.string(), m_Props);
+			Asset<Sound> sound = Asset<Sound>(Sound::Create(filepath.string(), m_Props));
 
 			sound.Save(filepath, importPath);
 
@@ -57,9 +57,9 @@ namespace Mahakam
 	}
 #endif
 
-	void SoundAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
+	void SoundAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
 	{
-		Asset<Sound> sound = asset;
+		Ref<Sound> sound = StaticCastRef<Sound>(asset);
 
 		emitter << YAML::Key << "Volume";
 		emitter << YAML::Value << sound->GetProps().Volume;
@@ -67,7 +67,7 @@ namespace Mahakam
 		emitter << YAML::Value << sound->GetProps().Loop;
 	}
 
-	Asset<void> SoundAssetImporter::Deserialize(YAML::Node& node)
+	Ref<void> SoundAssetImporter::Deserialize(YAML::Node& node)
 	{
 		YAML::Node filepathNode = node["Filepath"];
 		std::string filepath;

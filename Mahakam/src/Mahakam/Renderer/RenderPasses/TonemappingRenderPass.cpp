@@ -24,7 +24,7 @@ namespace Mahakam
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
-		Renderer::AddFrameBuffer("Tonemapping", viewportFramebuffer.Get());
+		Renderer::AddFrameBuffer("Tonemapping", viewportFramebuffer);
 
 		tonemappingShader = Shader::Create("assets/shaders/internal/Tonemapping.shader");
 
@@ -44,14 +44,14 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool TonemappingRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
+	bool TonemappingRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		if (sceneData->wireframe)
 			return false;
 
-		src->Blit(viewportFramebuffer, false, true);
+		src->Blit(Asset<FrameBuffer>(viewportFramebuffer), false, true);
 
 		viewportFramebuffer->Bind();
 		GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });

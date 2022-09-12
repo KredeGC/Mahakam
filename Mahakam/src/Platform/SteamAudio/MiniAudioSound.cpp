@@ -6,9 +6,9 @@
 namespace Mahakam
 {
     //Ref<Sound> Sound::Create(const std::string& filepath, AudioContext* context)
-    MH_DEFINE_FUNC(Sound::CreateImpl, Asset<Sound>, const std::string& filepath, const SoundProps& props, AudioContext* context)
+    MH_DEFINE_FUNC(Sound::CreateImpl, Ref<Sound>, const std::string& filepath, const SoundProps& props, AudioContext* context)
     {
-        return Asset<MiniAudioSound>(CreateRef<MiniAudioSound>(filepath, props, static_cast<MiniAudioContext*>(context)));
+        return CreateRef<MiniAudioSound>(filepath, props, static_cast<MiniAudioContext*>(context));
     };
 
     MiniAudioSound::MiniAudioSound(const std::string& filepath, const SoundProps& props, MiniAudioContext* context)

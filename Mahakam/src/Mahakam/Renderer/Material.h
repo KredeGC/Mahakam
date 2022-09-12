@@ -77,10 +77,10 @@ namespace Mahakam
 		virtual const UnorderedMap<std::string, glm::vec4>& GetFloat4s() const = 0;
 
 
-		inline static Asset<Material> Create(Asset<Shader> shader, const std::string& variant = "") { return CreateImpl(shader, variant); }
+		inline static Ref<Material> Create(Asset<Shader> shader, const std::string& variant = "") { return CreateImpl(shader, variant); }
 		MH_DECLARE_FUNC(Copy, Asset<Material>, Asset<Material> material);
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<Material>, Asset<Shader> shader, const std::string& variant);
+		MH_DECLARE_FUNC(CreateImpl, Ref<Material>, Asset<Shader> shader, const std::string& variant);
 	};
 }

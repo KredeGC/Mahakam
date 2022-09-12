@@ -314,9 +314,11 @@ namespace Mahakam
 
 	void TextureAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		m_Texture.Save(filepath, importPath);
+		Asset<Texture> textureAsset = Asset<Texture>(m_Texture);
 
-		AssetDatabase::ReloadAsset(m_Texture.GetID());
+		textureAsset.Save(filepath, importPath);
+
+		AssetDatabase::ReloadAsset(textureAsset.GetID());
 
 		/*if (m_TextureType == 0)
 		{
@@ -337,13 +339,14 @@ namespace Mahakam
 	}
 #endif
 
-	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
+	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
 	{
-		Asset<Texture> texture(asset);
+		Ref<Texture> texture = StaticCastRef<Texture>(asset);
+		Asset<Texture> textureAsset(texture);
 
 		if (!texture->IsCubemap())
 		{
-			Asset<Texture2D> texture2D(texture);
+			Asset<Texture2D> texture2D(textureAsset);
 
 			emitter << YAML::Key << "Type";
 			emitter << YAML::Value << 0;
@@ -360,7 +363,7 @@ namespace Mahakam
 		}
 		else
 		{
-			Asset<TextureCube> textureCube(texture);
+			Asset<TextureCube> textureCube(textureAsset);
 
 			emitter << YAML::Key << "Type";
 			emitter << YAML::Value << 1;
@@ -377,7 +380,7 @@ namespace Mahakam
 		}
 	}
 
-	Asset<void> TextureAssetImporter::Deserialize(YAML::Node& node)
+	Ref<void> TextureAssetImporter::Deserialize(YAML::Node& node)
 	{
 		TextureProps props2D;
 		CubeTextureProps propsCube;

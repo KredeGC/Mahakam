@@ -7,7 +7,7 @@ namespace Mahakam
 	class GeometryRenderPass : public RenderPass
 	{
 	protected:
-		Asset<FrameBuffer> gBuffer = nullptr;
+		Ref<FrameBuffer> gBuffer = nullptr;
 
 	public:
 		virtual bool Init(uint32_t width, uint32_t height) override;
@@ -15,8 +15,8 @@ namespace Mahakam
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 
-		virtual bool Render(SceneData* sceneData, Asset<FrameBuffer> src) override;
+		virtual bool Render(SceneData* sceneData, Ref<FrameBuffer> src) override;
 
-		virtual Asset<FrameBuffer> GetFrameBuffer() override { return gBuffer; };
+		virtual Ref<FrameBuffer> GetFrameBuffer() override { return gBuffer; };
 	};
 }

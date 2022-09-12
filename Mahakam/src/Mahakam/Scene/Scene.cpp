@@ -87,24 +87,24 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
-		m_Environment.SkyboxMaterial = Material::Create(skyboxShader);
-		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, GL::GetTextureCubeWhite());
+		Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/Skybox.shader"));
+		m_Environment.SkyboxMaterial = Asset<Material>(Material::Create(skyboxShader));
+		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, Asset<TextureCube>(GL::GetTextureCubeWhite()));
 	}
 
 	Scene::Scene(const std::string& filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
-		Asset<Texture> skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F });
-		m_Environment.IrradianceMap = TextureCube::Create(filepath, { 64, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false });
-		m_Environment.SpecularMap = TextureCube::Create(filepath, { 512, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true });
+		Asset<Texture> skyboxTexture = Asset<TextureCube>(TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F }));
+		m_Environment.IrradianceMap = Asset<TextureCube>(TextureCube::Create(filepath, { 64, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false }));
+		m_Environment.SpecularMap = Asset<TextureCube>(TextureCube::Create(filepath, { 512, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true }));
 
 		//skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
 		//skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
 
-		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
-		m_Environment.SkyboxMaterial = Material::Create(skyboxShader);
+		Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/Skybox.shader"));
+		m_Environment.SkyboxMaterial = Asset<Material>(Material::Create(skyboxShader));
 		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
 	}
 
@@ -361,7 +361,7 @@ namespace Mahakam
 										else
 											transform = transformComponent.GetModelMatrix();
 
-										Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount]);
+										Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount].Get());
 									}
 								}
 							}
@@ -371,7 +371,7 @@ namespace Mahakam
 							glm::mat4 modelMatrix = transformComponent.GetModelMatrix();
 
 							for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
-								Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
+								Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount].Get());
 						}
 					}
 				});

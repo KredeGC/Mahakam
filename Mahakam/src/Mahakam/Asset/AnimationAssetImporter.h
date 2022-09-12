@@ -20,7 +20,7 @@ namespace Mahakam
 		virtual void OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) override;
 #endif
 
-		virtual void Serialize(YAML::Emitter& emitter, Asset<void> asset) override;
-		virtual Asset<void> Deserialize(YAML::Node& node) override;
+		virtual void Serialize(YAML::Emitter& emitter, Ref<void> asset) override;
+		virtual Ref<void> Deserialize(YAML::Node& node) override;
 	};
 }

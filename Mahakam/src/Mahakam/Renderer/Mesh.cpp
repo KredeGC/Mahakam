@@ -144,8 +144,8 @@ namespace Mahakam
 			GLTFReadNodeHierarchy(model, nodeIndex, child, id, skinnedMesh);
 	}
 
-	//Asset<Mesh> Mesh::LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props)
-	MH_DEFINE_FUNC(Mesh::LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props)
+	//Ref<Mesh> Mesh::LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props)
+	MH_DEFINE_FUNC(Mesh::LoadMeshImpl, Ref<Mesh>, const std::filesystem::path& filepath, const MeshProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -176,15 +176,18 @@ namespace Mahakam
 		auto& scene = model.scenes[model.defaultScene];
 
 		if (model.scenes.size() > 1)
-			MH_CORE_WARN("The model loader only supports 1 scene. Other scenes will be ignored");
+			MH_CORE_WARN("[GLTF] Only 1 scene is supported. Other scenes will be ignored");
 
 		MH_CORE_ASSERT(!scene.nodes.empty(), "[GLTF] Model nodes are empty!");
 
 
 		// TODO: Support interleaved data
+		// TODO: Support sparse data sets
 
 
 		Ref<Mesh> skinnedMesh = CreateRef<Mesh>();
+
+		skinnedMesh->Props = props;
 
 		// Extract vertex and index values
 		for (auto& m : model.meshes)
@@ -238,11 +241,14 @@ namespace Mahakam
 				// Extract vertex colors
 				GLTFLoadAttribute<glm::vec4>(model, p, "COLOR_0", colorOffset, colors);
 
-				// Extract joint information
-				GLTFLoadAttribute<glm::ivec4>(model, p, "JOINTS_0", boneIDOffset, boneIDs);
+				if (props.IncludeBones)
+				{
+					// Extract joint information
+					GLTFLoadAttribute<glm::ivec4>(model, p, "JOINTS_0", boneIDOffset, boneIDs);
 
-				// Extract weight information
-				GLTFLoadAttribute<glm::vec4>(model, p, "WEIGHTS_0", boneWeightOffset, boneWeights);
+					// Extract weight information
+					GLTFLoadAttribute<glm::vec4>(model, p, "WEIGHTS_0", boneWeightOffset, boneWeights);
+				}
 
 				// Normalize weights
 				{
@@ -310,63 +316,68 @@ namespace Mahakam
 				interleavedVertices.boneWeights = boneWeights.data();
 			}
 
-			Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+			Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 			skinnedMesh->Meshes.push_back(mesh);
 		}
 
 		// Extract nodes and bones
-		for (int rootNode : scene.nodes)
+		if (props.IncludeNodes)
 		{
-			UnorderedMap<int, size_t> nodeIndex; // Node ID to hierarchy index
-
-			// Populate node hierarchy
-			GLTFReadNodeHierarchy(model, nodeIndex, rootNode, -1, skinnedMesh);
-
-			// Extract bone transformations
-			for (auto& skinNode : model.nodes)
+			for (int rootNode : scene.nodes)
 			{
-				if (skinNode.skin > -1)
+				UnorderedMap<int, size_t> nodeIndex; // Node ID to hierarchy index
+
+				// Populate node hierarchy
+				GLTFReadNodeHierarchy(model, nodeIndex, rootNode, -1, skinnedMesh);
+
+				// Extract bone transformations
+				if (props.IncludeBones)
 				{
-					// Get the skin from the node
-					auto& skin = model.skins[skinNode.skin];
-
-					// Get the affected nodes and their bind matrices
-					auto& joints = skin.joints;
-					const auto& accessor = model.accessors[skin.inverseBindMatrices];
-					const auto& bufferView = model.bufferViews[accessor.bufferView];
-					const auto& buffer = model.buffers[bufferView.buffer];
-
-					const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
-
-					// Extract joint data
-					skinnedMesh->BoneCount = joints.size();
-					skinnedMesh->BoneInfoMap.reserve(joints.size());
-
-					// Add the bones to the skinned mesh
-					for (size_t i = 0; i < joints.size(); i++)
+					for (auto& skinNode : model.nodes)
 					{
-						int nodeID = joints[i];
-						const auto& node = model.nodes[nodeID];
+						if (skinNode.skin > -1)
+						{
+							// Get the skin from the node
+							auto& skin = model.skins[skinNode.skin];
 
-						// TODO: The spec is vague on when to do 'inv(parentMat) * nodeMat * invBindMatrix'
-						// For now it is done inside the Scene, once per frame
-						skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].offset = invMatrices[i]; // Override offset to be the bone's inverse matrix
-						skinnedMesh->BoneInfoMap[node.name] = i;
+							// Get the affected nodes and their bind matrices
+							auto& joints = skin.joints;
+							const auto& accessor = model.accessors[skin.inverseBindMatrices];
+							const auto& bufferView = model.bufferViews[accessor.bufferView];
+							const auto& buffer = model.buffers[bufferView.buffer];
+
+							MH_CORE_ASSERT(joints.size() == accessor.count, "Bone count doesn't match joint count");
+
+							const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
+
+							// Extract joint data
+							skinnedMesh->BoneInfoMap.reserve(skinnedMesh->BoneInfoMap.size() + joints.size());
+
+							// Add the bones to the skinned mesh
+							for (size_t i = 0; i < joints.size(); i++)
+							{
+								int nodeID = joints[i];
+								const auto& node = model.nodes[nodeID];
+
+								// TODO: The spec is vague on when to do 'inv(parentMat) * nodeMat * invBindMatrix'
+								// For now it is done inside the Scene, once per frame
+								skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].offset = invMatrices[i]; // Override offset to be the bone's inverse matrix
+								skinnedMesh->BoneInfoMap[node.name] = i;
+							}
+						}
 					}
-
-					MH_CORE_ASSERT(joints.size() == accessor.count, "Bone count doesn't match joint count");
 				}
 			}
 		}
 
 		MH_CORE_ASSERT(skinnedMesh->NodeHierarchy.size() == model.nodes.size(), "Node hierarchy doesn't match model");
 
-		return Asset<Mesh>(skinnedMesh);
+		return skinnedMesh;
 	};
 
-	//Ref<Mesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
-	MH_DEFINE_FUNC(SubMesh::CreateImpl, Asset<SubMesh>, uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	//Ref<SubMesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	MH_DEFINE_FUNC(SubMesh::CreateImpl, Ref<SubMesh>, uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -374,7 +385,7 @@ namespace Mahakam
 			MH_CORE_BREAK("Renderer API not supported!");
 			return nullptr;
 		case RendererAPI::API::OpenGL:
-			return Asset<OpenGLMesh>(CreateRef<OpenGLMesh>(vertexCount, indexCount, verts, indices));
+			return CreateRef<OpenGLMesh>(vertexCount, indexCount, verts, indices);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");
@@ -382,7 +393,7 @@ namespace Mahakam
 		return nullptr;
 	};
 
-	Asset<SubMesh> SubMesh::CreateCube(int tessellation, bool reverse)
+	Ref<SubMesh> SubMesh::CreateCube(int tessellation, bool reverse)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -466,12 +477,12 @@ namespace Mahakam
 		interleavedVertices.normals = normals.data();
 		//interleavedVertices.tangents = tangents.data(); // TODO
 
-		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 		return mesh;
 	}
 
-	Asset<SubMesh> SubMesh::CreatePlane(int rows, int columns)
+	Ref<SubMesh> SubMesh::CreatePlane(int rows, int columns)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -529,12 +540,12 @@ namespace Mahakam
 		interleavedVertices.normals = normals.data();
 		interleavedVertices.tangents = tangents.data();
 
-		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 		return mesh;
 	}
 
-	Asset<SubMesh> SubMesh::CreateUVSphere(int rows, int columns)
+	Ref<SubMesh> SubMesh::CreateUVSphere(int rows, int columns)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -593,12 +604,12 @@ namespace Mahakam
 		interleavedVertices.normals = normals.data();
 		interleavedVertices.tangents = tangents.data();
 
-		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 		return mesh;
 	}
 
-	Asset<SubMesh> SubMesh::CreateCubeSphere(int tessellation, bool reverse, bool equirectangular)
+	Ref<SubMesh> SubMesh::CreateCubeSphere(int tessellation, bool reverse, bool equirectangular)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -693,7 +704,7 @@ namespace Mahakam
 		interleavedVertices.normals = normals.data();
 		interleavedVertices.tangents = tangents.data();
 
-		Asset<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
 
 		return mesh;
 	}

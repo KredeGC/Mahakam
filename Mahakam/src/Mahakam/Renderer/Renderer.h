@@ -43,9 +43,9 @@ namespace Mahakam
 			std::vector<Ref<RenderPass>> renderPasses;
 			UnorderedMap<std::string, WeakRef<FrameBuffer>> frameBuffers;
 
-			Asset<FrameBuffer> gBuffer;
-			Asset<FrameBuffer> viewportFramebuffer;
-			Asset<Material> unlitMaterial; // TEMP: For AABB visualization
+			Ref<FrameBuffer> gBuffer;
+			Ref<FrameBuffer> viewportFramebuffer;
+			Ref<Material> unlitMaterial; // TEMP: For AABB visualization
 			uint32_t width;
 			uint32_t height;
 		};
@@ -67,7 +67,7 @@ namespace Mahakam
 		inline static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment) { MH_PROFILE_FUNCTION(); BeginSceneImpl(cam, transform, environment); }
 		inline static void EndScene() { MH_PROFILE_FUNCTION(); EndSceneImpl(); }
 		
-		inline static void Submit(const glm::mat4& transform, Asset<SubMesh> mesh, Asset<Material> material) { MH_PROFILE_FUNCTION(); SubmitImpl(transform, mesh, material); }
+		inline static void Submit(const glm::mat4& transform, Ref<SubMesh> mesh, Ref<Material> material) { MH_PROFILE_FUNCTION(); SubmitImpl(transform, mesh, material); }
 		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { MH_PROFILE_FUNCTION(); SubmitParticlesImpl(transform, particles); }
 		
 		// Drawing
@@ -89,8 +89,8 @@ namespace Mahakam
 		inline static void AddFrameBuffer(const std::string& name, WeakRef<FrameBuffer> frameBuffer) { AddFrameBufferImpl(name, frameBuffer); }
 		inline static const FrameBufferMap& GetFrameBuffers() { return GetFrameBuffersImpl(); }
 
-		inline static Asset<FrameBuffer> GetGBuffer() { return GetGBufferImpl(); }
-		inline static Asset<FrameBuffer> GetFrameBuffer() { return GetFrameBufferImpl(); }
+		inline static Ref<FrameBuffer> GetGBuffer() { return GetGBufferImpl(); }
+		inline static Ref<FrameBuffer> GetFrameBuffer() { return GetFrameBufferImpl(); }
 
 		// Performance
 		inline static void AddPerformanceResult(uint32_t vertexCount, uint32_t indexCount) { AddPerformanceResultImpl(vertexCount, indexCount); }
@@ -105,7 +105,7 @@ namespace Mahakam
 		MH_DECLARE_FUNC(BeginSceneImpl, void, const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment);
 		MH_DECLARE_FUNC(EndSceneImpl, void);
 
-		MH_DECLARE_FUNC(SubmitImpl, void, const glm::mat4& transform, Asset<SubMesh> mesh, Asset<Material> material);
+		MH_DECLARE_FUNC(SubmitImpl, void, const glm::mat4& transform, Ref<SubMesh> mesh, Ref<Material> material);
 		MH_DECLARE_FUNC(SubmitParticlesImpl, void, const glm::mat4& transform, const ParticleSystem& particles);
 		
 		// Drawing
@@ -127,8 +127,8 @@ namespace Mahakam
 		MH_DECLARE_FUNC(AddFrameBufferImpl, void, const std::string& name, WeakRef<FrameBuffer> frameBuffer);
 		MH_DECLARE_FUNC(GetFrameBuffersImpl, const FrameBufferMap&);
 		
-		MH_DECLARE_FUNC(GetGBufferImpl, Asset<FrameBuffer>);
-		MH_DECLARE_FUNC(GetFrameBufferImpl, Asset<FrameBuffer>);
+		MH_DECLARE_FUNC(GetGBufferImpl, Ref<FrameBuffer>);
+		MH_DECLARE_FUNC(GetFrameBufferImpl, Ref<FrameBuffer>);
 		 
 		// Performance
 		MH_DECLARE_FUNC(AddPerformanceResultImpl, void, uint32_t vertexCount, uint32_t indexCount);

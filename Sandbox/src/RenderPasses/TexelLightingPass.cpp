@@ -29,7 +29,7 @@ namespace Mahakam
 		shadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
 	}
 
-	void TexelLightingPass::SetupTextures(SceneData* sceneData, Asset<FrameBuffer> src)
+	void TexelLightingPass::SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -43,7 +43,7 @@ namespace Mahakam
 		deferredShader->SetTexture("u_GBuffer4", src->GetColorTexture(4));
 		deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
 
-		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
+		deferredShader->SetTexture("u_BRDFLUT", Asset<Texture>(brdfLut));
 		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
 
 		deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap);

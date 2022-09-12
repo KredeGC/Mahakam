@@ -77,6 +77,7 @@ namespace Mahakam
 		Ref<MeshAssetImporter> meshAssetImporter = CreateRef<MeshAssetImporter>();
 
 		AssetDatabase::RegisterAssetImporter(".gltf", meshAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".glb", meshAssetImporter);
 
 		// Shader
 		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
@@ -106,6 +107,7 @@ namespace Mahakam
 
 		// Mesh
 		AssetDatabase::DeregisterAssetImporter(".gltf");
+		AssetDatabase::DeregisterAssetImporter(".glb");
 
 		// Shader
 		AssetDatabase::DeregisterAssetImporter(".shader");
@@ -330,10 +332,7 @@ namespace Mahakam
 		auto importIter = m_AssetImporters.find(extension);
 		if (importIter != m_AssetImporters.end())
 		{
-			// TODO: Make the importer use Ref instead
-			Asset<void> asset = importIter->second->Deserialize(data);
-
-			return asset.Get();
+			return importIter->second->Deserialize(data);
 		}
 
 		return nullptr;

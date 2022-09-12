@@ -67,8 +67,6 @@ namespace Mahakam
 			else
 				interpolation = (m_Time - prev) / (next - prev);
 
-			//interpolation = 1.0f;
-
 			for (auto& bone : translations)
 				m_Translations[bone.first] = glm::mix(bone.second.at(prevIndex), bone.second.at(nextIndex), interpolation);
 			for (auto& bone : rotations)

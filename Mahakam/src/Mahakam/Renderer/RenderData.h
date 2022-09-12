@@ -83,13 +83,13 @@ namespace Mahakam
 		//  16 bits - Transform index
 		TrivialVector<uint64_t> renderQueue;
 
-		UnorderedMap<Asset<Shader>, uint64_t> shaderRefLookup;
-		UnorderedMap<Asset<Material>, uint64_t> materialRefLookup;
-		UnorderedMap<Asset<SubMesh>, uint64_t> meshRefLookup;
+		UnorderedMap<Ref<Shader>, uint64_t> shaderRefLookup;
+		UnorderedMap<Ref<Material>, uint64_t> materialRefLookup;
+		UnorderedMap<Ref<SubMesh>, uint64_t> meshRefLookup;
 
-		UnorderedMap<uint64_t, Asset<Shader>> shaderIDLookup;
-		UnorderedMap<uint64_t, Asset<Material>> materialIDLookup;
-		UnorderedMap<uint64_t, Asset<SubMesh>> meshIDLookup;
+		UnorderedMap<uint64_t, Ref<Shader>> shaderIDLookup;
+		UnorderedMap<uint64_t, Ref<Material>> materialIDLookup;
+		UnorderedMap<uint64_t, Ref<SubMesh>> meshIDLookup;
 		UnorderedMap<uint64_t, glm::mat4> transformIDLookup;
 
 		// Particle queue ID

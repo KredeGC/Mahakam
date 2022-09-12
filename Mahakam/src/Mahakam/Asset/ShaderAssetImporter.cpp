@@ -23,20 +23,20 @@ namespace Mahakam
 
 	void ShaderAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Shader> shader = Shader::Create(filepath.string());
+		Asset<Shader> shaderAsset = Asset<Shader>(Shader::Create(filepath.string()));
 
-		shader.Save(filepath, importPath);
+		shaderAsset.Save(filepath, importPath);
 
-		AssetDatabase::ReloadAsset(shader.GetID());
+		AssetDatabase::ReloadAsset(shaderAsset.GetID());
 	}
 #endif
 
-	void ShaderAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
+	void ShaderAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
 	{
 		//Ref<Shader> shader = StaticCastRef<Shader>(asset);
 	}
 
-	Asset<void> ShaderAssetImporter::Deserialize(YAML::Node& node)
+	Ref<void> ShaderAssetImporter::Deserialize(YAML::Node& node)
 	{
 		YAML::Node filepathNode = node["Filepath"];
 		if (filepathNode)

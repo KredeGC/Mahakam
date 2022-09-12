@@ -25,7 +25,7 @@ namespace Mahakam::Editor
 					SceneManager::GetActiveScene()->OnViewportResize((uint32_t)size.x, (uint32_t)size.y);
 				}
 
-				Asset<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
+				Ref<FrameBuffer> framebuffer = Renderer::GetFrameBuffer();
 				if (framebuffer)
 				{
 					Asset<Texture> viewportTexture = framebuffer->GetColorTexture(0);

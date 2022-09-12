@@ -33,12 +33,6 @@ namespace Mahakam
 	extern template class Asset<Shader>;
 	extern template class Asset<SubMesh>;
 
-	//struct BoneInfo
-	//{
-	//	int id; // Joint ID
-	//	glm::mat4 offset;
-	//};
-
 	struct MeshNode
 	{
 		std::string name; // Node name
@@ -48,46 +42,40 @@ namespace Mahakam
 		glm::mat4 offset; // Offset. In order of priority: invMatrix, matrix, TRS
 	};
 
-	// TODO: Use this prop struct when loading a model
 	struct MeshProps
 	{
-		bool CreateMaterials = false;
-		std::vector<Asset<Material>> OverrideMaterials;
-		std::vector<Asset<Shader>> OverrideShaders;
-
-		MeshProps() = default;
-
-		MeshProps(std::initializer_list<Asset<Shader>> shaders) : CreateMaterials(true), OverrideShaders(shaders) {}
-
-		MeshProps(std::initializer_list<Asset<Material>> materials) : CreateMaterials(false), OverrideMaterials(materials) {}
+		std::vector<Asset<Material>> Materials;
+		bool IncludeNodes = true;
+		bool IncludeBones = true;
 	};
 
 	class Mesh
 	{
 	public:
-		std::vector<Asset<SubMesh>> Meshes;
-		std::vector<Asset<Material>> Materials;
+		MeshProps Props;
+		std::vector<Ref<SubMesh>> Meshes;
 		std::vector<MeshNode> NodeHierarchy;
 		UnorderedMap<std::string, int> BoneInfoMap; // name to Joint ID
-		int BoneCount = 0;
 
 		Mesh() = default;
 
-		Mesh(const std::vector<Asset<SubMesh>>& meshes, const std::vector<Asset<Material>>& materials, const UnorderedMap<std::string, int>& boneInfo, int boneCount = 0)
-			: Meshes(meshes), Materials(materials), BoneInfoMap(boneInfo), BoneCount(boneCount)
-		{ }
-
-		Mesh(Asset<SubMesh> mesh, Asset<Material> material)
+		Mesh(Ref<SubMesh> mesh, Asset<Material> material)
 		{
 			Meshes.push_back(mesh);
-			Materials.push_back(material);
+			Props.Materials.push_back(material);
 		}
 
-		inline static Asset<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
+		Mesh(Ref<SubMesh> mesh, const MeshProps& props)
+		{
+			Meshes.push_back(mesh);
+			Props.Materials = props.Materials;
+		}
+
+		inline static Ref<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
 
 	private:
 		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Ref<Mesh> skinnedMesh);
-		MH_DECLARE_FUNC(LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
+		MH_DECLARE_FUNC(LoadMeshImpl, Ref<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
 	};
 
 	class SubMesh
@@ -149,14 +137,14 @@ namespace Mahakam
 		virtual const uint32_t* GetIndices() const = 0;
 		virtual uint32_t GetIndexCount() const = 0;
 
-		inline static Asset<SubMesh> Create(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
+		inline static Ref<SubMesh> Create(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
 		
-		static Asset<SubMesh> CreateCube(int tessellation, bool reverse = false);
-		static Asset<SubMesh> CreatePlane(int rows, int columns);
-		static Asset<SubMesh> CreateUVSphere(int rows, int columns);
-		static Asset<SubMesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
+		static Ref<SubMesh> CreateCube(int tessellation, bool reverse = false);
+		static Ref<SubMesh> CreatePlane(int rows, int columns);
+		static Ref<SubMesh> CreateUVSphere(int rows, int columns);
+		static Ref<SubMesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<SubMesh>, uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
+		MH_DECLARE_FUNC(CreateImpl, Ref<SubMesh>, uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
 	};
 }

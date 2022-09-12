@@ -19,7 +19,7 @@ namespace Mahakam
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
-		pixelationShader = Shader::Create("assets/shaders/external/Pixelation.shader");
+		pixelationShader = Asset<Shader>(Shader::Create("assets/shaders/external/Pixelation.shader"));
 
 		return true;
 	}
@@ -35,17 +35,17 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool PixelationPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
+	bool PixelationPass::Render(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		if (sceneData->wireframe)
 		{
-			src->Blit(viewportFramebuffer);
+			src->Blit(Asset<FrameBuffer>(viewportFramebuffer));
 			return false;
 		}
 
-		src->Blit(viewportFramebuffer, false, true);
+		src->Blit(Asset<FrameBuffer>(viewportFramebuffer), false, true);
 
 		viewportFramebuffer->Bind();
 		GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });

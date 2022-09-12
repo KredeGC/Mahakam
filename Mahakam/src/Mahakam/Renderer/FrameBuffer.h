@@ -70,6 +70,6 @@ namespace Mahakam
 
 		virtual void ReadColorPixels(void* pixels, int attachmentSlot = 0) const = 0;
 
-		MH_DECLARE_FUNC(Create, Asset<FrameBuffer>, const FrameBufferProps& props);
+		MH_DECLARE_FUNC(Create, Ref<FrameBuffer>, const FrameBufferProps& props);
 	};
 }

@@ -10,7 +10,7 @@ namespace Mahakam
 	{
 	private:
 		std::vector<Entity> m_BoneEntities;
-		bool m_TargetOrigin;
+		bool m_TargetOrigin = false;
 
 	public:
 		SkinComponent() {}

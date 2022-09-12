@@ -31,7 +31,7 @@ namespace Mahakam
 
 		ImporterProps m_ImporterProps;
 
-		Asset<Material> m_Material;
+		Ref<Material> m_Material;
 
 		std::filesystem::path m_ShaderImportPath;
 
@@ -39,8 +39,9 @@ namespace Mahakam
 		
 		UnorderedMap<std::string, Asset<Texture>> m_DefaultTextures;
 
+#ifndef MH_STANDALONE
 		// Preview
-		Asset<SubMesh> m_PreviewSphereMesh;
+		Ref<SubMesh> m_PreviewSphereMesh;
 		Camera m_PreviewCamera;
 		Ref<SceneData> m_SceneData;
 		glm::ivec2 m_ViewportSize{ 0 };
@@ -50,6 +51,7 @@ namespace Mahakam
 		Ref<RenderPass> m_GeometryPass;
 		Ref<RenderPass> m_LightingPass;
 		Ref<RenderPass> m_TonemapPass;
+#endif
 
 	public:
 		MaterialAssetImporter();
@@ -62,8 +64,8 @@ namespace Mahakam
 		virtual void OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) override;
 #endif
 
-		virtual void Serialize(YAML::Emitter& emitter, Asset<void> asset) override;
-		virtual Asset<void> Deserialize(YAML::Node& node) override;
+		virtual void Serialize(YAML::Emitter& emitter, Ref<void> asset) override;
+		virtual Ref<void> Deserialize(YAML::Node& node) override;
 
 	private:
 		Asset<Texture> GetDefaultTexture(const ShaderProperty& property);

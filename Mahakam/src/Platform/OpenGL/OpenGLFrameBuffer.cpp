@@ -140,7 +140,7 @@ namespace Mahakam
 		{
 			FrameBufferAttachmentProps& spec = m_Props.ColorAttachments[i];
 
-			Asset<Texture> tex = Texture2D::Create({ m_Props.Width, m_Props.Height, spec.Format, spec.FilterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+			Asset<Texture> tex = Asset<Texture2D>(Texture2D::Create({ m_Props.Width, m_Props.Height, spec.Format, spec.FilterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false }));
 
 			m_ColorAttachments.push_back(tex);
 
@@ -164,7 +164,7 @@ namespace Mahakam
 			}
 			else
 			{
-				m_DepthAttachment = Texture2D::Create({ m_Props.Width, m_Props.Height, spec.Format, spec.FilterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false });
+				m_DepthAttachment = Asset<Texture2D>(Texture2D::Create({ m_Props.Width, m_Props.Height, spec.Format, spec.FilterMode, TextureWrapMode::Clamp, TextureWrapMode::Clamp, false }));
 
 				MH_GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, m_DepthAttachment->GetRendererID(), 0));
 			}

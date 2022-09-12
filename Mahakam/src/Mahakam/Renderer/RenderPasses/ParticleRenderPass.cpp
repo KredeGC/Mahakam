@@ -25,7 +25,7 @@ namespace Mahakam
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
-		Renderer::AddFrameBuffer("Particle", viewportFramebuffer.Get());
+		Renderer::AddFrameBuffer("Particle", viewportFramebuffer);
 
 		particleCompute = ComputeShader::Create("assets/compute/Particles.glsl");
 
@@ -45,17 +45,17 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool ParticleRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
+	bool ParticleRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		GL::SetFillMode(!sceneData->wireframe);
 
-		src->Blit(viewportFramebuffer, true, true);
+		src->Blit(Asset<FrameBuffer>(viewportFramebuffer), true, true);
 
 		viewportFramebuffer->Bind();
 
-		Asset<FrameBuffer> gBuffer = Renderer::GetGBuffer();
+		Ref<FrameBuffer> gBuffer = Renderer::GetGBuffer();
 		gBuffer->GetColorTexture(3)->Bind(0);
 		gBuffer->GetDepthTexture()->Bind(1);
 
