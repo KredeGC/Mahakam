@@ -51,7 +51,7 @@ namespace Mahakam
 		if (sceneData->wireframe)
 			return false;
 
-		src->Blit(Asset<FrameBuffer>(viewportFramebuffer), false, true);
+		src->Blit(viewportFramebuffer, false, true);
 
 		viewportFramebuffer->Bind();
 		GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });

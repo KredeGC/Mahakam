@@ -42,9 +42,9 @@ namespace Mahakam
 		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 	}
 
-	void OpenGLFrameBuffer::Blit(Asset<FrameBuffer> dest, bool color, bool depth)
+	void OpenGLFrameBuffer::Blit(Ref<FrameBuffer> dest, bool color, bool depth)
 	{
-		Asset<OpenGLFrameBuffer> fbo = dest;
+		Ref<OpenGLFrameBuffer> fbo = StaticCastRef<OpenGLFrameBuffer>(dest);
 
 		MH_GL_CALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID));
 		MH_GL_CALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->m_RendererID));

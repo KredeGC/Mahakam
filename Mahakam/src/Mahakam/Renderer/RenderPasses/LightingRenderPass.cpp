@@ -184,7 +184,7 @@ namespace Mahakam
 		GL::SetViewport(0, 0, hdrFrameBuffer->GetSpecification().Width, hdrFrameBuffer->GetSpecification().Height);
 
 		// Blit depth buffer from gBuffer
-		src->Blit(Asset<FrameBuffer>(hdrFrameBuffer), false, true);
+		src->Blit(hdrFrameBuffer, false, true);
 
 		// Bind and clear lighting buffer
 		hdrFrameBuffer->Bind();

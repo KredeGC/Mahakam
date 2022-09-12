@@ -51,7 +51,7 @@ namespace Mahakam
 
 		GL::SetFillMode(!sceneData->wireframe);
 
-		src->Blit(Asset<FrameBuffer>(viewportFramebuffer), true, true);
+		src->Blit(viewportFramebuffer, true, true);
 
 		viewportFramebuffer->Bind();
 
