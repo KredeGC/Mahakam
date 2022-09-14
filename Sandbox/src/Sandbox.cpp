@@ -65,42 +65,6 @@ std::unordered_map<uint32_t, Entity> boneEntities;
 
 MH_EXTERN_EXPORTED void Run(Scene* scene)
 {
-	// Create light entity
-	Entity entity = scene->CreateEntity("DLL Light Test");
-	entity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
-	entity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
-
-#if 0
-	GLTFLoadModel("assets/models/mannequin_clap.gltf");
-
-	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
-
-	// Create skinned material
-	Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
-
-	// Create animation and model
-	SkinnedMesh skinnedModel = Mesh::LoadModel("assets/models/mannequin_clap.fbx");
-	Asset<Animation> animation = Animation::Load("assets/models/mannequin_clap.fbx", skinnedModel);
-
-	// Create skinned entities
-	for (int x = 0; x < 2; x++)
-	{
-		for (int z = 0; z < 2; z++)
-		{
-			Entity animatedEntity = scene->CreateEntity("DLL Animated");
-			animatedEntity.SetParent(animatedArchive);
-			animatedEntity.AddComponent<TransformComponent>().SetPosition({ x * 5.0f, 1.5f, 5.0f + z * 5.0f });
-			animatedEntity.GetComponent<TransformComponent>().SetScale({ 0.02f, 0.02f, 0.02f });
-			animatedEntity.AddComponent<MeshComponent>(skinnedModel, skinnedMaterial);
-			animatedEntity.AddComponent<AnimatorComponent>(animation);
-
-			if (z == 1)
-				animatedEntity.GetComponent<TransformComponent>().SetEulerangles({ 0.0f, 3.1415f, 0.0f });
-		}
-	}
-#endif
-
-
 	// Scene camera
 	Entity cameraEntity = scene->CreateEntity("Main Camera");
 	cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
@@ -115,7 +79,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	mainLightEntity.AddComponent<TransformComponent>().SetRotation(glm::quat({ -0.7f, -3.0f, 0.0f }));
 
 
-	// Spot
+	// Spot light
 	Entity pointLightEntity = scene->CreateEntity("Spot Light");
 	pointLightEntity.AddComponent<LightComponent>(Light::LightType::Spot, glm::radians(45.0f), 10.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 	pointLightEntity.AddComponent<TransformComponent>().SetPosition({ 1.0f, 2.5f, 4.0f });
@@ -143,7 +107,6 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 0
 	// Create backpack model
-	//SkinnedMesh backpackModel = Mesh::LoadModel("assets/models/backpack.obj");
 	Asset<Mesh> backpackModel = Mesh::LoadMesh("assets/models/backpack.gltf");
 
 	Asset<Material> backpackMaterial = Asset<Material>("import/assets/materials/Backpack.material.import");
@@ -157,6 +120,8 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 #if 1
+	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
+
 	// Create glTF skinned model
 	Asset<Mesh> skinnedModel = Asset<Mesh>("import/assets/models/mannequin_clap.glb.import");
 	//Asset<Mesh> skinnedModel = Asset<Mesh>(Mesh::LoadMesh("assets/models/mannequin_clap.glb"));
@@ -166,6 +131,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 	// Create backpack entity
 	Entity skinnedEntity = scene->CreateEntity("Skinned glTF");
+	skinnedEntity.SetParent(animatedArchive);
 	skinnedEntity.AddComponent<MeshComponent>(skinnedModel);
 	skinnedEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	skinnedEntity.AddComponent<AnimatorComponent>().GetAnimator().SetAnimation(skinnedAnimation);

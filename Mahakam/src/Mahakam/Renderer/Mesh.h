@@ -60,7 +60,7 @@ namespace Mahakam
 		}
 
 		inline static Ref<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
-		static Asset<Mesh> Copy(Asset<Mesh> copy) { return Asset<Mesh>(CreateRef<Mesh>(*copy.Ptr())); }
+		static Asset<Mesh> Copy(Asset<Mesh> copy) { return Asset<Mesh>(CreateRef<Mesh>(*copy.RefPtr())); }
 
 	private:
 		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Ref<Mesh> skinnedMesh);

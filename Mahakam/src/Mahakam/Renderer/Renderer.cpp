@@ -182,7 +182,7 @@ namespace Mahakam
 	{
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
-		Ref<Shader> shader = material->GetShader().Get();
+		Ref<Shader> shader = material->GetShader().RefPtr();
 		auto shaderIter = sceneData->shaderRefLookup.find(shader);
 		if (shaderIter == sceneData->shaderRefLookup.end())
 		{

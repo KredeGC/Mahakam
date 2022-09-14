@@ -12,6 +12,8 @@ namespace Mahakam
 	public:
 		struct ComponentInterface
 		{
+			const char* Icon = nullptr;
+
 			bool (*HasComponent)(Entity) = nullptr;
 			void (*AddComponent)(Entity) = nullptr;
 			void (*CopyComponent)(Entity, Entity) = nullptr;

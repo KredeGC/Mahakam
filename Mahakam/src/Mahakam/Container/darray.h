@@ -11,6 +11,10 @@ namespace Mahakam
 	class darray : private Alloc
 	{
 		static_assert(std::is_standard_layout<T>(), "Template class needs standard layout");
+	public:
+		typedef T* iterator;
+		typedef const T* const_iterator;
+
 	private:
 		T* m_Begin;
 		T* m_End;
@@ -112,13 +116,13 @@ namespace Mahakam
 			return *this;
 		}
 
-		T* begin() noexcept { return m_Begin; }
+		iterator begin() noexcept { return m_Begin; }
 
-		const T* begin() const noexcept { return m_Begin; }
+		const_iterator begin() const noexcept { return m_Begin; }
 
-		T* end() noexcept { return m_End; }
+		iterator end() noexcept { return m_End; }
 
-		const T* end() const noexcept { return m_End; }
+		const_iterator end() const noexcept { return m_End; }
 
 		std::reverse_iterator<T*> rbegin() noexcept { return std::reverse_iterator(m_End); }
 
@@ -132,8 +136,6 @@ namespace Mahakam
 		size_t size() const noexcept { return m_End - m_Begin; }
 
 		bool empty() const noexcept { return m_Begin == m_End; }
-
-		void clear() { m_End = m_Begin; }
 
 
 		T* data() noexcept { return m_Begin; }
@@ -183,5 +185,7 @@ namespace Mahakam
 
 			memcpy(m_Begin, first, n * sizeof(T));
 		}
+
+		void clear() { m_End = m_Begin; }
 	};
 }

@@ -22,7 +22,7 @@ namespace Mahakam::Editor
 		inline static void SetSelectedEntity(Entity entity) { s_SelectedEntity = entity; }
         inline static Entity GetSelectedEntity()
         {
-            if (!s_SelectedEntity || !s_SelectedEntity.IsValid())
+            if (!s_SelectedEntity)
                 s_SelectedEntity = {};
             return s_SelectedEntity;
         }

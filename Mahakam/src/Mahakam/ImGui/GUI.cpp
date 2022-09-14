@@ -119,7 +119,7 @@ namespace Mahakam::GUI
 	{
 		std::string entityLabel = "undefined";
 
-		if (entity && entity.IsValid())
+		if (entity)
 		{
 			if (TagComponent* tag = entity.TryGetComponent<TagComponent>())
 				entityLabel = tag->Tag;
@@ -177,7 +177,7 @@ namespace Mahakam::GUI
 	{
 		std::string entityLabel = "undefined";
 
-		if (entity && entity.IsValid())
+		if (entity)
 		{
 			if (TagComponent* tag = entity.TryGetComponent<TagComponent>())
 				entityLabel = tag->Tag;

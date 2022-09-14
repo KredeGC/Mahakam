@@ -34,6 +34,10 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 * [tinygltf](https://github.com/syoyo/tinygltf/tree/skinning) for model and animation loading.
 * [yaml-cpp](https://github.com/jbeder/yaml-cpp) for serializaing and deserializing various YAML files.
 
+Mahakam uses the Steam&reg; Audio SDK. Steam&reg; is a trademark or registered trademark of Valve Corporation in the United States of America and elsewhere.
+
+Steam&reg; Audio, Copyright 2017 - 2022, Valve Corp. All rights reserved.
+
 # Usage
 Mahakam can be used by itself, simply by building and linking to it.
 An editor application also exists, called Erebor, which includes a level-editor and asset manager among other game-making tools.

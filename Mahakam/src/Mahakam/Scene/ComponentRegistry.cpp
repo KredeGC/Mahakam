@@ -45,6 +45,7 @@ namespace Mahakam
 	{
 #pragma region Transform
 		ComponentInterface transformInterface;
+		transformInterface.Icon = u8"\uf020"; // vector
 		transformInterface.SetComponent<TransformComponent>();
 		transformInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{
@@ -72,6 +73,7 @@ namespace Mahakam
 
 #pragma region Animator
 		ComponentInterface animatorInterface;
+		animatorInterface.Icon = u8"\uecb4"; // video-clapper
 		animatorInterface.SetComponent<AnimatorComponent>();
 
 		RegisterComponent("Animator", animatorInterface);
@@ -79,6 +81,7 @@ namespace Mahakam
 
 #pragma region AudioListener
 		ComponentInterface audioListenerInterface;
+		audioListenerInterface.Icon = u8"\uea33"; // headphone
 		audioListenerInterface.SetComponent<AudioListenerComponent>();
 
 		RegisterComponent("Audio Listener", audioListenerInterface);
@@ -86,6 +89,7 @@ namespace Mahakam
 
 #pragma region AudioSource
 		ComponentInterface audioSourceInterface;
+		audioSourceInterface.Icon = u8"\ueea8"; // audio
 		audioSourceInterface.SetComponent<AudioSourceComponent>();
 		audioSourceInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{
@@ -124,6 +128,7 @@ namespace Mahakam
 
 #pragma region Camera
 		ComponentInterface cameraInterface;
+		cameraInterface.Icon = u8"\uecb5"; // video
 		cameraInterface.SetComponent<CameraComponent>();
 		cameraInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{
@@ -161,6 +166,7 @@ namespace Mahakam
 
 #pragma region Light
 		ComponentInterface lightInterface;
+		lightInterface.Icon = u8"\uef6b"; // light-bulb
 		lightInterface.SetComponent<LightComponent>();
 		lightInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{
@@ -194,6 +200,7 @@ namespace Mahakam
 
 #pragma region Mesh
 		ComponentInterface meshInterface;
+		meshInterface.Icon = u8"\ueef7"; // cube
 		meshInterface.SetComponent<MeshComponent>();
 		meshInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{
@@ -229,8 +236,17 @@ namespace Mahakam
 		RegisterComponent("Mesh", meshInterface);
 #pragma endregion
 
+#pragma region Particle
+		ComponentInterface particleInterface;
+		particleInterface.Icon = u8"\uefbe"; // pixels
+		particleInterface.SetComponent<ParticleSystemComponent>();
+
+		RegisterComponent("Particle system", particleInterface);
+#pragma endregion
+
 #pragma region Skin
 		ComponentInterface skinInterface;
+		skinInterface.Icon = u8"\uef89"; // male
 		skinInterface.SetComponent<SkinComponent>();
 		skinInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
 		{

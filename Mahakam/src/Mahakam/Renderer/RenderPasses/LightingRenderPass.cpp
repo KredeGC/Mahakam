@@ -612,7 +612,7 @@ namespace Mahakam
 
 			delete[] pixels;
 
-			return lut.Get();
+			return lut.RefPtr();
 		}
 		else
 		{

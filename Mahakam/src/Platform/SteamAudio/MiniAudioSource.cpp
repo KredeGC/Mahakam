@@ -64,7 +64,7 @@ namespace Mahakam
 
 		m_Sound = static_cast<Asset<MiniAudioSound>>(sound);
 		m_SoundProps = m_Sound->GetProps();
-		m_SoundSwitch = m_Sound.Get();
+		m_SoundSwitch = m_Sound.get();
 
 		InitSound();
 	}
@@ -89,12 +89,12 @@ namespace Mahakam
 		const SoundProps& props = m_Sound->GetProps();
 
 		// Reload the sound if the path changed
-		if (m_Sound.Get().get() != m_SoundSwitch.get())
+		if (m_Sound.get() != m_SoundSwitch)
 		{
 			UninitSound();
 
 			m_SoundProps = props;
-			m_SoundSwitch = m_Sound.Get();
+			m_SoundSwitch = m_Sound.get();
 
 			InitSound();
 

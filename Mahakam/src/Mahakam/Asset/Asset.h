@@ -88,17 +88,17 @@ namespace Mahakam
 
 		std::filesystem::path GetImportPath() const;
 
-		Ref<T> Get();
+		Ref<T> RefPtr();
 
-		Ref<T> Get() const;
+		Ref<T> RefPtr() const;
 
-		T* Ptr();
+		T* get();
 
-		T* Ptr() const;
+		T* get() const;
 
-		Ref<T> operator->() noexcept;
+		T* operator->() noexcept;
 
-		Ref<T> operator->() const noexcept;
+		T* operator->() const noexcept;
 
 		explicit operator bool() const noexcept;
 	};
@@ -107,13 +107,13 @@ namespace Mahakam
 	template<typename T>
 	bool operator==(const Asset<T>& _Left, std::nullptr_t) noexcept
 	{
-		return _Left.Ptr() == nullptr;
+		return _Left.get() == nullptr;
 	}
 
 	template<typename T1, typename T2>
 	bool operator==(const Asset<T1>& _Left, const Asset<T2>& _Right) noexcept
 	{
-		return _Left.Ptr() == _Right.Ptr();
+		return _Left.get() == _Right.get();
 	}
 
 	template<typename T>
@@ -210,7 +210,7 @@ namespace Mahakam
 	template<typename T>
 	void Asset<T>::Save(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		m_ID = AssetDatabase::SaveAsset(Get(), filepath, importPath);
+		m_ID = AssetDatabase::SaveAsset(RefPtr(), filepath, importPath);
 		if (m_Ptr)
 		{
 			AssetDatabase::RegisterAsset(m_ID);
@@ -231,7 +231,7 @@ namespace Mahakam
 	}
 
 	template<typename T>
-	Ref<T> Asset<T>::Get()
+	Ref<T> Asset<T>::RefPtr()
 	{
 		if (m_ID != 0)
 			return AssetDatabase::LoadAsset<T>(m_ID);
@@ -239,7 +239,7 @@ namespace Mahakam
 	}
 
 	template<typename T>
-	Ref<T> Asset<T>::Get() const
+	Ref<T> Asset<T>::RefPtr() const
 	{
 		if (m_ID != 0)
 			return AssetDatabase::LoadAsset<T>(m_ID);
@@ -247,33 +247,33 @@ namespace Mahakam
 	}
 
 	template<typename T>
-	T* Asset<T>::Ptr()
+	T* Asset<T>::get()
 	{
-		return Get().get();
+		return RefPtr().get();
 	}
 
 	template<typename T>
-	T* Asset<T>::Ptr() const
+	T* Asset<T>::get() const
 	{
-		return Get().get();
+		return RefPtr().get();
 	}
 
 	template<typename T>
-	Ref<T> Asset<T>::operator->() noexcept
+	T* Asset<T>::operator->() noexcept
 	{
-		return Get();
+		return get();
 	}
 
 	template<typename T>
-	Ref<T> Asset<T>::operator->() const noexcept
+	T* Asset<T>::operator->() const noexcept
 	{
-		return Get();
+		return get();
 	}
 
 	template<typename T>
 	Asset<T>::operator bool() const noexcept
 	{
-		return Get() != nullptr;
+		return RefPtr() != nullptr;
 	}
 }
 
@@ -284,7 +284,7 @@ namespace std
 	{
 		size_t operator()(const Mahakam::Asset<_Ty>& _Keyval) const noexcept
 		{
-			return hash<_Ty*>()(_Keyval.Ptr());
+			return hash<_Ty*>()(_Keyval.get());
 		}
 	};
 }

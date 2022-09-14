@@ -11,6 +11,13 @@ namespace Mahakam
 	Entity::Entity(entt::entity handle, Scene* scene)
 		: m_Handle(handle), m_Scene(scene) {}
 
+	Entity::operator bool() const
+	{
+		if (m_Handle == entt::null || !m_Scene)
+			return false;
+		return m_Scene->m_Registry.valid(m_Handle);
+	}
+
 	void Entity::SetParent(Entity parent)
 	{
 		auto& relation = m_Scene->m_Registry.get<RelationshipComponent>(m_Handle);
@@ -82,13 +89,6 @@ namespace Mahakam
 		// Mark children for deletion
 		// No need to reset their parents, they will soon be gone :)
 		MarkForDeletion(*this, relation);
-	}
-
-	bool Entity::IsValid() const
-	{
-		if (m_Scene)
-			return m_Scene->m_Registry.valid(m_Handle);
-		return false;
 	}
 
 	void Entity::ClearParent(Entity entity, RelationshipComponent& relation)

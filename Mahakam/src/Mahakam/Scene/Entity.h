@@ -22,7 +22,7 @@ namespace Mahakam
 		Entity(entt::entity handle, Scene* scene);
 		Entity(const Entity& ent) = default;
 
-		operator bool() const { return m_Handle != entt::null; }
+		operator bool() const;
 		operator entt::entity() const { return m_Handle; }
 		operator uint32_t() const { return (uint32_t)m_Handle; }
 		operator Scene*() const { return m_Scene; }
@@ -42,8 +42,6 @@ namespace Mahakam
 		Entity GetNext() const;
 		Entity GetPrev() const;
 		void Delete();
-
-		bool IsValid() const;
 
 		template<typename T, typename... Args>
 		void AddEmptyComponent(Args&&... args);

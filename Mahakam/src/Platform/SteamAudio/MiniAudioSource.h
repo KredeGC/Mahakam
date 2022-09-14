@@ -21,7 +21,7 @@ namespace Mahakam
 		ma_sound m_MaSound;
 
 		// Need to keep a reference to the sound itself, in case it changes
-		Ref<MiniAudioSound> m_SoundSwitch;
+		MiniAudioSound* m_SoundSwitch = nullptr;
 
 		// Need to keep a reference to props, in case they change
 		SoundProps m_SoundProps;

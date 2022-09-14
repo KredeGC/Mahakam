@@ -11,6 +11,10 @@ namespace Mahakam
 	class tvector : private Alloc
 	{
 		static_assert(std::is_standard_layout<T>(), "Template class needs standard layout");
+	public:
+		typedef T* iterator;
+		typedef const T* const_iterator;
+
 	private:
 		T* m_Begin;
 		T* m_End;
@@ -114,13 +118,13 @@ namespace Mahakam
 			return *this;
 		}
 
-		T* begin() noexcept { return m_Begin; }
+		iterator begin() noexcept { return m_Begin; }
 
-		const T* begin() const noexcept { return m_Begin; }
+		const_iterator begin() const noexcept { return m_Begin; }
 
-		T* end() noexcept { return m_End; }
+		iterator end() noexcept { return m_End; }
 
-		const T* end() const noexcept { return m_End; }
+		const_iterator end() const noexcept { return m_End; }
 
 		std::reverse_iterator<T*> rbegin() noexcept { return std::reverse_iterator(m_End); }
 
@@ -130,19 +134,23 @@ namespace Mahakam
 
 		std::reverse_iterator<const T*> rend() const noexcept { return std::reverse_iterator(m_Begin); }
 
+
 		size_t size() const noexcept { return m_End - m_Begin; }
 
 		size_t capacity() const noexcept { return m_EndMax - m_Begin; }
 
 		bool empty() const noexcept { return m_Begin == m_End; }
 
+
 		T* data() noexcept { return m_Begin; }
 
 		const T* data() const noexcept { return m_Begin; }
 
+
 		T& operator[](size_t index) noexcept { return m_Begin[index]; }
 
 		const T& operator[](size_t index) const noexcept { return m_Begin[index]; }
+
 
 		void resize(size_t n)
 		{

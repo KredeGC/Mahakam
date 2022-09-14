@@ -367,7 +367,7 @@ namespace Mahakam
 										else
 											transform = transformComponent.GetModelMatrix();
 
-										Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount].Get());
+										Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount].RefPtr());
 									}
 								}
 							}
@@ -377,7 +377,7 @@ namespace Mahakam
 							glm::mat4 modelMatrix = transformComponent.GetModelMatrix();
 
 							for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
-								Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount].Get());
+								Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount].RefPtr());
 						}
 					}
 				});

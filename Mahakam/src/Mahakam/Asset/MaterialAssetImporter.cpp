@@ -161,8 +161,8 @@ namespace Mahakam
 
 			Asset<Shader> shader = m_Material->GetShader();
 
-			m_SceneData->shaderIDLookup[0] = shader.Get();
-			m_SceneData->shaderRefLookup[shader.Get()] = 0; // This is the culprit, for some reason
+			m_SceneData->shaderIDLookup[0] = shader.RefPtr();
+			m_SceneData->shaderRefLookup[shader.RefPtr()] = 0; // This is the culprit, for some reason
 
 			m_SceneData->materialIDLookup[0] = m_Material;
 			m_SceneData->materialRefLookup[m_Material] = 0;
