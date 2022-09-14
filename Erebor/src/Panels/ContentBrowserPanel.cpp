@@ -100,8 +100,6 @@ namespace Mahakam::Editor
 		if (numColumns < 1)
 			numColumns = 1;
 
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0, 0, 0, 0 });
-
 		// Directories first
 		if (ImGui::CollapsingHeader("Directories", ImGuiTreeNodeFlags_SpanAvailWidth))
 		{
@@ -162,9 +160,7 @@ namespace Mahakam::Editor
 
 								ImGui::SetDragDropPayload(info.Extension.c_str(), importBuffer, strlen(importBuffer) + 1);
 								
-								ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
-								ImGui::Image((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
-								ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+								ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 								ImGui::TextWrapped("%s", pathName.c_str());
 
 								ImGui::EndDragDropSource();
@@ -204,22 +200,6 @@ namespace Mahakam::Editor
 						ImGui::PushID(file.path().string().c_str());
 						ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, { 0.48f, 0.5f, 0.53f, 1 });
 						
-						if (ImGui::BeginDragDropSource())
-						{
-							std::string extension = file.path().extension().string();
-							std::string importString = file.path().string();
-							const char* importBuffer = importString.c_str();
-
-							ImGui::SetDragDropPayload(extension.c_str(), importBuffer, strlen(importBuffer) + 1);
-
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
-							ImGui::Image((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
-							ImGui::TextWrapped("%s", pathName.c_str());
-
-							ImGui::EndDragDropSource();
-						}
-						
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 						{
 							std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
@@ -234,7 +214,5 @@ namespace Mahakam::Editor
 				ImGui::EndTable();
 			}
 		}
-
-		ImGui::PopStyleColor();
 	}
 }

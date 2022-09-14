@@ -23,37 +23,44 @@ namespace Mahakam
 
 	}
 
-	static void SetDarkTheme()
+	static void SetDarkTheme(ImGuiStyle& style)
 	{
-		auto& style = ImGui::GetStyle().Colors;
-		style[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.105f, 0.11f, 1.0f);
+		auto& colors = style.Colors;
+		colors[ImGuiCol_WindowBg] = ImVec4(0.14f, 0.145f, 0.15f, 1.0f);
 
 		// Header
-		style[ImGuiCol_Header] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
-		style[ImGuiCol_HeaderHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
-		style[ImGuiCol_HeaderActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		colors[ImGuiCol_Header] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+		colors[ImGuiCol_HeaderHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
+		colors[ImGuiCol_HeaderActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
 
 		// Buttons
-		style[ImGuiCol_Button] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
-		style[ImGuiCol_ButtonHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
-		style[ImGuiCol_ButtonActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		colors[ImGuiCol_Button] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+		colors[ImGuiCol_ButtonHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
+		colors[ImGuiCol_ButtonActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
 
 		// Frame
-		style[ImGuiCol_FrameBg] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
-		style[ImGuiCol_FrameBgHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
-		style[ImGuiCol_FrameBgActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		colors[ImGuiCol_FrameBg] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
+		colors[ImGuiCol_FrameBgActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+
+		// Borders
+		colors[ImGuiCol_Border] = ImVec4(0.1f, 0.09f, 0.08f, 1.0f);
+		colors[ImGuiCol_BorderShadow] = ImVec4(0.2f, 0.18f, 0.14f, 0.5f);
 
 		// Tabs
-		style[ImGuiCol_Tab] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
-		style[ImGuiCol_TabHovered] = ImVec4(0.38f, 0.385f, 0.39f, 1.0f);
-		style[ImGuiCol_TabActive] = ImVec4(0.28f, 0.285f, 0.29f, 1.0f);
-		style[ImGuiCol_TabUnfocused] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
-		style[ImGuiCol_TabUnfocusedActive] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+		colors[ImGuiCol_Tab] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		colors[ImGuiCol_TabHovered] = ImVec4(0.38f, 0.385f, 0.39f, 1.0f);
+		colors[ImGuiCol_TabActive] = ImVec4(0.28f, 0.285f, 0.29f, 1.0f);
+		colors[ImGuiCol_TabUnfocused] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+
+		// Popups
+		colors[ImGuiCol_PopupBg] = ImVec4(0.12f, 0.125f, 0.13f, 1.0f);
 
 		// Title
-		style[ImGuiCol_TitleBg] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
-		style[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
-		style[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		colors[ImGuiCol_TitleBg] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		colors[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
+		colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
 	}
 
 	void ImGuiLayer::OnAttach()
@@ -63,7 +70,8 @@ namespace Mahakam
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Disabled until ALT can be overriden
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Disabled until ALT can be overriden
+		io.ConfigFlags |= ImGuiConfigFlags_NavNoCaptureKeyboard;
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -71,14 +79,14 @@ namespace Mahakam
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
 		// Default font
-		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Roboto/Roboto-Regular.ttf", 18.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Roboto/Roboto-Regular.ttf", 16.0f);
 
 		// Font icons
 		ImFontConfig config;
 		config.MergeMode = true;
-		config.GlyphMinAdvanceX = 18.0f; // Use if you want to make the icon monospaced
+		config.GlyphMinAdvanceX = 16.0f; // Use if you want to make the icon monospaced
 		static const ImWchar icon_ranges[] = { 0xe800, 0xf02e, 0 };
-		io.Fonts->AddFontFromFileTTF("assets/fonts/IcoFont/icofont.ttf", 18.0f, &config, icon_ranges);
+		io.Fonts->AddFontFromFileTTF("assets/fonts/IcoFont/icofont.ttf", 16.0f, &config, icon_ranges);
 
 		// Mono font
 		ImFontConfig monoConfig;
@@ -91,13 +99,20 @@ namespace Mahakam
 		ImGui::StyleColorsDark();
 
 		ImGuiStyle& style = ImGui::GetStyle();
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			style.WindowRounding = 0.0f;
-			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-		}
+		style.WindowRounding = 0.0f;
+		style.WindowBorderSize = 0.0f;
+		style.PopupRounding = 2.0f;
+		style.PopupBorderSize = 0.0f;
+		style.FrameRounding = 2.0f;
+		style.FrameBorderSize = 1.0f;
+		style.ChildRounding = 2.0f;
+		style.ChildBorderSize = 1.0f;
+		style.TabRounding = 2.0f;
+		style.TabBorderSize = 0.0f;
+		style.ScrollbarRounding = 2.0f;
+		style.ScrollbarSize = 14.0f;
 
-		SetDarkTheme();
+		SetDarkTheme(style);
 
 		Application* app = Application::GetInstance();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app->GetWindow().GetNativeWindow());

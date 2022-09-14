@@ -28,10 +28,10 @@ namespace Mahakam::Editor
 		std::stringstream tagStream;
 
 		// Add icons
-		for (auto& component : ComponentRegistry::GetComponents())
+		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
-			if (component.second.Icon && component.second.HasComponent(entity))
-				tagStream << component.second.Icon;
+			if (componentInterface.Icon && componentInterface.HasComponent(entity))
+				tagStream << componentInterface.Icon;
 		}
 
 		// Use default icon
@@ -59,7 +59,38 @@ namespace Mahakam::Editor
 		// If entity is right-clicked
 		if (ImGui::BeginPopupContextItem())
 		{
-			ImGui::TextDisabled("(%d) %s", uint32_t(entity), tagName);
+			char buffer[GUI::MAX_STR_LEN]{ 0 };
+			std::strncpy(buffer, tag.c_str(), sizeof(buffer));
+			if (ImGui::InputText("##Entity Tag", buffer, sizeof(buffer)))
+			{
+				tag = std::string(buffer);
+			}
+
+			ImGui::SameLine();
+			ImGui::PushItemWidth(-FLT_MIN);
+
+			// Draw add component popup
+			if (ImGui::Button("+"))
+				ImGui::OpenPopup("AddComponentEntity");
+
+			if (ImGui::BeginPopup("AddComponentEntity"))
+			{
+				for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
+				{
+					if (!componentInterface.HasComponent(entity))
+					{
+						if (ImGui::MenuItem(name.c_str()))
+						{
+							componentInterface.AddComponent(entity);
+							ImGui::CloseCurrentPopup();
+						}
+					}
+				}
+
+				ImGui::EndPopup();
+			}
+
+			ImGui::PopItemWidth();
 
 			if (ImGui::MenuItem("Create empty entity"))
 			{
@@ -100,8 +131,7 @@ namespace Mahakam::Editor
 		{
 			std::string& tag = entity.GetComponent<TagComponent>().Tag;
 
-			char buffer[256];
-			memset(buffer, 0, sizeof(buffer));
+			char buffer[GUI::MAX_STR_LEN]{ 0 };
 			std::strncpy(buffer, tag.c_str(), sizeof(buffer));
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
@@ -141,8 +171,15 @@ namespace Mahakam::Editor
 		{
 			if (componentInterface.HasComponent(entity))
 			{
+				std::stringstream tagStream;
+				if (componentInterface.Icon)
+					tagStream << componentInterface.Icon << " ";
+				tagStream << name;
+
+				std::string tagString = tagStream.str();
+
 				bool markedForDeletion = false;
-				if (ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+				if (ImGui::CollapsingHeader(tagString.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1))
 						ImGui::OpenPopup(name.c_str());
