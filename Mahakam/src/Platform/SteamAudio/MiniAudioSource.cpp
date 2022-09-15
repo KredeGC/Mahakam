@@ -62,11 +62,14 @@ namespace Mahakam
 		if (m_Sound)
 			UninitSound();
 
-		m_Sound = static_cast<Asset<MiniAudioSound>>(sound);
-		m_SoundProps = m_Sound->GetProps();
-		m_SoundSwitch = m_Sound.get();
+		if (sound)
+		{
+			m_Sound = static_cast<Asset<MiniAudioSound>>(sound);
+			m_SoundProps = m_Sound->GetProps();
+			m_SoundSwitch = m_Sound.get();
 
-		InitSound();
+			InitSound();
+		}
 	}
 
 	void MiniAudioSource::SetInterpolation(bool interpolate)
@@ -86,6 +89,8 @@ namespace Mahakam
 
 	void MiniAudioSource::UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos)
 	{
+		if (!m_Sound) return;
+
 		const SoundProps& props = m_Sound->GetProps();
 
 		// Reload the sound if the path changed

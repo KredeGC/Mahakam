@@ -232,6 +232,18 @@ namespace Mahakam::Editor
 		PropertyRegistry::PropertyPtr meshInspector = [](Entity entity)
 		{
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
+
+			// Mesh dragdrop
+			std::filesystem::path importPath = meshComponent.GetMesh().GetImportPath();
+			if (GUI::DrawDragDropField("Mesh", ".mesh", importPath))
+			{
+				Asset<Mesh> mesh = Asset<Mesh>(importPath);
+				if (mesh)
+					meshComponent.SetMesh(mesh);
+				else
+					meshComponent.SetMesh(nullptr);
+			}
+
 			if (!meshComponent.HasMesh()) return;
 
 			auto& meshes = meshComponent.GetSubMeshes();
@@ -251,14 +263,6 @@ namespace Mahakam::Editor
 			{
 				ImGui::Text("Vertex count: %d", vertexCount);
 				ImGui::Text("Triangle count: %d", indexCount / 3);
-			}
-
-			const auto& materials = meshComponent.GetMaterials();
-			for (size_t i = 0; i < materials.size(); i++)
-			{
-				std::filesystem::path importPath = materials[i].GetImportPath();
-				GUI::DrawDragDropField("Material " + std::to_string(i), ".material", importPath);
-				// TODO: Change if updated
 			}
 		};
 
@@ -280,9 +284,10 @@ namespace Mahakam::Editor
 					ImGui::SameLine();
 					ImGui::Button("Set bones from Mesh");
 
-					for (size_t i = 0; i < bones.size(); i++)
+					if (bones.size() == hierarchy.size())
 					{
-						GUI::DrawDragDropEntity(hierarchy[i].name, "Transform", bones[i]);
+						for (size_t i = 0; i < bones.size(); i++)
+							GUI::DrawDragDropEntity(hierarchy[i].name, "Transform", bones[i]);
 					}
 				}
 				else

@@ -49,8 +49,8 @@ namespace Mahakam
 
 		// Tabs
 		colors[ImGuiCol_Tab] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
-		colors[ImGuiCol_TabHovered] = ImVec4(0.38f, 0.385f, 0.39f, 1.0f);
-		colors[ImGuiCol_TabActive] = ImVec4(0.28f, 0.285f, 0.29f, 1.0f);
+		colors[ImGuiCol_TabHovered] = ImVec4(0.11f, 0.59f, 0.92f, 1.0f);
+		colors[ImGuiCol_TabActive] = ImVec4(0.0f, 0.48f, 0.8f, 1.0f);
 		colors[ImGuiCol_TabUnfocused] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
 		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
 
@@ -58,7 +58,7 @@ namespace Mahakam
 		colors[ImGuiCol_PopupBg] = ImVec4(0.12f, 0.125f, 0.13f, 1.0f);
 
 		// DragDrop
-		colors[ImGuiCol_DragDropTarget] = ImVec4(0.8f, 0.7f, 0.2f, 1.0f);
+		colors[ImGuiCol_DragDropTarget] = ImVec4(0.0f, 0.48f, 0.8f, 1.0f);
 
 		// Title
 		colors[ImGuiCol_TitleBg] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
@@ -110,7 +110,7 @@ namespace Mahakam
 		style.FrameBorderSize = 1.0f;
 		style.ChildRounding = 2.0f;
 		style.ChildBorderSize = 1.0f;
-		style.TabRounding = 2.0f;
+		style.TabRounding = 0.0f;
 		style.TabBorderSize = 0.0f;
 		style.ScrollbarRounding = 2.0f;
 		style.ScrollbarSize = 14.0f;

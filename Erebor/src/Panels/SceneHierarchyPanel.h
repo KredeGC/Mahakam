@@ -6,6 +6,9 @@ namespace Mahakam::Editor
 {
 	class SceneHierarchyPanel : EditorWindow
 	{
+	public:
+		static constexpr float SEPARATOR_HEIGHT = 6.0f;
+
 	private:
 		bool m_Open = true;
 

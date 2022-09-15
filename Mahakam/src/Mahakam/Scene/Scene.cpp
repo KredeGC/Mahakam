@@ -118,11 +118,18 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - AnimatorComponent");
 
-			m_Registry.view<AnimatorComponent, SkinComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
+			m_Registry.view<AnimatorComponent>().each([=](AnimatorComponent& animatorComponent)
 			{
 				auto& animator = animatorComponent.GetAnimator();
 
 				animator.Update(ts);
+			});
+
+			m_Registry.view<AnimatorComponent, SkinComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
+			{
+				if (!meshComponent.HasMesh()) return;
+
+				auto& animator = animatorComponent.GetAnimator();
 
 				const auto& translations = animator.GetTranslations();
 				const auto& rotations = animator.GetRotations();
@@ -132,10 +139,7 @@ namespace Mahakam
 				const auto& hierarchy = meshComponent.GetNodeHierarchy();
 
 				if (boneEntities.size() != hierarchy.size())
-				{
 					boneEntities.resize(hierarchy.size());
-					return;
-				}
 
 				for (size_t i = 0; i < boneEntities.size(); i++)
 				{

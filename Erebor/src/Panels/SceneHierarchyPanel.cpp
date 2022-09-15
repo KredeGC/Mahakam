@@ -34,6 +34,36 @@ namespace Mahakam::Editor
 		return tagStream.str();
 	}
 
+	template<typename Fn>
+	static void DrawDropTarget(Ref<Scene> context, Entity entity, Fn func)
+	{
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity"))
+			{
+				Entity move = *((Entity*)payload->Data);
+
+				if (entity != move)
+				{
+					// Make sure that circular parenting never happens
+					Entity current = entity;
+					while (current)
+					{
+						if (current == move)
+							return;
+
+						current = current.GetParent();
+					}
+
+					func(entity, move);
+					context->Sort();
+				}
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+	}
+
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity, Ref<Scene> context)
 	{
 		std::string& tag = entity.GetComponent<TagComponent>().Tag;
@@ -67,12 +97,17 @@ namespace Mahakam::Editor
 		// If entity is right-clicked
 		if (ImGui::BeginPopupContextItem())
 		{
+			// Draw entity tag name
+			ImGui::PushItemWidth(ImGui::CalcTextSize(tag.c_str()).x + 18.f);
+
 			char buffer[GUI::MAX_STR_LEN]{ 0 };
 			std::strncpy(buffer, tag.c_str(), sizeof(buffer));
 			if (ImGui::InputText("##Entity Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
 			}
+
+			ImGui::PopItemWidth();
 
 			ImGui::SameLine();
 			ImGui::PushItemWidth(-FLT_MIN);
@@ -118,26 +153,13 @@ namespace Mahakam::Editor
 		}
 
 		// Mark as drop target
-		if (ImGui::BeginDragDropTarget())
+		DrawDropTarget(context, entity, [](Entity parent, Entity move)
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity"))
-			{
-				Entity move = *((Entity*)payload->Data);
-
-				if (entity != move)
-				{
-					move.SetParent(entity);
-					context->Sort();
-				}
-			}
-
-			ImGui::EndDragDropTarget();
-		}
+			move.SetParent(parent);
+		});
 
 		ImVec2 min = ImGui::GetItemRectMin();
 		ImVec2 max = ImGui::GetItemRectMax();
-
-		constexpr float separatorHeight = 8.0f;
 
 		// If entity is open
 		if (open)
@@ -145,23 +167,12 @@ namespace Mahakam::Editor
 			// Draw separator before children
 			if (relation.First != entt::null)
 			{
-				ImGui::InvisibleButton(tagName, { max.x - min.x, separatorHeight });
+				ImGui::InvisibleButton(tagName, { max.x - min.x, SEPARATOR_HEIGHT });
 
-				if (ImGui::BeginDragDropTarget())
+				DrawDropTarget(context, entity, [](Entity parent, Entity move)
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity"))
-					{
-						Entity move = *((Entity*)payload->Data);
-
-						if (entity != move)
-						{
-							entity.SetFirstChild(move);
-							context->Sort();
-						}
-					}
-
-					ImGui::EndDragDropTarget();
-				}
+					parent.SetFirstChild(move);
+				});
 			}
 
 			// Draw child entities
@@ -179,23 +190,12 @@ namespace Mahakam::Editor
 		// Draw last separator if at root, not open or has no children
 		if (!open || relation.Parent == entt::null || relation.First == entt::null)
 		{
-			ImGui::InvisibleButton(tagName, { max.x - min.x, separatorHeight });
+			ImGui::InvisibleButton(tagName, { max.x - min.x, SEPARATOR_HEIGHT });
 
-			if (ImGui::BeginDragDropTarget())
+			DrawDropTarget(context, entity, [](Entity parent, Entity move)
 			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity"))
-				{
-					Entity move = *((Entity*)payload->Data);
-
-					if (entity != move)
-					{
-						entity.SetNext(move);
-						context->Sort();
-					}
-				}
-
-				ImGui::EndDragDropTarget();
-			}
+				parent.SetNext(move);
+			});
 		}
 	}
 
@@ -277,9 +277,11 @@ namespace Mahakam::Editor
 						ImGui::EndPopup();
 					}
 
+					ImGui::Indent();
 					PropertyRegistry::PropertyPtr onInspector = PropertyRegistry::GetProperty(name);
 					if (onInspector)
 						onInspector(entity);
+					ImGui::Unindent();
 				}
 
 				if (markedForDeletion)
@@ -297,17 +299,7 @@ namespace Mahakam::Editor
 				Ref<Scene> context = SceneManager::GetActiveScene();
 				if (context)
 				{
-					// context->ForEach<RelationshipComponent>([&](auto handle, RelationshipComponent& relation)
-					// {
-					// 	// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
-					// 	Entity entity{ handle, context.get() };
-
-					// 	// Start by drawing the root entities
-					// 	// Recursively draw their children
-					// 	//if (!relation.Parent)
-					// 		DrawEntityNode(entity, context);
-					// });
-
+					// Draw each entity in the hierarchy
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 					context->ForEachEntity([&](Entity entity)
 					{
@@ -319,6 +311,23 @@ namespace Mahakam::Editor
 						if (relation.Parent == entt::null)
 							DrawEntityNode(entity, context);
 					});
+
+					// Use the remaining space as drop target
+					if (ImGui::GetDragDropPayload())
+					{
+						ImVec2 size = ImGui::GetContentRegionAvail();
+
+						if (size.y > 0.0f)
+						{
+							ImGui::InvisibleButton("##Empty Hierarchy", { size.x, size.y });
+
+							DrawDropTarget(context, {}, [](Entity parent, Entity move)
+							{
+								move.SetParent({});
+							});
+						}
+					}
+
 					ImGui::PopStyleVar();
 
 					if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
