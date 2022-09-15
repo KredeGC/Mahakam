@@ -85,6 +85,8 @@
 //  ES 3.0    300       "#version 300 es"   = WebGL 2.0
 //----------------------------------------
 
+#include "Mahakam/mhpch.h"
+
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -140,7 +142,7 @@
 // Changes to this backend using new APIs should be accompanied by a regenerated stripped loader version.
 #include <glad/glad.h>
 #define IMGL3W_IMPL
-#include "imgui_impl_glad_loader.h"
+#include "imgui_impl_opengl3_loader.h"
 #endif
 
 // Vertex arrays are not supported on ES2/WebGL1 unless Emscripten which uses an extension
