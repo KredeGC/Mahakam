@@ -8,23 +8,14 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <unordered_map>
 #include <sstream>
 
 namespace Mahakam::Editor
 {
-	void SceneHierarchyPanel::DrawEntityNode(Entity entity, Ref<Scene> context)
+	static std::string CreateTagIcons(Entity entity, const std::string& tag)
 	{
-		std::string& tag = entity.GetComponent<TagComponent>().Tag;
-
-		ImGuiTreeNodeFlags flags = ((entity == Selection::GetSelectedEntity()) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
-
-		auto& relation = entity.GetComponent<RelationshipComponent>();
-
-		// Remove leaf node on parents with no children
-		if (relation.First == entt::null)
-			flags |= ImGuiTreeNodeFlags_Leaf;
-
-		// Create tag
+		// Create stream for icons
 		std::stringstream tagStream;
 
 		// Add icons
@@ -38,8 +29,25 @@ namespace Mahakam::Editor
 		if (tagStream.tellp() == 0)
 			tagStream << u8"\ueea5"; // Archive icon
 
+		// Add tag at the end
 		tagStream << " " << tag.c_str();
-		std::string tagString = tagStream.str();
+		return tagStream.str();
+	}
+
+	void SceneHierarchyPanel::DrawEntityNode(Entity entity, Ref<Scene> context)
+	{
+		std::string& tag = entity.GetComponent<TagComponent>().Tag;
+
+		ImGuiTreeNodeFlags flags = ((entity == Selection::GetSelectedEntity()) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
+
+		auto& relation = entity.GetComponent<RelationshipComponent>();
+
+		// Remove leaf node on parents with no children
+		if (relation.First == entt::null)
+			flags |= ImGuiTreeNodeFlags_Leaf;
+
+		// Create tag
+		std::string tagString = CreateTagIcons(entity, tag);
 		const char* tagName = tagString.c_str();
 
 		bool open = ImGui::TreeNodeEx((void*)(uint64_t)uint32_t(entity), flags, "%s", tagName);
@@ -52,7 +60,7 @@ namespace Mahakam::Editor
 		if (ImGui::BeginDragDropSource())
 		{
 			ImGui::SetDragDropPayload("Entity", &entity, sizeof(Entity));
-			ImGui::Text("(%d) %s", uint32_t(entity), tagName);
+			ImGui::Text("%s", tagName);
 			ImGui::EndDragDropSource();
 		}
 
@@ -109,9 +117,54 @@ namespace Mahakam::Editor
 			ImGui::EndPopup();
 		}
 
+		// Mark as drop target
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity"))
+			{
+				Entity move = *((Entity*)payload->Data);
+
+				if (entity != move)
+				{
+					move.SetParent(entity);
+					context->Sort();
+				}
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		ImVec2 min = ImGui::GetItemRectMin();
+		ImVec2 max = ImGui::GetItemRectMax();
+
+		constexpr float separatorHeight = 8.0f;
+
 		// If entity is open
 		if (open)
 		{
+			// Draw separator before children
+			if (relation.First != entt::null)
+			{
+				ImGui::InvisibleButton(tagName, { max.x - min.x, separatorHeight });
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity"))
+					{
+						Entity move = *((Entity*)payload->Data);
+
+						if (entity != move)
+						{
+							entity.SetFirstChild(move);
+							context->Sort();
+						}
+					}
+
+					ImGui::EndDragDropTarget();
+				}
+			}
+
+			// Draw child entities
 			Entity current = entity.GetFirstChild();
 			while (current)
 			{
@@ -121,6 +174,28 @@ namespace Mahakam::Editor
 			}
 
 			ImGui::TreePop();
+		}
+
+		// Draw last separator if at root, not open or has no children
+		if (!open || relation.Parent == entt::null || relation.First == entt::null)
+		{
+			ImGui::InvisibleButton(tagName, { max.x - min.x, separatorHeight });
+
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Entity"))
+				{
+					Entity move = *((Entity*)payload->Data);
+
+					if (entity != move)
+					{
+						entity.SetNext(move);
+						context->Sort();
+					}
+				}
+
+				ImGui::EndDragDropTarget();
+			}
 		}
 	}
 
@@ -233,6 +308,7 @@ namespace Mahakam::Editor
 					// 		DrawEntityNode(entity, context);
 					// });
 
+					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
 					context->ForEachEntity([&](Entity entity)
 					{
 						// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
@@ -243,6 +319,7 @@ namespace Mahakam::Editor
 						if (relation.Parent == entt::null)
 							DrawEntityNode(entity, context);
 					});
+					ImGui::PopStyleVar();
 
 					if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 						Selection::SetSelectedEntity({});

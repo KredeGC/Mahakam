@@ -57,6 +57,9 @@ namespace Mahakam
 		// Popups
 		colors[ImGuiCol_PopupBg] = ImVec4(0.12f, 0.125f, 0.13f, 1.0f);
 
+		// DragDrop
+		colors[ImGuiCol_DragDropTarget] = ImVec4(0.8f, 0.7f, 0.2f, 1.0f);
+
 		// Title
 		colors[ImGuiCol_TitleBg] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
 		colors[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.155f, 0.16f, 1.0f);
@@ -102,7 +105,7 @@ namespace Mahakam
 		style.WindowRounding = 0.0f;
 		style.WindowBorderSize = 0.0f;
 		style.PopupRounding = 2.0f;
-		style.PopupBorderSize = 0.0f;
+		style.PopupBorderSize = 1.0f;
 		style.FrameRounding = 2.0f;
 		style.FrameBorderSize = 1.0f;
 		style.ChildRounding = 2.0f;

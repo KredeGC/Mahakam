@@ -64,9 +64,60 @@ namespace Mahakam
 		return { m_Scene->m_Registry.get<RelationshipComponent>(m_Handle).Parent, m_Scene };
 	}
 
+	void Entity::SetFirstChild(Entity first)
+	{
+		auto& relation = m_Scene->m_Registry.get<RelationshipComponent>(m_Handle);
+		auto& firstRelation = m_Scene->m_Registry.get<RelationshipComponent>(first.m_Handle);
+
+		// Clear first's current parent
+		ClearParent(first, firstRelation);
+
+		// Clear their relationship
+		firstRelation.Prev = entt::null;
+		firstRelation.Next = entt::null;
+		firstRelation.Parent = m_Handle;
+
+		// Get our old first
+		entt::entity oldFirst = relation.First;
+
+		relation.First = first;
+
+		if (oldFirst != entt::null)
+		{
+			firstRelation.Next = oldFirst;
+			m_Scene->m_Registry.get<RelationshipComponent>(oldFirst).Prev = first;
+		}
+	}
+
 	Entity Entity::GetFirstChild() const
 	{
 		return { m_Scene->m_Registry.get<RelationshipComponent>(m_Handle).First, m_Scene };
+	}
+
+	void Entity::SetNext(Entity next)
+	{
+		auto& relation = m_Scene->m_Registry.get<RelationshipComponent>(m_Handle);
+		auto& nextRelation = m_Scene->m_Registry.get<RelationshipComponent>(next.m_Handle);
+
+		// Clear next's current parent
+		ClearParent(next, nextRelation);
+
+		// Clear their relationship
+		nextRelation.Prev = entt::null;
+		nextRelation.Next = entt::null;
+		nextRelation.Parent = relation.Parent;
+
+		// Setting the next child of an empty parent is just unparenting
+		if (relation.Parent == entt::null) return;
+
+		if (relation.Next != entt::null)
+		{
+			nextRelation.Next = relation.Next;
+			m_Scene->m_Registry.get<RelationshipComponent>(relation.Next).Prev = next;
+		}
+
+		relation.Next = next;
+		nextRelation.Prev = m_Handle;
 	}
 
 	Entity Entity::GetNext() const

@@ -38,7 +38,9 @@ namespace Mahakam
 
 		void SetParent(Entity parent);
 		Entity GetParent() const;
+		void SetFirstChild(Entity first);
 		Entity GetFirstChild() const;
+		void SetNext(Entity next);
 		Entity GetNext() const;
 		Entity GetPrev() const;
 		void Delete();
