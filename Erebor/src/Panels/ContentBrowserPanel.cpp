@@ -105,6 +105,22 @@ namespace Mahakam::Editor
 		{
 			if (ImGui::BeginTable("Directory Divisor", numColumns))
 			{
+				// Draw .. directory
+				if (path != s_AssetDirectory)
+				{
+					ImGui::TableNextColumn();
+
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+					ImGui::PushID("..");
+					ImGui::ImageButton((ImTextureID)(uintptr_t)m_DirectoryIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+						m_CurrentDirectory = path.parent_path();
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+					ImGui::TextWrapped("%s", "..");
+					ImGui::PopID();
+				}
+
+				// Draw other directories
 				for (auto& file : std::filesystem::directory_iterator(path))
 				{
 					if (file.is_directory())
@@ -117,9 +133,7 @@ namespace Mahakam::Editor
 						ImGui::PushID(file.path().string().c_str());
 						ImGui::ImageButton((ImTextureID)(uintptr_t)m_DirectoryIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-						{
 							m_CurrentDirectory = file.path();
-						}
 						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 						ImGui::TextWrapped("%s", pathName.c_str());
 						ImGui::PopID();

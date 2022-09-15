@@ -28,7 +28,7 @@ namespace Mahakam::Editor
 		oldMouseX = mouseX;
 		oldMouseY = mouseY;
 
-		if (focus && altHeld && Input::IsMouseButtonPressed(MouseButton::LEFT)) // Orbit around target
+		if (focus && hovered && altHeld && Input::IsMouseButtonPressed(MouseButton::LEFT)) // Orbit around target
 		{
 			controlling = true;
 			Application::GetInstance()->GetWindow().SetCursorVisible(false);
@@ -40,7 +40,7 @@ namespace Mahakam::Editor
 
 			UpdateRotationMatrix();
 		}
-		else if (noCapture && hover && !altHeld && Input::IsMouseButtonPressed(MouseButton::RIGHT)) // FPS Rotate
+		else if (noCapture && focus && hovered && !altHeld && Input::IsMouseButtonPressed(MouseButton::RIGHT)) // FPS Rotate
 		{
 			controlling = true;
 			Application::GetInstance()->GetWindow().SetCursorVisible(false);

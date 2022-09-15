@@ -6,8 +6,10 @@
 
 #include <imgui/imgui.h>
 
-#include <imgui/backends/imgui_impl_glfw.cpp>
+#include "imgui_impl_glfw.h" //#include <imgui/backends/imgui_impl_glfw.cpp>
 #include "imgui_impl_glad.h" //#include <imgui/backends/imgui_impl_opengl3.cpp>
+
+#include <GLFW/glfw3.h>
 
 #include <imguizmo/ImGuizmo.h>
 
@@ -73,7 +75,7 @@ namespace Mahakam
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Disabled until ALT can be overriden
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_NavNoCaptureKeyboard;
 		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;

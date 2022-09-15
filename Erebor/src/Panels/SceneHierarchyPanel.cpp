@@ -167,7 +167,13 @@ namespace Mahakam::Editor
 			// Draw separator before children
 			if (relation.First != entt::null)
 			{
-				ImGui::InvisibleButton(tagName, { max.x - min.x, SEPARATOR_HEIGHT });
+				float separatorWidth = ImGui::GetContentRegionAvail().x;
+
+				/*if (ImGui::GetDragDropPayload())
+					ImGui::Button("##Visible Separator", { separatorWidth, SEPARATOR_HEIGHT });
+				else
+					*/
+				ImGui::InvisibleButton(tagName, { separatorWidth, SEPARATOR_HEIGHT });
 
 				DrawDropTarget(context, entity, [](Entity parent, Entity move)
 				{
@@ -188,9 +194,15 @@ namespace Mahakam::Editor
 		}
 
 		// Draw last separator if at root, not open or has no children
-		if (!open || relation.Parent == entt::null || relation.First == entt::null)
+		if (!open || relation.First == entt::null)
 		{
-			ImGui::InvisibleButton(tagName, { max.x - min.x, SEPARATOR_HEIGHT });
+			float separatorWidth = ImGui::GetContentRegionAvail().x;
+
+			/*if (ImGui::GetDragDropPayload())
+				ImGui::Button("##Visible Separator", { separatorWidth, SEPARATOR_HEIGHT });
+			else
+				*/
+			ImGui::InvisibleButton(tagName, { separatorWidth, SEPARATOR_HEIGHT });
 
 			DrawDropTarget(context, entity, [](Entity parent, Entity move)
 			{
@@ -334,7 +346,7 @@ namespace Mahakam::Editor
 						Selection::SetSelectedEntity({});
 
 					// Blank space menu
-					if (ImGui::BeginPopupContextWindow("Hierarchy Empty RMB", 1, false))
+					if (ImGui::BeginPopupContextWindow("Hierarchy Empty RMB", ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
 					{
 						if (ImGui::MenuItem("Create empty entity"))
 							context->CreateEntity();

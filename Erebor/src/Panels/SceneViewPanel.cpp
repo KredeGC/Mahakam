@@ -93,8 +93,12 @@ namespace Mahakam::Editor
 				m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
 				m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
+				if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(1))
+					ImGui::SetWindowFocus();
+
 				m_Focused = ImGui::IsWindowFocused();
-				m_Hovered = ImGui::IsWindowHovered();
+				if (Application::GetInstance()->GetWindow().IsCursorVisible())
+					m_Hovered = ImGui::IsWindowHovered();
 				Application::GetInstance()->GetImGuiLayer()->BlockEvents(!m_Focused && !m_Hovered);
 				ImVec2 newViewportSize = ImGui::GetContentRegionAvail();
 				if (newViewportSize.x != m_ViewportSize.x || newViewportSize.y != m_ViewportSize.y)
