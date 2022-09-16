@@ -2,7 +2,7 @@
 #version 430 core
 #include "assets/shaders/include/Matrix.glsl"
 
-layout (std140, binding = 1) uniform LightMatrices {
+layout (std140, binding = LIGHT_MATRICES_BINDING) uniform LightMatrices {
     mat4 u_WorldToLight;
 };
 

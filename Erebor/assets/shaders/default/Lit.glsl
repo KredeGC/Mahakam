@@ -2,38 +2,67 @@
 #version 430 core
 #include "assets/shaders/include/Matrix.glsl"
 
-struct v2f {
-    vec3 v_WorldPos;
-    vec3 v_WorldNormal;
-    #ifndef USE_TRIPLANAR
-        vec3 v_WorldTangent;
-        vec3 v_WorldBinormal;
-        vec2 v_UV;
-    #endif
-};
+#ifdef SKIN
+#include "assets/shaders/include/Skin.glsl"
+#endif
 
-layout(location = 0) out v2f o;
+#if defined(GEOMETRY)
+    struct v2f {
+        vec3 v_WorldPos;
+        vec3 v_WorldNormal;
+        #ifndef USE_TRIPLANAR
+            vec3 v_WorldTangent;
+            vec3 v_WorldBinormal;
+            vec2 v_UV;
+        #endif
+    };
+
+    layout(location = 0) out v2f o;
+#elif defined(SHADOW)
+    layout (std140, binding = LIGHT_MATRICES_BINDING) uniform LightMatrices {
+        mat4 u_WorldToLight;
+    };
+#endif // GEOMETRY || SHADOW
 
 layout(location = 0) in vec3 i_Pos;
 layout(location = 1) in vec2 i_UV;
 layout(location = 2) in vec3 i_Normal;
 layout(location = 3) in vec4 i_Tangent;
+#ifdef SKIN
+    layout(location = 5) in ivec4 i_BoneIDs;
+    layout(location = 6) in vec4 i_BoneWeights;
+#endif // SKIN
 
 #ifndef USE_TRIPLANAR
     layout(location = 0) uniform vec4 u_UVTransform;
-#endif
+#endif // USE_TRIPLANAR
 
 void main() {
-    gl_Position = MATRIX_MVP * vec4(i_Pos, 1.0);
+    #ifdef SKIN
+        mat4 boneTransform = transformBoneVertex(i_BoneIDS, i_BoneWeights);
+
+        vec3 pos = boneTransform * vec4(i_Pos, 1.0);
+        vec3 normal = mat3(boneTransform) * i_Normal;
+        vec3 tangent = mat3(boneTransform) * i_Tangent.xyz;
+    #else
+        vec3 pos = i_Pos;
+        vec3 normal = i_Normal;
+        vec3 tangent = i_Tangent.xyz;
+    #endif // SKIN
     
-    o.v_WorldPos = (MATRIX_M * vec4(i_Pos, 1.0)).xyz;
-    //o.v_WorldNormal = (MATRIX_M * vec4(i_Normal, 0.0)).xyz; // Correct for uniformly scaled objects
-    o.v_WorldNormal = (vec4(i_Normal, 0.0) * inverse(MATRIX_M)).xyz; // Correct for non-uniform scaled objects
-    #ifndef USE_TRIPLANAR
-        o.v_WorldTangent = (MATRIX_M * vec4(i_Tangent.xyz, 0.0)).xyz;
-        o.v_WorldBinormal = cross(o.v_WorldNormal, o.v_WorldTangent.xyz);
-        o.v_UV = u_UVTransform.xy * i_UV + u_UVTransform.zw;
-    #endif
+    #if defined(GEOMETRY)
+        gl_Position = MATRIX_MVP * vec4(pos, 1.0);
+
+        o.v_WorldPos = transformWorldPos(MATRIX_M, pos);
+        o.v_WorldNormal = transformWorldNormal(MATRIX_M, normal);
+        #ifndef USE_TRIPLANAR
+            o.v_WorldTangent = transformWorldTangent(MATRIX_M, tangent);
+            o.v_WorldBinormal = transformWorldBinormal(o.v_WorldNormal, o.v_WorldTangent, i_Tangent.w);
+            o.v_UV = transformTexCoordinates(i_UV, u_UVTransform);
+        #endif
+    #elif defined(SHADOW)
+        gl_Position = u_WorldToLight * MATRIX_M * vec4(pos, 1.0);
+    #endif // GEOMETRY || SHADOW
 }
 
 
@@ -44,30 +73,32 @@ void main() {
 
 #ifdef USE_BUMP
 #include "assets/shaders/include/Normal.glsl"
-#endif
+#endif // USE_BUMP
 
 #ifdef USE_STOCHASTIC
 #include "assets/shaders/include/Stochastic.glsl"
 #define SAMPLE_TEXTURE SampleStochastic
 #else
 #define SAMPLE_TEXTURE texture
-#endif
+#endif // USE_STOCHASTIC
 
 #ifdef USE_TRIPLANAR
 #include "assets/shaders/include/Triplanar.glsl"
-#endif
+#endif // USE_TRIPLANAR
 
-struct v2f {
-    vec3 v_WorldPos;
-    vec3 v_WorldNormal;
-    #ifndef USE_TRIPLANAR
-        vec3 v_WorldTangent;
-        vec3 v_WorldBinormal;
-        vec2 v_UV;
-    #endif
-};
+#ifdef GEOMETRY
+    struct v2f {
+        vec3 v_WorldPos;
+        vec3 v_WorldNormal;
+        #ifndef USE_TRIPLANAR
+            vec3 v_WorldTangent;
+            vec3 v_WorldBinormal;
+            vec2 v_UV;
+        #endif
+    };
 
-layout(location = 0) in v2f i;
+    layout(location = 0) in v2f i;
+#endif // GEOMETRY
 
 layout(location = 0) out vec4 o_Albedo;
 layout(location = 1) out vec4 o_Specular;
@@ -77,28 +108,29 @@ layout(location = 3) out vec4 o_Normal;
 layout(location = 0) uniform vec4 u_UVTransform;
 #ifdef USE_ALBEDO
     layout(binding = 1, location = 1) uniform sampler2D u_Albedo;
-#endif
+#endif // USE_ALBEDO
 layout(location = 2) uniform vec3 u_Color;
 #ifdef USE_BUMP
     layout(binding = 3, location = 3) uniform sampler2D u_Bump;
-#endif
+#endif // USE_BUMP
 #ifdef USE_METALLIC
     layout(binding = 4, location = 4) uniform sampler2D u_Metallic;
-#endif
+#endif // USE_METALLIC
 layout(location = 5) uniform float u_MetallicMul;
 #ifdef USE_ROUGHNESS
     layout(binding = 6, location = 6) uniform sampler2D u_Roughness;
-#endif
+#endif // USE_ROUGHNESS
 layout(location = 7) uniform float u_RoughnessMul;
 #ifdef USE_OCCLUSSION
     layout(binding = 8, location = 8) uniform sampler2D u_Occlussion;
-#endif
+#endif // USE_OCCLUSSION
 #ifdef USE_EMISSION
     layout(binding = 9, location = 9) uniform sampler2D u_Emission;
-#endif
+#endif // USE_EMISSION
 layout(location = 10) uniform vec3 u_EmissionColor;
 
 void main() {
+#ifdef GEOMETRY
     vec3 worldNormal = normalize(i.v_WorldNormal);
     
     // Triplanar values
@@ -189,4 +221,5 @@ void main() {
     o_Specular = vec4(0.0, 0.0, metallic, roughness);
     o_Emission = vec4(emission, 0.0);
     o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
+#endif
 }

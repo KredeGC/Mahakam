@@ -40,7 +40,6 @@ void main() {
     boneTransform += finalBonesMatrices[i_BoneIDs[2]] * i_BoneWeights[2];
     boneTransform += finalBonesMatrices[i_BoneIDs[3]] * i_BoneWeights[3];
     
-    //mat3 normalMatrix = transpose(inverse(mat3(boneTransform)));
     vec4 pos = boneTransform * vec4(i_Pos, 1.0);
     
     #if defined(GEOMETRY)
