@@ -39,9 +39,9 @@ layout(location = 3) in vec4 i_Tangent;
 
 void main() {
     #ifdef SKIN
-        mat4 boneTransform = transformBoneVertex(i_BoneIDS, i_BoneWeights);
+        mat4 boneTransform = transformBoneVertex(i_BoneIDs, i_BoneWeights);
 
-        vec3 pos = boneTransform * vec4(i_Pos, 1.0);
+        vec3 pos = (boneTransform * vec4(i_Pos, 1.0)).xyz;
         vec3 normal = mat3(boneTransform) * i_Normal;
         vec3 tangent = mat3(boneTransform) * i_Tangent.xyz;
     #else
