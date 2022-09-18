@@ -123,7 +123,7 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		// Create lighting shader
-		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.shader", { "DEBUG" });
+		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.shader");
 
 		// Create default shadow shader
 		shadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
@@ -157,10 +157,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		if (sceneData->gBuffer)
-			deferredShader->Bind("DIRECTIONAL", "DEBUG");
-		else
-			deferredShader->Bind("DIRECTIONAL");
+		deferredShader->Bind("DIRECTIONAL");
 		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
 		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
 		deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(2));
@@ -539,10 +536,7 @@ namespace Mahakam
 			sceneData->pointLightBuffer->Bind(1);
 			sceneData->pointLightBuffer->SetData(&sceneData->environment.PointLights[0], 0, bufferSize);
 
-			if (sceneData->gBuffer)
-				deferredShader->Bind("POINT", "DEBUG");
-			else
-				deferredShader->Bind("POINT");
+			deferredShader->Bind("POINT");
 			deferredShader->SetTexture("u_AttenuationLUT", Asset<Texture>(falloffLut));
 
 			Renderer::DrawInstancedSphere(amount);
@@ -566,10 +560,7 @@ namespace Mahakam
 			sceneData->spotLightBuffer->Bind(1);
 			sceneData->spotLightBuffer->SetData(&sceneData->environment.SpotLights[0], 0, bufferSize);
 
-			if (sceneData->gBuffer)
-				deferredShader->Bind("SPOT", "DEBUG");
-			else
-				deferredShader->Bind("SPOT");
+			deferredShader->Bind("SPOT");
 			deferredShader->SetTexture("u_AttenuationLUT", Asset<Texture>(falloffLut));
 			deferredShader->SetTexture("u_LightCookie", Asset<Texture>(spotlightTexture));
 

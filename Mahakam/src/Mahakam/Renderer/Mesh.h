@@ -40,7 +40,7 @@ namespace Mahakam
 		MeshProps Props;
 		std::vector<Ref<SubMesh>> Meshes;
 		std::vector<MeshNode> NodeHierarchy;
-		UnorderedMap<std::string, int> BoneInfoMap; // name to Joint ID
+		UnorderedMap<std::string, int> BoneInfoMap; // Name to Joint ID
 
 		Mesh() = default;
 

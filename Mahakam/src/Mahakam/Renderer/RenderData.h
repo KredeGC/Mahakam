@@ -91,7 +91,6 @@ namespace Mahakam
 		UnorderedMap<uint64_t, Ref<Material>> materialIDLookup;
 		UnorderedMap<uint64_t, Ref<SubMesh>> meshIDLookup;
 		UnorderedMap<uint64_t, glm::mat4> transformIDLookup;
-		UnorderedMap<uint64_t, glm::mat4> boneIDLookup; // TODO: Implement this
 
 		// Particle queue ID
 		// 32 bits - Depth

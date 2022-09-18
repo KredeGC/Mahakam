@@ -14,7 +14,7 @@
 #ifdef MH_DEBUG
 #define MH_ENABLE_ASSERT // Enable asserts in debug builds
 #define MH_ENABLE_GL_ERRORS // Enable render API error logging in debug builds
-#endif // MH_RELEASE
+#endif // MH_DEBUG
 #endif // MH_STANDALONE
 
 

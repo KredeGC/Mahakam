@@ -30,7 +30,7 @@ namespace Mahakam
 	public:
 		virtual ~Shader() = default;
 
-		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") = 0;
+		virtual void Bind(const std::string& shaderPass) = 0;
 
 		virtual const std::filesystem::path& GetFilepath() const = 0;
 		virtual const std::string& GetName() const = 0;
@@ -51,9 +51,9 @@ namespace Mahakam
 		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) = 0;
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
 
-		inline static Ref<Shader> Create(const std::filesystem::path& filepath, const std::initializer_list<std::string>& keywords = {}) { return CreateFilepath(filepath, keywords); }
+		inline static Ref<Shader> Create(const std::filesystem::path& filepath) { return CreateFilepath(filepath); }
 
 	private:
-		MH_DECLARE_FUNC(CreateFilepath, Ref<Shader>, const std::filesystem::path& filepath, const std::initializer_list<std::string>& keywords);
+		MH_DECLARE_FUNC(CreateFilepath, Ref<Shader>, const std::filesystem::path& filepath);
 	};
 }

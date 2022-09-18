@@ -48,7 +48,7 @@ namespace Mahakam
 		return "";
 	}
 
-	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath, const std::initializer_list<std::string>& keywords)
+	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
 		: m_Filepath(filepath)
 	{
 		MH_PROFILE_FUNCTION();
@@ -56,11 +56,8 @@ namespace Mahakam
 		// Naming
 		m_Name = filepath.stem().string();
 
-		std::vector<std::string> features = keywords;
-		features.emplace_back("");
-
 		// Read YAML file for shader passes
-		ParseYAMLFile(filepath, features);
+		ParseYAMLFile(filepath);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -69,30 +66,17 @@ namespace Mahakam
 
 		for (auto& pass : m_ShaderPasses)
 		{
-			for (auto& shader : pass.second)
-			{
-				MH_GL_CALL(glDeleteProgram(shader.second));
-			}
+			MH_GL_CALL(glDeleteProgram(pass.second));
 		}
 	}
 
-	void OpenGLShader::Bind(const std::string& shaderPass, const std::string& variant)
+	void OpenGLShader::Bind(const std::string& shaderPass)
 	{
 		auto passIter = m_ShaderPasses.find(shaderPass);
 		if (passIter != m_ShaderPasses.end())
 		{
-			auto& variants = passIter->second;
-
-			auto variantIter = variants.find(variant);
-			if (variantIter != variants.end())
-			{
-				m_RendererID = variantIter->second;
-				MH_GL_CALL(glUseProgram(m_RendererID));
-			}
-			else
-			{
-				MH_CORE_BREAK("Attempted to use uncompiled shader variant!");
-			}
+			m_RendererID = passIter->second;
+			MH_GL_CALL(glUseProgram(m_RendererID));
 		}
 		else
 		{
@@ -349,7 +333,7 @@ namespace Mahakam
 		return "";
 	}
 
-	void OpenGLShader::ParseYAMLFile(const std::filesystem::path& filepath, const std::vector<std::string>& keywords)
+	void OpenGLShader::ParseYAMLFile(const std::filesystem::path& filepath)
 	{
 		YAML::Node rootNode;
 		try
@@ -362,8 +346,6 @@ namespace Mahakam
 		}
 
 		MH_CORE_ASSERT(rootNode && rootNode.size() > 0, "Loaded empty shader file! Path may be wrong!");
-
-		UnorderedMap<std::string, std::string> keywordPermutations = ParseShaderKeywords(keywords);
 
 		// Read properties
 		auto propertiesNode = rootNode["Properties"];
@@ -423,7 +405,7 @@ namespace Mahakam
 					shaderPassDefines << "#define " + define.as<std::string>() + "\n";
 			}
 
-			const std::string partialPath = filepath.string() + "_" + shaderPassName;
+			const std::string passPath = filepath.string() + "_" + shaderPassName;
 
 			// Read and compile include files
 			auto includesNode = shaderPassNode.second["Includes"];
@@ -440,9 +422,8 @@ namespace Mahakam
 
 				auto sources = ParseGLSLFile(source.str());
 
-				// Generate shaders for each shader pass * each keyword combination
-				for (const auto& directives : keywordPermutations)
-					m_ShaderPasses[shaderPassName][directives.first] = CompileBinary(FileUtility::GetCachePath(partialPath + directives.first), sources, shaderPassDefines.str() + directives.second);
+				// Generate shaders for each shader pass
+				m_ShaderPasses[shaderPassName] = CompileBinary(FileUtility::GetCachePath(passPath), sources, shaderPassDefines.str());
 			}
 		}
 	}
@@ -499,16 +480,28 @@ namespace Mahakam
 
 	int OpenGLShader::GetUniformLocation(const std::string& name)
 	{
-		auto iter = m_UniformIDCache.find(name);
-		if (iter != m_UniformIDCache.end() && iter->second != -1)
-			return iter->second;
+		auto cacheIter = m_UniformIDCache.find(name);
+		if (cacheIter != m_UniformIDCache.end() && cacheIter->second != -1)
+			return cacheIter->second;
 
-		int uniformID = glGetUniformLocation(m_RendererID, name.c_str());
+		// Get the ID of a shader pass (prefer our current shader pass)
+		int uniformID = -1;
+		if (m_RendererID != ~0)
+			MH_GL_CALL(uniformID = glGetUniformLocation(m_RendererID, name.c_str()));
+		if (uniformID == -1)
+		{
+			for (auto& [pass, id] : m_ShaderPasses)
+			{
+				if (id == m_RendererID || id == ~0) continue;
+				MH_GL_CALL(uniformID = glGetUniformLocation(id, name.c_str()));
+				if (uniformID != -1) break;
+			}
+		}
 
 		m_UniformIDCache[name] = uniformID;
 
 		// Inform the user that a property is unused
-		if (iter == m_UniformIDCache.end() && uniformID == -1)
+		if (cacheIter == m_UniformIDCache.end() && uniformID == -1)
 			MH_CORE_WARN("Shader {0} Uniform {1} unused or optimized away", m_Filepath.string(), name);
 
 		return uniformID;

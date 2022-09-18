@@ -23,7 +23,7 @@ namespace Mahakam
 	void TexelLightingPass::SetupShaders()
 	{
 		// Create lighting shader
-		deferredShader = Shader::Create("assets/shaders/external/DeferredTexel.shader", { "DEBUG" });
+		deferredShader = Shader::Create("assets/shaders/external/DeferredTexel.shader");
 
 		// Create default shadow shader
 		shadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
@@ -33,10 +33,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		if (sceneData->gBuffer)
-			deferredShader->Bind("DIRECTIONAL", "DEBUG");
-		else
-			deferredShader->Bind("DIRECTIONAL");
+		deferredShader->Bind("DIRECTIONAL");
 		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
 		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
 		deferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3));

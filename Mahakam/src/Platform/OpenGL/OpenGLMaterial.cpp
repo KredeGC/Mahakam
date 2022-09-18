@@ -10,8 +10,8 @@
 
 namespace Mahakam
 {
-	OpenGLMaterial::OpenGLMaterial(Asset<Shader> shader, const std::string& variant)
-		: m_Shader(shader), m_Variant(variant)
+	OpenGLMaterial::OpenGLMaterial(Asset<Shader> shader)
+		: m_Shader(shader)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -22,7 +22,6 @@ namespace Mahakam
 
 	OpenGLMaterial::OpenGLMaterial(const Asset<Material>& material) :
 		m_Shader(static_cast<Asset<OpenGLMaterial>>(material)->m_Shader),
-		m_Variant(static_cast<Asset<OpenGLMaterial>>(material)->m_Variant),
 		m_Textures(static_cast<Asset<OpenGLMaterial>>(material)->m_Textures),
 		m_Mat3s(static_cast<Asset<OpenGLMaterial>>(material)->m_Mat3s),
 		m_Mat4s(static_cast<Asset<OpenGLMaterial>>(material)->m_Mat4s),
@@ -113,7 +112,7 @@ namespace Mahakam
 
 	void OpenGLMaterial::Bind()
 	{
-		//shader->bind();
+		//MH_PROFILE_FUNCTION();
 
 		for (auto& [name, texture] : m_Textures)
 			m_Shader->SetTexture(name, texture);

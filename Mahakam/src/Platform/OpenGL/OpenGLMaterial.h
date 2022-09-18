@@ -15,8 +15,6 @@ namespace Mahakam
 	private:
 		Asset<OpenGLShader> m_Shader;
 
-		std::string m_Variant = "";
-
 		UnorderedMap<std::string, Asset<Texture>> m_Textures;
 		
 		UnorderedMap<std::string, glm::mat3> m_Mat3s;
@@ -30,7 +28,7 @@ namespace Mahakam
 		UnorderedMap<std::string, glm::vec4> m_Float4s;
 
 	public:
-		OpenGLMaterial(Asset<Shader> shader, const std::string& variant = "");
+		OpenGLMaterial(Asset<Shader> shader);
 		OpenGLMaterial(const Asset<Material>& material);
 		virtual ~OpenGLMaterial() = default;
 
@@ -39,7 +37,6 @@ namespace Mahakam
 		inline virtual Asset<Shader> GetShader() const override { return m_Shader; }
 
 		virtual void BindShader(const std::string& shaderPass) override { m_Shader->Bind(shaderPass); }
-		virtual void BindShader(const std::string& shaderPass, const std::string& variant) override { m_Shader->Bind(shaderPass, variant); }
 		virtual void Bind() override;
 
 		virtual void SetTransform(const glm::mat4& modelMatrix) override;
@@ -68,19 +65,6 @@ namespace Mahakam
 		virtual glm::vec2 GetFloat2(const std::string& name) const override;
 		virtual glm::vec3 GetFloat3(const std::string& name) const override;
 		virtual glm::vec4 GetFloat4(const std::string& name) const override;
-
-
-		virtual const UnorderedMap<std::string, Asset<Texture>>& GetTextures() const override { return m_Textures; }
-
-		virtual const UnorderedMap<std::string, glm::mat3>& GetMat3s() const override { return m_Mat3s; }
-		virtual const UnorderedMap<std::string, glm::mat4>& GetMat4s() const override { return m_Mat4s; }
-
-		virtual const UnorderedMap<std::string, int32_t>& GetInts() const override { return m_Ints; }
-
-		virtual const UnorderedMap<std::string, float>& GetFloats() const override { return m_Floats; }
-		virtual const UnorderedMap<std::string, glm::vec2>& GetFloat2s() const override { return m_Float2s; }
-		virtual const UnorderedMap<std::string, glm::vec3>& GetFloat3s() const override { return m_Float3s; }
-		virtual const UnorderedMap<std::string, glm::vec4>& GetFloat4s() const override { return m_Float4s; }
 
 	private:
 		void ResetShaderProperties(const UnorderedMap<std::string, ShaderProperty>& properties);

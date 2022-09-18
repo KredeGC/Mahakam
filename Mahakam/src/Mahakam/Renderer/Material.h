@@ -33,7 +33,6 @@ namespace Mahakam
 		virtual Asset<Shader> GetShader() const = 0;
 
 		virtual void BindShader(const std::string& shaderPass) = 0;
-		virtual void BindShader(const std::string& shaderPass, const std::string& variant) = 0;
 		virtual void Bind() = 0;
 
 		virtual void SetTransform(const glm::mat4& modelMatrix) = 0;
@@ -64,23 +63,10 @@ namespace Mahakam
 		virtual glm::vec4 GetFloat4(const std::string& name) const = 0;
 
 
-		virtual const UnorderedMap<std::string, Asset<Texture>>& GetTextures() const = 0;
-
-		virtual const UnorderedMap<std::string, glm::mat3>& GetMat3s() const = 0;
-		virtual const UnorderedMap<std::string, glm::mat4>& GetMat4s() const = 0;
-
-		virtual const UnorderedMap<std::string, int32_t>& GetInts() const = 0;
-
-		virtual const UnorderedMap<std::string, float>& GetFloats() const = 0;
-		virtual const UnorderedMap<std::string, glm::vec2>& GetFloat2s() const = 0;
-		virtual const UnorderedMap<std::string, glm::vec3>& GetFloat3s() const = 0;
-		virtual const UnorderedMap<std::string, glm::vec4>& GetFloat4s() const = 0;
-
-
-		inline static Ref<Material> Create(Asset<Shader> shader, const std::string& variant = "") { return CreateImpl(shader, variant); }
+		inline static Ref<Material> Create(Asset<Shader> shader) { return CreateImpl(shader); }
 		MH_DECLARE_FUNC(Copy, Asset<Material>, Asset<Material> material);
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Ref<Material>, Asset<Shader> shader, const std::string& variant);
+		MH_DECLARE_FUNC(CreateImpl, Ref<Material>, Asset<Shader> shader);
 	};
 }

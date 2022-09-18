@@ -15,18 +15,18 @@ namespace Mahakam
 		std::filesystem::path m_Filepath;
 		std::string m_Name;
 
-		UnorderedMap<std::string, // Render passes
-			UnorderedMap<std::string, // Shader variants
-			uint32_t>> m_ShaderPasses;
+		// TODO: Create a UniformBuffer and store the uniforms in that instead
+
+		UnorderedMap<std::string, uint32_t> m_ShaderPasses;
 
 		UnorderedMap<std::string, int> m_UniformIDCache;
 		UnorderedMap<std::string, ShaderProperty> m_Properties;
 
 	public:
-		OpenGLShader(const std::filesystem::path& filepath, const std::initializer_list<std::string>& defines = {});
+		OpenGLShader(const std::filesystem::path& filepath);
 		virtual ~OpenGLShader();
 
-		virtual void Bind(const std::string& shaderPass, const std::string& variant = "") override;
+		virtual void Bind(const std::string& shaderPass) override;
 
 		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
 		virtual const std::string& GetName() const override { return m_Name; }
@@ -51,7 +51,7 @@ namespace Mahakam
 		uint32_t CompileBinary(const std::filesystem::path& cachePath, const UnorderedMap<uint32_t, std::string>& sources, const std::string& directives);
 
 		std::string ParseDefaultValue(const YAML::Node& node);
-		void ParseYAMLFile(const std::filesystem::path& filepath, const std::vector<std::string>& keywords);
+		void ParseYAMLFile(const std::filesystem::path& filepath);
 		UnorderedMap<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
 		UnorderedMap<uint32_t, std::string> ParseGLSLFile(const std::string& source);
 

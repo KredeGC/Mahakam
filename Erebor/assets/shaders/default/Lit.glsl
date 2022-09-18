@@ -34,7 +34,7 @@ layout(location = 3) in vec4 i_Tangent;
 #endif // SKIN
 
 #ifndef USE_TRIPLANAR
-    layout(location = 0) uniform vec4 u_UVTransform;
+    layout(location = 6) uniform vec4 u_UVTransform;
 #endif // USE_TRIPLANAR
 
 void main() {
@@ -105,29 +105,32 @@ layout(location = 1) out vec4 o_Specular;
 layout(location = 2) out vec4 o_Emission;
 layout(location = 3) out vec4 o_Normal;
 
-layout(location = 0) uniform vec4 u_UVTransform;
 #ifdef USE_ALBEDO
-    layout(binding = 1, location = 1) uniform sampler2D u_Albedo;
+    layout(binding = 0, location = 0) uniform sampler2D u_Albedo;
 #endif // USE_ALBEDO
-layout(location = 2) uniform vec3 u_Color;
 #ifdef USE_BUMP
-    layout(binding = 3, location = 3) uniform sampler2D u_Bump;
+    layout(binding = 1, location = 1) uniform sampler2D u_Bump;
 #endif // USE_BUMP
 #ifdef USE_METALLIC
-    layout(binding = 4, location = 4) uniform sampler2D u_Metallic;
+    layout(binding = 2, location = 2) uniform sampler2D u_Metallic;
 #endif // USE_METALLIC
-layout(location = 5) uniform float u_MetallicMul;
 #ifdef USE_ROUGHNESS
-    layout(binding = 6, location = 6) uniform sampler2D u_Roughness;
+    layout(binding = 3, location = 3) uniform sampler2D u_Roughness;
 #endif // USE_ROUGHNESS
-layout(location = 7) uniform float u_RoughnessMul;
 #ifdef USE_OCCLUSSION
-    layout(binding = 8, location = 8) uniform sampler2D u_Occlussion;
+    layout(binding = 4, location = 4) uniform sampler2D u_Occlussion;
 #endif // USE_OCCLUSSION
 #ifdef USE_EMISSION
-    layout(binding = 9, location = 9) uniform sampler2D u_Emission;
+    layout(binding = 5, location = 5) uniform sampler2D u_Emission;
 #endif // USE_EMISSION
-layout(location = 10) uniform vec3 u_EmissionColor;
+
+#ifdef USE_TRIPLANAR
+    layout(location = 6) uniform vec4 u_UVTransform;
+#endif // USE_TRIPLANAR
+layout(location = 7) uniform vec3 u_Color;
+layout(location = 8) uniform vec3 u_EmissionColor;
+layout(location = 9) uniform float u_MetallicMul;
+layout(location = 10) uniform float u_RoughnessMul;
 
 void main() {
 #ifdef GEOMETRY
