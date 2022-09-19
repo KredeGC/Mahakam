@@ -5,6 +5,7 @@
 namespace Mahakam
 {
 	class OpenGLShader;
+	class UniformBuffer;
 
 	extern template class Asset<OpenGLShader>;
 
@@ -15,7 +16,7 @@ namespace Mahakam
 		std::filesystem::path m_Filepath;
 		std::string m_Name;
 
-		// TODO: Create a UniformBuffer and store the uniforms in that instead
+		Ref<UniformBuffer> m_Buffer;
 
 		UnorderedMap<std::string, uint32_t> m_ShaderPasses;
 

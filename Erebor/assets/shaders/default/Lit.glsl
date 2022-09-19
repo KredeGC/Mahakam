@@ -33,9 +33,13 @@ layout(location = 3) in vec4 i_Tangent;
     layout(location = 6) in vec4 i_BoneWeights;
 #endif // SKIN
 
-#ifndef USE_TRIPLANAR
-    layout(location = 6) uniform vec4 u_UVTransform;
-#endif // USE_TRIPLANAR
+layout (std140) uniform Uniforms {
+    vec4 u_UVTransform;
+    vec3 u_Color;
+    vec3 u_EmissionColor;
+    float u_MetallicMul;
+    float u_RoughnessMul;
+};
 
 void main() {
     #ifdef SKIN
@@ -124,13 +128,13 @@ layout(location = 3) out vec4 o_Normal;
     layout(binding = 5, location = 5) uniform sampler2D u_Emission;
 #endif // USE_EMISSION
 
-#ifdef USE_TRIPLANAR
-    layout(location = 6) uniform vec4 u_UVTransform;
-#endif // USE_TRIPLANAR
-layout(location = 7) uniform vec3 u_Color;
-layout(location = 8) uniform vec3 u_EmissionColor;
-layout(location = 9) uniform float u_MetallicMul;
-layout(location = 10) uniform float u_RoughnessMul;
+layout (std140) uniform Uniforms {
+    vec4 u_UVTransform;
+    vec3 u_Color;
+    vec3 u_EmissionColor;
+    float u_MetallicMul;
+    float u_RoughnessMul;
+};
 
 void main() {
 #ifdef GEOMETRY

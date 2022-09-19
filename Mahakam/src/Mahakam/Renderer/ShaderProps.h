@@ -25,5 +25,7 @@ namespace Mahakam
 		float Min = 0;
 		float Max = 0;
 		std::string DefaultString;
+		uint32_t Count = 1;
+		int Offset = 0;
 	};
 }

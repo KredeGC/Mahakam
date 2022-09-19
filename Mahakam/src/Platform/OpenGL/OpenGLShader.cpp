@@ -9,6 +9,7 @@
 
 #include "Mahakam/Math/Math.h"
 
+#include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/Texture.h"
 
 #include <glad/glad.h>
@@ -29,8 +30,7 @@ namespace Mahakam
 		else if (type == "fragment" || type == "pixel")
 			return GL_FRAGMENT_SHADER;
 
-		MH_CORE_BREAK("Unknown shader type!");
-
+		MH_CORE_WARN("Shader stage {0} not supported!", type);
 		return 0;
 	}
 
@@ -44,8 +44,51 @@ namespace Mahakam
 			return ".frag";
 		}
 
-		MH_CORE_BREAK("Shader stage not supported!");
+		MH_CORE_WARN("Shader stage {0} not supported!", stage);
 		return "";
+	}
+
+	static uint32_t GetShaderPropertySize(const ShaderProperty& property)
+	{
+		uint32_t componentSize = 0;
+		switch (property.DataType)
+		{
+			case ShaderDataType::Mat3:
+				componentSize += 16 * 3;
+				break;
+			case ShaderDataType::Mat4:
+				componentSize += 16 * 4;
+				break;
+			case ShaderDataType::Bool:
+			case ShaderDataType::Int:
+			case ShaderDataType::Int2:
+			case ShaderDataType::Int3:
+			case ShaderDataType::Int4:
+			case ShaderDataType::Float:
+			case ShaderDataType::Float2:
+			case ShaderDataType::Float3:
+			case ShaderDataType::Float4:
+				componentSize += 16;
+				break;
+			default:
+				break;
+		}
+
+		return componentSize * property.Count;
+	}
+
+	static uint32_t GetUniformOffset(const UnorderedMap<std::string, ShaderProperty>& properties, const std::string& propertyName)
+	{
+		uint32_t size = 0;
+		for (auto& [name, property] : properties)
+		{
+			if (name == propertyName)
+				return size;
+
+			size += GetShaderPropertySize(property);
+		}
+
+		return 0;
 	}
 
 	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
@@ -58,6 +101,13 @@ namespace Mahakam
 
 		// Read YAML file for shader passes
 		ParseYAMLFile(filepath);
+
+		// Construct buffer for uniform values
+		uint32_t size = 0;
+		for (auto& [name, property] : m_Properties)
+			size += GetShaderPropertySize(property);
+		if (size > 0)
+			m_Buffer = UniformBuffer::Create(size);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -80,7 +130,7 @@ namespace Mahakam
 		}
 		else
 		{
-			MH_CORE_BREAK("Attempted to use unknown shader pass!");
+			MH_CORE_WARN("Attempted to use unknown shader pass: {0} on {1}", shaderPass, m_Name);
 		}
 	}
 
@@ -123,9 +173,12 @@ namespace Mahakam
 
 	void OpenGLShader::SetUniformFloat(const std::string& name, float value)
 	{
-		int slot = GetUniformLocation(name);
-		if (slot != -1)
-			MH_GL_CALL(glUniform1f(slot, value));
+		auto iter = m_Properties.find(name);
+		if (iter != m_Properties.end())
+		{
+			if (m_Buffer && iter->second.Offset != -1)
+				m_Buffer->SetData(&value, iter->second.Offset, sizeof(int));
+		}
 	}
 
 	void OpenGLShader::SetUniformFloat2(const std::string& name, const glm::vec2& value)
@@ -233,12 +286,12 @@ namespace Mahakam
 
 			// Write to cache
 			int bufSize;
-			glGetProgramiv(program, GL_PROGRAM_BINARY_LENGTH, &bufSize);
+			MH_GL_CALL(glGetProgramiv(program, GL_PROGRAM_BINARY_LENGTH, &bufSize));
 
 			char* data = new char[bufSize];
 			uint32_t format;
 
-			glGetProgramBinary(program, bufSize, nullptr, &format, data);
+			MH_GL_CALL(glGetProgramBinary(program, bufSize, nullptr, &format, data));
 
 			std::ofstream out(cachePath, std::ios::out | std::ios::binary);
 			out.write((char*)&format, sizeof(uint32_t));
@@ -257,7 +310,7 @@ namespace Mahakam
 			in.read((char*)&format, sizeof(uint32_t));
 			in.read(data, bufSize);
 
-			glProgramBinary(program, format, data, bufSize);
+			MH_GL_CALL(glProgramBinary(program, format, data, bufSize));
 
 			GLint isLinked;
 			MH_GL_CALL(glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked));
@@ -282,28 +335,42 @@ namespace Mahakam
 		// Shader reflection
 		GLint numUniforms = 0;
 		MH_GL_CALL(glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms));
-		const GLenum props[4] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION };
+		const GLenum props[5] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_OFFSET, GL_ARRAY_SIZE };
 
 		for (int unif = 0; unif < numUniforms; ++unif)
 		{
-			GLint values[4];
-			MH_GL_CALL(glGetProgramResourceiv(program, GL_UNIFORM, unif, 4, props, 4, NULL, values));
+			GLint values[5];
+			MH_GL_CALL(glGetProgramResourceiv(program, GL_UNIFORM, unif, 5, props, 5, NULL, values));
 
 			// Skip any uniforms that are in a block.
-			if (values[0] != -1)
-				continue;
+			// if (values[0] != -1)
+			// 	continue;
 
 			// Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
 			// C++11 would let you use a std::string directly.
 			std::vector<char> nameData(values[2]);
 			MH_GL_CALL(glGetProgramResourceName(program, GL_UNIFORM, unif, (GLsizei)nameData.size(), NULL, &nameData[0]));
-			std::string name(nameData.begin(), nameData.end() - 1);
+			std::string propertyName(nameData.begin(), nameData.end() - 1);
 
 			ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
 
-			auto iter = m_Properties.find(name);
+			MH_CORE_TRACE("NAME: {0}, OFFSET: {1}", propertyName, values[3]);
+
+			// Set property
+			auto iter = m_Properties.find(propertyName);
 			if (iter != m_Properties.end())
+			{
 				iter->second.DataType = OpenGLDataTypeToShaderDataType(values[1]);
+				iter->second.Count = values[4];
+				iter->second.Offset = values[3];
+			}
+			else
+			{
+				auto& property = m_Properties[propertyName];
+				property.DataType = OpenGLDataTypeToShaderDataType(values[1]);
+				property.Count = values[4];
+				property.Offset = values[3];
+			}
 		}
 
 		return program;
@@ -384,7 +451,7 @@ namespace Mahakam
 
 			std::string defaultValue = ParseDefaultValue(defaultNode);
 
-			m_Properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue };
+			m_Properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue, 1, 0 };
 
 			MH_CORE_INFO("  {0}: {1}", propertyName, defaultValue);
 		}
