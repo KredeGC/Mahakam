@@ -43,7 +43,7 @@ namespace Mahakam
 
 		// Initialize camera buffer
 		sceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
-		sceneData->UniformBuffer = UniformBuffer::Create(2 << 14); // 16KB
+		sceneData->UniformValueBuffer = UniformBuffer::Create(2 << 14); // 16KB
 
 		// Initialize default material
 		// TODO: Move to a seperate pass
@@ -99,7 +99,7 @@ namespace Mahakam
 		sceneData->cameraBuffer->SetData(&sceneData->cameraData, 0, sizeof(CameraData));
 
 		// Setup uniforms buffer
-		sceneData->UniformBuffer->Bind(3);
+		sceneData->UniformValueBuffer->Bind(3);
 
 		// Setup results
 		rendererData->rendererResults.drawCalls = 0;
@@ -287,7 +287,7 @@ namespace Mahakam
 		if (sceneData->environment.SkyboxMaterial)
 		{
 			sceneData->environment.SkyboxMaterial->BindShader("GEOMETRY");
-			sceneData->environment.SkyboxMaterial->Bind(sceneData->UniformBuffer);
+			sceneData->environment.SkyboxMaterial->Bind(sceneData->UniformValueBuffer);
 			DrawScreenQuad();
 		}
 	};

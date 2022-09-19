@@ -317,7 +317,7 @@ namespace Mahakam
 			if (materialID != *lastMaterialID && *lastShaderID != ~0)
 			{
 				*lastMaterialID = materialID;
-				material->Bind(sceneData->UniformBuffer);
+				material->Bind(sceneData->UniformValueBuffer);
 			}
 
 			// Bind mesh

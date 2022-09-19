@@ -23,8 +23,8 @@ namespace Mahakam
 	class SubMesh;
 	class Shader;
 	class Material;
-	class UniformBuffer;
 	class StorageBuffer;
+	class UniformBuffer;
 
 	extern template class Asset<Material>;
 	extern template class Asset<Shader>;
@@ -111,7 +111,7 @@ namespace Mahakam
 		Ref<UniformBuffer> cameraBuffer;
 
 		// Uniform values
-		Ref<UniformBuffer> UniformBuffer;
+		Ref<UniformBuffer> UniformValueBuffer;
 
 		// Lighting buffers
 		Ref<StorageBuffer> directionalLightBuffer;

@@ -107,7 +107,7 @@ namespace Mahakam
 					if (materialID != lastMaterialID)
 					{
 						lastMaterialID = materialID;
-						material->Bind(sceneData->UniformBuffer);
+						material->Bind(sceneData->UniformValueBuffer);
 					}
 
 					// Choose a mesh

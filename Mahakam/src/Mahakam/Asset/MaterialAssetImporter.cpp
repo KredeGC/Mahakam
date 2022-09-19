@@ -78,7 +78,7 @@ namespace Mahakam
 		m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
 
 		// Uniform values
-		m_SceneData->UniformBuffer = UniformBuffer::Create(2 << 14); // 16KB
+		m_SceneData->UniformValueBuffer = UniformBuffer::Create(2 << 14); // 16KB
 
 		// Renderpasses
 		m_GeometryPass = CreateRef<GeometryRenderPass>();
@@ -297,7 +297,7 @@ namespace Mahakam
 			m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
 
 			// Setup uniform values
-			m_SceneData->UniformBuffer->Bind(3);
+			m_SceneData->UniformValueBuffer->Bind(3);
 
 			// Render the material
 			Ref<FrameBuffer> nullBuffer = nullptr;
