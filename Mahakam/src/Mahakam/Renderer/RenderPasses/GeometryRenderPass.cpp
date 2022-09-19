@@ -98,7 +98,7 @@ namespace Mahakam
 						if (!shader->HasShaderPass("GEOMETRY"))
 							continue;
 						lastShaderID = shaderID;
-						shader->Bind("GEOMETRY"); // TODO: Some way of doing keyword support. Maybe baked into the drawID?
+						shader->Bind("GEOMETRY");
 					}
 
 					// Choose a material
@@ -107,7 +107,7 @@ namespace Mahakam
 					if (materialID != lastMaterialID)
 					{
 						lastMaterialID = materialID;
-						material->Bind();
+						material->Bind(sceneData->UniformBuffer);
 					}
 
 					// Choose a mesh
@@ -117,7 +117,7 @@ namespace Mahakam
 						mesh->Bind();
 					}
 
-					material->SetTransform(transform);
+					sceneData->cameraBuffer->SetData(&transform, 0, sizeof(glm::mat4));
 
 					Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
 

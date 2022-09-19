@@ -2,10 +2,6 @@
 #version 430 core
 #include "assets/shaders/include/Matrix.glsl"
 
-#ifdef SKIN
-#include "assets/shaders/include/Skin.glsl"
-#endif
-
 #if defined(GEOMETRY)
     struct v2f {
         vec3 v_WorldPos;
@@ -33,13 +29,20 @@ layout(location = 3) in vec4 i_Tangent;
     layout(location = 6) in vec4 i_BoneWeights;
 #endif // SKIN
 
-layout (std140) uniform Uniforms {
+layout (shared, binding = UNIFORM_BINDING) uniform Uniforms {
+    #ifdef SKIN
+        mat4 finalBonesMatrices[100];
+    #endif
     vec4 u_UVTransform;
     vec3 u_Color;
     vec3 u_EmissionColor;
     float u_MetallicMul;
     float u_RoughnessMul;
 };
+
+#ifdef SKIN
+#include "assets/shaders/include/Skin.glsl"
+#endif
 
 void main() {
     #ifdef SKIN
@@ -128,7 +131,10 @@ layout(location = 3) out vec4 o_Normal;
     layout(binding = 5, location = 5) uniform sampler2D u_Emission;
 #endif // USE_EMISSION
 
-layout (std140) uniform Uniforms {
+layout (shared, binding = UNIFORM_BINDING) uniform Uniforms {
+    #ifdef SKIN
+        mat4 finalBonesMatrices[100];
+    #endif
     vec4 u_UVTransform;
     vec3 u_Color;
     vec3 u_EmissionColor;

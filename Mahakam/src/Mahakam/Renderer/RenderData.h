@@ -33,6 +33,9 @@ namespace Mahakam
 	struct CameraData
 	{
 	public:
+		// Model matrix
+		glm::mat4 u_m4_M;
+
 		// View & projection matrices
 		glm::mat4 u_m4_V;
 		glm::mat4 u_m4_P;
@@ -106,6 +109,9 @@ namespace Mahakam
 		// Render camera matrices
 		CameraData cameraData;
 		Ref<UniformBuffer> cameraBuffer;
+
+		// Uniform values
+		Ref<UniformBuffer> UniformBuffer;
 
 		// Lighting buffers
 		Ref<StorageBuffer> directionalLightBuffer;

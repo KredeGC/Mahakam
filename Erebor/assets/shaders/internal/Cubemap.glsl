@@ -1,5 +1,6 @@
 #type vertex
 #version 430 core
+#include "assets/shaders/include/Binding.glsl"
 
 layout(location = 0) in vec3 i_Pos;
 
@@ -9,8 +10,8 @@ struct v2f {
 
 layout(location = 0) out v2f o;
 
-layout(location = 1) uniform mat4 u_Projection;
-layout(location = 2) uniform mat4 u_View;
+uniform mat4 u_Projection;
+uniform mat4 u_View;
 
 void main() {
     o.v_LocalPos = i_Pos;  

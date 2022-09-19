@@ -43,6 +43,7 @@ namespace Mahakam
 
 		// Initialize camera buffer
 		sceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
+		sceneData->UniformBuffer = UniformBuffer::Create(2 << 14); // 16KB
 
 		// Initialize default material
 		// TODO: Move to a seperate pass
@@ -97,6 +98,9 @@ namespace Mahakam
 		sceneData->cameraBuffer->Bind(0);
 		sceneData->cameraBuffer->SetData(&sceneData->cameraData, 0, sizeof(CameraData));
 
+		// Setup uniforms buffer
+		sceneData->UniformBuffer->Bind(3);
+
 		// Setup results
 		rendererData->rendererResults.drawCalls = 0;
 		rendererData->rendererResults.vertexCount = 0;
@@ -123,13 +127,13 @@ namespace Mahakam
 		rendererData->viewportFramebuffer = prevBuffer;
 
 		// Render bounding boxes
-		if (sceneData->boundingBox)
+		/*if (sceneData->boundingBox)
 		{
 			rendererData->viewportFramebuffer->Bind();
 			GL::SetFillMode(false);
 
 			rendererData->unlitMaterial->BindShader("GEOMETRY");
-			rendererData->unlitMaterial->Bind();
+			rendererData->unlitMaterial->Bind(sceneData->UniformBuffer);
 
 			auto wireMesh = GL::GetCube();
 			wireMesh->Bind();
@@ -159,7 +163,7 @@ namespace Mahakam
 
 			GL::SetFillMode(true);
 			rendererData->viewportFramebuffer->Unbind();
-		}
+		}*/
 
 		// Normalize results
 		rendererData->rendererResults.triCount /= 3;
@@ -283,7 +287,7 @@ namespace Mahakam
 		if (sceneData->environment.SkyboxMaterial)
 		{
 			sceneData->environment.SkyboxMaterial->BindShader("GEOMETRY");
-			sceneData->environment.SkyboxMaterial->Bind();
+			sceneData->environment.SkyboxMaterial->Bind(sceneData->UniformBuffer);
 			DrawScreenQuad();
 		}
 	};

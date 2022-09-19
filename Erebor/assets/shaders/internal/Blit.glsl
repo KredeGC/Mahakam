@@ -19,6 +19,7 @@ void main() {
 
 #type fragment
 #version 430 core
+#include "assets/shaders/include/Binding.glsl"
 
 struct v2f {
     vec2 v_UV;
@@ -29,7 +30,8 @@ layout(location = 0) in v2f i;
 layout(location = 0) out vec4 o_Color;
 
 layout(binding = 0, location = 0) uniform sampler2D u_Albedo;
-layout(location = 1) uniform int u_Depth;
+
+uniform int u_Depth;
 
 void main() {
     vec3 color = texture(u_Albedo, i.v_UV).rgb;

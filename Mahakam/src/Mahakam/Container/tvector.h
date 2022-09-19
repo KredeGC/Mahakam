@@ -95,9 +95,10 @@ namespace Mahakam
 					Alloc::deallocate(m_Begin, capacity());
 
 				m_Begin = alBlock;
-				m_End = m_Begin + n;
-				m_EndMax = m_End;
+				m_EndMax = m_Begin + n;
 			}
+
+			m_End = m_Begin + n;
 
 			memcpy(m_Begin, other.m_Begin, n * sizeof(T));
 			return *this;

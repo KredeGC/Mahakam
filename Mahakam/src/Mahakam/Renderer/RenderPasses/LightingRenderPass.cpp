@@ -111,7 +111,7 @@ namespace Mahakam
 		lightingProps.Width = width;
 		lightingProps.Height = height;
 		lightingProps.ColorAttachments = { TextureFormat::RG11B10F };
-		//lightingProps.depthAttachment = { TextureFormat::Depth24 };
+		lightingProps.DepthAttachment = { TextureFormat::Depth24 };
 
 		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
 
@@ -144,6 +144,9 @@ namespace Mahakam
 		uint64_t lastMeshID = ~0;
 		shadowShader->Bind("SHADOW");
 
+		// Bind worldToLight matrix
+		shadowMatrixBuffer->Bind(1);
+
 		// Directional shadows
 		RenderDirectionalShadows(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
 
@@ -158,20 +161,20 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		deferredShader->Bind("DIRECTIONAL");
-		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
-		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
-		deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(2));
-		deferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3));
-		deferredShader->SetTexture("u_Depth", src->GetDepthTexture());
+		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0).RefPtr());
+		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1).RefPtr());
+		deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(2).RefPtr());
+		deferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3).RefPtr());
+		deferredShader->SetTexture("u_Depth", src->GetDepthTexture().RefPtr());
 
-		deferredShader->SetTexture("u_BRDFLUT", Asset<Texture>(brdfLut));
-		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture());
+		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
+		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture().RefPtr());
 
 		if (sceneData->environment.IrradianceMap)
-			deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap);
+			deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap.RefPtr());
 
 		if (sceneData->environment.SpecularMap)
-			deferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap);
+			deferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap.RefPtr());
 	}
 
 	void LightingRenderPass::RenderLighting(SceneData* sceneData, Ref<FrameBuffer> src)
@@ -275,7 +278,7 @@ namespace Mahakam
 		return hash;
 	}
 
-	void LightingRenderPass::RenderShadowGeometry(SceneData* sceneData, const Frustum& frustum, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
+	void LightingRenderPass::RenderShadowGeometry(SceneData* sceneData, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -291,54 +294,45 @@ namespace Mahakam
 			const uint64_t transformID = drawID & 0xFFFFULL;
 			glm::mat4& transform = sceneData->transformIDLookup[transformID];
 			
-			// Perform AABB test
-			Bounds transformedBounds = Bounds::TransformBounds(mesh->GetBounds(), transform);
-
-			if (frustum.IsBoxVisible(transformedBounds.Min, transformedBounds.Max))
+			// Choose and bind shader
+			const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
+			Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+			if (shaderID != *lastShaderID)
 			{
-				// Choose and bind shader
-				const uint64_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
-				Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
-				if (shaderID != *lastShaderID)
+				if (shader->HasShaderPass("SHADOW"))
 				{
-					if (shader->HasShaderPass("SHADOW"))
-					{
-						*lastShaderID = shaderID;
-						shader->Bind("SHADOW");
-					}
-					else if (*lastShaderID != ~0)
-					{
-						*lastShaderID = ~0;
-						shadowShader->Bind("SHADOW");
-					}
+					*lastShaderID = shaderID;
+					shader->Bind("SHADOW");
 				}
-
-				// Choose and bind material
-				const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-				Ref<Material>& material = sceneData->materialIDLookup[materialID];
-				if (materialID != *lastMaterialID && *lastShaderID != ~0)
+				else if (*lastShaderID != ~0)
 				{
-					*lastMaterialID = materialID;
-					material->Bind();
+					*lastShaderID = ~0;
+					shadowShader->Bind("SHADOW");
 				}
-
-				// Bind mesh
-				if (meshID != *lastMeshID)
-				{
-					*lastMeshID = meshID;
-					mesh->Bind();
-				}
-
-				// Render to depth map
-				if (*lastShaderID == ~0)
-					shadowShader->SetUniformMat4("u_m4_M", transform);
-				else
-					shader->SetUniformMat4("u_m4_M", transform);
-
-				Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
-
-				GL::DrawIndexed(mesh->GetIndexCount());
 			}
+
+			// Choose and bind material
+			const uint64_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
+			Ref<Material>& material = sceneData->materialIDLookup[materialID];
+			if (materialID != *lastMaterialID && *lastShaderID != ~0)
+			{
+				*lastMaterialID = materialID;
+				material->Bind(sceneData->UniformBuffer);
+			}
+
+			// Bind mesh
+			if (meshID != *lastMeshID)
+			{
+				*lastMeshID = meshID;
+				mesh->Bind();
+			}
+
+			// Render to depth map
+			sceneData->cameraBuffer->SetData(&transform, 0, sizeof(glm::mat4));
+
+			Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
+
+			GL::DrawIndexed(mesh->GetIndexCount());
 		}
 	}
 
@@ -401,14 +395,13 @@ namespace Mahakam
 					continue;
 				lightHashes[currentOffset] = hash;
 
-				// Bind worldToLight matrix
-				shadowMatrixBuffer->Bind(1);
+				// Set light data in buffer
 				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
 
-				RenderShadowGeometry(sceneData, frustum, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
+				RenderShadowGeometry(sceneData, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
 			}
 
 			shadowMapMargin.x = shadowMapOffset.x;
@@ -476,14 +469,13 @@ namespace Mahakam
 					continue;
 				lightHashes[currentOffset] = hash;
 
-				// Bind worldToLight matrix
-				shadowMatrixBuffer->Bind(1);
+				// Set light data in buffer
 				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
 
-				RenderShadowGeometry(sceneData, frustum, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
+				RenderShadowGeometry(sceneData, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
 			}
 		}
 	}
@@ -507,7 +499,7 @@ namespace Mahakam
 				sceneData->directionalLightBuffer = StorageBuffer::Create(bufferSize);
 
 			sceneData->directionalLightBuffer->SetData(&amount, 0, sizeof(int));
-			sceneData->directionalLightBuffer->SetData(&sceneData->environment.DirectionalLights[0], amountSize, amount * lightSize);
+			sceneData->directionalLightBuffer->SetData(sceneData->environment.DirectionalLights.data(), amountSize, amount * lightSize);
 		}
 		else if (!sceneData->directionalLightBuffer || sceneData->directionalLightBuffer->GetSize() != amountSize)
 		{
@@ -534,10 +526,10 @@ namespace Mahakam
 				sceneData->pointLightBuffer = StorageBuffer::Create(bufferSize);
 
 			sceneData->pointLightBuffer->Bind(1);
-			sceneData->pointLightBuffer->SetData(&sceneData->environment.PointLights[0], 0, bufferSize);
+			sceneData->pointLightBuffer->SetData(sceneData->environment.PointLights.data(), 0, bufferSize);
 
 			deferredShader->Bind("POINT");
-			deferredShader->SetTexture("u_AttenuationLUT", Asset<Texture>(falloffLut));
+			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
 
 			Renderer::DrawInstancedSphere(amount);
 		}
@@ -558,11 +550,11 @@ namespace Mahakam
 				sceneData->spotLightBuffer = StorageBuffer::Create(bufferSize);
 
 			sceneData->spotLightBuffer->Bind(1);
-			sceneData->spotLightBuffer->SetData(&sceneData->environment.SpotLights[0], 0, bufferSize);
+			sceneData->spotLightBuffer->SetData(sceneData->environment.SpotLights.data(), 0, bufferSize);
 
 			deferredShader->Bind("SPOT");
-			deferredShader->SetTexture("u_AttenuationLUT", Asset<Texture>(falloffLut));
-			deferredShader->SetTexture("u_LightCookie", Asset<Texture>(spotlightTexture));
+			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
+			deferredShader->SetTexture("u_LightCookie", spotlightTexture);
 
 			Renderer::DrawInstancedPyramid(amount);
 		}

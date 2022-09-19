@@ -18,6 +18,7 @@ namespace Mahakam
 	class Material;
 	class Shader;
 	class Texture;
+	class UniformBuffer;
 
 	extern template class Asset<Material>;
 	extern template class Asset<Shader>;
@@ -33,9 +34,7 @@ namespace Mahakam
 		virtual Asset<Shader> GetShader() const = 0;
 
 		virtual void BindShader(const std::string& shaderPass) = 0;
-		virtual void Bind() = 0;
-
-		virtual void SetTransform(const glm::mat4& modelMatrix) = 0;
+		virtual void Bind(Ref<UniformBuffer> uniformBuffer) = 0;
 
 		virtual void SetTexture(const std::string& name, int slot, Asset<Texture> tex) = 0;
 

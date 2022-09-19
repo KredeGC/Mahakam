@@ -13,10 +13,8 @@
 #define MATRIX_MV MATRIX_V * MATRIX_P
 #define MATRIX_MVP MATRIX_VP * MATRIX_M
 
-// IDEA: Use SSBO with offset etc. Would take up too much space :(
-layout(location = 200) uniform mat4 u_m4_M;
-
 layout(std140, binding = MATRICES_BINDING) uniform Matrices {
+    mat4 u_m4_M;
     mat4 u_m4_V;
     mat4 u_m4_P;
     

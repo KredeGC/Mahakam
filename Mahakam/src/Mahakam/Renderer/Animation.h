@@ -29,7 +29,7 @@ namespace Mahakam
 		std::string m_Name;
 
 		int m_AnimationIndex;
-		float m_Duration;
+		float m_Duration = 0.0f;
 
 		std::vector<Sampler> m_Samplers;
 

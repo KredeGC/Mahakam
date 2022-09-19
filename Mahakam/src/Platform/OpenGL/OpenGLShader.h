@@ -16,12 +16,12 @@ namespace Mahakam
 		std::filesystem::path m_Filepath;
 		std::string m_Name;
 
-		Ref<UniformBuffer> m_Buffer;
-
 		UnorderedMap<std::string, uint32_t> m_ShaderPasses;
 
 		UnorderedMap<std::string, int> m_UniformIDCache;
 		UnorderedMap<std::string, ShaderProperty> m_Properties;
+
+		uint32_t m_UniformSize = 0;
 
 	public:
 		OpenGLShader(const std::filesystem::path& filepath);
@@ -36,7 +36,7 @@ namespace Mahakam
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const override;
 
-		virtual void SetTexture(const std::string& name, Asset<Texture> tex) override;
+		virtual void SetTexture(const std::string& name, Ref<Texture> tex) override;
 
 		virtual void SetUniformMat3(const std::string& name, const glm::mat3& value) override;
 		virtual void SetUniformMat4(const std::string& name, const glm::mat4& value) override;
@@ -47,6 +47,8 @@ namespace Mahakam
 		virtual void SetUniformFloat2(const std::string& name, const glm::vec2& value) override;
 		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) override;
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) override;
+
+		uint32_t GetUniformSize() const { return m_UniformSize; }
 
 	private:
 		uint32_t CompileBinary(const std::filesystem::path& cachePath, const UnorderedMap<uint32_t, std::string>& sources, const std::string& directives);

@@ -53,8 +53,8 @@ namespace Mahakam
 
 		// HDR Tonemapping
 		pixelationShader->Bind("POSTPROCESSING");
-		pixelationShader->SetTexture("u_Albedo", src->GetColorTexture(0));
-		pixelationShader->SetTexture("u_Depth", src->GetDepthTexture());
+		pixelationShader->SetTexture("u_Albedo", src->GetColorTexture(0).RefPtr());
+		pixelationShader->SetTexture("u_Depth", src->GetDepthTexture().RefPtr());
 
 		GL::EnableZTesting(false);
 		GL::EnableZWriting(false);

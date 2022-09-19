@@ -40,16 +40,21 @@ namespace Mahakam
 
 	void OpenGLUniformBuffer::SetData(const void* data, uint32_t offset, uint32_t size)
 	{
-		MH_GL_CALL(glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data));
+		//MH_PROFILE_FUNCTION();
+
+		//MH_GL_CALL(glNamedBufferSubData(m_RendererID, offset, size, data));
+
+		//MH_GL_CALL(glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data));
 
 		/*glBindBuffer(GL_UNIFORM_BUFFER, rendererID);
 		void* ptr = glMapBufferRange(GL_UNIFORM_BUFFER, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
 		memcpy(ptr, data, size);
 		glUnmapBuffer(GL_UNIFORM_BUFFER);*/
 
-		/*void* ptr = glMapNamedBufferRange(rendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+		void* ptr;
+		MH_GL_CALL(ptr = glMapNamedBufferRange(m_RendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT));
 		memcpy(ptr, data, size);
-		glUnmapNamedBuffer(rendererID);*/
+		MH_GL_CALL(glUnmapNamedBuffer(m_RendererID));
 	}
 #pragma endregion
 
@@ -91,7 +96,9 @@ namespace Mahakam
 
 	void OpenGLStorageBuffer::SetData(const void* data, uint32_t offset, uint32_t size)
 	{
-		MH_GL_CALL(glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, size, data));
+		MH_GL_CALL(glNamedBufferSubData(m_RendererID, offset, size, data));
+
+		//MH_GL_CALL(glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, size, data));
 
 		/*void* ptr = glMapNamedBufferRange(rendererID, offset, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
 		memcpy(ptr, data, size);

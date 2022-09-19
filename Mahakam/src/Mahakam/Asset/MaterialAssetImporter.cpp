@@ -74,8 +74,11 @@ namespace Mahakam
 		CameraData cameraData(m_PreviewCamera, { 512, 512 }, transform);
 
 		m_SceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
-		m_SceneData->cameraBuffer->Bind();
+		m_SceneData->cameraBuffer->Bind(0);
 		m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
+
+		// Uniform values
+		m_SceneData->UniformBuffer = UniformBuffer::Create(2 << 14); // 16KB
 
 		// Renderpasses
 		m_GeometryPass = CreateRef<GeometryRenderPass>();
@@ -282,12 +285,6 @@ namespace Mahakam
 				m_TonemapPass->OnWindowResize(m_ViewportSize.x, m_ViewportSize.y);
 			}
 
-			// Render the material
-			Ref<FrameBuffer> nullBuffer = nullptr;
-			m_GeometryPass->Render(m_SceneData.get(), nullBuffer);
-			m_LightingPass->Render(m_SceneData.get(), m_GeometryPass->GetFrameBuffer());
-			m_TonemapPass->Render(m_SceneData.get(), m_LightingPass->GetFrameBuffer());
-
 			// Setup camera
 			m_PreviewCamera.SetRatio(viewportSize.x / viewportSize.y);
 			m_PreviewCamera.RecalculateProjectionMatrix();
@@ -298,6 +295,15 @@ namespace Mahakam
 
 			m_SceneData->cameraBuffer->Bind(0);
 			m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
+
+			// Setup uniform values
+			m_SceneData->UniformBuffer->Bind(3);
+
+			// Render the material
+			Ref<FrameBuffer> nullBuffer = nullptr;
+			m_GeometryPass->Render(m_SceneData.get(), nullBuffer);
+			m_LightingPass->Render(m_SceneData.get(), m_GeometryPass->GetFrameBuffer());
+			m_TonemapPass->Render(m_SceneData.get(), m_LightingPass->GetFrameBuffer());
 
 			ImGui::BeginChild("Material Preview", viewportSize);
 			bool focused = ImGui::IsWindowFocused();

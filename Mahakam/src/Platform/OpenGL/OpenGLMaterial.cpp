@@ -4,12 +4,35 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Profiler.h"
 
+#include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Texture.h"
 
 namespace Mahakam
 {
+	template<typename T>
+	static void CopyUniformToData(const UnorderedMap<std::string, ShaderProperty>& properties, const std::string& name, uint8_t* data, const void* value)
+	{
+		std::string key = name;
+		int offset = 0;
+
+		size_t startPar = name.find("[");
+		size_t endPar = name.find("]");
+		if (startPar != std::string::npos && endPar != std::string::npos)
+		{
+			key = name.substr(0, startPar);
+			offset = std::stoi(name.substr(startPar + 1, endPar - startPar - 1)) * sizeof(T);
+		}
+
+		auto iter = properties.find(key);
+		if (iter != properties.end())
+		{
+			if (iter->second.Offset != -1)
+				memcpy(data + iter->second.Offset + offset, value, sizeof(T));
+		}
+	}
+
 	OpenGLMaterial::OpenGLMaterial(Asset<Shader> shader)
 		: m_Shader(shader)
 	{
@@ -18,6 +41,10 @@ namespace Mahakam
 		auto& defaultProps = shader->GetProperties();
 
 		ResetShaderProperties(defaultProps);
+
+		m_DataSize = m_Shader->GetUniformSize();
+		if (m_DataSize > 0)
+			m_Data = new uint8_t[m_DataSize];
 	}
 
 	OpenGLMaterial::OpenGLMaterial(const Asset<Material>& material) :
@@ -29,7 +56,22 @@ namespace Mahakam
 		m_Floats(static_cast<Asset<OpenGLMaterial>>(material)->m_Floats),
 		m_Float2s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float2s),
 		m_Float3s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float3s),
-		m_Float4s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float4s) {}
+		m_Float4s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float4s)
+	{
+		m_DataSize = m_Shader->GetUniformSize();
+		if (m_DataSize > 0)
+		{
+			Asset<OpenGLMaterial> glMaterial = static_cast<Asset<OpenGLMaterial>>(material);
+			m_Data = new uint8_t[m_DataSize];
+			memcpy(m_Data, glMaterial->m_Data, glMaterial->m_DataSize);
+		}
+	}
+
+	OpenGLMaterial::~OpenGLMaterial()
+	{
+		if (m_Data)
+			delete[] m_Data;
+	}
 
 	uint64_t OpenGLMaterial::Hash() const
 	{
@@ -110,14 +152,17 @@ namespace Mahakam
 		return hash;
 	}
 
-	void OpenGLMaterial::Bind()
+	void OpenGLMaterial::Bind(Ref<UniformBuffer> uniformBuffer)
 	{
 		//MH_PROFILE_FUNCTION();
 
 		for (auto& [name, texture] : m_Textures)
-			m_Shader->SetTexture(name, texture);
+			m_Shader->SetTexture(name, texture.RefPtr());
 
-		for (auto& [name, mat] : m_Mat3s)
+		if (uniformBuffer && m_Data && m_DataSize > 0)
+			uniformBuffer->SetData(m_Data, 0, m_DataSize);
+
+		/*for (auto& [name, mat] : m_Mat3s)
 			m_Shader->SetUniformMat3(name, mat);
 
 		for (auto& [name, mat] : m_Mat4s)
@@ -136,12 +181,56 @@ namespace Mahakam
 			m_Shader->SetUniformFloat3(name, value);
  
 		for (auto& [name, value] : m_Float4s)
-			m_Shader->SetUniformFloat4(name, value);
+			m_Shader->SetUniformFloat4(name, value);*/
 	}
 
-	void OpenGLMaterial::SetTransform(const glm::mat4& modelMatrix)
+	void OpenGLMaterial::SetMat3(const std::string& name, const glm::mat3& value)
 	{
-		m_Shader->SetUniformMat4("u_m4_M", modelMatrix);
+		m_Mat3s[name] = value;
+
+		CopyUniformToData<glm::mat3>(m_Shader->GetProperties(), name, m_Data, glm::value_ptr(value));
+	}
+
+	void OpenGLMaterial::SetMat4(const std::string& name, const glm::mat4& value)
+	{
+		m_Mat4s[name] = value;
+
+		CopyUniformToData<glm::mat4>(m_Shader->GetProperties(), name, m_Data, glm::value_ptr(value));
+	}
+
+	void OpenGLMaterial::SetInt(const std::string& name, int32_t value)
+	{
+		m_Ints[name] = value;
+
+		CopyUniformToData<int>(m_Shader->GetProperties(), name, m_Data, &value);
+	}
+
+	void OpenGLMaterial::SetFloat(const std::string& name, float value)
+	{
+		m_Floats[name] = value;
+
+		CopyUniformToData<float>(m_Shader->GetProperties(), name, m_Data, &value);
+	}
+
+	void OpenGLMaterial::SetFloat2(const std::string& name, const glm::vec2& value)
+	{
+		m_Float2s[name] = value;
+
+		CopyUniformToData<glm::vec2>(m_Shader->GetProperties(), name, m_Data, glm::value_ptr(value));
+	}
+
+	void OpenGLMaterial::SetFloat3(const std::string& name, const glm::vec3& value)
+	{
+		m_Float3s[name] = value;
+
+		CopyUniformToData<glm::vec3>(m_Shader->GetProperties(), name, m_Data, glm::value_ptr(value));
+	}
+
+	void OpenGLMaterial::SetFloat4(const std::string& name, const glm::vec4& value)
+	{
+		m_Float4s[name] = value;
+
+		CopyUniformToData<glm::vec4>(m_Shader->GetProperties(), name, m_Data, glm::value_ptr(value));
 	}
 
 	Asset<Texture> OpenGLMaterial::GetTexture(const std::string& name) const

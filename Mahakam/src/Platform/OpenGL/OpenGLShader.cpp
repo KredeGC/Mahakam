@@ -48,49 +48,6 @@ namespace Mahakam
 		return "";
 	}
 
-	static uint32_t GetShaderPropertySize(const ShaderProperty& property)
-	{
-		uint32_t componentSize = 0;
-		switch (property.DataType)
-		{
-			case ShaderDataType::Mat3:
-				componentSize += 16 * 3;
-				break;
-			case ShaderDataType::Mat4:
-				componentSize += 16 * 4;
-				break;
-			case ShaderDataType::Bool:
-			case ShaderDataType::Int:
-			case ShaderDataType::Int2:
-			case ShaderDataType::Int3:
-			case ShaderDataType::Int4:
-			case ShaderDataType::Float:
-			case ShaderDataType::Float2:
-			case ShaderDataType::Float3:
-			case ShaderDataType::Float4:
-				componentSize += 16;
-				break;
-			default:
-				break;
-		}
-
-		return componentSize * property.Count;
-	}
-
-	static uint32_t GetUniformOffset(const UnorderedMap<std::string, ShaderProperty>& properties, const std::string& propertyName)
-	{
-		uint32_t size = 0;
-		for (auto& [name, property] : properties)
-		{
-			if (name == propertyName)
-				return size;
-
-			size += GetShaderPropertySize(property);
-		}
-
-		return 0;
-	}
-
 	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
 		: m_Filepath(filepath)
 	{
@@ -101,13 +58,6 @@ namespace Mahakam
 
 		// Read YAML file for shader passes
 		ParseYAMLFile(filepath);
-
-		// Construct buffer for uniform values
-		uint32_t size = 0;
-		for (auto& [name, property] : m_Properties)
-			size += GetShaderPropertySize(property);
-		if (size > 0)
-			m_Buffer = UniformBuffer::Create(size);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -143,7 +93,7 @@ namespace Mahakam
 		return false;
 	}
 
-	void OpenGLShader::SetTexture(const std::string& name, Asset<Texture> tex)
+	void OpenGLShader::SetTexture(const std::string& name, Ref<Texture> tex)
 	{
 		int slot = GetUniformLocation(name);
 		if (slot != -1)
@@ -173,12 +123,9 @@ namespace Mahakam
 
 	void OpenGLShader::SetUniformFloat(const std::string& name, float value)
 	{
-		auto iter = m_Properties.find(name);
-		if (iter != m_Properties.end())
-		{
-			if (m_Buffer && iter->second.Offset != -1)
-				m_Buffer->SetData(&value, iter->second.Offset, sizeof(int));
-		}
+		int slot = GetUniformLocation(name);
+		if (slot != -1)
+			MH_GL_CALL(glUniform1f(slot, value));
 	}
 
 	void OpenGLShader::SetUniformFloat2(const std::string& name, const glm::vec2& value)
@@ -332,6 +279,18 @@ namespace Mahakam
 		}
 
 
+		// #define UNIFORM_BINDING 3
+		uint32_t uniformIndex = glGetUniformBlockIndex(program, "Uniforms");
+
+		if (uniformIndex != ~0)
+		{
+			const GLenum blockProps[1] = { GL_BUFFER_DATA_SIZE };
+			GLint values[1];
+			MH_GL_CALL(glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformIndex, 1, blockProps, 1, NULL, values));
+
+			m_UniformSize = values[0];
+		}
+
 		// Shader reflection
 		GLint numUniforms = 0;
 		MH_GL_CALL(glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms));
@@ -343,8 +302,8 @@ namespace Mahakam
 			MH_GL_CALL(glGetProgramResourceiv(program, GL_UNIFORM, unif, 5, props, 5, NULL, values));
 
 			// Skip any uniforms that are in a block.
-			// if (values[0] != -1)
-			// 	continue;
+			if (values[0] != uniformIndex && values[0] != -1)
+				continue;
 
 			// Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
 			// C++11 would let you use a std::string directly.
@@ -352,22 +311,25 @@ namespace Mahakam
 			MH_GL_CALL(glGetProgramResourceName(program, GL_UNIFORM, unif, (GLsizei)nameData.size(), NULL, &nameData[0]));
 			std::string propertyName(nameData.begin(), nameData.end() - 1);
 
-			ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
+			// Trim array postfix
+			size_t isArray = propertyName.find("[0]");
+			if (isArray != std::string::npos)
+				propertyName = propertyName.substr(0, isArray);
 
-			MH_CORE_TRACE("NAME: {0}, OFFSET: {1}", propertyName, values[3]);
+			ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
 
 			// Set property
 			auto iter = m_Properties.find(propertyName);
 			if (iter != m_Properties.end())
 			{
-				iter->second.DataType = OpenGLDataTypeToShaderDataType(values[1]);
+				iter->second.DataType = dataType;
 				iter->second.Count = values[4];
 				iter->second.Offset = values[3];
 			}
 			else
 			{
 				auto& property = m_Properties[propertyName];
-				property.DataType = OpenGLDataTypeToShaderDataType(values[1]);
+				property.DataType = dataType;
 				property.Count = values[4];
 				property.Offset = values[3];
 			}

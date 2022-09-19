@@ -15,6 +15,9 @@ namespace Mahakam
 	private:
 		Asset<OpenGLShader> m_Shader;
 
+		uint8_t* m_Data = nullptr;
+		uint32_t m_DataSize;
+
 		UnorderedMap<std::string, Asset<Texture>> m_Textures;
 		
 		UnorderedMap<std::string, glm::mat3> m_Mat3s;
@@ -30,28 +33,26 @@ namespace Mahakam
 	public:
 		OpenGLMaterial(Asset<Shader> shader);
 		OpenGLMaterial(const Asset<Material>& material);
-		virtual ~OpenGLMaterial() = default;
+		virtual ~OpenGLMaterial();
 
 		virtual uint64_t Hash() const override;
 
 		inline virtual Asset<Shader> GetShader() const override { return m_Shader; }
 
 		virtual void BindShader(const std::string& shaderPass) override { m_Shader->Bind(shaderPass); }
-		virtual void Bind() override;
-
-		virtual void SetTransform(const glm::mat4& modelMatrix) override;
+		virtual void Bind(Ref<UniformBuffer> uniformBuffer) override;
 
 		virtual void SetTexture(const std::string& name, int slot, Asset<Texture> tex) override { m_Textures[name] = tex; }
 
-		virtual void SetMat3(const std::string& name, const glm::mat3& value) override { m_Mat3s[name] = value; }
-		virtual void SetMat4(const std::string& name, const glm::mat4& value) override { m_Mat4s[name] = value; }
+		virtual void SetMat3(const std::string& name, const glm::mat3& value) override;
+		virtual void SetMat4(const std::string& name, const glm::mat4& value) override;
 
-		virtual void SetInt(const std::string& name, int32_t value) override { m_Ints[name] = value; }
+		virtual void SetInt(const std::string& name, int32_t value) override;
 
-		virtual void SetFloat(const std::string& name, float value) override { m_Floats[name] = value; }
-		virtual void SetFloat2(const std::string& name, const glm::vec2& value) override { m_Float2s[name] = value; }
-		virtual void SetFloat3(const std::string& name, const glm::vec3& value) override { m_Float3s[name] = value; }
-		virtual void SetFloat4(const std::string& name, const glm::vec4& value) override { m_Float4s[name] = value; }
+		virtual void SetFloat(const std::string& name, float value) override;
+		virtual void SetFloat2(const std::string& name, const glm::vec2& value) override;
+		virtual void SetFloat3(const std::string& name, const glm::vec3& value) override;
+		virtual void SetFloat4(const std::string& name, const glm::vec4& value) override;
 
 
 		virtual Asset<Texture> GetTexture(const std::string& name) const override;
