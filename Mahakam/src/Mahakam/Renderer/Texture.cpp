@@ -6,6 +6,7 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Platform/Headless/HeadlessTexture.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace Mahakam
@@ -16,8 +17,7 @@ namespace Mahakam
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-			return nullptr;
+			return CreateRef<HeadlessTexture2D>(props);
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTexture2D>(props);
 		}
@@ -33,8 +33,7 @@ namespace Mahakam
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-			return nullptr;
+			return CreateRef<HeadlessTexture2D>(props);
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTexture2D>(filepath, props);
 		}
@@ -51,8 +50,7 @@ namespace Mahakam
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-			return nullptr;
+			return CreateRef<HeadlessTextureCube>(props);
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTextureCube>(props);
 		}
@@ -68,8 +66,7 @@ namespace Mahakam
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-			return nullptr;
+			return CreateRef<HeadlessTextureCube>(props);
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTextureCube>(filepath, props);
 		}

@@ -12,6 +12,8 @@ namespace Mahakam::Editor
 {
 	void EditorCamera::OnUpdate(Timestep dt, bool focus, bool hover)
 	{
+		if (RendererAPI::GetAPI() == RendererAPI::API::None) return;
+
 		hovered = hover;
 
 		ImGuiIO& io = ImGui::GetIO();

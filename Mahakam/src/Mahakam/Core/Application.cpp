@@ -11,6 +11,7 @@
 #include "Mahakam/Physics/PhysicsEngine.h"
 
 #include "Mahakam/Renderer/Renderer.h"
+#include "Mahakam/Renderer/RendererAPI.h"
 
 namespace Mahakam
 {
@@ -32,8 +33,11 @@ namespace Mahakam
 
 		PhysicsEngine::Init();
 
-		imGuiLayer = new ImGuiLayer();
-		PushOverlay(imGuiLayer);
+		if (RendererAPI::GetAPI() != RendererAPI::API::None)
+		{
+			imGuiLayer = new ImGuiLayer();
+			PushOverlay(imGuiLayer);
+		}
 	}
 
 	Application::~Application()
@@ -64,10 +68,13 @@ namespace Mahakam
 					layer->OnUpdate(timestep);
 			}
 
-			imGuiLayer->Begin();
-			for (Layer* layer : layerStack)
-				layer->OnImGuiRender();
-			imGuiLayer->End();
+			if (imGuiLayer)
+			{
+				imGuiLayer->Begin();
+				for (Layer* layer : layerStack)
+					layer->OnImGuiRender();
+				imGuiLayer->End();
+			}
 
 			window->OnUpdate();
 

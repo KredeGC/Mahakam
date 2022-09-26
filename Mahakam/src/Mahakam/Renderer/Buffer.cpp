@@ -6,6 +6,7 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Platform/Headless/HeadlessBuffer.h"
 #include "Platform/OpenGL/OpenGLBuffer.h"
 
 namespace Mahakam
@@ -16,8 +17,7 @@ namespace Mahakam
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-			return nullptr;
+			return CreateRef<HeadlessUniformBuffer>(size);
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLUniformBuffer>(size);
 		}
@@ -34,8 +34,7 @@ namespace Mahakam
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-			return nullptr;
+			return CreateRef<HeadlessStorageBuffer>(size);
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLStorageBuffer>(size);
 		}

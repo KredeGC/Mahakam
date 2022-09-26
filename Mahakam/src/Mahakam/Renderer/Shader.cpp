@@ -6,6 +6,7 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Platform/Headless/HeadlessShader.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace Mahakam
@@ -16,8 +17,7 @@ namespace Mahakam
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-			return nullptr;
+			return CreateRef<HeadlessShader>(filepath);
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLShader>(filepath);
 		}

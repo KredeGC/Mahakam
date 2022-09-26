@@ -89,7 +89,7 @@ namespace Mahakam
 
 			if (spec.Immutable)
 			{
-				m_DepthAttachment = RenderBuffer::Create(m_Props.Width, m_Props.Height, spec.Format);
+				m_DepthAttachment = Asset<RenderBuffer>(RenderBuffer::Create(m_Props.Width, m_Props.Height, spec.Format));
 			}
 			else
 			{

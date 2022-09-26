@@ -5,19 +5,30 @@
 
 #include "Mahakam/Renderer/RendererAPI.h"
 
+#include <signal.h>
+
 #if defined(MH_PLATFORM_WINDOWS) || defined(MH_PLATFORM_LINUX)
 
 extern Mahakam::Application* Mahakam::CreateApplication();
 
+static Mahakam::Application* g_App;
+
+void intercept_interrupt(int signal)
+{
+	g_App->Close();
+}
+
 int main(int argc, char** argv)
 {
+	signal(SIGINT, intercept_interrupt);
+
 #if defined(MH_PLATFORM_WINDOWS) && defined(MH_RELEASE)
 	FreeConsole();
 #endif
 
-	if (argc > 0)
+	if (argc > 1)
 	{
-		if (argv[0] == "--headless")
+		if (strcmp(argv[1], "--headless") == 0)
 		{
 			Mahakam::RendererAPI::SetAPI(Mahakam::RendererAPI::API::None);
 		}
@@ -32,14 +43,17 @@ int main(int argc, char** argv)
 #endif
 
 	MH_PROFILE_BEGIN_SESSION("startup", "profiling/Startup.json");
-	auto app = Mahakam::CreateApplication();
+	g_App = Mahakam::CreateApplication();
 	MH_PROFILE_END_SESSION();
 
-	app->Run();
+	g_App->Run();
 
 	MH_PROFILE_BEGIN_SESSION("shutdown", "profiling/Shutdown.json");
-	delete app;
+	delete g_App;
 	MH_PROFILE_END_SESSION();
+
+	MH_CORE_INFO("Logging uninitialized");
+	MH_INFO("Logging uninitialized");
 
 	Mahakam::Log::Shutdown();
 }

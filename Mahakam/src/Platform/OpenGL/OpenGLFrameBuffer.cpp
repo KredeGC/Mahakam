@@ -156,7 +156,7 @@ namespace Mahakam
 
 			if (spec.Immutable)
 			{
-				m_DepthAttachment = RenderBuffer::Create(m_Props.Width, m_Props.Height, spec.Format);
+				m_DepthAttachment = Asset<RenderBuffer>(RenderBuffer::Create(m_Props.Width, m_Props.Height, spec.Format));
 
 				MH_GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, m_DepthAttachment->GetRendererID()));
 			}

@@ -15,7 +15,7 @@ namespace Mahakam
 	{
 	private:
 		Scope<Window> window;
-		ImGuiLayer* imGuiLayer;
+		ImGuiLayer* imGuiLayer = nullptr;
 		bool running = true;
 		bool minimized = false;
 		LayerStack layerStack;
