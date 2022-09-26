@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Application.h"
-
 #include "FileUtility.h"
+
+#include "Mahakam/Renderer/RendererAPI.h"
 
 #if defined(MH_PLATFORM_WINDOWS) || defined(MH_PLATFORM_LINUX)
 
@@ -10,15 +11,23 @@ extern Mahakam::Application* Mahakam::CreateApplication();
 
 int main(int argc, char** argv)
 {
-#if defined(MH_PLATFORM_WINDOWS) && !defined(MH_DEBUG)
+#if defined(MH_PLATFORM_WINDOWS) && defined(MH_RELEASE)
 	FreeConsole();
 #endif
+
+	if (argc > 0)
+	{
+		if (argv[0] == "--headless")
+		{
+			Mahakam::RendererAPI::SetAPI(Mahakam::RendererAPI::API::None);
+		}
+	}
 
 	Mahakam::Log::Init();
 	MH_CORE_INFO("Logging initialized");
 	MH_INFO("Logging initialized");
 
-#ifndef MH_RUNTIME
+#ifndef MH_STANDALONE
 	Mahakam::FileUtility::CreateDirectories("profiling/");
 #endif
 

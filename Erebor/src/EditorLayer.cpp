@@ -321,7 +321,7 @@ namespace Mahakam::Editor
 
 		// EnvironmentPanel
 		EditorWindowRegistry::RegisterWindowClass<EnvironmentPanel>("Scene Environment");
-		EditorWindowRegistry::OpenWindow("Scene Environment");
+		//EditorWindowRegistry::OpenWindow("Scene Environment");
 
 		// ImportWizardPanel
 		EditorWindowRegistry::EditorWindowProps panelProps;

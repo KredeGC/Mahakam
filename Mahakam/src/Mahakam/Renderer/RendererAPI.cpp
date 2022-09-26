@@ -3,5 +3,5 @@
 
 namespace Mahakam
 {
-	RendererAPI::API RendererAPI::api = RendererAPI::API::OpenGL;
+	RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
 }

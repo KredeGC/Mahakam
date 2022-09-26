@@ -28,7 +28,7 @@ namespace Mahakam
 		};
 
 	private:
-		static API api;
+		static API s_API;
 
 	public:
 		virtual ~RendererAPI() = default;
@@ -56,6 +56,7 @@ namespace Mahakam
 
 		virtual void DrawInstanced(uint32_t indexCount, uint32_t count) = 0;
 
-		inline static API GetAPI() { return api; }
+		inline static void SetAPI(API api) { s_API = api; }
+		inline static API GetAPI() { return s_API; }
 	};
 }
