@@ -22,6 +22,16 @@ namespace Mahakam
 	class Texture3D;
 	class TextureCube;
 
+	// Headless
+	class HeadlessComputeShader;
+	class HeadlessFrameBuffer;
+	class HeadlessMaterial;
+	class HeadlessMesh;
+	class HeadlessRenderBuffer;
+	class HeadlessShader;
+	class HeadlessTexture2D;
+	class HeadlessTextureCube;
+
 	// OpenGL
 	class OpenGLComputeShader;
 	class OpenGLFrameBuffer;
@@ -53,6 +63,16 @@ template class Mahakam::Asset<Mahakam::Texture2D>;
 template class Mahakam::Asset<Mahakam::Texture2DArray>;
 template class Mahakam::Asset<Mahakam::Texture3D>;
 template class Mahakam::Asset<Mahakam::TextureCube>;
+
+// Headless
+template class Mahakam::Asset<Mahakam::HeadlessComputeShader>;
+template class Mahakam::Asset<Mahakam::HeadlessFrameBuffer>;
+template class Mahakam::Asset<Mahakam::HeadlessMaterial>;
+template class Mahakam::Asset<Mahakam::HeadlessMesh>;
+template class Mahakam::Asset<Mahakam::HeadlessRenderBuffer>;
+template class Mahakam::Asset<Mahakam::HeadlessShader>;
+template class Mahakam::Asset<Mahakam::HeadlessTexture2D>;
+template class Mahakam::Asset<Mahakam::HeadlessTextureCube>;
 
 // OpenGL
 template class Mahakam::Asset<Mahakam::OpenGLComputeShader>;
