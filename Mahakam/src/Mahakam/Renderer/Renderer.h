@@ -39,21 +39,21 @@ namespace Mahakam
 	private:
 		struct RendererData
 		{
-			RendererResults rendererResults;
-			std::vector<Ref<RenderPass>> renderPasses;
-			UnorderedMap<std::string, WeakRef<FrameBuffer>> frameBuffers;
+			RendererResults RendererResults;
+			std::vector<Ref<RenderPass>> RenderPasses;
+			UnorderedMap<std::string, WeakRef<FrameBuffer>> FrameBuffers;
 
-			Ref<FrameBuffer> gBuffer;
-			Ref<FrameBuffer> viewportFramebuffer;
-			Ref<Material> unlitMaterial; // TEMP: For AABB visualization
-			uint32_t width;
-			uint32_t height;
+			Ref<FrameBuffer> GBuffer;
+			Ref<FrameBuffer> ViewportFramebuffer;
+			Ref<Material> UnlitMaterial; // TEMP: For AABB visualization
+			uint32_t Width;
+			uint32_t Height;
 		};
 
 		using FrameBufferMap = UnorderedMap<std::string, WeakRef<FrameBuffer>>;
 
-		static RendererData* rendererData;
-		static SceneData* sceneData;
+		static RendererData* s_RendererData;
+		static SceneData* s_SceneData;
 
 	public:
 		static void Init(uint32_t width, uint32_t height);

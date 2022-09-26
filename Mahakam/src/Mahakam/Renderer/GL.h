@@ -10,14 +10,10 @@ namespace Mahakam
 	class Texture2D;
 	class TextureCube;
 
-	extern template class Asset<SubMesh>;
-	extern template class Asset<Texture2D>;
-	extern template class Asset<TextureCube>;
-
 	class GL
 	{
 	private:
-		static RendererAPI* rendererAPI;
+		static Scope<RendererAPI> rendererAPI;
 		
 		static Ref<SubMesh> staticScreenQuad;
 		static Ref<SubMesh> staticSphereMesh;

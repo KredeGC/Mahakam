@@ -22,7 +22,7 @@ namespace Mahakam
 		WindowData m_Data;
         std::chrono::steady_clock::time_point m_Start;
 
-		RenderingContext* m_Context;
+		Scope<RenderingContext> m_Context;
 
 	public:
 		HeadlessWindow(const WindowProps& props);
@@ -47,7 +47,7 @@ namespace Mahakam
 
 		virtual inline void* GetProcess() const override { return (void*)this; }
 
-		virtual inline RenderingContext* GetContext() const override { return m_Context; }
+		virtual inline RenderingContext& GetContext() const override { return *m_Context; }
 
 	private:
 		virtual void Init(const WindowProps& props);

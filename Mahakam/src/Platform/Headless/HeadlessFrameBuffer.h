@@ -16,6 +16,8 @@ namespace Mahakam
 		std::vector<Asset<RenderBuffer>> m_ColorAttachments;
 		Asset<RenderBuffer> m_DepthAttachment = nullptr;
 
+		inline static constexpr uint32_t MAX_FRAMEBUFFER_SIZE = 8192;
+
 	public:
 		HeadlessFrameBuffer(const FrameBufferProps& props);
 		virtual ~HeadlessFrameBuffer() override;

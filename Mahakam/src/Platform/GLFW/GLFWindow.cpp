@@ -1,5 +1,5 @@
 #include "Mahakam/mhpch.h"
-#include "WindowsWindow.h"
+#include "GLFWindow.h"
 
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Profiler.h"
@@ -16,8 +16,8 @@
 
 #include <stb_image.h>
 
-namespace Mahakam {
-
+namespace Mahakam
+{
 	static bool glfwInitialized = false;
 
 	static void GLFWErrorCallback(int error, const char* message)
@@ -25,12 +25,7 @@ namespace Mahakam {
 		MH_CORE_ERROR("[GLFW Error] (Code {0}): {1}", error, message);
 	}
 
-	Scope<Window> Window::Create(const WindowProps& props)
-	{
-		return CreateScope<WindowsWindow>(props);
-	}
-
-	void WindowsWindow::Init(const WindowProps& props)
+	void GLFWindow::Init(const WindowProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -190,24 +185,24 @@ namespace Mahakam {
 		});
 	}
 
-	void WindowsWindow::Shutdown()
+	void GLFWindow::Shutdown()
 	{
 		MH_PROFILE_FUNCTION();
 
 		glfwDestroyWindow(m_Window);
 	}
 
-	WindowsWindow::WindowsWindow(const WindowProps& props)
+	GLFWindow::GLFWindow(const WindowProps& props)
 	{
 		Init(props);
 	}
 
-	WindowsWindow::~WindowsWindow()
+	GLFWindow::~GLFWindow()
 	{
 		Shutdown();
 	}
 
-	void WindowsWindow::OnUpdate()
+	void GLFWindow::OnUpdate()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -215,7 +210,7 @@ namespace Mahakam {
 		m_Context->SwapBuffers();
 	}
 
-	void WindowsWindow::SetVSync(bool enabled)
+	void GLFWindow::SetVSync(bool enabled)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -224,7 +219,7 @@ namespace Mahakam {
 		m_Data.VSync = enabled;
 	}
 
-	void WindowsWindow::SetCursorVisible(bool visible)
+	void GLFWindow::SetCursorVisible(bool visible)
 	{
 		MH_PROFILE_FUNCTION();
 

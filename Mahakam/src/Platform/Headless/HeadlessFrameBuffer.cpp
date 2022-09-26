@@ -8,8 +8,6 @@
 
 namespace Mahakam
 {
-	static const uint32_t MAX_FRAMEBUFFER_SIZE = 8192;
-
 	HeadlessFrameBuffer::HeadlessFrameBuffer(const FrameBufferProps& props)
 		: m_Props(props)
 	{

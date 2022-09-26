@@ -4,6 +4,7 @@
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Platform/Headless/HeadlessRendererAPI.h"
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
 
 #include "Mesh.h"
@@ -11,7 +12,7 @@
 
 namespace Mahakam
 {
-	RendererAPI* GL::rendererAPI;
+	Scope<RendererAPI> GL::rendererAPI;
 
 	Ref<SubMesh> GL::staticScreenQuad;
 	Ref<SubMesh> GL::staticSphereMesh;
@@ -31,7 +32,16 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		rendererAPI = new OpenGLRendererAPI;
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::None:
+			rendererAPI = CreateScope<HeadlessRendererAPI>();
+			break;
+		case RendererAPI::API::OpenGL:
+			rendererAPI = CreateScope<OpenGLRendererAPI>();
+			break;
+		}
+
 		rendererAPI->Init();
 
 		staticScreenQuad = CreateScreenQuad();
@@ -87,9 +97,6 @@ namespace Mahakam
 
 	void GL::Shutdown()
 	{
-		//rendererAPI->Shutdown();
-		delete rendererAPI;
-
 		staticScreenQuad = nullptr;
 		staticSphereMesh = nullptr;
 		staticInvertedPyramid = nullptr;

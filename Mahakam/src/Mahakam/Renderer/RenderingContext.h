@@ -9,6 +9,6 @@ namespace Mahakam
 		virtual void Reload() = 0;
 		virtual void SwapBuffers() = 0;
 
-		static RenderingContext* Create(void* window, void* proc);
+		static Scope<RenderingContext> Create(void* window, void* proc);
 	};
 }

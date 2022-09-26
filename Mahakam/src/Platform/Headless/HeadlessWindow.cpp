@@ -4,13 +4,8 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Profiler.h"
 
-namespace Mahakam {
-
-	Scope<Window> Window::Create(const WindowProps& props)
-	{
-		return CreateScope<HeadlessWindow>(props);
-	}
-
+namespace Mahakam
+{
 	void HeadlessWindow::Init(const WindowProps& props)
 	{
 		MH_PROFILE_FUNCTION();

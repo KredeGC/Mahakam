@@ -13,8 +13,6 @@
 
 namespace Mahakam
 {
-	static const uint32_t MAX_FRAMEBUFFER_SIZE = 8192;
-
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferProps& props)
 		: m_Props(props)
 	{

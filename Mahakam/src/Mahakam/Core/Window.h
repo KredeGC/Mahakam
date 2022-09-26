@@ -1,9 +1,11 @@
 #pragma once
 #include "Core.h"
-#include "Mahakam/Events/Event.h"
+
+#include "SharedLibrary.h"
 
 namespace Mahakam
 {
+	class Event;
 	class RenderingContext;
 
 	struct WindowProps
@@ -42,8 +44,11 @@ namespace Mahakam
 
 		virtual void* GetProcess() const = 0;
 
-		virtual RenderingContext* GetContext() const = 0;
+		virtual RenderingContext& GetContext() const = 0;
 
-		static Scope<Window> Create(const WindowProps& props = WindowProps());
+		inline static Scope<Window> Create(const WindowProps& props = WindowProps()) { return CreateImpl(props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateImpl, Scope<Window>, const WindowProps& props);
 	};
 }

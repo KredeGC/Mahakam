@@ -7,7 +7,7 @@
 
 namespace Mahakam
 {
-	class WindowsWindow : public Window
+	class GLFWindow : public Window
 	{
 	private:
 		struct WindowData
@@ -22,11 +22,11 @@ namespace Mahakam
 		GLFWwindow* m_Window;
 		WindowData m_Data;
 
-		RenderingContext* m_Context;
+		Scope<RenderingContext> m_Context;
 
 	public:
-		WindowsWindow(const WindowProps& props);
-		virtual ~WindowsWindow();
+		GLFWindow(const WindowProps& props);
+		virtual ~GLFWindow();
 
 		virtual void OnUpdate() override;
 
@@ -47,7 +47,7 @@ namespace Mahakam
 
 		virtual inline void* GetProcess() const override { return (void*)glfwGetProcAddress; }
 
-		virtual inline RenderingContext* GetContext() const override { return m_Context; }
+		virtual inline RenderingContext& GetContext() const override { return *m_Context; }
 
 	private:
 		virtual void Init(const WindowProps& props);
