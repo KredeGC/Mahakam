@@ -39,7 +39,7 @@ namespace Mahakam
 	private:
 		struct RendererData
 		{
-			RendererResults RendererResults;
+			RendererResults FrameResults;
 			std::vector<Ref<RenderPass>> RenderPasses;
 			UnorderedMap<std::string, WeakRef<FrameBuffer>> FrameBuffers;
 

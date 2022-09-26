@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Mahakam
 {
 	enum class ShaderDataType
@@ -19,4 +21,8 @@ namespace Mahakam
 		Sampler2D,
 		SamplerCube
 	};
+
+	uint32_t ShaderDataTypeComponentCount(ShaderDataType type);
+
+	uint32_t ShaderDataTypeSize(ShaderDataType type);
 }

@@ -10,6 +10,7 @@
 
 #include "Mahakam/Container/darray.h"
 
+#include "Platform/Headless/HeadlessMesh.h"
 #include "Platform/OpenGL/OpenGLMesh.h"
 
 #include <glm/gtx/fast_square_root.hpp>
@@ -382,8 +383,7 @@ namespace Mahakam
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			MH_CORE_BREAK("Renderer API not supported!");
-			return nullptr;
+			return CreateRef<HeadlessMesh>(vertexCount, indexCount, verts, indices);
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLMesh>(vertexCount, indexCount, verts, indices);
 		}
