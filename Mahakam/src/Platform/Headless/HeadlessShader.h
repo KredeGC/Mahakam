@@ -49,9 +49,5 @@ namespace Mahakam
 	private:
 		std::string ParseDefaultValue(const YAML::Node& node);
 		void ParseYAMLFile(const std::filesystem::path& filepath);
-		UnorderedMap<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
-		UnorderedMap<uint32_t, std::string> ParseGLSLFile(const std::string& source);
-
-		int GetUniformLocation(const std::string& name);
 	};
 }

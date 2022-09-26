@@ -3,14 +3,17 @@
 
 #include "Mahakam/Core/Application.h"
 
+#ifndef MH_HEADLESS
+#include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#endif // MH_HEADLESS
+
 #if MH_PLATFORM_WINDOWS
 #include <windows.h>
 #endif
 
 #include <commdlg.h>
-#include <GLFW/glfw3.h>
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3native.h>
 
 namespace Mahakam
 {
@@ -21,7 +24,11 @@ namespace Mahakam
 		CHAR currentDir[256] = { 0 };
 		ZeroMemory(&ofn, sizeof(OPENFILENAME));
 		ofn.lStructSize = sizeof(OPENFILENAME);
+#ifdef MH_HEADLESS
+		ofn.hwndOwner = NULL;
+#else
 		ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::GetInstance()->GetWindow().GetNativeWindow());
+#endif // MH_HEADLESS
 		ofn.lpstrFile = szFile;
 		ofn.nMaxFile = sizeof(szFile);
 		if (GetCurrentDirectoryA(256, currentDir))
@@ -43,7 +50,11 @@ namespace Mahakam
 		CHAR currentDir[256] = { 0 };
 		ZeroMemory(&ofn, sizeof(OPENFILENAME));
 		ofn.lStructSize = sizeof(OPENFILENAME);
+#ifdef MH_HEADLESS
+		ofn.hwndOwner = NULL;
+#else
 		ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::GetInstance()->GetWindow().GetNativeWindow());
+#endif // MH_HEADLESS
 		ofn.lpstrFile = szFile;
 		ofn.nMaxFile = sizeof(szFile);
 		if (GetCurrentDirectoryA(256, currentDir))

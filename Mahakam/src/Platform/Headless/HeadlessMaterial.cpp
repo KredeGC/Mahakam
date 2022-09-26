@@ -123,9 +123,6 @@ namespace Mahakam
 	{
 		for (auto& [name, texture] : m_Textures)
 			m_Shader->SetTexture(name, texture.RefPtr());
-
-		if (uniformBuffer)
-			uniformBuffer->SetData(m_Data, 0, m_DataSize);
 	}
 
 	void HeadlessMaterial::SetMat3(const std::string& name, const glm::mat3& value)
