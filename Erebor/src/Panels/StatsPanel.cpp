@@ -19,9 +19,9 @@ namespace Mahakam::Editor
 			if (ImGui::Begin("Performance Stats", &m_Open))
 			{
 				ImGui::TextWrapped("Graphics unit: %s", GL::GetGraphicsVendor());
-				ImGui::TextWrapped("Drawcalls: %d", results.drawCalls);
-				ImGui::TextWrapped("Vertex count: %d", results.vertexCount);
-				ImGui::TextWrapped("Tri count: %d", results.triCount);
+				ImGui::TextWrapped("Drawcalls: %d", results.DrawCalls);
+				ImGui::TextWrapped("Vertex count: %d", results.VertexCount);
+				ImGui::TextWrapped("Tri count: %d", results.TriCount);
 				ImGui::TextWrapped("Frametime: %.3d fps (%.3f ms)", (int)(1.0f / m_Frametime), m_Frametime.GetMilliSeconds());
 				ImGui::TextWrapped("Smooth Frametime: %.3d fps (%.3f ms)", (int)(1.0f / m_SmoothDelta), m_SmoothDelta.GetMilliSeconds());
 			}

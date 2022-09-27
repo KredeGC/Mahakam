@@ -51,6 +51,7 @@
 #include "Mahakam/ImGui/ImGuiLayer.h"
 
 // Math
+#include "Mahakam/Math/Bounds.h"
 #include "Mahakam/Math/Math.h"
 
 // Physics

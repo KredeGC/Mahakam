@@ -29,9 +29,9 @@ namespace Mahakam
 
 	struct RendererResults
 	{
-		uint32_t drawCalls = 0;
-		uint32_t vertexCount = 0;
-		uint32_t triCount = 0;
+		uint32_t DrawCalls = 0;
+		uint32_t VertexCount = 0;
+		uint32_t TriCount = 0;
 	};
 
 	class Renderer

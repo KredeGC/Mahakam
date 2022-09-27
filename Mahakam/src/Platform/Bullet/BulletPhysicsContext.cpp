@@ -1,6 +1,9 @@
 #include "Mahakam/mhpch.h"
 #include "BulletPhysicsContext.h"
 
+#include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/Profiler.h"
+
 namespace Mahakam
 {
 	PhysicsContext* PhysicsContext::Create()
@@ -43,6 +46,8 @@ namespace Mahakam
 
 	void BulletPhysicsContext::Update(Timestep ts)
 	{
+		MH_PROFILE_FUNCTION();
+
 		m_DynamicsWorld->stepSimulation(ts, 1, 1.0f / 60.0f);
 
 		//print positions of all objects

@@ -102,9 +102,9 @@ namespace Mahakam
 		s_SceneData->UniformValueBuffer->Bind(3);
 
 		// Setup results
-		s_RendererData->FrameResults.drawCalls = 0;
-		s_RendererData->FrameResults.vertexCount = 0;
-		s_RendererData->FrameResults.triCount = 0;
+		s_RendererData->FrameResults.DrawCalls = 0;
+		s_RendererData->FrameResults.VertexCount = 0;
+		s_RendererData->FrameResults.TriCount = 0;
 	};
 
 	//void Renderer::EndSceneImpl()
@@ -166,7 +166,7 @@ namespace Mahakam
 		}*/
 
 		// Normalize results
-		s_RendererData->FrameResults.triCount /= 3;
+		s_RendererData->FrameResults.TriCount /= 3;
 
 		// Clear render queues
 		s_SceneData->renderQueue.clear();
@@ -396,9 +396,9 @@ namespace Mahakam
 	//void Renderer::AddPerformanceResultImpl(uint32_t vertexCount, uint32_t indexCount)
 	MH_DEFINE_FUNC(Renderer::AddPerformanceResultImpl, void, uint32_t vertexCount, uint32_t indexCount)
 	{
-		s_RendererData->FrameResults.drawCalls++;
-		s_RendererData->FrameResults.vertexCount += vertexCount;
-		s_RendererData->FrameResults.triCount += indexCount;
+		s_RendererData->FrameResults.DrawCalls++;
+		s_RendererData->FrameResults.VertexCount += vertexCount;
+		s_RendererData->FrameResults.TriCount += indexCount;
 	};
 
 	//const RendererResults& Renderer::GetPerformanceResultsImpl()

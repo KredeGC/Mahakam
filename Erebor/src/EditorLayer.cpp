@@ -6,7 +6,6 @@
 #include "Panels/ConsolePanel.h"
 #include "Panels/ContentBrowserPanel.h"
 #include "Panels/EnvironmentPanel.h"
-#include "Panels/GameViewPanel.h"
 #include "Panels/ImportWizardPanel.h"
 #include "Panels/ProfilerPanel.h"
 #include "Panels/RenderPassPanel.h"
@@ -330,10 +329,6 @@ namespace Mahakam::Editor
 		panelProps.SetWindow<ImportWizardPanel>();
 
 		EditorWindowRegistry::RegisterWindow(panelProps);
-
-		// GameViewPanel
-		EditorWindowRegistry::RegisterWindowClass<GameViewPanel>("Game View");
-		EditorWindowRegistry::OpenWindow("Game View");
 
 		// ProfilerPanel
 		EditorWindowRegistry::RegisterWindowClass<ProfilerPanel>("Profiler");

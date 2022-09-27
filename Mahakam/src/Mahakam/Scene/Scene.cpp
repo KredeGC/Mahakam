@@ -193,9 +193,10 @@ namespace Mahakam
 
 			m_Registry.view<TransformComponent, AudioSourceComponent>().each([=](TransformComponent& transformComponent, AudioSourceComponent& audioSourceComponent)
 			{
-				// TODO: Use the model matrix instead. Helps with parenting
+				const glm::mat4& modelMatrix = transformComponent.GetModelMatrix();
+
 				auto source = audioSourceComponent.GetAudioSource();
-				source->SetPosition(transformComponent.GetPosition());
+				source->SetPosition(modelMatrix[3]);
 			});
 		}
 
