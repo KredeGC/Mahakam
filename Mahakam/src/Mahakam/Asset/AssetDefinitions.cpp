@@ -46,6 +46,9 @@ namespace Mahakam
 	class MiniAudioSound;
 }
 
+// Void
+template class Mahakam::Asset<void>;
+
 // Audio
 template class Mahakam::Asset<Mahakam::Sound>;
 

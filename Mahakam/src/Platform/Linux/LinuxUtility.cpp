@@ -21,7 +21,7 @@ namespace Mahakam
 
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
 		{
-			MH_CORE_WARN("Zenity not found in path. See Hazel pre-requisites to install.");
+			MH_CORE_WARN("Zenity not found in path!");
 			pclose(fp);
 			return false;
 		}
@@ -77,7 +77,7 @@ namespace Mahakam
 			+ ("\" --title=\"Save As File\" --save --confirm-overwrite");
 		fp = popen(cmdline.c_str(), "r");
 		if (fp == NULL)
-			MH_CORE_ERROR("Null file pointer in FileUtility::OpenFile().\n");
+			MH_CORE_ERROR("Null file pointer in FileUtility::SaveFile().\n");
 
 		//Check for File dialog cancellation.
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)

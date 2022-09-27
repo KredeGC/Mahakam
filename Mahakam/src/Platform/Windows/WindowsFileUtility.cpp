@@ -3,16 +3,11 @@
 
 #include "Mahakam/Core/Application.h"
 
-#ifndef MH_HEADLESS
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
-#endif // MH_HEADLESS
 
-#if MH_PLATFORM_WINDOWS
 #include <windows.h>
-#endif
-
 #include <commdlg.h>
 
 namespace Mahakam

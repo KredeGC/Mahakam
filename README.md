@@ -42,6 +42,7 @@ Steam&reg; Audio, Copyright 2017 - 2022, Valve Corp. All rights reserved.
 Mahakam can be used by itself, simply by building and linking to it.
 An editor application also exists, called Erebor, which includes a level-editor and asset manager among other game-making tools.
 The best way to understand and use the engine is to build and run it, and then change around stuff to see how it affects the state.
+Applications created with the engine can also be run in headless mode, using the `--headless` flag.
 
 # Erebor
 Running the editor can be done via Visual Studio or Visual Studio Code, via their respective debuggers.
