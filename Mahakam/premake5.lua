@@ -36,6 +36,7 @@ project "Mahakam"
         "%{IncludeDir.glm}",
         "%{IncludeDir.imgui}",
         "%{IncludeDir.imguizmo}",
+        "%{IncludeDir.ktl}",
         "%{IncludeDir.miniaudio}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.stb_image}",

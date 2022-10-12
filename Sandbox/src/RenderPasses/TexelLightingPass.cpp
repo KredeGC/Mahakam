@@ -17,33 +17,33 @@ namespace Mahakam
 		lightingProps.ColorAttachments = { TextureFormat::RG11B10F };
 		lightingProps.DepthAttachment = { TextureFormat::Depth24 };
 
-		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
+		m_HDRFrameBuffer = FrameBuffer::Create(lightingProps);
 	}
 
 	void TexelLightingPass::SetupShaders()
 	{
 		// Create lighting shader
-		deferredShader = Shader::Create("assets/shaders/external/DeferredTexel.shader");
+		m_DeferredShader = Shader::Create("assets/shaders/external/DeferredTexel.shader");
 
 		// Create default shadow shader
-		shadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
+		m_ShadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
 	}
 
 	void TexelLightingPass::SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		deferredShader->Bind("DIRECTIONAL");
-		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0).RefPtr());
-		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1).RefPtr());
-		deferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3).RefPtr());
-		deferredShader->SetTexture("u_GBuffer4", src->GetColorTexture(4).RefPtr());
-		deferredShader->SetTexture("u_Depth", src->GetDepthTexture().RefPtr());
-
-		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
-		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture().RefPtr());
-
-		deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap.RefPtr());
-		deferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap.RefPtr());
+		m_DeferredShader->Bind("DIRECTIONAL");
+		m_DeferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0).RefPtr());
+		m_DeferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1).RefPtr());
+		m_DeferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3).RefPtr());
+		m_DeferredShader->SetTexture("u_GBuffer4", src->GetColorTexture(4).RefPtr());
+		m_DeferredShader->SetTexture("u_Depth", src->GetDepthTexture().RefPtr());
+		
+		m_DeferredShader->SetTexture("u_BRDFLUT", m_BRDFLut);
+		m_DeferredShader->SetTexture("u_ShadowMap", m_ShadowFramebuffer->GetDepthTexture().RefPtr());
+		
+		m_DeferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap.RefPtr());
+		m_DeferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap.RefPtr());
 	}
 }

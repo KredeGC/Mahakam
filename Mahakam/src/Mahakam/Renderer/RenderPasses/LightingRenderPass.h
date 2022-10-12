@@ -22,22 +22,24 @@ namespace Mahakam
 	class LightingRenderPass : public RenderPass
 	{
 	protected:
-		Ref<Texture> brdfLut = nullptr;
-		Ref<Texture> falloffLut = nullptr;
-		Ref<Texture> spotlightTexture = nullptr;
+		Ref<Texture> m_BRDFLut = nullptr;
+		Ref<Texture> m_FalloffLut = nullptr;
+		Ref<Texture> m_SpotlightTexture = nullptr;
 
-		Ref<FrameBuffer> hdrFrameBuffer = nullptr;
-		Ref<Shader> deferredShader = nullptr;
+		Ref<FrameBuffer> m_HDRFrameBuffer = nullptr;
+		Ref<Shader> m_DeferredShader = nullptr;
 
-		Ref<FrameBuffer> shadowFramebuffer = nullptr;
-		Ref<Shader> shadowShader = nullptr;
+		Ref<FrameBuffer> m_ShadowFramebuffer = nullptr;
+		Ref<Shader> m_ShadowShader = nullptr;
 
-		Ref<UniformBuffer> shadowMatrixBuffer = nullptr;
+		Ref<UniformBuffer> m_ShadowMatrixBuffer = nullptr;
 
-		UnorderedMap<glm::ivec2, uint64_t> lightHashes;
+		UnorderedMap<glm::ivec2, uint64_t> m_LightHashes;
 
-		glm::ivec2 shadowMapOffset = { 0.0f, 0.0f };
-		glm::ivec2 shadowMapMargin = { 0.0f, 0.0f };
+		TrivialVector<uint64_t> m_RenderQueue;
+
+		glm::ivec2 m_ShadowMapOffset = { 0.0f, 0.0f };
+		glm::ivec2 m_ShadowMapMargin = { 0.0f, 0.0f };
 
 		static constexpr uint32_t s_ShadowMapSize = 8192;
 		static constexpr uint32_t s_DirectionalShadowSize = 4096;
@@ -51,7 +53,7 @@ namespace Mahakam
 
 		virtual bool Render(SceneData* sceneData, Ref<FrameBuffer> src) override;
 
-		virtual Ref<FrameBuffer> GetFrameBuffer() override { return hdrFrameBuffer; };
+		virtual Ref<FrameBuffer> GetFrameBuffer() override { return m_HDRFrameBuffer; };
 
 	protected:
 		virtual void SetupBRDF();
@@ -62,8 +64,8 @@ namespace Mahakam
 		virtual void SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src);
 		virtual void RenderLighting(SceneData* sceneData, Ref<FrameBuffer> src);
 
-		virtual uint64_t PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum, std::vector<uint64_t>& renderQueue);
-		virtual void RenderShadowGeometry(SceneData* sceneData, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
+		virtual uint64_t PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum);
+		virtual void RenderShadowGeometry(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 
 		virtual void RenderDirectionalShadows(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);
 		virtual void RenderSpotShadows(SceneData* sceneData, const Frustum& cameraFrustum, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);

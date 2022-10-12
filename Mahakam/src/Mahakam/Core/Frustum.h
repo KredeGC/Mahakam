@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Core/Profiler.h"
+
 #include <glm/ext/matrix_float4x4.hpp>
 
 namespace Mahakam
@@ -46,6 +48,8 @@ namespace Mahakam
 
 	inline Frustum::Frustum(glm::mat4 m)
 	{
+		MH_PROFILE_FUNCTION();
+
 		m = glm::transpose(m);
 		m_planes[Left] = m[3] + m[0];
 		m_planes[Right] = m[3] - m[0];

@@ -59,6 +59,7 @@ IncludeDir["glad"]              = "../Mahakam/vendor/glad/include"
 IncludeDir["glm"]               = "../Mahakam/vendor/glm"
 IncludeDir["imgui"]             = "../Mahakam/vendor"
 IncludeDir["imguizmo"]          = "../Mahakam/vendor"
+IncludeDir["ktl"]               = "../Mahakam/vendor/ktl"
 IncludeDir["miniaudio"]         = "../Mahakam/vendor/miniaudio/include"
 IncludeDir["spdlog"]            = "../Mahakam/vendor/spdlog/include"
 IncludeDir["stb_image"]         = "../Mahakam/vendor/stb_image"
@@ -76,6 +77,7 @@ VendorIncludes = {
     "%{IncludeDir.glm}",
     "%{IncludeDir.imgui}",
     "%{IncludeDir.imguizmo}",
+    "%{IncludeDir.ktl}",
     "%{IncludeDir.spdlog}",
     "%{IncludeDir.yaml}"
 }

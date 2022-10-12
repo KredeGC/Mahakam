@@ -38,11 +38,11 @@ namespace Mahakam
 		shadowProps.Width = s_ShadowMapSize;
 		shadowProps.Height = s_ShadowMapSize;
 		shadowProps.DepthAttachment = { TextureFormat::Depth24, TextureFilter::Point };
-		shadowFramebuffer = FrameBuffer::Create(shadowProps);
+		m_ShadowFramebuffer = FrameBuffer::Create(shadowProps);
 
-		Renderer::AddFrameBuffer("Shadow Atlas", shadowFramebuffer);
+		Renderer::AddFrameBuffer("Shadow Atlas", m_ShadowFramebuffer);
 
-		shadowMatrixBuffer = UniformBuffer::Create(sizeof(glm::mat4));
+		m_ShadowMatrixBuffer = UniformBuffer::Create(sizeof(glm::mat4));
 
 		return true;
 	}
@@ -51,20 +51,20 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		brdfLut = nullptr;
-		falloffLut = nullptr;
-		spotlightTexture = nullptr;
+		m_BRDFLut = nullptr;
+		m_FalloffLut = nullptr;
+		m_SpotlightTexture = nullptr;
 
-		hdrFrameBuffer = nullptr;
-		deferredShader = nullptr;
+		m_HDRFrameBuffer = nullptr;
+		m_DeferredShader = nullptr;
 
-		shadowFramebuffer = nullptr;
-		shadowShader = nullptr;
+		m_ShadowFramebuffer = nullptr;
+		m_ShadowShader = nullptr;
 	}
 
 	void LightingRenderPass::OnWindowResize(uint32_t width, uint32_t height)
 	{
-		hdrFrameBuffer->Resize(width, height);
+		m_HDRFrameBuffer->Resize(width, height);
 	}
 
 	bool LightingRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer> src)
@@ -96,10 +96,10 @@ namespace Mahakam
 		// Create BRDF and falloff maps
 		FileUtility::CreateDirectories("cache/internal/");
 		 
-		brdfLut = LoadOrCreateLUTTexture("cache/internal/brdf.dat", "assets/shaders/internal/BRDF.shader", TextureFormat::RG16F, 512, 512);
-		falloffLut = LoadOrCreateLUTTexture("cache/internal/falloff.dat", "assets/shaders/internal/Falloff.shader", TextureFormat::R8, 16, 16);
+		m_BRDFLut = LoadOrCreateLUTTexture("cache/internal/brdf.dat", "assets/shaders/internal/BRDF.shader", TextureFormat::RG16F, 512, 512);
+		m_FalloffLut = LoadOrCreateLUTTexture("cache/internal/falloff.dat", "assets/shaders/internal/Falloff.shader", TextureFormat::R8, 16, 16);
 
-		spotlightTexture = Texture2D::Create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
+		m_SpotlightTexture = Texture2D::Create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
 	}
 
 	void LightingRenderPass::SetupFrameBuffer(uint32_t width, uint32_t height)
@@ -113,9 +113,9 @@ namespace Mahakam
 		lightingProps.ColorAttachments = { TextureFormat::RG11B10F };
 		lightingProps.DepthAttachment = { TextureFormat::Depth24 };
 
-		hdrFrameBuffer = FrameBuffer::Create(lightingProps);
+		m_HDRFrameBuffer = FrameBuffer::Create(lightingProps);
 
-		Renderer::AddFrameBuffer("Lighting", hdrFrameBuffer);
+		Renderer::AddFrameBuffer("Lighting", m_HDRFrameBuffer);
 	}
 
 	void LightingRenderPass::SetupShaders()
@@ -123,29 +123,29 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		// Create lighting shader
-		deferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.shader");
+		m_DeferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.shader");
 
 		// Create default shadow shader
-		shadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
+		m_ShadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
 	}
 
 	void LightingRenderPass::RenderShadowMaps(SceneData* sceneData, const Frustum& frustum)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		shadowMapOffset = { 0.0f, 0.0f };
-		shadowMapMargin = { 0.0f, 0.0f };
+		m_ShadowMapOffset = { 0.0f, 0.0f };
+		m_ShadowMapMargin = { 0.0f, 0.0f };
 
-		shadowFramebuffer->Bind();
+		m_ShadowFramebuffer->Bind();
 
 		// Setup and bind shadow shader
 		uint64_t lastShaderID = ~0;
 		uint64_t lastMaterialID = ~0;
 		uint64_t lastMeshID = ~0;
-		shadowShader->Bind("SHADOW");
+		m_ShadowShader->Bind("SHADOW");
 
 		// Bind worldToLight matrix
-		shadowMatrixBuffer->Bind(1);
+		m_ShadowMatrixBuffer->Bind(1);
 
 		// Directional shadows
 		RenderDirectionalShadows(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
@@ -153,41 +153,41 @@ namespace Mahakam
 		// Spot shadows
 		RenderSpotShadows(sceneData, frustum, &lastShaderID, &lastMaterialID, &lastMeshID);
 
-		shadowFramebuffer->Unbind();
+		m_ShadowFramebuffer->Unbind();
 	}
 
 	void LightingRenderPass::SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		deferredShader->Bind("DIRECTIONAL");
-		deferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0).RefPtr());
-		deferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1).RefPtr());
-		deferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(2).RefPtr());
-		deferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3).RefPtr());
-		deferredShader->SetTexture("u_Depth", src->GetDepthTexture().RefPtr());
+		m_DeferredShader->Bind("DIRECTIONAL");
+		m_DeferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0).RefPtr());
+		m_DeferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1).RefPtr());
+		m_DeferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(2).RefPtr());
+		m_DeferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3).RefPtr());
+		m_DeferredShader->SetTexture("u_Depth", src->GetDepthTexture().RefPtr());
 
-		deferredShader->SetTexture("u_BRDFLUT", brdfLut);
-		deferredShader->SetTexture("u_ShadowMap", shadowFramebuffer->GetDepthTexture().RefPtr());
+		m_DeferredShader->SetTexture("u_BRDFLUT", m_BRDFLut);
+		m_DeferredShader->SetTexture("u_ShadowMap", m_ShadowFramebuffer->GetDepthTexture().RefPtr());
 
 		if (sceneData->environment.IrradianceMap)
-			deferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap.RefPtr());
+			m_DeferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap.RefPtr());
 
 		if (sceneData->environment.SpecularMap)
-			deferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap.RefPtr());
+			m_DeferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap.RefPtr());
 	}
 
 	void LightingRenderPass::RenderLighting(SceneData* sceneData, Ref<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		GL::SetViewport(0, 0, hdrFrameBuffer->GetSpecification().Width, hdrFrameBuffer->GetSpecification().Height);
+		GL::SetViewport(0, 0, m_HDRFrameBuffer->GetSpecification().Width, m_HDRFrameBuffer->GetSpecification().Height);
 
 		// Blit depth buffer from gBuffer
-		src->Blit(hdrFrameBuffer, false, true);
+		src->Blit(m_HDRFrameBuffer, false, true);
 
 		// Bind and clear lighting buffer
-		hdrFrameBuffer->Bind();
+		m_HDRFrameBuffer->Bind();
 		GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
 		GL::Clear(true, false);
 
@@ -217,10 +217,10 @@ namespace Mahakam
 		if (!sceneData->gBuffer)
 			Renderer::DrawSkybox(sceneData);
 
-		hdrFrameBuffer->Unbind();
+		m_HDRFrameBuffer->Unbind();
 	}
 
-	uint64_t LightingRenderPass::PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum, std::vector<uint64_t>& renderQueue)
+	uint64_t LightingRenderPass::PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -250,41 +250,41 @@ namespace Mahakam
 				Ref<Material>& material = sceneData->materialIDLookup[materialID];
 
 				// Hash shader
-				uint8_t* shaderPtr = (uint8_t*)shader.get();
+				const uint8_t* shaderPtr = reinterpret_cast<const uint8_t*>(shader.get());
 				for (uint64_t i = 0; i < sizeof(Shader*); ++i)
 					hash = (hash * 16777619ULL) ^ *(shaderPtr + i);
 
 				// Hash material
 				uint64_t materialHash = material->Hash();
-				uint8_t* materialPtr = (uint8_t*)&materialHash;
+				const uint8_t* materialPtr = reinterpret_cast<const uint8_t*>(&materialHash);
 				for (uint64_t i = 0; i < sizeof(uint64_t); ++i)
 					hash = (hash * 16777619ULL) ^ *(materialPtr + i);
 
 				// Hash mesh
-				uint8_t* meshPtr = (uint8_t*)mesh.get();
+				const uint8_t* meshPtr = reinterpret_cast<const uint8_t*>(mesh.get());
 				for (uint64_t i = 0; i < sizeof(SubMesh*); ++i)
 					hash = (hash * 16777619ULL) ^ *(meshPtr + i);
 
 				// Hash transform
-				uint8_t* transformPtr = (uint8_t*)glm::value_ptr(transform);
+				const uint8_t* transformPtr = reinterpret_cast<const uint8_t*>(glm::value_ptr(transform));
 				for (uint64_t i = 0; i < sizeof(glm::mat4); ++i)
 					hash = (hash * 16777619ULL) ^ *(transformPtr + i);
 
 				// Add to render queue
-				renderQueue.push_back(drawID);
+				m_RenderQueue.push_back(drawID);
 			}
 		}
 
 		return hash;
 	}
 
-	void LightingRenderPass::RenderShadowGeometry(SceneData* sceneData, const std::vector<uint64_t>& renderQueue, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
+	void LightingRenderPass::RenderShadowGeometry(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		GL::Clear(false, true);
 
-		for (uint64_t drawID : renderQueue)
+		for (uint64_t drawID : m_RenderQueue)
 		{
 			// Choose a mesh
 			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
@@ -307,7 +307,7 @@ namespace Mahakam
 				else if (*lastShaderID != ~0)
 				{
 					*lastShaderID = ~0;
-					shadowShader->Bind("SHADOW");
+					m_ShadowShader->Bind("SHADOW");
 				}
 			}
 
@@ -357,19 +357,19 @@ namespace Mahakam
 					continue;
 
 				// Update current shadow map offset
-				if (shadowMapOffset.x + size > s_ShadowMapSize)
+				if (m_ShadowMapOffset.x + size > s_ShadowMapSize)
 				{
-					shadowMapOffset.y += size;
+					m_ShadowMapOffset.y += size;
 
-					if (shadowMapOffset.y > shadowMapMargin.y)
-						shadowMapMargin.x = 0;
+					if (m_ShadowMapOffset.y > m_ShadowMapMargin.y)
+						m_ShadowMapMargin.x = 0;
 
-					shadowMapOffset.x = shadowMapMargin.x;
+					m_ShadowMapOffset.x = m_ShadowMapMargin.x;
 				}
 
-				const glm::ivec2 currentOffset = shadowMapOffset;
+				const glm::ivec2 currentOffset = m_ShadowMapOffset;
 
-				shadowMapOffset.x += size;
+				m_ShadowMapOffset.x += size;
 
 				light.offset = { currentOffset.x / (ratio * (float)size), currentOffset.y / (ratio * (float)size), 1.0f / (float)ratio, light.offset.w };
 
@@ -381,31 +381,31 @@ namespace Mahakam
 				// Calculate hash
 				Frustum frustum(light.worldToLight);
 
-				std::vector<uint64_t> renderQueue;
+				m_RenderQueue.clear();
 
 				uint64_t hash = light.Hash();
-				uint64_t frustumHash = PrePassShadowGeometry(sceneData, frustum, renderQueue);
+				uint64_t frustumHash = PrePassShadowGeometry(sceneData, frustum);
 
-				const unsigned char* p = reinterpret_cast<const unsigned char*>(&frustumHash);
+				const uint8_t* p = reinterpret_cast<const uint8_t*>(&frustumHash);
 				for (uint64_t i = 0; i < sizeof(uint64_t); ++i)
 					hash = (hash * 16777619ULL) ^ p[i];
 
-				auto iter = lightHashes.find(currentOffset);
-				if (iter != lightHashes.end() && iter->second == hash) // If the hashes match, skip rendering
+				auto iter = m_LightHashes.find(currentOffset);
+				if (iter != m_LightHashes.end() && iter->second == hash) // If the hashes match, skip rendering
 					continue;
-				lightHashes[currentOffset] = hash;
+				m_LightHashes[currentOffset] = hash;
 
 				// Set light data in buffer
-				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
+				m_ShadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
 
-				RenderShadowGeometry(sceneData, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
+				RenderShadowGeometry(sceneData, lastShaderID, lastMaterialID, lastMeshID);
 			}
 
-			shadowMapMargin.x = shadowMapOffset.x;
-			shadowMapMargin.y = shadowMapOffset.y + size;
+			m_ShadowMapMargin.x = m_ShadowMapOffset.x;
+			m_ShadowMapMargin.y = m_ShadowMapOffset.y + size;
 		}
 	}
 
@@ -435,47 +435,47 @@ namespace Mahakam
 					continue;
 
 				// Update current shadow map offset
-				if (shadowMapOffset.x + size > s_ShadowMapSize)
+				if (m_ShadowMapOffset.x + size > s_ShadowMapSize)
 				{
-					shadowMapOffset.y += size;
+					m_ShadowMapOffset.y += size;
 
-					if (shadowMapOffset.y > shadowMapMargin.y)
-						shadowMapMargin.x = 0;
+					if (m_ShadowMapOffset.y > m_ShadowMapMargin.y)
+						m_ShadowMapMargin.x = 0;
 
-					shadowMapOffset.x = shadowMapMargin.x;
+					m_ShadowMapOffset.x = m_ShadowMapMargin.x;
 				}
 
-				const glm::ivec2 currentOffset = shadowMapOffset;
+				const glm::ivec2 currentOffset = m_ShadowMapOffset;
 
-				shadowMapOffset.x += size;
+				m_ShadowMapOffset.x += size;
 
 				light.offset = { currentOffset.x / (ratio * (float)size), currentOffset.y / (ratio * (float)size), 1.0f / (float)ratio, light.offset.w };
 
-				// TODO: Calculate a hash based on objects in frustum
+				// Calculate hash
 				Frustum frustum(light.worldToLight);
 
-				std::vector<uint64_t> renderQueue;
+				m_RenderQueue.clear();
 
 				uint64_t hash = light.Hash();
 
-				uint64_t frustumHash = PrePassShadowGeometry(sceneData, frustum, renderQueue);
+				uint64_t frustumHash = PrePassShadowGeometry(sceneData, frustum);
 
-				const unsigned char* p = reinterpret_cast<const unsigned char*>(&frustumHash);
+				const uint8_t* p = reinterpret_cast<const uint8_t*>(&frustumHash);
 				for (uint64_t i = 0; i < sizeof(uint64_t); ++i)
 					hash = (hash * 16777619ULL) ^ p[i];
 
-				auto iter = lightHashes.find(currentOffset);
-				if (iter != lightHashes.end() && iter->second == hash) // If the hashes match, skip rendering
+				auto iter = m_LightHashes.find(currentOffset);
+				if (iter != m_LightHashes.end() && iter->second == hash) // If the hashes match, skip rendering
 					continue;
-				lightHashes[currentOffset] = hash;
+				m_LightHashes[currentOffset] = hash;
 
 				// Set light data in buffer
-				shadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
+				m_ShadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
 
-				RenderShadowGeometry(sceneData, renderQueue, lastShaderID, lastMaterialID, lastMeshID);
+				RenderShadowGeometry(sceneData, lastShaderID, lastMaterialID, lastMeshID);
 			}
 		}
 	}
@@ -528,8 +528,8 @@ namespace Mahakam
 			sceneData->pointLightBuffer->Bind(1);
 			sceneData->pointLightBuffer->SetData(sceneData->environment.PointLights.data(), 0, bufferSize);
 
-			deferredShader->Bind("POINT");
-			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
+			m_DeferredShader->Bind("POINT");
+			m_DeferredShader->SetTexture("u_AttenuationLUT", m_FalloffLut);
 
 			Renderer::DrawInstancedSphere(amount);
 		}
@@ -552,9 +552,9 @@ namespace Mahakam
 			sceneData->spotLightBuffer->Bind(1);
 			sceneData->spotLightBuffer->SetData(sceneData->environment.SpotLights.data(), 0, bufferSize);
 
-			deferredShader->Bind("SPOT");
-			deferredShader->SetTexture("u_AttenuationLUT", falloffLut);
-			deferredShader->SetTexture("u_LightCookie", spotlightTexture);
+			m_DeferredShader->Bind("SPOT");
+			m_DeferredShader->SetTexture("u_AttenuationLUT", m_FalloffLut);
+			m_DeferredShader->SetTexture("u_LightCookie", m_SpotlightTexture);
 
 			Renderer::DrawInstancedPyramid(amount);
 		}

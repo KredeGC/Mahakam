@@ -284,7 +284,7 @@ namespace Mahakam
 
 		// Setup scene lights
 		{
-			MH_PROFILE_SCOPE("Scene::OnUpdate - LightComponent");
+			MH_PROFILE_SCOPE("Scene::OnRender - LightComponent");
 
 			// Clear previous lights
 			m_Environment.DirectionalLights.clear();
@@ -332,12 +332,12 @@ namespace Mahakam
 
 		// Begin the render loop
 		{
-			MH_PROFILE_SCOPE("Scene::OnUpdate - Render loop");
+			MH_PROFILE_SCOPE("Scene::OnRender - Render loop");
 			Renderer::BeginScene(camera, cameraTransform, m_Environment);
 
 			// Render each entity with a mesh
 			{
-				MH_PROFILE_SCOPE("Scene::OnUpdate - Submit");
+				MH_PROFILE_SCOPE("Scene::OnRender - Submit");
 
 				m_Registry.view<TransformComponent, MeshComponent>().each([&](entt::entity entity, TransformComponent& transformComponent, MeshComponent& meshComponent)
 				{
@@ -354,32 +354,49 @@ namespace Mahakam
 							const auto& boneEntities = skinComponent->GetBoneEntities();
 							const auto& hierarchy = meshComponent.GetNodeHierarchy();
 
-							for (size_t i = 0; i < hierarchy.size(); i++)
+							// I've yet to make the inverse skin transform to work. For now it has a toggle instead
+							if (skinComponent->HasTargetOrigin())
 							{
-								auto& index = hierarchy.at(i);
-								auto& boneEntity = boneEntities.at(i);
-
-								if (boneEntity && index.mesh > -1)
+								for (size_t i = 0; i < hierarchy.size(); i++)
 								{
-									if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
-									{
-										// TODO: Undo the skin transformation instead. This doesn't actually seem to work though
-										// I've yet to make the inverse skin transform to work. For now it has a toggle instead
-										glm::mat4 transform;
-										if (skinComponent->HasTargetOrigin())
-											transform = boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
-											* index.offset;
-										else
-											transform = transformComponent.GetModelMatrix();
+									auto& index = hierarchy.at(i);
+									auto& boneEntity = boneEntities.at(i);
 
-										Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount].RefPtr());
+									if (boneEntity && index.mesh > -1)
+									{
+										if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
+										{
+											// TODO: Undo the skin transformation instead. This doesn't actually seem to work though
+											glm::mat4 transform = boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
+												* index.offset;
+
+											Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount].RefPtr());
+										}
+									}
+								}
+							}
+							else
+							{
+								for (size_t i = 0; i < hierarchy.size(); i++)
+								{
+									auto& index = hierarchy.at(i);
+									auto& boneEntity = boneEntities.at(i);
+
+									if (boneEntity && index.mesh > -1)
+									{
+										if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
+										{
+											const glm::mat4& transform = transformComponent.GetModelMatrix();
+
+											Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount].RefPtr());
+										}
 									}
 								}
 							}
 						}
 						else
 						{
-							glm::mat4 modelMatrix = transformComponent.GetModelMatrix();
+							const glm::mat4& modelMatrix = transformComponent.GetModelMatrix();
 
 							for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
 								Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount].RefPtr());
@@ -390,7 +407,7 @@ namespace Mahakam
 
 			// Render particle systems
 			{
-				MH_PROFILE_SCOPE("Scene::OnUpdate - SubmitParticles");
+				MH_PROFILE_SCOPE("Scene::OnRender - SubmitParticles");
 
 				m_Registry.view<TransformComponent, ParticleSystemComponent>().each([=](TransformComponent& transformComponent, ParticleSystemComponent& particleComponent)
 				{

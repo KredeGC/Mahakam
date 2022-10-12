@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Allocator.h"
 #include "Mahakam/Version.h"
 #include "Mahakam/Container/tvector.h"
 
@@ -87,8 +88,8 @@
 
 namespace Mahakam
 {
-	template<typename T>
-	using TrivialVector = tvector<T>;
+	template<typename T, typename Alloc = std::allocator<T>>
+	using TrivialVector = tvector<T, Alloc>;
 
 	template<typename K, typename V>
 	using UnorderedMap = std::unordered_map<K, V>;
@@ -131,7 +132,7 @@ namespace Mahakam
 	template<typename T, typename ... Args>
 	constexpr Ref<T> CreateRef(Args&& ... args)
 	{
-		return std::make_shared<T>(std::forward<Args>(args)...);
+		return std::allocate_shared<T>(Allocator::GetAllocator<T>(), std::forward<Args>(args)...);
 	}
 
 	template<typename T>
