@@ -77,7 +77,7 @@ namespace ktl
 				return next;
 			}
 
-			return m_Alloc.allocate(n);
+			return nullptr;
 		}
 
 		void deallocate(void* p, size_type n)

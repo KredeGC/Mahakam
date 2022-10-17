@@ -210,9 +210,6 @@ namespace Mahakam
 
 			emitter << YAML::Key << "Mesh" << YAML::Value << mesh.GetID();
 
-			// TODO: Implement primitive saving
-			// TODO: Implement mesh properties
-
 			return true;
 		};
 		meshInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)

@@ -16,6 +16,8 @@ namespace Mahakam::Editor
 
 		inline const static std::filesystem::path s_AssetDirectory = "assets";
 
+		using DirectorySet = std::set<std::string, std::less<std::string>, Allocator::BaseAllocator<std::string>>;
+
 	public:
 		ContentBrowserPanel();
 
@@ -24,7 +26,11 @@ namespace Mahakam::Editor
 		virtual void OnImGuiRender() override;
 
 	private:
-		void DrawDirectoryRecursive(std::filesystem::path path);
+		bool HasSubDirectories(const std::filesystem::path& path);
+
+		DirectorySet GetDirectores(const std::filesystem::path& path);
+
+		void DrawDirectoryRecursive(const std::filesystem::path& path, const DirectorySet& directories);
 
 		void DrawDirectoryContents(std::filesystem::path path);
 	};

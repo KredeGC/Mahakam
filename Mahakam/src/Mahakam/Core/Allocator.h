@@ -11,13 +11,10 @@ namespace Mahakam
 {
 	class Allocator
 	{
-	private:
+	public:
 		template<typename T>
 		using BaseAllocator = ktl::type_composite_allocator<T, ktl::freelist_allocator<0, 256, 8, 64, ktl::pre_allocator<16384>>, ktl::mallocator>;
 
-		inline static BaseAllocator<uint8_t> m_Alloc;
-
-	public:
 		template<typename T>
 		static BaseAllocator<T> GetAllocator()
 		{
@@ -47,5 +44,8 @@ namespace Mahakam
 		{
 			std::allocator_traits<T>::destroy(m_Alloc, p);
 		}
+
+	private:
+		inline static BaseAllocator<uint8_t> m_Alloc;
 	};
 }

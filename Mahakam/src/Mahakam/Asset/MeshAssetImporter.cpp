@@ -150,7 +150,7 @@ namespace Mahakam
 		}
 		emitter << YAML::EndSeq;
 
-		emitter << YAML::Key << "Primitive" << YAML::Value << (int)m_MeshProps.Primitive;
+		emitter << YAML::Key << "Primitive" << YAML::Value << (int)mesh->Props.Primitive;
 
 		switch (mesh->Props.Primitive)
 		{

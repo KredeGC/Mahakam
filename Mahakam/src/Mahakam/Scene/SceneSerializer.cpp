@@ -190,6 +190,8 @@ namespace Mahakam
 			}
 		}
 
+		m_Scene->Sort();
+
 		return true;
 	}
 

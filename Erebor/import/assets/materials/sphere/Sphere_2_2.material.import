@@ -1,0 +1,10 @@
+Filepath: sphere.material
+Extension: .material
+ID: 4013540258713361686
+Shader: 17048867044831516029
+Properties:
+  u_Color: [1, 1, 1]
+  u_MetallicMul: 0.200000003
+  u_EmissionColor: [0, 0, 0]
+  u_RoughnessMul: 0.200000003
+  u_UVTransform: [0, 0, 0, 0]

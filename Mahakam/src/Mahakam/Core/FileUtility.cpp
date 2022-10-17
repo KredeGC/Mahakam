@@ -29,7 +29,7 @@ namespace Mahakam
 
 		CreateDirectories(importDirectory);
 
-		if (std::filesystem::is_directory(filepath))
+		if (!std::filesystem::exists(filepath) || std::filesystem::is_directory(filepath))
 			return IMPORT_PATH / filepath.string();
 		else
 			return IMPORT_PATH / std::filesystem::path(filepath.string() + ".import");
