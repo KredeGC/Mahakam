@@ -282,7 +282,6 @@ namespace Mahakam
 				m_Ints[prop.first] = 0;
 				break;
 			default:
-				MH_CORE_WARN("Material properties for {0} shader include unused property: {1}", m_Shader->GetName(), prop.first);
 				break;
 			}
 		}
