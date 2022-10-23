@@ -9,27 +9,40 @@ project "glslang"
     objdir ("bin-obj/%{outputdir}")
 
 	files {
-		"**.cpp",
-		"**.h",
-		"**.hpp"
+        "glslang/**.cpp",
+        "OGLCompilersDLL/InitializeDll.cpp",
+        "SPIRV/**.cpp",
+        "Standalone/**.cpp"
 	}
 
 	includedirs {
 		".",
-        "include"
+        "include",
+        "Standalone",
+        "OGLCompilersDLL"
 	}
 
     removefiles {
-        "glslang/OSDependent/Windows/**",
-        "glslang/OSDependent/Web/**",
-        "glslang/HLSL/**",
+        "glslang/OSDependent/**"
+    }
+    
+    defines {
+        "ENABLE_HLSL"
     }
 
     filter "options:target=linux"
         systemversion "latest"
+        
+        files {
+            "glslang/OSDependent/Unix/ossource.cpp"
+        }
 
     filter "options:target=windows"
         systemversion "latest"
+        
+        files {
+            "glslang/OSDependent/Windows/ossource.cpp"
+        }
     
     -- Unity build
     filter "options:unity"
