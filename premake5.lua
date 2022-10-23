@@ -57,11 +57,13 @@ IncludeDir["entt"]              = "../Mahakam/vendor/entt/include"
 IncludeDir["glfw"]              = "../Mahakam/vendor/glfw/include"
 IncludeDir["glad"]              = "../Mahakam/vendor/glad/include"
 IncludeDir["glm"]               = "../Mahakam/vendor/glm"
+IncludeDir["glslang"]           = "../Mahakam/vendor/glslang"
 IncludeDir["imgui"]             = "../Mahakam/vendor"
 IncludeDir["imguizmo"]          = "../Mahakam/vendor"
 IncludeDir["ktl"]               = "../Mahakam/vendor/ktl"
 IncludeDir["miniaudio"]         = "../Mahakam/vendor/miniaudio/include"
 IncludeDir["spdlog"]            = "../Mahakam/vendor/spdlog/include"
+IncludeDir["spirv_cross"]       = "../Mahakam/vendor/spirv_cross/include"
 IncludeDir["stb_image"]         = "../Mahakam/vendor/stb_image"
 IncludeDir["steamaudio"]        = "../Mahakam/vendor/steamaudio/include"
 IncludeDir["tiny_gltf"]         = "../Mahakam/vendor/tiny_gltf"
@@ -93,9 +95,11 @@ VendorLinks = {
     "LinearMath",
     "GLFW",
     "glad",
+    "glslang",
     "ImGui",
     "ImGuizmo",
     "yaml-cpp",
+    "spirv_cross",
     "phonon"
 }
 
@@ -141,7 +145,9 @@ group "Dependencies"
     include "Mahakam/vendor/imgui"
     include "Mahakam/vendor/imguizmo"
     include "Mahakam/vendor/glad"
+    include "Mahakam/vendor/glslang"
     include "Mahakam/vendor/yaml-cpp"
+    include "Mahakam/vendor/spirv_cross"
     include "Mahakam/vendor/bullet/build3"
 group ""
 

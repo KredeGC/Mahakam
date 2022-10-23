@@ -34,11 +34,13 @@ project "Mahakam"
         "%{IncludeDir.glfw}",
         "%{IncludeDir.glad}",
         "%{IncludeDir.glm}",
+        "%{IncludeDir.glslang}",
         "%{IncludeDir.imgui}",
         "%{IncludeDir.imguizmo}",
         "%{IncludeDir.ktl}",
         "%{IncludeDir.miniaudio}",
         "%{IncludeDir.spdlog}",
+        "%{IncludeDir.spirv_cross}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.steamaudio}",
         "%{IncludeDir.tiny_gltf}",
@@ -53,9 +55,11 @@ project "Mahakam"
         "LinearMath",
         "GLFW",
         "glad",
+        "glslang",
         "ImGui",
         "ImGuizmo",
         "yaml-cpp",
+        "spirv_cross",
         "phonon"
     }
 

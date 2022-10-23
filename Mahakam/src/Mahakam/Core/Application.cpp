@@ -13,6 +13,11 @@
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/RendererAPI.h"
 
+
+// TEMP
+#include <spirv_cross/spirv_glsl.hpp>
+#include <glslang/SPIRV/GlslangToSpv.h>
+
 namespace Mahakam
 {
 	Application* Application::instance = nullptr;
@@ -38,6 +43,15 @@ namespace Mahakam
 			imGuiLayer = new ImGuiLayer();
 			PushOverlay(imGuiLayer);
 		}
+
+		// TEMP
+		glslang::InitializeProcess();
+		
+		glslang::TShader shader(EShLangVertex);
+		glslang::TProgram program;
+		const char* shaderStrings[1];
+		
+
 	}
 
 	Application::~Application()
