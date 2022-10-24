@@ -140,7 +140,7 @@
 // - You may need to regenerate imgui_impl_opengl3_loader.h to add new symbols. See https://github.com/dearimgui/gl3w_stripped
 // - You can temporarily use an unstripped version. See https://github.com/dearimgui/gl3w_stripped/releases
 // Changes to this backend using new APIs should be accompanied by a regenerated stripped loader version.
-#include <glad/glad.h>
+#include <glad/gl.h>
 #define IMGL3W_IMPL
 #include "imgui_impl_opengl3_loader.h"
 #endif

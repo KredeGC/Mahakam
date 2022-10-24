@@ -4,6 +4,8 @@
 
 #include "Mahakam/Core/Profiler.h"
 
+#include <glad/gl.h>
+
 namespace Mahakam
 {
 	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)

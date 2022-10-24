@@ -9,7 +9,7 @@
 #include "Mahakam/Renderer/RenderBuffer.h"
 #include "Mahakam/Renderer/Texture.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Mahakam
 {

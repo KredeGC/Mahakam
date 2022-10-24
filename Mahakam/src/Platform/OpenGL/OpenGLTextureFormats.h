@@ -2,7 +2,7 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Renderer/TextureFormats.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 // ONLY INCLUDE IN CPP FILES
 

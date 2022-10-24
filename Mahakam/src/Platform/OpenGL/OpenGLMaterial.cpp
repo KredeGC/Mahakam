@@ -31,6 +31,10 @@ namespace Mahakam
 			if (iter->second.Offset != -1)
 				memcpy(data + iter->second.Offset + offset, value, sizeof(T));
 		}
+		else
+		{
+			MH_CORE_WARN("Attempting to set nonexistent property ({0})", key);
+		}
 	}
 
 	OpenGLMaterial::OpenGLMaterial(Asset<Shader> shader)

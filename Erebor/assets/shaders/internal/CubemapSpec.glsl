@@ -10,8 +10,8 @@ struct v2f {
 
 layout(location = 0) out v2f o;
 
-uniform mat4 u_Projection;
-uniform mat4 u_View;
+layout(location = 1) uniform mat4 u_Projection;
+layout(location = 2) uniform mat4 u_View;
 
 void main() {
     o.v_LocalPos = i_Pos;  
@@ -34,7 +34,7 @@ layout(location = 0) out vec4 o_Color;
 
 layout(binding = 0, location = 0) uniform samplerCube u_EnvironmentMap;
 
-uniform float u_Roughness;
+layout(location = 3) uniform float u_Roughness;
 
 const float PI = 3.14159265359;
 

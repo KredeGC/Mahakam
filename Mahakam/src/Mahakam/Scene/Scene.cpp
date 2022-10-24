@@ -226,14 +226,15 @@ namespace Mahakam
 							{
 								auto& node = hierarchy.at(i);
 
-								// TODO: Replace the mat4 array with a UniformBuffer
+								// TODO: Find some better way?
+								// Currently the bones are part of the uniform buffer, but that seems a bit unwieldy
 								auto boneIter = bones.find(node.name);
 								if (boneIter != bones.end())
 								{
 									glm::mat4 transform = invTransform
 										* boneTransform->GetModelMatrix()
 										* node.offset;
-									material->SetMat4("finalBonesMatrices[" + std::to_string(boneIter->second) + "]", transform);
+									material->SetMat4("Uniforms.BoneMatrices[" + std::to_string(boneIter->second) + "]", transform);
 								}
 							}
 						}

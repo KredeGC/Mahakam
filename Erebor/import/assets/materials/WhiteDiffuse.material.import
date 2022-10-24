@@ -3,7 +3,7 @@ Extension: .material
 ID: 15739498696759362444
 Shader: 17048867044831516029
 Properties:
-  u_Color: [1, 1, 1]
-  u_MetallicMul: 0
-  u_EmissionColor: [0, 0, 0]
-  u_RoughnessMul: 0.497000009
+  Uniforms.Color: [1, 1, 1]
+  Uniforms.MetallicMul: 0
+  Uniforms.EmissionColor: [0, 0, 0]
+  Uniforms.RoughnessMul: 0.497000009

@@ -1,14 +1,14 @@
 #include "Mahakam/mhpch.h"
 #include "OpenGLBase.h"
 #include "OpenGLComputeShader.h"
-#include "OpenGLUtility.h"
 
 #include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Core/Profiler.h"
 
+#include "Mahakam/Renderer/ShaderUtility.h"
 #include "Mahakam/Renderer/Texture.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <filesystem>
 #include <fstream>
@@ -34,9 +34,9 @@ namespace Mahakam
 		//const std::string cachePath = "cache/compute/" + name + ".dat";
 		std::filesystem::path cachePath = FileUtility::GetCachePath(filepath);
 
-		std::string src = OpenGLUtility::ReadFile(filepath);
+		std::string src = ShaderUtility::ReadFile(filepath);
 
-		src = OpenGLUtility::SortIncludes(src);
+		src = ShaderUtility::SortIncludes(src);
 
 		CompileBinary(cachePath, src);
 	}

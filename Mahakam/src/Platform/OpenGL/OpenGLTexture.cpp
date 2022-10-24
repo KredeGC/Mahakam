@@ -13,7 +13,7 @@
 
 #include <stb_image.h>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>

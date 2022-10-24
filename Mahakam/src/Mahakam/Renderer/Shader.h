@@ -17,6 +17,11 @@
 #include <filesystem>
 #include <string>
 
+namespace YAML
+{
+	class Node;
+}
+
 namespace Mahakam
 {
 	class Shader;
@@ -27,6 +32,12 @@ namespace Mahakam
 	class Shader
 	{
 	public:
+		struct SourceDefinition
+		{
+			UnorderedMap<ShaderStage, std::string> Sources;
+			std::string Defines;
+		};
+
 		virtual ~Shader() = default;
 
 		virtual void Bind(const std::string& shaderPass) = 0;
@@ -49,6 +60,11 @@ namespace Mahakam
 		virtual void SetUniformFloat2(const std::string& name, const glm::vec2& value) = 0;
 		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) = 0;
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
+
+		static UnorderedMap<ShaderStage, std::string> ParseGLSLFile(const std::string& source);
+		static std::string ParseDefaultValue(const YAML::Node& node);
+		static bool ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, SourceDefinition>& sources, UnorderedMap<std::string, ShaderProperty>& properties);
+		static bool CompileSPIRV(UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv, const SourceDefinition& source);
 
 		inline static Ref<Shader> Create(const std::filesystem::path& filepath) { return CreateFilepath(filepath); }
 

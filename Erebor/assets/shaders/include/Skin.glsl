@@ -12,7 +12,7 @@
 
 // TEMP
 //layout(location = 11) uniform mat4 finalBonesMatrices[MAX_BONES];
-#define u_Bones finalBonesMatrices
+#define u_Bones BoneMatrices
 
 mat4 transformBoneVertex(ivec4 boneIDs, vec4 boneWeights) {
     mat4 boneTransform = u_Bones[boneIDs[0]] * boneWeights[0];

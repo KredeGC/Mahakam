@@ -201,21 +201,26 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create base collection entity to store in
+	Asset<Mesh> sphereMesh = Asset<Mesh>("import/assets/models/CubeSphere.gltf.import");
+
+	// Create base collection entity to store in
 	Entity sphereCollection = scene->CreateEntity("Spheres");
-	sphereCollection.AddComponent<TransformComponent>().SetEulerangles({ 0.0f, 1.0f, 0.0f });
+	sphereCollection.AddComponent<TransformComponent>().SetEulerangles({ 0.0f, 90.0f, 0.0f });
 
 	// Create scene entities
 	for (int y = 0; y < 10; y++)
 	{
 		for (int x = 0; x < 10; x++)
 		{
-			// Load the mesh instance along with its material
-			Asset<Mesh> meshInstance = Asset<Mesh>(std::string("import/assets/models/sphere/Sphere_") + std::to_string(x) + std::string("_") + std::to_string(y) + ".mesh.import");
+			// Setup material with texture
+			Asset<Material> material = Material::Copy(sphereMesh->Props.Materials[0]);
+			material->SetFloat("Uniforms.MetallicMul", y / 10.0f);
+			material->SetFloat("Uniforms.RoughnessMul", x / 10.0f);
 
 			// Create entity
 			Entity entity = scene->CreateEntity(std::string("Sphere ") + std::to_string(x) + std::string(",") + std::to_string(y));
 			entity.SetParent(sphereCollection);
-			entity.AddComponent<MeshComponent>(meshInstance);
+			entity.AddComponent<MeshComponent>(Mesh::Copy(sphereMesh), material);
 			entity.AddComponent<TransformComponent>().SetPosition({ x, y, 0.0f });
 
 			if (x == 0 && y == 0)

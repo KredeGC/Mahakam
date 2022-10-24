@@ -10,8 +10,8 @@ struct v2f {
 
 layout(location = 0) out v2f o;
 
-uniform mat4 u_Projection;
-uniform mat4 u_View;
+layout(location = 1) uniform mat4 u_Projection;
+layout(location = 2) uniform mat4 u_View;
 
 void main() {
     o.v_LocalPos = i_Pos;  

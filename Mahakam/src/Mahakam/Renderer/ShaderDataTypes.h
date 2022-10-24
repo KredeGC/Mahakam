@@ -4,6 +4,13 @@
 
 namespace Mahakam
 {
+	enum class ShaderStage
+	{
+		None = 0,
+		Vertex,
+		Fragment
+	};
+
 	enum class ShaderDataType
 	{
 		None = 0,
@@ -21,6 +28,10 @@ namespace Mahakam
 		Sampler2D,
 		SamplerCube
 	};
+
+	ShaderStage EShLanguageToShaderStage(uint32_t stage);
+
+	uint32_t ShaderStageToEShLanguage(ShaderStage stage);
 
 	uint32_t ShaderDataTypeComponentCount(ShaderDataType type);
 

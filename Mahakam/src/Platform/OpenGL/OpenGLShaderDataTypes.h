@@ -2,7 +2,7 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Renderer/ShaderDataTypes.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 // ONLY INCLUDE IN CPP FILES
 
@@ -40,6 +40,20 @@ namespace Mahakam
 		MH_CORE_BREAK("Unknown ShaderDataType provided!");
 		return ShaderDataType::None;
 	}*/
+
+	static GLenum ShaderStageToOpenGLStage(ShaderStage stage)
+	{
+		switch (stage)
+		{
+		case ShaderStage::Vertex:
+			return GL_VERTEX_SHADER;
+		case ShaderStage::Fragment:
+			return GL_FRAGMENT_SHADER;
+		default:
+			MH_CORE_BREAK("Unknown shader stage!");
+			return 0;
+		}
+	}
 
 	static GLenum ShaderDataTypeToOpenGLDataType(ShaderDataType type)
 	{

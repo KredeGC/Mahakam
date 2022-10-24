@@ -29,15 +29,15 @@ layout(location = 3) in vec4 i_Tangent;
     layout(location = 6) in vec4 i_BoneWeights;
 #endif // SKIN
 
-layout (shared, binding = UNIFORM_BINDING) uniform Uniforms {
+layout (std140, binding = UNIFORM_BINDING) uniform Uniforms {
     #ifdef SKIN
-        mat4 finalBonesMatrices[100];
+        mat4 BoneMatrices[100];
     #endif
-    vec4 u_UVTransform;
-    vec3 u_Color;
-    vec3 u_EmissionColor;
-    float u_MetallicMul;
-    float u_RoughnessMul;
+    vec4 UVTransform;
+    vec3 Color;
+    vec3 EmissionColor;
+    float MetallicMul;
+    float RoughnessMul;
 };
 
 #ifdef SKIN
@@ -65,7 +65,7 @@ void main() {
         #ifndef USE_TRIPLANAR
             o.v_WorldTangent = transformWorldTangent(MATRIX_M, tangent);
             o.v_WorldBinormal = transformWorldBinormal(o.v_WorldNormal, o.v_WorldTangent, i_Tangent.w);
-            o.v_UV = transformTexCoordinates(i_UV, u_UVTransform);
+            o.v_UV = transformTexCoordinates(i_UV, UVTransform);
         #endif
     #elif defined(SHADOW)
         gl_Position = u_WorldToLight * MATRIX_M * vec4(pos, 1.0);
@@ -131,15 +131,15 @@ layout(location = 3) out vec4 o_Normal;
     layout(binding = 5, location = 5) uniform sampler2D u_Emission;
 #endif // USE_EMISSION
 
-layout (shared, binding = UNIFORM_BINDING) uniform Uniforms {
+layout (std140, binding = UNIFORM_BINDING) uniform Uniforms {
     #ifdef SKIN
-        mat4 finalBonesMatrices[100];
+        mat4 BoneMatrices[100];
     #endif
-    vec4 u_UVTransform;
-    vec3 u_Color;
-    vec3 u_EmissionColor;
-    float u_MetallicMul;
-    float u_RoughnessMul;
+    vec4 UVTransform;
+    vec3 Color;
+    vec3 EmissionColor;
+    float MetallicMul;
+    float RoughnessMul;
 };
 
 void main() {
@@ -150,7 +150,7 @@ void main() {
     #ifdef USE_TRIPLANAR
         vec3 axisSign = CalculateAxisSign(worldNormal);
         vec2 uvX, uvY, uvZ;
-        CreateTriplanarUVs(i.v_WorldPos, worldNormal, axisSign, u_UVTransform, uvX, uvY, uvZ);
+        CreateTriplanarUVs(i.v_WorldPos, worldNormal, axisSign, UVTransform, uvX, uvY, uvZ);
         vec3 blend = TriplanarWeights(worldNormal);
     #endif // USE_TRIPLANAR
     
@@ -225,10 +225,10 @@ void main() {
     #endif // USE_EMISSION
     
     // Combine with multipliers
-    albedo *= u_Color;
-    metallic *= u_MetallicMul;
-    roughness *= u_RoughnessMul;
-    emission *= u_EmissionColor;
+    albedo *= Color;
+    metallic *= MetallicMul;
+    roughness *= RoughnessMul;
+    emission *= EmissionColor;
     
     o_Albedo = vec4(albedo, ao);
     o_Specular = vec4(0.0, 0.0, metallic, roughness);

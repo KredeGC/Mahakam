@@ -2,6 +2,7 @@
 #include "Shader.h"
 
 #include "RendererAPI.h"
+#include "ShaderUtility.h"
 
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/SharedLibrary.h"
@@ -9,8 +10,408 @@
 #include "Platform/Headless/HeadlessShader.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
+#include <yaml-cpp/yaml.h>
+
+#define ENABLE_HLSL
+#include <spirv_cross/spirv_glsl.hpp>
+#include <spirv_cross/spirv_hlsl.hpp>
+#include <glslang/SPIRV/GlslangToSpv.h>
+
 namespace Mahakam
 {
+	static const TBuiltInResource DefaultTBuiltInResource = {
+		/* .MaxLights = */ 32,
+		/* .MaxClipPlanes = */ 6,
+		/* .MaxTextureUnits = */ 32,
+		/* .MaxTextureCoords = */ 32,
+		/* .MaxVertexAttribs = */ 64,
+		/* .MaxVertexUniformComponents = */ 4096,
+		/* .MaxVaryingFloats = */ 64,
+		/* .MaxVertexTextureImageUnits = */ 32,
+		/* .MaxCombinedTextureImageUnits = */ 80,
+		/* .MaxTextureImageUnits = */ 32,
+		/* .MaxFragmentUniformComponents = */ 4096,
+		/* .MaxDrawBuffers = */ 32,
+		/* .MaxVertexUniformVectors = */ 128,
+		/* .MaxVaryingVectors = */ 8,
+		/* .MaxFragmentUniformVectors = */ 16,
+		/* .MaxVertexOutputVectors = */ 16,
+		/* .MaxFragmentInputVectors = */ 15,
+		/* .MinProgramTexelOffset = */ -8,
+		/* .MaxProgramTexelOffset = */ 7,
+		/* .MaxClipDistances = */ 8,
+		/* .MaxComputeWorkGroupCountX = */ 65535,
+		/* .MaxComputeWorkGroupCountY = */ 65535,
+		/* .MaxComputeWorkGroupCountZ = */ 65535,
+		/* .MaxComputeWorkGroupSizeX = */ 1024,
+		/* .MaxComputeWorkGroupSizeY = */ 1024,
+		/* .MaxComputeWorkGroupSizeZ = */ 64,
+		/* .MaxComputeUniformComponents = */ 1024,
+		/* .MaxComputeTextureImageUnits = */ 16,
+		/* .MaxComputeImageUniforms = */ 8,
+		/* .MaxComputeAtomicCounters = */ 8,
+		/* .MaxComputeAtomicCounterBuffers = */ 1,
+		/* .MaxVaryingComponents = */ 60,
+		/* .MaxVertexOutputComponents = */ 64,
+		/* .MaxGeometryInputComponents = */ 64,
+		/* .MaxGeometryOutputComponents = */ 128,
+		/* .MaxFragmentInputComponents = */ 128,
+		/* .MaxImageUnits = */ 8,
+		/* .MaxCombinedImageUnitsAndFragmentOutputs = */ 8,
+		/* .MaxCombinedShaderOutputResources = */ 8,
+		/* .MaxImageSamples = */ 0,
+		/* .MaxVertexImageUniforms = */ 0,
+		/* .MaxTessControlImageUniforms = */ 0,
+		/* .MaxTessEvaluationImageUniforms = */ 0,
+		/* .MaxGeometryImageUniforms = */ 0,
+		/* .MaxFragmentImageUniforms = */ 8,
+		/* .MaxCombinedImageUniforms = */ 8,
+		/* .MaxGeometryTextureImageUnits = */ 16,
+		/* .MaxGeometryOutputVertices = */ 256,
+		/* .MaxGeometryTotalOutputComponents = */ 1024,
+		/* .MaxGeometryUniformComponents = */ 1024,
+		/* .MaxGeometryVaryingComponents = */ 64,
+		/* .MaxTessControlInputComponents = */ 128,
+		/* .MaxTessControlOutputComponents = */ 128,
+		/* .MaxTessControlTextureImageUnits = */ 16,
+		/* .MaxTessControlUniformComponents = */ 1024,
+		/* .MaxTessControlTotalOutputComponents = */ 4096,
+		/* .MaxTessEvaluationInputComponents = */ 128,
+		/* .MaxTessEvaluationOutputComponents = */ 128,
+		/* .MaxTessEvaluationTextureImageUnits = */ 16,
+		/* .MaxTessEvaluationUniformComponents = */ 1024,
+		/* .MaxTessPatchComponents = */ 120,
+		/* .MaxPatchVertices = */ 32,
+		/* .MaxTessGenLevel = */ 64,
+		/* .MaxViewports = */ 16,
+		/* .MaxVertexAtomicCounters = */ 0,
+		/* .MaxTessControlAtomicCounters = */ 0,
+		/* .MaxTessEvaluationAtomicCounters = */ 0,
+		/* .MaxGeometryAtomicCounters = */ 0,
+		/* .MaxFragmentAtomicCounters = */ 8,
+		/* .MaxCombinedAtomicCounters = */ 8,
+		/* .MaxAtomicCounterBindings = */ 1,
+		/* .MaxVertexAtomicCounterBuffers = */ 0,
+		/* .MaxTessControlAtomicCounterBuffers = */ 0,
+		/* .MaxTessEvaluationAtomicCounterBuffers = */ 0,
+		/* .MaxGeometryAtomicCounterBuffers = */ 0,
+		/* .MaxFragmentAtomicCounterBuffers = */ 1,
+		/* .MaxCombinedAtomicCounterBuffers = */ 1,
+		/* .MaxAtomicCounterBufferSize = */ 16384,
+		/* .MaxTransformFeedbackBuffers = */ 4,
+		/* .MaxTransformFeedbackInterleavedComponents = */ 64,
+		/* .MaxCullDistances = */ 8,
+		/* .MaxCombinedClipAndCullDistances = */ 8,
+		/* .MaxSamples = */ 4,
+		/* .maxMeshOutputVerticesNV = */ 256,
+		/* .maxMeshOutputPrimitivesNV = */ 512,
+		/* .maxMeshWorkGroupSizeX_NV = */ 32,
+		/* .maxMeshWorkGroupSizeY_NV = */ 1,
+		/* .maxMeshWorkGroupSizeZ_NV = */ 1,
+		/* .maxTaskWorkGroupSizeX_NV = */ 32,
+		/* .maxTaskWorkGroupSizeY_NV = */ 1,
+		/* .maxTaskWorkGroupSizeZ_NV = */ 1,
+		/* .maxMeshViewCountNV = */ 4,
+		/* .maxMeshOutputVerticesEXT = */ 256,
+		/* .maxMeshOutputPrimitivesEXT = */ 256,
+		/* .maxMeshWorkGroupSizeX_EXT = */ 128,
+		/* .maxMeshWorkGroupSizeY_EXT = */ 128,
+		/* .maxMeshWorkGroupSizeZ_EXT = */ 128,
+		/* .maxTaskWorkGroupSizeX_EXT = */ 128,
+		/* .maxTaskWorkGroupSizeY_EXT = */ 128,
+		/* .maxTaskWorkGroupSizeZ_EXT = */ 128,
+		/* .maxMeshViewCountEXT = */ 4,
+		/* .maxDualSourceDrawBuffersEXT = */ 1,
+
+		/* .limits = */ {
+			/* .nonInductiveForLoops = */ 1,
+			/* .whileLoops = */ 1,
+			/* .doWhileLoops = */ 1,
+			/* .generalUniformIndexing = */ 1,
+			/* .generalAttributeMatrixVectorIndexing = */ 1,
+			/* .generalVaryingIndexing = */ 1,
+			/* .generalSamplerIndexing = */ 1,
+			/* .generalVariableIndexing = */ 1,
+			/* .generalConstantMatrixVectorIndexing = */ 1,
+	} };
+
+	static ShaderStage ShaderTypeFromString(const std::string& type)
+	{
+		if (type == "vertex")
+			return ShaderStage::Vertex;
+		else if (type == "fragment" || type == "pixel")
+			return ShaderStage::Fragment;
+
+		MH_CORE_WARN("Shader stage {0} not supported!", type);
+		return ShaderStage::None;
+	}
+
+	UnorderedMap<ShaderStage, std::string> Shader::ParseGLSLFile(const std::string& source)
+	{
+		MH_PROFILE_FUNCTION();
+
+		UnorderedMap<ShaderStage, std::string> sources;
+
+		const char* typeToken = "#type";
+		size_t typeTokenLength = strlen(typeToken);
+		size_t pos = source.find(typeToken, 0);
+		while (pos != std::string::npos)
+		{
+			size_t eol = source.find_first_of("\r\n", pos);
+			MH_CORE_ASSERT(eol != std::string::npos, "Syntax error!");
+			size_t begin = pos + typeTokenLength + 1;
+			std::string type = source.substr(begin, eol - begin);
+			MH_CORE_ASSERT(ShaderTypeFromString(type) != ShaderStage::None, "Invalid shader type!");
+
+			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
+			pos = source.find(typeToken, nextLinePos);
+			sources[ShaderTypeFromString(type)] =
+				source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
+		}
+
+		return sources;
+	}
+
+	std::string Shader::ParseDefaultValue(const YAML::Node& node)
+	{
+		if (node)
+		{
+			if (node.IsScalar())
+			{
+				return node.Scalar();
+			}
+			else if (node.IsSequence())
+			{
+				std::stringstream value;
+				for (auto iter = node.begin(); iter != node.end();)
+				{
+					value << ParseDefaultValue(*iter);
+					if (++iter != node.end())
+						value << ",";
+				}
+				return "[" + value.str() + "]";
+			}
+		}
+
+		return "";
+	}
+
+	bool Shader::ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, SourceDefinition>& sources, UnorderedMap<std::string, ShaderProperty>& properties)
+	{
+		YAML::Node rootNode;
+		try
+		{
+			rootNode = YAML::LoadFile(filepath.string());
+		}
+		catch (YAML::Exception e)
+		{
+			MH_CORE_WARN("Shader encountered exception trying to parse YAML file {0}: {1}", filepath, e.msg);
+			return false;
+		}
+
+		if (!rootNode || rootNode.size() <= 0)
+		{
+			MH_CORE_WARN("Loaded empty shader file {0}!", filepath);
+			return false;
+		}
+
+		// Read properties
+		auto propertiesNode = rootNode["Properties"];
+
+		MH_CORE_INFO("Loading properties for shader: {0}", filepath.string());
+		for (auto propertyNode : propertiesNode)
+		{
+			std::string propertyName = propertyNode.first.as<std::string>();
+
+			YAML::Node typeNode = propertyNode.second["Type"];
+			YAML::Node minNode = propertyNode.second["Min"];
+			YAML::Node maxNode = propertyNode.second["Max"];
+			YAML::Node defaultNode = propertyNode.second["Default"];
+
+			ShaderPropertyType propertyType = ShaderPropertyType::Default;
+			if (typeNode)
+			{
+				std::string typeString = typeNode.as<std::string>();
+				if (typeString == "Color")			propertyType = ShaderPropertyType::Color;
+				else if (typeString == "HDR")		propertyType = ShaderPropertyType::HDR;
+				else if (typeString == "Vector")	propertyType = ShaderPropertyType::Vector;
+				else if (typeString == "Range")		propertyType = ShaderPropertyType::Range;
+				else if (typeString == "Drag")		propertyType = ShaderPropertyType::Drag;
+				else if (typeString == "Texture")	propertyType = ShaderPropertyType::Texture;
+				else if (typeString == "Normal")	propertyType = ShaderPropertyType::Normal;
+				else if (typeString == "Default")	propertyType = ShaderPropertyType::Default;
+			}
+
+			float min = 0;
+			if (minNode)
+				min = minNode.as<float>();
+
+			float max = 0;
+			if (maxNode)
+				max = maxNode.as<float>();
+
+			std::string defaultValue = ParseDefaultValue(defaultNode);
+
+			properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue, 1, 0 };
+
+			MH_CORE_INFO("  {0}: {1}", propertyName, defaultValue);
+		}
+
+		// Read shader passes
+		auto passesNode = rootNode["Passes"];
+
+		for (auto shaderPassNode : passesNode)
+		{
+			std::string shaderPassName = shaderPassNode.first.as<std::string>();
+
+			// Read shaderpass defines
+			std::stringstream shaderPassDefines;
+			auto definesNode = shaderPassNode.second["Defines"];
+			if (definesNode)
+			{
+				for (auto define : definesNode)
+					shaderPassDefines << "#define " + define.as<std::string>() + "\n";
+			}
+
+			// Read and compile include files
+			auto includesNode = shaderPassNode.second["Includes"];
+			if (includesNode)
+			{
+				// Read and parse source files
+				std::stringstream source;
+				for (auto includeNode : includesNode)
+				{
+					std::string shaderPath = includeNode.as<std::string>();
+
+					source << ShaderUtility::ReadFile(shaderPath);
+				}
+
+				auto glslSources = ParseGLSLFile(source.str());
+
+				// Output shader source for each pass and stage
+				sources[shaderPassName] = { glslSources, shaderPassDefines.str() };
+			}
+		}
+
+		return true;
+	}
+
+	bool Shader::CompileSPIRV(UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv, const SourceDefinition& sourceDef)
+	{
+		glslang::InitializeProcess();
+
+		glslang::TProgram* program = new glslang::TProgram;
+
+		EShMessages messages = (EShMessages)(EShMsgSpvRules | EShMsgEnhanced);
+
+		bool success = true;
+
+		// Parse each shader stage
+		std::vector<glslang::TShader*> shaders;
+		shaders.reserve(sourceDef.Sources.size());
+		for (auto& source : sourceDef.Sources)
+		{
+			glslang::TShader* shader = new glslang::TShader((EShLanguage)ShaderStageToEShLanguage(source.first));
+			const char* shaderStrings[1];
+
+			std::string sortedSource = ShaderUtility::SortIncludes(source.second);
+
+			shaderStrings[0] = sortedSource.c_str();
+
+			// Set preprocessor defines
+			shader->setPreamble(sourceDef.Defines.c_str());
+
+			// Set target and version
+			shader->setEnvClient(glslang::EShClient::EShClientOpenGL, glslang::EShTargetClientVersion::EShTargetOpenGL_450);
+
+			// Set source code
+			shader->setStrings(shaderStrings, 1);
+
+			// TODO: Use HLSL instead of GLSL
+			/*shader.setEnvInput(glslang::EShSourceHlsl,
+				stage, glslang::EShClient::EShClientOpenGL, 100);
+			shader.setEnvTargetHlslFunctionality1();*/
+
+			if (!shader->parse(&DefaultTBuiltInResource, 100, false, messages))
+			{
+				MH_CORE_WARN(shader->getInfoLog());
+				MH_CORE_WARN(shader->getInfoDebugLog());
+
+				success = false;
+			}
+
+			shaders.push_back(shader);
+
+			program->addShader(shader);
+		}
+
+		// Link program with shaders
+		if (!program->link(messages))
+		{
+			MH_CORE_WARN(program->getInfoLog());
+			MH_CORE_WARN(program->getInfoDebugLog());
+
+			success = false;
+		}
+
+		// Retrieve SPIR-V
+		if (success)
+		{
+			for (int stage = 0; stage < EShLangCount; stage++)
+			{
+				// Output into 1 big SPIR-V binary
+				if (glslang::TIntermediate* ptr = program->getIntermediate((EShLanguage)stage))
+				{
+					ShaderStage stageEnum = EShLanguageToShaderStage(stage);
+					spirv.insert({ stageEnum, std::vector<uint32_t>() });
+					glslang::GlslangToSpv(*ptr, spirv[stageEnum]);
+				}
+			}
+		}
+
+		// Cleanup
+		delete program;
+		for (auto& shader : shaders)
+			delete shader;
+
+		glslang::FinalizeProcess();
+
+
+		// TEMP
+		if (success)
+		{
+			// GLSL
+			{
+				spirv_cross::CompilerGLSL glsl(spirv[ShaderStage::Vertex]);
+
+				spirv_cross::CompilerGLSL::Options options;
+				options.version = 430;
+				glsl.set_common_options(options);
+
+				// Compile to GLSL, ready to give to GL driver.
+				std::string source = glsl.compile();
+
+				MH_CORE_TRACE(source);
+			}
+
+			// HLSL
+			{
+				spirv_cross::CompilerHLSL hlsl(spirv[ShaderStage::Vertex]);
+
+				spirv_cross::CompilerHLSL::Options options;
+				options.shader_model = 40;
+				hlsl.set_hlsl_options(options);
+
+				// Compile to HLSL, ready to give to DX driver.
+				std::string source = hlsl.compile();
+
+				MH_CORE_TRACE(source);
+			}
+		}
+
+		return success;
+	}
+
 	//Ref<Shader> Shader::Create(const std::string& filepath, const std::initializer_list<std::string>& keywords)
 	MH_DEFINE_FUNC(Shader::CreateFilepath, Ref<Shader>, const std::filesystem::path& filepath)
 	{
@@ -26,6 +427,34 @@ namespace Mahakam
 
 		return nullptr;
 	};
+
+	ShaderStage EShLanguageToShaderStage(uint32_t stage)
+	{
+		switch (stage)
+		{
+		case 0:
+			return ShaderStage::Vertex;
+		case 4:
+			return ShaderStage::Fragment;
+		default:
+			MH_CORE_BREAK("Unknown shader data type!");
+			return ShaderStage::None;
+		}
+	}
+
+	uint32_t ShaderStageToEShLanguage(ShaderStage stage)
+	{
+		switch (stage)
+		{
+		case ShaderStage::Vertex:
+			return 0;
+		case ShaderStage::Fragment:
+			return 4;
+		default:
+			MH_CORE_BREAK("Unknown shader data type!");
+			return 0;
+		}
+	}
 
 	uint32_t ShaderDataTypeComponentCount(ShaderDataType type)
 	{

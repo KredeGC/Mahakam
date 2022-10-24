@@ -1,17 +1,17 @@
 Properties:
-  u_UVTransform:
+  Uniforms.UVTransform:
     Type: Drag
     Default: [1, 1, 0, 0]
   u_Albedo:
     Type: Texture
     Default: White
-  u_Color:
+  Uniforms.Color:
     Type: Color
     Default: [1, 1, 1]
   u_Bump:
     Type: Normal
     Default: Bump
-  u_MetallicMul:
+  Uniforms.MetallicMul:
     Type: Range
     Min: 0
     Max: 1
@@ -19,12 +19,12 @@ Properties:
   u_Roughness:
     Type: Texture
     Default: White
-  u_RoughnessMul:
+  Uniforms.RoughnessMul:
     Type: Range
     Min: 0
     Max: 1
     Default: 1
-  u_EmissionColor:
+  Uniforms.EmissionColor:
     Type: HDR
     Default: [0, 0, 0]
 Passes:

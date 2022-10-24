@@ -1,18 +1,18 @@
 Properties:
-  u_Color:
+  Uniforms.Color:
     Type: Color
     Default: [1, 1, 1]
-  u_MetallicMul:
+  Uniforms.MetallicMul:
     Type: Range
     Min: 0
     Max: 1
     Default: 0
-  u_RoughnessMul:
+  Uniforms.RoughnessMul:
     Type: Range
     Min: 0
     Max: 1
     Default: 0.5
-  u_EmissionColor:
+  Uniforms.EmissionColor:
     Type: HDR
     Default: [0, 0, 0]
 Passes:

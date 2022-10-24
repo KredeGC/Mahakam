@@ -31,7 +31,7 @@ layout(location = 0) out vec4 o_Color;
 
 layout(binding = 0, location = 0) uniform sampler2D u_Albedo;
 
-uniform int u_Depth;
+layout(location = 1) uniform int u_Depth;
 
 void main() {
     vec3 color = texture(u_Albedo, i.v_UV).rgb;

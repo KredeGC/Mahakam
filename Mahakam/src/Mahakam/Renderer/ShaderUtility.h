@@ -9,7 +9,7 @@
 
 namespace Mahakam
 {
-	class OpenGLUtility
+	class ShaderUtility
 	{
 	public:
 		inline static std::string SortIncludes(const std::string& source)

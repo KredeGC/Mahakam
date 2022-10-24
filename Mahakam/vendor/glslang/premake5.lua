@@ -43,10 +43,6 @@ project "glslang"
         files {
             "glslang/OSDependent/Windows/ossource.cpp"
         }
-    
-    -- Unity build
-    filter "options:unity"
-        unity "on"
 
     filter "configurations:Debug"
         runtime "Debug"

@@ -2,7 +2,7 @@
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/Log.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #ifdef MH_ENABLE_GL_ERRORS
 static void glClearErrors()

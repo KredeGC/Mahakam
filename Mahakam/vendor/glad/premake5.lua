@@ -10,7 +10,7 @@ project "glad"
 	files {
 		"include/glad/glad.h",
 		"include/KHR/khrplatform.h",
-		"src/glad.c"
+		"src/gl.c"
 	}
 
 	includedirs {
@@ -24,10 +24,6 @@ project "glad"
     -- Linux
 	filter "system:linux"
 		systemversion "latest"
-    
-    -- Unity build
-    filter "options:unity"
-        unity "on"
 
     filter "configurations:Debug"
         runtime "Debug"

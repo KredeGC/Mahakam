@@ -51,12 +51,7 @@ namespace Mahakam
 		uint32_t GetUniformSize() const { return m_UniformSize; }
 
 	private:
-		uint32_t CompileBinary(const std::filesystem::path& cachePath, const UnorderedMap<uint32_t, std::string>& sources, const std::string& directives);
-
-		std::string ParseDefaultValue(const YAML::Node& node);
-		void ParseYAMLFile(const std::filesystem::path& filepath);
-		UnorderedMap<std::string, std::string> ParseShaderKeywords(const std::vector<std::string>& keywords);
-		UnorderedMap<uint32_t, std::string> ParseGLSLFile(const std::string& source);
+		uint32_t CompileBinary(const UnorderedMap<ShaderStage, std::string>& sources, const std::string& directives);
 
 		int GetUniformLocation(const std::string& name);
 	};

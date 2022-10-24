@@ -1,5 +1,5 @@
 Properties:
-  u_UVTransform:
+  Uniforms.UVTransform:
     Type: Drag
     Default: [1, 1, 0, 0]
   u_Albedo:
@@ -20,7 +20,7 @@ Properties:
   u_Emission:
     Type: Texture
     Default: Black
-  u_EmissionColor:
+  Uniforms.EmissionColor:
     Type: HDR
     Default: [0, 0, 0]
 Passes:

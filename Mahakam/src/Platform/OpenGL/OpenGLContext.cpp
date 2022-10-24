@@ -7,7 +7,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Mahakam
 {
@@ -28,7 +28,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		int status = gladLoadGLLoader((GLADloadproc)m_ProcAddress);
+		int status = gladLoadGL(glfwGetProcAddress);
 		MH_CORE_ASSERT(status, "Could not initialize glad!");
 
 		MH_CORE_ASSERT(glGetError, "Could not initialize OpenGL functions!");
