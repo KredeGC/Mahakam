@@ -23,6 +23,8 @@ project "spirv_cross"
 
     filter "options:target=windows"
         systemversion "latest"
+        
+        buildoptions { "/bigobj" }
     
     -- Unity build
     filter "options:unity"
