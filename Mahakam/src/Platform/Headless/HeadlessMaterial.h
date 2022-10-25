@@ -5,10 +5,6 @@
 
 namespace Mahakam
 {
-	class HeadlessMaterial;
-
-	extern template class Asset<HeadlessMaterial>;
-
 	class HeadlessMaterial : public Material
 	{
 	private:

@@ -2,16 +2,10 @@
 
 #include "Mahakam/Core/Core.h"
 
-#include "Mahakam/Asset/Asset.h"
-
 #include "TextureFormats.h"
 
 namespace Mahakam
 {
-	class RenderBuffer;
-
-	extern template class Asset<RenderBuffer>;
-
 	class RenderBuffer
 	{
 	public:

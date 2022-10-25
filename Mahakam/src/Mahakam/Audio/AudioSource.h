@@ -16,8 +16,6 @@ namespace Mahakam
 	class AudioContext;
 	class Sound;
 
-	extern template class Asset<Sound>;
-
 	class AudioSource
 	{
 	public:

@@ -6,11 +6,6 @@
 
 namespace Mahakam
 {
-	class HeadlessShader;
-	class UniformBuffer;
-
-	extern template class Asset<HeadlessShader>;
-
 	class HeadlessShader : public Shader
 	{
 	private:
@@ -45,9 +40,5 @@ namespace Mahakam
 		virtual void SetUniformFloat2(const std::string& name, const glm::vec2& value) override;
 		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) override;
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) override;
-
-	private:
-		std::string ParseDefaultValue(const YAML::Node& node);
-		void ParseYAMLFile(const std::filesystem::path& filepath);
 	};
 }

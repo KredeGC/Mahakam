@@ -25,7 +25,19 @@ namespace Mahakam
 		m_Name = filepath.stem().string();
 
 		// Read YAML file for shader passes
-		ParseYAMLFile(filepath);
+		UnorderedMap<std::string, SourceDefinition> sources;
+		if (ParseYAMLFile(filepath, sources, m_Properties))
+		{
+			// Add each shader pass to the list
+			for (auto& [shaderPass, sourceDef]: sources)
+            {
+                UnorderedMap<ShaderStage, std::vector<uint32_t>> spirv;
+            
+                CompileSPIRV(spirv, sourceDef);
+                
+				m_ShaderPasses.insert(shaderPass);
+            }
+		}
 	}
 
 	HeadlessShader::~HeadlessShader() {}
@@ -63,111 +75,4 @@ namespace Mahakam
 	void HeadlessShader::SetUniformFloat3(const std::string& name, const glm::vec3& value) {}
 
 	void HeadlessShader::SetUniformFloat4(const std::string& name, const glm::vec4& value) {}
-
-	std::string HeadlessShader::ParseDefaultValue(const YAML::Node& node)
-	{
-		if (node)
-		{
-			if (node.IsScalar())
-			{
-				return node.Scalar();
-			}
-			else if (node.IsSequence())
-			{
-				std::stringstream value;
-				for (auto iter = node.begin(); iter != node.end();)
-				{
-					value << ParseDefaultValue(*iter);
-					if (++iter != node.end())
-						value << ",";
-				}
-				return "[" + value.str() + "]";
-			}
-		}
-
-		return "";
-	}
-
-	void HeadlessShader::ParseYAMLFile(const std::filesystem::path& filepath)
-	{
-		YAML::Node rootNode;
-		try
-		{
-			rootNode = YAML::LoadFile(filepath.string());
-		}
-		catch (YAML::Exception e)
-		{
-			MH_CORE_WARN("HeadlessShader encountered exception trying to parse YAML file {0}: {1}", filepath, e.msg);
-		}
-
-		MH_CORE_ASSERT(rootNode && rootNode.size() > 0, "Loaded empty shader file! Path may be wrong!");
-
-		// Read properties
-		auto propertiesNode = rootNode["Properties"];
-
-		MH_CORE_INFO("Loading properties for shader: {0}", m_Name);
-		for (auto propertyNode : propertiesNode)
-		{
-			std::string propertyName = propertyNode.first.as<std::string>();
-
-			YAML::Node typeNode = propertyNode.second["Type"];
-			YAML::Node minNode = propertyNode.second["Min"];
-			YAML::Node maxNode = propertyNode.second["Max"];
-			YAML::Node defaultNode = propertyNode.second["Default"];
-
-			ShaderPropertyType propertyType = ShaderPropertyType::Default;
-			if (typeNode)
-			{
-				std::string typeString = typeNode.as<std::string>();
-				if (typeString == "Color")			propertyType = ShaderPropertyType::Color;
-				else if (typeString == "HDR")		propertyType = ShaderPropertyType::HDR;
-				else if (typeString == "Vector")	propertyType = ShaderPropertyType::Vector;
-				else if (typeString == "Range")		propertyType = ShaderPropertyType::Range;
-				else if (typeString == "Drag")		propertyType = ShaderPropertyType::Drag;
-				else if (typeString == "Texture")	propertyType = ShaderPropertyType::Texture;
-				else if (typeString == "Normal")	propertyType = ShaderPropertyType::Normal;
-				else if (typeString == "Default")	propertyType = ShaderPropertyType::Default;
-			}
-
-			float min = 0;
-			if (minNode)
-				min = minNode.as<float>();
-
-			float max = 0;
-			if (maxNode)
-				max = maxNode.as<float>();
-
-			std::string defaultValue = ParseDefaultValue(defaultNode);
-
-			m_Properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue, 1, 0 };
-
-			MH_CORE_INFO("  {0}: {1}", propertyName, defaultValue);
-		}
-
-		// Read shader passes
-		auto passesNode = rootNode["Passes"];
-
-		for (auto shaderPassNode : passesNode)
-		{
-			std::string shaderPassName = shaderPassNode.first.as<std::string>();
-
-			// Read shaderpass defines
-			std::stringstream shaderPassDefines;
-			auto definesNode = shaderPassNode.second["Defines"];
-			if (definesNode)
-			{
-				for (auto define : definesNode)
-					shaderPassDefines << "#define " + define.as<std::string>() + "\n";
-			}
-
-			const std::string passPath = filepath.string() + "_" + shaderPassName;
-
-			// Read and compile include files
-			auto includesNode = shaderPassNode.second["Includes"];
-			if (includesNode)
-			{
-				m_ShaderPasses.emplace(shaderPassName);
-			}
-		}
-	}
 }

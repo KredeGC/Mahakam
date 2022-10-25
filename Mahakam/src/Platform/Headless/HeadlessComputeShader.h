@@ -4,10 +4,6 @@
 
 namespace Mahakam
 {
-	class HeadlessComputeShader;
-
-	extern template class Asset<HeadlessComputeShader>;
-
 	class HeadlessComputeShader : public ComputeShader
 	{
 	private:

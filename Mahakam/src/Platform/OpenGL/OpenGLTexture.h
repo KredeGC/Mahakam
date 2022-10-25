@@ -4,12 +4,6 @@
 
 namespace Mahakam
 {
-	class OpenGLTexture2D;
-	class OpenGLTextureCube;
-
-	extern template class Asset<OpenGLTexture2D>;
-	extern template class Asset<OpenGLTextureCube>;
-
 	class OpenGLTexture2D : public Texture2D
 	{
 	private:

@@ -4,10 +4,6 @@
 
 namespace Mahakam
 {
-	class HeadlessFrameBuffer;
-
-	extern template class Asset<HeadlessFrameBuffer>;
-
 	class HeadlessFrameBuffer : public FrameBuffer
 	{
 	private:

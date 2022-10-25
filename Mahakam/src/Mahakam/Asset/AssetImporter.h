@@ -11,8 +11,6 @@
 
 namespace Mahakam
 {
-	extern template class Asset<void>;
-
 	class AssetImporter
 	{
 	public:

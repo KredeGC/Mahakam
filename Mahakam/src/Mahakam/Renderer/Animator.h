@@ -7,9 +7,6 @@
 namespace Mahakam
 {
 	class Animation;
-	class Animator;
-
-	extern template class Asset<Animation>;
 
 	class Animator
 	{

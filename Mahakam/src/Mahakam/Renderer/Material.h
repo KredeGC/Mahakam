@@ -15,14 +15,9 @@
 
 namespace Mahakam
 {
-	class Material;
 	class Shader;
 	class Texture;
 	class UniformBuffer;
-
-	extern template class Asset<Material>;
-	extern template class Asset<Shader>;
-	extern template class Asset<Texture>;
 
 	class Material
 	{

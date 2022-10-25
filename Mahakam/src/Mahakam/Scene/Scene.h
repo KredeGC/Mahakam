@@ -16,9 +16,6 @@ namespace Mahakam
 	class Material;
 	class TextureCube;
 
-	extern template class Asset<Material>;
-	extern template class Asset<TextureCube>;
-
 	class Scene
 	{
 	private:

@@ -4,12 +4,6 @@
 
 namespace Mahakam
 {
-	class HeadlessTexture2D;
-	class HeadlessTextureCube;
-
-	extern template class Asset<HeadlessTexture2D>;
-	extern template class Asset<HeadlessTextureCube>;
-
 	class HeadlessTexture2D : public Texture2D
 	{
 	private:

@@ -6,12 +6,8 @@
 
 namespace Mahakam
 {
-	class ComputeShader;
 	class Texture;
-
-	extern template class Asset<ComputeShader>;
-	extern template class Asset<Texture>;
-
+    
 	class ComputeShader
 	{
 	public:

@@ -6,10 +6,6 @@
 
 namespace Mahakam
 {
-	class OpenGLMaterial;
-
-	extern template class Asset<OpenGLMaterial>;
-
 	class OpenGLMaterial : public Material
 	{
 	private:

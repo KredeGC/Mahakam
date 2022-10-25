@@ -25,14 +25,8 @@ namespace Mahakam
 {
 	class Bounds;
 	class Material;
-	class Mesh;
 	class Shader;
 	class SubMesh;
-
-	extern template class Asset<Material>;
-	extern template class Asset<Mesh>;
-	extern template class Asset<Shader>;
-	extern template class Asset<SubMesh>;
 
 	class Mesh
 	{

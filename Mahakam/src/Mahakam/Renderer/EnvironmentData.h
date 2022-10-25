@@ -19,9 +19,6 @@ namespace Mahakam
 	class Material;
 	class TextureCube;
 
-	extern template class Asset<Material>;
-	extern template class Asset<TextureCube>;
-
 	struct DirectionalLight
 	{
 		glm::vec3 direction;

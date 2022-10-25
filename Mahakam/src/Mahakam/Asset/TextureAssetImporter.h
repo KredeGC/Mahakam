@@ -9,9 +9,6 @@ namespace Mahakam
 	class FrameBuffer;
 	class Texture;
 
-	extern template class Asset<FrameBuffer>;
-	extern template class Asset<Texture>;
-
 	class TextureAssetImporter : public AssetImporter
 	{
 	private:

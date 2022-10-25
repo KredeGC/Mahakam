@@ -16,9 +16,6 @@ namespace Mahakam
 	class Texture;
 	class UniformBuffer;
 
-	extern template class Asset<Shader>;
-	extern template class Asset<Texture>;
-
 	class LightingRenderPass : public RenderPass
 	{
 	protected:

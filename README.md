@@ -25,10 +25,12 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 * [glad](https://github.com/Dav1dde/glad) for interfacing with OpenGL.
 * [GLFW](https://github.com/glfw/glfw) for window creation and management.
 * [OpenGL Mathematics](https://github.com/g-truc/glm) for fast SIMD vector math.
+* [glslang](https://github.com/KhronosGroup/glslang) for shader compilation.
 * [Dear ImGui](https://github.com/ocornut/imgui) for GUI interaction and rendering.
 * [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) for editor interaction and rendering.
 * [miniaudio](https://github.com/mackron/miniaudio) for audio playback.
 * [spdlog](https://github.com/gabime/spdlog) for easy and fast logging.
+* [spirv-cross](https://github.com/KhronosGroup/SPIRV-Cross) for shader transpiling and reflection.
 * [stb_image](https://github.com/nothings/stb) for loading various image files.
 * [Steam Audio](https://valvesoftware.github.io/steam-audio/) for audio spatialization.
 * [tinygltf](https://github.com/syoyo/tinygltf) for model and animation loading.

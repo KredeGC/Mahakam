@@ -5,10 +5,6 @@
 
 namespace Mahakam
 {
-	class HeadlessMesh;
-
-	extern template class Asset<HeadlessMesh>;
-
 	class HeadlessMesh : public SubMesh
 	{
 	private:

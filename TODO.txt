@@ -1,5 +1,0 @@
-Frame debugger:
-Needs to be enabled and haults default rendering.
-Each call to GL:: also keeps track of the state of the renderer.
-
-Finish porting to OGL 3.3, using the old-school buffer binding...

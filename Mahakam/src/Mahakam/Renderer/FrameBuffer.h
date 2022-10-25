@@ -10,13 +10,8 @@
 
 namespace Mahakam
 {
-	class FrameBuffer;
 	class RenderBuffer;
 	class Texture;
-
-	extern template class Asset<FrameBuffer>;
-	extern template class Asset<RenderBuffer>;
-	extern template class Asset<Texture>;
 
 	struct FrameBufferAttachmentProps
 	{

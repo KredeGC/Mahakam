@@ -14,8 +14,6 @@ namespace Mahakam
 {
 	class Material;
 
-	extern template class Asset<Material>;
-
 	enum class MeshPrimitive
 	{
 		Model,

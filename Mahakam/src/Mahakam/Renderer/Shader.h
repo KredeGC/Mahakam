@@ -3,8 +3,6 @@
 #include "ShaderDataTypes.h"
 #include "ShaderProps.h"
 
-#include "Mahakam/Asset/Asset.h"
-
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
 #define GLM_ENABLE_EXPERIMENTAL
@@ -24,10 +22,7 @@ namespace YAML
 
 namespace Mahakam
 {
-	class Shader;
 	class Texture;
-
-	extern template class Asset<Shader>;
 
 	class Shader
 	{

@@ -4,10 +4,6 @@
 
 namespace Mahakam
 {
-	class OpenGLFrameBuffer;
-
-	extern template class Asset<OpenGLFrameBuffer>;
-
 	class OpenGLFrameBuffer : public FrameBuffer
 	{
 	private:

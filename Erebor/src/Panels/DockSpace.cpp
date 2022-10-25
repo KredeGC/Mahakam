@@ -86,6 +86,23 @@ namespace Mahakam::Editor
 
 				ImGui::EndMenu();
 			}
+            
+            if (ImGui::BeginMenu("Build"))
+            {
+                if (ImGui::MenuItem("Build Assets"))
+                {
+                    // TODO: Build binary assets
+                    
+                    
+                }
+                
+                if (ImGui::MenuItem("Build Executable"))
+                {
+                    // TODO: Build executable in MH_STANDALONE
+                }
+                
+                ImGui::EndMenu();
+            }
 
 			ImGui::EndMenuBar();
 		}

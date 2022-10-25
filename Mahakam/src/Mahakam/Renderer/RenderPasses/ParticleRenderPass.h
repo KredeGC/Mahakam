@@ -6,8 +6,6 @@ namespace Mahakam
 {
 	class ComputeShader;
 
-	extern template class Asset<ComputeShader>;
-
 	class ParticleRenderPass : public RenderPass
 	{
 	private:

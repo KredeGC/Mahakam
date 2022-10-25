@@ -26,10 +26,6 @@ namespace Mahakam
 	class StorageBuffer;
 	class UniformBuffer;
 
-	extern template class Asset<Material>;
-	extern template class Asset<Shader>;
-	extern template class Asset<SubMesh>;
-
 	struct CameraData
 	{
 	public:
