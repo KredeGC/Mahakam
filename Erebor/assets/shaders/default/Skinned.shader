@@ -21,10 +21,10 @@ Passes:
       - GEOMETRY
       - SKIN
     Includes:
-      - assets/shaders/default/Lit.glsl
+      - internal/shaders/default/Lit.glsl
   SHADOW:
     Defines:
       - SHADOW
       - SKIN
     Includes:
-      - assets/shaders/default/Lit.glsl
+      - internal/shaders/default/Lit.glsl

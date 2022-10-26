@@ -41,4 +41,4 @@ Passes:
       - USE_STOCHASTIC
       - USE_TRIPLANAR
     Includes:
-      - assets/shaders/default/Lit.glsl
+      - internal/shaders/default/Lit.glsl

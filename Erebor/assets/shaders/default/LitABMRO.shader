@@ -43,4 +43,4 @@ Passes:
       - USE_ROUGHNESS
       - USE_OCCLUSSION
     Includes:
-      - assets/shaders/default/Lit.glsl
+      - internal/shaders/default/Lit.glsl

@@ -47,9 +47,9 @@ namespace Mahakam
 
 		// Initialize default material
 		// TODO: Move to a seperate pass
-		Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.shader"); // TODO: Use the asset system to load it
-		s_RendererData->UnlitMaterial = Material::Create(Asset<Shader>(unlitColorShader));
-		s_RendererData->UnlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
+		//Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.shader"); // TODO: Use the asset system to load it
+		//s_RendererData->UnlitMaterial = Material::Create(Asset<Shader>(unlitColorShader));
+		//s_RendererData->UnlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
 	}
 
 	void Renderer::Shutdown()

@@ -87,7 +87,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/Skybox.shader"));
+		Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/default/Skybox.shader"));
 		m_Environment.SkyboxMaterial = Asset<Material>(Material::Create(skyboxShader));
 		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, Asset<TextureCube>(GL::GetTextureCubeWhite()));
 	}
@@ -103,7 +103,7 @@ namespace Mahakam
 		//skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
 		//skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
 
-		Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/Skybox.shader"));
+		Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/default/Skybox.shader"));
 		m_Environment.SkyboxMaterial = Asset<Material>(Material::Create(skyboxShader));
 		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
 	}

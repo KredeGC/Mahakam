@@ -224,7 +224,7 @@ namespace Mahakam
 	{
 		uint32_t readWrite = (read && write) ? GL_READ_WRITE : (write ? GL_WRITE_ONLY : GL_READ_ONLY);
 
-		glBindImageTexture(slot, m_RendererID, 0, GL_FALSE, 0, readWrite, m_InternalFormat);
+		MH_GL_CALL(glBindImageTexture(slot, m_RendererID, 0, GL_FALSE, 0, readWrite, m_InternalFormat));
 	}
 
 	void OpenGLTexture2D::ReadPixels(void* pixels, bool mipmaps)
@@ -251,8 +251,8 @@ namespace Mahakam
 			}
 			else
 			{
-				uint32_t mipWidth = (uint32_t)(m_Props.Width * std::pow(0.5, mip));
-				uint32_t mipHeight = (uint32_t)(m_Props.Height * std::pow(0.5, mip));
+				uint32_t mipWidth = (uint32_t)(m_Props.Width * glm::pow(0.5, mip));
+				uint32_t mipHeight = (uint32_t)(m_Props.Height * glm::pow(0.5, mip));
 
 				mipSize = mipWidth * mipHeight * bpp;
 				MH_GL_CALL(glGetTexImage(GL_TEXTURE_2D, mip, m_DataFormat, m_FormatType, (char*)pixels + offset));
@@ -512,7 +512,7 @@ namespace Mahakam
 
 
 		// Convert HDR equirectangular environment map to cubemap equivalent
-		OpenGLShader equiToCubeShader("internal/shaders/Cubemap.shader");
+		OpenGLShader equiToCubeShader("internal/shaders/builtin/Cubemap.shader");
 		equiToCubeShader.Bind("LUT");
 		equiToCubeShader.SetUniformMat4("u_Projection", captureProjection);
 
@@ -612,7 +612,7 @@ namespace Mahakam
 
 
 		// Convert HDR equirectangular environment map to cubemap equivalent
-		std::string shaderPath = "internal/shaders/";
+		std::string shaderPath = "internal/shaders/builtin/";
 		if (m_Props.Prefilter == TextureCubePrefilter::Convolute)
 			shaderPath += "CubemapBlur.shader";
 		else if (m_Props.Prefilter == TextureCubePrefilter::Prefilter)

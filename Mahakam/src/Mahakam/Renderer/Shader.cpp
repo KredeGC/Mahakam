@@ -378,36 +378,36 @@ namespace Mahakam
 
 
 		// TEMP
-		if (success)
-		{
-			// GLSL
-			{
-				spirv_cross::CompilerGLSL glsl(spirv[ShaderStage::Vertex]);
+		//if (success)
+		//{
+		//	// GLSL
+		//	{
+		//		spirv_cross::CompilerGLSL glsl(spirv[ShaderStage::Vertex]);
 
-				spirv_cross::CompilerGLSL::Options options;
-				options.version = 430;
-				glsl.set_common_options(options);
+		//		spirv_cross::CompilerGLSL::Options options;
+		//		options.version = 430;
+		//		glsl.set_common_options(options);
 
-				// Compile to GLSL, ready to give to GL driver.
-				std::string source = glsl.compile();
+		//		// Compile to GLSL, ready to give to GL driver.
+		//		std::string source = glsl.compile();
 
-				MH_CORE_TRACE(source);
-			}
+		//		MH_CORE_TRACE(source);
+		//	}
 
-			// HLSL
-			{
-				spirv_cross::CompilerHLSL hlsl(spirv[ShaderStage::Vertex]);
+		//	// HLSL
+		//	{
+		//		spirv_cross::CompilerHLSL hlsl(spirv[ShaderStage::Vertex]);
 
-				spirv_cross::CompilerHLSL::Options options;
-				options.shader_model = 40;
-				hlsl.set_hlsl_options(options);
+		//		spirv_cross::CompilerHLSL::Options options;
+		//		options.shader_model = 40;
+		//		hlsl.set_hlsl_options(options);
 
-				// Compile to HLSL, ready to give to DX driver.
-				std::string source = hlsl.compile();
+		//		// Compile to HLSL, ready to give to DX driver.
+		//		std::string source = hlsl.compile();
 
-				MH_CORE_TRACE(source);
-			}
-		}
+		//		MH_CORE_TRACE(source);
+		//	}
+		//}
 
 		return success;
 	}

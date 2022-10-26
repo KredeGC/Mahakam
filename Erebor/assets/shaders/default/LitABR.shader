@@ -35,4 +35,4 @@ Passes:
       - USE_BUMP
       - USE_ROUGHNESS
     Includes:
-      - assets/shaders/default/Lit.glsl
+      - internal/shaders/default/Lit.glsl

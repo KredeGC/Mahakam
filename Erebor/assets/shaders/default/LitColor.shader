@@ -20,4 +20,4 @@ Passes:
     Defines:
       - GEOMETRY
     Includes:
-      - assets/shaders/default/Lit.glsl
+      - internal/shaders/default/Lit.glsl

@@ -77,7 +77,7 @@ namespace Mahakam::Editor
 		}
 
 		{
-			std::filesystem::path importPath = FileUtility::GetImportPath(path);
+			std::filesystem::path importPath = FileUtility::IMPORT_PATH / path;
 			if (FileUtility::Exists(importPath))
 			{
 				auto importIter = std::filesystem::directory_iterator(importPath);
@@ -107,7 +107,7 @@ namespace Mahakam::Editor
 		}
 
 		{
-			std::filesystem::path importPath = FileUtility::GetImportPath(path);
+			std::filesystem::path importPath = FileUtility::IMPORT_PATH / path;
 			if (FileUtility::Exists(importPath))
 			{
 				auto importIter = std::filesystem::directory_iterator(importPath);
@@ -154,9 +154,7 @@ namespace Mahakam::Editor
 		float cellSize = padding + thumbnailSize;
 
 		float panelWidth = ImGui::GetContentRegionAvail().x;
-		int numColumns = (int)(panelWidth / cellSize);
-		if (numColumns < 1)
-			numColumns = 1;
+		int numColumns = glm::max((int)(panelWidth / cellSize), 1);
 
 		// Directories first
 		if (ImGui::CollapsingHeader("Directories", ImGuiTreeNodeFlags_SpanAvailWidth))
