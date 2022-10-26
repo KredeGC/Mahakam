@@ -76,7 +76,7 @@
 // Function declarations which should be reachable in DLLs
 #ifndef MH_STANDALONE
 #define MH_DECLARE_FUNC_LINE2(line, func, returnType, ...) static returnType (*func)(__VA_ARGS__); \
-	inline static uint8_t generated_##line = (::Mahakam::SharedLibrary::AddFunction((void**)&func), 0);
+	inline static uint8_t generated_##line = (::Mahakam::SharedLibrary::AddExportFunction((void**)&func), 0);
 #define MH_DECLARE_FUNC_LINE(line, func, returnType, ...) MH_DECLARE_FUNC_LINE2(line, func, returnType, __VA_ARGS__)
 
 #define MH_DECLARE_FUNC(func, returnType, ...) MH_DECLARE_FUNC_LINE(__LINE__, func, returnType, __VA_ARGS__)

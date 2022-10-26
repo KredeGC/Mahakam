@@ -7,8 +7,6 @@ namespace Mahakam::Editor
 	class DockSpace
 	{
 	public:
-		DockSpace() {}
-
 		void Begin();
 		void End();
 

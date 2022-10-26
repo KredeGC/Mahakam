@@ -18,6 +18,24 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 
 </div>
 
+# Usage
+Mahakam can be used by itself, simply by building and linking to it.
+An editor application also exists, called Erebor, which includes a level-editor and asset manager among other game-making tools.
+The best way to understand and use the engine is to build and run it, and then change around stuff to see how it affects the state.
+Applications created with the engine can also be run in headless mode, using the `--headless` flag.
+
+# Erebor
+Running the editor can be done via Visual Studio or Visual Studio Code, via their respective debuggers.
+It can also be run using various files within the Erebor directory, namely: EreborDebug, EreborOptimized and EreborRelease.
+There are both bash and batch files for Linux and Windows.
+
+# Building
+Refer to the [BUILDING.md](BUILDING.md) file.
+
+# Media
+![Editor 1](https://github.com/KredeGC/Mahakam/blob/master/.github/media/editor1.png)
+![Editor 2](https://github.com/KredeGC/Mahakam/blob/master/.github/media/editor2.png)
+
 # Libraries and technologies
 * Uses OpenGL for rendering. No other rendering APIs are supported currently, but may in the future.
 * [Bullet Physics SDK](https://github.com/bulletphysics/bullet3) for physics and collision detection.
@@ -39,21 +57,3 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 Mahakam uses the Steam&reg; Audio SDK. Steam&reg; is a trademark or registered trademark of Valve Corporation in the United States of America and elsewhere.
 
 Steam&reg; Audio, Copyright 2017 - 2022, Valve Corp. All rights reserved.
-
-# Usage
-Mahakam can be used by itself, simply by building and linking to it.
-An editor application also exists, called Erebor, which includes a level-editor and asset manager among other game-making tools.
-The best way to understand and use the engine is to build and run it, and then change around stuff to see how it affects the state.
-Applications created with the engine can also be run in headless mode, using the `--headless` flag.
-
-# Erebor
-Running the editor can be done via Visual Studio or Visual Studio Code, via their respective debuggers.
-It can also be run using various files within the Erebor directory, namely: EreborDebug, EreborOptimized and EreborRelease.
-There are both bash and batch files for Linux and Windows.
-
-# Building
-Refer to the [BUILDING.md](BUILDING.md) file.
-
-# Media
-![Editor 1](https://github.com/KredeGC/Mahakam/blob/master/.github/media/editor1.png)
-![Editor 2](https://github.com/KredeGC/Mahakam/blob/master/.github/media/editor2.png)

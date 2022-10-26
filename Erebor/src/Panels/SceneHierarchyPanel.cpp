@@ -1,8 +1,6 @@
 #include "ebpch.h"
 #include "SceneHierarchyPanel.h"
 
-#include "EditorLayer.h"
-
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 

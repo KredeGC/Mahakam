@@ -3,6 +3,7 @@
 
 #ifndef MH_STANDALONE
 #include "Panels/AssetManagerPanel.h"
+#include "Panels/BuildPanel.h"
 #include "Panels/ConsolePanel.h"
 #include "Panels/ContentBrowserPanel.h"
 #include "Panels/EnvironmentPanel.h"
@@ -13,6 +14,7 @@
 #include "Panels/SceneViewPanel.h"
 #include "Panels/StatsPanel.h"
 #include "ConsoleLogSink.h"
+#include "Runtime.h"
 #endif
 
 #include <fstream>
@@ -311,6 +313,10 @@ namespace Mahakam::Editor
 		//EditorWindowRegistry::OpenWindow("Asset Manager");
 
 		// ConsolePanel
+		EditorWindowRegistry::RegisterWindowClass<BuildPanel>("Build Runtime");
+		EditorWindowRegistry::OpenWindow("Build Runtime");
+
+		// ConsolePanel
 		EditorWindowRegistry::RegisterWindowClass<ConsolePanel>("Console");
 		EditorWindowRegistry::OpenWindow("Console");
 
@@ -386,31 +392,22 @@ namespace Mahakam::Editor
 
 
 		// Load the runtime
-#if MH_PLATFORM_WINDOWS
-		m_Runtime = CreateScope<SharedLibrary>("runtime/Sandbox.dll");
-#else
-		m_Runtime = CreateScope<SharedLibrary>("runtime/libSandbox.so");
-#endif
+		Runtime::LoadRuntime("runtime", "Sandbox");
 
-		auto runPtr = m_Runtime->GetFunction<void, Scene*>("Run");
-		m_UpdatePtr = m_Runtime->GetFunction<void, Scene*, Timestep>("Update");
-
-		// Run the game
-		runPtr(activeScene.get());
+		// TEMP: Run the game, as we don't have a playmode yet
+		Runtime::RunScene(activeScene);
 	}
 
 	void EditorLayer::OnDetach()
 	{
-		// Stop the game
-		auto stopPtr = m_Runtime->GetFunction<void, Scene*>("Stop");
-		stopPtr(SceneManager::GetActiveScene().get());
+		// TEMP: Stop the game, as we don't have a playmode yet
+		Runtime::StopScene(SceneManager::GetActiveScene());
 		
 		// IMPORTANT: Unload the scene before unloading the runtime
 		SceneManager::SetActiveScene(nullptr);
 
 		// Unload the runtime
-		m_Runtime = nullptr;
-		m_UpdatePtr = nullptr;
+		Runtime::UnloadRuntime();
 
 		ComponentRegistry::DeregisterDefaultComponents();
 
@@ -421,10 +418,8 @@ namespace Mahakam::Editor
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		//UpdateRuntimeLibrary();
-
-		// Call shared library update
-		m_UpdatePtr(SceneManager::GetActiveScene().get(), dt);
+		// Call runtime update
+		Runtime::UpdateScene(SceneManager::GetActiveScene(), dt);
 
 		static const bool m_PlayMode = false;
 		if (m_PlayMode)
@@ -487,74 +482,6 @@ namespace Mahakam::Editor
 #else
 		dispatcher.DispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(EditorLayer::OnWindowResized));
 #endif
-	}
-
-	void EditorLayer::CopyRuntime(std::istream& binaryStream, size_t binaryLength)
-	{
-		// Copy new runtime
-		std::vector<char> binaryBuffer;
-		binaryBuffer.reserve(binaryLength);
-		std::copy(std::istreambuf_iterator<char>(binaryStream),
-			std::istreambuf_iterator<char>(),
-			std::back_inserter(binaryBuffer));
-
-		std::ofstream copyOut("runtime/Sandbox-runtime.dll", std::ios_base::binary);
-		copyOut.write(binaryBuffer.data(), binaryLength);
-		copyOut.close();
-	}
-
-	void EditorLayer::UpdateRuntimeLibrary()
-	{
-		if (std::filesystem::exists("runtime/Sandbox.dll"))
-		{
-			std::ifstream binaryStream("runtime/Sandbox.dll", std::ios_base::binary);
-
-			binaryStream.seekg(0, std::ios_base::end);
-			size_t binaryLength = binaryStream.tellg();
-			binaryStream.seekg(0, std::ios_base::beg);
-
-			if (std::filesystem::exists("runtime/Sandbox-runtime.dll"))
-			{
-				std::ifstream runtimeStream("runtime/Sandbox-runtime.dll", std::ios_base::binary);
-
-				runtimeStream.seekg(0, std::ios_base::end);
-				size_t runtimeLength = runtimeStream.tellg();
-				runtimeStream.seekg(0, std::ios_base::beg);
-
-				if (binaryLength != runtimeLength)
-				{
-					MH_CORE_TRACE("Reloading runtime code");
-
-					// Unload old scene and runtime
-					SceneManager::SetActiveScene(nullptr);
-					//s_ActiveScene = nullptr;
-					m_Runtime = nullptr;
-
-					// Copy new runtime
-					CopyRuntime(binaryStream, binaryLength);
-
-					// Create new scene
-					Ref<Scene> activeScene = Scene::Create("assets/textures/pines.hdr");
-					SceneManager::SetActiveScene(activeScene);
-
-					// Load new runtime
-					m_Runtime = CreateScope<SharedLibrary>("runtime/Sandbox-runtime.dll");
-
-					auto runPtr = m_Runtime->GetFunction<void, Scene*>("Run");
-
-					runPtr(activeScene.get());
-
-					m_UpdatePtr = m_Runtime->GetFunction<void, Scene*, Timestep>("Update");
-				}
-			}
-			else
-			{
-				MH_CORE_TRACE("Copying runtime code");
-
-				// Copy new runtime
-				CopyRuntime(binaryStream, binaryLength);
-			}
-		}
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)

@@ -2,6 +2,8 @@
 
 #include "Mahakam/Core/Core.h"
 
+#include <filesystem>
+
 #if MH_PLATFORM_WINDOWS
 #include <windows.h>
 #elif MH_PLATFORM_LINUX
@@ -16,37 +18,40 @@ namespace Mahakam
 		static constexpr int NUM_FUNC_PTRS = 111;
 
 	private:
-		const char* filepath = nullptr;
+		std::filesystem::path m_Filepath = nullptr;
 #if defined(MH_PLATFORM_WINDOWS)
-		HINSTANCE handle = 0;
+		HINSTANCE m_Handle = 0;
 #elif defined(MH_PLATFORM_LINUX)
-		void* handle = nullptr;
+		void* m_Handle = nullptr;
 #endif
 
-		inline static bool initialized = false;
-		inline static FuncPtr funcPointers[NUM_FUNC_PTRS];
-		inline static int funcPointerCounter = 0;
+		inline static bool s_Initialized = false;
+		inline static FuncPtr s_FuncPointers[NUM_FUNC_PTRS];
+		inline static int s_FuncPointerCounter = 0;
 
 	public:
 		SharedLibrary() = default;
 
-		SharedLibrary(const char* filepath);
+		SharedLibrary(const std::filesystem::path& filepath);
 
-		virtual ~SharedLibrary();
+		~SharedLibrary();
 
-		static void AddFunction(FuncPtr funcPtr);
-
-		static void ExportFuncPointers();
-		static void ImportFuncPointers(FuncPtr ptrs[NUM_FUNC_PTRS]);
+		void Load();
+		void Unload();
 
 		template<typename R, typename ...Args>
 		auto GetFunction(const char* name)
 		{
 #if defined(MH_PLATFORM_WINDOWS)
-			return (R (*)(Args...))GetProcAddress(handle, name);
+			return (R(*)(Args...))GetProcAddress(m_Handle, name);
 #elif defined(MH_PLATFORM_LINUX)
-			return (R (*)(Args...))dlsym(handle, name);
+			return (R(*)(Args...))dlsym(m_Handle, name);
 #endif
 		}
+
+		static void AddExportFunction(FuncPtr funcPtr);
+
+		static void ExportFuncPointers();
+		static void ImportFuncPointers(FuncPtr ptrs[NUM_FUNC_PTRS]);
 	};
 }

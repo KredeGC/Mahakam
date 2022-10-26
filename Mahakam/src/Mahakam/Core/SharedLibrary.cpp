@@ -8,30 +8,50 @@
 
 namespace Mahakam
 {
-	SharedLibrary::SharedLibrary(const char* filepath) : filepath(filepath)
+	SharedLibrary::SharedLibrary(const std::filesystem::path& filepath) : m_Filepath(filepath)
+	{
+		MH_PROFILE_FUNCTION();
+
+		std::string pathString = m_Filepath.string();
+
+#if defined(MH_PLATFORM_WINDOWS)
+		m_Handle = LoadLibraryA(pathString.c_str());
+#elif defined(MH_PLATFORM_LINUX)
+		m_Handle = dlopen(pathString.c_str(), RTLD_NOW);
+#endif
+
+		if (!m_Handle)
+			MH_CORE_WARN("Failed to open shared library {0}", m_Filepath);
+
+		if (!s_Initialized)
+			ExportFuncPointers();
+	}
+
+	SharedLibrary::~SharedLibrary()
 	{
 		MH_PROFILE_FUNCTION();
 
 #if defined(MH_PLATFORM_WINDOWS)
-		handle = LoadLibraryA(filepath);
+		if (!FreeLibrary(m_Handle))
+			MH_CORE_WARN("Failed to close shared library {0}", m_Filepath);
 #elif defined(MH_PLATFORM_LINUX)
-		handle = dlopen(filepath, RTLD_NOW);
+		dlclose(m_Handle);
 #endif
+	}
 
-		MH_CORE_ASSERT(handle, "Failed to open shared library!");
-
-		if (!initialized)
-			ExportFuncPointers();
+	void SharedLibrary::Load()
+	{
+		MH_PROFILE_FUNCTION();
 
 		auto loadPtr = GetFunction<void, ImGuiContext*, FuncPtr*>("Load");
 
 		ImGuiContext* context = ImGui::GetCurrentContext();
 
 		if (loadPtr)
-			loadPtr(context, funcPointers);
+			loadPtr(context, s_FuncPointers);
 	}
 
-	SharedLibrary::~SharedLibrary()
+	void SharedLibrary::Unload()
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -39,34 +59,28 @@ namespace Mahakam
 
 		if (unloadPtr)
 			unloadPtr();
-
-#if defined(MH_PLATFORM_WINDOWS)
-		MH_CORE_ASSERT(FreeLibrary(handle), "Failed to close shared library!");
-#elif defined(MH_PLATFORM_LINUX)
-		dlclose(handle);
-#endif
 	}
 
-	void SharedLibrary::AddFunction(FuncPtr funcPtr)
+	void SharedLibrary::AddExportFunction(FuncPtr funcPtr)
 	{
-		funcPointers[funcPointerCounter++] = funcPtr;
+		s_FuncPointers[s_FuncPointerCounter++] = funcPtr;
 	}
 
 	void SharedLibrary::ExportFuncPointers()
 	{
-		initialized = true;
+		s_Initialized = true;
 
-		MH_CORE_ASSERT(funcPointerCounter == NUM_FUNC_PTRS, "Inconsisent amount of func pointers exported!");
+		MH_CORE_ASSERT(s_FuncPointerCounter == NUM_FUNC_PTRS, "Inconsisent amount of func pointers exported!");
 	}
 
 	void SharedLibrary::ImportFuncPointers(FuncPtr ptrs[NUM_FUNC_PTRS])
 	{
-		initialized = true;
+		s_Initialized = true;
 
 		for (int i = 0; i < NUM_FUNC_PTRS; i++)
 		{
-			if (funcPointers[i] && *funcPointers[i])
-				*funcPointers[i] = *ptrs[i];
+			if (s_FuncPointers[i] && *s_FuncPointers[i])
+				*s_FuncPointers[i] = *ptrs[i];
 		}
 	}
 }
