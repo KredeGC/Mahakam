@@ -40,7 +40,7 @@ namespace Mahakam
 		template<typename T2>
 		operator Asset<T2>() const
 		{
-			auto ptr = std::static_pointer_cast<T2>(this->m_Ptr);
+			auto ptr = StaticCastRef<T2>(this->m_Ptr);
 
 			if (m_ID != 0)
 				return Asset<T2>(m_ID);

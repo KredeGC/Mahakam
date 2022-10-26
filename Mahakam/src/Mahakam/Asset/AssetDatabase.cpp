@@ -123,8 +123,8 @@ namespace Mahakam
 		AssetDatabase::DeregisterAssetImporter(".hdr");
 	};
 
-	//void AssetDatabase::ReloadAsset(uint64_t id)
-	MH_DEFINE_FUNC(AssetDatabase::ReloadAsset, void, uint64_t id)
+	//void AssetDatabase::ReloadAsset(AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::ReloadAsset, void, AssetDatabase::AssetID id)
 	{
 		auto pathIter = m_AssetPaths.find(id);
 		if (pathIter == m_AssetPaths.end())
@@ -165,8 +165,8 @@ namespace Mahakam
 		RecursiveCacheAssets(FileUtility::IMPORT_PATH);
 	};
 
-	//std::filesystem::path AssetDatabase::GetAssetImportPath(uint64_t id)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetImportPath, std::filesystem::path, uint64_t id)
+	//std::filesystem::path AssetDatabase::GetAssetImportPath(AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImportPath, std::filesystem::path, AssetDatabase::AssetID id)
 	{
 		auto iter = m_AssetPaths.find(id);
 		if (iter != m_AssetPaths.end())
@@ -181,8 +181,8 @@ namespace Mahakam
 		return m_AssetPaths;
 	};
 
-	//uint32_t AssetDatabase::GetAssetReferences(uint64_t id)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetReferences, uint32_t, uint64_t id)
+	//uint32_t AssetDatabase::GetAssetReferences(AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetReferences, uint32_t, AssetDatabase::AssetID id)
 	{
 		auto iter = m_CachedAssets.find(id);
 		if (iter != m_CachedAssets.end())
@@ -191,8 +191,8 @@ namespace Mahakam
 		return 0;
 	};
 
-	//uint32_t AssetDatabase::GetStrongReferences(uint64_t id)
-	MH_DEFINE_FUNC(AssetDatabase::GetStrongReferences, uint32_t, uint64_t id)
+	//uint32_t AssetDatabase::GetStrongReferences(AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::GetStrongReferences, uint32_t, AssetDatabase::AssetID id)
 	{
 		auto iter = m_CachedAssets.find(id);
 		if (iter != m_CachedAssets.end())
@@ -204,7 +204,7 @@ namespace Mahakam
 	//std::string GetAssetType::GetAssetType(const std::filesystem::path& importPath)
 	MH_DEFINE_FUNC(AssetDatabase::ReadAssetInfo, AssetDatabase::AssetInfo, const std::filesystem::path& importPath)
 	{
-		if (std::filesystem::is_directory(importPath) || !std::filesystem::exists(importPath))
+		if (!std::filesystem::exists(importPath) || std::filesystem::is_directory(importPath))
 		{
 			MH_CORE_WARN("AssetDatabase::ReadAssetInfo: The path '{0}' doesn't exist", importPath.string());
 			return {};
@@ -244,12 +244,12 @@ namespace Mahakam
 		return info;
 	};
 
-	//uint64_t AssetDatabase::SaveAsset(Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, uint64_t, Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	//AssetDatabase::AssetID AssetDatabase::SaveAsset(Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::AssetID, Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
 		// Read asset info and ID
 		std::string extension;
-		uint64_t id = 0;
+		AssetID id = 0;
 		if (std::filesystem::exists(importPath))
 		{
 			AssetInfo info = ReadAssetInfo(importPath);
@@ -295,8 +295,8 @@ namespace Mahakam
 		return 0;
 	};
 
-	//Ref<void> AssetDatabase::LoadAssetFromID(uint64_t id)
-	MH_DEFINE_FUNC(AssetDatabase::LoadAssetFromID, Ref<void>, uint64_t id)
+	//Ref<void> AssetDatabase::LoadAssetFromID(AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::LoadAssetFromID, Ref<void>, AssetDatabase::AssetID id)
 	{
 		MH_CORE_ASSERT(id, "Asset ID to be loaded cannot be 0");
 
@@ -338,8 +338,8 @@ namespace Mahakam
 		return nullptr;
 	};
 
-	//void AssetDatabase::RegisterAsset(uint64_t id, Ref<void> asset)
-	MH_DEFINE_FUNC(AssetDatabase::RegisterAsset, void, uint64_t id)
+	//void AssetDatabase::RegisterAsset(AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::RegisterAsset, void, AssetDatabase::AssetID id)
 	{
 		if (id)
 		{
@@ -354,8 +354,8 @@ namespace Mahakam
 		}
 	};
 
-	//void AssetDatabase::DeregisterAsset(uint64_t id)
-	MH_DEFINE_FUNC(AssetDatabase::DeregisterAsset, void, uint64_t id)
+	//void AssetDatabase::DeregisterAsset(AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::DeregisterAsset, void, AssetDatabase::AssetID id)
 	{
 		if (id)
 		{
@@ -382,7 +382,7 @@ namespace Mahakam
 			}
 			else if (directory.path().extension() == ".import")
 			{
-				uint64_t id = ReadAssetInfo(directory.path()).ID;
+				AssetID id = ReadAssetInfo(directory.path()).ID;
 
 				if (id)
 				{
