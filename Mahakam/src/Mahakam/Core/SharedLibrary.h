@@ -18,7 +18,7 @@ namespace Mahakam
 		static constexpr int NUM_FUNC_PTRS = 111;
 
 	private:
-		std::filesystem::path m_Filepath = nullptr;
+		std::filesystem::path m_Filepath;
 #if defined(MH_PLATFORM_WINDOWS)
 		HINSTANCE m_Handle = 0;
 #elif defined(MH_PLATFORM_LINUX)
