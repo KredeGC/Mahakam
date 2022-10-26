@@ -50,8 +50,14 @@ namespace Mahakam
 		{
 			MH_PROFILE_FUNCTION();
 
+			std::filesystem::path assetPath;
+			if (FileUtility::Exists(filepath))
+				assetPath = filepath;
+			else
+				assetPath = FileUtility::ASSET_PATH / filepath;
+
 			std::string result;
-			std::ifstream stream(filepath, std::ios::in | std::ios::binary);
+			std::ifstream stream(assetPath, std::ios::in | std::ios::binary);
 			if (stream)
 			{
 				stream.seekg(0, std::ios::end);

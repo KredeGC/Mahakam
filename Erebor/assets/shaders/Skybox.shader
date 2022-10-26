@@ -5,4 +5,4 @@ Properties:
 Passes:
   GEOMETRY:
     Includes:
-      - assets/shaders/Skybox.glsl
+      - shaders/Skybox.glsl

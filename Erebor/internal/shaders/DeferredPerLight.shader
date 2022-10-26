@@ -5,16 +5,16 @@ Passes:
       - BILINEAR_SHADOWS
       - PCF_SHADOWS
     Includes:
-      - assets/shaders/internal/DeferredPerLight.glsl
+      - internal/shaders/DeferredPerLight.glsl
   POINT:
     Defines:
       - POINT
     Includes:
-      - assets/shaders/internal/DeferredPerLight.glsl
+      - internal/shaders/DeferredPerLight.glsl
   SPOT:
     Defines:
       - SPOT
       - BILINEAR_SHADOWS
       - PCF_SHADOWS
     Includes:
-      - assets/shaders/internal/DeferredPerLight.glsl
+      - internal/shaders/DeferredPerLight.glsl

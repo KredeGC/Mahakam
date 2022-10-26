@@ -4,8 +4,8 @@
     layout(location = 0) out flat int v_InstanceID;
 #endif
 
-#include "assets/shaders/include/Matrix.glsl"
-#include "assets/shaders/include/lighting/LightStruct.glsl"
+#include "shaders/include/Matrix.glsl"
+#include "shaders/include/lighting/LightStruct.glsl"
 
 layout(location = 0) in vec3 i_Pos;
 
@@ -41,8 +41,8 @@ void main() {
     layout(location = 0) in flat int v_InstanceID;
 #endif
 
-#include "assets/shaders/include/Matrix.glsl"
-#include "assets/shaders/include/lighting/StandardLighting.glsl"
+#include "shaders/include/Matrix.glsl"
+#include "shaders/include/lighting/StandardLighting.glsl"
 
 struct v2f {
     vec3 v_ScreenPos;

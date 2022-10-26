@@ -121,10 +121,10 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		// Create lighting shader
-		m_DeferredShader = Shader::Create("assets/shaders/internal/DeferredPerLight.shader");
+		m_DeferredShader = Shader::Create("internal/shaders/DeferredPerLight.shader");
 
 		// Create default shadow shader
-		m_ShadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
+		m_ShadowShader = Shader::Create("internal/shaders/Shadow.shader");
 	}
 
 	void LightingRenderPass::RenderShadowMaps(SceneData* sceneData, const Frustum& frustum)

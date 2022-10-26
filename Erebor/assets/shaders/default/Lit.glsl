@@ -1,6 +1,6 @@
 #type vertex
 #version 430 core
-#include "assets/shaders/include/Matrix.glsl"
+#include "shaders/include/Matrix.glsl"
 
 #if defined(GEOMETRY)
     struct v2f {
@@ -41,7 +41,7 @@ layout (std140, binding = UNIFORM_BINDING) uniform Uniforms {
 };
 
 #ifdef SKIN
-#include "assets/shaders/include/Skin.glsl"
+#include "shaders/include/Skin.glsl"
 #endif
 
 void main() {
