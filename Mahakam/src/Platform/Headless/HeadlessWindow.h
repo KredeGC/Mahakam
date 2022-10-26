@@ -37,6 +37,8 @@ namespace Mahakam
 
 		virtual inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 
+		virtual void SetTitle(const std::string& title) override;
+
 		virtual void SetVSync(bool enabled) override;
 		virtual inline bool IsVSync() const override { return m_Data.VSync; }
 

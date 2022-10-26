@@ -30,7 +30,7 @@ namespace Mahakam
 		return true;
 	}
 
-	std::filesystem::path FileUtility::OpenFile(const char* filter)
+	std::filesystem::path FileUtility::OpenFile(const char* filter, const std::filesystem::path& basePath)
 	{
 		if (!FileDialogsUtilityCheck())
 			return std::string();
@@ -61,7 +61,7 @@ namespace Mahakam
 		return file_choice;
 	}
 
-	std::filesystem::path FileUtility::SaveFile(const char* filter)
+	std::filesystem::path FileUtility::SaveFile(const char* filter, const std::filesystem::path& basePath)
 	{
 		if (!FileDialogsUtilityCheck())
 			return std::string();
@@ -92,5 +92,13 @@ namespace Mahakam
 		int endline_pos = file_choice.find_first_of("\n");
 		file_choice.resize(endline_pos);
 		return file_choice;
+	}
+
+	std::filesystem::path FileUtility::OpenDirectory()
+	{
+		if (!FileDialogsUtilityCheck())
+			return std::string();
+
+		return std::string();
 	}
 }

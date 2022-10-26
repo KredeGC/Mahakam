@@ -3,6 +3,8 @@
 
 #include "SharedLibrary.h"
 
+#include <filesystem>
+
 namespace Mahakam
 {
 	class Event;
@@ -11,10 +13,10 @@ namespace Mahakam
 	struct WindowProps
 	{
 		std::string Title;
-		std::string Iconpath;
+		std::filesystem::path Iconpath;
 		uint32_t Width, Height;
 
-		WindowProps(const std::string& title = "Mahakam", const std::string& iconpath = "", uint32_t width = 1600, uint32_t height = 900)
+		WindowProps(const std::string& title = "Mahakam", const std::filesystem::path& iconpath = "", uint32_t width = 1600, uint32_t height = 900)
 			: Title(title), Iconpath(iconpath), Width(width), Height(height) {}
 	};
 
@@ -33,6 +35,8 @@ namespace Mahakam
 		virtual uint32_t GetHeight() const = 0;
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+
+		virtual void SetTitle(const std::string& title) = 0;
 
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;

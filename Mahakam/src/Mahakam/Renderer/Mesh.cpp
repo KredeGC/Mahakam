@@ -364,7 +364,7 @@ namespace Mahakam
 								// TODO: The spec is vague on when to do 'inv(parentMat) * nodeMat * invBindMatrix'
 								// For now it is done inside the Scene, once per frame
 								skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].offset = invMatrices[i]; // Override offset to be the bone's inverse matrix
-								skinnedMesh->BoneInfoMap[node.name] = i;
+								skinnedMesh->BoneInfoMap[node.name] = (int)i;
 							}
 						}
 					}

@@ -9,8 +9,8 @@ namespace Mahakam::Editor
 {
 	ContentBrowserPanel::ContentBrowserPanel()
 	{
-		m_DirectoryIcon = Asset<Texture2D>(Texture2D::Create("internal/icons/icon-directory.png", { TextureFormat::RGBA8 }));
-		m_FileIcon = Asset<Texture2D>(Texture2D::Create("internal/icons/icon-file.png", { TextureFormat::RGBA8 }));
+		m_DirectoryIcon = Texture2D::Create("internal/icons/icon-directory.png", { TextureFormat::RGBA8 });
+		m_FileIcon = Texture2D::Create("internal/icons/icon-file.png", { TextureFormat::RGBA8 });
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
@@ -30,22 +30,19 @@ namespace Mahakam::Editor
 
 					ImGui::BeginChild("File Browser Child", { 0, -2 }, false);
 
-					ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == s_AssetDirectory) ? ImGuiTreeNodeFlags_Selected : 0);
+					ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == FileUtility::ASSET_PATH) ? ImGuiTreeNodeFlags_Selected : 0);
 					flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
-					std::string fileString = s_AssetDirectory.string();
-					const char* fileCStr = fileString.c_str();
-
-					bool open = ImGui::TreeNodeEx(fileCStr, flags | ImGuiTreeNodeFlags_DefaultOpen, "%s", fileCStr);
+					bool open = ImGui::TreeNodeEx("assets", flags | ImGuiTreeNodeFlags_DefaultOpen, "%s", "assets");
 
 					if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-						m_CurrentDirectory = s_AssetDirectory;
+						m_CurrentDirectory = FileUtility::ASSET_PATH;
 
 					if (open)
 					{
-						DirectorySet directories = GetDirectores(s_AssetDirectory);
+						DirectorySet directories = GetDirectores(FileUtility::ASSET_PATH);
 
-						DrawDirectoryRecursive(s_AssetDirectory, directories);
+						DrawDirectoryRecursive(FileUtility::ASSET_PATH, directories);
 						ImGui::TreePop();
 					}
 
@@ -167,7 +164,7 @@ namespace Mahakam::Editor
 			if (ImGui::BeginTable("Directory Divisor", numColumns))
 			{
 				// Draw .. directory
-				if (path != s_AssetDirectory)
+				if (path != FileUtility::ASSET_PATH)
 				{
 					ImGui::TableNextColumn();
 

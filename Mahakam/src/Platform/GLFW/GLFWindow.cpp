@@ -60,7 +60,8 @@ namespace Mahakam
 		// Loading the window icon
 		stbi_set_flip_vertically_on_load(0);
 		int width, height;
-		unsigned char* pixels = stbi_load(props.Iconpath.c_str(), &width, &height, 0, 4);
+		std::string iconString = props.Iconpath.string();
+		unsigned char* pixels = stbi_load(iconString.c_str(), &width, &height, 0, 4);
 		GLFWimage* icon = new GLFWimage
 		{
 			width,
@@ -208,6 +209,13 @@ namespace Mahakam
 
 		glfwPollEvents();
 		m_Context->SwapBuffers();
+	}
+
+	void GLFWindow::SetTitle(const std::string& title)
+	{
+		m_Data.Title = title;
+
+		glfwSetWindowTitle(m_Window, title.c_str());
 	}
 
 	void GLFWindow::SetVSync(bool enabled)

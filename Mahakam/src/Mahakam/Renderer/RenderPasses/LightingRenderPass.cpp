@@ -94,12 +94,10 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		// Create BRDF and falloff maps
-		FileUtility::CreateDirectories("cache/internal/");
-		 
-		m_BRDFLut = LoadOrCreateLUTTexture("cache/internal/brdf.dat", "assets/shaders/internal/BRDF.shader", TextureFormat::RG16F, 512, 512);
-		m_FalloffLut = LoadOrCreateLUTTexture("cache/internal/falloff.dat", "assets/shaders/internal/Falloff.shader", TextureFormat::R8, 16, 16);
+		m_BRDFLut = LoadOrCreateLUTTexture("internal/textures/brdf.dat", "internal/shaders/BRDF.shader", TextureFormat::RG16F, 512, 512);
+		m_FalloffLut = LoadOrCreateLUTTexture("internal/textures/falloff.dat", "internal/shaders/Falloff.shader", TextureFormat::R8, 16, 16);
 
-		m_SpotlightTexture = Texture2D::Create("assets/textures/internal/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
+		m_SpotlightTexture = Texture2D::Create("internal/textures/spotlight.png", { TextureFormat::SRGB_DXT1, TextureFilter::Bilinear, TextureWrapMode::ClampBorder, TextureWrapMode::ClampBorder });
 	}
 
 	void LightingRenderPass::SetupFrameBuffer(uint32_t width, uint32_t height)

@@ -15,7 +15,7 @@ namespace Mahakam::Editor
 
 		Ref<FrameBuffer> m_ViewportFramebuffer;
 
-		Asset<Shader> m_BlitShader;
+		Ref<Shader> m_BlitShader;
 
 	public:
 		RenderPassPanel();

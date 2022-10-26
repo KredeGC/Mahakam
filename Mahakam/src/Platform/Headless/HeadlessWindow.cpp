@@ -45,6 +45,11 @@ namespace Mahakam
 		m_Context->SwapBuffers();
 	}
 
+	void HeadlessWindow::SetTitle(const std::string& title)
+	{
+		m_Data.Title = title;
+	}
+
 	void HeadlessWindow::SetVSync(bool enabled)
 	{
 		MH_PROFILE_FUNCTION();

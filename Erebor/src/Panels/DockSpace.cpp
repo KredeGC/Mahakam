@@ -40,25 +40,47 @@ namespace Mahakam::Editor
 		// File bar
 		if (ImGui::BeginMenuBar())
 		{
-			if (ImGui::BeginMenu("File"))
+			if (ImGui::BeginMenu("Project"))
+			{
+				if (ImGui::MenuItem(u8"\uec5b" " Open Project"))
+				{
+					std::filesystem::path projectPath = FileUtility::OpenDirectory();
+
+					if (projectPath != "")
+					{
+						Application::GetInstance()->GetWindow().SetTitle("Erebor " + projectPath.string());
+
+						FileUtility::ASSET_PATH = std::filesystem::relative(projectPath / "assets", FileUtility::GetWorkingDirectory());
+						FileUtility::IMPORT_PATH = std::filesystem::relative(projectPath / "import", FileUtility::GetWorkingDirectory());
+
+						NewScene();
+
+						AssetDatabase::ReloadAssetImports();
+					}
+				}
+
+				if (ImGui::MenuItem(u8"\uef1d" " Exit"))
+					Application::GetInstance()->Close();
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Scene"))
 			{
 				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
 				// which we can't undo at the moment without finer window depth/z control.
 				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);1
-				if (ImGui::MenuItem(u8"\uef10" " New", "Ctrl+N"))
+				if (ImGui::MenuItem(u8"\uef10" " New Scene", "Ctrl+N"))
 					NewScene();
 
-				if (ImGui::MenuItem(u8"\uec5b" " Open...", "Ctrl+O"))
+				if (ImGui::MenuItem(u8"\uec5b" " Open Scene...", "Ctrl+O"))
 					OpenScene();
 
-				if (ImGui::MenuItem(u8"\uee00" " Save...", "Ctrl+Shift+S"))
+				if (ImGui::MenuItem(u8"\uee00" " Save Scene...", "Ctrl+S"))
 					SaveScene();
 
-				if (ImGui::MenuItem(u8"\uee00" " Save As...", "Ctrl+Shift+S"))
+				if (ImGui::MenuItem(u8"\uee00" " Save Scene As...", "Ctrl+Shift+S"))
 					SaveSceneAs();
-
-				if (ImGui::MenuItem(u8"\uef1d" " Exit"))
-					Application::GetInstance()->Close();
 
 				ImGui::EndMenu();
 			}
@@ -153,7 +175,7 @@ namespace Mahakam::Editor
 
 	void DockSpace::OpenScene()
 	{
-		std::filesystem::path filepath = FileUtility::OpenFile("Mahakam Scene (*.mhk)\0*.mhk\0");
+		std::filesystem::path filepath = FileUtility::OpenFile("Mahakam Scene (*.mhk)\0*.mhk\0", FileUtility::GetWorkingDirectory() / FileUtility::ASSET_PATH);
 
 		if (!filepath.empty())
 		{
@@ -173,7 +195,7 @@ namespace Mahakam::Editor
 
 	void DockSpace::SaveSceneAs()
 	{
-		std::filesystem::path filepath = FileUtility::SaveFile("Mahakam Scene (*.mhk)\0*.mhk\0");
+		std::filesystem::path filepath = FileUtility::SaveFile("Mahakam Scene (*.mhk)\0*.mhk\0", FileUtility::GetWorkingDirectory() / FileUtility::ASSET_PATH);
 
 		if (!filepath.empty())
 		{

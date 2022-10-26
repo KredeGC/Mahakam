@@ -9,12 +9,10 @@ namespace Mahakam::Editor
 	private:
 		bool m_Open = true;
 
-		std::filesystem::path m_CurrentDirectory = s_AssetDirectory;
+		std::filesystem::path m_CurrentDirectory = FileUtility::ASSET_PATH;
 
-		Asset<Texture2D> m_DirectoryIcon;
-		Asset<Texture2D> m_FileIcon;
-
-		inline const static std::filesystem::path s_AssetDirectory = "assets";
+		Ref<Texture2D> m_DirectoryIcon;
+		Ref<Texture2D> m_FileIcon;
 
 		using DirectorySet = std::set<std::string, std::less<std::string>, Allocator::BaseAllocator<std::string>>;
 

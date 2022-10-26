@@ -3,6 +3,16 @@
 
 namespace Mahakam
 {
+	void FileUtility::SetWorkingDirectory(const std::filesystem::path& filepath)
+	{
+		std::filesystem::current_path(filepath);
+	}
+
+	std::filesystem::path FileUtility::GetWorkingDirectory()
+	{
+		return std::filesystem::current_path();
+	}
+
 	bool FileUtility::Exists(const std::filesystem::path& src)
 	{
 		return std::filesystem::exists(src);

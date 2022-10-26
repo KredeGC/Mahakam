@@ -372,6 +372,12 @@ namespace Mahakam
 
 	void AssetDatabase::RecursiveCacheAssets(const std::filesystem::path& filepath)
 	{
+		if (!FileUtility::Exists(filepath))
+		{
+			MH_CORE_WARN("Could not import assets. Does the import folder exist?");
+			return;
+		}
+
 		auto iter = std::filesystem::directory_iterator(filepath);
 
 		for (auto& directory : iter)
