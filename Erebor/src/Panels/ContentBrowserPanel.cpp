@@ -77,7 +77,7 @@ namespace Mahakam::Editor
 		}
 
 		{
-			std::filesystem::path importPath = FileUtility::IMPORT_PATH / path;
+			std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
 			if (FileUtility::Exists(importPath))
 			{
 				auto importIter = std::filesystem::directory_iterator(importPath);
@@ -107,7 +107,7 @@ namespace Mahakam::Editor
 		}
 
 		{
-			std::filesystem::path importPath = FileUtility::IMPORT_PATH / path;
+			std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
 			if (FileUtility::Exists(importPath))
 			{
 				auto importIter = std::filesystem::directory_iterator(importPath);
@@ -204,7 +204,7 @@ namespace Mahakam::Editor
 		{
 			if (ImGui::BeginTable("Import Divisor", numColumns))
 			{
-				std::filesystem::path importPath = FileUtility::GetImportPath(path);
+				std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
 				if (std::filesystem::exists(importPath))
 				{
 					for (auto& file : std::filesystem::directory_iterator(importPath))

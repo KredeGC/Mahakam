@@ -48,15 +48,9 @@ namespace Mahakam::Editor
 
 					if (projectPath != "")
 					{
-						// TODO: Have this be a function somewhere
 						Application::GetInstance()->GetWindow().SetTitle("Erebor " + projectPath.string());
 
-						FileUtility::ASSET_PATH = std::filesystem::relative(projectPath / "assets", FileUtility::GetWorkingDirectory());
-						FileUtility::IMPORT_PATH = std::filesystem::relative(projectPath / "import", FileUtility::GetWorkingDirectory());
-
-						NewScene();
-
-						AssetDatabase::ReloadAssetImports();
+						FileUtility::SetProjectDirectory(projectPath);
 					}
 				}
 

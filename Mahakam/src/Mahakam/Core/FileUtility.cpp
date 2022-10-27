@@ -1,8 +1,36 @@
 #include "Mahakam/mhpch.h"
 #include "FileUtility.h"
 
+#include "SceneManager.h"
+
+#ifndef MH_STANDALONE
+#include "Mahakam/Editor/Selection.h"
+#endif
+
 namespace Mahakam
 {
+	void FileUtility::SetProjectDirectory(const std::filesystem::path& filepath)
+	{
+		// Only reload if the path has changed
+		if (filepath != PROJECT_PATH)
+		{
+#ifndef MH_STANDALONE
+			Editor::Selection::SetSelectedEntity({});
+#endif
+
+			// Reset the scene
+			Ref<Scene> scene = Scene::Create();
+			SceneManager::SetActiveScene(scene);
+
+			// Set the project paths
+			PROJECT_PATH = filepath;
+			ASSET_PATH = std::filesystem::relative(filepath / "assets", GetWorkingDirectory());
+			IMPORT_PATH = std::filesystem::relative(filepath / "import", GetWorkingDirectory());
+
+			AssetDatabase::ReloadAssetImports();
+		}
+	}
+
 	void FileUtility::SetWorkingDirectory(const std::filesystem::path& filepath)
 	{
 		std::filesystem::current_path(filepath);
@@ -35,13 +63,15 @@ namespace Mahakam
 
 	std::filesystem::path FileUtility::GetImportPath(const std::filesystem::path& filepath)
 	{
-		std::filesystem::path importDirectory = IMPORT_PATH / filepath.parent_path();
+		std::filesystem::path importPath = std::filesystem::relative(filepath, PROJECT_PATH);
+
+		std::filesystem::path importDirectory = IMPORT_PATH / importPath.parent_path();
 
 		CreateDirectories(importDirectory);
 
-		if (!std::filesystem::exists(filepath) || std::filesystem::is_directory(filepath))
-			return IMPORT_PATH / filepath.string();
+		if (!std::filesystem::exists(importPath) || std::filesystem::is_directory(importPath))
+			return IMPORT_PATH / importPath;
 		else
-			return IMPORT_PATH / std::filesystem::path(filepath.string() + ".import");
+			return IMPORT_PATH / std::filesystem::path(importPath.string() + ".import");
 	}
 }

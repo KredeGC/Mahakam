@@ -8,9 +8,12 @@ namespace Mahakam
 	class FileUtility
 	{
 	public:
+		inline static std::filesystem::path PROJECT_PATH = std::filesystem::current_path();
 		inline static std::filesystem::path CACHE_PATH = "cache";
 		inline static std::filesystem::path IMPORT_PATH = "import";
 		inline static std::filesystem::path ASSET_PATH = "assets";
+
+		static void SetProjectDirectory(const std::filesystem::path& filepath);
 
 		static void SetWorkingDirectory(const std::filesystem::path& filepath);
 		static std::filesystem::path GetWorkingDirectory();
