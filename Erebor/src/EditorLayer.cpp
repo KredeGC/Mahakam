@@ -14,7 +14,6 @@
 #include "Panels/SceneViewPanel.h"
 #include "Panels/StatsPanel.h"
 #include "ConsoleLogSink.h"
-#include "Runtime.h"
 #endif
 
 #include <fstream>

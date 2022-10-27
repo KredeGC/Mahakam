@@ -1,8 +1,6 @@
 #include "ebpch.h"
 #include "BuildPanel.h"
 
-#include "Runtime.h"
-
 namespace Mahakam::Editor
 {
 	void BuildPanel::OnImGuiRender()
