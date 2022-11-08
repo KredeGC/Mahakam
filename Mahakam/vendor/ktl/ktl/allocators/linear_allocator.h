@@ -10,37 +10,34 @@
 namespace ktl
 {
 	template<size_t Size>
-	struct stack
+	class linear_allocator
 	{
-		alignas(ALIGNMENT) char Data[Size];
-		char* Free;
-		size_t ObjectCount;
+	private:
+		struct arena
+		{
+			alignas(ALIGNMENT) char Data[Size];
+			char* Free;
+			size_t ObjectCount;
 
-		stack() noexcept :
-			Data{},
-			Free(Data),
-			ObjectCount(0) {}
-	};
+			arena() noexcept :
+				Data{},
+				Free(Data),
+				ObjectCount(0) {}
+		};
 
-	template<size_t Size>
-	class stack_allocator
-	{
 	public:
-		stack_allocator(stack<Size>& block) noexcept :
-			m_Block(&block) {}
+		linear_allocator() noexcept :
+			m_Block(std::make_shared<arena>()) {}
 
-		stack_allocator(stack<Size>* block) noexcept
-			: m_Block(block) {}
-
-		stack_allocator(const stack_allocator& other) noexcept :
+		linear_allocator(const linear_allocator& other) noexcept :
 			m_Block(other.m_Block) {}
 
-		bool operator==(const stack_allocator& rhs) const noexcept
+		bool operator==(const linear_allocator& rhs) const noexcept
 		{
 			return m_Block == rhs.m_Block;
 		}
 
-		bool operator!=(const stack_allocator& rhs) const noexcept
+		bool operator!=(const linear_allocator& rhs) const noexcept
 		{
 			return m_Block != rhs.m_Block;
 		}
@@ -90,9 +87,9 @@ namespace ktl
 #pragma endregion
 
 	private:
-		stack<Size>* m_Block;
+		std::shared_ptr<arena> m_Block;
 	};
 
 	template<typename T, size_t Size>
-	using type_stack_allocator = type_allocator<T, stack_allocator<Size>>;
+	using type_linear_allocator = type_allocator<T, linear_allocator<Size>>;
 }

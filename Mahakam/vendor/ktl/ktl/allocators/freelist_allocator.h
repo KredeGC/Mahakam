@@ -8,11 +8,10 @@
 
 namespace ktl
 {
-	template<size_t Min, size_t Max, size_t Batch, size_t Threshold, typename Alloc>
+	template<size_t Min, size_t Max, typename Alloc>
 	class freelist_allocator
 	{
 	private:
-		static_assert(Threshold % Batch == 0, "Threshold must be a multiple of Batch count");
 		static_assert(has_value_type<Alloc>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
 
 	public:
@@ -24,19 +23,21 @@ namespace ktl
             link* Next;
         };
         
-        struct stats
-        {
-            link* Free = nullptr;
-            size_t Count = 0;
-        };
+		struct stats
+		{
+			Alloc Allocator;
+			link* Free;
+
+			stats(const Alloc& alloc) :
+				Allocator(alloc),
+				Free(nullptr) {}
+		};
 
 	public:
 		freelist_allocator(const Alloc& alloc = Alloc()) noexcept :
-            m_Alloc(alloc),
-            m_Stats(std::make_shared<stats>()) {}
+            m_Stats(std::make_shared<stats>(alloc)) {}
 
 		freelist_allocator(const freelist_allocator& other) noexcept :
-            m_Alloc(other.m_Alloc),
             m_Stats(other.m_Stats) {}
 
         ~freelist_allocator()
@@ -48,34 +49,34 @@ namespace ktl
                 {
                     link* prev = next;
                     next = next->Next;
-                    m_Alloc.deallocate(prev, Max);
+					m_Stats->Allocator.deallocate(prev, Max);
                 }
             }
         }
+
+		bool operator==(const freelist_allocator& rhs) const noexcept
+		{
+			return m_Stats->Allocator == rhs.m_Stats->Allocator;
+		}
+
+		bool operator!=(const freelist_allocator& rhs) const noexcept
+		{
+			return m_Stats->Allocator != rhs.m_Stats->Allocator;
+		}
 
 #pragma region Allocation
 		void* allocate(size_type n)
 		{
 			if (n > Min && n <= Max)
 			{
-				if (!m_Stats->Free && m_Stats->Count < Threshold)
-				{
-					for (size_t i = 0; i < Batch; i++)
-					{
-						link* next = reinterpret_cast<link*>(m_Alloc.allocate(Max));
-						if (!next)
-							break;
-
-						next->Next = m_Stats->Free;
-						m_Stats->Free = next;
-						m_Stats->Count++;
-					}
-				}
-
 				link* next = m_Stats->Free;
 				if (next)
+				{
 					m_Stats->Free = next->Next;
-				return next;
+					return next;
+				}
+
+				return m_Stats->Allocator.allocate(Max);
 			}
 
 			return nullptr;
@@ -83,7 +84,7 @@ namespace ktl
 
 		void deallocate(void* p, size_type n)
 		{
-			if (n > Min && n <= Max && m_Stats->Count < Threshold)
+			if (n > Min && n <= Max && p)
 			{
 				link* next = reinterpret_cast<link*>(p);
 				next->Next = m_Stats->Free;
@@ -97,14 +98,14 @@ namespace ktl
 		typename std::enable_if<has_construct<void, Alloc, T*, Args...>::value, void>::type
 		construct(T* p, Args&&... args)
 		{
-			m_Alloc.construct(p, std::forward<Args>(args)...);
+			m_Stats->Allocator.construct(p, std::forward<Args>(args)...);
 		}
 
 		template<typename T>
 		typename std::enable_if<has_destroy<Alloc, T*>::value, void>::type
 		destroy(T* p)
 		{
-			m_Alloc.destroy(p);
+			m_Stats->Allocator.destroy(p);
 		}
 #pragma endregion
 
@@ -113,44 +114,31 @@ namespace ktl
 		typename std::enable_if<has_max_size<A>::value, size_type>::type
 		max_size() const noexcept
 		{
-			return m_Alloc.max_size();
+			return m_Stats->Allocator.max_size();
 		}
 
 		template<typename A = Alloc>
 		typename std::enable_if<has_owns<A>::value, bool>::type
 		owns(void* p)
 		{
-			return m_Alloc.owns(p);
+			return m_Stats->Allocator.owns(p);
 		}
 #pragma endregion
 
 		Alloc& get_allocator()
 		{
-			return m_Alloc;
+			return m_Stats->Allocator;
 		}
 
 		const Alloc& get_allocator() const
 		{
-			return m_Alloc;
+			return m_Stats->Allocator;
 		}
 
 	private:
-		Alloc m_Alloc;
         std::shared_ptr<stats> m_Stats;
 	};
 
-	template<size_t Min1, size_t Max1, size_t Batch1, size_t Threshold1, typename A, size_t Min2, size_t Max2, size_t Batch2, size_t Threshold2, typename U>
-	bool operator==(const freelist_allocator<Min1, Min2, Batch1, Threshold1, A>& lhs, const freelist_allocator<Min2, Max2, Batch2, Threshold2, U>& rhs) noexcept
-	{
-		return lhs.m_Alloc == rhs.m_Alloc;
-	}
-
-	template<size_t Min1, size_t Max1, size_t Batch1, size_t Threshold1, typename A, size_t Min2, size_t Max2, size_t Batch2, size_t Threshold2, typename U>
-	bool operator!=(const freelist_allocator<Min1, Min2, Batch1, Threshold1, A>& lhs, const freelist_allocator<Min2, Max2, Batch2, Threshold2, U>& rhs) noexcept
-	{
-		return lhs.m_Alloc != rhs.m_Alloc;
-	}
-
-	template<typename T, size_t Min, size_t Max, size_t Batch, size_t Threshold, typename A>
-	using type_freelist_allocator = type_allocator<T, freelist_allocator<Min, Max, Batch, Threshold, A>>;
+	template<typename T, size_t Min, size_t Max, typename A>
+	using type_freelist_allocator = type_allocator<T, freelist_allocator<Min, Max, A>>;
 }

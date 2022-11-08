@@ -1,8 +1,9 @@
 #pragma once
 
 #include <ktl/allocators/cascading_allocator.h>
+#include <ktl/allocators/freelist_allocator.h>
+#include <ktl/allocators/linear_allocator.h>
 #include <ktl/allocators/mallocator.h>
-#include <ktl/allocators/pre_allocator.h>
 #include <ktl/allocators/segragator_allocator.h>
 
 #include <cstdint>
@@ -14,7 +15,7 @@ namespace Mahakam
 	public:
 		template<typename T>
 		using BaseAllocator = ktl::type_segragator_allocator<T, 512,
-			ktl::cascading_allocator<ktl::pre_allocator<512 * 64>>,
+			ktl::cascading_allocator<ktl::freelist_allocator<0, 512, ktl::linear_allocator<512 * 64>>>,
 			ktl::mallocator>;
 
 		template<typename T>
@@ -38,13 +39,13 @@ namespace Mahakam
 		template<typename T, typename ...Args>
 		static void Construct(T* p, Args&&... args)
 		{
-			std::allocator_traits<T>::construct(m_Alloc, p, std::forward<Args>(args)...);
+			std::allocator_traits<BaseAllocator<T>>::construct(static_cast<BaseAllocator<T>>(m_Alloc), p, std::forward<Args>(args)...);
 		}
 
 		template<typename T>
 		static void Deconstruct(T* p)
 		{
-			std::allocator_traits<T>::destroy(m_Alloc, p);
+			std::allocator_traits<BaseAllocator<T>>::destroy(static_cast<BaseAllocator<T>>(m_Alloc), p);
 		}
 
 	private:

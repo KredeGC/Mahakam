@@ -8,15 +8,42 @@
 namespace Mahakam::Editor
 {
 	ContentBrowserPanel::ContentBrowserPanel()
+		: m_Directories(Allocator::GetAllocator<std::string>())
 	{
 		m_DirectoryIcon = Texture2D::Create("internal/icons/icon-directory.png", { TextureFormat::RGBA8 });
 		m_FileIcon = Texture2D::Create("internal/icons/icon-file.png", { TextureFormat::RGBA8 });
+
+		m_RootDir = Allocator::Allocate<DirNode>(1);
+
+		Allocator::Construct<DirNode>(m_RootDir, "assets", nullptr, nullptr);
+	}
+
+	ContentBrowserPanel::~ContentBrowserPanel()
+	{
+		Allocator::Deconstruct(m_RootDir);
+
+		Allocator::Deallocate<DirNode>(m_RootDir, 1);
+	}
+
+	void ContentBrowserPanel::OnUpdate(Timestep dt)
+	{
+		m_Time += dt;
+
+		// Only update every 3 seconds
+		if (m_Time >= 2.0f)
+		{
+			m_Time -= 2.0f;
+
+			ClearFileStructure(m_RootDir);
+
+			CreateFileStructure(m_RootDir, FileUtility::ASSET_PATH);
+
+			CreateDirectories(m_CurrentDirectory);
+		}
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
 	{
-		// TODO: Don't render when in play-mode, unless hovered
-		// TODO: Cache the directory structure every second
 		if (m_Open)
 		{
 			if (ImGui::Begin("Content Browser", &m_Open))
@@ -30,21 +57,7 @@ namespace Mahakam::Editor
 
 					ImGui::BeginChild("File Browser Child", { 0, -2 }, false);
 
-					ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == FileUtility::ASSET_PATH) ? ImGuiTreeNodeFlags_Selected : 0);
-					flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-
-					bool open = ImGui::TreeNodeEx("assets", flags | ImGuiTreeNodeFlags_DefaultOpen, "%s", "assets");
-
-					if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-						m_CurrentDirectory = FileUtility::ASSET_PATH;
-
-					if (open)
-					{
-						DirectorySet directories = GetDirectores(FileUtility::ASSET_PATH);
-
-						DrawDirectoryRecursive(FileUtility::ASSET_PATH, directories);
-						ImGui::TreePop();
-					}
+					DrawDirectoryRecursive(m_RootDir, FileUtility::ASSET_PATH);
 
 					ImGui::EndChild();
 
@@ -64,38 +77,30 @@ namespace Mahakam::Editor
 		}
 	}
 
-	bool ContentBrowserPanel::HasSubDirectories(const std::filesystem::path& path)
+	void ContentBrowserPanel::ClearFileStructure(DirNode* parent)
 	{
-		if (FileUtility::Exists(path))
+		DirNode* current = parent->FirstChild;
+		while (current)
 		{
-			auto iter = std::filesystem::directory_iterator(path);
-			for (auto& directory : iter)
-			{
-				if (directory.is_directory())
-					return true;
-			}
-		}
+			DirNode* next = current->Next;
 
-		{
-			std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
-			if (FileUtility::Exists(importPath))
-			{
-				auto importIter = std::filesystem::directory_iterator(importPath);
-				for (auto& directory : importIter)
-				{
-					if (directory.is_directory())
-						return true;
-				}
-			}
-		}
+			ClearFileStructure(current);
 
-		return false;
+			Allocator::Deconstruct<DirNode>(current);
+
+			Allocator::Deallocate<DirNode>(current, 1);
+
+			current = next;
+		}
 	}
 
-	ContentBrowserPanel::DirectorySet ContentBrowserPanel::GetDirectores(const std::filesystem::path& path)
+	void ContentBrowserPanel::CreateFileStructure(DirNode* parent, const std::filesystem::path& path)
 	{
+		auto alloc = Allocator::GetAllocator<DirNode>();
+
 		DirectorySet directories(Allocator::GetAllocator<std::string>());
 
+		// Search the "assets" path
 		if (FileUtility::Exists(path))
 		{
 			auto iter = std::filesystem::directory_iterator(path);
@@ -106,44 +111,91 @@ namespace Mahakam::Editor
 			}
 		}
 
+		// Search the "imports/assets" path
+		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
+		if (FileUtility::Exists(importPath))
 		{
-			std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
-			if (FileUtility::Exists(importPath))
+			auto importIter = std::filesystem::directory_iterator(importPath);
+			for (auto& directory : importIter)
 			{
-				auto importIter = std::filesystem::directory_iterator(importPath);
-				for (auto& directory : importIter)
-				{
-					if (directory.is_directory())
-						directories.insert(directory.path().filename().string());
-				}
+				if (directory.is_directory())
+					directories.insert(directory.path().filename().string());
 			}
 		}
 
-		return directories;
+		// Add directories as children to the parent node
+		DirNode* sibling = nullptr;
+		for (auto& dir : directories)
+		{
+			DirNode* node = Allocator::Allocate<DirNode>(1);
+
+			Allocator::Construct<DirNode>(node, dir, nullptr, nullptr);
+
+			if (sibling)
+				sibling->Next = node;
+			else
+				parent->FirstChild = node;
+
+			sibling = node;
+
+			CreateFileStructure(node, path / dir);
+		}
 	}
 
-	void ContentBrowserPanel::DrawDirectoryRecursive(const std::filesystem::path& path, const DirectorySet& directories)
+	void ContentBrowserPanel::CreateDirectories(const std::filesystem::path& path)
 	{
-		for (const auto& directory : directories)
+		m_Directories.clear();
+
+		if (FileUtility::Exists(path))
 		{
-			std::filesystem::path dirPath = path / directory;
-
-			ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == dirPath) ? ImGuiTreeNodeFlags_Selected : 0);
-			flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-			if (!HasSubDirectories(dirPath))
-				flags |= ImGuiTreeNodeFlags_Leaf;
-
-			bool open = ImGui::TreeNodeEx(dirPath.string().c_str(), flags, "%s", directory.c_str());
-
-			if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-				m_CurrentDirectory = dirPath;
-
-			if (open)
+			auto iter = std::filesystem::directory_iterator(path);
+			for (auto& directory : iter)
 			{
-				DirectorySet childDirectories = GetDirectores(dirPath);
-				DrawDirectoryRecursive(dirPath, childDirectories);
-				ImGui::TreePop();
+				if (directory.is_directory())
+					m_Directories.insert(directory.path().filename().string());
 			}
+		}
+
+		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
+		if (FileUtility::Exists(importPath))
+		{
+			auto importIter = std::filesystem::directory_iterator(importPath);
+			for (auto& directory : importIter)
+			{
+				if (directory.is_directory())
+					m_Directories.insert(directory.path().filename().string());
+			}
+		}
+	}
+
+	void ContentBrowserPanel::DrawDirectoryRecursive(DirNode* parent, const std::filesystem::path& path)
+	{
+		ImGuiTreeNodeFlags flags = ((m_CurrentDirectory == path) ? ImGuiTreeNodeFlags_Selected : 0);
+		flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+		if (!parent->FirstChild)
+			flags |= ImGuiTreeNodeFlags_Leaf;
+		if (parent == m_RootDir)
+			flags |= ImGuiTreeNodeFlags_DefaultOpen;
+
+		bool open = ImGui::TreeNodeEx(path.string().c_str(), flags, "%s", parent->Name.c_str());
+
+		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+		{
+			m_CurrentDirectory = path;
+			CreateDirectories(m_CurrentDirectory);
+		}
+
+		if (open)
+		{
+			DirNode* current = parent->FirstChild;
+			while (current)
+			{
+				DrawDirectoryRecursive(current, path / current->Name);
+
+				current = current->Next;
+			}
+
+			ImGui::TreePop();
 		}
 	}
 
@@ -169,8 +221,13 @@ namespace Mahakam::Editor
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 					ImGui::PushID("..");
 					ImGui::ImageButton((ImTextureID)(uintptr_t)m_DirectoryIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+
 					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+					{
 						m_CurrentDirectory = path.parent_path();
+						CreateDirectories(m_CurrentDirectory);
+					}
+
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 					ImGui::TextWrapped("%s", "..");
 					ImGui::PopID();
@@ -179,16 +236,20 @@ namespace Mahakam::Editor
 				// Draw other directories
 				if (std::filesystem::exists(path))
 				{
-					DirectorySet directories = GetDirectores(path);
-					for (const auto& directory : directories)
+					for (const auto& directory : m_Directories)
 					{
 						ImGui::TableNextColumn();
 
 						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 						ImGui::PushID(directory.c_str());
 						ImGui::ImageButton((ImTextureID)(uintptr_t)m_DirectoryIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+						{
 							m_CurrentDirectory = path / directory;
+							CreateDirectories(m_CurrentDirectory);
+						}
+
 						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 						ImGui::TextWrapped("%s", directory.c_str());
 						ImGui::PopID();
@@ -241,6 +302,7 @@ namespace Mahakam::Editor
 
 								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
 							}
+
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 							ImGui::TextWrapped("%s", pathName.c_str());
 							ImGui::PopID();
@@ -276,6 +338,7 @@ namespace Mahakam::Editor
 								std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
 								ImportWizardPanel::ImportAsset(file.path(), file.path().extension().string(), importPath);
 							}
+
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
 							ImGui::TextWrapped("%s", pathName.c_str());
 							ImGui::PopID();

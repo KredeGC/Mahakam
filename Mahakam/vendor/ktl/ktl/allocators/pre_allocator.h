@@ -49,6 +49,17 @@ namespace ktl
 			other.m_Block = nullptr;
 		}
 
+		bool operator==(const pre_allocator& rhs) const noexcept
+		{
+			return m_Block == rhs.m_Block;
+		}
+
+		bool operator!=(const pre_allocator& rhs) const noexcept
+		{
+			return m_Block != rhs.m_Block;
+		}
+
+#pragma region Allocation
 		void* allocate(size_t n)
 		{
 			size_t totalSize = (std::max)(n, sizeof(footer));
@@ -106,7 +117,8 @@ namespace ktl
 				if (m_Block->Free == current)
 					m_Block->Free = current->Next;
 
-				m_Block->Guess = current;
+				if (m_Block->Guess == current)
+					m_Block->Guess = current->Next;
 			}
 
 			return current;
@@ -162,7 +174,9 @@ namespace ktl
 				m_Block->Guess = current;
 			}
 		}
+#pragma endregion
 
+#pragma region Utility
 		size_t max_size() const noexcept
 		{
 			return Size;
@@ -173,7 +187,9 @@ namespace ktl
 			char* ptr = reinterpret_cast<char*>(p);
 			return ptr >= m_Block->Data && ptr < m_Block->Data + Size;
 		}
+#pragma endregion
 
+	private:
 		void coalesce(footer* header) noexcept
 		{
 			char* headerOffset = reinterpret_cast<char*>(header);
@@ -195,21 +211,8 @@ namespace ktl
 			}
 		}
 
-	private:
 		std::shared_ptr<arena> m_Block;
 	};
-
-	template<size_t S, size_t T>
-	bool operator==(const pre_allocator<S>& lhs, const pre_allocator<T>& rhs) noexcept
-	{
-		return &lhs == &rhs;
-	}
-
-	template<size_t S, size_t T>
-	bool operator!=(const pre_allocator<S>& lhs, const pre_allocator<T>& rhs) noexcept
-	{
-		return &lhs != &rhs;
-	}
 
 	template<typename T, size_t Size>
 	using type_pre_allocator = type_allocator<T, pre_allocator<Size>>;
