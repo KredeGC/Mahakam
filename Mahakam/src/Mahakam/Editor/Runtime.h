@@ -1,8 +1,16 @@
 #pragma once
 
-#include <Mahakam/Mahakam.h>
+#include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Timestep.h"
 
 #include <filesystem>
+#include <string>
+
+namespace Mahakam
+{
+	class Scene;
+	class SharedLibrary;
+}
 
 namespace Mahakam::Editor
 {

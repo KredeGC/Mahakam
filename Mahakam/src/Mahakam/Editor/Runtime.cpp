@@ -1,6 +1,9 @@
 #include "Mahakam/mhpch.h"
 #include "Runtime.h"
 
+#include "Mahakam/Core/SharedLibrary.h"
+#include "Mahakam/Scene/Scene.h"
+
 namespace Mahakam::Editor
 {
 	void Runtime::LoadRuntime(const std::filesystem::path& filepath, const std::string& filename)

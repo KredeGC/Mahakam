@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Scene/Entity.h"
 
