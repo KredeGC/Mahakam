@@ -8,13 +8,16 @@ namespace ktl
 	template<size_t Size>
 	struct stack;
 
-	// arena
-	template<size_t Size>
-	struct arena;
-
 	// type_allocator
 	template<typename T, typename Alloc>
 	class type_allocator;
+
+	// cascading_allocator
+	template<typename Alloc>
+	class cascading_allocator;
+
+	template<typename T, typename Alloc>
+	using type_cascading_allocator = type_allocator<T, cascading_allocator<Alloc>>;
 
 	// composite_allocator
 	template<typename P, typename F>
@@ -36,6 +39,9 @@ namespace ktl
 	template<typename T>
 	using type_mallocator = type_allocator<T, mallocator>;
 
+	// null_allocator
+	class null_allocator;
+
 	// overflow_allocator
 	template<typename Alloc, std::ostream& Stream>
 	class overflow_allocator;
@@ -49,6 +55,13 @@ namespace ktl
 
 	template<typename T, size_t Size>
 	using type_pre_allocator = type_allocator<T, pre_allocator<Size>>;
+
+	// segragator_allocator
+	template<size_t Threshold, typename P, typename F>
+	class segragator_allocator;
+
+	template<typename T, size_t Threshold, typename P, typename F>
+	using type_segragator_allocator = type_allocator<T, segragator_allocator<Threshold, P, F>>;
 
 	// stack_allocator
 	template<size_t Size>

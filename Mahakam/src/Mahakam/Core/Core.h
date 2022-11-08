@@ -2,7 +2,8 @@
 
 #include "Allocator.h"
 #include "Mahakam/Version.h"
-#include "Mahakam/Container/tvector.h"
+
+#include <ktl/containers/trivial_vector.h>
 
 #include <memory>
 #include <unordered_map>
@@ -89,7 +90,7 @@
 namespace Mahakam
 {
 	template<typename T, typename Alloc = std::allocator<T>>
-	using TrivialVector = tvector<T, Alloc>;
+	using TrivialVector = ktl::trivial_vector<T, Alloc>;
 
 	template<typename K, typename V>
 	using UnorderedMap = std::unordered_map<K, V>;

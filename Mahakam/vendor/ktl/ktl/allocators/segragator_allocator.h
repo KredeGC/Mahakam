@@ -3,52 +3,45 @@
 #include "../utility/meta_template.h"
 #include "type_allocator.h"
 
-#include <limits>
 #include <memory>
 #include <type_traits>
 
 namespace ktl
 {
-	template<typename P, typename F>
-	class composite_allocator
+	template<size_t Threshold, typename P, typename F>
+	class segragator_allocator
 	{
 	private:
 		static_assert(has_value_type<P>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
 		static_assert(has_value_type<F>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
-		static_assert(has_owns<P>::value, "The primary allocator is required to have an 'owns(void*)' method");
+		static_assert(!has_construct<P>::value || has_owns<P>::value, "The primary allocator is required to have an 'owns(void*)' method, if it has a construct(void*, Args...) method");
 
 	public:
 		typedef typename get_size_type<P>::type size_type;
 
-		composite_allocator(const P& primary = P(), const F& fallback = F()) noexcept :
+		segragator_allocator(const P& primary = P(), const F& fallback = F()) noexcept :
 			m_Primary(primary),
 			m_Fallback(fallback) {}
 
-		composite_allocator(const composite_allocator& other) noexcept :
+		segragator_allocator(const segragator_allocator& other) noexcept :
 			m_Primary(other.m_Primary),
 			m_Fallback(other.m_Fallback) {}
 
 #pragma region Allocation
 		void* allocate(size_t n)
 		{
-			void* ptr = m_Primary.allocate(n);
-			if (!ptr)
+			if (n <= Threshold)
+				return m_Primary.allocate(n);
+			else
 				return m_Fallback.allocate(n);
-			return ptr;
 		}
 
 		void deallocate(void* p, size_t n)
 		{
-			if constexpr (has_owns<P>::value)
-			{
-				if (m_Primary.owns(p))
-				{
-					m_Primary.deallocate(p, n);
-					return;
-				}
-			}
-
-			m_Fallback.deallocate(p, n);
+			if (n <= Threshold)
+				return m_Primary.deallocate(p, n);
+			else
+				return m_Fallback.deallocate(p, n);
 		}
 #pragma endregion
 
@@ -106,15 +99,17 @@ namespace ktl
 			return (std::max)(m_Primary.max_size(), m_Fallback.max_size());
 		}
 
-		bool owns(void* p)
+		template<typename Primary = P, typename Fallback = F>
+		typename std::enable_if<has_owns<Primary>::value || has_owns<Fallback>::value, bool>::type
+		owns(void* p)
 		{
-			if constexpr (has_owns<P>::value)
+			if constexpr (has_owns<Primary>::value)
 			{
 				if (m_Primary.owns(p))
 					return true;
 			}
-
-			if constexpr (has_owns<F>::value)
+			
+			if constexpr (has_owns<Fallback>::value)
 			{
 				if (m_Fallback.owns(p))
 					return true;
@@ -129,18 +124,18 @@ namespace ktl
 		F m_Fallback;
 	};
 
-	template<typename P, typename F, typename U, typename V>
-	bool operator==(const composite_allocator<P, F>& lhs, const composite_allocator<U, V>& rhs) noexcept
+	template<size_t T1, typename P, typename F, size_t T2, typename U, typename V>
+	bool operator==(const segragator_allocator<T1, P, F>& lhs, const segragator_allocator<T2, U, V>& rhs) noexcept
 	{
 		return lhs.m_Primary == rhs.m_Primary && lhs.m_Fallback == rhs.m_Fallback;
 	}
 
-	template<typename P, typename F, typename U, typename V>
-	bool operator!=(const composite_allocator<P, F>& lhs, const composite_allocator<U, V>& rhs) noexcept
+	template<size_t T1, typename P, typename F, size_t T2, typename U, typename V>
+	bool operator!=(const segragator_allocator<T1, P, F>& lhs, const segragator_allocator<T2, U, V>& rhs) noexcept
 	{
 		return lhs.m_Primary != rhs.m_Primary || lhs.m_Fallback != rhs.m_Fallback;
 	}
 
-	template<typename T, typename P, typename F>
-	using type_composite_allocator = type_allocator<T, composite_allocator<P, F>>;
+	template<typename T, size_t Threshold, typename P, typename F>
+	using type_segragator_allocator = type_allocator<T, segragator_allocator<Threshold, P, F>>;
 }

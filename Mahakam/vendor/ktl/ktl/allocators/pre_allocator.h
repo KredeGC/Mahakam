@@ -9,10 +9,6 @@
 
 namespace ktl
 {
-	// Weirdness: std::vector allocates some data in the constructor with a different allocator (std::_ContainerProxy_t or smth)
-	// Question: Why have stateful allocators when copying requires that the state is not altered?
-	// Is this just an msc thing? Other compilers seem to work fine, despite *potentially* being UB
-
 	template<size_t Size>
 	class pre_allocator
 	{
@@ -35,6 +31,8 @@ namespace ktl
 				Free = reinterpret_cast<footer*>(Data);
 				Free->AvailableSpace = Size;
 				Free->Next = nullptr;
+
+				Guess = Free;
 			}
 		};
 
@@ -44,6 +42,12 @@ namespace ktl
 
 		pre_allocator(const pre_allocator& other) noexcept :
 			m_Block(other.m_Block) {}
+
+		pre_allocator(pre_allocator&& other) noexcept :
+			m_Block(std::move(other.m_Block))
+		{
+			other.m_Block = nullptr;
+		}
 
 		void* allocate(size_t n)
 		{
@@ -73,6 +77,7 @@ namespace ktl
 				}
 			}
 
+			// Out-of-memory
 			if (current->AvailableSpace < totalSize && !current->Next)
 				return nullptr;
 
@@ -121,19 +126,20 @@ namespace ktl
 				footer* begin = m_Block->Free;
 				footerPtr->Next = begin;
 				m_Block->Free = footerPtr;
-				m_Block->Guess = footerPtr;
 
-				coalesce(m_Block->Free);
+				coalesce(footerPtr);
+
+				if (m_Block->Guess == begin)
+					m_Block->Guess = footerPtr;
 			}
 			else
 			{
 				// Utilize the power of random chance
 				// Guessing is usually better than starting from scratch
-				footer* current;
-				if (m_Block->Guess < footerPtr)
-					current = m_Block->Guess;
-				else
-					current = m_Block->Free;
+				footer* current = m_Block->Guess < footerPtr ? m_Block->Guess : m_Block->Free;
+
+				//if (m_Block->Guess < footerPtr)
+				//	std::cout << footerPtr - m_Block->Guess << std::endl;
 
 				while (current->Next)
 				{
@@ -146,11 +152,14 @@ namespace ktl
 				footerPtr->Next = current->Next;
 				current->Next = footerPtr;
 
-				m_Block->Guess = current;
-
 				// Coalesce twice. header's next may be right up against current
-				coalesce(current);
-				coalesce(current);
+				if (current->Next)
+				{
+					coalesce(current);
+					coalesce(current);
+				}
+
+				m_Block->Guess = current;
 			}
 		}
 
@@ -173,7 +182,8 @@ namespace ktl
 			size_t diff = size_t(nextOffset - headerOffset);
 			size_t space = (diff - header->AvailableSpace);
 
-			if (space == 0)
+			// Coalesce if the difference in space is less than the size of footer
+			if (space < sizeof(footer))
 			{
 				header->AvailableSpace = diff;
 

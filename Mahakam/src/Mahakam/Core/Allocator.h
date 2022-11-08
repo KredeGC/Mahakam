@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ktl/allocators/composite_allocator.h>
-#include <ktl/allocators/freelist_allocator.h>
+#include <ktl/allocators/cascading_allocator.h>
 #include <ktl/allocators/mallocator.h>
 #include <ktl/allocators/pre_allocator.h>
+#include <ktl/allocators/segragator_allocator.h>
 
 #include <cstdint>
 
@@ -13,7 +13,9 @@ namespace Mahakam
 	{
 	public:
 		template<typename T>
-		using BaseAllocator = ktl::type_composite_allocator<T, ktl::freelist_allocator<0, 256, 8, 64, ktl::pre_allocator<16384>>, ktl::mallocator>;
+		using BaseAllocator = ktl::type_segragator_allocator<T, 512,
+			ktl::cascading_allocator<ktl::pre_allocator<512 * 64>>,
+			ktl::mallocator>;
 
 		template<typename T>
 		static BaseAllocator<T> GetAllocator()
