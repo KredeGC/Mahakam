@@ -19,36 +19,41 @@ namespace Mahakam
 			ktl::mallocator>;
 
 		template<typename T>
+		using BaseTraits = std::allocator_traits<BaseAllocator<T>>;
+
+		template<typename T>
 		static BaseAllocator<T> GetAllocator()
 		{
-			return m_Alloc;
+			return s_Alloc;
 		}
 
 		template<typename T>
 		static T* Allocate(size_t n)
 		{
-			return reinterpret_cast<T*>(m_Alloc.allocate(n * sizeof(T)));
+			return reinterpret_cast<T*>(s_Alloc.allocate(n * sizeof(T)));
 		}
 
 		template<typename T>
 		static void Deallocate(T* p, size_t n)
 		{
-			m_Alloc.deallocate(reinterpret_cast<uint8_t*>(p), n * sizeof(T));
+			s_Alloc.deallocate(reinterpret_cast<uint8_t*>(p), n * sizeof(T));
 		}
 
 		template<typename T, typename ...Args>
 		static void Construct(T* p, Args&&... args)
 		{
-			std::allocator_traits<BaseAllocator<T>>::construct(static_cast<BaseAllocator<T>&>(m_Alloc), p, std::forward<Args>(args)...);
+			BaseAllocator<T> alloc = static_cast<BaseAllocator<T>>(s_Alloc);
+			BaseTraits<T>::construct(alloc, p, std::forward<Args>(args)...);
 		}
 
 		template<typename T>
 		static void Deconstruct(T* p)
 		{
-			std::allocator_traits<BaseAllocator<T>>::destroy(static_cast<BaseAllocator<T>&>(m_Alloc), p);
+			BaseAllocator<T> alloc = static_cast<BaseAllocator<T>>(s_Alloc);
+			BaseTraits<T>::destroy(alloc, p);
 		}
 
 	private:
-		inline static BaseAllocator<uint8_t> m_Alloc;
+		inline static BaseAllocator<uint8_t> s_Alloc;
 	};
 }
