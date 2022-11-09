@@ -8,6 +8,9 @@
 
 namespace Mahakam
 {
+	Profiler::ProfileVector Profiler::s_ResultsFwd(Allocator::GetAllocator<Profiler::ProfileResult>());
+	Profiler::ProfileVector Profiler::s_ResultsBck(Allocator::GetAllocator<Profiler::ProfileResult>());
+
 #ifdef MH_ENABLE_PROFILING
 	Profiler::~Profiler()
 	{
@@ -70,7 +73,7 @@ namespace Mahakam
 #endif
 	}
 
-	const TrivialVector<Profiler::ProfileResult>& Profiler::GetResults()
+	const Profiler::ProfileVector& Profiler::GetResults()
 	{
 		return s_ResultsFwd;
 	}

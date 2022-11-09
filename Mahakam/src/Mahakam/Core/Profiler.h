@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core.h"
+#include "Allocator.h"
 
 #include <chrono>
 #include <thread>
@@ -20,13 +21,15 @@ namespace Mahakam
 			std::thread::id ThreadID;
 		};
 
+		using ProfileVector = TrivialVector<ProfileResult, Allocator::BaseAllocator<ProfileResult>>;
+
 	private:
 		const char* m_Name;
 		bool m_FlushRenderer;
 		bool m_Stopped;
 		std::chrono::steady_clock::time_point m_StartPoint;
-		inline static TrivialVector<ProfileResult> s_ResultsFwd;
-		inline static TrivialVector<ProfileResult> s_ResultsBck;
+		static ProfileVector s_ResultsFwd;
+		static ProfileVector s_ResultsBck;
 
 	public:
 		Profiler(const char* name, bool flushRenderer)
@@ -44,6 +47,6 @@ namespace Mahakam
 #endif
 
 		static void ClearResults();
-		static const TrivialVector<ProfileResult>& GetResults();
+		static const ProfileVector& GetResults();
 	};
 }
