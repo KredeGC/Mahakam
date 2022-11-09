@@ -39,13 +39,13 @@ namespace Mahakam
 		template<typename T, typename ...Args>
 		static void Construct(T* p, Args&&... args)
 		{
-			std::allocator_traits<BaseAllocator<T>>::construct(static_cast<BaseAllocator<T>>(m_Alloc), p, std::forward<Args>(args)...);
+			std::allocator_traits<BaseAllocator<T>>::construct(static_cast<BaseAllocator<T>&>(m_Alloc), p, std::forward<Args>(args)...);
 		}
 
 		template<typename T>
 		static void Deconstruct(T* p)
 		{
-			std::allocator_traits<BaseAllocator<T>>::destroy(static_cast<BaseAllocator<T>>(m_Alloc), p);
+			std::allocator_traits<BaseAllocator<T>>::destroy(static_cast<BaseAllocator<T>&>(m_Alloc), p);
 		}
 
 	private:
