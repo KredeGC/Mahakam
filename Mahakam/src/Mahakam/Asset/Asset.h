@@ -1,13 +1,19 @@
 #pragma once
 
-#include "Mahakam/Core/Core.h"
-
 #include "AssetDatabase.h"
 
+#include "Mahakam/Core/Allocator.h"
+
 #include <cstddef>
+#include <filesystem>
+#include <functional>
+#include <memory>
+#include <type_traits>
 
 namespace Mahakam
 {
+	class AssetDatabase;
+
 	template<typename T>
 	class Asset
 	{
@@ -15,276 +21,244 @@ namespace Mahakam
 		template<typename T2>
 		friend class Asset;
 
-		// 0 is guaranteed to be invalid
-		uint64_t m_ID = 0;
+		friend class AssetDatabase;
 
-		Ref<T> m_Ptr = nullptr;
+		using AssetID = AssetDatabase::AssetID;
+		using ControlBlock = AssetDatabase::ControlBlock;
+
+		ControlBlock* m_Control;
 
 	public:
-		Asset();
+		Asset() :
+			m_Control(nullptr) {}
 
-		Asset(const std::nullptr_t&) {}
-		
-		explicit Asset(Ref<T> ptr);
-		
-		explicit Asset(uint64_t id);
+		Asset(const std::nullptr_t&) :
+			m_Control(nullptr) {}
 
-		Asset(const std::filesystem::path& importPath);
+		explicit Asset(T* value, const std::function<void(void*)>& deleter)
+		{
+			m_Control = Allocator::Allocate<ControlBlock>(1);
+			Allocator::Construct<ControlBlock>(m_Control);
 
-		Asset(Asset&& other) noexcept;
+			m_Control->UseCount = 1;
+			m_Control->ID = 0;
+			m_Control->Ptr = value;
 
-		Asset(const Asset& other) noexcept;
+			m_Control->DeleteData = deleter;
+		}
 
-		~Asset();
+		explicit Asset(AssetID id)
+		{
+			// Register if the ID is valid
+			if (id)
+				m_Control = AssetDatabase::IncrementAsset(id);
+			else
+				m_Control = nullptr;
+		}
+
+		explicit Asset(ControlBlock* control)
+			: m_Control(control)
+		{
+			// Increment the count
+			IncrementRef();
+		}
+
+		explicit Asset(const std::filesystem::path& importPath)
+		{
+			// Register if the ID is valid
+			AssetID id = AssetDatabase::ReadAssetInfo(importPath).ID;
+			if (id)
+				m_Control = AssetDatabase::IncrementAsset(id);
+			else
+				m_Control = nullptr;
+		}
+
+		Asset(const Asset& other) noexcept :
+			m_Control(other.m_Control)
+		{
+			// Increment the count
+			IncrementRef();
+		}
+
+		Asset(Asset&& other) noexcept :
+			m_Control(other.m_Control)
+		{
+			// Invalidate the other, as it's destructor is still called
+			other.m_Control = nullptr;
+		}
+
+		~Asset()
+		{
+			// Remember to clear on delete
+			DecrementRef();
+		}
+
+		Asset& operator=(const Asset& rhs)
+		{
+			// Remember to clear if we already have something
+			DecrementRef();
+
+			m_Control = rhs.m_Control;
+
+			// Register our new ID
+			IncrementRef();
+			return *this;
+		}
+
+		Asset& operator=(Asset&& rhs) noexcept
+		{
+			// Remember to clear if we already have something
+			DecrementRef();
+
+			m_Control = rhs.m_Control;
+			// Invalidate the rhs, as it's destructor is still called
+			rhs.m_Control = nullptr;
+			return *this;
+		}
 
 		template<typename T2>
 		operator Asset<T2>() const
 		{
-			auto ptr = StaticCastRef<T2>(this->m_Ptr);
-
-			if (m_ID != 0)
-				return Asset<T2>(m_ID);
-			else
-				return Asset<T2>(ptr);
+			return Asset<T2>(m_Control);
 		}
-
-		template<typename T2>
-		Asset& operator=(Asset<T2>&& rhs)
-		{
-			// Remember to clear if we already have something
-			if (m_ID)
-				AssetDatabase::DeregisterAsset(m_ID);
-			m_Ptr = rhs.m_Ptr;
-			m_ID = rhs.m_ID;
-			// Invalidate the rhs, as it's destructor is still called
-			rhs.m_Ptr = nullptr;
-			rhs.m_ID = 0;
-			return *this;
-		}
-
-		Asset<T>& operator=(Asset<T>&& rhs) noexcept;
 
 		template<typename T2>
 		Asset& operator=(const Asset<T2>& rhs)
 		{
 			// Remember to clear if we already have something
-			if (m_ID)
-				AssetDatabase::DeregisterAsset(m_ID);
-			m_Ptr = rhs.m_Ptr;
-			m_ID = rhs.m_ID;
+			DecrementRef();
+
+			m_Control = rhs.m_Control;
+
 			// Register our new ID
-			if (m_ID)
-				AssetDatabase::RegisterAsset(m_ID);
+			IncrementRef();
 			return *this;
 		}
 
-		Asset<T>& operator=(const Asset<T>& rhs);
+		template<typename T2>
+		Asset& operator=(Asset<T2>&& rhs) noexcept
+		{
+			// Remember to clear if we already have something
+			DecrementRef();
 
-		Asset& operator=(const std::nullptr_t& rhs);
+			m_Control = rhs.m_Control;
+			// Invalidate the rhs, as it's destructor is still called
+			rhs.m_Control = nullptr;
+			return *this;
+		}
 
-		void Save(const std::filesystem::path& filepath, const std::filesystem::path& importPath);
+		Asset& operator=(const std::nullptr_t& rhs)
+		{
+			// Remember to clear if we already have something
+			DecrementRef();
 
-		uint64_t GetID() const;
+			m_Control = nullptr;
+			return *this;
+		}
 
-		std::filesystem::path GetImportPath() const;
+		void Save(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+		{
+			m_Control = AssetDatabase::SaveAsset(m_Control, filepath, importPath);
+		}
 
-		Ref<T> RefPtr();
+		AssetID GetID() const
+		{
+			return m_Control ? m_Control->ID : 0;
+		}
 
-		Ref<T> RefPtr() const;
+		std::filesystem::path GetImportPath() const
+		{
+			if (m_Control)
+				return AssetDatabase::GetAssetImportPath(m_Control->ID);
+			return "";
+		}
 
-		T* get();
+		size_t UseCount() const noexcept
+		{
+			return m_Control ? m_Control->UseCount : 0;
+		}
 
-		T* get() const;
+		T* get() const noexcept
+		{
+			return m_Control ? static_cast<T*>(m_Control->Ptr) : nullptr;
+		}
 
-		T* operator->() noexcept;
+		template<typename Ty = T, std::enable_if_t<!std::is_void<Ty>::value, bool> = true>
+		Ty& operator*() const noexcept
+		{
+			return *static_cast<T*>(m_Control->Ptr);
+		}
 
-		T* operator->() const noexcept;
+		T* operator->() const noexcept
+		{
+			return m_Control ? static_cast<T*>(m_Control->Ptr) : nullptr;
+		}
 
-		explicit operator bool() const noexcept;
+		explicit operator bool() const noexcept
+		{
+			return m_Control;
+		}
+
+	private:
+		void IncrementRef()
+		{
+			if (m_Control)
+				m_Control->UseCount++;
+		}
+
+		void DecrementRef()
+		{
+			if (!m_Control) return;
+
+			if (--m_Control->UseCount == 0)
+			{
+				if (m_Control->ID)
+				{
+					AssetDatabase::UnloadAsset(m_Control);
+				}
+				else
+				{
+					auto destroy = m_Control->DeleteData;
+					if (destroy)
+						destroy(m_Control->Ptr);
+
+					Allocator::Deconstruct<ControlBlock>(m_Control);
+					Allocator::Deallocate<ControlBlock>(m_Control, 1);
+				}
+			}
+		}
 	};
 
-
-	template<typename T>
-	bool operator==(const Asset<T>& _Left, std::nullptr_t) noexcept
+	template<typename T, typename ... Args>
+	constexpr Asset<T> CreateAsset(Args&& ... args)
 	{
-		return _Left.get() == nullptr;
+		T* value = Allocator::Allocate<T>(1);
+		Allocator::Construct<T>(value, std::forward<Args>(args)...);
+
+		auto deleter = [](void* p)
+		{
+			Allocator::Deconstruct<T>(static_cast<T*>(p));
+			Allocator::Deallocate<T>(static_cast<T*>(p), 1);
+		};
+
+		return Asset<T>(value, deleter);
 	}
 
 	template<typename T1, typename T2>
-	bool operator==(const Asset<T1>& _Left, const Asset<T2>& _Right) noexcept
+	bool operator==(const Asset<T1>& lhs, const Asset<T2>& rhs) noexcept
 	{
-		return _Left.get() == _Right.get();
-	}
-
-	template<typename T>
-	Asset<T>::Asset() : m_ID(0), m_Ptr(nullptr) {}
-
-	template<typename T>
-	Asset<T>::Asset(Ref<T> ptr)
-	{
-		m_Ptr = ptr;
-	}
-
-	template<typename T>
-	Asset<T>::Asset(uint64_t id) : m_ID(id)
-	{
-		// Register if the ID is valid
-		if (m_ID)
-			AssetDatabase::RegisterAsset(m_ID);
-	}
-
-	template<typename T>
-	Asset<T>::Asset(const std::filesystem::path& importPath)
-	{
-		// Register if the ID is valid
-		m_ID = AssetDatabase::ReadAssetInfo(importPath).ID;
-		if (m_ID)
-			AssetDatabase::RegisterAsset(m_ID);
-	}
-
-	template<typename T>
-	Asset<T>::Asset(Asset&& other) noexcept
-		: m_ID(other.m_ID), m_Ptr(other.m_Ptr)
-	{
-		// Invalidate the other, as it's destructor is still called
-		other.m_ID = 0;
-		other.m_Ptr = nullptr;
-	}
-
-	template<typename T>
-	Asset<T>::Asset(const Asset& other) noexcept
-		: m_ID(other.m_ID), m_Ptr(other.m_Ptr)
-	{
-		// Register if the ID is valid
-		if (m_ID)
-			AssetDatabase::RegisterAsset(m_ID);
-	}
-
-	template<typename T>
-	Asset<T>::~Asset()
-	{
-		// Remember to clear on delete
-		if (m_ID)
-			AssetDatabase::DeregisterAsset(m_ID);
-	}
-
-	template<typename T>
-	Asset<T>& Asset<T>::operator=(Asset<T>&& rhs) noexcept
-	{
-		// Remember to clear if we already have something
-		if (m_ID)
-			AssetDatabase::DeregisterAsset(m_ID);
-		m_Ptr = rhs.m_Ptr;
-		m_ID = rhs.m_ID;
-		// Invalidate the rhs, as it's destructor is still called
-		rhs.m_Ptr = nullptr;
-		rhs.m_ID = 0;
-		return *this;
-	}
-
-	template<typename T>
-	Asset<T>& Asset<T>::operator=(const Asset<T>& rhs)
-	{
-		// Remember to clear if we already have something
-		if (m_ID)
-			AssetDatabase::DeregisterAsset(m_ID);
-		m_Ptr = rhs.m_Ptr;
-		m_ID = rhs.m_ID;
-		// Register our new ID
-		if (m_ID)
-			AssetDatabase::RegisterAsset(m_ID);
-		return *this;
-	}
-
-	template<typename T>
-	Asset<T>& Asset<T>::operator=(const std::nullptr_t& rhs)
-	{
-		// Remember to clear if we already have something
-		if (m_ID)
-			AssetDatabase::DeregisterAsset(m_ID);
-		m_Ptr = nullptr;
-		m_ID = 0;
-		return *this;
-	}
-
-	template<typename T>
-	void Asset<T>::Save(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-	{
-		m_ID = AssetDatabase::SaveAsset(RefPtr(), filepath, importPath);
-		if (m_Ptr)
-		{
-			AssetDatabase::RegisterAsset(m_ID);
-			m_Ptr = nullptr;
-		}
-	}
-
-	template<typename T>
-	uint64_t Asset<T>::GetID() const
-	{
-		return m_ID;
-	}
-
-	template<typename T>
-	std::filesystem::path Asset<T>::GetImportPath() const
-	{
-		return AssetDatabase::GetAssetImportPath(m_ID);
-	}
-
-	template<typename T>
-	Ref<T> Asset<T>::RefPtr()
-	{
-		if (m_ID != 0)
-			return AssetDatabase::LoadAsset<T>(m_ID);
-		return m_Ptr;
-	}
-
-	template<typename T>
-	Ref<T> Asset<T>::RefPtr() const
-	{
-		if (m_ID != 0)
-			return AssetDatabase::LoadAsset<T>(m_ID);
-		return m_Ptr;
-	}
-
-	template<typename T>
-	T* Asset<T>::get()
-	{
-		return RefPtr().get();
-	}
-
-	template<typename T>
-	T* Asset<T>::get() const
-	{
-		return RefPtr().get();
-	}
-
-	template<typename T>
-	T* Asset<T>::operator->() noexcept
-	{
-		return get();
-	}
-
-	template<typename T>
-	T* Asset<T>::operator->() const noexcept
-	{
-		return get();
-	}
-
-	template<typename T>
-	Asset<T>::operator bool() const noexcept
-	{
-		return RefPtr() != nullptr;
+		return lhs.get() == rhs.get();
 	}
 }
 
 namespace std
 {
-	template<typename _Ty>
-	struct hash<Mahakam::Asset<_Ty>>
+	template<typename T>
+	struct hash<::Mahakam::Asset<T>>
 	{
-		size_t operator()(const Mahakam::Asset<_Ty>& _Keyval) const noexcept
+		size_t operator()(const ::Mahakam::Asset<T>& kv) const noexcept
 		{
-			return hash<_Ty*>()(_Keyval.get());
+			return hash<T*>()(kv.get());
 		}
 	};
 }

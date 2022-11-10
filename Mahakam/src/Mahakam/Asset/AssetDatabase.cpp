@@ -139,12 +139,24 @@ namespace Mahakam
 		if (pathIter == s_AssetPaths.end())
 			RefreshAssetImports();
 
-		auto iter = s_CachedAssets.find(id);
-		if (iter != s_CachedAssets.end())
+		// TODO: Is this even needed anymore? SaveAsset does something similar
+		auto iter = s_LoadedAssets.find(id);
+		if (iter != s_LoadedAssets.end())
 		{
-			iter->second.Asset = nullptr;
-			Ref<void> asset = LoadAssetFromID(id);
-			iter->second.Asset = asset;
+			// Delete our previous data
+			auto destroy = iter->second->DeleteData;
+			destroy(iter->second->Ptr);
+
+			// Load the asset
+			ControlBlock* control = LoadAndIncrementAsset(id);
+
+			// Move the pointer and destructor to the existing control block
+			iter->second->Ptr = control->Ptr;
+			iter->second->DeleteData = control->DeleteData;
+
+			// Delete the control block
+			Allocator::Deconstruct<ControlBlock>(control);
+			Allocator::Deallocate<ControlBlock>(control, 1);
 		}
 	};
 
@@ -159,11 +171,22 @@ namespace Mahakam
 		RefreshAssetImports();
 
 		// Reimport all imported assets
-		for (auto& kv : s_CachedAssets)
+		for (auto& kv : s_LoadedAssets)
 		{
-			kv.second.Asset = nullptr;
-			Ref<void> asset = LoadAssetFromID(kv.first);
-			kv.second.Asset = asset;
+			// Delete our previous data
+			auto destroy = kv.second->DeleteData;
+			destroy(kv.second->Ptr);
+
+			// Load the asset
+			ControlBlock* control = LoadAndIncrementAsset(kv.first);
+
+			// Move the pointer and destructor to the existing control block
+			kv.second->Ptr = control->Ptr;
+			kv.second->DeleteData = control->DeleteData;
+
+			// Delete the control block
+			Allocator::Deconstruct<ControlBlock>(control);
+			Allocator::Deallocate<ControlBlock>(control, 1);
 		}
 	};
 
@@ -191,21 +214,11 @@ namespace Mahakam
 	};
 
 	//uint32_t AssetDatabase::GetAssetReferences(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetReferences, uint32_t, AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetReferences, size_t, AssetDatabase::AssetID id)
 	{
-		auto iter = s_CachedAssets.find(id);
-		if (iter != s_CachedAssets.end())
-			return iter->second.UseCount;
-
-		return 0;
-	};
-
-	//uint32_t AssetDatabase::GetStrongReferences(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::GetStrongReferences, uint32_t, AssetDatabase::AssetID id)
-	{
-		auto iter = s_CachedAssets.find(id);
-		if (iter != s_CachedAssets.end())
-			return iter->second.Asset.use_count();
+		auto iter = s_LoadedAssets.find(id);
+		if (iter != s_LoadedAssets.end())
+			return iter->second->UseCount;
 
 		return 0;
 	};
@@ -253,8 +266,8 @@ namespace Mahakam
 		return info;
 	};
 
-	//AssetDatabase::AssetID AssetDatabase::SaveAsset(Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::AssetID, Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
 		// Read asset info and ID
 		std::string extension;
@@ -291,6 +304,8 @@ namespace Mahakam
 			emitter << YAML::Key << "ID";
 			emitter << YAML::Value << id;
 
+			Asset<void> asset(control);
+
 			iter->second->Serialize(emitter, asset);
 
 			emitter << YAML::EndMap;
@@ -298,21 +313,89 @@ namespace Mahakam
 			std::ofstream filestream(importPath);
 			filestream << emitter.c_str();
 
-			return id;
+			auto controlIter = s_LoadedAssets.find(id);
+			if (controlIter != s_LoadedAssets.end())
+			{
+				ControlBlock* loadedControl = controlIter->second;
+
+				// If the control block is different, then copy and invalidate
+				if (loadedControl != control)
+				{
+					// Increment the UseCount
+					loadedControl->UseCount++;
+
+					// Delete our previous data
+					auto destroy = loadedControl->DeleteData;
+					destroy(loadedControl->Ptr);
+
+					// Move the pointer and destructor to the existing control block
+					loadedControl->Ptr = control->Ptr;
+					loadedControl->DeleteData = std::move(control->DeleteData);
+
+					control->Ptr = nullptr;
+					control->DeleteData = nullptr;
+				}
+
+				return loadedControl;
+			}
+			else
+			{
+				control->ID = id;
+
+				s_LoadedAssets[id] = control;
+
+				return control;
+			}
 		}
 
-		return 0;
+		return nullptr;
 	};
 
-	//Ref<void> AssetDatabase::LoadAssetFromID(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::LoadAssetFromID, Ref<void>, AssetDatabase::AssetID id)
+	//AssetDatabase::ControlBlock* AssetDatabase::IncrementAsset(AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::IncrementAsset, AssetDatabase::ControlBlock*, AssetDatabase::AssetID id)
+	{
+		if (id)
+		{
+			auto iter = s_LoadedAssets.find(id);
+			if (iter != s_LoadedAssets.end())
+			{
+				iter->second->UseCount++;
+
+				return iter->second;
+			}
+			else
+			{
+				ControlBlock* control = LoadAndIncrementAsset(id);
+
+				s_LoadedAssets[id] = control;
+
+				return control;
+			}
+		}
+
+		return nullptr;
+	};
+
+	//void AssetDatabase::DecrementAsset(ControlBlock* control)
+	MH_DEFINE_FUNC(AssetDatabase::UnloadAsset, void, ControlBlock* control)
+	{
+		MH_CORE_ASSERT(control->UseCount == 0, "Attempting to unload multiple instances of Asset");
+
+		s_LoadedAssets.erase(control->ID);
+
+		// Destroy the object before deallocating the control block
+		auto destroy = control->DeleteData;
+		if (destroy)
+			destroy(control->Ptr);
+
+		// Delete the control block
+		Allocator::Deconstruct<ControlBlock>(control);
+		Allocator::Deallocate<ControlBlock>(control, 1);
+	};
+
+	AssetDatabase::ControlBlock* AssetDatabase::LoadAndIncrementAsset(AssetID id)
 	{
 		MH_CORE_ASSERT(id, "Asset ID to be loaded cannot be 0");
-
-		// If the asset has already been loaded, just return it
-		auto cacheIter = s_CachedAssets.find(id);
-		if (cacheIter != s_CachedAssets.end() && cacheIter->second.Asset)
-			return cacheIter->second.Asset;
 
 		// Find the import path from the ID
 		std::filesystem::path importPath;
@@ -334,6 +417,7 @@ namespace Mahakam
 		catch (YAML::ParserException e)
 		{
 			MH_CORE_WARN("AssetDatabase encountered exception trying to import yaml file {0}: {1}", importPath.string(), e.msg);
+			return nullptr;
 		}
 
 		// If the asset type has an importer
@@ -341,43 +425,15 @@ namespace Mahakam
 		auto importIter = s_AssetExtensions.find(extension);
 		if (importIter != s_AssetExtensions.end())
 		{
-			return importIter->second->Deserialize(data);
+			Asset<void> asset = importIter->second->Deserialize(data);
+			asset.m_Control->ID = id;
+			asset.IncrementRef();
+
+			return asset.m_Control;
 		}
 
 		return nullptr;
-	};
-
-	//void AssetDatabase::RegisterAsset(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::RegisterAsset, void, AssetDatabase::AssetID id)
-	{
-		if (id)
-		{
-			auto iter = s_CachedAssets.find(id);
-			if (iter != s_CachedAssets.end())
-				iter->second.UseCount++;
-			else
-			{
-				Ref<void> asset = AssetDatabase::LoadAssetFromID(id);
-				s_CachedAssets[id] = { asset, 1 };
-			}
-		}
-	};
-
-	//void AssetDatabase::DeregisterAsset(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::DeregisterAsset, void, AssetDatabase::AssetID id)
-	{
-		if (id)
-		{
-			auto iter = s_CachedAssets.find(id);
-			if (iter != s_CachedAssets.end())
-			{
-				iter->second.UseCount--;
-
-				if (iter->second.UseCount <= 0)
-					s_CachedAssets.erase(iter);
-			}
-		}
-	};
+	}
 
 	void AssetDatabase::RecursiveCacheAssets(const std::filesystem::path& filepath)
 	{

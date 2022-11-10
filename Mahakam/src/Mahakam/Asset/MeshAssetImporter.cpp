@@ -131,17 +131,36 @@ namespace Mahakam
 
 	void MeshAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Mesh> meshAsset = Asset<Mesh>(CreateRef<Mesh>(m_MeshProps));
+		Asset<Mesh> meshAsset;
+
+		switch (m_MeshProps.Primitive)
+		{
+		case MeshPrimitive::Model:
+			meshAsset = Mesh::LoadMesh(filepath, m_MeshProps);
+			break;
+		case MeshPrimitive::Plane:
+			meshAsset = Mesh::Create(SubMesh::CreatePlane(m_MeshProps.Rows, m_MeshProps.Columns), m_MeshProps);
+			break;
+		case MeshPrimitive::Cube:
+			meshAsset = Mesh::Create(SubMesh::CreateCube(m_MeshProps.Rows, m_MeshProps.Invert), m_MeshProps);
+			break;
+		case MeshPrimitive::CubeSphere:
+			meshAsset = Mesh::Create(SubMesh::CreateCubeSphere(m_MeshProps.Rows, m_MeshProps.Invert), m_MeshProps);
+			break;
+		case MeshPrimitive::UVSphere:
+			meshAsset = Mesh::Create(SubMesh::CreateUVSphere(m_MeshProps.Rows, m_MeshProps.Columns), m_MeshProps);
+			break;
+		}
 
 		meshAsset.Save(filepath, importPath);
 
-		AssetDatabase::ReloadAsset(meshAsset.GetID());
+		//AssetDatabase::ReloadAsset(meshAsset.GetID());
 	}
 #endif
 
-	void MeshAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
+	void MeshAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{
-		Ref<Mesh> mesh = StaticCastRef<Mesh>(asset);
+		Asset<Mesh> mesh(asset);
 
 		emitter << YAML::Key << "Materials" << YAML::Value << YAML::BeginSeq;
 		for (auto& material : mesh->Props.Materials)
@@ -171,7 +190,7 @@ namespace Mahakam
 		}
 	}
 
-	Ref<void> MeshAssetImporter::Deserialize(YAML::Node& node)
+	Asset<void> MeshAssetImporter::Deserialize(YAML::Node& node)
 	{
 		MeshProps meshProps;
 
@@ -225,14 +244,15 @@ namespace Mahakam
 
 				return Mesh::LoadMesh(filepath, meshProps);
 			}
+			return nullptr;
 		case MeshPrimitive::Plane:
-			return CreateRef<Mesh>(SubMesh::CreatePlane(meshProps.Rows, meshProps.Columns), meshProps);
+			return Mesh::Create(SubMesh::CreatePlane(meshProps.Rows, meshProps.Columns), meshProps);
 		case MeshPrimitive::Cube:
-			return CreateRef<Mesh>(SubMesh::CreateCube(meshProps.Rows, meshProps.Invert), meshProps);
+			return Mesh::Create(SubMesh::CreateCube(meshProps.Rows, meshProps.Invert), meshProps);
 		case MeshPrimitive::CubeSphere:
-			return CreateRef<Mesh>(SubMesh::CreateCubeSphere(meshProps.Rows, meshProps.Invert), meshProps);
+			return Mesh::Create(SubMesh::CreateCubeSphere(meshProps.Rows, meshProps.Invert), meshProps);
 		case MeshPrimitive::UVSphere:
-			return CreateRef<Mesh>(SubMesh::CreateUVSphere(meshProps.Rows, meshProps.Columns), meshProps);
+			return Mesh::Create(SubMesh::CreateUVSphere(meshProps.Rows, meshProps.Columns), meshProps);
 		}
 
 		return nullptr;

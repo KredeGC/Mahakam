@@ -53,7 +53,7 @@ namespace Mahakam
 		gBuffer->Resize(width, height);
 	}
 
-	bool GeometryRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer> src)
+	bool GeometryRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -94,7 +94,7 @@ namespace Mahakam
 					const uint16_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
 					if (shaderID != lastShaderID)
 					{
-						Ref<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+						Asset<Shader>& shader = sceneData->shaderIDLookup[shaderID];
 						if (!shader->HasShaderPass("GEOMETRY"))
 							continue;
 						lastShaderID = shaderID;
@@ -103,7 +103,7 @@ namespace Mahakam
 
 					// Choose a material
 					const uint16_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-					Ref<Material>& material = sceneData->materialIDLookup[materialID];
+					Asset<Material>& material = sceneData->materialIDLookup[materialID];
 					if (materialID != lastMaterialID)
 					{
 						lastMaterialID = materialID;

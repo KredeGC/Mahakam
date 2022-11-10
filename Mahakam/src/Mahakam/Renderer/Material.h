@@ -57,10 +57,10 @@ namespace Mahakam
 		virtual glm::vec4 GetFloat4(const std::string& name) const = 0;
 
 
-		inline static Ref<Material> Create(Asset<Shader> shader) { return CreateImpl(shader); }
+		inline static Asset<Material> Create(Asset<Shader> shader) { return CreateImpl(shader); }
 		MH_DECLARE_FUNC(Copy, Asset<Material>, Asset<Material> material);
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Ref<Material>, Asset<Shader> shader);
+		MH_DECLARE_FUNC(CreateImpl, Asset<Material>, Asset<Shader> shader);
 	};
 }

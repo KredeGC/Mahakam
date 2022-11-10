@@ -35,12 +35,12 @@ namespace Mahakam
 
 		virtual const TextureProps& GetProps() const = 0;
 
-		inline static Ref<Texture2D> Create(const TextureProps& props = TextureProps()) { return CreateProps(props); }
-		inline static Ref<Texture2D> Create(const std::filesystem::path& filepath, const TextureProps& props = TextureProps()) { return CreateFilepath(filepath, props); }
+		inline static Asset<Texture2D> Create(const TextureProps& props = TextureProps()) { return CreateProps(props); }
+		inline static Asset<Texture2D> Create(const std::filesystem::path& filepath, const TextureProps& props = TextureProps()) { return CreateFilepath(filepath, props); }
 
 	private:
-		MH_DECLARE_FUNC(CreateProps, Ref<Texture2D>, const TextureProps& props);
-		MH_DECLARE_FUNC(CreateFilepath, Ref<Texture2D>, const std::filesystem::path& filepath, const TextureProps& props);
+		MH_DECLARE_FUNC(CreateProps, Asset<Texture2D>, const TextureProps& props);
+		MH_DECLARE_FUNC(CreateFilepath, Asset<Texture2D>, const std::filesystem::path& filepath, const TextureProps& props);
 	};
 
 
@@ -49,7 +49,7 @@ namespace Mahakam
 	public:
 		virtual bool IsCubemap() const override { return false; }
 
-		static Ref<Texture2DArray> Create(const TextureProps& props = TextureProps());
+		static Asset<Texture2DArray> Create(const TextureProps& props = TextureProps());
 	};
 
 
@@ -60,7 +60,7 @@ namespace Mahakam
 
 		virtual uint32_t GetDepth() const = 0;
 
-		static Ref<Texture3D> Create(const std::filesystem::path& filepath, const TextureProps& props = TextureProps());
+		static Asset<Texture3D> Create(const std::filesystem::path& filepath, const TextureProps& props = TextureProps());
 	};
 
 
@@ -71,11 +71,11 @@ namespace Mahakam
 
 		virtual const CubeTextureProps& GetProps() const = 0;
 
-		inline static Ref<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps()) { return CreateProps(props); }
-		inline static Ref<TextureCube> Create(const std::filesystem::path& filepath, const CubeTextureProps& props = CubeTextureProps()) { return CreateFilepath(filepath, props); }
+		inline static Asset<TextureCube> Create(const CubeTextureProps& props = CubeTextureProps()) { return CreateProps(props); }
+		inline static Asset<TextureCube> Create(const std::filesystem::path& filepath, const CubeTextureProps& props = CubeTextureProps()) { return CreateFilepath(filepath, props); }
 		
 	private:
-		MH_DECLARE_FUNC(CreateProps, Ref<TextureCube>, const CubeTextureProps& props);
-		MH_DECLARE_FUNC(CreateFilepath, Ref<TextureCube>, const std::filesystem::path& filepath, const CubeTextureProps& props);
+		MH_DECLARE_FUNC(CreateProps, Asset<TextureCube>, const CubeTextureProps& props);
+		MH_DECLARE_FUNC(CreateFilepath, Asset<TextureCube>, const std::filesystem::path& filepath, const CubeTextureProps& props);
 	};
 }

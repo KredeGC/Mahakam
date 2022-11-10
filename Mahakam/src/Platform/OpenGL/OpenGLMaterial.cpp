@@ -161,7 +161,7 @@ namespace Mahakam
 		//MH_PROFILE_FUNCTION();
 
 		for (auto& [name, texture] : m_Textures)
-			m_Shader->SetTexture(name, texture.RefPtr());
+			m_Shader->SetTexture(name, texture);
 
 		if (uniformBuffer && m_Data && m_DataSize > 0)
 			uniformBuffer->SetData(m_Data, 0, m_DataSize);

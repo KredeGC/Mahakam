@@ -19,8 +19,8 @@ namespace Mahakam
 
 		int m_TextureType = 0;
 
-		Ref<Texture> m_Texture;
-		Ref<FrameBuffer> m_PreviewBuffer;
+		Asset<Texture> m_Texture;
+		Asset<FrameBuffer> m_PreviewBuffer;
 
 	public:
 		TextureAssetImporter();
@@ -34,8 +34,8 @@ namespace Mahakam
 		virtual void OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) override;
 #endif
 
-		virtual void Serialize(YAML::Emitter& emitter, Ref<void> asset) override;
-		virtual Ref<void> Deserialize(YAML::Node& node) override;
+		virtual void Serialize(YAML::Emitter& emitter, Asset<void> asset) override;
+		virtual Asset<void> Deserialize(YAML::Node& node) override;
 
 	private:
 		void CreateTexture(const std::filesystem::path& filepath);

@@ -1,8 +1,10 @@
 #pragma once
+
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include <filesystem>
+#include <functional>
 #include <string>
 
 namespace Mahakam
@@ -14,6 +16,14 @@ namespace Mahakam
 	public:
 		template<typename T>
 		friend class Asset;
+
+		// Basic reference resource policy:
+		// - Ref<T> and Asset<T> are no longer interchangable
+		// - Ref<T> should be used for internal objects that are not assets, like buffers
+		// - Asset<T> should be used for asset objects, like texures
+		// - Having an Asset<T> object means that it is always loaded
+		// - Asset<T> uses a pointer and ID. If the ID is set, it's a saved asset, if not then it's a runtime asset
+		// - A delete function is used in the control block for deleting when no longer used
         
         typedef uint64_t AssetID;
 
@@ -24,22 +34,13 @@ namespace Mahakam
 			std::string Extension = "";
 		};
 
-		// TODO: Find a way to minimize the usage of Ref
-		// Having 2 separate counters seems overkill
-		// Idea for policy:
-		// - Ref<T> and Asset<T> are no longer interchangable
-		// - Ref<T> should be used for internal objects that are not assets, like buffers
-		// - Asset<T> should be used for asset objects, like texures
-		// - Having an Asset<T> object means that it is always loaded
-		// - Having a WeakAsset<T> means that it may be unloaded at any moment
-		// - Calling lock() on a WeakAsset<T> returns an Asset<T>, which ensures it is loaded
-		// - Both Asset<T> and WeakAsset<T> may use a pointer instead of an ID
-		// - WeakAsset<T> can be queried to see whether it has expired()
-		// - A delete function may need to be saved in LiveAsset, since the type is lost
-		struct LiveAsset
+		struct ControlBlock
 		{
-			Ref<void> Asset;
-			int32_t UseCount;
+			// ID 0 is guaranteed to be invalid
+			size_t UseCount;
+			AssetID ID;
+			std::function<void(void*)> DeleteData;
+			void* Ptr;
 		};
 
 	private:
@@ -52,7 +53,7 @@ namespace Mahakam
 
 		inline static AssetMap s_AssetPaths;
 
-		inline static UnorderedMap<AssetID, LiveAsset> s_CachedAssets;
+		inline static UnorderedMap<AssetID, ControlBlock*> s_LoadedAssets;
 
 	public:
 		// Registering asset importers
@@ -73,25 +74,19 @@ namespace Mahakam
 		// Various getters
 		MH_DECLARE_FUNC(GetAssetImportPath, std::filesystem::path, AssetID id); // Gets the import path of a given asset
 		MH_DECLARE_FUNC(GetAssetHandles, const AssetMap&); // Gets a reference to all assets, whether they're currently loaded or not
-		MH_DECLARE_FUNC(GetAssetReferences, uint32_t, AssetID id); // Gets the amount of references to this asset, if any
-		MH_DECLARE_FUNC(GetStrongReferences, uint32_t, AssetID id); // Gets the amount of references to this asset, if any
+		MH_DECLARE_FUNC(GetAssetReferences, size_t, AssetID id); // Gets the amount of references to this asset, if any
 
 		// If you don't want to load the asset first
 		MH_DECLARE_FUNC(ReadAssetInfo, AssetInfo, const std::filesystem::path& importPath); // Gets information about the given asset without loading it
 
 	private:
 		// Saving and loading assets
-		MH_DECLARE_FUNC(SaveAsset, AssetID, Ref<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath);
-		MH_DECLARE_FUNC(LoadAssetFromID, Ref<void>, AssetID id);
+		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, const std::filesystem::path& filepath, const std::filesystem::path& importPath);
 
-		template<typename T>
-		static Ref<T> LoadAsset(AssetID id)
-		{
-			return StaticCastRef<T>(AssetDatabase::LoadAssetFromID(id));
-		}
+		MH_DECLARE_FUNC(IncrementAsset, ControlBlock*, AssetID id);
+		MH_DECLARE_FUNC(UnloadAsset, void, ControlBlock* control);
 
-		MH_DECLARE_FUNC(RegisterAsset, void, AssetID);
-		MH_DECLARE_FUNC(DeregisterAsset, void, AssetID);
+		static ControlBlock* LoadAndIncrementAsset(AssetID id);
 
 		static void RecursiveCacheAssets(const std::filesystem::path& filepath);
 

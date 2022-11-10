@@ -101,7 +101,7 @@ namespace Mahakam
 		offset += accessor.count;
 	}
 
-	void Mesh::GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Ref<Mesh> skinnedMesh)
+	void Mesh::GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Mesh* skinnedMesh)
 	{
 		const tinygltf::Node& node = model.nodes[id];
 
@@ -145,8 +145,8 @@ namespace Mahakam
 			GLTFReadNodeHierarchy(model, nodeIndex, child, id, skinnedMesh);
 	}
 
-	//Ref<Mesh> Mesh::LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props)
-	MH_DEFINE_FUNC(Mesh::LoadMeshImpl, Ref<Mesh>, const std::filesystem::path& filepath, const MeshProps& props)
+	//Asset<Mesh> Mesh::LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props)
+	MH_DEFINE_FUNC(Mesh::LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -186,7 +186,14 @@ namespace Mahakam
 		// TODO: Support sparse data sets
 
 
-		Ref<Mesh> skinnedMesh = CreateRef<Mesh>();
+		Mesh* skinnedMesh = Allocator::Allocate<Mesh>(1);
+		Allocator::Construct<Mesh>(skinnedMesh);
+
+		auto deleter = [](void* p)
+		{
+			Allocator::Deconstruct<Mesh>(static_cast<Mesh*>(p));
+			Allocator::Deallocate<Mesh>(static_cast<Mesh*>(p), 1);
+		};
 
 		skinnedMesh->Props = props;
 
@@ -374,7 +381,7 @@ namespace Mahakam
 			MH_CORE_ASSERT(skinnedMesh->NodeHierarchy.size() == model.nodes.size(), "Node hierarchy doesn't match model");
 		}
 
-		return skinnedMesh;
+		return Asset<Mesh>(skinnedMesh, deleter);
 	};
 
 	//Ref<SubMesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)

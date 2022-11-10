@@ -20,12 +20,12 @@ namespace Mahakam
 		static Ref<SubMesh> staticInvertedCubemapMesh;
 		static Ref<SubMesh> staticCube;
 
-		static Ref<Texture2D> texture2DRed;
-		static Ref<Texture2D> texture2DWhite;
-		static Ref<Texture2D> texture2DBlack;
-		static Ref<Texture2D> texture2DBump;
-		static Ref<TextureCube> textureCubeWhite;
-		static Ref<TextureCube> textureCubeGrey;
+		static Asset<Texture2D> texture2DRed;
+		static Asset<Texture2D> texture2DWhite;
+		static Asset<Texture2D> texture2DBlack;
+		static Asset<Texture2D> texture2DBump;
+		static Asset<TextureCube> textureCubeWhite;
+		static Asset<TextureCube> textureCubeGrey;
 
 	public:
 		static void Init();
@@ -38,12 +38,12 @@ namespace Mahakam
 		MH_DECLARE_FUNC(GetInvertedCube, Ref<SubMesh>);
 		MH_DECLARE_FUNC(GetCube, Ref<SubMesh>);
 
-		MH_DECLARE_FUNC(GetTexture2DRed, Ref<Texture2D>);
-		MH_DECLARE_FUNC(GetTexture2DWhite, Ref<Texture2D>);
-		MH_DECLARE_FUNC(GetTexture2DBlack, Ref<Texture2D>);
-		MH_DECLARE_FUNC(GetTexture2DBump, Ref<Texture2D>);
-		MH_DECLARE_FUNC(GetTextureCubeWhite, Ref<TextureCube>);
-		MH_DECLARE_FUNC(GetTextureCubeGrey, Ref<TextureCube>);
+		MH_DECLARE_FUNC(GetTexture2DRed, Asset<Texture2D>);
+		MH_DECLARE_FUNC(GetTexture2DWhite, Asset<Texture2D>);
+		MH_DECLARE_FUNC(GetTexture2DBlack, Asset<Texture2D>);
+		MH_DECLARE_FUNC(GetTexture2DBump, Asset<Texture2D>);
+		MH_DECLARE_FUNC(GetTextureCubeWhite, Asset<TextureCube>);
+		MH_DECLARE_FUNC(GetTextureCubeGrey, Asset<TextureCube>);
 
 		MH_DECLARE_FUNC(GetGraphicsVendor, const char*);
 

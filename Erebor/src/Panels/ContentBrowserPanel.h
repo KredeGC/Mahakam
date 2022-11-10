@@ -29,8 +29,8 @@ namespace Mahakam::Editor
 		DirectorySet m_Directories;
 		float m_Time = 1.0f;
 
-		Ref<Texture2D> m_DirectoryIcon;
-		Ref<Texture2D> m_FileIcon;
+		Asset<Texture2D> m_DirectoryIcon;
+		Asset<Texture2D> m_FileIcon;
 
 	public:
 		ContentBrowserPanel();

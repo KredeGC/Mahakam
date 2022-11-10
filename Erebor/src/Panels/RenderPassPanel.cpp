@@ -77,7 +77,7 @@ namespace Mahakam::Editor
 		// Show framebuffer combo box
 		DrawComboBox("Framebuffer", frameBufferNames, m_FrameBufferIndex);
 
-		if (auto frameBuffer = frameBuffers.at(frameBufferNames[m_FrameBufferIndex]).lock())
+		if (auto frameBuffer = frameBuffers.at(frameBufferNames[m_FrameBufferIndex]))
 		{
 			auto& spec = frameBuffer->GetSpecification();
 
@@ -116,15 +116,15 @@ namespace Mahakam::Editor
 		}
 	}
 
-	void RenderPassPanel::RenderImage(Ref<FrameBuffer> frameBuffer, int index, bool depth)
+	void RenderPassPanel::RenderImage(Asset<FrameBuffer> frameBuffer, int index, bool depth)
 	{
 		m_ViewportFramebuffer->Bind();
 
 		m_BlitShader->Bind("POSTPROCESSING");
 		if (depth)
-			m_BlitShader->SetTexture("u_Albedo", frameBuffer->GetDepthTexture().RefPtr());
+			m_BlitShader->SetTexture("u_Albedo", frameBuffer->GetDepthTexture());
 		else
-			m_BlitShader->SetTexture("u_Albedo", frameBuffer->GetColorTexture(index).RefPtr());
+			m_BlitShader->SetTexture("u_Albedo", frameBuffer->GetColorTexture(index));
 
 		m_BlitShader->SetUniformInt("u_Depth", depth);
 

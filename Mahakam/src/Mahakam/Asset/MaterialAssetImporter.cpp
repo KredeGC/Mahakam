@@ -288,7 +288,7 @@ namespace Mahakam
 			m_SceneData->UniformValueBuffer->Bind(3);
 
 			// Render the material
-			Ref<FrameBuffer> nullBuffer = nullptr;
+			Asset<FrameBuffer> nullBuffer = nullptr;
 			m_GeometryPass->Render(m_SceneData.get(), nullBuffer);
 			m_LightingPass->Render(m_SceneData.get(), m_GeometryPass->GetFrameBuffer());
 			m_TonemapPass->Render(m_SceneData.get(), m_LightingPass->GetFrameBuffer());
@@ -317,17 +317,22 @@ namespace Mahakam
 
 	void MaterialAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Material> materialAsset = Asset<Material>(m_Material);
+		Asset<Material> materialAsset = Material::Copy(m_Material);
 
 		materialAsset.Save(filepath, importPath);
 
-		AssetDatabase::ReloadAsset(materialAsset.GetID());
+		//AssetDatabase::ReloadAsset(materialAsset.GetID());
+
+		// Reset so we don't keep resources in memory
+		m_ShaderImportPath = "";
+		m_Material = nullptr;
+		SetupMaterialProperties({});
 	}
 #endif
 
-	void MaterialAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
+	void MaterialAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{
-		Ref<Material> material = StaticCastRef<Material>(asset);
+		Asset<Material> material(asset);
 
 		// Shader ID
 		emitter << YAML::Key << "Shader";
@@ -361,7 +366,7 @@ namespace Mahakam
 		emitter << YAML::EndMap;
 	}
 
-	Ref<void> MaterialAssetImporter::Deserialize(YAML::Node& rootNode)
+	Asset<void> MaterialAssetImporter::Deserialize(YAML::Node& rootNode)
 	{
 		Asset<Shader> shader;
 		YAML::Node shaderNode = rootNode["Shader"];
@@ -370,7 +375,7 @@ namespace Mahakam
 
 		if (shader)
 		{
-			Ref<Material> material = Material::Create(shader);
+			Asset<Material> material = Material::Create(shader);
 
 			const UnorderedMap<std::string, ShaderProperty>& properties = shader->GetProperties();
 			YAML::Node propertiesNode = rootNode["Properties"];
@@ -438,11 +443,11 @@ namespace Mahakam
 				defaultString = defaultNode.as<std::string>();
 
 				if (defaultString == "White")
-					return Asset<Texture2D>(GL::GetTexture2DWhite());
+					return GL::GetTexture2DWhite();
 				else if (defaultString == "Black")
-					return Asset<Texture2D>(GL::GetTexture2DBlack());
+					return GL::GetTexture2DBlack();
 				else if (defaultString == "Bump")
-					return Asset<Texture2D>(GL::GetTexture2DBump());
+					return GL::GetTexture2DBump();
 				else
 					MH_CORE_WARN("Could not find default Texture2D of type: {0}", defaultString);
 
@@ -451,9 +456,9 @@ namespace Mahakam
 				defaultString = defaultNode.as<std::string>();
 
 				if (defaultString == "White")
-					return Asset<TextureCube>(GL::GetTextureCubeWhite());
+					return GL::GetTextureCubeWhite();
 				else if (defaultString == "Black")
-					return Asset<TextureCube>(GL::GetTextureCubeWhite());
+					return GL::GetTextureCubeWhite();
 				else
 					MH_CORE_WARN("Could not find default TextureCube of type: {0}", defaultString);
 
@@ -504,11 +509,11 @@ namespace Mahakam
 				defaultString = defaultNode.as<std::string>();
 
 				if (defaultString == "White")
-					m_DefaultTextures[propertyName] = Asset<Texture2D>(GL::GetTexture2DWhite());
+					m_DefaultTextures[propertyName] = GL::GetTexture2DWhite();
 				else if (defaultString == "Black")
-					m_DefaultTextures[propertyName] = Asset<Texture2D>(GL::GetTexture2DBlack());
+					m_DefaultTextures[propertyName] = GL::GetTexture2DBlack();
 				else if (defaultString == "Bump")
-					m_DefaultTextures[propertyName] = Asset<Texture2D>(GL::GetTexture2DBump());
+					m_DefaultTextures[propertyName] = GL::GetTexture2DBump();
 				else
 					MH_CORE_WARN("Could not find default Texture2D of type: {0}", defaultString);
 
@@ -519,9 +524,9 @@ namespace Mahakam
 				defaultString = defaultNode.as<std::string>();
 
 				if (defaultString == "White")
-					m_DefaultTextures[propertyName] = Asset<TextureCube>(GL::GetTextureCubeWhite());
+					m_DefaultTextures[propertyName] = GL::GetTextureCubeWhite();
 				else if (defaultString == "Black")
-					m_DefaultTextures[propertyName] = Asset<TextureCube>(GL::GetTextureCubeWhite());
+					m_DefaultTextures[propertyName] = GL::GetTextureCubeWhite();
 				else
 					MH_CORE_WARN("Could not find default TextureCube of type: {0}", defaultString);
 
@@ -544,8 +549,8 @@ namespace Mahakam
 		{
 			Asset<Shader> shader = m_Material->GetShader();
 
-			m_SceneData->shaderIDLookup[0] = shader.RefPtr();
-			m_SceneData->shaderRefLookup[shader.RefPtr()] = 0;
+			m_SceneData->shaderIDLookup[0] = shader;
+			m_SceneData->shaderRefLookup[shader] = 0;
 
 			m_SceneData->materialIDLookup[0] = m_Material;
 			m_SceneData->materialRefLookup[m_Material] = 0;

@@ -19,7 +19,7 @@ namespace Mahakam
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 
-		pixelationShader = Asset<Shader>(Shader::Create("assets/shaders/external/Pixelation.shader"));
+		pixelationShader = Shader::Create("assets/shaders/external/Pixelation.shader");
 
 		return true;
 	}
@@ -35,7 +35,7 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool PixelationPass::Render(SceneData* sceneData, Ref<FrameBuffer> src)
+	bool PixelationPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -53,8 +53,8 @@ namespace Mahakam
 
 		// HDR Tonemapping
 		pixelationShader->Bind("POSTPROCESSING");
-		pixelationShader->SetTexture("u_Albedo", src->GetColorTexture(0).RefPtr());
-		pixelationShader->SetTexture("u_Depth", src->GetDepthTexture().RefPtr());
+		pixelationShader->SetTexture("u_Albedo", src->GetColorTexture(0));
+		pixelationShader->SetTexture("u_Depth", src->GetDepthTexture());
 
 		GL::EnableZTesting(false);
 		GL::EnableZWriting(false);

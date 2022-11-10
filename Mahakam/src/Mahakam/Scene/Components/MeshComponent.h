@@ -23,7 +23,7 @@ namespace Mahakam
 		}
 
 		MeshComponent(Ref<SubMesh> mesh, Asset<Material> material)
-			: m_SkinnedMesh(CreateRef<Mesh>(mesh, material)) {}
+			: m_SkinnedMesh(CreateAsset<Mesh>(mesh, material)) {}
 
 		inline void SetMesh(Asset<Mesh> skinnedMesh) { m_SkinnedMesh = skinnedMesh; }
 		inline Asset<Mesh> GetMesh() const { return m_SkinnedMesh; }

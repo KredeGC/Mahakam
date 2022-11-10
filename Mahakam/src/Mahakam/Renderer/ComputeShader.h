@@ -19,6 +19,6 @@ namespace Mahakam
 
 		virtual void SetTexture(const std::string& name, Asset<Texture> tex) = 0;
 
-		MH_DECLARE_FUNC(Create, Ref<ComputeShader>, const std::filesystem::path& filepath);
+		MH_DECLARE_FUNC(Create, Asset<ComputeShader>, const std::filesystem::path& filepath);
 	};
 }

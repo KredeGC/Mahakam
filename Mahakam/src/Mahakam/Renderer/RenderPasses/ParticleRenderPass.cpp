@@ -45,7 +45,7 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool ParticleRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer> src)
+	bool ParticleRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -55,7 +55,7 @@ namespace Mahakam
 
 		viewportFramebuffer->Bind();
 
-		Ref<FrameBuffer> gBuffer = Renderer::GetGBuffer();
+		Asset<FrameBuffer> gBuffer = Renderer::GetGBuffer();
 		gBuffer->GetColorTexture(3)->Bind(0);
 		gBuffer->GetDepthTexture()->Bind(1);
 

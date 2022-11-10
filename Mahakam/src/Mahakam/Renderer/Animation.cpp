@@ -1,6 +1,7 @@
 #include "Mahakam/mhpch.h"
 #include "Animation.h"
 
+#include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
@@ -106,6 +107,17 @@ namespace Mahakam
 	//Asset<Animation> Animation::LoadImpl(const std::filesystem::path& filepath)
 	MH_DEFINE_FUNC(Animation::LoadImpl, Asset<Animation>, const std::filesystem::path& filepath, int index)
 	{
-		return Asset<Animation>(CreateRef<Animation>(filepath, index));
+		return CreateAsset<Animation>(filepath, index);
+
+		/*Animation* animation = Allocator::Allocate<Animation>(1);
+		Allocator::Construct<Animation>(animation, filepath, index);
+
+		auto deleter = [](void* p)
+		{
+			Allocator::Deconstruct<Animation>(static_cast<Animation*>(p));
+			Allocator::Deallocate<Animation>(static_cast<Animation*>(p), 1);
+		};
+
+		return Asset<Animation>(animation, deleter);*/
 	};
 }

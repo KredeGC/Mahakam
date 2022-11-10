@@ -117,7 +117,7 @@ namespace Mahakam
 		// Render each render pass
 		s_RendererData->GBuffer = s_RendererData->RenderPasses[0]->GetFrameBuffer();
 
-		Ref<FrameBuffer> prevBuffer = nullptr;
+		Asset<FrameBuffer> prevBuffer = nullptr;
 		for (uint32_t i = 0; i < s_RendererData->RenderPasses.size(); i++)
 		{
 			if (s_RendererData->RenderPasses[i]->Render(s_SceneData, prevBuffer))
@@ -182,11 +182,11 @@ namespace Mahakam
 	};
 
 	//void Renderer::SubmitImpl(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
-	MH_DEFINE_FUNC(Renderer::SubmitImpl, void, const glm::mat4& transform, Ref<SubMesh> mesh, Ref<Material> material)
+	MH_DEFINE_FUNC(Renderer::SubmitImpl, void, const glm::mat4& transform, Ref<SubMesh> mesh, Asset<Material> material)
 	{
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
-		Ref<Shader> shader = material->GetShader().RefPtr();
+		Asset<Shader> shader = material->GetShader();
 		auto shaderIter = s_SceneData->shaderRefLookup.find(shader);
 		if (shaderIter == s_SceneData->shaderRefLookup.end())
 		{
@@ -361,7 +361,7 @@ namespace Mahakam
 	};
 
 	//void Renderer::AddFrameBufferImpl(const std::string& name, WeakRef<FrameBuffer> frameBuffer)
-	MH_DEFINE_FUNC(Renderer::AddFrameBufferImpl, void, const std::string& name, WeakRef<FrameBuffer> frameBuffer)
+	MH_DEFINE_FUNC(Renderer::AddFrameBufferImpl, void, const std::string& name, Asset<FrameBuffer> frameBuffer)
 	{
 		s_RendererData->FrameBuffers[name] = frameBuffer;
 	};
@@ -372,7 +372,7 @@ namespace Mahakam
 		auto iter = s_RendererData->FrameBuffers.begin();
 		while (iter != s_RendererData->FrameBuffers.end())
 		{
-			if (iter->second.expired())
+			if (iter->second.UseCount() == 1) // 2?
 				iter = s_RendererData->FrameBuffers.erase(iter);
 			else
 				iter++;
@@ -382,13 +382,13 @@ namespace Mahakam
 	};
 
 	//Ref<FrameBuffer> Renderer::GetGBufferImpl()
-	MH_DEFINE_FUNC(Renderer::GetGBufferImpl, Ref<FrameBuffer>)
+	MH_DEFINE_FUNC(Renderer::GetGBufferImpl, Asset<FrameBuffer>)
 	{
 		return s_RendererData->GBuffer;
 	};
 
 	//Ref<FrameBuffer> Renderer::GetFrameBufferImpl()
-	MH_DEFINE_FUNC(Renderer::GetFrameBufferImpl, Ref<FrameBuffer>)
+	MH_DEFINE_FUNC(Renderer::GetFrameBufferImpl, Asset<FrameBuffer>)
 	{
 		return s_RendererData->ViewportFramebuffer;
 	};

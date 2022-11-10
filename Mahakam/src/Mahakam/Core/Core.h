@@ -74,19 +74,6 @@
 // Returns a non-capturing lambda which calls fn
 #define MH_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
-// Function declarations which should be reachable in DLLs
-#ifndef MH_STANDALONE
-#define MH_DECLARE_FUNC_LINE2(line, func, returnType, ...) static returnType (*func)(__VA_ARGS__); \
-	inline static uint8_t generated_##line = (::Mahakam::SharedLibrary::AddExportFunction((void**)&func), 0);
-#define MH_DECLARE_FUNC_LINE(line, func, returnType, ...) MH_DECLARE_FUNC_LINE2(line, func, returnType, __VA_ARGS__)
-
-#define MH_DECLARE_FUNC(func, returnType, ...) MH_DECLARE_FUNC_LINE(__LINE__, func, returnType, __VA_ARGS__)
-#define MH_DEFINE_FUNC(func, returnType, ...) returnType (*func)(__VA_ARGS__) = [](__VA_ARGS__) -> returnType
-#else
-#define MH_DECLARE_FUNC(func, returnType, ...) static returnType func(__VA_ARGS__);
-#define MH_DEFINE_FUNC(func, returnType, ...) returnType func(__VA_ARGS__)
-#endif
-
 namespace Mahakam
 {
 	template<typename T, typename Alloc = std::allocator<T>>
@@ -98,10 +85,14 @@ namespace Mahakam
 	template<typename K>
 	using UnorderedSet = std::unordered_set<K>;
 
-	typedef void** FuncPtr;
-
 	template<typename T>
 	using Scope = std::unique_ptr<T>;
+
+	template<typename T>
+	using Ref = std::shared_ptr<T>;
+
+	template<typename T>
+	using WeakRef = std::weak_ptr<T>;
 
 	template<typename T, typename ... Args>
 	constexpr Scope<T> CreateScope(Args&& ... args)
@@ -109,14 +100,23 @@ namespace Mahakam
 		return std::make_unique<T>(std::forward<Args>(args)...);
 	}
 
+	template<typename T, typename ... Args>
+	constexpr Ref<T> CreateRef(Args&& ... args)
+	{
+		return std::allocate_shared<T>(Allocator::GetAllocator<T>(), std::forward<Args>(args)...);
+	}
+
+	template<typename T>
+	constexpr WeakRef<T> CreateWeakRef(const Ref<T>& ref)
+	{
+		return WeakRef<T>(ref);
+	}
+
 	template<typename T, typename T2>
 	constexpr Scope<T> StaticCastScope(Scope<T2> ptr)
 	{
 		return std::static_pointer_cast<T>(ptr);
 	}
-
-	template<typename T>
-	using Ref = std::shared_ptr<T>;
 
 	template<typename T, typename T2>
 	constexpr Ref<T> DynamicCastRef(Ref<T2> ptr)
@@ -128,20 +128,5 @@ namespace Mahakam
 	constexpr Ref<T> StaticCastRef(Ref<T2> ptr)
 	{
 		return std::static_pointer_cast<T>(ptr);
-	}
-
-	template<typename T, typename ... Args>
-	constexpr Ref<T> CreateRef(Args&& ... args)
-	{
-		return std::allocate_shared<T>(Allocator::GetAllocator<T>(), std::forward<Args>(args)...);
-	}
-
-	template<typename T>
-	using WeakRef = std::weak_ptr<T>;
-
-	template<typename T>
-	constexpr WeakRef<T> CreateWeakRef(const Ref<T>& ref)
-	{
-		return WeakRef<T>(ref);
 	}
 }

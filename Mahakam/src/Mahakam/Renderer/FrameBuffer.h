@@ -51,7 +51,7 @@ namespace Mahakam
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		virtual void Blit(Ref<FrameBuffer> dest, bool color = true, bool depth = true) = 0;
+		virtual void Blit(Asset<FrameBuffer> dest, bool color = true, bool depth = true) = 0;
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 
 		virtual const std::vector<Asset<RenderBuffer>>& GetColorBuffers() const = 0;
@@ -65,6 +65,6 @@ namespace Mahakam
 
 		virtual void ReadColorPixels(void* pixels, int attachmentSlot = 0) const = 0;
 
-		MH_DECLARE_FUNC(Create, Ref<FrameBuffer>, const FrameBufferProps& props);
+		MH_DECLARE_FUNC(Create, Asset<FrameBuffer>, const FrameBufferProps& props);
 	};
 }

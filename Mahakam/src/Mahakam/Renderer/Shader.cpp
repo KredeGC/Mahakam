@@ -412,15 +412,15 @@ namespace Mahakam
 		return success;
 	}
 
-	//Ref<Shader> Shader::Create(const std::string& filepath, const std::initializer_list<std::string>& keywords)
-	MH_DEFINE_FUNC(Shader::CreateFilepath, Ref<Shader>, const std::filesystem::path& filepath)
+	//Asset<Shader> Shader::Create(const std::string& filepath, const std::initializer_list<std::string>& keywords)
+	MH_DEFINE_FUNC(Shader::CreateFilepath, Asset<Shader>, const std::filesystem::path& filepath)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			return CreateRef<HeadlessShader>(filepath);
+			return CreateAsset<HeadlessShader>(filepath);
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLShader>(filepath);
+			return CreateAsset<OpenGLShader>(filepath);
 		}
 
 		MH_CORE_BREAK("Unknown renderer API!");

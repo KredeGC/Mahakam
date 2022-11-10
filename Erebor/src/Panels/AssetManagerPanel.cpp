@@ -50,10 +50,6 @@ namespace Mahakam::Editor
 						uint32_t assetCount = AssetDatabase::GetAssetReferences(asset.first);
 						std::string assetCountString = std::to_string(assetCount);
 						ImGui::TextWrapped("Asset references: %s", assetCountString.c_str());
-
-						uint32_t strongCount = AssetDatabase::GetStrongReferences(asset.first);
-						std::string strongCountString = std::to_string(strongCount);
-						ImGui::TextWrapped("Strong references: %s", strongCountString.c_str());
 					}
 				}
 

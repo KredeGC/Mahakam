@@ -371,7 +371,7 @@ namespace Mahakam
 											glm::mat4 transform = boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
 												* index.offset;
 
-											Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount].RefPtr());
+											Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount]);
 										}
 									}
 								}
@@ -389,7 +389,7 @@ namespace Mahakam
 										{
 											const glm::mat4& transform = transformComponent.GetModelMatrix();
 
-											Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount].RefPtr());
+											Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount]);
 										}
 									}
 								}
@@ -400,7 +400,7 @@ namespace Mahakam
 							const glm::mat4& modelMatrix = transformComponent.GetModelMatrix();
 
 							for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
-								Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount].RefPtr());
+								Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
 						}
 					}
 				});

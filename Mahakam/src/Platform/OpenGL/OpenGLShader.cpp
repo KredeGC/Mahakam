@@ -78,7 +78,7 @@ namespace Mahakam
 		return false;
 	}
 
-	void OpenGLShader::SetTexture(const std::string& name, Ref<Texture> tex)
+	void OpenGLShader::SetTexture(const std::string& name, Asset<Texture> tex)
 	{
 		int slot = GetUniformLocation(name);
 		if (slot != -1)

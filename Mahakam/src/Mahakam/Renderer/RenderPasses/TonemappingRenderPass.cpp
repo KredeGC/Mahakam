@@ -44,7 +44,7 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool TonemappingRenderPass::Render(SceneData* sceneData, Ref<FrameBuffer> src)
+	bool TonemappingRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -59,7 +59,7 @@ namespace Mahakam
 
 		// HDR Tonemapping
 		tonemappingShader->Bind("POSTPROCESSING");
-		tonemappingShader->SetTexture("u_Albedo", src->GetColorTexture(0).RefPtr());
+		tonemappingShader->SetTexture("u_Albedo", src->GetColorTexture(0));
 
 		GL::EnableZTesting(false);
 		GL::EnableZWriting(false);

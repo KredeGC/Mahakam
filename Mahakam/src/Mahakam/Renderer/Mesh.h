@@ -38,7 +38,7 @@ namespace Mahakam
 
 		Mesh() = default;
 
-		explicit Mesh(const MeshProps & props) :
+		explicit Mesh(const MeshProps& props) :
 			Props(props) {}
 
 		Mesh(Ref<SubMesh> mesh, Asset<Material> material)
@@ -53,12 +53,26 @@ namespace Mahakam
 			Meshes.push_back(mesh);
 		}
 
-		inline static Ref<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
-		static Asset<Mesh> Copy(Asset<Mesh> copy) { return Asset<Mesh>(CreateRef<Mesh>(*copy.RefPtr())); }
+		inline static Asset<Mesh> Create(const MeshProps& props)
+		{
+			return CreateAsset<Mesh>(props);
+		}
+
+		inline static Asset<Mesh> Create(Ref<SubMesh> subMesh, const MeshProps& props)
+		{
+			return CreateAsset<Mesh>(subMesh, props);
+		}
+
+		inline static Asset<Mesh> Copy(Asset<Mesh> copy)
+		{
+			return CreateAsset<Mesh>(*copy.get());
+		}
+
+		inline static Asset<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
 
 	private:
-		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Ref<Mesh> skinnedMesh);
-		MH_DECLARE_FUNC(LoadMeshImpl, Ref<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
+		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Mesh* skinnedMesh);
+		MH_DECLARE_FUNC(LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
 	};
 
 	class SubMesh

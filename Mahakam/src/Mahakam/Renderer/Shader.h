@@ -44,7 +44,7 @@ namespace Mahakam
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const = 0;
 
-		virtual void SetTexture(const std::string& name, Ref<Texture> tex) = 0;
+		virtual void SetTexture(const std::string& name, Asset<Texture> tex) = 0;
 
 		virtual void SetUniformMat3(const std::string& name, const glm::mat3& value) = 0;
 		virtual void SetUniformMat4(const std::string& name, const glm::mat4& value) = 0;
@@ -61,9 +61,9 @@ namespace Mahakam
 		static bool ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, SourceDefinition>& sources, UnorderedMap<std::string, ShaderProperty>& properties);
 		static bool CompileSPIRV(UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv, const SourceDefinition& source);
 
-		inline static Ref<Shader> Create(const std::filesystem::path& filepath) { return CreateFilepath(filepath); }
+		inline static Asset<Shader> Create(const std::filesystem::path& filepath) { return CreateFilepath(filepath); }
 
 	private:
-		MH_DECLARE_FUNC(CreateFilepath, Ref<Shader>, const std::filesystem::path& filepath);
+		MH_DECLARE_FUNC(CreateFilepath, Asset<Shader>, const std::filesystem::path& filepath);
 	};
 }

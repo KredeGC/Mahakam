@@ -29,21 +29,21 @@ namespace Mahakam
 		m_ShadowShader = Shader::Create("assets/shaders/internal/Shadow.shader");
 	}
 
-	void TexelLightingPass::SetupTextures(SceneData* sceneData, Ref<FrameBuffer> src)
+	void TexelLightingPass::SetupTextures(SceneData* sceneData, Asset<FrameBuffer> src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		m_DeferredShader->Bind("DIRECTIONAL");
-		m_DeferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0).RefPtr());
-		m_DeferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1).RefPtr());
-		m_DeferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3).RefPtr());
-		m_DeferredShader->SetTexture("u_GBuffer4", src->GetColorTexture(4).RefPtr());
-		m_DeferredShader->SetTexture("u_Depth", src->GetDepthTexture().RefPtr());
+		m_DeferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
+		m_DeferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
+		m_DeferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3));
+		m_DeferredShader->SetTexture("u_GBuffer4", src->GetColorTexture(4));
+		m_DeferredShader->SetTexture("u_Depth", src->GetDepthTexture());
 		
 		m_DeferredShader->SetTexture("u_BRDFLUT", m_BRDFLut);
-		m_DeferredShader->SetTexture("u_ShadowMap", m_ShadowFramebuffer->GetDepthTexture().RefPtr());
+		m_DeferredShader->SetTexture("u_ShadowMap", m_ShadowFramebuffer->GetDepthTexture());
 		
-		m_DeferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap.RefPtr());
-		m_DeferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap.RefPtr());
+		m_DeferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap);
+		m_DeferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap);
 	}
 }

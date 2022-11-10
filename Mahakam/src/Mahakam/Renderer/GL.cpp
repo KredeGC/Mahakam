@@ -21,12 +21,12 @@ namespace Mahakam
 	Ref<SubMesh> GL::staticInvertedCubemapMesh;
 	Ref<SubMesh> GL::staticCube;
 	
-	Ref<Texture2D> GL::texture2DRed;
-	Ref<Texture2D> GL::texture2DWhite;
-	Ref<Texture2D> GL::texture2DBlack;
-	Ref<Texture2D> GL::texture2DBump;
-	Ref<TextureCube> GL::textureCubeWhite;
-	Ref<TextureCube> GL::textureCubeGrey;
+	Asset<Texture2D> GL::texture2DRed;
+	Asset<Texture2D> GL::texture2DWhite;
+	Asset<Texture2D> GL::texture2DBlack;
+	Asset<Texture2D> GL::texture2DBump;
+	Asset<TextureCube> GL::textureCubeWhite;
+	Asset<TextureCube> GL::textureCubeGrey;
 
 	void GL::Init()
 	{
@@ -152,37 +152,37 @@ namespace Mahakam
 
 #pragma region Texture
 	//Ref<Texture2D> GL::GetTexture2DRed()
-	MH_DEFINE_FUNC(GL::GetTexture2DRed, Ref<Texture2D>)
+	MH_DEFINE_FUNC(GL::GetTexture2DRed, Asset<Texture2D>)
 	{
 		return texture2DRed;
 	};
 
 	//Ref<Texture2D> GL::GetTexture2DWhite()
-	MH_DEFINE_FUNC(GL::GetTexture2DWhite, Ref<Texture2D>)
+	MH_DEFINE_FUNC(GL::GetTexture2DWhite, Asset<Texture2D>)
 	{
 		return texture2DWhite;
 	};
 
 	//Ref<Texture2D> GL::GetTexture2DBlack()
-	MH_DEFINE_FUNC(GL::GetTexture2DBlack, Ref<Texture2D>)
+	MH_DEFINE_FUNC(GL::GetTexture2DBlack, Asset<Texture2D>)
 	{
 		return texture2DBlack;
 	};
 
 	//Ref<Texture2D> GL::GetTexture2DBump()
-	MH_DEFINE_FUNC(GL::GetTexture2DBump, Ref<Texture2D>)
+	MH_DEFINE_FUNC(GL::GetTexture2DBump, Asset<Texture2D>)
 	{
 		return texture2DBump;
 	};
 
 	//Ref<TextureCube> GL::GetTextureCubeWhite()
-	MH_DEFINE_FUNC(GL::GetTextureCubeWhite, Ref<TextureCube>)
+	MH_DEFINE_FUNC(GL::GetTextureCubeWhite, Asset<TextureCube>)
 	{
 		return textureCubeWhite;
 	};
 
 	//Ref<TextureCube> GL::GetTextureCubeGrey()
-	MH_DEFINE_FUNC(GL::GetTextureCubeGrey, Ref<TextureCube>)
+	MH_DEFINE_FUNC(GL::GetTextureCubeGrey, Asset<TextureCube>)
 	{
 		return textureCubeGrey;
 	};

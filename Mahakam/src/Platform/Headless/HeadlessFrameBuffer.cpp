@@ -23,7 +23,7 @@ namespace Mahakam
 
 	void HeadlessFrameBuffer::Unbind() {}
 
-	void HeadlessFrameBuffer::Blit(Ref<FrameBuffer> dest, bool color, bool depth) {}
+	void HeadlessFrameBuffer::Blit(Asset<FrameBuffer> dest, bool color, bool depth) {}
 
 	void HeadlessFrameBuffer::Resize(uint32_t width, uint32_t height)
 	{

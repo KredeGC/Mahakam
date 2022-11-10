@@ -314,7 +314,7 @@ namespace Mahakam
 
 	void TextureAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Texture> textureAsset = Asset<Texture>(m_Texture);
+		Asset<Texture> textureAsset(m_Texture);
 
 		textureAsset.Save(filepath, importPath);
 
@@ -339,12 +339,11 @@ namespace Mahakam
 	}
 #endif
 
-	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Ref<void> asset)
+	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
 	{
-		Ref<Texture> texture = StaticCastRef<Texture>(asset);
-		Asset<Texture> textureAsset(texture);
+		Asset<Texture> textureAsset(asset);
 
-		if (!texture->IsCubemap())
+		if (!textureAsset->IsCubemap())
 		{
 			Asset<Texture2D> texture2D(textureAsset);
 
@@ -380,7 +379,7 @@ namespace Mahakam
 		}
 	}
 
-	Ref<void> TextureAssetImporter::Deserialize(YAML::Node& node)
+	Asset<void> TextureAssetImporter::Deserialize(YAML::Node& node)
 	{
 		TextureProps props2D;
 		CubeTextureProps propsCube;
