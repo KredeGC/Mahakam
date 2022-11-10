@@ -16,7 +16,7 @@ namespace Mahakam
 
 		AnimatorComponent(Asset<Animation> animation)
 		{
-			animator.SetAnimation(animation);
+			animator.SetAnimation(std::move(animation));
 		}
 
 		operator Animator& () { return animator; }

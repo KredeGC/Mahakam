@@ -55,9 +55,9 @@ namespace Mahakam
 		template<typename ... Args>
 		void DestroyAllEntities();
 
-		void SetSkyboxMaterial(Asset<Material> material) { m_Environment.SkyboxMaterial = material; }
-		void SetSkyboxIrradiance(Asset<TextureCube> irradiance) { m_Environment.IrradianceMap = irradiance; }
-		void SetSkyboxSpecular(Asset<TextureCube> specular) { m_Environment.SpecularMap = specular; }
+		void SetSkyboxMaterial(Asset<Material> material) { m_Environment.SkyboxMaterial = std::move(material); }
+		void SetSkyboxIrradiance(Asset<TextureCube> irradiance) { m_Environment.IrradianceMap = std::move(irradiance); }
+		void SetSkyboxSpecular(Asset<TextureCube> specular) { m_Environment.SpecularMap = std::move(specular); }
 
 		Asset<Material> GetSkyboxMaterial() const { return m_Environment.SkyboxMaterial; }
 		Asset<TextureCube> GetSkyboxIrradiance() const { return m_Environment.IrradianceMap; }

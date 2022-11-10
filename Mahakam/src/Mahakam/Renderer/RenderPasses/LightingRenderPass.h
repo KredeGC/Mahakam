@@ -48,7 +48,7 @@ namespace Mahakam
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 
-		virtual bool Render(SceneData* sceneData, Asset<FrameBuffer> src) override;
+		virtual bool Render(SceneData* sceneData, const Asset<FrameBuffer>& src) override;
 
 		virtual Asset<FrameBuffer> GetFrameBuffer() override { return m_HDRFrameBuffer; };
 
@@ -58,8 +58,8 @@ namespace Mahakam
 		virtual void SetupShaders();
 
 		virtual void RenderShadowMaps(SceneData* sceneData, const Frustum& frustum);
-		virtual void SetupTextures(SceneData* sceneData, Asset<FrameBuffer> src);
-		virtual void RenderLighting(SceneData* sceneData, Asset<FrameBuffer> src);
+		virtual void SetupTextures(SceneData* sceneData, const Asset<FrameBuffer>& src);
+		virtual void RenderLighting(SceneData* sceneData, const Asset<FrameBuffer>& src);
 
 		virtual uint64_t PrePassShadowGeometry(SceneData* sceneData, const Frustum& frustum);
 		virtual void RenderShadowGeometry(SceneData* sceneData, uint64_t* lastShaderID, uint64_t* lastMaterialID, uint64_t* lastMeshID);

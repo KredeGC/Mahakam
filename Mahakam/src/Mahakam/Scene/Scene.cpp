@@ -87,25 +87,25 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/default/Skybox.shader"));
-		m_Environment.SkyboxMaterial = Asset<Material>(Material::Create(skyboxShader));
-		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, Asset<TextureCube>(GL::GetTextureCubeWhite()));
+		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/default/Skybox.shader");
+		m_Environment.SkyboxMaterial = std::move(Material::Create(skyboxShader));
+		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, GL::GetTextureCubeWhite());
 	}
 
 	Scene::Scene(const std::string& filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
-		Asset<Texture> skyboxTexture = Asset<TextureCube>(TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F }));
-		m_Environment.IrradianceMap = Asset<TextureCube>(TextureCube::Create(filepath, { 64, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false }));
-		m_Environment.SpecularMap = Asset<TextureCube>(TextureCube::Create(filepath, { 512, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true }));
+		Asset<Texture> skyboxTexture = TextureCube::Create(filepath, { 4096, TextureFormat::RG11B10F });
+		m_Environment.IrradianceMap = TextureCube::Create(filepath, { 64, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false });
+		m_Environment.SpecularMap = TextureCube::Create(filepath, { 512, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true });
 
 		//skyboxIrradiance = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".irradiance", skyboxTexture, false, TextureCubePrefilter::Convolute, { 64, TextureFormat::RG11B10F, false });
 		//skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
 
-		Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/default/Skybox.shader"));
-		m_Environment.SkyboxMaterial = Asset<Material>(Material::Create(skyboxShader));
-		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
+		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/default/Skybox.shader");
+		m_Environment.SkyboxMaterial = std::move(Material::Create(skyboxShader));
+		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, std::move(skyboxTexture));
 	}
 
 	Scene::~Scene() {}
@@ -426,16 +426,11 @@ namespace Mahakam
 		// In release this is called by EditorLayer.OnWindowResize
 		m_ViewportRatio = (float)width / (float)height;
 
-		auto cameras = m_Registry.view<CameraComponent>();
-		for (auto& entity : cameras)
+		m_Registry.view<CameraComponent>().each([=](CameraComponent& cameraComponent)
 		{
-			CameraComponent& cameraComponent = cameras.get<CameraComponent>(entity);
-
 			if (!cameraComponent.HasFixedAspectRatio())
-			{
 				cameraComponent.GetCamera().SetRatio(m_ViewportRatio);
-			}
-		}
+		});
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)

@@ -34,7 +34,7 @@ namespace Mahakam
 		virtual void BindShader(const std::string& shaderPass) override;
 		virtual void Bind(Ref<UniformBuffer> uniformBuffer) override;
 
-		virtual void SetTexture(const std::string& name, int slot, Asset<Texture> tex) override { m_Textures[name] = tex; }
+		virtual void SetTexture(const std::string& name, int slot, Asset<Texture> tex) override { m_Textures[name] = std::move(tex); }
 
 		virtual void SetMat3(const std::string& name, const glm::mat3& value) override;
 		virtual void SetMat4(const std::string& name, const glm::mat4& value) override;

@@ -44,7 +44,7 @@ namespace Mahakam
 		viewportFramebuffer->Resize(width, height);
 	}
 
-	bool TonemappingRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
+	bool TonemappingRenderPass::Render(SceneData* sceneData, const Asset<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

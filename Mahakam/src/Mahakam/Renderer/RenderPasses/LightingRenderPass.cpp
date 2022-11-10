@@ -67,7 +67,7 @@ namespace Mahakam
 		m_HDRFrameBuffer->Resize(width, height);
 	}
 
-	bool LightingRenderPass::Render(SceneData* sceneData, Asset<FrameBuffer> src)
+	bool LightingRenderPass::Render(SceneData* sceneData, const Asset<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -156,7 +156,7 @@ namespace Mahakam
 		m_ShadowFramebuffer->Unbind();
 	}
 
-	void LightingRenderPass::SetupTextures(SceneData* sceneData, Asset<FrameBuffer> src)
+	void LightingRenderPass::SetupTextures(SceneData* sceneData, const Asset<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
@@ -177,7 +177,7 @@ namespace Mahakam
 			m_DeferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap);
 	}
 
-	void LightingRenderPass::RenderLighting(SceneData* sceneData, Asset<FrameBuffer> src)
+	void LightingRenderPass::RenderLighting(SceneData* sceneData, const Asset<FrameBuffer>& src)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 

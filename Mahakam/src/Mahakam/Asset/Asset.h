@@ -73,6 +73,7 @@ namespace Mahakam
 				m_Control = nullptr;
 		}
 
+#pragma region Copy & Move constructors
 		Asset(const Asset& other) noexcept :
 			m_Control(other.m_Control)
 		{
@@ -87,12 +88,36 @@ namespace Mahakam
 			other.m_Control = nullptr;
 		}
 
+		template<typename T2>
+		Asset(const Asset<T2>& other) noexcept :
+			m_Control(other.m_Control)
+		{
+			// Increment the count
+			IncrementRef();
+		}
+
+		template<typename T2>
+		Asset(Asset<T2>&& other) noexcept :
+			m_Control(other.m_Control)
+		{
+			// Invalidate the other, as it's destructor is still called
+			other.m_Control = nullptr;
+		}
+#pragma endregion
+
 		~Asset()
 		{
 			// Remember to clear on delete
 			DecrementRef();
 		}
 
+		template<typename T2>
+		explicit operator Asset<T2>() const
+		{
+			return Asset<T2>(m_Control);
+		}
+
+#pragma region Copy & Move operators
 		Asset& operator=(const Asset& rhs)
 		{
 			// Remember to clear if we already have something
@@ -114,12 +139,6 @@ namespace Mahakam
 			// Invalidate the rhs, as it's destructor is still called
 			rhs.m_Control = nullptr;
 			return *this;
-		}
-
-		template<typename T2>
-		operator Asset<T2>() const
-		{
-			return Asset<T2>(m_Control);
 		}
 
 		template<typename T2>
@@ -155,6 +174,7 @@ namespace Mahakam
 			m_Control = nullptr;
 			return *this;
 		}
+#pragma endregion
 
 		void Save(const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 		{

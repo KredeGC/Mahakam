@@ -43,14 +43,14 @@ namespace Mahakam
 
 		Mesh(Ref<SubMesh> mesh, Asset<Material> material)
 		{
-			Meshes.push_back(mesh);
-			Props.Materials.push_back(material);
+			Meshes.push_back(std::move(mesh));
+			Props.Materials.push_back(std::move(material));
 		}
 
 		Mesh(Ref<SubMesh> mesh, const MeshProps& props) :
 			Props(props)
 		{
-			Meshes.push_back(mesh);
+			Meshes.push_back(std::move(mesh));
 		}
 
 		inline static Asset<Mesh> Create(const MeshProps& props)

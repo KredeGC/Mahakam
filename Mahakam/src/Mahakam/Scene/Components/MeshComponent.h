@@ -14,18 +14,18 @@ namespace Mahakam
 
 		MeshComponent(const MeshComponent&) = default;
 
-		MeshComponent(Asset<Mesh> skinnedMesh) : m_SkinnedMesh(skinnedMesh) {}
+		MeshComponent(Asset<Mesh> skinnedMesh) : m_SkinnedMesh(std::move(skinnedMesh)) {}
 
-		MeshComponent(Asset<Mesh> skinnedMesh, Asset<Material> material) : m_SkinnedMesh(skinnedMesh)
+		MeshComponent(Asset<Mesh> skinnedMesh, Asset<Material> material) : m_SkinnedMesh(std::move(skinnedMesh))
 		{
 			m_SkinnedMesh->Props.Materials.clear();
-			m_SkinnedMesh->Props.Materials.push_back(material);
+			m_SkinnedMesh->Props.Materials.push_back(std::move(material));
 		}
 
 		MeshComponent(Ref<SubMesh> mesh, Asset<Material> material)
-			: m_SkinnedMesh(CreateAsset<Mesh>(mesh, material)) {}
+			: m_SkinnedMesh(CreateAsset<Mesh>(std::move(mesh), std::move(material))) {}
 
-		inline void SetMesh(Asset<Mesh> skinnedMesh) { m_SkinnedMesh = skinnedMesh; }
+		inline void SetMesh(Asset<Mesh> skinnedMesh) { m_SkinnedMesh = std::move(skinnedMesh); }
 		inline Asset<Mesh> GetMesh() const { return m_SkinnedMesh; }
 		inline bool HasMesh() const { return bool(m_SkinnedMesh); }
 

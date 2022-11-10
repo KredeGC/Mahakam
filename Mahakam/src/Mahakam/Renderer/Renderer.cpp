@@ -206,7 +206,7 @@ namespace Mahakam
 		{
 			materialID = s_SceneData->materialRefLookup.size();
 			s_SceneData->materialRefLookup[material] = materialID;
-			s_SceneData->materialIDLookup[materialID] = material;
+			s_SceneData->materialIDLookup[materialID] = std::move(material);
 		}
 		else
 		{
@@ -220,7 +220,7 @@ namespace Mahakam
 		{
 			meshID = s_SceneData->meshRefLookup.size();
 			s_SceneData->meshRefLookup[mesh] = meshID;
-			s_SceneData->meshIDLookup[meshID] = mesh;
+			s_SceneData->meshIDLookup[meshID] = std::move(mesh);
 		}
 		else
 		{

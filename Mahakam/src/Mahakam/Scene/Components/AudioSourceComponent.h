@@ -26,7 +26,7 @@ namespace Mahakam
 		void Play() { m_Source->Play(); }
 		void Stop() { m_Source->Stop(); }
 
-		void SetSound(Asset<Sound> sound) { m_Source->SetSound(sound); }
+		void SetSound(Asset<Sound> sound) { m_Source->SetSound(std::move(sound)); }
 		Asset<Sound> GetSound() const { return m_Source->GetSound(); }
 
 		void SetInterpolation(bool interpolate) { m_Source->SetInterpolation(interpolate); }

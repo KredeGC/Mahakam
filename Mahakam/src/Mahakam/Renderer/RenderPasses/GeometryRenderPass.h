@@ -15,7 +15,7 @@ namespace Mahakam
 
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 
-		virtual bool Render(SceneData* sceneData, Asset<FrameBuffer> src) override;
+		virtual bool Render(SceneData* sceneData, const Asset<FrameBuffer>& src) override;
 
 		virtual Asset<FrameBuffer> GetFrameBuffer() override { return gBuffer; };
 	};

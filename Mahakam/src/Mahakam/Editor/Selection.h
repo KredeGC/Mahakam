@@ -19,7 +19,7 @@ namespace Mahakam::Editor
         inline static void SetOrbitTarget(const glm::vec3& target) { s_OrbitTarget = target; }
         inline static const glm::vec3& GetOrbitTarget() { return s_OrbitTarget; }
 
-		inline static void SetSelectedEntity(Entity entity) { s_SelectedEntity = entity; }
+		inline static void SetSelectedEntity(Entity entity) { s_SelectedEntity = std::move(entity); }
         inline static Entity GetSelectedEntity()
         {
             if (!s_SelectedEntity)

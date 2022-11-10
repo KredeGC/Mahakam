@@ -63,7 +63,7 @@ namespace Mahakam
 		inline static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment) { MH_PROFILE_FUNCTION(); BeginSceneImpl(cam, transform, environment); }
 		inline static void EndScene() { MH_PROFILE_FUNCTION(); EndSceneImpl(); }
 		
-		inline static void Submit(const glm::mat4& transform, Ref<SubMesh> mesh, Asset<Material> material) { MH_PROFILE_FUNCTION(); SubmitImpl(transform, mesh, material); }
+		inline static void Submit(const glm::mat4& transform, Ref<SubMesh> mesh, Asset<Material> material) { MH_PROFILE_FUNCTION(); SubmitImpl(transform, std::move(mesh), std::move(material)); }
 		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { MH_PROFILE_FUNCTION(); SubmitParticlesImpl(transform, particles); }
 		
 		// Drawing
@@ -82,7 +82,7 @@ namespace Mahakam
 		inline static bool HasGBufferEnabled() { return HasGBufferEnabledImpl(); }
 
 		// Framebuffers
-		inline static void AddFrameBuffer(const std::string& name, Asset<FrameBuffer> frameBuffer) { AddFrameBufferImpl(name, frameBuffer); }
+		inline static void AddFrameBuffer(const std::string& name, Asset<FrameBuffer> frameBuffer) { AddFrameBufferImpl(name, std::move(frameBuffer)); }
 		inline static const FrameBufferMap& GetFrameBuffers() { return GetFrameBuffersImpl(); }
 
 		inline static Asset<FrameBuffer> GetGBuffer() { return GetGBufferImpl(); }

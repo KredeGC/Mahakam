@@ -17,7 +17,7 @@ namespace Mahakam
 
 		inline void AddBoneEntity(Entity entity)
 		{
-			m_BoneEntities.push_back(entity);
+			m_BoneEntities.push_back(std::move(entity));
 		}
 
 		inline void EnableTargetOrigin(bool enable) { m_TargetOrigin = enable; }
