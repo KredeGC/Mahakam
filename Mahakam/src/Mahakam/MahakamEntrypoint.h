@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Mahakam/Mahakam.h>
-#include "Mahakam/Core/EntryPoint.h"
+#include <Mahakam/Core/EntryPoint.h>
 
 #if !defined(MH_STANDALONE_TITLE)
 #define MH_STANDALONE_TITLE "" // Just so VS stops nagging me about this

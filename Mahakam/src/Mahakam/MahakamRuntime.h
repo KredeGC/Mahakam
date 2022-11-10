@@ -2,13 +2,13 @@
 
 #include <Mahakam/Mahakam.h>
 
-#ifdef MH_STANDALONE
+#ifndef MH_ENABLE_DYNAMIC_LINKING
 
 #define MH_EXPORTED
 #define MH_EXTERN_EXPORTED
 #define MH_RUNTIME_LOAD(context, funcPtrs)
 
-#else // MH_STANDALONE
+#else // MH_ENABLE_DYNAMIC_LINKING
 
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef MH_WIN_EXPORT
@@ -37,4 +37,4 @@
 #define MH_RUNTIME_LOAD(context, funcPtrs) ImGui::SetCurrentContext(context); \
 	SharedLibrary::ImportFuncPointers(funcPtrs);
 
-#endif // MH_STANDALONE
+#endif // MH_ENABLE_DYNAMIC_LINKING

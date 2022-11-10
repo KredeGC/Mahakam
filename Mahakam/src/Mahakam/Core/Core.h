@@ -11,6 +11,7 @@
 
 
 #ifndef MH_STANDALONE
+#define MH_ENABLE_DYNAMIC_LINKING // Expose engine functions to dynamically loaded libraries
 #define MH_ENABLE_PROFILING // Enable profiling in builds
 #define MH_ENABLE_RENDER_PROFILING // Enable render profiling in builds
 #ifdef MH_DEBUG
