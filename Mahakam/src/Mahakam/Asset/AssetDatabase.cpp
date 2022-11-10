@@ -22,47 +22,56 @@ namespace Mahakam
 	//void AssetDatabase::RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport)
 	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImporter)
 	{
-		m_AssetImporters[extension] = assetImporter;
-		m_AssetImporters[assetImporter->GetImporterProps().Extension] = assetImporter;
+		s_AssetImporters.insert(assetImporter);
+		s_AssetExtensions[extension] = assetImporter;
+		s_AssetExtensions[assetImporter->GetImporterProps().Extension] = assetImporter;
 	};
 
 	//void AssetDatabase::DeregisterAssetImporter(const std::string& extension)
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterAssetImporter, void, const std::string& extension)
 	{
-		auto iter = m_AssetImporters.find(extension);
-		if (iter != m_AssetImporters.end())
+		auto iter = s_AssetExtensions.find(extension);
+		if (iter != s_AssetExtensions.end())
 		{
 			std::string extension = iter->second->GetImporterProps().Extension;
 			long useCount = iter->second.use_count();
 
-			m_AssetImporters.erase(iter);
+			s_AssetImporters.erase(iter->second);
+			s_AssetExtensions.erase(iter);
 
 			// 2 references should exist at this point, the extension itself and this iterator
 			if (useCount <= 2)
-				m_AssetImporters.erase(extension);
+				s_AssetExtensions.erase(extension);
 		}
 	};
 
 	//void AssetDatabase::DeregisterAllAssetImporters()
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterAllAssetImporters, void) // TODO: Define the function
 	{
-		m_AssetImporters.clear();
+		s_AssetImporters.clear();
+		s_AssetExtensions.clear();
 	};
 
 	//Ref<AssetImporter> AssetDatabase::GetAssetImporter(const std::string& extension)
 	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporter, Ref<AssetImporter>, const std::string& extension)
 	{
-		auto iter = m_AssetImporters.find(extension);
-		if (iter != m_AssetImporters.end())
+		auto iter = s_AssetExtensions.find(extension);
+		if (iter != s_AssetExtensions.end())
 			return iter->second;
 
 		return nullptr;
 	};
 
-	//const AssetDatabase::ImporterMap& AssetDatabase::GetAssetImporters()
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporters, const AssetDatabase::ImporterMap&)
+	//const AssetDatabase::ImporterSet& AssetDatabase::GetAssetImporters()
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporters, const AssetDatabase::ImporterSet&)
 	{
-		return m_AssetImporters;
+		return s_AssetImporters;
+	};
+
+	//const AssetDatabase::ImporterMap& AssetDatabase::GetAssetExtensions()
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetExtensions, const AssetDatabase::ImporterMap&)
+	{
+		return s_AssetExtensions;
 	};
 
 	//void AssetDatabase::LoadDefaultAssetImporters()
@@ -126,12 +135,12 @@ namespace Mahakam
 	//void AssetDatabase::ReloadAsset(AssetDatabase::AssetID id)
 	MH_DEFINE_FUNC(AssetDatabase::ReloadAsset, void, AssetDatabase::AssetID id)
 	{
-		auto pathIter = m_AssetPaths.find(id);
-		if (pathIter == m_AssetPaths.end())
+		auto pathIter = s_AssetPaths.find(id);
+		if (pathIter == s_AssetPaths.end())
 			RefreshAssetImports();
 
-		auto iter = m_CachedAssets.find(id);
-		if (iter != m_CachedAssets.end())
+		auto iter = s_CachedAssets.find(id);
+		if (iter != s_CachedAssets.end())
 		{
 			iter->second.Asset = nullptr;
 			Ref<void> asset = LoadAssetFromID(id);
@@ -150,7 +159,7 @@ namespace Mahakam
 		RefreshAssetImports();
 
 		// Reimport all imported assets
-		for (auto& kv : m_CachedAssets)
+		for (auto& kv : s_CachedAssets)
 		{
 			kv.second.Asset = nullptr;
 			Ref<void> asset = LoadAssetFromID(kv.first);
@@ -161,15 +170,15 @@ namespace Mahakam
 	//void AssetDatabase::RefreshAssetImports()
 	MH_DEFINE_FUNC(AssetDatabase::RefreshAssetImports, void)
 	{
-		m_AssetPaths.clear();
+		s_AssetPaths.clear();
 		RecursiveCacheAssets(FileUtility::IMPORT_PATH);
 	};
 
 	//std::filesystem::path AssetDatabase::GetAssetImportPath(AssetDatabase::AssetID id)
 	MH_DEFINE_FUNC(AssetDatabase::GetAssetImportPath, std::filesystem::path, AssetDatabase::AssetID id)
 	{
-		auto iter = m_AssetPaths.find(id);
-		if (iter != m_AssetPaths.end())
+		auto iter = s_AssetPaths.find(id);
+		if (iter != s_AssetPaths.end())
 			return iter->second;
 
 		return "";
@@ -178,14 +187,14 @@ namespace Mahakam
 	//const AssetDatabase::AssetMap& AssetDatabase::GetAssetHandles()
 	MH_DEFINE_FUNC(AssetDatabase::GetAssetHandles, const AssetDatabase::AssetMap&)
 	{
-		return m_AssetPaths;
+		return s_AssetPaths;
 	};
 
 	//uint32_t AssetDatabase::GetAssetReferences(AssetDatabase::AssetID id)
 	MH_DEFINE_FUNC(AssetDatabase::GetAssetReferences, uint32_t, AssetDatabase::AssetID id)
 	{
-		auto iter = m_CachedAssets.find(id);
-		if (iter != m_CachedAssets.end())
+		auto iter = s_CachedAssets.find(id);
+		if (iter != s_CachedAssets.end())
 			return iter->second.UseCount;
 
 		return 0;
@@ -194,8 +203,8 @@ namespace Mahakam
 	//uint32_t AssetDatabase::GetStrongReferences(AssetDatabase::AssetID id)
 	MH_DEFINE_FUNC(AssetDatabase::GetStrongReferences, uint32_t, AssetDatabase::AssetID id)
 	{
-		auto iter = m_CachedAssets.find(id);
-		if (iter != m_CachedAssets.end())
+		auto iter = s_CachedAssets.find(id);
+		if (iter != s_CachedAssets.end())
 			return iter->second.Asset.use_count();
 
 		return 0;
@@ -262,8 +271,8 @@ namespace Mahakam
 			id = Random::GetRandomID64();
 		}
 
-		auto iter = m_AssetImporters.find(extension);
-		if (iter != m_AssetImporters.end())
+		auto iter = s_AssetExtensions.find(extension);
+		if (iter != s_AssetExtensions.end())
 		{
 			FileUtility::CreateDirectories(importPath.parent_path());
 
@@ -278,7 +287,7 @@ namespace Mahakam
 			emitter << YAML::Key << "Filepath";
 			emitter << YAML::Value << filepathUnix;
 			emitter << YAML::Key << "Extension";
-			emitter << YAML::Value << m_AssetImporters[extension]->GetImporterProps().Extension;
+			emitter << YAML::Value << iter->second->GetImporterProps().Extension;
 			emitter << YAML::Key << "ID";
 			emitter << YAML::Value << id;
 
@@ -301,14 +310,14 @@ namespace Mahakam
 		MH_CORE_ASSERT(id, "Asset ID to be loaded cannot be 0");
 
 		// If the asset has already been loaded, just return it
-		auto cacheIter = m_CachedAssets.find(id);
-		if (cacheIter != m_CachedAssets.end() && cacheIter->second.Asset)
+		auto cacheIter = s_CachedAssets.find(id);
+		if (cacheIter != s_CachedAssets.end() && cacheIter->second.Asset)
 			return cacheIter->second.Asset;
 
 		// Find the import path from the ID
 		std::filesystem::path importPath;
-		auto iter = m_AssetPaths.find(id);
-		if (iter != m_AssetPaths.end())
+		auto iter = s_AssetPaths.find(id);
+		if (iter != s_AssetPaths.end())
 			importPath = iter->second;
 
 		if (!std::filesystem::exists(importPath))
@@ -329,8 +338,8 @@ namespace Mahakam
 
 		// If the asset type has an importer
 		std::string extension = data["Extension"].as<std::string>();
-		auto importIter = m_AssetImporters.find(extension);
-		if (importIter != m_AssetImporters.end())
+		auto importIter = s_AssetExtensions.find(extension);
+		if (importIter != s_AssetExtensions.end())
 		{
 			return importIter->second->Deserialize(data);
 		}
@@ -343,13 +352,13 @@ namespace Mahakam
 	{
 		if (id)
 		{
-			auto iter = m_CachedAssets.find(id);
-			if (iter != m_CachedAssets.end())
+			auto iter = s_CachedAssets.find(id);
+			if (iter != s_CachedAssets.end())
 				iter->second.UseCount++;
 			else
 			{
 				Ref<void> asset = AssetDatabase::LoadAssetFromID(id);
-				m_CachedAssets[id] = { asset, 1 };
+				s_CachedAssets[id] = { asset, 1 };
 			}
 		}
 	};
@@ -359,13 +368,13 @@ namespace Mahakam
 	{
 		if (id)
 		{
-			auto iter = m_CachedAssets.find(id);
-			if (iter != m_CachedAssets.end())
+			auto iter = s_CachedAssets.find(id);
+			if (iter != s_CachedAssets.end())
 			{
 				iter->second.UseCount--;
 
 				if (iter->second.UseCount <= 0)
-					m_CachedAssets.erase(iter);
+					s_CachedAssets.erase(iter);
 			}
 		}
 	};
@@ -397,11 +406,11 @@ namespace Mahakam
 					std::string filepathUnix = directory.path().string();
 					std::replace(filepathUnix.begin(), filepathUnix.end(), '/', seperator);
 
-					auto iter = m_AssetPaths.find(id);
+					auto iter = s_AssetPaths.find(id);
 
-					MH_CORE_ASSERT(iter == m_AssetPaths.end(), "AssetDatabase::RecursiveCacheAssets: Asset with the given ID already exists");
+					MH_CORE_ASSERT(iter == s_AssetPaths.end(), "AssetDatabase::RecursiveCacheAssets: Asset with the given ID already exists");
 
-					m_AssetPaths[id] = filepathUnix;
+					s_AssetPaths[id] = filepathUnix;
 				}
 			}
 		}

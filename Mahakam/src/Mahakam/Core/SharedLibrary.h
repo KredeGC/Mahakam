@@ -15,7 +15,7 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
-		static constexpr int NUM_FUNC_PTRS = 111;
+		static constexpr int NUM_FUNC_PTRS = 112;
 
 	private:
 		std::filesystem::path m_Filepath;

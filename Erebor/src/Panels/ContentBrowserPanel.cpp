@@ -13,16 +13,12 @@ namespace Mahakam::Editor
 		m_DirectoryIcon = Texture2D::Create("internal/icons/icon-directory.png", { TextureFormat::RGBA8 });
 		m_FileIcon = Texture2D::Create("internal/icons/icon-file.png", { TextureFormat::RGBA8 });
 
-		m_RootDir = Allocator::Allocate<DirNode>(1);
-
-		Allocator::Construct<DirNode>(m_RootDir, "assets", nullptr, nullptr);
+		m_RootDir = Allocator::New<DirNode>("assets", nullptr, nullptr);
 	}
 
 	ContentBrowserPanel::~ContentBrowserPanel()
 	{
-		Allocator::Deconstruct(m_RootDir);
-
-		Allocator::Deallocate<DirNode>(m_RootDir, 1);
+		Allocator::Delete<DirNode>(m_RootDir);
 	}
 
 	void ContentBrowserPanel::OnUpdate(Timestep dt)
@@ -86,9 +82,7 @@ namespace Mahakam::Editor
 
 			ClearFileStructure(current);
 
-			Allocator::Deconstruct<DirNode>(current);
-
-			Allocator::Deallocate<DirNode>(current, 1);
+			Allocator::Delete<DirNode>(current);
 
 			current = next;
 		}
@@ -96,8 +90,6 @@ namespace Mahakam::Editor
 
 	void ContentBrowserPanel::CreateFileStructure(DirNode* parent, const std::filesystem::path& path)
 	{
-		auto alloc = Allocator::GetAllocator<DirNode>();
-
 		DirectorySet directories(Allocator::GetAllocator<std::string>());
 
 		// Search the "assets" path
@@ -127,9 +119,7 @@ namespace Mahakam::Editor
 		DirNode* sibling = nullptr;
 		for (auto& dir : directories)
 		{
-			DirNode* node = Allocator::Allocate<DirNode>(1);
-
-			Allocator::Construct<DirNode>(node, dir, nullptr, nullptr);
+			DirNode* node = Allocator::New<DirNode>(dir, nullptr, nullptr);
 
 			if (sibling)
 				sibling->Next = node;
@@ -348,6 +338,33 @@ namespace Mahakam::Editor
 
 				ImGui::EndTable();
 			}
+		}
+		
+		if (ImGui::BeginPopupContextWindow("ContentBrowser Empty RMB", ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
+		{
+			if (ImGui::BeginMenu("Create"))
+			{
+				const auto& importers = AssetDatabase::GetAssetImporters();
+
+				for (const auto& kv : importers)
+				{
+					const auto& props = kv->GetImporterProps();
+					if (props.CreateMenu)
+					{
+						if (ImGui::MenuItem(props.Extension.c_str()))
+						{
+							std::string filename = "Asset" + props.Extension;
+							std::filesystem::path filepath = m_CurrentDirectory / filename;
+							std::filesystem::path importPath = FileUtility::GetImportPath(filepath);
+							ImportWizardPanel::ImportAsset(filepath, props.Extension, importPath);
+						}
+					}
+				}
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndPopup();
 		}
 	}
 }

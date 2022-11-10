@@ -155,23 +155,11 @@ namespace Mahakam
 				}
 			}
 		}
-
-		if (m_Material)
-		{
-			// Setup scene data for the material
-			m_SceneData->shaderRefLookup.clear();
-			m_SceneData->materialRefLookup.clear();
-
-			Asset<Shader> shader = m_Material->GetShader();
-
-			m_SceneData->shaderIDLookup[0] = shader.RefPtr();
-			m_SceneData->shaderRefLookup[shader.RefPtr()] = 0; // This is the culprit, for some reason
-
-			m_SceneData->materialIDLookup[0] = m_Material;
-			m_SceneData->materialRefLookup[m_Material] = 0;
-		}
 		else
 		{
+			m_ShaderImportPath = "";
+			m_Material = nullptr;
+
 			SetupMaterialProperties({});
 		}
 	}
@@ -484,7 +472,7 @@ namespace Mahakam
 
 		m_MaterialProperties = shaderProperties;
 
-
+		// Setup default material properties
 		for (auto& kv : m_MaterialProperties)
 		{
 			std::string propertyName = kv.first;
@@ -543,6 +531,24 @@ namespace Mahakam
 			default:
 				break;
 			}
+		}
+
+		// Setup scene data for the material
+		m_SceneData->shaderIDLookup.clear();
+		m_SceneData->materialIDLookup.clear();
+
+		m_SceneData->shaderRefLookup.clear();
+		m_SceneData->materialRefLookup.clear();
+
+		if (m_Material)
+		{
+			Asset<Shader> shader = m_Material->GetShader();
+
+			m_SceneData->shaderIDLookup[0] = shader.RefPtr();
+			m_SceneData->shaderRefLookup[shader.RefPtr()] = 0;
+
+			m_SceneData->materialIDLookup[0] = m_Material;
+			m_SceneData->materialRefLookup[m_Material] = 0;
 		}
 	}
 }

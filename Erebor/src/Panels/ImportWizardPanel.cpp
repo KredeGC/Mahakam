@@ -14,19 +14,31 @@ namespace Mahakam::Editor
 
 				ImGui::Separator();
 
+				// Draw filepath input
 				if (!importer->GetImporterProps().NoFilepath)
 				{
 					GUI::DrawDragDropField("File path", m_Extension, m_FilePath);
 				}
 
-				std::string importString = m_ImportPath.string();
-				char importBuffer[GUI::MAX_STR_LEN]{ 0 };
-				strncpy(importBuffer, importString.c_str(), importString.size() - 7);
-				if (ImGui::InputText("Import path", importBuffer, GUI::MAX_STR_LEN))
+				// Draw filename input without path/**.extension.import
+				std::string nameString = m_ImportPath.stem().stem().string();
+				char nameBuffer[GUI::MAX_STR_LEN]{ 0 };
+				strncpy(nameBuffer, nameString.c_str(), nameString.size());
+				if (ImGui::InputText("Import filename", nameBuffer, GUI::MAX_STR_LEN))
 				{
-					m_ImportPath = std::string(importBuffer) + ".import";
+					m_ImportPath = m_ImportPath.parent_path() / (std::string(nameBuffer) + importer->GetImporterProps().Extension + ".import");
 				}
 
+				// Draw import path input without the .extension.import
+				std::string importString = (m_ImportPath.parent_path() / m_ImportPath.stem().stem()).string();
+				char importBuffer[GUI::MAX_STR_LEN]{ 0 };
+				strncpy(importBuffer, importString.c_str(), importString.size());
+				if (ImGui::InputText("Import path", importBuffer, GUI::MAX_STR_LEN))
+				{
+					m_ImportPath = std::string(importBuffer) + importer->GetImporterProps().Extension + ".import";
+				}
+
+				// Draw import button
 				if (ImGui::Button("Import"))
 				{
 					Asset<void> asset(m_ImportPath);

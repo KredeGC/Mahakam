@@ -24,6 +24,18 @@ namespace Mahakam
 			std::string Extension = "";
 		};
 
+		// TODO: Find a way to minimize the usage of Ref
+		// Having 2 separate counters seems overkill
+		// Idea for policy:
+		// - Ref<T> and Asset<T> are no longer interchangable
+		// - Ref<T> should be used for internal objects that are not assets, like buffers
+		// - Asset<T> should be used for asset objects, like texures
+		// - Having an Asset<T> object means that it is always loaded
+		// - Having a WeakAsset<T> means that it may be unloaded at any moment
+		// - Calling lock() on a WeakAsset<T> returns an Asset<T>, which ensures it is loaded
+		// - Both Asset<T> and WeakAsset<T> may use a pointer instead of an ID
+		// - WeakAsset<T> can be queried to see whether it has expired()
+		// - A delete function may need to be saved in LiveAsset, since the type is lost
 		struct LiveAsset
 		{
 			Ref<void> Asset;
@@ -33,12 +45,14 @@ namespace Mahakam
 	private:
 		using AssetMap = UnorderedMap<AssetID, std::filesystem::path>;
 		using ImporterMap = UnorderedMap<std::string, Ref<AssetImporter>>;
+		using ImporterSet = UnorderedSet<Ref<AssetImporter>>;
 
-		inline static ImporterMap m_AssetImporters;
+		inline static ImporterSet s_AssetImporters;
+		inline static ImporterMap s_AssetExtensions;
 
-		inline static AssetMap m_AssetPaths;
+		inline static AssetMap s_AssetPaths;
 
-		inline static UnorderedMap<AssetID, LiveAsset> m_CachedAssets;
+		inline static UnorderedMap<AssetID, LiveAsset> s_CachedAssets;
 
 	public:
 		// Registering asset importers
@@ -46,7 +60,8 @@ namespace Mahakam
 		MH_DECLARE_FUNC(DeregisterAssetImporter, void, const std::string& extension); // Deregisters a specific asset importer, given an extension
 		MH_DECLARE_FUNC(DeregisterAllAssetImporters, void); // Removes all currently assigned asset importers
 		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const std::string& extension); // Returns a specific importer, given an extension
-		MH_DECLARE_FUNC(GetAssetImporters, const ImporterMap&); // Returns a map of extensions and their importers
+		MH_DECLARE_FUNC(GetAssetImporters, const ImporterSet&); // Returns a map of importers
+		MH_DECLARE_FUNC(GetAssetExtensions, const ImporterMap&); // Returns a map of extensions and their importers
 		MH_DECLARE_FUNC(LoadDefaultAssetImporters, void); // Load default asset importers
 		MH_DECLARE_FUNC(UnloadDefaultAssetImporters, void); // Unload default asset importers
 
