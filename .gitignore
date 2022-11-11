@@ -8,23 +8,10 @@ Erebor/cache/
 Erebor/profiling/
 Erebor/runtime/
 
-Mahakam/headers/
-
-Mahakam/vendor/assimp/lib/
-Mahakam/vendor/assimp/generated/
-Mahakam/vendor/assimp/CMakeCache.txt
-
-Mahakam/vendor/assimp/code/assimp.dir/
-Mahakam/vendor/assimp/code/Debug/
-Mahakam/vendor/assimp/code/Release/
-
-Mahakam/vendor/assimp/contrib/zlib/zlibstatic.dir/
-Mahakam/vendor/assimp/contrib/zlib/Debug/
-Mahakam/vendor/assimp/contrib/zlib/Release/
-
-# Mahakam files
+# Generated files
 *.log
 *.user
+.make
 Makefile
 Unity-Build.cpp
 Unity-Build.c

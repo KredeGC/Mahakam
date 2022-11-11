@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Mahakam/Asset/Asset.h"
+#include "Mahakam/Core/Core.h"
 
-#include "Mahakam/Container/darray.h"
+#include "Mahakam/Asset/Asset.h"
 
 #include <filesystem>
 #include <string>
@@ -14,11 +14,11 @@ namespace Mahakam
 	private:
 		struct Sampler
 		{
-			darray<float> Timestamps;
+			TrivialArray<float> Timestamps;
 
-			UnorderedMap<int, darray<glm::vec3>> Translations;
-			UnorderedMap<int, darray<glm::quat>> Rotations;
-			UnorderedMap<int, darray<glm::vec3>> Scales;
+			UnorderedMap<int, TrivialArray<glm::vec3>> Translations;
+			UnorderedMap<int, TrivialArray<glm::quat>> Rotations;
+			UnorderedMap<int, TrivialArray<glm::vec3>> Scales;
 		};
 
 		std::filesystem::path m_Filepath;

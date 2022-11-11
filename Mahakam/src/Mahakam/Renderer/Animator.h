@@ -15,7 +15,7 @@ namespace Mahakam
 
 		float m_Time = 0.0f;
 
-		darray<size_t> m_Indices;
+		TrivialArray<size_t> m_Indices;
 
 		UnorderedMap<int, glm::vec3> m_Translations;
 		UnorderedMap<int, glm::quat> m_Rotations;

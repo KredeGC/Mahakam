@@ -35,8 +35,6 @@
 #include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Core/Window.h"
 
-#include "Mahakam/Container/darray.h"
-
 #include "Mahakam/Events/ApplicationEvent.h"
 #include "Mahakam/Events/Event.h"
 #include "Mahakam/Events/KeyEvent.h"

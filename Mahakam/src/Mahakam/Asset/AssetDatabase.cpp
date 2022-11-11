@@ -410,20 +410,19 @@ namespace Mahakam
 		// If the asset type has an importer
 		std::string extension = data["Extension"].as<std::string>();
 		auto importIter = s_AssetExtensions.find(extension);
-		if (importIter != s_AssetExtensions.end())
-		{
-			Asset<void> asset = importIter->second->Deserialize(data);
+		if (importIter == s_AssetExtensions.end())
+			return nullptr;
 
-			if (!asset)
-				return nullptr;
+		// Deserialize the asset using the YAML
+		Asset<void> asset = importIter->second->Deserialize(data);
 
-			asset.m_Control->ID = id;
-			asset.IncrementRef();
+		if (!asset)
+			return nullptr;
 
-			return asset.m_Control;
-		}
+		asset.m_Control->ID = id;
+		asset.IncrementRef();
 
-		return nullptr;
+		return asset.m_Control;
 	}
 
 	void AssetDatabase::RecursiveCacheAssets(const std::filesystem::path& filepath)

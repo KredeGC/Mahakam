@@ -3,6 +3,7 @@
 #include "Allocator.h"
 #include "Mahakam/Version.h"
 
+#include <ktl/containers/trivial_array.h>
 #include <ktl/containers/trivial_vector.h>
 
 #include <memory>
@@ -77,6 +78,9 @@
 
 namespace Mahakam
 {
+	template<typename T, typename Alloc = std::allocator<T>>
+	using TrivialArray = ktl::trivial_array<T, Alloc>;
+
 	template<typename T, typename Alloc = std::allocator<T>>
 	using TrivialVector = ktl::trivial_vector<T, Alloc>;
 

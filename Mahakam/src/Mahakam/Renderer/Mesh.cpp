@@ -8,8 +8,6 @@
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
-#include "Mahakam/Container/darray.h"
-
 #include "Platform/Headless/HeadlessMesh.h"
 #include "Platform/OpenGL/OpenGLMesh.h"
 
@@ -65,7 +63,7 @@ namespace Mahakam
 	}
 
 	template<typename T>
-	void GLTFLoadAttribute(tinygltf::Model& model, tinygltf::Primitive& p, const std::string& attribute, size_t& offset, darray<T>& dst)
+	void GLTFLoadAttribute(tinygltf::Model& model, tinygltf::Primitive& p, const std::string& attribute, size_t& offset, TrivialArray<T>& dst)
 	{
 		auto iter = p.attributes.find(attribute);
 		if (iter == p.attributes.end()) return;
@@ -231,14 +229,14 @@ namespace Mahakam
 			}
 
 			// Setup variables
-			darray<glm::vec3> positions(vertexCount);
-			darray<glm::vec2> texcoords(vertexCount);
-			darray<glm::vec3> normals(vertexCount);
-			darray<glm::vec4> tangents(vertexCount);
-			darray<glm::vec4> colors(vertexCount);
-			darray<glm::ivec4> boneIDs(vertexCount, { -1, -1, -1, -1 });
-			darray<glm::vec4> boneWeights(vertexCount, { 0.0f, 0.0f, 0.0f, 0.0f });
-			darray<uint32_t> indices(indexCount, 0);
+			TrivialArray<glm::vec3> positions(vertexCount);
+			TrivialArray<glm::vec2> texcoords(vertexCount);
+			TrivialArray<glm::vec3> normals(vertexCount);
+			TrivialArray<glm::vec4> tangents(vertexCount);
+			TrivialArray<glm::vec4> colors(vertexCount);
+			TrivialArray<glm::ivec4> boneIDs(vertexCount, { -1, -1, -1, -1 });
+			TrivialArray<glm::vec4> boneWeights(vertexCount, { 0.0f, 0.0f, 0.0f, 0.0f });
+			TrivialArray<uint32_t> indices(indexCount, 0);
 
 			size_t positionOffset = 0;
 			size_t texcoordOffset = 0;
@@ -435,12 +433,11 @@ namespace Mahakam
 			{  0.0f,  0.0f, -1.0f }
 		};
 
-		darray<glm::vec3> positions(vertexCount);
-		darray<glm::vec2> uvs(vertexCount);
-		darray<glm::vec3> normals(vertexCount);
-		darray<glm::vec4> tangents(vertexCount);
-
-		darray<uint32_t> indices(indexCount);
+		TrivialArray<glm::vec3> positions(vertexCount);
+		TrivialArray<glm::vec2> uvs(vertexCount);
+		TrivialArray<glm::vec3> normals(vertexCount);
+		TrivialArray<glm::vec4> tangents(vertexCount);
+		TrivialArray<uint32_t> indices(indexCount);
 
 		int index = 0;
 		int triIndex = 0;
@@ -514,12 +511,11 @@ namespace Mahakam
 		uint32_t vertexCount = rows * columns;
 		uint32_t indexCount = 6 * (rows - 1) * (columns - 1);
 
-		darray<glm::vec3> positions(vertexCount);
-		darray<glm::vec2> uvs(vertexCount);
-		darray<glm::vec3> normals(vertexCount);
-		darray<glm::vec4> tangents(vertexCount);
-
-		darray<uint32_t> indices(indexCount);
+		TrivialArray<glm::vec3> positions(vertexCount);
+		TrivialArray<glm::vec2> uvs(vertexCount);
+		TrivialArray<glm::vec3> normals(vertexCount);
+		TrivialArray<glm::vec4> tangents(vertexCount);
+		TrivialArray<uint32_t> indices(indexCount);
 
 		glm::vec3 upwards = { 0.0f, 1.0f, 0.0f };
 		glm::vec3 axisA(upwards.y, upwards.z, upwards.x);
@@ -577,12 +573,11 @@ namespace Mahakam
 		uint32_t vertexCount = rows * columns;
 		uint32_t indexCount = 6 * (rows - 1) * (columns - 1);
 
-		darray<glm::vec3> positions(vertexCount);
-		darray<glm::vec2> uvs(vertexCount);
-		darray<glm::vec3> normals(vertexCount);
-		darray<glm::vec4> tangents(vertexCount);
-
-		darray<uint32_t> indices(indexCount);
+		TrivialArray<glm::vec3> positions(vertexCount);
+		TrivialArray<glm::vec2> uvs(vertexCount);
+		TrivialArray<glm::vec3> normals(vertexCount);
+		TrivialArray<glm::vec4> tangents(vertexCount);
+		TrivialArray<uint32_t> indices(indexCount);
 
 		glm::vec3 upwards = { 0.0f, 1.0f, 0.0f };
 		glm::vec3 axisA(upwards.y, upwards.z, upwards.x);
@@ -651,12 +646,11 @@ namespace Mahakam
 			{  0.0f,  0.0f, -1.0f }
 		};
 
-		darray<glm::vec3> positions(vertexCount);
-		darray<glm::vec2> uvs(vertexCount);
-		darray<glm::vec3> normals(vertexCount);
-		darray<glm::vec4> tangents(vertexCount);
-
-		darray<uint32_t> indices(indexCount);
+		TrivialArray<glm::vec3> positions(vertexCount);
+		TrivialArray<glm::vec2> uvs(vertexCount);
+		TrivialArray<glm::vec3> normals(vertexCount);
+		TrivialArray<glm::vec4> tangents(vertexCount);
+		TrivialArray<uint32_t> indices(indexCount);
 
 		int index = 0;
 		int triIndex = 0;
