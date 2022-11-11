@@ -145,6 +145,24 @@ namespace Mahakam
 			GLTFReadNodeHierarchy(model, nodeIndex, child, id, skinnedMesh);
 	}
 
+	//Asset<Mesh> Mesh::CreatePropsImpl(const MeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreatePropsImpl, Asset<Mesh>, const MeshProps& props)
+	{
+		return CreateAsset<Mesh>(props);
+	};
+
+	//Asset<Mesh> Mesh::CreateSubMeshImpl(Ref<SubMesh> subMesh, const MeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreateSubMeshImpl, Asset<Mesh>, Ref<SubMesh> subMesh, const MeshProps& props)
+	{
+		return CreateAsset<Mesh>(subMesh, props);
+	};
+
+	//Asset<Mesh> Mesh::CreatePropsImpl(const MeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CopyImpl, Asset<Mesh>, Asset<Mesh> other)
+	{
+		return CreateAsset<Mesh>(*other.get());
+	};
+
 	//Asset<Mesh> Mesh::LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props)
 	MH_DEFINE_FUNC(Mesh::LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props)
 	{

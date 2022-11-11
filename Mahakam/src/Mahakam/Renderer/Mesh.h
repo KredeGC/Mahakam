@@ -53,26 +53,23 @@ namespace Mahakam
 			Meshes.push_back(std::move(mesh));
 		}
 
-		inline static Asset<Mesh> Create(const MeshProps& props)
-		{
-			return CreateAsset<Mesh>(props);
-		}
+		inline static Asset<Mesh> Create(const MeshProps& props) { return CreatePropsImpl(props); }
 
-		inline static Asset<Mesh> Create(Ref<SubMesh> subMesh, const MeshProps& props)
-		{
-			return CreateAsset<Mesh>(subMesh, props);
-		}
+		inline static Asset<Mesh> Create(Ref<SubMesh> subMesh, const MeshProps& props) { return CreateSubMeshImpl(std::move(subMesh), props); }
 
-		inline static Asset<Mesh> Copy(Asset<Mesh> copy)
-		{
-			return CreateAsset<Mesh>(*copy.get());
-		}
+		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
 
 		inline static Asset<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
 
 	private:
 		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Mesh* skinnedMesh);
+
 		MH_DECLARE_FUNC(LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
+
+		MH_DECLARE_FUNC(CreatePropsImpl, Asset<Mesh>, const MeshProps& props);
+		MH_DECLARE_FUNC(CreateSubMeshImpl, Asset<Mesh>, Ref<SubMesh> subMesh, const MeshProps& props);
+
+		MH_DECLARE_FUNC(CopyImpl, Asset<Mesh>, Asset<Mesh> other);
 	};
 
 	class SubMesh
