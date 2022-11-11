@@ -6,7 +6,6 @@
 
 #include <cstddef>
 #include <filesystem>
-#include <functional>
 #include <memory>
 #include <type_traits>
 
@@ -35,15 +34,13 @@ namespace Mahakam
 		Asset(const std::nullptr_t&) :
 			m_Control(nullptr) {}
 
-		explicit Asset(T* value, const std::function<void(void*)>& deleter)
+		explicit Asset(T* value, void (*deleter)(void*))
 		{
 			m_Control = Allocator::Allocate<ControlBlock>(1);
-			Allocator::Construct<ControlBlock>(m_Control);
 
 			m_Control->UseCount = 1;
 			m_Control->ID = 0;
 			m_Control->Ptr = value;
-
 			m_Control->DeleteData = deleter;
 		}
 
@@ -232,19 +229,15 @@ namespace Mahakam
 
 			if (--m_Control->UseCount == 0)
 			{
+				// Remember to erase it from AssetDatabase
 				if (m_Control->ID)
-				{
 					AssetDatabase::UnloadAsset(m_Control);
-				}
-				else
-				{
-					auto destroy = m_Control->DeleteData;
-					if (destroy)
-						destroy(m_Control->Ptr);
 
-					Allocator::Deconstruct<ControlBlock>(m_Control);
-					Allocator::Deallocate<ControlBlock>(m_Control, 1);
-				}
+				auto destroy = m_Control->DeleteData;
+				if (destroy)
+					destroy(m_Control->Ptr);
+
+				Allocator::Deallocate<ControlBlock>(m_Control, 1);
 			}
 		}
 	};

@@ -4,7 +4,6 @@
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include <filesystem>
-#include <functional>
 #include <string>
 
 namespace Mahakam
@@ -39,7 +38,7 @@ namespace Mahakam
 			// ID 0 is guaranteed to be invalid
 			size_t UseCount;
 			AssetID ID;
-			std::function<void(void*)> DeleteData;
+			void (*DeleteData)(void*);
 			void* Ptr;
 		};
 

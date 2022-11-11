@@ -14,7 +14,7 @@ namespace Mahakam
 #endif
 
 	public:
-		inline static void SetActiveScene(Ref<Scene> scene) { s_ActiveScene = scene; }
+		inline static void SetActiveScene(Ref<Scene> scene) { s_ActiveScene = std::move(scene); }
 		inline static Ref<Scene> GetActiveScene() { return s_ActiveScene; }
 
 		inline static void MakeSceneInactive()

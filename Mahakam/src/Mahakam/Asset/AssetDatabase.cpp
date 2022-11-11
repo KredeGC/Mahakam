@@ -46,7 +46,7 @@ namespace Mahakam
 	};
 
 	//void AssetDatabase::DeregisterAllAssetImporters()
-	MH_DEFINE_FUNC(AssetDatabase::DeregisterAllAssetImporters, void) // TODO: Define the function
+	MH_DEFINE_FUNC(AssetDatabase::DeregisterAllAssetImporters, void)
 	{
 		s_AssetImporters.clear();
 		s_AssetExtensions.clear();
@@ -155,7 +155,6 @@ namespace Mahakam
 			iter->second->DeleteData = control->DeleteData;
 
 			// Delete the control block
-			Allocator::Deconstruct<ControlBlock>(control);
 			Allocator::Deallocate<ControlBlock>(control, 1);
 		}
 	};
@@ -185,7 +184,6 @@ namespace Mahakam
 			kv.second->DeleteData = control->DeleteData;
 
 			// Delete the control block
-			Allocator::Deconstruct<ControlBlock>(control);
 			Allocator::Deallocate<ControlBlock>(control, 1);
 		}
 	};
@@ -382,15 +380,6 @@ namespace Mahakam
 		MH_CORE_ASSERT(control->UseCount == 0, "Attempting to unload multiple instances of Asset");
 
 		s_LoadedAssets.erase(control->ID);
-
-		// Destroy the object before deallocating the control block
-		auto destroy = control->DeleteData;
-		if (destroy)
-			destroy(control->Ptr);
-
-		// Delete the control block
-		Allocator::Deconstruct<ControlBlock>(control);
-		Allocator::Deallocate<ControlBlock>(control, 1);
 	};
 
 	AssetDatabase::ControlBlock* AssetDatabase::LoadAndIncrementAsset(AssetID id)
