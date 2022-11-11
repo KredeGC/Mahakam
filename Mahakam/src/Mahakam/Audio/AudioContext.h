@@ -14,6 +14,6 @@ namespace Mahakam
 
 		virtual void UpdateSounds(const glm::mat4& listenerTransform) = 0;
 
-		static AudioContext* Create();
+		static Scope<AudioContext> Create();
 	};
 }

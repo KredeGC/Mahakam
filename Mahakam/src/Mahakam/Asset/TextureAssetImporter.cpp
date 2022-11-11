@@ -314,28 +314,9 @@ namespace Mahakam
 
 	void TextureAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Texture> textureAsset(m_Texture);
+		m_Texture.Save(filepath, importPath);
 
-		textureAsset.Save(filepath, importPath);
-
-		AssetDatabase::ReloadAsset(textureAsset.GetID());
-
-		/*if (m_TextureType == 0)
-		{
-			Asset<Texture2D> texture = Texture2D::Create(filepath.string(), m_Props2D);
-
-			texture.Save(filepath, importPath);
-
-			AssetDatabase::ReloadAsset(texture.GetID());
-		}
-		else
-		{
-			Asset<TextureCube> texture = TextureCube::Create(filepath.string(), m_PropsCube);
-
-			texture.Save(filepath, importPath);
-
-			AssetDatabase::ReloadAsset(texture.GetID());
-		}*/
+		m_Texture = nullptr;
 	}
 #endif
 

@@ -39,7 +39,7 @@ namespace Mahakam
 		if (asset && info.Filepath == filepath)
 		{
 			// If the sound already exists, just update some parameters and save
-			Asset<Sound> sound(asset);
+			Asset<Sound> sound(std::move(asset));
 
 			sound->SetProps(m_Props);
 

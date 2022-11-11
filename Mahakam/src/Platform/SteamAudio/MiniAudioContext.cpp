@@ -2,15 +2,16 @@
 #include "MiniAudioContext.h"
 #include "MiniAudioSource.h"
 
+#include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Log.h"
 
 #include <algorithm>
 
 namespace Mahakam
 {
-	AudioContext* AudioContext::Create()
+	Scope<AudioContext> AudioContext::Create()
 	{
-		return new MiniAudioContext();
+		return CreateScope<MiniAudioContext>();
 	}
 
 	MiniAudioContext::MiniAudioContext()

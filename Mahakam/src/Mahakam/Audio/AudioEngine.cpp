@@ -3,27 +3,29 @@
 
 #include "AudioContext.h"
 
+#include "Mahakam/Core/Allocator.h"
+
 namespace Mahakam
 {
-	AudioContext* AudioEngine::m_Context;
+	Scope<AudioContext> AudioEngine::s_Context;
 
 	void AudioEngine::Init()
 	{
-		m_Context = AudioContext::Create();
+		s_Context = AudioContext::Create();
 	}
 
 	void AudioEngine::Shutdown()
 	{
-		delete m_Context;
+		s_Context = nullptr;
 	}
 
 	MH_DEFINE_FUNC(AudioEngine::UpdateSoundsImpl, void, const glm::mat4& listenerTransform)
 	{
-		m_Context->UpdateSounds(listenerTransform);
+		s_Context->UpdateSounds(listenerTransform);
 	};
 
 	MH_DEFINE_FUNC(AudioEngine::GetContextImpl, AudioContext*)
 	{
-		return m_Context;
+		return s_Context.get();
 	};
 }

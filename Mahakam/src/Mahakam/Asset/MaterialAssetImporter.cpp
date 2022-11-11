@@ -317,11 +317,9 @@ namespace Mahakam
 
 	void MaterialAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Material> materialAsset = Material::Copy(m_Material);
+		m_Material.Save(filepath, importPath);
 
-		materialAsset.Save(filepath, importPath);
-
-		//AssetDatabase::ReloadAsset(materialAsset.GetID());
+		//AssetDatabase::ReloadAsset(m_Material.GetID());
 
 		// Reset so we don't keep resources in memory
 		m_ShaderImportPath = "";

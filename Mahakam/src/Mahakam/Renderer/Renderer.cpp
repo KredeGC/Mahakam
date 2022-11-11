@@ -184,9 +184,12 @@ namespace Mahakam
 	//void Renderer::SubmitImpl(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
 	MH_DEFINE_FUNC(Renderer::SubmitImpl, void, const glm::mat4& transform, Ref<SubMesh> mesh, Asset<Material> material)
 	{
+		if (!material) return;
+		Asset<Shader> shader = material->GetShader();
+		if (!shader) return;
+
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
-		Asset<Shader> shader = material->GetShader();
 		auto shaderIter = s_SceneData->shaderRefLookup.find(shader);
 		if (shaderIter == s_SceneData->shaderRefLookup.end())
 		{

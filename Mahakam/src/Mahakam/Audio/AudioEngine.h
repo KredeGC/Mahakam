@@ -18,7 +18,7 @@ namespace Mahakam
 	class AudioEngine
 	{
 	private:
-		static AudioContext* m_Context;
+		static Scope<AudioContext> s_Context;
 
 	public:
 		static void Init();

@@ -282,96 +282,94 @@ namespace Mahakam
 			id = Random::GetRandomID64();
 		}
 
+		// If no importer exists with this extension
 		auto iter = s_AssetExtensions.find(extension);
-		if (iter != s_AssetExtensions.end())
+		if (iter == s_AssetExtensions.end())
+			return nullptr;
+
+		// Create the import directory, if it doesn't exist
+		FileUtility::CreateDirectories(importPath.parent_path());
+
+		// Serialize the asset
+		YAML::Emitter emitter;
+		emitter << YAML::BeginMap;
+
+		char seperator = std::filesystem::path::preferred_separator;
+
+		std::string filepathUnix = filepath.string();
+		std::replace(filepathUnix.begin(), filepathUnix.end(), seperator, '/');
+
+		emitter << YAML::Key << "Filepath";
+		emitter << YAML::Value << filepathUnix;
+		emitter << YAML::Key << "Extension";
+		emitter << YAML::Value << iter->second->GetImporterProps().Extension;
+		emitter << YAML::Key << "ID";
+		emitter << YAML::Value << id;
+
+		Asset<void> asset(control);
+
+		iter->second->Serialize(emitter, asset);
+
+		emitter << YAML::EndMap;
+
+		std::ofstream filestream(importPath);
+		filestream << emitter.c_str();
+
+		auto controlIter = s_LoadedAssets.find(id);
+		if (controlIter != s_LoadedAssets.end())
 		{
-			FileUtility::CreateDirectories(importPath.parent_path());
+			ControlBlock* loadedControl = controlIter->second;
 
-			YAML::Emitter emitter;
-			emitter << YAML::BeginMap;
-
-			char seperator = std::filesystem::path::preferred_separator;
-
-			std::string filepathUnix = filepath.string();
-			std::replace(filepathUnix.begin(), filepathUnix.end(), seperator, '/');
-
-			emitter << YAML::Key << "Filepath";
-			emitter << YAML::Value << filepathUnix;
-			emitter << YAML::Key << "Extension";
-			emitter << YAML::Value << iter->second->GetImporterProps().Extension;
-			emitter << YAML::Key << "ID";
-			emitter << YAML::Value << id;
-
-			Asset<void> asset(control);
-
-			iter->second->Serialize(emitter, asset);
-
-			emitter << YAML::EndMap;
-
-			std::ofstream filestream(importPath);
-			filestream << emitter.c_str();
-
-			auto controlIter = s_LoadedAssets.find(id);
-			if (controlIter != s_LoadedAssets.end())
+			// If the control block is different, then copy and invalidate
+			if (loadedControl != control)
 			{
-				ControlBlock* loadedControl = controlIter->second;
+				// Increment the UseCount
+				loadedControl->UseCount++;
 
-				// If the control block is different, then copy and invalidate
-				if (loadedControl != control)
-				{
-					// Increment the UseCount
-					loadedControl->UseCount++;
+				// Delete our previous data
+				auto destroy = loadedControl->DeleteData;
+				destroy(loadedControl->Ptr);
 
-					// Delete our previous data
-					auto destroy = loadedControl->DeleteData;
-					destroy(loadedControl->Ptr);
+				// Move the pointer and destructor to the existing control block
+				loadedControl->Ptr = control->Ptr;
+				loadedControl->DeleteData = std::move(control->DeleteData);
 
-					// Move the pointer and destructor to the existing control block
-					loadedControl->Ptr = control->Ptr;
-					loadedControl->DeleteData = std::move(control->DeleteData);
-
-					control->Ptr = nullptr;
-					control->DeleteData = nullptr;
-				}
-
-				return loadedControl;
+				control->Ptr = nullptr;
+				control->DeleteData = nullptr;
 			}
-			else
-			{
-				control->ID = id;
 
-				s_LoadedAssets[id] = control;
-
-				return control;
-			}
+			return loadedControl;
 		}
+		else
+		{
+			control->ID = id;
 
-		return nullptr;
+			s_LoadedAssets[id] = control;
+
+			return control;
+		}
 	};
 
 	//AssetDatabase::ControlBlock* AssetDatabase::IncrementAsset(AssetDatabase::AssetID id)
 	MH_DEFINE_FUNC(AssetDatabase::IncrementAsset, AssetDatabase::ControlBlock*, AssetDatabase::AssetID id)
 	{
-		if (id)
+		MH_CORE_ASSERT(id, "Attempting to load an Asset with id 0");
+
+		auto iter = s_LoadedAssets.find(id);
+		if (iter != s_LoadedAssets.end())
 		{
-			auto iter = s_LoadedAssets.find(id);
-			if (iter != s_LoadedAssets.end())
-			{
-				iter->second->UseCount++;
+			iter->second->UseCount++;
 
-				return iter->second;
-			}
-			else
-			{
-				ControlBlock* control = LoadAndIncrementAsset(id);
-
-				s_LoadedAssets[id] = control;
-
-				return control;
-			}
+			return iter->second;
 		}
+		else
+		{
+			ControlBlock* control = LoadAndIncrementAsset(id);
 
-		return nullptr;
+			s_LoadedAssets[id] = control;
+
+			return control;
+		}
 	};
 
 	//void AssetDatabase::DecrementAsset(ControlBlock* control)
@@ -415,6 +413,10 @@ namespace Mahakam
 		if (importIter != s_AssetExtensions.end())
 		{
 			Asset<void> asset = importIter->second->Deserialize(data);
+
+			if (!asset)
+				return nullptr;
+
 			asset.m_Control->ID = id;
 			asset.IncrementRef();
 
@@ -452,8 +454,8 @@ namespace Mahakam
 					std::replace(filepathUnix.begin(), filepathUnix.end(), '/', seperator);
 
 					auto iter = s_AssetPaths.find(id);
-
-					MH_CORE_ASSERT(iter == s_AssetPaths.end(), "AssetDatabase::RecursiveCacheAssets: Asset with the given ID already exists");
+					if (iter != s_AssetPaths.end())
+						MH_CORE_WARN("Attempting to load multiple Assets with ID {0} at {1} and {2}", id, iter->second.string(), filepathUnix);
 
 					s_AssetPaths[id] = filepathUnix;
 				}

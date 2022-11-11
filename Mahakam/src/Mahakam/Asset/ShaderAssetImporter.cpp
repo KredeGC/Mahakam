@@ -26,8 +26,6 @@ namespace Mahakam
 		Asset<Shader> shaderAsset = Shader::Create(filepath.string());
 
 		shaderAsset.Save(filepath, importPath);
-
-		AssetDatabase::ReloadAsset(shaderAsset.GetID());
 	}
 #endif
 

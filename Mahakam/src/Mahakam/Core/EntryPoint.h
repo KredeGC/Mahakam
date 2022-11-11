@@ -26,6 +26,10 @@ int main(int argc, char** argv)
 	FreeConsole();
 #endif
 
+	Mahakam::Log::Init();
+	MH_CORE_INFO("Logging initialized");
+	MH_INFO("Logging initialized");
+
 	if (argc > 1)
 	{
 		if (strcmp(argv[1], "--headless") == 0)
@@ -34,11 +38,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	Mahakam::Log::Init();
-	MH_CORE_INFO("Logging initialized");
-	MH_INFO("Logging initialized");
-
-#ifndef MH_STANDALONE
+#ifdef MH_ENABLE_PROFILING
 	Mahakam::FileUtility::CreateDirectories("profiling/");
 #endif
 
@@ -56,6 +56,8 @@ int main(int argc, char** argv)
 	MH_INFO("Logging uninitialized");
 
 	Mahakam::Log::Shutdown();
+
+	return 0;
 }
 
 #endif
