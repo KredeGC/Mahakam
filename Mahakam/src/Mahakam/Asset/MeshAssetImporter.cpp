@@ -18,6 +18,9 @@ namespace Mahakam
 	{
 		m_MeshProps = {};
 
+		if (!node.valid())
+			return;
+
 		if (node.has_child("Primitive"))
 		{
 			int primitive;

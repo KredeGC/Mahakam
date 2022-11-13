@@ -57,7 +57,7 @@ namespace Mahakam
 
 #ifndef MH_STANDALONE
 		// Preview stuff
-		m_PreviewSphereMesh = SubMesh::CreateUVSphere(20, 20);
+		m_PreviewSphereMesh = SubMesh::CreateUVSphere(40, 20);
 
 		m_PreviewCamera = Camera(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.03f, 5.0f);
 

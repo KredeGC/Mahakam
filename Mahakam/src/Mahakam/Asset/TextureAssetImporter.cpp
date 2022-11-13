@@ -29,62 +29,65 @@ namespace Mahakam
 		m_Props2D = TextureProps{};
 		m_PropsCube = CubeTextureProps{};
 
-		int enumInt;
-
-		m_TextureType = 0;
-		if (node.has_child("Type"))
-			node["Type"] >> m_TextureType;
-
-		if (node.has_child("Format"))
+		if (node.valid())
 		{
-			node["Format"] >> enumInt;
-			if (m_TextureType == 0)
-				m_Props2D.Format = (TextureFormat)enumInt;
-			else
-				m_PropsCube.Format = (TextureFormat)enumInt;
-		}
+			int enumInt;
 
-		if (node.has_child("Filter"))
-		{
-			node["Filter"] >> enumInt;
-			if (m_TextureType == 0)
-				m_Props2D.FilterMode = (TextureFilter)enumInt;
-			else
-				m_PropsCube.FilterMode = (TextureFilter)enumInt;
-		}
+			m_TextureType = 0;
+			if (node.has_child("Type"))
+				node["Type"] >> m_TextureType;
 
-		if (m_TextureType == 0)
-		{
-			if (node.has_child("WrapX"))
+			if (node.has_child("Format"))
 			{
-				node["WrapX"] >> enumInt;
-				m_Props2D.WrapX = (TextureWrapMode)enumInt;
+				node["Format"] >> enumInt;
+				if (m_TextureType == 0)
+					m_Props2D.Format = (TextureFormat)enumInt;
+				else
+					m_PropsCube.Format = (TextureFormat)enumInt;
 			}
 
-			if (node.has_child("WrapY"))
+			if (node.has_child("Filter"))
 			{
-				node["WrapY"] >> enumInt;
-				m_Props2D.WrapY = (TextureWrapMode)enumInt;
+				node["Filter"] >> enumInt;
+				if (m_TextureType == 0)
+					m_Props2D.FilterMode = (TextureFilter)enumInt;
+				else
+					m_PropsCube.FilterMode = (TextureFilter)enumInt;
 			}
-		}
-		else
-		{
-			if (node.has_child("Resolution"))
-				node["Resolution"] >> m_PropsCube.Resolution;
 
-			if (node.has_child("Prefilter"))
-			{
-				node["Prefilter"] >> enumInt;
-				m_PropsCube.Prefilter = (TextureCubePrefilter)enumInt;
-			}
-		}
-
-		if (node.has_child("Mipmaps"))
-		{
 			if (m_TextureType == 0)
-				node["Mipmaps"] >> m_Props2D.Mipmaps;
+			{
+				if (node.has_child("WrapX"))
+				{
+					node["WrapX"] >> enumInt;
+					m_Props2D.WrapX = (TextureWrapMode)enumInt;
+				}
+
+				if (node.has_child("WrapY"))
+				{
+					node["WrapY"] >> enumInt;
+					m_Props2D.WrapY = (TextureWrapMode)enumInt;
+				}
+			}
 			else
-				node["Mipmaps"] >> m_PropsCube.Mipmaps;
+			{
+				if (node.has_child("Resolution"))
+					node["Resolution"] >> m_PropsCube.Resolution;
+
+				if (node.has_child("Prefilter"))
+				{
+					node["Prefilter"] >> enumInt;
+					m_PropsCube.Prefilter = (TextureCubePrefilter)enumInt;
+				}
+			}
+
+			if (node.has_child("Mipmaps"))
+			{
+				if (m_TextureType == 0)
+					node["Mipmaps"] >> m_Props2D.Mipmaps;
+				else
+					node["Mipmaps"] >> m_PropsCube.Mipmaps;
+			}
 		}
 
 		if (m_TextureType == 0)
