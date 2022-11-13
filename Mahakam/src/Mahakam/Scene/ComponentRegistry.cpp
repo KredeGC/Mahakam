@@ -18,8 +18,10 @@
 
 #include "Mahakam/Serialization/YAMLSerialization.h"
 
-#define MH_DESERIALIZE_NODE(type, variable, name) type variable; \
-	if (node.has_child(name)) node[name] >> variable;
+#define MH_DESERIALIZE_NODE(func, type, name) if (node.has_child(name)) { \
+	type value; \
+	node[name] >> value; \
+	func; }
 
 namespace Mahakam
 {
@@ -64,14 +66,9 @@ namespace Mahakam
 		{
 			TransformComponent& transform = entity.AddComponent<TransformComponent>();
 
-			MH_DESERIALIZE_NODE(glm::vec3, pos, "Translation");
-			transform.SetPosition(pos);
-
-			MH_DESERIALIZE_NODE(glm::quat, rot, "Rotation");
-			transform.SetRotation(rot);
-
-			MH_DESERIALIZE_NODE(glm::vec3, scale, "Scale");
-			transform.SetScale(scale);
+			MH_DESERIALIZE_NODE(transform.SetPosition(value), glm::vec3, "Translation");
+			MH_DESERIALIZE_NODE(transform.SetRotation(value), glm::quat, "Rotation");
+			MH_DESERIALIZE_NODE(transform.SetScale(value), glm::vec3, "Scale");
 
 			return true;
 		};
@@ -112,16 +109,19 @@ namespace Mahakam
 		{
 			AudioSourceComponent& source = entity.AddComponent<AudioSourceComponent>();
 
-			MH_DESERIALIZE_NODE(uint64_t, assetID, "Sound");
-			Asset<Sound> sound = Asset<Sound>(assetID);
-			if (sound)
+			if (node.has_child("Sound"))
 			{
-				source.SetSound(sound);
-				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
+				uint64_t assetID;
+				node["Sound"] >> assetID;
+				Asset<Sound> sound = Asset<Sound>(assetID);
+				if (sound)
+				{
+					source.SetSound(sound);
+					source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
+				}
 			}
 
-			MH_DESERIALIZE_NODE(float, blend, "SpatialBlend");
-			source.SetSpatialBlend(blend);
+			MH_DESERIALIZE_NODE(source.SetSpatialBlend(value), float, "SpatialBlend");
 
 			return true;
 		};
@@ -153,26 +153,13 @@ namespace Mahakam
 			CameraComponent& cameraComponent = entity.AddComponent<CameraComponent>();
 			Camera& camera = cameraComponent;
 
-			MH_DESERIALIZE_NODE(int, projection, "Projection");
-			camera.SetProjectionType((Camera::ProjectionType)projection);
-
-			MH_DESERIALIZE_NODE(float, fov, "FOV");
-			camera.SetFov(fov);
-
-			MH_DESERIALIZE_NODE(float, nearZ, "NearZ");
-			camera.SetNearPlane(nearZ);
-
-			MH_DESERIALIZE_NODE(float, farZ, "FarZ");
-			camera.SetFarPlane(farZ);
-
-			MH_DESERIALIZE_NODE(float, size, "Size");
-			camera.SetSize(size);
-
-			MH_DESERIALIZE_NODE(float, ratio, "Ratio");
-			camera.SetRatio(ratio);
-
-			MH_DESERIALIZE_NODE(float, fixed, "FixedRatio");
-			cameraComponent.SetFixedAspectRatio(ratio);
+			MH_DESERIALIZE_NODE(camera.SetProjectionType((Camera::ProjectionType)value), int, "Projection");
+			MH_DESERIALIZE_NODE(camera.SetFov(value), float, "FOV");
+			MH_DESERIALIZE_NODE(camera.SetNearPlane(value), float, "NearZ");
+			MH_DESERIALIZE_NODE(camera.SetFarPlane(value), float, "FarZ");
+			MH_DESERIALIZE_NODE(camera.SetSize(value), float, "Size");
+			MH_DESERIALIZE_NODE(camera.SetRatio(value), float, "Ratio");
+			MH_DESERIALIZE_NODE(cameraComponent.SetFixedAspectRatio(value), float, "FixedRatio");
 
 			return true;
 		};
@@ -201,23 +188,12 @@ namespace Mahakam
 		{
 			Light& light = entity.AddComponent<LightComponent>();
 
-			MH_DESERIALIZE_NODE(int, type, "LightType");
-			light.SetLightType((Light::LightType)type);
-
-			MH_DESERIALIZE_NODE(float, range, "Range");
-			light.SetRange(range);
-
-			MH_DESERIALIZE_NODE(float, fov, "FOV");
-			light.SetFov(fov);
-
-			MH_DESERIALIZE_NODE(glm::vec3, color, "Color");
-			light.SetColor(color);
-
-			MH_DESERIALIZE_NODE(bool, shadowCasting, "ShadowCasting");
-			light.SetShadowCasting(shadowCasting);
-
-			MH_DESERIALIZE_NODE(float, shadowBias, "ShadowBias");
-			light.SetBias(shadowBias);
+			MH_DESERIALIZE_NODE(light.SetLightType((Light::LightType)value), int, "LightType");
+			MH_DESERIALIZE_NODE(light.SetRange(value), float, "Range");
+			MH_DESERIALIZE_NODE(light.SetFov(value), float, "FOV");
+			MH_DESERIALIZE_NODE(light.SetColor(value), glm::vec3, "Color");
+			MH_DESERIALIZE_NODE(light.SetShadowCasting(value), bool, "ShadowCasting");
+			MH_DESERIALIZE_NODE(light.SetBias(value), float, "ShadowBias");
 
 			return true;
 		};
@@ -299,7 +275,7 @@ namespace Mahakam
 				boneEntities.reserve(nodes.num_children());
 				uint32_t entityID;
 
-				for (auto boneNode : nodes)
+				for (auto& boneNode : nodes)
 				{
 					boneNode >> entityID;
 
@@ -336,3 +312,5 @@ namespace Mahakam
 		DeregisterComponent("Skin");
 	};
 }
+
+#undef MH_DESERIALIZE_NODE
