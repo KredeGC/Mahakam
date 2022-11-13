@@ -128,7 +128,7 @@ namespace Mahakam
 				if (node.has_child("Properties"))
 				{
 					ryml::NodeRef propertiesNode = node["Properties"];
-					for (auto& propertyNode : propertiesNode)
+					for (auto propertyNode : propertiesNode)
 					{
 						ryml::csubstr key = propertyNode.key();
 						std::string propertyName(key.str, key.size());
@@ -384,7 +384,7 @@ namespace Mahakam
 			if (node.has_child("Properties"))
 			{
 				ryml::NodeRef propertiesNode = node["Properties"];
-				for (auto& propertyNode : propertiesNode)
+				for (auto propertyNode : propertiesNode)
 				{
 					ryml::csubstr key = propertyNode.key();
 					std::string propertyName(key.str, key.size());

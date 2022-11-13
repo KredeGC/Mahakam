@@ -275,7 +275,7 @@ namespace Mahakam
 				boneEntities.reserve(nodes.num_children());
 				uint32_t entityID;
 
-				for (auto& boneNode : nodes)
+				for (auto boneNode : nodes)
 				{
 					boneNode >> entityID;
 

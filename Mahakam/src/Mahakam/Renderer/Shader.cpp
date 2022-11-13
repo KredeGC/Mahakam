@@ -217,7 +217,7 @@ namespace Mahakam
 				ryml::NodeRef propertiesNode = root["Properties"];
 
 				MH_CORE_INFO("Loading properties for shader: {0}", filepath.string());
-				for (auto& propertyNode : propertiesNode)
+				for (auto propertyNode : propertiesNode)
 				{
 					ryml::csubstr key = propertyNode.key();
 					std::string propertyName(key.str, key.size());
@@ -272,7 +272,7 @@ namespace Mahakam
 					if (shaderPassNode.has_child("Defines"))
 					{
 						auto definesNode = shaderPassNode["Defines"];
-						for (auto& defineNode : definesNode)
+						for (auto defineNode : definesNode)
 						{
 							std::string define;
 							defineNode >> define;
@@ -287,7 +287,7 @@ namespace Mahakam
 
 						// Read and parse source files
 						std::stringstream source;
-						for (auto& includeNode : includesNode)
+						for (auto includeNode : includesNode)
 						{
 							std::string shaderPath;
 							includeNode >> shaderPath;
