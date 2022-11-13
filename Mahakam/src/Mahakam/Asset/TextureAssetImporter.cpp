@@ -24,62 +24,67 @@ namespace Mahakam
 	}
 
 #ifndef MH_STANDALONE
-	void TextureAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
+	void TextureAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node)
 	{
 		m_Props2D = TextureProps{};
 		m_PropsCube = CubeTextureProps{};
 
-		YAML::Node cubeNode = node["Type"];
-		m_TextureType = 0;
-		if (cubeNode)
-			m_TextureType = cubeNode.as<int>();
+		int enumInt;
 
-		YAML::Node formatNode = node["Format"];
-		if (formatNode)
+		m_TextureType = 0;
+		if (node.has_child("Type"))
+			node["Type"] >> m_TextureType;
+
+		if (node.has_child("Format"))
 		{
+			node["Format"] >> enumInt;
 			if (m_TextureType == 0)
-				m_Props2D.Format = (TextureFormat)formatNode.as<int>();
+				m_Props2D.Format = (TextureFormat)enumInt;
 			else
-				m_PropsCube.Format = (TextureFormat)formatNode.as<int>();
+				m_PropsCube.Format = (TextureFormat)enumInt;
 		}
 
-		YAML::Node filterNode = node["Filter"];
-		if (filterNode)
+		if (node.has_child("Filter"))
 		{
+			node["Filter"] >> enumInt;
 			if (m_TextureType == 0)
-				m_Props2D.FilterMode = (TextureFilter)filterNode.as<int>();
+				m_Props2D.FilterMode = (TextureFilter)enumInt;
 			else
-				m_PropsCube.FilterMode = (TextureFilter)filterNode.as<int>();
+				m_PropsCube.FilterMode = (TextureFilter)enumInt;
 		}
 
 		if (m_TextureType == 0)
 		{
-			YAML::Node wrapXNode = node["WrapX"];
-			if (wrapXNode)
-				m_Props2D.WrapX = (TextureWrapMode)wrapXNode.as<int>();
+			if (node.has_child("WrapX"))
+			{
+				node["WrapX"] >> enumInt;
+				m_Props2D.WrapX = (TextureWrapMode)enumInt;
+			}
 
-			YAML::Node wrapYNode = node["WrapY"];
-			if (wrapYNode)
-				m_Props2D.WrapY = (TextureWrapMode)wrapYNode.as<int>();
+			if (node.has_child("WrapY"))
+			{
+				node["WrapY"] >> enumInt;
+				m_Props2D.WrapY = (TextureWrapMode)enumInt;
+			}
 		}
 		else
 		{
-			YAML::Node resolutionNode = node["Resolution"];
-			if (resolutionNode)
-				m_PropsCube.Resolution = resolutionNode.as<uint32_t>();
+			if (node.has_child("Resolution"))
+				node["Resolution"] >> m_PropsCube.Resolution;
 
-			YAML::Node prefilterNode = node["Prefilter"];
-			if (prefilterNode)
-				m_PropsCube.Prefilter = (TextureCubePrefilter)prefilterNode.as<int>();
+			if (node.has_child("Prefilter"))
+			{
+				node["Prefilter"] >> enumInt;
+				m_PropsCube.Prefilter = (TextureCubePrefilter)enumInt;
+			}
 		}
 
-		YAML::Node mipmapsNode = node["Mipmaps"];
-		if (mipmapsNode)
+		if (node.has_child("Mipmaps"))
 		{
 			if (m_TextureType == 0)
-				m_Props2D.Mipmaps = mipmapsNode.as<bool>();
+				node["Mipmaps"] >> m_Props2D.Mipmaps;
 			else
-				m_PropsCube.Mipmaps = mipmapsNode.as<bool>();
+				node["Mipmaps"] >> m_PropsCube.Mipmaps;
 		}
 
 		if (m_TextureType == 0)
@@ -320,7 +325,7 @@ namespace Mahakam
 	}
 #endif
 
-	void TextureAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
+	void TextureAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
 	{
 		Asset<Texture> textureAsset(asset);
 
@@ -328,99 +333,91 @@ namespace Mahakam
 		{
 			Asset<Texture2D> texture2D(textureAsset);
 
-			emitter << YAML::Key << "Type";
-			emitter << YAML::Value << 0;
-			emitter << YAML::Key << "Format";
-			emitter << YAML::Value << (int)texture2D->GetProps().Format;
-			emitter << YAML::Key << "Filter";
-			emitter << YAML::Value << (int)texture2D->GetProps().FilterMode;
-			emitter << YAML::Key << "WrapX";
-			emitter << YAML::Value << (int)texture2D->GetProps().WrapX;
-			emitter << YAML::Key << "WrapY";
-			emitter << YAML::Value << (int)texture2D->GetProps().WrapY;
-			emitter << YAML::Key << "Mipmaps";
-			emitter << YAML::Value << texture2D->GetProps().Mipmaps;
+			node["Type"] << 0;
+			node["Format"] << (int)texture2D->GetProps().Format;
+			node["Filter"] << (int)texture2D->GetProps().FilterMode;
+			node["WrapX"] << (int)texture2D->GetProps().WrapX;
+			node["WrapY"] << (int)texture2D->GetProps().WrapY;
+			node["Mipmaps"] << texture2D->GetProps().Mipmaps;
 		}
 		else
 		{
 			Asset<TextureCube> textureCube(textureAsset);
 
-			emitter << YAML::Key << "Type";
-			emitter << YAML::Value << 1;
-			emitter << YAML::Key << "Format";
-			emitter << YAML::Value << (int)textureCube->GetProps().Format;
-			emitter << YAML::Key << "Filter";
-			emitter << YAML::Value << (int)textureCube->GetProps().FilterMode;
-			emitter << YAML::Key << "Resolution";
-			emitter << YAML::Value << textureCube->GetProps().Resolution;
-			emitter << YAML::Key << "Prefilter";
-			emitter << YAML::Value << (int)textureCube->GetProps().Prefilter;
-			emitter << YAML::Key << "Mipmaps";
-			emitter << YAML::Value << textureCube->GetProps().Mipmaps;
+			node["Type"] << 1;
+			node["Format"] << (int)textureCube->GetProps().Format;
+			node["Filter"] << (int)textureCube->GetProps().FilterMode;
+			node["Resolution"] << textureCube->GetProps().Resolution;
+			node["Prefilter"] << (int)textureCube->GetProps().Prefilter;
+			node["Mipmaps"] << textureCube->GetProps().Mipmaps;
 		}
 	}
 
-	Asset<void> TextureAssetImporter::Deserialize(YAML::Node& node)
+	Asset<void> TextureAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
 		TextureProps props2D;
 		CubeTextureProps propsCube;
 
-		YAML::Node filepathNode = node["Filepath"];
+		int enumInt;
+
 		std::string filepath;
-		if (filepathNode)
-			filepath = filepathNode.as<std::string>();
+		if (node.has_child("Filepath"))
+			node["Filepath"] >> filepath;
 
-		YAML::Node typeNode = node["Type"];
 		int textureType = 0;
-		if (typeNode)
-			textureType = typeNode.as<int>();
+		if (node.has_child("Type"))
+			node["Type"] >> textureType;
 
-		YAML::Node formatNode = node["Format"];
-		if (formatNode)
+		if (node.has_child("Format"))
 		{
+			node["Format"] >> enumInt;
 			if (textureType == 0)
-				props2D.Format = (TextureFormat)formatNode.as<int>();
+				props2D.Format = (TextureFormat)enumInt;
 			else
-				propsCube.Format = (TextureFormat)formatNode.as<int>();
+				propsCube.Format = (TextureFormat)enumInt;
 		}
 
-		YAML::Node filterNode = node["Filter"];
-		if (filterNode)
+		if (node.has_child("Filter"))
 		{
+			node["Filter"] >> enumInt;
 			if (textureType == 0)
-				props2D.FilterMode = (TextureFilter)filterNode.as<int>();
+				props2D.FilterMode = (TextureFilter)enumInt;
 			else
-				propsCube.FilterMode = (TextureFilter)filterNode.as<int>();
+				propsCube.FilterMode = (TextureFilter)enumInt;
 		}
 
 		if (textureType == 0)
 		{
-			YAML::Node wrapXNode = node["WrapX"];
-			if (wrapXNode)
-				props2D.WrapX = (TextureWrapMode)wrapXNode.as<int>();
+			if (node.has_child("WrapX"))
+			{
+				node["WrapX"] >> enumInt;
+				props2D.WrapX = (TextureWrapMode)enumInt;
+			}
 
-			YAML::Node wrapYNode = node["WrapY"];
-			if (wrapYNode)
-				props2D.WrapY = (TextureWrapMode)wrapYNode.as<int>();
+			if (node.has_child("WrapY"))
+			{
+				node["WrapY"] >> enumInt;
+				props2D.WrapY = (TextureWrapMode)enumInt;
+			}
 		}
 		else
 		{
-			YAML::Node resolutionNode = node["Resolution"];
-			if (resolutionNode)
-				propsCube.Resolution = resolutionNode.as<uint32_t>();
+			if (node.has_child("Resolution"))
+				node["Resolution"] >> propsCube.Resolution;
 
-			YAML::Node prefilterNode = node["Prefilter"];
-			if (prefilterNode)
-				propsCube.Prefilter = (TextureCubePrefilter)prefilterNode.as<int>();
+			if (node.has_child("Prefilter"))
+			{
+				node["Prefilter"] >> enumInt;
+				propsCube.Prefilter = (TextureCubePrefilter)enumInt;
+			}
 		}
 
-		YAML::Node mipmapsNode = node["Mipmaps"];
-		if (mipmapsNode)
+		if (node.has_child("Mipmaps"))
 		{
 			if (textureType == 0)
-				props2D.Mipmaps = mipmapsNode.as<bool>();
+				node["Mipmaps"] >> props2D.Mipmaps;
 			else
-				propsCube.Mipmaps = mipmapsNode.as<bool>();
+				node["Mipmaps"] >> propsCube.Mipmaps;
 		}
 
 		if (textureType == 0)

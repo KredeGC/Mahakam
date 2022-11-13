@@ -11,7 +11,7 @@ namespace Mahakam
 	}
 
 #ifndef MH_STANDALONE
-	void AnimationAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
+	void AnimationAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node)
 	{
 
 	}
@@ -27,12 +27,12 @@ namespace Mahakam
 	}
 #endif
 
-	void AnimationAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
+	void AnimationAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
 	{
 		// TODO: Properties
 	}
 
-	Asset<void> AnimationAssetImporter::Deserialize(YAML::Node& node)
+	Asset<void> AnimationAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
 		return nullptr;
 	}

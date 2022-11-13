@@ -72,8 +72,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <ktl/containers/trivial_vector.h>
-
-#include <yaml-cpp/yaml.h>
+#include <ktl/containers/trivial_array.h>
 
 #ifdef MH_BUILD
 #include <miniaudio/miniaudio.h>

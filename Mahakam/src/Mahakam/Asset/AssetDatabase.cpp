@@ -1,10 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "AssetDatabase.h"
 
-#include "Mahakam/Core/FileUtility.h"
-#include "Mahakam/Core/Log.h"
-#include "Mahakam/Core/Random.h"
-
 #include "AssetImporter.h"
 #include "MaterialAssetImporter.h"
 #include "MeshAssetImporter.h"
@@ -12,7 +8,13 @@
 #include "SoundAssetImporter.h"
 #include "TextureAssetImporter.h"
 
-#include <yaml-cpp/yaml.h>
+#include "Mahakam/Core/FileUtility.h"
+#include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/Random.h"
+
+#include "Mahakam/Serialization/YAMLGuard.h"
+
+#include <ryml/rapidyaml-0.4.1.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -150,12 +152,15 @@ namespace Mahakam
 			// Load the asset
 			ControlBlock* control = LoadAndIncrementAsset(id);
 
-			// Move the pointer and destructor to the existing control block
-			iter->second->Ptr = control->Ptr;
-			iter->second->DeleteData = control->DeleteData;
+			if (control)
+			{
+				// Move the pointer and destructor to the existing control block
+				iter->second->Ptr = control->Ptr;
+				iter->second->DeleteData = control->DeleteData;
 
-			// Delete the control block
-			Allocator::Deallocate<ControlBlock>(control, 1);
+				// Delete the control block
+				Allocator::Deallocate<ControlBlock>(control, 1);
+			}
 		}
 	};
 
@@ -179,12 +184,15 @@ namespace Mahakam
 			// Load the asset
 			ControlBlock* control = LoadAndIncrementAsset(kv.first);
 
-			// Move the pointer and destructor to the existing control block
-			kv.second->Ptr = control->Ptr;
-			kv.second->DeleteData = control->DeleteData;
+			if (control)
+			{
+				// Move the pointer and destructor to the existing control block
+				kv.second->Ptr = control->Ptr;
+				kv.second->DeleteData = control->DeleteData;
 
-			// Delete the control block
-			Allocator::Deallocate<ControlBlock>(control, 1);
+				// Delete the control block
+				Allocator::Deallocate<ControlBlock>(control, 1);
+			}
 		}
 	};
 
@@ -230,38 +238,45 @@ namespace Mahakam
 			return {};
 		}
 
-		YAML::Node data;
+		std::vector<char> buffer;
+
+		if (!FileUtility::ReadFile(importPath, buffer))
+			return {};
+
 		try
 		{
-			data = YAML::LoadFile(importPath.string());
+			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(buffer));
+
+			ryml::NodeRef root = tree.rootref();
+
+			AssetInfo info;
+
+			if (root.has_child("ID"))
+				root["ID"] >> info.ID;
+
+			if (root.has_child("Filepath"))
+			{
+				ryml::NodeRef filepathNode = root["Filepath"];
+				char seperator = std::filesystem::path::preferred_separator;
+
+				std::string filepathUnix;
+				filepathNode >> filepathUnix;
+				std::replace(filepathUnix.begin(), filepathUnix.end(), '/', seperator);
+
+				info.Filepath = filepathUnix;
+			}
+
+			if (root.has_child("Extension"))
+				root["Extension"] >> info.Extension;
+
+			return info;
 		}
-		catch (YAML::ParserException e)
+		catch (std::runtime_error const& e)
 		{
-			MH_CORE_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.msg);
+			MH_CORE_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.what());
 		}
 
-		AssetInfo info;
-
-		YAML::Node idNode = data["ID"];
-		if (idNode)
-			info.ID = idNode.as<uint64_t>();
-
-		YAML::Node filepathNode = data["Filepath"];
-		if (filepathNode)
-		{
-			char seperator = std::filesystem::path::preferred_separator;
-
-			std::string filepathUnix = filepathNode.as<std::string>();
-			std::replace(filepathUnix.begin(), filepathUnix.end(), '/', seperator);
-
-			info.Filepath = filepathUnix;
-		}
-
-		YAML::Node extensionNode = data["Extension"];
-		if (extensionNode)
-			info.Extension = extensionNode.as<std::string>();
-
-		return info;
+		return {};
 	};
 
 	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
@@ -291,29 +306,26 @@ namespace Mahakam
 		FileUtility::CreateDirectories(importPath.parent_path());
 
 		// Serialize the asset
-		YAML::Emitter emitter;
-		emitter << YAML::BeginMap;
-
 		char seperator = std::filesystem::path::preferred_separator;
 
 		std::string filepathUnix = filepath.string();
 		std::replace(filepathUnix.begin(), filepathUnix.end(), seperator, '/');
 
-		emitter << YAML::Key << "Filepath";
-		emitter << YAML::Value << filepathUnix;
-		emitter << YAML::Key << "Extension";
-		emitter << YAML::Value << iter->second->GetImporterProps().Extension;
-		emitter << YAML::Key << "ID";
-		emitter << YAML::Value << id;
+		ryml::Tree tree;
+
+		ryml::NodeRef root = tree.rootref();
+		root |= ryml::MAP;
+
+		root["Filepath"] << filepathUnix;
+		root["Extension"] << iter->second->GetImporterProps().Extension;
+		root["ID"] << id;
 
 		Asset<void> asset(control);
 
-		iter->second->Serialize(emitter, asset);
-
-		emitter << YAML::EndMap;
+		iter->second->Serialize(root, asset);
 
 		std::ofstream filestream(importPath);
-		filestream << emitter.c_str();
+		filestream << tree;
 
 		auto controlIter = s_LoadedAssets.find(id);
 		if (controlIter != s_LoadedAssets.end())
@@ -366,7 +378,8 @@ namespace Mahakam
 		{
 			ControlBlock* control = LoadAndIncrementAsset(id);
 
-			s_LoadedAssets[id] = control;
+			if (control)
+				s_LoadedAssets[id] = control;
 
 			return control;
 		}
@@ -396,33 +409,56 @@ namespace Mahakam
 			return nullptr;
 		}
 
-		YAML::Node data;
+		std::ifstream ifs(importPath, std::ios::binary | std::ios::ate);
+
+		if (!ifs)
+			return nullptr;
+
+		auto end = ifs.tellg();
+		ifs.seekg(0, std::ios::beg);
+
+		auto size = size_t(end - ifs.tellg());
+
+		if (size == 0) // avoid undefined behavior 
+			return nullptr;
+
+		std::vector<char> buffer(size);
+
+		if (!ifs.read(buffer.data(), buffer.size()))
+			return nullptr;
+
 		try
 		{
-			data = YAML::LoadFile(importPath.string());
+			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(buffer));
+
+			ryml::NodeRef root = tree.rootref();
+
+			// If the asset type has an importer
+			std::string extension;
+			if (root.has_child("Extension"))
+				root["Extension"] >> extension;
+
+			auto importIter = s_AssetExtensions.find(extension);
+			if (importIter == s_AssetExtensions.end())
+				return nullptr;
+
+			// Deserialize the asset using the YAML node
+			Asset<void> asset = importIter->second->Deserialize(root);
+
+			if (!asset)
+				return nullptr;
+
+			asset.m_Control->ID = id;
+			asset.IncrementRef();
+
+			return asset.m_Control;
 		}
-		catch (YAML::ParserException e)
+		catch (std::runtime_error const& e)
 		{
-			MH_CORE_WARN("AssetDatabase encountered exception trying to import yaml file {0}: {1}", importPath.string(), e.msg);
-			return nullptr;
+			MH_CORE_WARN("AssetDatabase encountered exception trying to import yaml file {0}: {1}", importPath.string(), e.what());
 		}
 
-		// If the asset type has an importer
-		std::string extension = data["Extension"].as<std::string>();
-		auto importIter = s_AssetExtensions.find(extension);
-		if (importIter == s_AssetExtensions.end())
-			return nullptr;
-
-		// Deserialize the asset using the YAML
-		Asset<void> asset = importIter->second->Deserialize(data);
-
-		if (!asset)
-			return nullptr;
-
-		asset.m_Control->ID = id;
-		asset.IncrementRef();
-
-		return asset.m_Control;
+		return nullptr;
 	}
 
 	void AssetDatabase::RecursiveCacheAssets(const std::filesystem::path& filepath)

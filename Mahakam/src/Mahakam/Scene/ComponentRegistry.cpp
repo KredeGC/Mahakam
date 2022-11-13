@@ -16,7 +16,10 @@
 
 #include "Mahakam/Core/SharedLibrary.h"
 
-#include "Mahakam/Math/Math.h"
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
+#define MH_DESERIALIZE_NODE(type, variable, name) type variable; \
+	if (node.has_child(name)) node[name] >> variable;
 
 namespace Mahakam
 {
@@ -47,23 +50,28 @@ namespace Mahakam
 		ComponentInterface transformInterface;
 		transformInterface.Icon = u8"\uf020"; // vector
 		transformInterface.SetComponent<TransformComponent>();
-		transformInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		transformInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			TransformComponent& transform = entity.GetComponent<TransformComponent>();
 
-			emitter << YAML::Key << "Translation" << YAML::Value << transform.GetPosition();
-			emitter << YAML::Key << "Rotation" << YAML::Value << transform.GetRotation();
-			emitter << YAML::Key << "Scale" << YAML::Value << transform.GetScale();
+			node["Translation"] << transform.GetPosition();
+			node["Rotation"] << transform.GetRotation();
+			node["Scale"] << transform.GetScale();
 
 			return true;
 		};
-		transformInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
+		transformInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			TransformComponent& transform = entity.AddComponent<TransformComponent>();
 
-			transform.SetPosition(node["Translation"].as<glm::vec3>());
-			transform.SetRotation(node["Rotation"].as<glm::quat>());
-			transform.SetScale(node["Scale"].as<glm::vec3>());
+			MH_DESERIALIZE_NODE(glm::vec3, pos, "Translation");
+			transform.SetPosition(pos);
+
+			MH_DESERIALIZE_NODE(glm::quat, rot, "Rotation");
+			transform.SetRotation(rot);
+
+			MH_DESERIALIZE_NODE(glm::vec3, scale, "Scale");
+			transform.SetScale(scale);
 
 			return true;
 		};
@@ -91,34 +99,29 @@ namespace Mahakam
 		ComponentInterface audioSourceInterface;
 		audioSourceInterface.Icon = u8"\ueea8"; // audio
 		audioSourceInterface.SetComponent<AudioSourceComponent>();
-		audioSourceInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		audioSourceInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
 
-			emitter << YAML::Key << "Sound" << YAML::Value << source.GetSound().GetID();
-			emitter << YAML::Key << "SpatialBlend" << YAML::Value << source.GetSpatialBlend();
+			node["Sound"] << source.GetSound().GetID();
+			node["SpatialBlend"] << source.GetSpatialBlend();
 
 			return true;
 		};
-		audioSourceInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
+		audioSourceInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			AudioSourceComponent& source = entity.AddComponent<AudioSourceComponent>();
 
-			YAML::Node soundNode = node["Sound"];
-			if (soundNode)
+			MH_DESERIALIZE_NODE(uint64_t, assetID, "Sound");
+			Asset<Sound> sound = Asset<Sound>(assetID);
+			if (sound)
 			{
-				Asset<Sound> sound = Asset<Sound>(soundNode.as<uint64_t>());
-
-				if (sound)
-				{
-					source.SetSound(sound);
-					source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
-				}
+				source.SetSound(sound);
+				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
 			}
 
-			YAML::Node spatialNode = node["SpatialBlend"];
-			if (spatialNode)
-				source.SetSpatialBlend(spatialNode.as<float>());
+			MH_DESERIALIZE_NODE(float, blend, "SpatialBlend");
+			source.SetSpatialBlend(blend);
 
 			return true;
 		};
@@ -130,33 +133,46 @@ namespace Mahakam
 		ComponentInterface cameraInterface;
 		cameraInterface.Icon = u8"\uecb5"; // video
 		cameraInterface.SetComponent<CameraComponent>();
-		cameraInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		cameraInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
 			Camera& camera = cameraComponent;
 
-			emitter << YAML::Key << "Projection" << YAML::Value << (int)camera.GetProjectionType();
-			emitter << YAML::Key << "FOV" << YAML::Value << camera.GetFov();
-			emitter << YAML::Key << "NearZ" << YAML::Value << camera.GetNearPlane();
-			emitter << YAML::Key << "FarZ" << YAML::Value << camera.GetFarPlane();
-			emitter << YAML::Key << "Size" << YAML::Value << camera.GetSize();
-			emitter << YAML::Key << "Ratio" << YAML::Value << camera.GetRatio();
-			emitter << YAML::Key << "FixedRatio" << YAML::Value << cameraComponent.HasFixedAspectRatio();
+			node["Projection"] << (int)camera.GetProjectionType();
+			node["FOV"] << camera.GetFov();
+			node["NearZ"] << camera.GetNearPlane();
+			node["FarZ"] << camera.GetFarPlane();
+			node["Size"] << camera.GetSize();
+			node["Ratio"] << camera.GetRatio();
+			node["FixedRatio"] << cameraComponent.HasFixedAspectRatio();
 
 			return true;
 		};
-		cameraInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
+		cameraInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			CameraComponent& cameraComponent = entity.AddComponent<CameraComponent>();
 			Camera& camera = cameraComponent;
 
-			camera.SetProjectionType((Camera::ProjectionType)node["Projection"].as<int>());
-			camera.SetFov(node["FOV"].as<float>());
-			camera.SetNearPlane(node["NearZ"].as<float>());
-			camera.SetFarPlane(node["FarZ"].as<float>());
-			camera.SetSize(node["Size"].as<float>());
-			camera.SetRatio(node["Ratio"].as<float>());
-			cameraComponent.SetFixedAspectRatio(node["FixedRatio"].as<bool>());
+			MH_DESERIALIZE_NODE(int, projection, "Projection");
+			camera.SetProjectionType((Camera::ProjectionType)projection);
+
+			MH_DESERIALIZE_NODE(float, fov, "FOV");
+			camera.SetFov(fov);
+
+			MH_DESERIALIZE_NODE(float, nearZ, "NearZ");
+			camera.SetNearPlane(nearZ);
+
+			MH_DESERIALIZE_NODE(float, farZ, "FarZ");
+			camera.SetFarPlane(farZ);
+
+			MH_DESERIALIZE_NODE(float, size, "Size");
+			camera.SetSize(size);
+
+			MH_DESERIALIZE_NODE(float, ratio, "Ratio");
+			camera.SetRatio(ratio);
+
+			MH_DESERIALIZE_NODE(float, fixed, "FixedRatio");
+			cameraComponent.SetFixedAspectRatio(ratio);
 
 			return true;
 		};
@@ -168,29 +184,40 @@ namespace Mahakam
 		ComponentInterface lightInterface;
 		lightInterface.Icon = u8"\uef6b"; // light-bulb
 		lightInterface.SetComponent<LightComponent>();
-		lightInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		lightInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			Light& light = entity.GetComponent<LightComponent>();
 
-			emitter << YAML::Key << "LightType" << YAML::Value << (int)light.GetLightType();
-			emitter << YAML::Key << "Range" << YAML::Value << light.GetRange();
-			emitter << YAML::Key << "FOV" << YAML::Value << light.GetFov();
-			emitter << YAML::Key << "Color" << YAML::Value << light.GetColor();
-			emitter << YAML::Key << "ShadowCasting" << YAML::Value << light.IsShadowCasting();
-			emitter << YAML::Key << "ShadowBias" << YAML::Value << light.GetBias();
+			node["LightType"] << (int)light.GetLightType();
+			node["Range"] << light.GetRange();
+			node["FOV"] << light.GetFov();
+			node["Color"] << light.GetColor();
+			node["ShadowCasting"] << light.IsShadowCasting();
+			node["ShadowBias"] << light.GetBias();
 
 			return true;
 		};
-		lightInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
+		lightInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			Light& light = entity.AddComponent<LightComponent>();
 
-			light.SetLightType((Light::LightType)node["LightType"].as<int>());
-			light.SetRange(node["Range"].as<float>());
-			light.SetFov(node["FOV"].as<float>());
-			light.SetColor(node["Color"].as<glm::vec3>());
-			light.SetShadowCasting(node["ShadowCasting"].as<bool>());
-			light.SetBias(node["ShadowBias"].as<float>());
+			MH_DESERIALIZE_NODE(int, type, "LightType");
+			light.SetLightType((Light::LightType)type);
+
+			MH_DESERIALIZE_NODE(float, range, "Range");
+			light.SetRange(range);
+
+			MH_DESERIALIZE_NODE(float, fov, "FOV");
+			light.SetFov(fov);
+
+			MH_DESERIALIZE_NODE(glm::vec3, color, "Color");
+			light.SetColor(color);
+
+			MH_DESERIALIZE_NODE(bool, shadowCasting, "ShadowCasting");
+			light.SetShadowCasting(shadowCasting);
+
+			MH_DESERIALIZE_NODE(float, shadowBias, "ShadowBias");
+			light.SetBias(shadowBias);
 
 			return true;
 		};
@@ -202,22 +229,23 @@ namespace Mahakam
 		ComponentInterface meshInterface;
 		meshInterface.Icon = u8"\ueef7"; // cube
 		meshInterface.SetComponent<MeshComponent>();
-		meshInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		meshInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
 
 			Asset<Mesh> mesh = meshComponent.GetMesh();
 
-			emitter << YAML::Key << "Mesh" << YAML::Value << mesh.GetID();
+			node["Mesh"] << mesh.GetID();
 
 			return true;
 		};
-		meshInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
+		meshInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
-			YAML::Node meshNode = node["Mesh"];
-			if (meshNode)
+			if (node.has_child("Mesh"))
 			{
-				uint64_t meshID = meshNode.as<uint64_t>();
+				uint64_t meshID;
+				node["Mesh"] >> meshID;
+
 				Asset<Mesh> mesh = Asset<Mesh>(meshID);
 
 				MeshComponent& meshComponent = entity.AddComponent<MeshComponent>(mesh);
@@ -245,39 +273,46 @@ namespace Mahakam
 		ComponentInterface skinInterface;
 		skinInterface.Icon = u8"\uef89"; // male
 		skinInterface.SetComponent<SkinComponent>();
-		skinInterface.Serialize = [](YAML::Emitter& emitter, Entity entity)
+		skinInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			SkinComponent& skin = entity.GetComponent<SkinComponent>();
 
-			emitter << YAML::Key << "Bones" << YAML::Value << YAML::BeginSeq;
+			ryml::NodeRef bones = node["Bones"];
+			bones |= ryml::SEQ;
+
 			const std::vector<Entity>& boneEntities = skin.GetBoneEntities();
 			for (auto& boneEntity : boneEntities)
 			{
-				emitter << YAML::Value << uint32_t(boneEntity);
+				bones.append_child() << uint32_t(boneEntity);
 			}
-			emitter << YAML::EndSeq;
 
 			return true;
 		};
-		skinInterface.Deserialize = [](YAML::Node& node, SceneSerializer::EntityMap& translation, Entity entity)
+		skinInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			SkinComponent& skin = entity.AddComponent<SkinComponent>();
 			std::vector<Entity>& boneEntities = skin.GetBoneEntities();
 
-			YAML::Node nodes = node["Bones"];
-			boneEntities.reserve(nodes.size());
-			for (auto boneNode : nodes)
+			if (node.has_child("Bones"))
 			{
-				uint32_t entityID = boneNode.as<uint32_t>();
-				auto entityIter = translation.find(entityID);
-				if (entityIter != translation.end())
+				ryml::NodeRef nodes = node["Bones"];
+				boneEntities.reserve(nodes.num_children());
+				uint32_t entityID;
+
+				for (auto boneNode : nodes)
 				{
-					Entity translatedEntity{ entityIter->second, entity };
-					boneEntities.push_back(translatedEntity);
-				}
-				else
-				{
-					boneEntities.push_back({});
+					boneNode >> entityID;
+
+					auto entityIter = translation.find(entityID);
+					if (entityIter != translation.end())
+					{
+						Entity translatedEntity{ entityIter->second, entity };
+						boneEntities.push_back(translatedEntity);
+					}
+					else
+					{
+						boneEntities.push_back({});
+					}
 				}
 			}
 

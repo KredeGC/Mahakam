@@ -16,8 +16,6 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include <yaml-cpp/yaml.h>
-
 #define ENABLE_HLSL
 #include <spirv_cross/spirv_glsl.hpp>
 #include <spirv_cross/spirv_hlsl.hpp>

@@ -30,8 +30,6 @@
 #include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <fstream>
 
 namespace Mahakam

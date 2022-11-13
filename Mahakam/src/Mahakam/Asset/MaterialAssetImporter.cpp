@@ -6,8 +6,6 @@
 
 #include "Mahakam/ImGui/GUI.h"
 
-#include "Mahakam/Math/Math.h"
-
 #include "Mahakam/Renderer/RenderPasses/GeometryRenderPass.h"
 #include "Mahakam/Renderer/RenderPasses/LightingRenderPass.h"
 #include "Mahakam/Renderer/RenderPasses/TonemappingRenderPass.h"
@@ -24,6 +22,8 @@
 #include "Mahakam/Renderer/Shader.h"
 #include "Mahakam/Renderer/Texture.h"
 
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
 #include <imgui/imgui.h>
 
 #define MH_CONDITIONAL_COLOR(Func, Type, Setter, Getter) { Type value = m_Material->Getter(propertyName); \
@@ -39,6 +39,11 @@
 #define MH_CONDITIONAL_DRAG(Func, Type, Setter, Getter) { Type value = m_Material->Getter(propertyName); \
 	if (Func(propertyName, value, dragSpeed, property.Min, property.Max)) \
 		m_Material->Setter(propertyName, value); \
+	break; }
+
+#define MH_CONDITIONAL_SET_VALUE(Func, Type) { Type value; \
+	propertyNode >> value; \
+	Func(propertyName, value); \
 	break; }
 
 namespace Mahakam
@@ -92,7 +97,7 @@ namespace Mahakam
 	}
 
 #ifndef MH_STANDALONE
-	void MaterialAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& rootNode)
+	void MaterialAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node)
 	{
 		// Load the preview skybox
 		Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/internal/PreviewSky.material.import");
@@ -106,11 +111,11 @@ namespace Mahakam
 		// Reset orbit angles
 		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
 
-		YAML::Node shaderNode = rootNode["Shader"];
-		if (shaderNode)
+		if (node.valid() && node.has_child("Shader"))
 		{
-			uint64_t shaderID = shaderNode.as<uint64_t>();
-			Asset<Shader> shader = Asset<Shader>(shaderID);
+			uint64_t shaderID;
+			node["Shader"] >> shaderID;
+			Asset<Shader> shader(shaderID);
 			m_ShaderImportPath = shader.GetImportPath();
 
 			if (shader)
@@ -120,31 +125,34 @@ namespace Mahakam
 				SetupMaterialProperties(shader->GetProperties());
 
 				const UnorderedMap<std::string, ShaderProperty>& properties = shader->GetProperties();
-				YAML::Node propertiesNode = rootNode["Properties"];
-				if (propertiesNode)
+				if (node.has_child("Properties"))
 				{
-					for (auto propertyNode : propertiesNode)
+					ryml::NodeRef propertiesNode = node["Properties"];
+					for (auto& propertyNode : propertiesNode)
 					{
-						std::string propertyName = propertyNode.first.as<std::string>();
+						ryml::csubstr key = propertyNode.key();
+						std::string propertyName(key.str, key.size());
 
 						auto iter = properties.find(propertyName);
 						if (iter != properties.end())
 						{
 							switch (iter->second.DataType)
 							{
-							case ShaderDataType::Float:			m_Material->SetFloat(propertyName, propertyNode.second.as<float>()); break;
-							case ShaderDataType::Float2:		m_Material->SetFloat2(propertyName, propertyNode.second.as<glm::vec2>()); break;
-							case ShaderDataType::Float3:		m_Material->SetFloat3(propertyName, propertyNode.second.as<glm::vec3>()); break;
-							case ShaderDataType::Float4:		m_Material->SetFloat4(propertyName, propertyNode.second.as<glm::vec4>()); break;
-							case ShaderDataType::Mat3:			break; // TODO: Support mats
-							case ShaderDataType::Mat4:			break;
-							case ShaderDataType::Int:			m_Material->SetInt(propertyName, propertyNode.second.as<int>()); break;
+							case ShaderDataType::Float:			MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat, float);
+							case ShaderDataType::Float2:		MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat2, glm::vec2);
+							case ShaderDataType::Float3:		MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat3, glm::vec3);
+							case ShaderDataType::Float4:		MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat4, glm::vec4);
+							case ShaderDataType::Mat3:			MH_CONDITIONAL_SET_VALUE(m_Material->SetMat3, glm::mat3);
+							case ShaderDataType::Mat4:			MH_CONDITIONAL_SET_VALUE(m_Material->SetMat4, glm::mat4);
+							case ShaderDataType::Int:			MH_CONDITIONAL_SET_VALUE(m_Material->SetInt, int);
 							case ShaderDataType::Sampler2D:
 							case ShaderDataType::SamplerCube:
 							{
-								uint64_t textureID = propertyNode.second.as<uint64_t>();
+								uint64_t textureID;
+								propertyNode >> textureID;
 								if (textureID)
 									m_Material->SetTexture(propertyName, 0, Asset<Texture>(textureID));
+
 								break;
 							}
 							default:
@@ -328,83 +336,83 @@ namespace Mahakam
 	}
 #endif
 
-	void MaterialAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
+	void MaterialAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
 	{
 		Asset<Material> material(asset);
 
 		// Shader ID
-		emitter << YAML::Key << "Shader";
-		emitter << YAML::Value << material->GetShader().GetID();
+		node["Shader"] << material->GetShader().GetID();
 
 		// Material properties
-		emitter << YAML::Key << "Properties";
-		emitter << YAML::Value << YAML::BeginMap;
+		ryml::NodeRef propertiesNode = node["Properties"];
+		propertiesNode |= ryml::MAP;
 
 		const UnorderedMap<std::string, ShaderProperty>& properties = material->GetShader()->GetProperties();
 		for (auto& kv : properties)
 		{
-			emitter << YAML::Key << kv.first;
-			emitter << YAML::Value;
-
 			switch (kv.second.DataType)
 			{
-			case ShaderDataType::Float:			emitter << material->GetFloat(kv.first); break;
-			case ShaderDataType::Float2:		emitter << material->GetFloat2(kv.first); break;
-			case ShaderDataType::Float3:		emitter << material->GetFloat3(kv.first); break;
-			case ShaderDataType::Float4:		emitter << material->GetFloat4(kv.first); break;
-			case ShaderDataType::Mat3:			emitter << material->GetMat3(kv.first); break;
-			case ShaderDataType::Mat4:			emitter << material->GetMat4(kv.first); break;
-			case ShaderDataType::Int:			emitter << material->GetInt(kv.first); break;
-			case ShaderDataType::Sampler2D:		emitter << material->GetTexture(kv.first).GetID(); break;
-			case ShaderDataType::SamplerCube:	emitter << material->GetTexture(kv.first).GetID(); break;
+			case ShaderDataType::Float:			propertiesNode[ryml::to_csubstr(kv.first)] << material->GetFloat(kv.first); break;
+			case ShaderDataType::Float2:		propertiesNode[ryml::to_csubstr(kv.first)] << material->GetFloat2(kv.first); break;
+			case ShaderDataType::Float3:		propertiesNode[ryml::to_csubstr(kv.first)] << material->GetFloat3(kv.first); break;
+			case ShaderDataType::Float4:		propertiesNode[ryml::to_csubstr(kv.first)] << material->GetFloat4(kv.first); break;
+			case ShaderDataType::Mat3:			propertiesNode[ryml::to_csubstr(kv.first)] << material->GetMat3(kv.first); break;
+			case ShaderDataType::Mat4:			propertiesNode[ryml::to_csubstr(kv.first)] << material->GetMat4(kv.first); break;
+			case ShaderDataType::Int:			propertiesNode[ryml::to_csubstr(kv.first)] << material->GetInt(kv.first); break;
+			case ShaderDataType::Sampler2D:		propertiesNode[ryml::to_csubstr(kv.first)] << material->GetTexture(kv.first).GetID(); break;
+			case ShaderDataType::SamplerCube:	propertiesNode[ryml::to_csubstr(kv.first)] << material->GetTexture(kv.first).GetID(); break;
 			default: break;
 			}
 		}
-
-		emitter << YAML::EndMap;
 	}
 
-	Asset<void> MaterialAssetImporter::Deserialize(YAML::Node& rootNode)
+	Asset<void> MaterialAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
 		Asset<Shader> shader;
-		YAML::Node shaderNode = rootNode["Shader"];
-		if (shaderNode)
-			shader = Asset<Shader>(shaderNode.as<uint64_t>());
+		if (node.has_child("Shader"))
+		{
+			uint64_t assetID;
+			node["Shader"] >> assetID;
+			shader = Asset<Shader>(assetID);
+		}
 
 		if (shader)
 		{
 			Asset<Material> material = Material::Create(shader);
 
 			const UnorderedMap<std::string, ShaderProperty>& properties = shader->GetProperties();
-			YAML::Node propertiesNode = rootNode["Properties"];
-			if (propertiesNode)
+			if (node.has_child("Properties"))
 			{
-				for (auto propertyNode : propertiesNode)
+				ryml::NodeRef propertiesNode = node["Properties"];
+				for (auto& propertyNode : propertiesNode)
 				{
-					std::string propertyName = propertyNode.first.as<std::string>();
+					ryml::csubstr key = propertyNode.key();
+					std::string propertyName(key.str, key.size());
 
 					auto iter = properties.find(propertyName);
 					if (iter != properties.end())
 					{
-						uint64_t textureID;
 						switch (iter->second.DataType)
 						{
-						case ShaderDataType::Float:			material->SetFloat(propertyName, propertyNode.second.as<float>()); break;
-						case ShaderDataType::Float2:		material->SetFloat2(propertyName, propertyNode.second.as<glm::vec2>()); break;
-						case ShaderDataType::Float3:		material->SetFloat3(propertyName, propertyNode.second.as<glm::vec3>()); break;
-						case ShaderDataType::Float4:		material->SetFloat4(propertyName, propertyNode.second.as<glm::vec4>()); break;
-						case ShaderDataType::Mat3:			material->SetMat3(propertyName, propertyNode.second.as<glm::mat3>()); break;
-						case ShaderDataType::Mat4:			material->SetMat4(propertyName, propertyNode.second.as<glm::mat4>()); break;
-						case ShaderDataType::Int:			material->SetInt(propertyName, propertyNode.second.as<int>()); break;
+						case ShaderDataType::Float:			MH_CONDITIONAL_SET_VALUE(material->SetFloat, float);
+						case ShaderDataType::Float2:		MH_CONDITIONAL_SET_VALUE(material->SetFloat2, glm::vec2);
+						case ShaderDataType::Float3:		MH_CONDITIONAL_SET_VALUE(material->SetFloat3, glm::vec3);
+						case ShaderDataType::Float4:		MH_CONDITIONAL_SET_VALUE(material->SetFloat4, glm::vec4);
+						case ShaderDataType::Mat3:			MH_CONDITIONAL_SET_VALUE(material->SetMat3, glm::mat3);
+						case ShaderDataType::Mat4:			MH_CONDITIONAL_SET_VALUE(material->SetMat4, glm::mat4);
+						case ShaderDataType::Int:			MH_CONDITIONAL_SET_VALUE(material->SetInt, int);
 						case ShaderDataType::Sampler2D:
 						case ShaderDataType::SamplerCube:
-							textureID = propertyNode.second.as<uint64_t>();
+						{
+							uint64_t textureID;
+							propertyNode >> textureID;
 							if (textureID)
 								material->SetTexture(propertyName, 0, Asset<Texture>(textureID));
 							else
 								material->SetTexture(propertyName, 0, GetDefaultTexture(iter->second));
 
 							break;
+						}
 						default:
 							break;
 						}
@@ -419,26 +427,19 @@ namespace Mahakam
 
 	Asset<Texture> MaterialAssetImporter::GetDefaultTexture(const ShaderProperty& property)
 	{
-		YAML::Node rootNode;
-		try
-		{
-			rootNode = YAML::Load(property.DefaultString);
-		}
-		catch (YAML::Exception e)
-		{
-			MH_CORE_WARN("MaterialAssetImporter encountered exception trying to import default texture: {1}", e.msg);
-		}
+		ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(property.DefaultString));
 
-		if (!rootNode || rootNode.size() <= 0) return nullptr;
+		ryml::NodeRef rootNode = tree.rootref();
 
-		YAML::Node defaultNode = rootNode["Value"];
-		if (defaultNode)
+		if (rootNode.has_child("Value"))
 		{
+			ryml::NodeRef defaultNode = rootNode["Value"];
+
 			std::string defaultString;
 			switch (property.DataType)
 			{
 			case ShaderDataType::Sampler2D:
-				defaultString = defaultNode.as<std::string>();
+				defaultNode >> defaultString;
 
 				if (defaultString == "White")
 					return GL::GetTexture2DWhite();
@@ -451,7 +452,7 @@ namespace Mahakam
 
 				break;
 			case ShaderDataType::SamplerCube:
-				defaultString = defaultNode.as<std::string>();
+				defaultNode >> defaultString;
 
 				if (defaultString == "White")
 					return GL::GetTextureCubeWhite();
@@ -464,6 +465,8 @@ namespace Mahakam
 			default:
 				break;
 			}
+
+			return nullptr;
 		}
 
 		return nullptr;
@@ -480,59 +483,57 @@ namespace Mahakam
 		{
 			std::string propertyName = kv.first;
 
-			YAML::Node rootNode;
-			try
+			if (kv.second.DefaultString.empty())
+				continue;
+
+			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(kv.second.DefaultString));
+
+			ryml::NodeRef rootNode = tree.rootref();
+
+			if (rootNode.has_child("Value"))
 			{
-				rootNode = YAML::Load(kv.second.DefaultString);
-			}
-			catch (YAML::Exception e)
-			{
-				MH_CORE_WARN("MaterialAssetImporter encountered exception trying to import default value {0}: {1}", propertyName, e.msg);
-			}
+				ryml::NodeRef propertyNode = rootNode["Value"];
+				std::string defaultString;
+				switch (kv.second.DataType)
+				{
+				case ShaderDataType::Float:			MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat, float);
+				case ShaderDataType::Float2:		MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat2, glm::vec2);
+				case ShaderDataType::Float3:		MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat3, glm::vec3);
+				case ShaderDataType::Float4:		MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat4, glm::vec4);
+				case ShaderDataType::Mat3:			MH_CONDITIONAL_SET_VALUE(m_Material->SetMat3, glm::mat3);
+				case ShaderDataType::Mat4:			MH_CONDITIONAL_SET_VALUE(m_Material->SetMat4, glm::mat4);
+				case ShaderDataType::Int:			MH_CONDITIONAL_SET_VALUE(m_Material->SetInt, int);
+				case ShaderDataType::Sampler2D:
+					propertyNode >> defaultString;
 
-			if (!rootNode || rootNode.size() <= 0) continue;
+					if (defaultString == "White")
+						m_DefaultTextures[propertyName] = GL::GetTexture2DWhite();
+					else if (defaultString == "Black")
+						m_DefaultTextures[propertyName] = GL::GetTexture2DBlack();
+					else if (defaultString == "Bump")
+						m_DefaultTextures[propertyName] = GL::GetTexture2DBump();
+					else
+						MH_CORE_WARN("Could not find default Texture2D of type: {0}", defaultString);
 
-			YAML::Node defaultNode = rootNode["Value"];
-			std::string defaultString;
-			switch (kv.second.DataType)
-			{
-			case ShaderDataType::Float:			m_Material->SetFloat(propertyName, defaultNode.as<float>()); break;
-			case ShaderDataType::Float2:		m_Material->SetFloat2(propertyName, defaultNode.as<glm::vec2>()); break;
-			case ShaderDataType::Float3:		m_Material->SetFloat3(propertyName, defaultNode.as<glm::vec3>()); break;
-			case ShaderDataType::Float4:		m_Material->SetFloat4(propertyName, defaultNode.as<glm::vec4>()); break;
-			case ShaderDataType::Int:			m_Material->SetInt(propertyName, defaultNode.as<int>()); break;
-			case ShaderDataType::Mat3:			m_Material->SetMat3 (propertyName, defaultNode.as<glm::mat3>()); break;
-			case ShaderDataType::Mat4:			m_Material->SetMat4(propertyName, defaultNode.as<glm::mat4>()); break;
-			case ShaderDataType::Sampler2D:
-				defaultString = defaultNode.as<std::string>();
+					m_Material->SetTexture(propertyName, 0, m_DefaultTextures[propertyName]);
 
-				if (defaultString == "White")
-					m_DefaultTextures[propertyName] = GL::GetTexture2DWhite();
-				else if (defaultString == "Black")
-					m_DefaultTextures[propertyName] = GL::GetTexture2DBlack();
-				else if (defaultString == "Bump")
-					m_DefaultTextures[propertyName] = GL::GetTexture2DBump();
-				else
-					MH_CORE_WARN("Could not find default Texture2D of type: {0}", defaultString);
+					break;
+				case ShaderDataType::SamplerCube:
+					propertyNode >> defaultString;
 
-				m_Material->SetTexture(propertyName, 0, m_DefaultTextures[propertyName]);
+					if (defaultString == "White")
+						m_DefaultTextures[propertyName] = GL::GetTextureCubeWhite();
+					else if (defaultString == "Black")
+						m_DefaultTextures[propertyName] = GL::GetTextureCubeWhite();
+					else
+						MH_CORE_WARN("Could not find default TextureCube of type: {0}", defaultString);
 
-				break;
-			case ShaderDataType::SamplerCube:
-				defaultString = defaultNode.as<std::string>();
+					m_Material->SetTexture(propertyName, 0, m_DefaultTextures[propertyName]);
 
-				if (defaultString == "White")
-					m_DefaultTextures[propertyName] = GL::GetTextureCubeWhite();
-				else if (defaultString == "Black")
-					m_DefaultTextures[propertyName] = GL::GetTextureCubeWhite();
-				else
-					MH_CORE_WARN("Could not find default TextureCube of type: {0}", defaultString);
-
-				m_Material->SetTexture(propertyName, 0, m_DefaultTextures[propertyName]);
-
-				break;
-			default:
-				break;
+					break;
+				default:
+					break;
+				}
 			}
 		}
 
@@ -555,3 +556,8 @@ namespace Mahakam
 		}
 	}
 }
+
+#undef MH_CONDITIONAL_COLOR
+#undef MH_CONDITIONAL_SLIDER
+#undef MH_CONDITIONAL_DRAG
+#undef MH_CONDITIONAL_SET_VALUE

@@ -9,8 +9,6 @@
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/Texture.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <filesystem>
 #include <fstream>
 

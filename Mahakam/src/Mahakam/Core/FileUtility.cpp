@@ -41,6 +41,29 @@ namespace Mahakam
 		return std::filesystem::current_path();
 	}
 
+	bool FileUtility::ReadFile(const std::filesystem::path& filepath, std::vector<char>& buffer)
+	{
+		std::ifstream ifs(filepath, std::ios::binary | std::ios::ate);
+
+		if (!ifs)
+			return false;
+
+		auto end = ifs.tellg();
+		ifs.seekg(0, std::ios::beg);
+
+		auto size = size_t(end - ifs.tellg());
+
+		if (size == 0) // avoid undefined behavior 
+			return false;
+
+		buffer.resize(size);
+
+		if (!ifs.read(buffer.data(), buffer.size()))
+			return false;
+
+		return true;
+	}
+
 	bool FileUtility::Exists(const std::filesystem::path& src)
 	{
 		return std::filesystem::exists(src);

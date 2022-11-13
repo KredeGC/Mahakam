@@ -2,7 +2,7 @@
 
 #include "Scene.h"
 
-#include <yaml-cpp/yaml.h>
+#include <ryml/rapidyaml-0.4.1.hpp>
 
 #include <filesystem>
 
@@ -27,9 +27,9 @@ namespace Mahakam
 		bool Deserialize(const std::filesystem::path& filepath);
 
 	private:
-		bool DeserializeFromNode(YAML::Node& node);
+		bool DeserializeFromTree(ryml::Tree& tree);
 
-		void SerializeEntity(YAML::Emitter& emitter, Entity entity);
-		void DeserializeEntity(YAML::Node& node, Entity entity);
+		void SerializeEntity(ryml::NodeRef& entities, Entity entity);
+		void DeserializeEntity(ryml::NodeRef& node, Entity entity);
 	};
 }

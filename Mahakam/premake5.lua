@@ -19,6 +19,7 @@ project "Mahakam"
         "vendor/miniaudio/**.h",
         "vendor/stb_image/**.h",
         "vendor/stb_image/**.cpp",
+        "vendor/ryml/src/ryml.cpp",
         "vendor/tiny_gltf/tiny_gltf/**.h",
         "vendor/tiny_gltf/tiny_gltf/**.hpp",
         "vendor/tiny_gltf/tiny_gltf/**.cpp"
@@ -39,12 +40,12 @@ project "Mahakam"
         "%{IncludeDir.imguizmo}",
         "%{IncludeDir.ktl}",
         "%{IncludeDir.miniaudio}",
+        "%{IncludeDir.ryml}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.spirv_cross}",
         "%{IncludeDir.stb_image}",
         "%{IncludeDir.steamaudio}",
-        "%{IncludeDir.tiny_gltf}",
-        "%{IncludeDir.yaml}"
+        "%{IncludeDir.tiny_gltf}"
     }
     
     libdirs { SteamAudioLibDir }
@@ -58,7 +59,6 @@ project "Mahakam"
         "glslang",
         "ImGui",
         "ImGuizmo",
-        "yaml-cpp",
         "spirv_cross",
         "phonon"
     }

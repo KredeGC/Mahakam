@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <string>
 
-#include <yaml-cpp/yaml.h>
+#include <ryml/rapidyaml-0.4.1.hpp>
 
 namespace Mahakam
 {
@@ -27,12 +27,12 @@ namespace Mahakam
 		virtual const ImporterProps& GetImporterProps() const = 0;
 
 #ifndef MH_STANDALONE
-		virtual void OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& rootNode) = 0;
+		virtual void OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& rootNode) = 0;
 		virtual void OnWizardRender(const std::filesystem::path& filepath) = 0;
 		virtual void OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) = 0;
 #endif
 
-		virtual void Serialize(YAML::Emitter& emitter, Asset<void> asset) = 0;
-		virtual Asset<void> Deserialize(YAML::Node& rootNode) = 0;
+		virtual void Serialize(ryml::NodeRef& node, Asset<void> asset) = 0;
+		virtual Asset<void> Deserialize(ryml::NodeRef& node) = 0;
 	};
 }

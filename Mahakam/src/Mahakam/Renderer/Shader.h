@@ -12,13 +12,10 @@
 #include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 
+#include <ryml/rapidyaml-0.4.1.hpp>
+
 #include <filesystem>
 #include <string>
-
-namespace YAML
-{
-	class Node;
-}
 
 namespace Mahakam
 {
@@ -57,7 +54,7 @@ namespace Mahakam
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
 
 		static UnorderedMap<ShaderStage, std::string> ParseGLSLFile(const std::string& source);
-		static std::string ParseDefaultValue(const YAML::Node& node);
+		static std::string ParseDefaultValue(const ryml::NodeRef& node);
 		static bool ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, SourceDefinition>& sources, UnorderedMap<std::string, ShaderProperty>& properties);
 		static bool CompileSPIRV(UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv, const SourceDefinition& source);
 

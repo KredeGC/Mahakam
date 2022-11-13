@@ -74,20 +74,34 @@ namespace Mahakam::Editor
 				window->m_FilePath = filepath;
 				window->m_ImportPath = importPath;
 
-				YAML::Node data;
-				if (std::filesystem::exists(importPath))
+				if (FileUtility::Exists(importPath))
 				{
+					std::vector<char> buffer;
+
+					if (!FileUtility::ReadFile(importPath, buffer))
+						return;
+
 					try
 					{
-						data = YAML::LoadFile(importPath.string());
+						ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(buffer));
+
+						ryml::NodeRef root = tree.rootref();
+
+						importer->OnWizardOpen(filepath, root);
+
+						return;
 					}
-					catch (YAML::ParserException e)
+					catch (std::runtime_error const& e)
 					{
-						MH_CORE_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.msg);
+						MH_CORE_WARN("Asset Import Wizard experienced an error when reading {0}: {1}", filepath.string(), e.what());
 					}
 				}
+				else
+				{
+					ryml::NodeRef root;
 
-				importer->OnWizardOpen(filepath, data);
+					importer->OnWizardOpen(filepath, root);
+				}
 			}
 		}
 	}

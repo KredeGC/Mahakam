@@ -62,12 +62,12 @@ IncludeDir["imgui"]             = "../Mahakam/vendor"
 IncludeDir["imguizmo"]          = "../Mahakam/vendor"
 IncludeDir["ktl"]               = "../Mahakam/vendor/ktl"
 IncludeDir["miniaudio"]         = "../Mahakam/vendor/miniaudio/include"
+IncludeDir["ryml"]              = "../Mahakam/vendor/ryml/include"
 IncludeDir["spdlog"]            = "../Mahakam/vendor/spdlog/include"
 IncludeDir["spirv_cross"]       = "../Mahakam/vendor/spirv_cross/include"
 IncludeDir["stb_image"]         = "../Mahakam/vendor/stb_image"
 IncludeDir["steamaudio"]        = "../Mahakam/vendor/steamaudio/include"
 IncludeDir["tiny_gltf"]         = "../Mahakam/vendor/tiny_gltf"
-IncludeDir["yaml"]              = "../Mahakam/vendor/yaml-cpp/include"
 
 
 SteamAudioLibDir = "../Mahakam/vendor/steamaudio/lib/".._OPTIONS["target"].."-x64"
@@ -80,8 +80,8 @@ VendorIncludes = {
     "%{IncludeDir.imgui}",
     "%{IncludeDir.imguizmo}",
     "%{IncludeDir.ktl}",
-    "%{IncludeDir.spdlog}",
-    "%{IncludeDir.yaml}"
+    "%{IncludeDir.ryml}",
+    "%{IncludeDir.spdlog}"
 }
 
 VendorLibDirs = {
@@ -98,7 +98,6 @@ VendorLinks = {
     "glslang",
     "ImGui",
     "ImGuizmo",
-    "yaml-cpp",
     "spirv_cross",
     "phonon"
 }
@@ -146,7 +145,6 @@ group "Dependencies"
     include "Mahakam/vendor/imguizmo"
     include "Mahakam/vendor/glad"
     include "Mahakam/vendor/glslang"
-    include "Mahakam/vendor/yaml-cpp"
     include "Mahakam/vendor/spirv_cross"
     include "Mahakam/vendor/bullet/build3"
 group ""

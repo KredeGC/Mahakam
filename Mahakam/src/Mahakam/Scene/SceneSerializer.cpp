@@ -1,8 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "SceneSerializer.h"
 
-#include "Mahakam/Math/Math.h"
-
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Shader.h"
 
@@ -12,33 +10,36 @@
 #include "ComponentRegistry.h"
 #include "Entity.h"
 
+#include "Mahakam/Serialization/YAMLGuard.h"
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
+#include <ryml/rapidyaml-0.4.1.hpp>
+
 namespace Mahakam
 {
 	SceneSerializer::SceneSerializer(Ref<Scene> scene)
-		: m_Scene(scene)
-	{ }
+		: m_Scene(scene) {}
 
 	std::string SceneSerializer::Serialize()
 	{
-		YAML::Emitter emitter;
-		emitter << YAML::BeginMap;
-		emitter << YAML::Key << "Scene";
-		emitter << YAML::Value << "Untitled";
+		ryml::Tree tree;
 
-		emitter << YAML::Key << "Skybox";
-		emitter << YAML::Value << YAML::BeginMap;
+		ryml::NodeRef root = tree.rootref();
+		root |= ryml::MAP;
 
-		emitter << YAML::Key << "Material";
-		emitter << YAML::Value << m_Scene->GetSkyboxMaterial().GetID();
-		emitter << YAML::Key << "Irradiance";
-		emitter << YAML::Value << m_Scene->GetSkyboxIrradiance().GetID();
-		emitter << YAML::Key << "Specular";
-		emitter << YAML::Value << m_Scene->GetSkyboxSpecular().GetID();
+		root["Scene"] << "Untitled";
 
-		emitter << YAML::Value << YAML::EndMap;
+		// Skybox
+		ryml::NodeRef skybox = root["Skybox"];
+		skybox |= ryml::MAP;
+		skybox["Material"] << m_Scene->GetSkyboxMaterial().GetID();
+		skybox["Irradiance"] << m_Scene->GetSkyboxIrradiance().GetID();
+		skybox["Specular"] << m_Scene->GetSkyboxSpecular().GetID();
 
-		emitter << YAML::Key << "Entities";
-		emitter << YAML::Value << YAML::BeginSeq;
+		// Entities
+		ryml::NodeRef entities = root["Entities"];
+		entities |= ryml::SEQ;
+
 		m_Scene->ForEachEntity([&](Entity entity)
 		{
 			if (!entity)
@@ -50,32 +51,33 @@ namespace Mahakam
 				auto& relation = entity.GetComponent<RelationshipComponent>();
 
 				if (relation.Parent == entt::null)
-					SerializeEntity(emitter, entity);
+					SerializeEntity(entities, entity);
 			}
 			else
 			{
-				SerializeEntity(emitter, entity);
+				SerializeEntity(entities, entity);
 			}
 		});
-		emitter << YAML::EndSeq;
-		emitter << YAML::EndMap;
 
-		return emitter.c_str();
+		std::stringstream ss;
+		ss << tree;
+		return ss.str();
 	}
 
 	bool SceneSerializer::Deserialize(const std::string& src)
 	{
-		YAML::Node node;
 		try
 		{
-			node = YAML::Load(src);
+			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(src));
+
+			return DeserializeFromTree(tree);
 		}
-		catch (YAML::ParserException e)
+		catch (std::runtime_error const& e)
 		{
-			return false;
+			MH_CORE_WARN("Scene was unable to load from YAML source: {0}", e.what());
 		}
 
-		return DeserializeFromNode(node);
+		return false;
 	}
 
 	void SceneSerializer::Serialize(const std::filesystem::path& filepath)
@@ -88,35 +90,49 @@ namespace Mahakam
 
 	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
-		YAML::Node node;
+		std::vector<char> buffer;
+
+		if (!FileUtility::ReadFile(filepath, buffer))
+			return false;
+
 		try
 		{
-			node = YAML::LoadFile(filepath.string());
+			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(buffer));
+
+			return DeserializeFromTree(tree);
 		}
-		catch (YAML::ParserException e)
+		catch (std::runtime_error const& e)
 		{
-			return false;
+			MH_CORE_WARN("Scene was unable to load from YAML file {0}: {1}", filepath.string(), e.what());
 		}
 
-		return DeserializeFromNode(node);
+		return false;
 	}
 
-	bool SceneSerializer::DeserializeFromNode(YAML::Node& node)
+	bool SceneSerializer::DeserializeFromTree(ryml::Tree& tree)
 	{
 		m_Entities.clear();
 
-		if (!node["Scene"])
+		ryml::NodeRef root = tree.rootref();
+
+		if (!root.has_child("Scene"))
 			return false;
 
-		std::string sceneName = node["Scene"].as<std::string>();
-
-		YAML::Node skyboxNode = node["Skybox"];
-		if (skyboxNode)
+		if (root.has_child("Skybox"))
 		{
+			ryml::NodeRef skyboxNode = root["Skybox"];
+
 			Asset<Material> skyboxMaterial;
-			YAML::Node materialNode = skyboxNode["Material"];
-			if (materialNode)
-				skyboxMaterial = Asset<Material>(materialNode.as<uint64_t>());
+			uint64_t assetID = 0;
+
+			if (skyboxNode.has_child("Material"))
+			{
+				ryml::NodeRef materialNode = skyboxNode["Material"];
+				materialNode >> assetID;
+
+				skyboxMaterial = Asset<Material>(assetID);
+			}
+
 			if (!skyboxMaterial)
 			{
 				Asset<Shader> skyboxShader = Asset<Shader>(Shader::Create("assets/shaders/Skybox.shader"));
@@ -124,43 +140,45 @@ namespace Mahakam
 			}
 			m_Scene->SetSkyboxMaterial(skyboxMaterial);
 
-			YAML::Node irradianceNode = skyboxNode["Irradiance"];
-			if (irradianceNode)
+			if (skyboxNode.has_child("Irradiance"))
 			{
-				Asset<TextureCube> irradianceTexture = Asset<TextureCube>(irradianceNode.as<uint64_t>());
+				ryml::NodeRef irradianceNode = skyboxNode["Irradiance"];
+				irradianceNode >> assetID;
+
+				Asset<TextureCube> irradianceTexture = Asset<TextureCube>(assetID);
 				m_Scene->SetSkyboxIrradiance(irradianceTexture);
 			}
 
-			YAML::Node specularNode = skyboxNode["Specular"];
-			if (specularNode)
+			if (skyboxNode.has_child("Specular"))
 			{
-				Asset<TextureCube> specularTexture = Asset<TextureCube>(specularNode.as<uint64_t>());
+				ryml::NodeRef specularNode = skyboxNode["Specular"];
+				specularNode >> assetID;
+
+				Asset<TextureCube> specularTexture = Asset<TextureCube>(assetID);
 				m_Scene->SetSkyboxSpecular(specularTexture);
 			}
 		}
 
-		auto entities = node["Entities"];
-		if (entities)
+		if (root.has_child("Entities"))
 		{
-			m_Entities.reserve(entities.size());
+			ryml::NodeRef entities = root["Entities"];
+
+			m_Entities.reserve(entities.num_children());
 
 			// Create entities and their relationships
 			for (auto entity : entities)
 			{
 				uint32_t id = entt::null;
-				auto idNode = entity["ID"];
-				if (idNode)
-					id = idNode.as<uint32_t>();
+				if (entity.has_child("ID"))
+					entity["ID"] >> id;
 
 				uint32_t parent = entt::null;
-				auto parentNode = entity["Parent"];
-				if (parentNode)
-					parent = parentNode.as<uint32_t>();
+				if (entity.has_child("Parent"))
+					entity["Parent"] >> parent;
 
 				std::string tag;
-				auto tagNode = entity["Tag"];
-				if (tagNode)
-					tag = tagNode.as<std::string>();
+				if (entity.has_child("Tag"))
+					entity["Tag"] >> tag;
 
 				Entity deserializedEntity = m_Scene->CreateEntity(tag);
 				if (parent)
@@ -180,9 +198,8 @@ namespace Mahakam
 			for (auto entity : entities)
 			{
 				uint32_t id = entt::null;
-				auto idNode = entity["ID"];
-				if (idNode)
-					id = idNode.as<uint32_t>();
+				if (entity.has_child("ID"))
+					entity["ID"] >> id;
 
 				Entity deserializedEntity{ m_Entities[id], m_Scene.get() };
 
@@ -195,20 +212,16 @@ namespace Mahakam
 		return true;
 	}
 
-	void SceneSerializer::SerializeEntity(YAML::Emitter& emitter, Entity entity)
+	void SceneSerializer::SerializeEntity(ryml::NodeRef& entities, Entity entity)
 	{
-		// m_Entities[entity] = uint32_t(entity);
-
-		emitter << YAML::BeginMap;
+		ryml::NodeRef entityNode = entities.append_child({ ryml::MAP });
 
 		if (entity.HasComponent<TagComponent>())
 		{
 			TagComponent& tag = entity.GetComponent<TagComponent>();
 
-			emitter << YAML::Key << "ID";
-			emitter << YAML::Value << uint32_t(entity);
-			emitter << YAML::Key << "Tag";
-			emitter << YAML::Value << tag.Tag;
+			entityNode["ID"] << uint32_t(entity);
+			entityNode["Tag"] << tag.Tag;
 		}
 
 		if (entity.HasComponent<RelationshipComponent>())
@@ -216,26 +229,19 @@ namespace Mahakam
 			RelationshipComponent& relation = entity.GetComponent<RelationshipComponent>();
 
 			if (relation.Parent != entt::null)
-			{
-				emitter << YAML::Key << "Parent";
-				emitter << YAML::Value << uint32_t(relation.Parent);
-			}
+				entityNode["Parent"] << uint32_t(relation.Parent);
 		}
 
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
 			if (componentInterface.HasComponent(entity) && componentInterface.Serialize)
 			{
-				emitter << YAML::Key << name;
-				emitter << YAML::BeginMap;
+				ryml::NodeRef component = entityNode[ryml::to_csubstr(name)];
+				component |= ryml::MAP;
 
-				componentInterface.Serialize(emitter, entity);
-
-				emitter << YAML::EndMap;
+				componentInterface.Serialize(component, entity);
 			}
 		}
-
-		emitter << YAML::EndMap;
 
 		if (entity.HasComponent<RelationshipComponent>())
 		{
@@ -244,20 +250,23 @@ namespace Mahakam
 			Entity current = entity.GetFirstChild();
 			while (current)
 			{
-				SerializeEntity(emitter, current);
+				SerializeEntity(entities, current);
 
 				current = current.GetNext();
 			}
 		}
 	}
 
-	void SceneSerializer::DeserializeEntity(YAML::Node& node, Entity entity)
+	void SceneSerializer::DeserializeEntity(ryml::NodeRef& node, Entity entity)
 	{
 		for (auto& [name, componentInterface] : ComponentRegistry::GetComponents())
 		{
-			YAML::Node component = node[name];
-			if (component && componentInterface.Deserialize)
+			ryml::csubstr key = ryml::to_csubstr(name);
+			if (node.has_child(key) && componentInterface.Deserialize)
+			{
+				ryml::NodeRef component = node[key];
 				componentInterface.Deserialize(component, m_Entities, entity);
+			}
 		}
 	}
 }

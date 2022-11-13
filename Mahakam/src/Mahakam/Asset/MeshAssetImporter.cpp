@@ -14,55 +14,51 @@ namespace Mahakam
 	}
 
 #ifndef MH_STANDALONE
-	void MeshAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node)
+	void MeshAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node)
 	{
 		m_MeshProps = {};
 
-		YAML::Node primitiveNode = node["Primitive"];
-		if (primitiveNode)
+		if (node.has_child("Primitive"))
 		{
-			m_MeshProps.Primitive = (MeshPrimitive)primitiveNode.as<int>();
+			int primitive;
+			node["Primitive"] >> primitive;
+			m_MeshProps.Primitive = (MeshPrimitive)primitive;
+
 			if (m_MeshProps.Primitive == MeshPrimitive::Model)
 				m_ImporterProps.NoFilepath = false;
 			else
 				m_ImporterProps.NoFilepath = true;
 		}
 
-		YAML::Node materialsNode = node["Materials"];
-		if (materialsNode)
+		if (node.has_child("Materials"))
 		{
-			for (auto materialNode : materialsNode)
+			uint64_t materialID;
+			for (auto materialNode : node["Materials"])
 			{
-				uint64_t materialID = materialNode.as<uint64_t>();
+				materialNode >> materialID;
 				Asset<Material> material = Asset<Material>(materialID);
 
 				m_MeshProps.Materials.push_back(material);
 			}
 		}
 
-		YAML::Node includeNodesNode = node["IncludeNodes"];
-		if (includeNodesNode)
-			m_MeshProps.IncludeNodes = includeNodesNode.as<bool>();
+		if (node.has_child("IncludeNodes"))
+			node["IncludeNodes"] >> m_MeshProps.IncludeNodes;
 
-		YAML::Node includeBonesNode = node["IncludeBones"];
-		if (includeBonesNode)
-			m_MeshProps.IncludeBones = includeBonesNode.as<bool>();
+		if (node.has_child("IncludeBones"))
+			node["IncludeBones"] >> m_MeshProps.IncludeBones;
 
-		YAML::Node rowsNode = node["Rows"];
-		if (rowsNode)
-			m_MeshProps.Rows = rowsNode.as<int>();
+		if (node.has_child("Rows"))
+			node["Rows"] >> m_MeshProps.Rows;
 
-		YAML::Node columnsNode = node["Columns"];
-		if (columnsNode)
-			m_MeshProps.Columns = columnsNode.as<int>();
+		if (node.has_child("Columns"))
+			node["Columns"] >> m_MeshProps.Columns;
 
-		YAML::Node tessellationNode = node["Tessellation"];
-		if (tessellationNode)
-			m_MeshProps.Rows = tessellationNode.as<int>();
+		if (node.has_child("Tessellation"))
+			node["Tessellation"] >> m_MeshProps.Rows;
 
-		YAML::Node invertNode = node["Invert"];
-		if (invertNode)
-			m_MeshProps.Invert = invertNode.as<bool>();
+		if (node.has_child("Invert"))
+			node["Invert"] >> m_MeshProps.Invert;
 	}
 
 	void MeshAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
@@ -158,89 +154,85 @@ namespace Mahakam
 	}
 #endif
 
-	void MeshAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
+	void MeshAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
 	{
 		Asset<Mesh> mesh(asset);
 
-		emitter << YAML::Key << "Materials" << YAML::Value << YAML::BeginSeq;
-		for (auto& material : mesh->Props.Materials)
-		{
-			emitter << YAML::Value << material.GetID();
-		}
-		emitter << YAML::EndSeq;
+		ryml::NodeRef materialsNode = node["Materials"];
+		materialsNode |= ryml::SEQ;
 
-		emitter << YAML::Key << "Primitive" << YAML::Value << (int)mesh->Props.Primitive;
+		for (auto& material : mesh->Props.Materials)
+			materialsNode.append_child() << material.GetID();
+
+		node["Primitive"] << (int)mesh->Props.Primitive;
 
 		switch (mesh->Props.Primitive)
 		{
 		case MeshPrimitive::Model:
-			emitter << YAML::Key << "IncludeNodes" << YAML::Value << mesh->Props.IncludeNodes;
-			emitter << YAML::Key << "IncludeBones" << YAML::Value << mesh->Props.IncludeBones;
+			node["IncludeNodes"] << mesh->Props.IncludeNodes;
+			node["IncludeBones"] << mesh->Props.IncludeBones;
 			break;
 		case MeshPrimitive::Plane:
 		case MeshPrimitive::UVSphere:
-			emitter << YAML::Key << "Rows" << YAML::Value << mesh->Props.Rows;
-			emitter << YAML::Key << "Columns" << YAML::Value << mesh->Props.Columns;
+			node["Rows"] << mesh->Props.Rows;
+			node["Columns"] << mesh->Props.Columns;
 			break;
 		case MeshPrimitive::Cube:
 		case MeshPrimitive::CubeSphere:
-			emitter << YAML::Key << "Tessellation" << YAML::Value << mesh->Props.Rows;
-			emitter << YAML::Key << "Invert" << YAML::Value << mesh->Props.Invert;
+			node["Tessellation"] << mesh->Props.Rows;
+			node["Invert"] << mesh->Props.Invert;
 			break;
 		}
 	}
 
-	Asset<void> MeshAssetImporter::Deserialize(YAML::Node& node)
+	Asset<void> MeshAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
 		MeshProps meshProps;
 
-		YAML::Node primitiveNode = node["Primitive"];
-		if (primitiveNode)
-			meshProps.Primitive = (MeshPrimitive)primitiveNode.as<int>();
-
-		YAML::Node materialsNode = node["Materials"];
-		if (materialsNode)
+		if (node.has_child("Primitive"))
 		{
-			for (auto materialNode : materialsNode)
+			int primitive;
+			node["Primitive"] >> primitive;
+			meshProps.Primitive = (MeshPrimitive)primitive;
+		}
+
+		if (node.has_child("Materials"))
+		{
+			uint64_t materialID;
+			for (auto materialNode : node["Materials"])
 			{
-				uint64_t materialID = materialNode.as<uint64_t>();
+				materialNode >> materialID;
 				Asset<Material> material = Asset<Material>(materialID);
 
 				meshProps.Materials.push_back(material);
 			}
 		}
 
-		YAML::Node includeNodesNode = node["IncludeNodes"];
-		if (includeNodesNode)
-			meshProps.IncludeNodes = includeNodesNode.as<bool>();
+		if (node.has_child("IncludeNodes"))
+			node["IncludeNodes"] >> meshProps.IncludeNodes;
 
-		YAML::Node includeBonesNode = node["IncludeBones"];
-		if (includeBonesNode)
-			meshProps.IncludeBones = includeBonesNode.as<bool>();
+		if (node.has_child("IncludeBones"))
+			node["IncludeBones"] >> meshProps.IncludeBones;
 
-		YAML::Node rowsNode = node["Rows"];
-		if (rowsNode)
-			meshProps.Rows = rowsNode.as<int>();
+		if (node.has_child("Rows"))
+			node["Rows"] >> meshProps.Rows;
 
-		YAML::Node columnsNode = node["Columns"];
-		if (columnsNode)
-			meshProps.Columns = columnsNode.as<int>();
+		if (node.has_child("Columns"))
+			node["Columns"] >> meshProps.Columns;
 
-		YAML::Node tessellationNode = node["Tessellation"];
-		if (tessellationNode)
-			meshProps.Rows = tessellationNode.as<int>();
+		if (node.has_child("Tessellation"))
+			node["Tessellation"] >> meshProps.Rows;
 
-		YAML::Node invertNode = node["Invert"];
-		if (invertNode)
-			meshProps.Invert = invertNode.as<bool>();
+		if (node.has_child("Invert"))
+			node["Invert"] >> meshProps.Invert;
 
-		YAML::Node filepathNode = node["Filepath"];
 		switch (meshProps.Primitive)
 		{
 		case MeshPrimitive::Model:
-			if (filepathNode)
+			if (node.has_child("Filepath"))
 			{
-				std::string filepath = filepathNode.as<std::string>();
+				std::string filepath;
+				node["Filepath"] >> filepath;
 
 				return Mesh::LoadMesh(filepath, meshProps);
 			}

@@ -3,7 +3,7 @@
 #include "Entity.h"
 #include "SceneSerializer.h"
 
-#include <yaml-cpp/yaml.h>
+#include <ryml/rapidyaml-0.4.1.hpp>
 
 namespace Mahakam
 {
@@ -19,8 +19,8 @@ namespace Mahakam
 			void (*CopyComponent)(Entity, Entity) = nullptr;
 			void (*RemoveComponent)(Entity) = nullptr;
 
-			bool (*Serialize)(YAML::Emitter&, Entity) = nullptr;
-			bool (*Deserialize)(YAML::Node&, SceneSerializer::EntityMap&, Entity) = nullptr;
+			bool (*Serialize)(ryml::NodeRef&, Entity) = nullptr;
+			bool (*Deserialize)(ryml::NodeRef&, SceneSerializer::EntityMap&, Entity) = nullptr;
 
 			template<typename T>
 			void SetComponent()

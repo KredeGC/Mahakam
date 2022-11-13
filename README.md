@@ -51,8 +51,8 @@ Refer to the [BUILDING.md](BUILDING.md) file.
 * [spirv-cross](https://github.com/KhronosGroup/SPIRV-Cross) for shader transpiling and reflection.
 * [stb_image](https://github.com/nothings/stb) for loading various image files.
 * [Steam Audio](https://valvesoftware.github.io/steam-audio/) for audio spatialization.
+* [Rapid YAML](https://github.com/biojppm/rapidyaml) for serializaing and deserializing various YAML files.
 * [tinygltf](https://github.com/syoyo/tinygltf) for model and animation loading.
-* [yaml-cpp](https://github.com/jbeder/yaml-cpp) for serializaing and deserializing various YAML files.
 
 Mahakam uses the Steam&reg; Audio SDK. Steam&reg; is a trademark or registered trademark of Valve Corporation in the United States of America and elsewhere.
 

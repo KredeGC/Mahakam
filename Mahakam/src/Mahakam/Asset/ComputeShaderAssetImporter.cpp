@@ -14,7 +14,7 @@ namespace Mahakam
 	}
 
 #ifndef MH_STANDALONE
-	void ComputeShaderAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, YAML::Node& node) { }
+	void ComputeShaderAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node) { }
 
 	void ComputeShaderAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
@@ -26,22 +26,20 @@ namespace Mahakam
 		Asset<ComputeShader> shaderAsset = ComputeShader::Create(filepath.string());
 
 		shaderAsset.Save(filepath, importPath);
-
-		AssetDatabase::ReloadAsset(shaderAsset.GetID());
 	}
 #endif
 
-	void ComputeShaderAssetImporter::Serialize(YAML::Emitter& emitter, Asset<void> asset)
+	void ComputeShaderAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
 	{
 		//Ref<Shader> shader = StaticCastRef<Shader>(asset);
 	}
 
-	Asset<void> ComputeShaderAssetImporter::Deserialize(YAML::Node& node)
+	Asset<void> ComputeShaderAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
-		YAML::Node filepathNode = node["Filepath"];
-		if (filepathNode)
+		if (node.has_child("Filepath"))
 		{
-			std::string filepath = filepathNode.as<std::string>();
+			std::string filepath;
+			node["Filepath"] >> filepath;
 
 			return ComputeShader::Create(filepath);
 		}

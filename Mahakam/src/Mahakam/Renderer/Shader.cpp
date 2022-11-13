@@ -10,7 +10,7 @@
 #include "Platform/Headless/HeadlessShader.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
-#include <yaml-cpp/yaml.h>
+#include <ryml/rapidyaml-0.4.1.hpp>
 
 #define ENABLE_HLSL
 #include <spirv_cross/spirv_glsl.hpp>
@@ -172,128 +172,145 @@ namespace Mahakam
 		return sources;
 	}
 
-	std::string Shader::ParseDefaultValue(const YAML::Node& node)
+	std::string Shader::ParseDefaultValue(const ryml::NodeRef& node)
 	{
-		if (node)
+		if (node.is_seq())
 		{
-			if (node.IsScalar())
+			std::stringstream value;
+			for (auto iter = node.begin(); iter != node.end();)
 			{
-				return node.Scalar();
+				value << ParseDefaultValue(*iter);
+				if (++iter != node.end())
+					value << ",";
 			}
-			else if (node.IsSequence())
-			{
-				std::stringstream value;
-				for (auto iter = node.begin(); iter != node.end();)
-				{
-					value << ParseDefaultValue(*iter);
-					if (++iter != node.end())
-						value << ",";
-				}
-				return "[" + value.str() + "]";
-			}
+			return "[" + value.str() + "]";
 		}
-
-		return "";
+		// TODO: Maps
+		else
+		{
+			ryml::csubstr val = node.val();
+			return std::string(val.str, val.size());
+		}
 	}
 
 	bool Shader::ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, SourceDefinition>& sources, UnorderedMap<std::string, ShaderProperty>& properties)
 	{
-		YAML::Node rootNode;
+		std::vector<char> buffer;
+
+		if (!FileUtility::ReadFile(filepath, buffer))
+			return false;
+
 		try
 		{
-			rootNode = YAML::LoadFile(filepath.string());
-		}
-		catch (YAML::Exception e)
-		{
-			MH_CORE_WARN("Shader encountered exception trying to parse YAML file {0}: {1}", filepath, e.msg);
-			return false;
-		}
+			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(buffer));
 
-		if (!rootNode || rootNode.size() <= 0)
-		{
-			MH_CORE_WARN("Loaded empty shader file {0}!", filepath);
-			return false;
-		}
+			ryml::NodeRef root = tree.rootref();
 
-		// Read properties
-		auto propertiesNode = rootNode["Properties"];
-
-		MH_CORE_INFO("Loading properties for shader: {0}", filepath.string());
-		for (auto propertyNode : propertiesNode)
-		{
-			std::string propertyName = propertyNode.first.as<std::string>();
-
-			YAML::Node typeNode = propertyNode.second["Type"];
-			YAML::Node minNode = propertyNode.second["Min"];
-			YAML::Node maxNode = propertyNode.second["Max"];
-			YAML::Node defaultNode = propertyNode.second["Default"];
-
-			ShaderPropertyType propertyType = ShaderPropertyType::Default;
-			if (typeNode)
+			if (!root.valid())
 			{
-				std::string typeString = typeNode.as<std::string>();
-				if (typeString == "Color")			propertyType = ShaderPropertyType::Color;
-				else if (typeString == "HDR")		propertyType = ShaderPropertyType::HDR;
-				else if (typeString == "Vector")	propertyType = ShaderPropertyType::Vector;
-				else if (typeString == "Range")		propertyType = ShaderPropertyType::Range;
-				else if (typeString == "Drag")		propertyType = ShaderPropertyType::Drag;
-				else if (typeString == "Texture")	propertyType = ShaderPropertyType::Texture;
-				else if (typeString == "Normal")	propertyType = ShaderPropertyType::Normal;
-				else if (typeString == "Default")	propertyType = ShaderPropertyType::Default;
+				MH_CORE_WARN("Loaded empty shader file {0}!", filepath);
+				return false;
 			}
 
-			float min = 0;
-			if (minNode)
-				min = minNode.as<float>();
-
-			float max = 0;
-			if (maxNode)
-				max = maxNode.as<float>();
-
-			std::string defaultValue = ParseDefaultValue(defaultNode);
-
-			properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue, 1, 0 };
-
-			MH_CORE_INFO("  {0}: {1}", propertyName, defaultValue);
-		}
-
-		// Read shader passes
-		auto passesNode = rootNode["Passes"];
-
-		for (auto shaderPassNode : passesNode)
-		{
-			std::string shaderPassName = shaderPassNode.first.as<std::string>();
-
-			// Read shaderpass defines
-			std::stringstream shaderPassDefines;
-			auto definesNode = shaderPassNode.second["Defines"];
-			if (definesNode)
+			if (root.has_child("Properties"))
 			{
-				for (auto define : definesNode)
-					shaderPassDefines << "#define " + define.as<std::string>() + "\n";
-			}
+				ryml::NodeRef propertiesNode = root["Properties"];
 
-			// Read and compile include files
-			auto includesNode = shaderPassNode.second["Includes"];
-			if (includesNode)
-			{
-				// Read and parse source files
-				std::stringstream source;
-				for (auto includeNode : includesNode)
+				MH_CORE_INFO("Loading properties for shader: {0}", filepath.string());
+				for (auto& propertyNode : propertiesNode)
 				{
-					std::string shaderPath = includeNode.as<std::string>();
+					ryml::csubstr key = propertyNode.key();
+					std::string propertyName(key.str, key.size());
 
-					source << ShaderUtility::ReadFile(shaderPath);
+					ShaderPropertyType propertyType = ShaderPropertyType::Default;
+					if (propertyNode.has_child("Type"))
+					{
+						ryml::NodeRef typeNode = propertyNode["Type"];
+						std::string typeString;
+						typeNode >> typeString;
+
+						if (typeString == "Color")			propertyType = ShaderPropertyType::Color;
+						else if (typeString == "HDR")		propertyType = ShaderPropertyType::HDR;
+						else if (typeString == "Vector")	propertyType = ShaderPropertyType::Vector;
+						else if (typeString == "Range")		propertyType = ShaderPropertyType::Range;
+						else if (typeString == "Drag")		propertyType = ShaderPropertyType::Drag;
+						else if (typeString == "Texture")	propertyType = ShaderPropertyType::Texture;
+						else if (typeString == "Normal")	propertyType = ShaderPropertyType::Normal;
+						else if (typeString == "Default")	propertyType = ShaderPropertyType::Default;
+					}
+
+					float min = 0;
+					if (propertyNode.has_child("Min"))
+						propertyNode["Min"] >> min;
+
+					float max = 0;
+					if (propertyNode.has_child("Max"))
+						propertyNode["Max"] >> max;
+
+					std::string defaultValue;
+					if (propertyNode.has_child("Default"))
+						defaultValue = ParseDefaultValue(propertyNode["Default"]);
+
+					properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue, 1, 0 };
+
+					MH_CORE_INFO("  {0}: {1}", propertyName, defaultValue);
 				}
-
-				auto glslSources = ParseGLSLFile(source.str());
-
-				// Output shader source for each pass and stage
-				sources[shaderPassName] = { glslSources, shaderPassDefines.str() };
 			}
+
+			// Read shader passes
+			if (root.has_child("Passes"))
+			{
+				ryml::NodeRef passesNode = root["Passes"];
+
+				for (auto shaderPassNode : passesNode)
+				{
+					ryml::csubstr key = shaderPassNode.key();
+					std::string shaderPassName(key.str, key.size());
+
+					// Read shaderpass defines
+					std::stringstream shaderPassDefines;
+					if (shaderPassNode.has_child("Defines"))
+					{
+						auto definesNode = shaderPassNode["Defines"];
+						for (auto& defineNode : definesNode)
+						{
+							std::string define;
+							defineNode >> define;
+							shaderPassDefines << "#define " + define + "\n";
+						}
+					}
+
+					// Read and compile include files
+					if (shaderPassNode.has_child("Includes"))
+					{
+						ryml::NodeRef includesNode = shaderPassNode["Includes"];
+
+						// Read and parse source files
+						std::stringstream source;
+						for (auto& includeNode : includesNode)
+						{
+							std::string shaderPath;
+							includeNode >> shaderPath;
+
+							source << ShaderUtility::ReadFile(shaderPath);
+						}
+
+						auto glslSources = ParseGLSLFile(source.str());
+
+						// Output shader source for each pass and stage
+						sources[shaderPassName] = { glslSources, shaderPassDefines.str() };
+					}
+				}
+			}
+
+			return true;
+		}
+		catch (std::runtime_error const& e)
+		{
+			MH_CORE_WARN("Shader encountered exception trying to parse YAML file {0}: {1}", filepath, e.what());
 		}
 
-		return true;
+		return false;
 	}
 
 	bool Shader::CompileSPIRV(UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv, const SourceDefinition& sourceDef)

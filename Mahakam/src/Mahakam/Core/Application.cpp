@@ -13,6 +13,8 @@
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/RendererAPI.h"
 
+#include "Mahakam/Serialization/YAMLGuard.h"
+
 namespace Mahakam
 {
 	Application* Application::instance = nullptr;
@@ -26,6 +28,8 @@ namespace Mahakam
 
 		window = Window::Create(props);
 		window->SetEventCallback(MH_BIND_EVENT(Application::OnEvent));
+
+		YAMLGuard::Init();
 
 		Renderer::Init(props.Width, props.Height);
 
@@ -52,6 +56,8 @@ namespace Mahakam
 		PhysicsEngine::Shutdown();
 
 		Renderer::Shutdown();
+
+		YAMLGuard::Shutdown();
 	}
 
 	void Application::Run()
