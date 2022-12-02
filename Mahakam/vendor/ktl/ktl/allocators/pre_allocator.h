@@ -1,9 +1,10 @@
 #pragma once
 
+#include "../utility/assert_utility.h"
+#include "../utility/alignment_utility.h"
 #include "type_allocator.h"
 
-#include "../utility/alignment_utility.h"
-
+#include <atomic>
 #include <memory>
 #include <type_traits>
 
@@ -21,12 +22,14 @@ namespace ktl
 
 		struct arena
 		{
+			alignas(ALIGNMENT) char Data[Size];
+			std::atomic<size_t> UseCount;
 			footer* Free;
 			footer* Guess;
-			alignas(ALIGNMENT) char Data[Size];
 
 			arena() noexcept :
-				Data{}
+				Data{},
+				UseCount(1)
 			{
 				Free = reinterpret_cast<footer*>(Data);
 				Free->AvailableSpace = Size;
@@ -38,15 +41,50 @@ namespace ktl
 
 	public:
 		pre_allocator() noexcept
-			: m_Block(std::make_shared<arena>()) {}
+		{
+			m_Block = new arena;
+		}
 
 		pre_allocator(const pre_allocator& other) noexcept :
-			m_Block(other.m_Block) {}
+			m_Block(other.m_Block)
+		{
+			m_Block->UseCount++;
+		}
 
 		pre_allocator(pre_allocator&& other) noexcept :
-			m_Block(std::move(other.m_Block))
+			m_Block(other.m_Block)
 		{
+			KTL_ASSERT(other.m_Block);
 			other.m_Block = nullptr;
+		}
+
+		~pre_allocator()
+		{
+			if (m_Block)
+				decrement();
+		}
+
+		pre_allocator& operator=(const pre_allocator& rhs) noexcept
+		{
+			if (m_Block)
+				decrement();
+
+			m_Block = rhs.m_Block;
+			m_Block->UseCount++;
+
+			return *this;
+		}
+
+		pre_allocator& operator=(pre_allocator&& rhs) noexcept
+		{
+			if (m_Block)
+				decrement();
+
+			m_Block = rhs.m_Block;
+
+			rhs.m_Block = nullptr;
+
+			return *this;
 		}
 
 		bool operator==(const pre_allocator& rhs) const noexcept
@@ -211,7 +249,13 @@ namespace ktl
 			}
 		}
 
-		std::shared_ptr<arena> m_Block;
+		void decrement()
+		{
+			if (m_Block->UseCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
+				delete m_Block;
+		}
+
+		arena* m_Block;
 	};
 
 	template<typename T, size_t Size>

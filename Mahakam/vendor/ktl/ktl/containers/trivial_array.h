@@ -1,5 +1,7 @@
 #pragma once
 
+#include "trivial_array_fwd.h"
+
 #include <cstring>
 #include <iterator>
 #include <memory>
@@ -7,7 +9,7 @@
 
 namespace ktl
 {
-	template<typename T, typename Alloc = std::allocator<T>>
+	template<typename T, typename Alloc>
 	class trivial_array
 	{
 	private:
@@ -58,7 +60,7 @@ namespace ktl
 			m_Begin(Traits::allocate(m_Alloc, size_t(last - first))),
 			m_End(m_Begin + size_t(last - first))
 		{
-			const size_t n = last - first;
+			size_t n = last - first;
 			std::memcpy(m_Begin, first, n * sizeof(T));
 		}
 
@@ -87,18 +89,17 @@ namespace ktl
 
 		trivial_array& operator=(const trivial_array& other) noexcept(std::is_nothrow_copy_assignable_v<T>)
 		{
-			const size_t n = other.size();
+			if (m_Begin != nullptr)
+				Traits::deallocate(m_Alloc, m_Begin, size());
 
-			if (n != size())
-			{
-				T* alBlock = Traits::allocate(m_Alloc, n);
+			m_Alloc = other.m_Alloc;
 
-				if (m_Begin != nullptr)
-					Traits::deallocate(m_Alloc, m_Begin, size());
+			size_t n = other.size();
 
-				m_Begin = alBlock;
-				m_End = m_Begin + n;
-			}
+			T* alBlock = Traits::allocate(m_Alloc, n);
+
+			m_Begin = alBlock;
+			m_End = m_Begin + n;
 
 			std::memcpy(m_Begin, other.m_Begin, n * sizeof(T));
 			return *this;
@@ -109,6 +110,7 @@ namespace ktl
 			if (m_Begin != nullptr)
 				Traits::deallocate(m_Alloc, m_Begin, size());
 
+			m_Alloc = std::move(other.m_Alloc);
 			m_Begin = other.m_Begin;
 			m_End = other.m_End;
 
@@ -141,7 +143,7 @@ namespace ktl
 
 		size_t size() const noexcept { return m_End - m_Begin; }
 
-		bool empty() const noexcept { return m_Begin == nullptr; }
+		bool empty() const noexcept { return m_Begin == m_End; }
 
 
 		T* data() noexcept { return m_Begin; }

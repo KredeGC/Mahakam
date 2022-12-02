@@ -1,9 +1,10 @@
 #pragma once
 
+#include "../utility/assert_utility.h"
+#include "../utility/alignment_utility.h"
 #include "type_allocator.h"
 
-#include "../utility/alignment_utility.h"
-
+#include <atomic>
 #include <memory>
 #include <type_traits>
 
@@ -16,21 +17,64 @@ namespace ktl
 		struct arena
 		{
 			alignas(ALIGNMENT) char Data[Size];
+			std::atomic<size_t> UseCount;
 			char* Free;
 			size_t ObjectCount;
 
 			arena() noexcept :
 				Data{},
+				UseCount(1),
 				Free(Data),
 				ObjectCount(0) {}
 		};
 
 	public:
-		linear_allocator() noexcept :
-			m_Block(std::make_shared<arena>()) {}
+		linear_allocator() noexcept
+		{
+			m_Block = new arena;
+		}
 
 		linear_allocator(const linear_allocator& other) noexcept :
-			m_Block(other.m_Block) {}
+			m_Block(other.m_Block)
+		{
+			m_Block->UseCount++;
+		}
+
+		linear_allocator(linear_allocator&& other) noexcept :
+			m_Block(other.m_Block)
+		{
+			KTL_ASSERT(other.m_Block);
+			other.m_Block = nullptr;
+		}
+
+		~linear_allocator()
+		{
+			if (m_Block)
+				decrement();
+		}
+
+		linear_allocator& operator=(const linear_allocator& rhs) noexcept
+		{
+			if (m_Block)
+				decrement();
+
+			m_Block = rhs.m_Block;
+			m_Block->UseCount++;
+
+			return *this;
+		}
+
+		linear_allocator& operator=(linear_allocator&& rhs) noexcept
+		{
+			if (m_Block)
+				decrement();
+
+			m_Block = rhs.m_Block;
+
+			rhs.m_Block = nullptr;
+
+			return *this;
+		}
 
 		bool operator==(const linear_allocator& rhs) const noexcept
 		{
@@ -87,7 +131,13 @@ namespace ktl
 #pragma endregion
 
 	private:
-		std::shared_ptr<arena> m_Block;
+		void decrement()
+		{
+			if (m_Block->UseCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
+				delete m_Block;
+		}
+
+		arena* m_Block;
 	};
 
 	template<typename T, size_t Size>

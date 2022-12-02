@@ -1,7 +1,10 @@
 #pragma once
 
+#include "../utility/assert_utility.h"
+#include "../utility/meta_template.h"
 #include "type_allocator.h"
 
+#include <atomic>
 #include <memory>
 #include <type_traits>
 
@@ -11,7 +14,7 @@ namespace ktl
 	class cascading_allocator
 	{
 	private:
-		static_assert(has_value_type<Alloc>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
+		static_assert(has_no_value_type<Alloc>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
 		static_assert(has_owns<Alloc>::value, "The allocator is required to have an 'owns(void*)' method");
 
 	public:
@@ -27,36 +30,61 @@ namespace ktl
 
 		struct block
 		{
-			node* Node = nullptr;
+			std::atomic<size_t> UseCount;
+			node* Node;
+
+			block() noexcept :
+				UseCount(1),
+				Node(nullptr) {}
 		};
 
 	public:
 		cascading_allocator() noexcept
-			: m_Block(std::make_shared<block>()) {}
+		{
+			m_Block = new block;
+		}
 
 		cascading_allocator(const cascading_allocator& other) noexcept :
-			m_Block(other.m_Block) {}
+			m_Block(other.m_Block)
+		{
+			KTL_ASSERT(other.m_Block);
+			m_Block->UseCount++;
+		}
 
 		cascading_allocator(cascading_allocator&& other) noexcept :
-			m_Block(std::move(other.m_Block))
+			m_Block(other.m_Block)
 		{
+			KTL_ASSERT(other.m_Block);
 			other.m_Block = nullptr;
 		}
 
 		~cascading_allocator()
 		{
-			if (m_Block.use_count() == 1)
-			{
-				node* next = m_Block->Node;
-				while (next)
-				{
-					node* current = next;
+			if (m_Block)
+				decrement();
+		}
 
-					next = current->Next;
+		cascading_allocator& operator=(const cascading_allocator& rhs) noexcept
+		{
+			if (m_Block)
+				decrement();
 
-					delete current;
-				}
-			}
+			m_Block = rhs.m_Block;
+			m_Block->UseCount++;
+
+			return *this;
+		}
+
+		cascading_allocator& operator=(cascading_allocator&& rhs) noexcept
+		{
+			if (m_Block)
+				decrement();
+
+			m_Block = rhs.m_Block;
+
+			rhs.m_Block = nullptr;
+
+			return *this;
 		}
 
 		bool operator==(const cascading_allocator& rhs) const noexcept
@@ -191,7 +219,28 @@ namespace ktl
 #pragma endregion
 
 	private:
-		std::shared_ptr<block> m_Block;
+		void decrement()
+		{
+			if (m_Block->UseCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
+			{
+				node* next = m_Block->Node;
+				while (next)
+				{
+					// Assert that we only have a single allocator left
+					// Otherwise someone forgot to deallocate memory
+					// This isn't a hard-error though
+					KTL_ASSERT(next == m_Block->Node);
+
+					node* current = next;
+
+					next = current->Next;
+
+					delete current;
+				}
+			}
+		}
+
+		block* m_Block;
 	};
 
 	template<typename T, typename Alloc>

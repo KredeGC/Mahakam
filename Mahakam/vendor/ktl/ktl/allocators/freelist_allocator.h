@@ -1,8 +1,11 @@
 #pragma once
 
+#include "../utility/assert_utility.h"
 #include "../utility/meta_template.h"
 #include "type_allocator.h"
 
+#include <atomic>
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 
@@ -12,7 +15,7 @@ namespace ktl
 	class freelist_allocator
 	{
 	private:
-		static_assert(has_value_type<Alloc>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
+		static_assert(has_no_value_type<Alloc>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
 
 	public:
 		typedef typename get_size_type<Alloc>::type size_type;
@@ -26,33 +29,74 @@ namespace ktl
 		struct stats
 		{
 			Alloc Allocator;
+			std::atomic<size_t> UseCount;
 			link* Free;
 
 			stats(const Alloc& alloc) :
 				Allocator(alloc),
+				UseCount(1),
 				Free(nullptr) {}
 		};
 
 	public:
-		freelist_allocator(const Alloc& alloc = Alloc()) noexcept :
-            m_Stats(std::make_shared<stats>(alloc)) {}
+		freelist_allocator(const Alloc& alloc = Alloc()) noexcept
+		{
+			// Allocate the control block with the allocator, if we fit
+			if constexpr (sizeof(stats) > Min && sizeof(stats) <= Max)
+			{
+				m_Stats = reinterpret_cast<stats*>(const_cast<Alloc&>(alloc).allocate(sizeof(stats)));
+				if constexpr (has_construct<void, Alloc, stats*, const Alloc&>::value)
+					alloc.construct(m_Stats, alloc);
+				else
+					::new(m_Stats) stats(alloc);
+			}
+			else
+			{
+				m_Stats = new stats(alloc);
+			}
+		}
 
 		freelist_allocator(const freelist_allocator& other) noexcept :
-            m_Stats(other.m_Stats) {}
+            m_Stats(other.m_Stats)
+		{
+			m_Stats->UseCount++;
+		}
+
+		freelist_allocator(freelist_allocator&& other) noexcept :
+			m_Stats(other.m_Stats)
+		{
+			KTL_ASSERT(other.m_Stats);
+			other.m_Stats = nullptr;
+		}
 
         ~freelist_allocator()
         {
-            if (m_Stats.use_count() == 1)
-            {
-                link* next = m_Stats->Free;
-                while (next)
-                {
-                    link* prev = next;
-                    next = next->Next;
-					m_Stats->Allocator.deallocate(prev, Max);
-                }
-            }
+			if (m_Stats)
+				decrement();
         }
+
+		freelist_allocator& operator=(const freelist_allocator& rhs)
+		{
+			if (m_Stats)
+				decrement();
+
+			m_Stats = rhs.m_Stats;
+			m_Stats->UseCount++;
+
+			return *this;
+		}
+
+		freelist_allocator& operator=(freelist_allocator&& rhs)
+		{
+			if (m_Stats)
+				decrement();
+
+			m_Stats = rhs.m_Stats;
+
+			rhs.m_Stats = nullptr;
+
+			return *this;
+		}
 
 		bool operator==(const freelist_allocator& rhs) const noexcept
 		{
@@ -136,7 +180,36 @@ namespace ktl
 		}
 
 	private:
-        std::shared_ptr<stats> m_Stats;
+		void decrement()
+		{
+			if (m_Stats->UseCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
+			{
+				link* next = m_Stats->Free;
+				while (next)
+				{
+					link* prev = next;
+					next = next->Next;
+					m_Stats->Allocator.deallocate(prev, Max);
+				}
+
+				if constexpr (sizeof(stats) > Min && sizeof(stats) <= Max)
+				{
+					Alloc alloc = std::move(m_Stats->Allocator);
+
+					if constexpr (has_destroy<Alloc, stats*>::value)
+						alloc.destroy(m_Stats);
+					else
+						m_Stats->~stats();
+					alloc.deallocate(m_Stats, sizeof(stats));
+				}
+				else
+				{
+					delete m_Stats;
+				}
+			}
+		}
+
+        stats* m_Stats;
 	};
 
 	template<typename T, size_t Min, size_t Max, typename A>

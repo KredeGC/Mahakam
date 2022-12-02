@@ -1,8 +1,10 @@
 #pragma once
 
+#include "../utility/assert_utility.h"
 #include "../utility/meta_template.h"
 #include "type_allocator.h"
 
+#include <atomic>
 #include <cstring>
 #include <memory>
 #include <ostream>
@@ -14,43 +16,88 @@ namespace ktl
 	class overflow_allocator
 	{
 	private:
-		static_assert(has_value_type<Alloc>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
+		static_assert(has_no_value_type<Alloc>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
 
 	public:
 		typedef typename get_size_type<Alloc>::type size_type;
 
 	private:
 		static constexpr int OVERFLOW_PATTERN = 0b01010101010101010101010101010101;
-		static constexpr size_t OVERFLOW_SIZE = 64;
+		static constexpr int64_t OVERFLOW_TEST = 0b0101010101010101010101010101010101010101010101010101010101010101;
+		static constexpr size_t OVERFLOW_SIZE = 8;
 
 		struct stats
 		{
 			Alloc Allocator;
+			std::atomic<size_t> UseCount;
 			size_type Allocs;
 			size_type Constructs;
 
 			stats(const Alloc& alloc) :
 				Allocator(alloc),
+				UseCount(1),
 				Allocs(0),
 				Constructs(0) {}
 		};
 
 	public:
-		overflow_allocator(const Alloc& alloc = Alloc()) noexcept :
-			m_Stats(std::make_shared<stats>(alloc)) {}
+		overflow_allocator(const Alloc& alloc = Alloc()) noexcept
+		{
+			// Allocate the control block with the allocator, if we fit
+			if constexpr (!has_max_size<Alloc>::value)
+			{
+				m_Stats = reinterpret_cast<stats*>(const_cast<Alloc&>(alloc).allocate(sizeof(stats)));
+				if constexpr (has_construct<void, Alloc, stats*, const Alloc&>::value)
+					alloc.construct(m_Stats, alloc);
+				else
+					::new(m_Stats) stats(alloc);
+			}
+			else
+			{
+				m_Stats = new stats(alloc);
+			}
+		}
 
 		overflow_allocator(const overflow_allocator& other) noexcept :
-			m_Stats(other.m_Stats) {}
+			m_Stats(other.m_Stats)
+		{
+			m_Stats->UseCount++;
+		}
+
+		overflow_allocator(overflow_allocator&& other) noexcept :
+			m_Stats(other.m_Stats)
+		{
+			KTL_ASSERT(other.m_Stats);
+			other.m_Stats = nullptr;
+		}
 
 		~overflow_allocator()
 		{
-			// Only assume a leak when we're the last reference
-			// Otherwise copies could still be using it, but receive an error
-			if (m_Stats.use_count() == 1)
-			{
-				if (m_Stats->Allocs != 0 || m_Stats->Constructs != 0)
-					Stream << "--------MEMORY LEAK DETECTED--------\nAllocator destroyed while having:\n" << m_Stats->Allocs << " Allocations\n" << m_Stats->Constructs << " Constructions\n";
-			}
+			if (m_Stats)
+				decrement();
+		}
+
+		overflow_allocator& operator=(const overflow_allocator& rhs) noexcept
+		{
+			if (m_Stats)
+				decrement();
+
+			m_Stats = rhs.m_Stats;
+			m_Stats->UseCount++;
+
+			return *this;
+		}
+
+		overflow_allocator& operator=(overflow_allocator&& rhs) noexcept
+		{
+			if (m_Stats)
+				decrement();
+
+			m_Stats = rhs.m_Stats;
+
+			rhs.m_Stats = nullptr;
+
+			return *this;
 		}
 
 		bool operator==(const overflow_allocator& rhs) const noexcept
@@ -88,10 +135,12 @@ namespace ktl
 			{
 				char* ptr = reinterpret_cast<char*>(p);
 
-				// HACK: In reality this should be compared to the reference directly, but that would require more allocation etc...
-				// Instead we just compare them to eachother. If corruption has occurred, it's very unlikely to have corrupted in an identical pattern
-				if (std::memcmp(ptr - OVERFLOW_SIZE, ptr + n, OVERFLOW_SIZE) != 0)
-					Stream << "--------MEMORY CORRUPTION DETECTED--------\nThe area around " << reinterpret_cast<int*>(p) << " has been modified\n";
+				// Check against corruption
+				if (std::memcmp(ptr + n, &OVERFLOW_TEST, OVERFLOW_SIZE) != 0)
+					Stream << "--------MEMORY CORRUPTION DETECTED--------\nThe area around " << reinterpret_cast<int*>(ptr + n) << " has been modified\n";
+
+				if (std::memcmp(ptr - OVERFLOW_SIZE, &OVERFLOW_TEST, OVERFLOW_SIZE) != 0)
+					Stream << "--------MEMORY CORRUPTION DETECTED--------\nThe area around " << reinterpret_cast<int*>(ptr - OVERFLOW_SIZE) << " has been modified\n";
 
 				size_type size = n + OVERFLOW_SIZE * 2;
 				m_Stats->Allocator.deallocate(ptr - OVERFLOW_SIZE, size);
@@ -150,7 +199,31 @@ namespace ktl
 		}
 
 	private:
-		std::shared_ptr<stats> m_Stats;
+		void decrement()
+		{
+			if (m_Stats->UseCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
+			{
+				if (m_Stats->Allocs != 0 || m_Stats->Constructs != 0)
+					Stream << "--------MEMORY LEAK DETECTED--------\nAllocator destroyed while having:\n" << m_Stats->Allocs << " Allocations\n" << m_Stats->Constructs << " Constructions\n";
+
+				if constexpr (!has_max_size<Alloc>::value)
+				{
+					Alloc alloc = std::move(m_Stats->Allocator);
+
+					if constexpr (has_destroy<Alloc, stats*>::value)
+						alloc.destroy(m_Stats);
+					else
+						m_Stats->~stats();
+					alloc.deallocate(m_Stats, sizeof(stats));
+				}
+				else
+				{
+					delete m_Stats;
+				}
+			}
+		}
+
+		stats* m_Stats;
 	};
 
 	template<typename T, typename A, std::ostream& Stream>

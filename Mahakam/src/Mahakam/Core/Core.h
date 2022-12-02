@@ -1,16 +1,5 @@
 #pragma once
 
-#include "Allocator.h"
-#include "Mahakam/Version.h"
-
-#include <ktl/containers/trivial_array.h>
-#include <ktl/containers/trivial_vector.h>
-
-#include <memory>
-#include <unordered_map>
-#include <unordered_set>
-
-
 #ifndef MH_STANDALONE
 #define MH_ENABLE_DYNAMIC_LINKING // Expose engine functions to dynamically loaded libraries
 #define MH_ENABLE_PROFILING // Enable profiling in builds
@@ -20,6 +9,20 @@
 #define MH_ENABLE_GL_ERRORS // Enable render API error logging in debug builds
 #endif // MH_DEBUG
 #endif // MH_STANDALONE
+
+#include "Allocator.h"
+#include "Mahakam/Version.h"
+
+#ifdef MH_ENABLE_ASSERT
+#define KTL_DEBUG_ASSERT
+#endif
+#include <ktl/containers/trivial_array.h>
+#include <ktl/containers/trivial_vector.h>
+#include <ktl/containers/unordered_probe_map.h>
+
+#include <memory>
+//#include <unordered_map>
+#include <unordered_set>
 
 
 #ifdef MH_ENABLE_ASSERT
@@ -85,7 +88,7 @@ namespace Mahakam
 	using TrivialVector = ktl::trivial_vector<T, Alloc>;
 
 	template<typename K, typename V>
-	using UnorderedMap = std::unordered_map<K, V>;
+	using UnorderedMap = ktl::unordered_probe_map<K, V>;
 
 	template<typename K>
 	using UnorderedSet = std::unordered_set<K>;

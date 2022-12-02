@@ -1,12 +1,8 @@
 #pragma once
 
-#include "type_allocator.h"
-
 #include "../utility/alignment_malloc.h"
 #include "../utility/alignment_utility.h"
-
-#include <memory>
-#include <type_traits>
+#include "type_allocator.h"
 
 namespace ktl
 {
@@ -18,6 +14,10 @@ namespace ktl
 		mallocator(const mallocator& other) noexcept = default;
 
 		mallocator(mallocator&& other) noexcept = default;
+
+		mallocator& operator=(const mallocator& rhs) noexcept = default;
+
+		mallocator& operator=(mallocator&& rhs) noexcept = default;
 
 		bool operator==(const mallocator& rhs) const noexcept
 		{

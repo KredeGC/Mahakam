@@ -12,8 +12,8 @@ namespace ktl
 	class segragator_allocator
 	{
 	private:
-		static_assert(has_value_type<P>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
-		static_assert(has_value_type<F>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
+		static_assert(has_no_value_type<P>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
+		static_assert(has_no_value_type<F>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
 		static_assert(!has_construct<P>::value || has_owns<P>::value, "The primary allocator is required to have an 'owns(void*)' method, if it has a construct(void*, Args...) method");
 
 	public:
@@ -23,9 +23,13 @@ namespace ktl
 			m_Primary(primary),
 			m_Fallback(fallback) {}
 
-		segragator_allocator(const segragator_allocator& other) noexcept :
-			m_Primary(other.m_Primary),
-			m_Fallback(other.m_Fallback) {}
+		segragator_allocator(const segragator_allocator& other) noexcept = default;
+
+		segragator_allocator(segragator_allocator&& other) noexcept = default;
+
+		segragator_allocator& operator=(const segragator_allocator& rhs) noexcept = default;
+
+		segragator_allocator& operator=(segragator_allocator&& rhs) noexcept = default;
 
 		bool operator==(const segragator_allocator& rhs) const noexcept
 		{
@@ -60,9 +64,11 @@ namespace ktl
 		typename std::enable_if<has_construct<void, P, T*, Args...>::value || has_construct<void, F, T*, Args...>::value, void>::type
 		construct(T* p, Args&&... args)
 		{
+			bool owned = m_Primary.owns(p);
+
 			if constexpr (has_construct<void, P, T*, Args...>::value)
 			{
-				if (m_Primary.owns(p))
+				if (owned)
 				{
 					m_Primary.construct(p, std::forward<Args>(args)...);
 					return;
@@ -71,8 +77,11 @@ namespace ktl
 
 			if constexpr (has_construct<void, F, T*, Args...>::value)
 			{
-				m_Fallback.construct(p, std::forward<Args>(args)...);
-				return;
+				if (!owned)
+				{
+					m_Fallback.construct(p, std::forward<Args>(args)...);
+					return;
+				}
 			}
 
 			::new(p) T(std::forward<Args>(args)...);
@@ -82,9 +91,11 @@ namespace ktl
 		typename std::enable_if<has_destroy<P, T*>::value || has_destroy<F, T*>::value, void>::type
 		destroy(T* p)
 		{
+			bool owned = m_Primary.owns(p);
+
 			if constexpr (has_destroy<P, T*>::value)
 			{
-				if (m_Primary.owns(p))
+				if (owned)
 				{
 					m_Primary.destroy(p);
 					return;
@@ -93,8 +104,11 @@ namespace ktl
 
 			if constexpr (has_destroy<F, T*>::value)
 			{
-				m_Fallback.destroy(p);
-				return;
+				if (!owned)
+				{
+					m_Fallback.destroy(p);
+					return;
+				}
 			}
 
 			p->~T();
@@ -102,30 +116,21 @@ namespace ktl
 #pragma endregion
 
 #pragma region Utility
-		template<typename Pr = P, typename Fr = F>
-		typename std::enable_if<has_max_size<Pr>::value && has_max_size<Fr>::value, size_type>::type
+		template<typename Primary = P, typename Fallback = F>
+		typename std::enable_if<has_max_size<Primary>::value && has_max_size<Fallback>::value, size_type>::type
 		max_size() const noexcept
 		{
 			return (std::max)(m_Primary.max_size(), m_Fallback.max_size());
 		}
 
 		template<typename Primary = P, typename Fallback = F>
-		typename std::enable_if<has_owns<Primary>::value || has_owns<Fallback>::value, bool>::type
+		typename std::enable_if<has_owns<Primary>::value && has_owns<Fallback>::value, bool>::type
 		owns(void* p)
 		{
-			if constexpr (has_owns<Primary>::value)
-			{
-				if (m_Primary.owns(p))
-					return true;
-			}
-			
-			if constexpr (has_owns<Fallback>::value)
-			{
-				if (m_Fallback.owns(p))
-					return true;
-			}
+			if (m_Primary.owns(p))
+				return true;
 
-			return false;
+			return m_Fallback.owns(p);
 		}
 #pragma endregion
 

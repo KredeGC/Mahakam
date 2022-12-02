@@ -10,7 +10,7 @@ namespace ktl
 	template<typename T, typename Alloc>
 	class type_allocator
 	{
-		static_assert(has_value_type<Alloc>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
+		static_assert(has_no_value_type<Alloc>::value, "Building on top of typed allocators is not allowed. Use allocators without a type");
 		static_assert(!std::is_const<T>::value, "Using an allocator of const T is ill-formed");
 
 	private:
@@ -28,15 +28,28 @@ namespace ktl
 			typedef type_allocator<U, Alloc> other;
 		};
 
-		type_allocator(const Alloc& alloc = Alloc()) noexcept :
+		type_allocator() noexcept :
+			m_Alloc(Alloc()) {}
+
+		explicit type_allocator(const Alloc& alloc) noexcept :
 			m_Alloc(alloc) {}
+
+		explicit type_allocator(Alloc&& alloc) noexcept :
+			m_Alloc(std::move(alloc)) {}
 
 		type_allocator(const type_allocator& other) noexcept :
 			m_Alloc(other.m_Alloc) {}
 
+		type_allocator(type_allocator&& other) noexcept :
+			m_Alloc(std::move(other.m_Alloc)) {}
+
 		template<typename U>
 		type_allocator(const type_allocator<U, Alloc>& other) noexcept :
 			m_Alloc(other.m_Alloc) {}
+
+		type_allocator& operator=(const type_allocator& rhs) noexcept = default;
+
+		type_allocator& operator=(type_allocator&& rhs) noexcept = default;
 
 #pragma region Allocation
 		value_type* allocate(size_t n)

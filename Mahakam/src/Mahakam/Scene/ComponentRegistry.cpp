@@ -30,7 +30,7 @@ namespace Mahakam
 	//void ComponentRegistry::RegisterComponent(const std::string& name, ComponentInterface componentInterface)
 	MH_DEFINE_FUNC(ComponentRegistry::RegisterComponent, void, const std::string& name, ComponentInterface componentInterface)
 	{
-		s_ComponentInterfaces[name] = componentInterface;
+		s_ComponentInterfaces.insert(name, componentInterface);
 	};
 
 	//void ComponentRegistry::DeregisterComponent(const std::string& name)

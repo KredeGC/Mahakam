@@ -165,8 +165,7 @@ namespace Mahakam
 
 			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
 			pos = source.find(typeToken, nextLinePos);
-			sources[ShaderTypeFromString(type)] =
-				source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
+			sources.insert(ShaderTypeFromString(type), source.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos)));
 		}
 
 		return sources;
@@ -298,7 +297,7 @@ namespace Mahakam
 						auto glslSources = ParseGLSLFile(source.str());
 
 						// Output shader source for each pass and stage
-						sources[shaderPassName] = { glslSources, shaderPassDefines.str() };
+						sources.insert(shaderPassName, SourceDefinition{ glslSources, shaderPassDefines.str() });
 					}
 				}
 			}
@@ -380,7 +379,7 @@ namespace Mahakam
 				if (glslang::TIntermediate* ptr = program->getIntermediate((EShLanguage)stage))
 				{
 					ShaderStage stageEnum = EShLanguageToShaderStage(stage);
-					spirv.insert({ stageEnum, std::vector<uint32_t>() });
+					spirv.insert(stageEnum, std::vector<uint32_t>());
 					glslang::GlslangToSpv(*ptr, spirv[stageEnum]);
 				}
 			}
