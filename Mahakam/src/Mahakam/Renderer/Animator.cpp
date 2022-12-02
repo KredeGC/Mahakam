@@ -68,11 +68,11 @@ namespace Mahakam
 				interpolation = (m_Time - prev) / (next - prev);
 
 			for (auto& bone : translations)
-				m_Translations.insert(bone.first, glm::mix(bone.second.at(prevIndex), bone.second.at(nextIndex), interpolation));
+				m_Translations[bone.first] = glm::mix(bone.second.at(prevIndex), bone.second.at(nextIndex), interpolation);
 			for (auto& bone : rotations)
-				m_Rotations.insert(bone.first, glm::slerp(bone.second.at(prevIndex), bone.second.at(nextIndex), interpolation));
+				m_Rotations[bone.first] = glm::slerp(bone.second.at(prevIndex), bone.second.at(nextIndex), interpolation);
 			for (auto& bone : scales)
-				m_Scales.insert(bone.first, glm::mix(bone.second.at(prevIndex), bone.second.at(nextIndex), interpolation));
+				m_Scales[bone.first] = glm::mix(bone.second.at(prevIndex), bone.second.at(nextIndex), interpolation);
 		}
 	}
 }
