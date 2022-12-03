@@ -16,6 +16,8 @@
 #include "ConsoleLogSink.h"
 #endif
 
+#include "RenderPasses/BoundingBoxRenderPass.h"
+
 #include <fstream>
 #include <filesystem>
 
@@ -362,6 +364,7 @@ namespace Mahakam::Editor
 			CreateRef<GeometryRenderPass>(),
 			CreateRef<LightingRenderPass>(),
 			CreateRef<ParticleRenderPass>(),
+			CreateRef<BoundingBoxRenderPass>(),
 			CreateRef<TonemappingRenderPass>() });
 
 		// Create a new active scene

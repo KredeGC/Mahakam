@@ -76,14 +76,14 @@ namespace Mahakam::Editor
 
 				if (FileUtility::Exists(importPath))
 				{
-					std::vector<char> buffer;
+					TrivialVector<char> buffer;
 
 					if (!FileUtility::ReadFile(importPath, buffer))
 						return;
 
 					try
 					{
-						ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(buffer));
+						ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
 
 						ryml::NodeRef root = tree.rootref();
 

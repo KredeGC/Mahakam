@@ -90,14 +90,14 @@ namespace Mahakam
 
 	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
-		std::vector<char> buffer;
+		TrivialVector<char> buffer;
 
 		if (!FileUtility::ReadFile(filepath, buffer))
 			return false;
 
 		try
 		{
-			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(buffer));
+			ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
 
 			return DeserializeFromTree(tree);
 		}

@@ -194,14 +194,14 @@ namespace Mahakam
 
 	bool Shader::ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, SourceDefinition>& sources, UnorderedMap<std::string, ShaderProperty>& properties)
 	{
-		std::vector<char> buffer;
+		TrivialVector<char> buffer;
 
 		if (!FileUtility::ReadFile(filepath, buffer))
 			return false;
 
 		try
 		{
-			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(buffer));
+			ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
 
 			ryml::NodeRef root = tree.rootref();
 

@@ -44,12 +44,6 @@ namespace Mahakam
 		// Initialize camera buffer
 		s_SceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
 		s_SceneData->UniformValueBuffer = UniformBuffer::Create(2 << 14); // 16KB
-
-		// Initialize default material
-		// TODO: Move to a seperate pass
-		//Ref<Shader> unlitColorShader = Shader::Create("assets/shaders/internal/UnlitColor.shader"); // TODO: Use the asset system to load it
-		//s_RendererData->UnlitMaterial = Material::Create(Asset<Shader>(unlitColorShader));
-		//s_RendererData->UnlitMaterial->SetFloat3("u_Color", { 0.0f, 1.0f, 0.0f });
 	}
 
 	void Renderer::Shutdown()
@@ -60,7 +54,6 @@ namespace Mahakam
 		s_RendererData->FrameBuffers.clear();
 		s_RendererData->GBuffer = nullptr;
 		s_RendererData->ViewportFramebuffer = nullptr;
-		s_RendererData->UnlitMaterial = nullptr;
 
 		delete s_RendererData;
 		delete s_SceneData;
@@ -118,52 +111,13 @@ namespace Mahakam
 		s_RendererData->GBuffer = s_RendererData->RenderPasses[0]->GetFrameBuffer();
 
 		Asset<FrameBuffer> prevBuffer = nullptr;
-		for (uint32_t i = 0; i < s_RendererData->RenderPasses.size(); i++)
+		for (auto& renderPass : s_RendererData->RenderPasses)
 		{
-			if (s_RendererData->RenderPasses[i]->Render(s_SceneData, prevBuffer))
-				prevBuffer = s_RendererData->RenderPasses[i]->GetFrameBuffer();
+			if (renderPass->Render(s_SceneData, prevBuffer))
+				prevBuffer = renderPass->GetFrameBuffer();
 		}
 
 		s_RendererData->ViewportFramebuffer = prevBuffer;
-
-		// Render bounding boxes
-		/*if (sceneData->boundingBox)
-		{
-			rendererData->viewportFramebuffer->Bind();
-			GL::SetFillMode(false);
-
-			rendererData->unlitMaterial->BindShader("GEOMETRY");
-			rendererData->unlitMaterial->Bind(sceneData->UniformBuffer);
-
-			auto wireMesh = GL::GetCube();
-			wireMesh->Bind();
-
-			for (uint64_t drawID : sceneData->renderQueue)
-			{
-				const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-				Ref<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
-
-				const uint64_t transformID = drawID & 0xFFFFULL;
-				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
-
-				const Bounds transformedBounds = Bounds::TransformBounds(mesh->GetBounds(), transform);
-
-				const glm::vec3 scale = transformedBounds.Max - transformedBounds.Min;
-				const glm::vec3 center = transformedBounds.Min + scale / 2.0f;
-
-				const glm::mat4 wireTransform = glm::translate(glm::mat4(1.0f), center)
-					* glm::scale(glm::mat4(1.0f), scale);
-
-				rendererData->unlitMaterial->SetTransform(wireTransform);
-
-				Renderer::AddPerformanceResult(wireMesh->GetVertexCount(), wireMesh->GetIndexCount());
-
-				GL::DrawIndexed(wireMesh->GetIndexCount());
-			}
-
-			GL::SetFillMode(true);
-			rendererData->viewportFramebuffer->Unbind();
-		}*/
 
 		// Normalize results
 		s_RendererData->FrameResults.TriCount /= 3;
@@ -399,9 +353,11 @@ namespace Mahakam
 	//void Renderer::AddPerformanceResultImpl(uint32_t vertexCount, uint32_t indexCount)
 	MH_DEFINE_FUNC(Renderer::AddPerformanceResultImpl, void, uint32_t vertexCount, uint32_t indexCount)
 	{
+#ifndef MH_STANDALONE
 		s_RendererData->FrameResults.DrawCalls++;
 		s_RendererData->FrameResults.VertexCount += vertexCount;
 		s_RendererData->FrameResults.TriCount += indexCount;
+#endif
 	};
 
 	//const RendererResults& Renderer::GetPerformanceResultsImpl()

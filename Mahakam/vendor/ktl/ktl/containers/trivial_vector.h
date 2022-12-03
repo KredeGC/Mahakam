@@ -163,6 +163,8 @@ namespace ktl
 
 		const T* data() const noexcept { return m_Begin; }
 
+		T& at(size_t index) const noexcept { return m_Begin[index]; }
+
 
 		void resize(size_t n)
 		{

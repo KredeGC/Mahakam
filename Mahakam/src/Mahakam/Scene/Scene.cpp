@@ -122,6 +122,11 @@ namespace Mahakam
 
 				animator.Update(ts);
 			});
+		}
+
+		// Update entities of skinned animators
+		{
+			MH_PROFILE_SCOPE("Scene::OnUpdate - Animations");
 
 			m_Registry.view<AnimatorComponent, SkinComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
 			{
@@ -222,7 +227,7 @@ namespace Mahakam
 						{
 							if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
 							{
-								auto& node = hierarchy.at(i);
+								const auto& node = hierarchy.at(i);
 
 								// TODO: Find some better way?
 								// Currently the bones are part of the uniform buffer, but that seems a bit unwieldy

@@ -41,7 +41,7 @@ namespace Mahakam
 		return std::filesystem::current_path();
 	}
 
-	bool FileUtility::ReadFile(const std::filesystem::path& filepath, std::vector<char>& buffer)
+	bool FileUtility::ReadFile(const std::filesystem::path& filepath, TrivialVector<char>& buffer)
 	{
 		std::ifstream ifs(filepath, std::ios::binary | std::ios::ate);
 

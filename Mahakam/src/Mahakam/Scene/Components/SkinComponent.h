@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Mahakam/Scene/Entity.h"
+#include "Mahakam/Core/Core.h"
 
-#include <vector>
+#include "Mahakam/Scene/Entity.h"
 
 namespace Mahakam
 {
 	struct SkinComponent
 	{
 	private:
-		std::vector<Entity> m_BoneEntities;
+		TrivialVector<Entity> m_BoneEntities;
 		bool m_TargetOrigin = false;
 
 	public:
@@ -23,6 +23,6 @@ namespace Mahakam
 		inline void EnableTargetOrigin(bool enable) { m_TargetOrigin = enable; }
 		inline bool HasTargetOrigin() const { return m_TargetOrigin; }
 
-		inline std::vector<Entity>& GetBoneEntities() { return m_BoneEntities; }
+		inline TrivialVector<Entity>& GetBoneEntities() { return m_BoneEntities; }
 	};
 }

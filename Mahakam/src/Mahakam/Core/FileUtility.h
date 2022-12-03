@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core.h"
+
 #include <string>
 #include <filesystem>
 
@@ -18,7 +20,7 @@ namespace Mahakam
 		static void SetWorkingDirectory(const std::filesystem::path& filepath);
 		static std::filesystem::path GetWorkingDirectory();
 
-		static bool ReadFile(const std::filesystem::path& filepath, std::vector<char>& buffer);
+		static bool ReadFile(const std::filesystem::path& filepath, TrivialVector<char>& buffer);
 
 		static bool Exists(const std::filesystem::path& src);
 		static void CreateDirectories(const std::filesystem::path& src);

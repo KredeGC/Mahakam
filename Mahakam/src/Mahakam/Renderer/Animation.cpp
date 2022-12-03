@@ -33,7 +33,7 @@ namespace Mahakam
 			MH_CORE_ERROR("[GLTF] Error: {0}", err);
 
 		if (!success) {
-			MH_CORE_ERROR("[GLTF] Failed to parse glTF model at {0}", filepath.string());
+			MH_CORE_ERROR("[GLTF] Failed to parse glTF animation at {0}", filepath.string());
 			return;
 		}
 
@@ -42,6 +42,7 @@ namespace Mahakam
 		m_Name = animation.name;
 
 		UnorderedMap<int, Sampler> samplers;
+		samplers.reserve(animation.samplers.size());
 
 		// Each channel refers to a node/bone's target
 		// channels.size() ~= bones.size() * [translation, rotation, scale, weights].size()

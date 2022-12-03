@@ -256,7 +256,7 @@ namespace Mahakam
 			ryml::NodeRef bones = node["Bones"];
 			bones |= ryml::SEQ;
 
-			const std::vector<Entity>& boneEntities = skin.GetBoneEntities();
+			const auto& boneEntities = skin.GetBoneEntities();
 			for (auto& boneEntity : boneEntities)
 			{
 				bones.append_child() << uint32_t(boneEntity);
@@ -267,7 +267,7 @@ namespace Mahakam
 		skinInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			SkinComponent& skin = entity.AddComponent<SkinComponent>();
-			std::vector<Entity>& boneEntities = skin.GetBoneEntities();
+			auto& boneEntities = skin.GetBoneEntities();
 
 			if (node.has_child("Bones"))
 			{

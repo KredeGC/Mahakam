@@ -7,7 +7,7 @@ namespace Mahakam
 {
 	void Animator::SetAnimation(Asset<Animation> animation)
 	{
-		m_Animation = animation;
+		m_Animation = std::move(animation);
 		m_Time = 0.0f;
 
 		m_Translations.clear();
@@ -50,8 +50,7 @@ namespace Mahakam
 			float next = timestamps.at(nextIndex);
 			while (m_Time > next && (nextIndex + 1) < frameCount)
 			{
-				nextIndex++;
-				next = timestamps.at(nextIndex);
+				next = timestamps.at(++nextIndex);
 			}
 
 			size_t prevIndex = 0;

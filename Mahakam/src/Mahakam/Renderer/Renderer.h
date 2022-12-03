@@ -21,8 +21,6 @@ namespace Mahakam
 	struct EnvironmentData;
 	struct SceneData;
 
-	// IDEA: Move the AABB visuals to a renderpass in Erebor, which can then be injected at will
-
 	struct RendererResults
 	{
 		uint32_t DrawCalls = 0;
@@ -43,7 +41,6 @@ namespace Mahakam
 
 			Asset<FrameBuffer> GBuffer;
 			Asset<FrameBuffer> ViewportFramebuffer;
-			Asset<Material> UnlitMaterial; // TEMP: For AABB visualization
 			uint32_t Width;
 			uint32_t Height;
 		};
@@ -61,7 +58,7 @@ namespace Mahakam
 		
 		// Scenes
 		inline static void BeginScene(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment) { MH_PROFILE_FUNCTION(); BeginSceneImpl(cam, transform, environment); }
-		inline static void EndScene() { MH_PROFILE_FUNCTION(); EndSceneImpl(); }
+		inline static void EndScene() { MH_PROFILE_RENDERING_FUNCTION(); EndSceneImpl(); }
 		
 		inline static void Submit(const glm::mat4& transform, Ref<SubMesh> mesh, Asset<Material> material) { MH_PROFILE_FUNCTION(); SubmitImpl(transform, std::move(mesh), std::move(material)); }
 		inline static void SubmitParticles(const glm::mat4& transform, const ParticleSystem& particles) { MH_PROFILE_FUNCTION(); SubmitParticlesImpl(transform, particles); }
