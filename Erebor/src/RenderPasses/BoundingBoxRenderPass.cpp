@@ -10,16 +10,6 @@ namespace Mahakam::Editor
 
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		// Create viewport framebuffer
-		FrameBufferProps viewportProps;
-		viewportProps.Width = width;
-		viewportProps.Height = height;
-		viewportProps.ColorAttachments = { TextureFormat::RG11B10F };
-
-		m_ViewportFramebuffer = FrameBuffer::Create(viewportProps);
-
-		Renderer::AddFrameBuffer("Bounding Box", m_ViewportFramebuffer);
-
 		m_UnlitShader = Shader::Create("internal/shaders/builtin/Wireframe.shader");
 
 		return true;
@@ -28,13 +18,6 @@ namespace Mahakam::Editor
 	BoundingBoxRenderPass::~BoundingBoxRenderPass()
 	{
 		MH_PROFILE_FUNCTION();
-
-		m_ViewportFramebuffer = nullptr;
-	}
-
-	void BoundingBoxRenderPass::OnWindowResize(uint32_t width, uint32_t height)
-	{
-		m_ViewportFramebuffer->Resize(width, height);
 	}
 
 	bool BoundingBoxRenderPass::Render(SceneData* sceneData, const Asset<FrameBuffer>& src)
@@ -44,9 +27,7 @@ namespace Mahakam::Editor
 		if (!sceneData->boundingBox)
 			return false;
 
-		src->Blit(m_ViewportFramebuffer, true, true);
-
-		m_ViewportFramebuffer->Bind();
+		src->Bind();
 
 		GL::SetFillMode(false);
 		GL::EnableCulling(false);
@@ -79,11 +60,11 @@ namespace Mahakam::Editor
 			GL::DrawIndexed(wireMesh->GetIndexCount());
 		}
 
-		m_ViewportFramebuffer->Unbind();
+		src->Unbind();
 
 		GL::EnableCulling(true);
 		GL::SetFillMode(true);
 
-		return true;
+		return false;
 	}
 }

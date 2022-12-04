@@ -22,11 +22,11 @@ namespace Mahakam
 		viewportProps.Height = height;
 		viewportProps.ColorAttachments = { TextureFormat::RGBA8 };
 
-		viewportFramebuffer = FrameBuffer::Create(viewportProps);
+		m_ViewportFramebuffer = FrameBuffer::Create(viewportProps);
 
-		Renderer::AddFrameBuffer("Tonemapping", viewportFramebuffer);
+		Renderer::AddFrameBuffer("Tonemapping", m_ViewportFramebuffer);
 
-		tonemappingShader = Shader::Create("internal/shaders/builtin/Tonemapping.shader");
+		m_TonemappingShader = Shader::Create("internal/shaders/builtin/Tonemapping.shader");
 
 		return true;
 	}
@@ -35,13 +35,13 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		viewportFramebuffer = nullptr;
-		tonemappingShader = nullptr;
+		m_ViewportFramebuffer = nullptr;
+		m_TonemappingShader = nullptr;
 	}
 
 	void TonemappingRenderPass::OnWindowResize(uint32_t width, uint32_t height)
 	{
-		viewportFramebuffer->Resize(width, height);
+		m_ViewportFramebuffer->Resize(width, height);
 	}
 
 	bool TonemappingRenderPass::Render(SceneData* sceneData, const Asset<FrameBuffer>& src)
@@ -51,15 +51,15 @@ namespace Mahakam
 		if (sceneData->wireframe)
 			return false;
 
-		src->Blit(viewportFramebuffer, false, true);
+		src->Blit(m_ViewportFramebuffer, false, true);
 
-		viewportFramebuffer->Bind();
+		m_ViewportFramebuffer->Bind();
 		GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
 		GL::Clear(true, false);
 
 		// HDR Tonemapping
-		tonemappingShader->Bind("POSTPROCESSING");
-		tonemappingShader->SetTexture("u_Albedo", src->GetColorTexture(0));
+		m_TonemappingShader->Bind("POSTPROCESSING");
+		m_TonemappingShader->SetTexture("u_Albedo", src->GetColorTexture(0));
 
 		GL::EnableZTesting(false);
 		GL::EnableZWriting(false);
@@ -67,7 +67,7 @@ namespace Mahakam
 		GL::EnableZWriting(true);
 		GL::EnableZTesting(true);
 
-		viewportFramebuffer->Unbind();
+		m_ViewportFramebuffer->Unbind();
 
 		return true;
 	}

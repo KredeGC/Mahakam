@@ -9,8 +9,8 @@ namespace Mahakam
 	class TonemappingRenderPass : public RenderPass
 	{
 	private:
-		Asset<FrameBuffer> viewportFramebuffer = nullptr;
-		Asset<Shader> tonemappingShader = nullptr;
+		Asset<FrameBuffer> m_ViewportFramebuffer = nullptr;
+		Asset<Shader> m_TonemappingShader = nullptr;
 
 	public:
 		virtual bool Init(uint32_t width, uint32_t height) override;
@@ -20,6 +20,6 @@ namespace Mahakam
 
 		virtual bool Render(SceneData* sceneData, const Asset<FrameBuffer>& src) override;
 
-		virtual Asset<FrameBuffer> GetFrameBuffer() override { return viewportFramebuffer; };
+		virtual Asset<FrameBuffer> GetFrameBuffer() override { return m_ViewportFramebuffer; };
 	};
 }

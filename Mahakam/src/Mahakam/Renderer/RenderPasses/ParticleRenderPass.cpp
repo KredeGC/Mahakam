@@ -17,16 +17,6 @@ namespace Mahakam
 
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		// Create viewport framebuffer
-		FrameBufferProps viewportProps;
-		viewportProps.Width = width;
-		viewportProps.Height = height;
-		viewportProps.ColorAttachments = { TextureFormat::RG11B10F };
-
-		viewportFramebuffer = FrameBuffer::Create(viewportProps);
-
-		Renderer::AddFrameBuffer("Particle", viewportFramebuffer);
-
 		particleCompute = ComputeShader::Create("assets/compute/Particles.glsl");
 
 		return true;
@@ -36,13 +26,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		viewportFramebuffer = nullptr;
 		particleCompute = nullptr;
-	}
-
-	void ParticleRenderPass::OnWindowResize(uint32_t width, uint32_t height)
-	{
-		viewportFramebuffer->Resize(width, height);
 	}
 
 	bool ParticleRenderPass::Render(SceneData* sceneData, const Asset<FrameBuffer>& src)
@@ -51,9 +35,7 @@ namespace Mahakam
 
 		GL::SetFillMode(!sceneData->wireframe);
 
-		src->Blit(viewportFramebuffer, true, true);
-
-		viewportFramebuffer->Bind();
+		src->Bind();
 
 		Asset<FrameBuffer> gBuffer = Renderer::GetGBuffer();
 		gBuffer->GetColorTexture(3)->Bind(0);
@@ -82,10 +64,10 @@ namespace Mahakam
 			//GL::DrawIndirect();
 		}
 
-		viewportFramebuffer->Unbind();
+		src->Unbind();
 
 		GL::SetFillMode(true);
 
-		return true;
+		return false;
 	}
 }
