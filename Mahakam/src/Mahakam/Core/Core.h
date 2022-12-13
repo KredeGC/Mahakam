@@ -18,7 +18,7 @@
 #endif
 #include <ktl/containers/trivial_array.h>
 #include <ktl/containers/trivial_vector.h>
-#include <ktl/containers/unordered_probe_map.h>
+#include <ktl/containers/unordered_map.h>
 
 #include <memory>
 //#include <unordered_map>
@@ -88,7 +88,7 @@ namespace Mahakam
 	using TrivialVector = ktl::trivial_vector<T, Alloc>;
 
 	template<typename K, typename V>
-	using UnorderedMap = ktl::unordered_probe_map<K, V>;
+	using UnorderedMap = ktl::unordered_map<K, V>;
 
 	template<typename K>
 	using UnorderedSet = std::unordered_set<K>;

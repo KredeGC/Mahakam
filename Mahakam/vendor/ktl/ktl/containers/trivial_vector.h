@@ -215,7 +215,7 @@ namespace ktl
 			m_End++;
 		}
 
-		void pop_back() { m_End--; }
+		T pop_back() { return m_Begin[--m_End]; }
 
 		void clear() { m_End = m_Begin; }
 

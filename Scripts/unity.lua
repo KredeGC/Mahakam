@@ -20,7 +20,7 @@ if not p.modules.unity then
         local location = path.getdirectory(filename)
 
         local buf = buffered.new()
-        buffered.writeln(buf, "// GENERATED UNITY BUILD. CHANGES WON'T BE PRESERVED")
+        buffered.writeln(buf, "// GENERATED UNITY FILE. CHANGES WON'T BE PRESERVED")
         buffered.writeln(buf, "")
 
         local pch = {}
@@ -85,6 +85,11 @@ if not p.modules.unity then
 
                 -- any file that has any file settings can't be added to the unityFile
                 if p.fileconfig.hasFileSettings(fcfg) then
+                    return
+                end
+                
+                -- if the file is the unityfile, ignore it
+                if p.workspace.getrelative(prj, fcfg.abspath) == "Unity-Build."..(p.project.iscpp(prj) and "cpp" or "c") then
                     return
                 end
 
