@@ -59,7 +59,7 @@ namespace Mahakam
 	};
 
 	//Ref<AssetImporter> AssetDatabase::GetAssetImporter(const Extension& extension)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporter, Ref<AssetImporter>, const Extension& extension)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporter, Ref<AssetImporter>, const ExtensionType& extension)
 	{
 		auto iter = s_AssetImporters.find(extension);
 		if (iter != s_AssetImporters.end())
@@ -293,7 +293,7 @@ namespace Mahakam
 	};
 
 	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, const Extension& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, const ExtensionType& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
 		// Read asset info and ID
 		AssetID id = 0;

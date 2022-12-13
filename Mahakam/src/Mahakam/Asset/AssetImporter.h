@@ -19,7 +19,7 @@ namespace Mahakam
 			bool CreateMenu = false;
 			bool NoFilepath = false;
 			bool NoWizard = false;
-			AssetDatabase::Extension Extension;
+			AssetDatabase::ExtensionType Extension;
 #ifndef MH_STANDALONE
 			std::string Name;
 #endif

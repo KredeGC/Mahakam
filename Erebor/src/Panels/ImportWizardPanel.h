@@ -9,7 +9,7 @@ namespace Mahakam::Editor
 	private:
 		bool m_Open = true;
 
-		AssetDatabase::Extension m_Extension;
+		AssetDatabase::ExtensionType m_Extension;
 		std::filesystem::path m_FilePath;
 		std::filesystem::path m_ImportPath;
 
@@ -20,6 +20,6 @@ namespace Mahakam::Editor
 
 		virtual void OnImGuiRender() override;
 
-		static void ImportAsset(const std::filesystem::path& filepath, const AssetDatabase::Extension& extension, const std::filesystem::path& importPath);
+		static void ImportAsset(const std::filesystem::path& filepath, const AssetDatabase::ExtensionType& extension, const std::filesystem::path& importPath);
 	};
 }

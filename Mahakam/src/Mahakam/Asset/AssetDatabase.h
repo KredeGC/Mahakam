@@ -32,16 +32,16 @@ namespace Mahakam
 
 #ifdef MH_STANDALONE
 		// TODO: Make this an enum or ID or something, as strings are slow
-		typedef std::string Extension;
+		typedef std::string ExtensionType;
 #else
-		typedef std::string Extension;
+		typedef std::string ExtensionType;
 #endif
 
 		struct AssetInfo
 		{
 			AssetID ID = 0;
 			std::filesystem::path Filepath = "";
-			Extension Extension = "";
+			ExtensionType Extension = "";
 		};
 
 	private:
@@ -62,7 +62,7 @@ namespace Mahakam
 		using AssetMap = UnorderedMap<AssetID, std::filesystem::path>;
 		using ExtensionMap = ktl::unordered_multimap<std::string, Ref<AssetImporter>>;
 
-		using ImporterMap = UnorderedMap<Extension, Ref<AssetImporter>>;
+		using ImporterMap = UnorderedMap<ExtensionType, Ref<AssetImporter>>;
 		using LoadedMap = UnorderedMap<AssetID, ControlBlock*>;
 
 		// TODO: Use AssetInfo instead of filepath
@@ -79,7 +79,7 @@ namespace Mahakam
 		MH_DECLARE_FUNC(RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImport); // Registers a specific asset importer to an extension
 		MH_DECLARE_FUNC(DeregisterAssetImporter, void, const std::string& extension); // Deregisters a specific asset importer, given an extension
 		MH_DECLARE_FUNC(DeregisterAllAssetImporters, void); // Removes all currently assigned asset importers
-		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const Extension& extension); // Returns a specific importer, given an extension
+		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const ExtensionType& extension); // Returns a specific importer, given an extension
 		MH_DECLARE_FUNC(GetAssetImporters, const ImporterMap&); // Returns a map of extensions and importers
 		MH_DECLARE_FUNC(GetAssetExtension, ExtensionMap::key_iterator, const std::string& extension); // Returns an iterator to an importer, given an extension
 		MH_DECLARE_FUNC(LoadDefaultAssetImporters, void); // Load default asset importers
@@ -100,7 +100,7 @@ namespace Mahakam
 
 	private:
 		// Saving and loading assets
-		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, const Extension& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath);
+		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, const ExtensionType& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath);
 
 		MH_DECLARE_FUNC(IncrementAsset, ControlBlock*, AssetID id);
 		MH_DECLARE_FUNC(UnloadAsset, void, ControlBlock* control);

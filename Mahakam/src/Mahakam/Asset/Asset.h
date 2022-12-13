@@ -24,7 +24,7 @@ namespace Mahakam
 
 		using AssetID = AssetDatabase::AssetID;
 		using ControlBlock = AssetDatabase::ControlBlock;
-		using Extension = AssetDatabase::Extension;
+		using ExtensionType = AssetDatabase::ExtensionType;
 
 		ControlBlock* m_Control;
 
@@ -174,7 +174,7 @@ namespace Mahakam
 		}
 #pragma endregion
 
-		void Save(const Extension& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+		void Save(const ExtensionType& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 		{
 			m_Control = AssetDatabase::SaveAsset(m_Control, extension, filepath, importPath);
 		}
