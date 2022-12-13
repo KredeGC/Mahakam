@@ -13,6 +13,10 @@ project "spirv_cross"
 		"include/**.h",
 		"include/**.hpp"
 	}
+    
+    removefiles {
+        "Unity-Build.cpp"
+    }
 
 	includedirs {
 		"include/spirv_cross"
