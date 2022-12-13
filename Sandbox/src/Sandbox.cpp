@@ -201,7 +201,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create base collection entity to store in
-	Asset<Mesh> sphereMesh = Asset<Mesh>("import/assets/models/CubeSphere.gltf.import");
+	Asset<Mesh> sphereMesh = Asset<Mesh>("import/assets/models/CubeSphere.mesh.import");
 
 	// Create base collection entity to store in
 	Entity sphereCollection = scene->CreateEntity("Spheres");

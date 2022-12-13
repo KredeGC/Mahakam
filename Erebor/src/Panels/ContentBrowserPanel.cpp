@@ -189,7 +189,7 @@ namespace Mahakam::Editor
 		}
 	}
 
-	void ContentBrowserPanel::DrawDirectoryContents(std::filesystem::path path)
+	void ContentBrowserPanel::DrawDirectoryContents(std::filesystem::path basePath)
 	{
 		float padding = 20.0f;
 		float thumbnailSize = 80.0f;
@@ -204,7 +204,7 @@ namespace Mahakam::Editor
 			if (ImGui::BeginTable("Directory Divisor", numColumns))
 			{
 				// Draw .. directory
-				if (path != FileUtility::ASSET_PATH)
+				if (basePath != FileUtility::ASSET_PATH)
 				{
 					ImGui::TableNextColumn();
 
@@ -214,7 +214,7 @@ namespace Mahakam::Editor
 
 					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 					{
-						m_CurrentDirectory = path.parent_path();
+						m_CurrentDirectory = basePath.parent_path();
 						CreateDirectories(m_CurrentDirectory);
 					}
 
@@ -224,7 +224,7 @@ namespace Mahakam::Editor
 				}
 
 				// Draw other directories
-				if (std::filesystem::exists(path))
+				if (std::filesystem::exists(basePath))
 				{
 					for (const auto& directory : m_Directories)
 					{
@@ -236,7 +236,7 @@ namespace Mahakam::Editor
 
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 						{
-							m_CurrentDirectory = path / directory;
+							m_CurrentDirectory = basePath / directory;
 							CreateDirectories(m_CurrentDirectory);
 						}
 
@@ -255,10 +255,10 @@ namespace Mahakam::Editor
 		{
 			if (ImGui::BeginTable("Import Divisor", numColumns))
 			{
-				std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
-				if (std::filesystem::exists(importPath))
+				std::filesystem::path importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(basePath, FileUtility::PROJECT_PATH);
+				if (std::filesystem::exists(importDirectory))
 				{
-					for (auto& file : std::filesystem::directory_iterator(importPath))
+					for (auto& file : std::filesystem::directory_iterator(importDirectory))
 					{
 						std::filesystem::path importPath = file.path();
 						if (!file.is_directory() && importPath.extension() == ".import")
@@ -309,9 +309,9 @@ namespace Mahakam::Editor
 		{
 			if (ImGui::BeginTable("Raw Divisor", numColumns))
 			{
-				if (std::filesystem::exists(path))
+				if (std::filesystem::exists(basePath))
 				{
-					for (auto& file : std::filesystem::directory_iterator(path))
+					for (auto& file : std::filesystem::directory_iterator(basePath))
 					{
 						if (!file.is_directory())
 						{
@@ -325,8 +325,28 @@ namespace Mahakam::Editor
 
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{
+								m_ImporterExtension = file.path().extension().string();
+								ImGui::OpenPopup("ImportAssetSelectPopup");
+							}
+
+							// Draw a popup to choose importer
+							if (ImGui::BeginPopup("ImportAssetSelectPopup"))
+							{
+								ImGui::Text("Import asset as...");
+
 								std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
-								ImportWizardPanel::ImportAsset(file.path(), file.path().extension().string(), importPath);
+
+								auto iter = AssetDatabase::GetAssetExtension(m_ImporterExtension);
+								while (iter)
+								{
+									const auto& props = iter->second->GetImporterProps();
+									if (ImGui::MenuItem(props.Name.c_str()))
+										ImportWizardPanel::ImportAsset(file.path(), props.Extension, importPath);
+
+									++iter;
+								}
+
+								ImGui::EndPopup();
 							}
 
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
@@ -348,12 +368,12 @@ namespace Mahakam::Editor
 
 				for (const auto& kv : importers)
 				{
-					const auto& props = kv->GetImporterProps();
+					const auto& props = kv.second->GetImporterProps();
 					if (props.CreateMenu)
 					{
-						if (ImGui::MenuItem(props.Extension.c_str()))
+						if (ImGui::MenuItem(props.Name.c_str()))
 						{
-							std::string filename = "Asset" + props.Extension;
+							std::string filename = props.Name + props.Extension;
 							std::filesystem::path filepath = m_CurrentDirectory / filename;
 							std::filesystem::path importPath = FileUtility::GetImportPath(filepath);
 							ImportWizardPanel::ImportAsset(filepath, props.Extension, importPath);

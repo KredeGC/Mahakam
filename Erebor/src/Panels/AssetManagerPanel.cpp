@@ -18,7 +18,7 @@ namespace Mahakam::Editor
 			if (ImGui::InputText("Search", searchBuffer, GUI::MAX_STR_LEN))
 				m_SearchString = std::string(searchBuffer);
 
-			const auto& importers = AssetDatabase::GetAssetExtensions();
+			const auto& importers = AssetDatabase::GetAssetImporters();
 			std::vector<std::string> extensions;
 			for (auto& importer : importers)
 				extensions.push_back(importer.first);

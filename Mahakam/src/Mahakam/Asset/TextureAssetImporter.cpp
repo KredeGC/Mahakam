@@ -12,7 +12,7 @@ namespace Mahakam
 {
 	TextureAssetImporter::TextureAssetImporter()
 	{
-		m_ImporterProps.Extension = ".texture";
+		Setup(m_ImporterProps, "Texture", ".texture");
 
 		// Create preview buffer
 		FrameBufferProps gProps;
@@ -322,7 +322,7 @@ namespace Mahakam
 
 	void TextureAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		m_Texture.Save(filepath, importPath);
+		m_Texture.Save(m_ImporterProps.Extension, filepath, importPath);
 
 		m_Texture = nullptr;
 	}

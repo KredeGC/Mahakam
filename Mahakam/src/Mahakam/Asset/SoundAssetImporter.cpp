@@ -9,7 +9,7 @@ namespace Mahakam
 {
 	SoundAssetImporter::SoundAssetImporter()
 	{
-		m_ImporterProps.Extension = ".sound";
+		Setup(m_ImporterProps, "Sound", ".sound");
 	}
 
 #ifndef MH_STANDALONE
@@ -41,14 +41,14 @@ namespace Mahakam
 
 			sound->SetProps(m_Props);
 
-			sound.Save(filepath, importPath);
+			sound.Save(m_ImporterProps.Extension, filepath, importPath);
 		}
 		else
 		{
 			// If the sound doesn't exist, or the filepath has changed, reload everything
 			Asset<Sound> sound = Sound::Create(filepath.string(), m_Props);
 
-			sound.Save(filepath, importPath);
+			sound.Save(m_ImporterProps.Extension, filepath, importPath);
 
 			AssetDatabase::ReloadAsset(sound.GetID());
 		}

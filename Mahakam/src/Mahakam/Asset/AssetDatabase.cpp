@@ -25,26 +25,29 @@ namespace Mahakam
 	//void AssetDatabase::RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport)
 	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImporter)
 	{
-		s_AssetImporters.insert(assetImporter);
-		s_AssetExtensions.insert({ assetImporter->GetImporterProps().Extension, assetImporter });
-		s_AssetExtensions.insert({ extension, assetImporter });
+		if (s_AssetImporters.find(assetImporter->GetImporterProps().Extension) == s_AssetImporters.end())
+			s_AssetImporters.insert(assetImporter->GetImporterProps().Extension, assetImporter);
+
+		s_AssetExtensions.insert(extension, assetImporter);
 	};
 
 	//void AssetDatabase::DeregisterAssetImporter(const std::string& extension)
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterAssetImporter, void, const std::string& extension)
 	{
 		auto iter = s_AssetExtensions.find(extension);
-		if (iter != s_AssetExtensions.end())
+		if (iter)
 		{
-			std::string extension = iter->second->GetImporterProps().Extension;
 			long useCount = iter->second.use_count();
 
-			s_AssetImporters.erase(iter->second);
 			s_AssetExtensions.erase(iter);
 
 			// 2 references should exist at this point, the extension itself and this iterator
 			if (useCount <= 2)
-				s_AssetExtensions.erase(extension);
+			{
+				std::string ext = iter->second->GetImporterProps().Extension;
+
+				s_AssetImporters.erase(ext);
+			}
 		}
 	};
 
@@ -55,26 +58,26 @@ namespace Mahakam
 		s_AssetExtensions.clear();
 	};
 
-	//Ref<AssetImporter> AssetDatabase::GetAssetImporter(const std::string& extension)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporter, Ref<AssetImporter>, const std::string& extension)
+	//Ref<AssetImporter> AssetDatabase::GetAssetImporter(const Extension& extension)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporter, Ref<AssetImporter>, const Extension& extension)
 	{
-		auto iter = s_AssetExtensions.find(extension);
-		if (iter != s_AssetExtensions.end())
+		auto iter = s_AssetImporters.find(extension);
+		if (iter != s_AssetImporters.end())
 			return iter->second;
 
 		return nullptr;
 	};
 
-	//const AssetDatabase::ImporterSet& AssetDatabase::GetAssetImporters()
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporters, const AssetDatabase::ImporterSet&)
+	//const AssetDatabase::ImporterMap& AssetDatabase::GetAssetImporters()
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporters, const AssetDatabase::ImporterMap&)
 	{
 		return s_AssetImporters;
 	};
 
-	//const AssetDatabase::ImporterMap& AssetDatabase::GetAssetExtensions()
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetExtensions, const AssetDatabase::ImporterMap&)
+	//AssetDatabase::ExtensionMap::key_iterator AssetDatabase::GetAssetExtension(const std::string& extension)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetExtension, AssetDatabase::ExtensionMap::key_iterator, const std::string& extension)
 	{
-		return s_AssetExtensions;
+		return s_AssetExtensions.find(extension);
 	};
 
 	//void AssetDatabase::LoadDefaultAssetImporters()
@@ -83,7 +86,6 @@ namespace Mahakam
 		// Animation
 		Ref<AnimationAssetImporter> animationAssetImporter = CreateRef<AnimationAssetImporter>();
 
-		// TODO: Make multimap work
 		AssetDatabase::RegisterAssetImporter(".gltf", animationAssetImporter);
 		AssetDatabase::RegisterAssetImporter(".glb", animationAssetImporter);
 
@@ -290,27 +292,19 @@ namespace Mahakam
 		return {};
 	};
 
-	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, const Extension& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
 		// Read asset info and ID
-		std::string extension;
 		AssetID id = 0;
 		if (std::filesystem::exists(importPath))
-		{
-			AssetInfo info = ReadAssetInfo(importPath);
-			extension = info.Extension;
-			id = info.ID;
-		}
+			id = ReadAssetInfo(importPath).ID;
 		else
-		{
-			extension = filepath.extension().string();
 			id = Random::GetRandomID64();
-		}
 
 		// If no importer exists with this extension
-		auto iter = s_AssetExtensions.find(extension);
-		if (iter == s_AssetExtensions.end())
+		auto iter = s_AssetImporters.find(extension);
+		if (iter == s_AssetImporters.end())
 			return nullptr;
 
 		// Create the import directory, if it doesn't exist
@@ -367,7 +361,7 @@ namespace Mahakam
 		{
 			control->ID = id;
 
-			s_LoadedAssets[id] = control;
+			s_LoadedAssets.insert(id, control);
 
 			return control;
 		}
@@ -390,7 +384,7 @@ namespace Mahakam
 			ControlBlock* control = LoadAndIncrementAsset(id);
 
 			if (control)
-				s_LoadedAssets[id] = control;
+				s_LoadedAssets.insert(id, control);
 
 			return control;
 		}
@@ -420,27 +414,13 @@ namespace Mahakam
 			return nullptr;
 		}
 
-		std::ifstream ifs(importPath, std::ios::binary | std::ios::ate);
-
-		if (!ifs)
-			return nullptr;
-
-		auto end = ifs.tellg();
-		ifs.seekg(0, std::ios::beg);
-
-		auto size = size_t(end - ifs.tellg());
-
-		if (size == 0) // avoid undefined behavior 
-			return nullptr;
-
-		std::vector<char> buffer(size);
-
-		if (!ifs.read(buffer.data(), buffer.size()))
+		TrivialVector<char> buffer;
+		if (!FileUtility::ReadFile(importPath, buffer))
 			return nullptr;
 
 		try
 		{
-			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(buffer));
+			ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
 
 			ryml::NodeRef root = tree.rootref();
 
@@ -449,8 +429,8 @@ namespace Mahakam
 			if (root.has_child("Extension"))
 				root["Extension"] >> extension;
 
-			auto importIter = s_AssetExtensions.find(extension);
-			if (importIter == s_AssetExtensions.end())
+			auto importIter = s_AssetImporters.find(extension);
+			if (importIter == s_AssetImporters.end())
 				return nullptr;
 
 			// Deserialize the asset using the YAML node

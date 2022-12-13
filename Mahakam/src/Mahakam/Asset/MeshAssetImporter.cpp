@@ -9,7 +9,8 @@ namespace Mahakam
 {
 	MeshAssetImporter::MeshAssetImporter()
 	{
-		m_ImporterProps.Extension = ".mesh";
+		Setup(m_ImporterProps, "Mesh", ".mesh");
+
 		m_ImporterProps.CreateMenu = true;
 	}
 
@@ -151,7 +152,7 @@ namespace Mahakam
 			break;
 		}
 
-		meshAsset.Save(filepath, importPath);
+		meshAsset.Save(m_ImporterProps.Extension, filepath, importPath);
 
 		//AssetDatabase::ReloadAsset(meshAsset.GetID());
 	}

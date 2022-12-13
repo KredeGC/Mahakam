@@ -9,7 +9,8 @@ namespace Mahakam
 {
 	ComputeShaderAssetImporter::ComputeShaderAssetImporter()
 	{
-		m_ImporterProps.Extension = ".compute";
+		Setup(m_ImporterProps, "Compute Shader", ".compute");
+
 		m_ImporterProps.NoWizard = true;
 	}
 
@@ -25,7 +26,7 @@ namespace Mahakam
 	{
 		Asset<ComputeShader> shaderAsset = ComputeShader::Create(filepath.string());
 
-		shaderAsset.Save(filepath, importPath);
+		shaderAsset.Save(m_ImporterProps.Extension, filepath, importPath);
 	}
 #endif
 

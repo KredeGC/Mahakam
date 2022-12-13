@@ -53,7 +53,7 @@ namespace Mahakam::Editor
 		}
 	}
 
-	void ImportWizardPanel::ImportAsset(const std::filesystem::path& filepath, const std::string& extension, const std::filesystem::path& importPath)
+	void ImportWizardPanel::ImportAsset(const std::filesystem::path& filepath, const AssetDatabase::Extension& extension, const std::filesystem::path& importPath)
 	{
 		if (Ref<AssetImporter> importer = AssetDatabase::GetAssetImporter(extension))
 		{

@@ -50,7 +50,8 @@ namespace Mahakam
 {
 	MaterialAssetImporter::MaterialAssetImporter()
 	{
-		m_ImporterProps.Extension = ".material";
+		Setup(m_ImporterProps, "Material", ".material");
+
 		m_ImporterProps.CreateMenu = true;
 		m_ImporterProps.NoFilepath = true;
 
@@ -325,7 +326,7 @@ namespace Mahakam
 
 	void MaterialAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		m_Material.Save(filepath, importPath);
+		m_Material.Save(m_ImporterProps.Extension, filepath, importPath);
 
 		//AssetDatabase::ReloadAsset(m_Material.GetID());
 

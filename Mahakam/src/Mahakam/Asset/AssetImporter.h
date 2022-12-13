@@ -19,7 +19,10 @@ namespace Mahakam
 			bool CreateMenu = false;
 			bool NoFilepath = false;
 			bool NoWizard = false;
-			std::string Extension;
+			AssetDatabase::Extension Extension;
+#ifndef MH_STANDALONE
+			std::string Name;
+#endif
 		};
 
 		virtual ~AssetImporter() = default;
@@ -34,5 +37,15 @@ namespace Mahakam
 
 		virtual void Serialize(ryml::NodeRef& node, Asset<void> asset) = 0;
 		virtual Asset<void> Deserialize(ryml::NodeRef& node) = 0;
+
+		inline static void Setup(ImporterProps& props, const std::string& name, const std::string& extension)
+		{
+#ifdef MH_STANDALONE
+			props.Extension = std::hash<std::string>()(extension);
+#else
+			props.Name = name;
+			props.Extension = extension;
+#endif
+		}
 	};
 }

@@ -9,8 +9,7 @@ namespace Mahakam
 {
 	AnimationAssetImporter::AnimationAssetImporter()
 	{
-		m_ImporterProps.Extension = ".anim";
-		m_ImporterProps.CreateMenu = true;
+		Setup(m_ImporterProps, "Animation", ".anim");
 	}
 
 #ifndef MH_STANDALONE
@@ -31,7 +30,7 @@ namespace Mahakam
 	{
 		Asset<Animation> shaderAsset = Animation::Load(filepath, m_Index);
 
-		shaderAsset.Save(filepath, importPath);
+		shaderAsset.Save(m_ImporterProps.Extension, filepath, importPath);
 	}
 #endif
 
