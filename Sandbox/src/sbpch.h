@@ -12,6 +12,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#define GLM_FORCE_INLINE
+#define GLM_FORCE_INTRINSICS
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>

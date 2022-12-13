@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Core/Core.h"
+
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
 #define GLM_ENABLE_EXPERIMENTAL
@@ -7,6 +9,7 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Mahakam
 {
@@ -28,7 +31,7 @@ namespace Mahakam
 		uint8_t m_Flags = 0;
 
 	public:
-		TransformComponent() {}
+		TransformComponent() = default;
 
 		TransformComponent(const TransformComponent&) = default;
 

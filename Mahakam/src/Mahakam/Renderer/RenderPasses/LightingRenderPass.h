@@ -50,7 +50,7 @@ namespace Mahakam
 
 		virtual bool Render(SceneData* sceneData, const Asset<FrameBuffer>& src) override;
 
-		virtual Asset<FrameBuffer> GetFrameBuffer() override { return m_HDRFrameBuffer; };
+		inline virtual Asset<FrameBuffer> GetFrameBuffer() override { return m_HDRFrameBuffer; };
 
 	protected:
 		virtual void SetupBRDF();
