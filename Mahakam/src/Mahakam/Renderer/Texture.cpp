@@ -6,6 +6,8 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Mahakam/Asset/Asset.h"
+
 #include "Platform/Headless/HeadlessTexture.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 

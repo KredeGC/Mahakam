@@ -2,6 +2,8 @@
 
 #include "RendererAPI.h"
 
+#include "Mahakam/Asset/Asset.h"
+
 namespace Mahakam
 {
 	class SubMesh;

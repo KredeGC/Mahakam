@@ -4,6 +4,7 @@
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include <filesystem>
+#include <unordered_map>
 #include <string>
 
 namespace Mahakam
@@ -12,10 +13,11 @@ namespace Mahakam
 
 	class AssetDatabase
 	{
-	public:
+	private:
 		template<typename T>
 		friend class Asset;
 
+	public:
 		// Basic reference resource policy:
 		// - Ref<T> and Asset<T> are no longer interchangable
 		// - Ref<T> should be used for internal objects that are not assets, like buffers
@@ -33,6 +35,7 @@ namespace Mahakam
 			std::string Extension = "";
 		};
 
+	private:
 		struct ControlBlock
 		{
 			// ID 0 is guaranteed to be invalid
@@ -42,14 +45,14 @@ namespace Mahakam
 			void* Ptr;
 		};
 
-	private:
 		using AssetMap = UnorderedMap<AssetID, std::filesystem::path>;
-		using ImporterMap = UnorderedMap<std::string, Ref<AssetImporter>>;
+		using ImporterMap = std::unordered_multimap<std::string, Ref<AssetImporter>>;
 		using ImporterSet = UnorderedSet<Ref<AssetImporter>>;
 
 		inline static ImporterSet s_AssetImporters;
 		inline static ImporterMap s_AssetExtensions;
 
+		// TODO: Use AssetInfo instead
 		inline static AssetMap s_AssetPaths;
 
 		inline static UnorderedMap<AssetID, ControlBlock*> s_LoadedAssets;

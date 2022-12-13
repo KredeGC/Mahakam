@@ -2,6 +2,8 @@
 
 #include "Mahakam/Core/Core.h"
 
+#include "Mahakam/Asset/Asset.h"
+
 #include "TextureFormats.h"
 
 namespace Mahakam

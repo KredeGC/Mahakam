@@ -3,6 +3,8 @@
 #include "AudioEngine.h"
 #include "SoundProps.h"
 
+#include "Mahakam/Asset/Asset.h"
+
 namespace Mahakam
 {
 	class Sound

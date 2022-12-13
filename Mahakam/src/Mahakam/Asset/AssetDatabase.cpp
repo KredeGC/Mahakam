@@ -2,6 +2,7 @@
 #include "AssetDatabase.h"
 
 #include "AssetImporter.h"
+#include "AnimationAssetImporter.h"
 #include "MaterialAssetImporter.h"
 #include "MeshAssetImporter.h"
 #include "ShaderAssetImporter.h"
@@ -25,8 +26,8 @@ namespace Mahakam
 	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImporter)
 	{
 		s_AssetImporters.insert(assetImporter);
-		s_AssetExtensions[extension] = assetImporter;
-		s_AssetExtensions[assetImporter->GetImporterProps().Extension] = assetImporter;
+		s_AssetExtensions.insert({ assetImporter->GetImporterProps().Extension, assetImporter });
+		s_AssetExtensions.insert({ extension, assetImporter });
 	};
 
 	//void AssetDatabase::DeregisterAssetImporter(const std::string& extension)
@@ -79,6 +80,13 @@ namespace Mahakam
 	//void AssetDatabase::LoadDefaultAssetImporters()
 	MH_DEFINE_FUNC(AssetDatabase::LoadDefaultAssetImporters, void)
 	{
+		// Animation
+		Ref<AnimationAssetImporter> animationAssetImporter = CreateRef<AnimationAssetImporter>();
+
+		// TODO: Make multimap work
+		AssetDatabase::RegisterAssetImporter(".gltf", animationAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".glb", animationAssetImporter);
+
 		// Material
 		Ref<MaterialAssetImporter> materialAssetImporter = CreateRef<MaterialAssetImporter>();
 
@@ -113,6 +121,9 @@ namespace Mahakam
 	//void AssetDatabase::UnloadDefaultAssetImporters()
 	MH_DEFINE_FUNC(AssetDatabase::UnloadDefaultAssetImporters, void)
 	{
+		// Animation
+		AssetDatabase::DeregisterAssetImporter(".anim");
+
 		// Material
 		AssetDatabase::DeregisterAssetImporter(".material");
 

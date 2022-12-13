@@ -9,6 +9,8 @@ namespace Mahakam
 	private:
 		ImporterProps m_ImporterProps;
 
+		int m_Index;
+
 	public:
 		AnimationAssetImporter();
 
