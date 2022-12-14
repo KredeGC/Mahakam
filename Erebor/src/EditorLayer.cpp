@@ -35,9 +35,9 @@ namespace Mahakam::Editor
 
 		ComponentRegistry::RegisterDefaultComponents();
 
-		AssetDatabase::LoadDefaultAssetImporters();
+		AssetDatabase::RegisterDefaultAssetImporters();
 
-		AssetDatabase::ReloadAssetImports();
+		AssetDatabase::ReloadAssets();
 
 #pragma region Component properties
 #ifndef MH_STANDALONE
@@ -413,7 +413,7 @@ namespace Mahakam::Editor
 
 		ComponentRegistry::DeregisterDefaultComponents();
 
-		AssetDatabase::UnloadDefaultAssetImporters();
+		AssetDatabase::DeregisterDefaultAssetImporters();
 	}
 
 	void EditorLayer::OnUpdate(Timestep dt)

@@ -326,7 +326,19 @@ namespace Mahakam::Editor
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{
 								m_ImporterExtension = file.path().extension().string();
-								ImGui::OpenPopup("ImportAssetSelectPopup");
+
+								auto iter = AssetDatabase::GetAssetImporterExtension(m_ImporterExtension);
+								auto props = iter->second->GetImporterProps();
+								if (++iter)
+								{
+									ImGui::OpenPopup("ImportAssetSelectPopup");
+								}
+								else
+								{
+									std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
+
+									ImportWizardPanel::ImportAsset(file.path(), props.Extension, importPath);
+								}
 							}
 
 							// Draw a popup to choose importer
@@ -336,7 +348,7 @@ namespace Mahakam::Editor
 
 								std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
 
-								auto iter = AssetDatabase::GetAssetExtension(m_ImporterExtension);
+								auto iter = AssetDatabase::GetAssetImporterExtension(m_ImporterExtension);
 								while (iter)
 								{
 									const auto& props = iter->second->GetImporterProps();

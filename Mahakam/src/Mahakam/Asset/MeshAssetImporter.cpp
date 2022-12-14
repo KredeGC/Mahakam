@@ -108,12 +108,6 @@ namespace Mahakam
 		{
 			ImGui::Checkbox("Include mesh nodes", &m_MeshProps.IncludeNodes);
 			ImGui::Checkbox("Include mesh bones", &m_MeshProps.IncludeBones);
-
-			if (ImGui::Button("Import animations"))
-			{
-				// TODO: Move ImportWizardPanel into Mahakam/Editor
-				// TODO: Open AnimationAssetImporter in wizard
-			}
 		}
 		else if (m_MeshProps.Primitive == MeshPrimitive::Plane || m_MeshProps.Primitive == MeshPrimitive::UVSphere)
 		{

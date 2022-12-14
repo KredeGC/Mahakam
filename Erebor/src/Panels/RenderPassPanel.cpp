@@ -137,8 +137,14 @@ namespace Mahakam::Editor
 		m_ViewportFramebuffer->Unbind();
 
 		ImVec2 contentSize = ImGui::GetContentRegionAvail();
-		float maxSize = std::min(contentSize.x, contentSize.y);
 
-		ImGui::Image((void*)(uintptr_t)m_ViewportFramebuffer->GetColorTexture(0)->GetRendererID(), ImVec2(maxSize, maxSize), ImVec2(0, 1), ImVec2(1, 0));
+		auto props = frameBuffer->GetSpecification();
+		float viewportRatio = contentSize.x / contentSize.y;
+		float framebufferRatio = static_cast<float>(props.Width) / static_cast<float>(props.Height);
+
+		contentSize.x *= framebufferRatio;
+		contentSize.x /= viewportRatio;
+
+		ImGui::Image((void*)(uintptr_t)m_ViewportFramebuffer->GetColorTexture(0)->GetRendererID(), contentSize, ImVec2(0, 1), ImVec2(1, 0));
 	}
 }

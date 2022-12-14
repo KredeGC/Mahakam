@@ -6,8 +6,19 @@ namespace Mahakam::Editor
 	void StatsPanel::OnUpdate(Timestep dt)
 	{
 		m_Frametime = dt;
+		m_LastSample += dt;
 
-		m_SmoothDelta = 0.99f * m_SmoothDelta + 0.01f * dt;
+		m_AvgFrametime = m_AvgFrametime + dt;
+		m_NumFrames++;
+
+		if (m_LastSample > 1.0f)
+		{
+			m_ShownFrametime = m_AvgFrametime / m_NumFrames;
+
+			m_AvgFrametime = 0.0f;
+			m_LastSample -= 1.0f;
+			m_NumFrames = 0;
+		}
 	}
 
 	void StatsPanel::OnImGuiRender()
@@ -23,7 +34,7 @@ namespace Mahakam::Editor
 				ImGui::TextWrapped("Vertex count: %d", results.VertexCount);
 				ImGui::TextWrapped("Tri count: %d", results.TriCount);
 				ImGui::TextWrapped("Frametime: %.3d fps (%.3f ms)", (int)(1.0f / m_Frametime), m_Frametime.GetMilliSeconds());
-				ImGui::TextWrapped("Smooth Frametime: %.3d fps (%.3f ms)", (int)(1.0f / m_SmoothDelta), m_SmoothDelta.GetMilliSeconds());
+				ImGui::TextWrapped("Average Frametime: %.3d fps (%.3f ms)", (int)(1.0f / m_ShownFrametime), m_ShownFrametime.GetMilliSeconds());
 			}
 			ImGui::End();
 		}

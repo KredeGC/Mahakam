@@ -27,7 +27,7 @@ namespace Mahakam
 			ASSET_PATH = std::filesystem::relative(filepath / "assets", GetWorkingDirectory());
 			IMPORT_PATH = std::filesystem::relative(filepath / "import", GetWorkingDirectory());
 
-			AssetDatabase::ReloadAssetImports();
+			AssetDatabase::ReloadAssets();
 		}
 	}
 

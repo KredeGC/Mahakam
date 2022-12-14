@@ -74,14 +74,14 @@ namespace Mahakam
 		return s_AssetImporters;
 	};
 
-	//AssetDatabase::ExtensionMap::key_iterator AssetDatabase::GetAssetExtension(const std::string& extension)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetExtension, AssetDatabase::ExtensionMap::key_iterator, const std::string& extension)
+	//AssetDatabase::ExtensionMap::key_iterator AssetDatabase::GetAssetImporterExtension(const std::string& extension)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporterExtension, AssetDatabase::ExtensionMap::key_iterator, const std::string& extension)
 	{
 		return s_AssetExtensions.find(extension);
 	};
 
-	//void AssetDatabase::LoadDefaultAssetImporters()
-	MH_DEFINE_FUNC(AssetDatabase::LoadDefaultAssetImporters, void)
+	//void AssetDatabase::RegisterDefaultAssetImporters()
+	MH_DEFINE_FUNC(AssetDatabase::RegisterDefaultAssetImporters, void)
 	{
 		// Animation
 		Ref<AnimationAssetImporter> animationAssetImporter = CreateRef<AnimationAssetImporter>();
@@ -120,8 +120,8 @@ namespace Mahakam
 		AssetDatabase::RegisterAssetImporter(".hdr", textureAssetImporter);
 	};
 
-	//void AssetDatabase::UnloadDefaultAssetImporters()
-	MH_DEFINE_FUNC(AssetDatabase::UnloadDefaultAssetImporters, void)
+	//void AssetDatabase::DeregisterDefaultAssetImporters()
+	MH_DEFINE_FUNC(AssetDatabase::DeregisterDefaultAssetImporters, void)
 	{
 		// Animation
 		AssetDatabase::DeregisterAssetImporter(".anim");
@@ -177,8 +177,8 @@ namespace Mahakam
 		}
 	};
 
-	//void AssetDatabase::ReloadAssetImports()
-	MH_DEFINE_FUNC(AssetDatabase::ReloadAssetImports, void)
+	//void AssetDatabase::ReloadAssets()
+	MH_DEFINE_FUNC(AssetDatabase::ReloadAssets, void)
 	{
 		// Import any assets that haven't been imported yet
 		// TODO: Think about whether this is needed? Maybe people don't want to import everything
