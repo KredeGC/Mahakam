@@ -4,6 +4,8 @@
 #include "Mahakam/Core/Application.h"
 #include "Mahakam/Core/Input.h"
 #include "Mahakam/Core/Instrumentor.h"
+#include "Mahakam/Core/FileUtility.h"
+#include "Mahakam/Core/Frustum.h"
 #include "Mahakam/Core/KeyCodes.h"
 #include "Mahakam/Core/Layer.h"
 #include "Mahakam/Core/Log.h"
@@ -13,7 +15,7 @@
 #include "Mahakam/Core/SceneManager.h"
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Timestep.h"
-#include "Mahakam/Core/FileUtility.h"
+#include "Mahakam/Core/Types.h"
 #include "Mahakam/Core/Window.h"
 
 // Asset

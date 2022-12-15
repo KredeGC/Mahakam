@@ -3,6 +3,7 @@
 #include "LayerStack.h"
 #include "Timestep.h"
 #include "Window.h"
+#include "Types.h"
 
 #include "Mahakam/Events/Event.h"
 #include "Mahakam/Events/ApplicationEvent.h"

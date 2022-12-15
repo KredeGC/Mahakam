@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core.h"
+
 #include <filesystem>
 
 #if MH_PLATFORM_WINDOWS

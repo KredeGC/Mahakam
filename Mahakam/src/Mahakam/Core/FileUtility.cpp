@@ -9,7 +9,7 @@
 
 namespace Mahakam
 {
-	void FileUtility::SetProjectDirectory(const std::filesystem::path& filepath)
+	void FileUtility::SetProjectDirectory(const Filepath& filepath)
 	{
 		// Only reload if the path has changed
 		if (filepath != PROJECT_PATH)
@@ -31,17 +31,17 @@ namespace Mahakam
 		}
 	}
 
-	void FileUtility::SetWorkingDirectory(const std::filesystem::path& filepath)
+	void FileUtility::SetWorkingDirectory(const Filepath& filepath)
 	{
 		std::filesystem::current_path(filepath);
 	}
 
-	std::filesystem::path FileUtility::GetWorkingDirectory()
+	Filepath FileUtility::GetWorkingDirectory()
 	{
 		return std::filesystem::current_path();
 	}
 
-	bool FileUtility::ReadFile(const std::filesystem::path& filepath, TrivialVector<char>& buffer)
+	bool FileUtility::ReadFile(const Filepath& filepath, TrivialVector<char>& buffer)
 	{
 		std::ifstream ifs(filepath, std::ios::binary | std::ios::ate);
 
@@ -64,34 +64,34 @@ namespace Mahakam
 		return true;
 	}
 
-	bool FileUtility::Exists(const std::filesystem::path& src)
+	bool FileUtility::Exists(const Filepath& src)
 	{
 		return std::filesystem::exists(src);
 	}
 
-	void FileUtility::CreateDirectories(const std::filesystem::path& src)
+	void FileUtility::CreateDirectories(const Filepath& src)
 	{
 		if (!std::filesystem::exists(src))
 			std::filesystem::create_directories(src);
 	}
 
-	std::filesystem::path FileUtility::GetCachePath(const std::filesystem::path& filepath)
+	Filepath FileUtility::GetCachePath(const Filepath& filepath)
 	{
-		std::filesystem::path importDirectory = CACHE_PATH / filepath.parent_path();
+		Filepath importDirectory = CACHE_PATH / filepath.parent_path();
 
 		CreateDirectories(importDirectory);
 
-		return CACHE_PATH / std::filesystem::path(filepath.string() + ".cache");
+		return CACHE_PATH / Filepath(filepath.string() + ".cache");
 	}
 
-	std::filesystem::path FileUtility::GetImportPath(const std::filesystem::path& filepath)
+	Filepath FileUtility::GetImportPath(const Filepath& filepath)
 	{
-		std::filesystem::path importPath = std::filesystem::relative(filepath, PROJECT_PATH);
+		Filepath importPath = std::filesystem::relative(filepath, PROJECT_PATH);
 
-		std::filesystem::path importDirectory = IMPORT_PATH / importPath.parent_path();
+		Filepath importDirectory = IMPORT_PATH / importPath.parent_path();
 
 		CreateDirectories(importDirectory);
 
-		return IMPORT_PATH / std::filesystem::path(importPath.string() + ".import");
+		return IMPORT_PATH / Filepath(importPath.string() + ".import");
 	}
 }

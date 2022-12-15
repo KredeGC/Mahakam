@@ -1,7 +1,7 @@
 #pragma once
-
 #include "Core.h"
 #include "Allocator.h"
+#include "Types.h"
 
 #include <chrono>
 #include <thread>

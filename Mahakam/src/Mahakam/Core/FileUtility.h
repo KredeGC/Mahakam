@@ -7,29 +7,31 @@
 
 namespace Mahakam
 {
+	typedef std::filesystem::path Filepath;
+
 	class FileUtility
 	{
 	public:
-		inline static std::filesystem::path PROJECT_PATH = std::filesystem::current_path();
-		inline static std::filesystem::path CACHE_PATH = "cache";
-		inline static std::filesystem::path IMPORT_PATH = "import";
-		inline static std::filesystem::path ASSET_PATH = "assets";
+		inline static Filepath PROJECT_PATH = std::filesystem::current_path();
+		inline static Filepath CACHE_PATH = "cache";
+		inline static Filepath IMPORT_PATH = "import";
+		inline static Filepath ASSET_PATH = "assets";
 
-		static void SetProjectDirectory(const std::filesystem::path& filepath);
+		static void SetProjectDirectory(const Filepath& filepath);
 
-		static void SetWorkingDirectory(const std::filesystem::path& filepath);
-		static std::filesystem::path GetWorkingDirectory();
+		static void SetWorkingDirectory(const Filepath& filepath);
+		static Filepath GetWorkingDirectory();
 
-		static bool ReadFile(const std::filesystem::path& filepath, TrivialVector<char>& buffer);
+		static bool ReadFile(const Filepath& filepath, TrivialVector<char>& buffer);
 
-		static bool Exists(const std::filesystem::path& src);
-		static void CreateDirectories(const std::filesystem::path& src);
-		static std::filesystem::path GetCachePath(const std::filesystem::path& filepath);
-		static std::filesystem::path GetImportPath(const std::filesystem::path& filepath);
+		static bool Exists(const Filepath& src);
+		static void CreateDirectories(const Filepath& src);
+		static Filepath GetCachePath(const Filepath& filepath);
+		static Filepath GetImportPath(const Filepath& filepath);
 
 		// Defined by each platform
-		static std::filesystem::path OpenFile(const char* filter, const std::filesystem::path& basePath);
-		static std::filesystem::path SaveFile(const char* filter, const std::filesystem::path& basePath);
-		static std::filesystem::path OpenDirectory();
+		static Filepath OpenFile(const char* filter, const Filepath& basePath);
+		static Filepath SaveFile(const char* filter, const Filepath& basePath);
+		static Filepath OpenDirectory();
 	};
 }

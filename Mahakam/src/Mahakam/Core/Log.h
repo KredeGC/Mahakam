@@ -1,6 +1,6 @@
 #pragma once
-
 #include "SharedLibrary.h"
+#include "Types.h"
 
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>

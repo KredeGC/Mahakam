@@ -13,13 +13,13 @@
 #include <thread>
 #include <utility>
 #include <vector>
-//#include <unordered_map>
 #include <unordered_set>
 
 #include "Mahakam/Asset/Asset.h"
 
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/Application.h"
+#include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Core/Frustum.h"
 #include "Mahakam/Core/Input.h"
 #include "Mahakam/Core/Instrumentor.h"
@@ -32,7 +32,7 @@
 #include "Mahakam/Core/Random.h"
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Timestep.h"
-#include "Mahakam/Core/FileUtility.h"
+#include "Mahakam/Core/Types.h"
 #include "Mahakam/Core/Window.h"
 
 #include "Mahakam/Events/ApplicationEvent.h"

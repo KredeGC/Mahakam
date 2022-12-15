@@ -20,7 +20,7 @@ namespace Mahakam
 		~ComInit() { CoUninitialize(); }
 	};
 
-	std::filesystem::path FileUtility::OpenFile(const char* filter, const std::filesystem::path& basePath)
+	Filepath FileUtility::OpenFile(const char* filter, const Filepath& basePath)
 	{
 		std::string pathString = (FileUtility::GetWorkingDirectory() / basePath).string();
 
@@ -43,10 +43,10 @@ namespace Mahakam
 		if (GetOpenFileNameA(&ofn) == TRUE)
 			return ofn.lpstrFile;
 
-		return std::filesystem::path();
+		return Filepath();
 	}
 
-	std::filesystem::path FileUtility::SaveFile(const char* filter, const std::filesystem::path& basePath)
+	Filepath FileUtility::SaveFile(const char* filter, const Filepath& basePath)
 	{
 		std::string pathString = (FileUtility::GetWorkingDirectory() / basePath).string();
 
@@ -72,10 +72,10 @@ namespace Mahakam
 		if (GetSaveFileNameA(&ofn) == TRUE)
 			return ofn.lpstrFile;
 
-		return std::filesystem::path();
+		return Filepath();
 	}
 
-	std::filesystem::path FileUtility::OpenDirectory()
+	Filepath FileUtility::OpenDirectory()
 	{
 		std::wstring pathString = FileUtility::GetWorkingDirectory().wstring();
 
@@ -105,11 +105,11 @@ namespace Mahakam
 				{
 					CComHeapPtr<wchar_t> pPath;
 					if (SUCCEEDED(pSelectedItem->GetDisplayName(SIGDN_FILESYSPATH, &pPath)))
-						return std::filesystem::path(pPath.m_pData);
+						return Filepath(pPath.m_pData);
 				}
 			}
 		}
 
-		return "";
+		return Filepath();
 	}
 }

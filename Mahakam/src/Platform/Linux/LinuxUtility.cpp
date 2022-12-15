@@ -30,10 +30,10 @@ namespace Mahakam
 		return true;
 	}
 
-	std::filesystem::path FileUtility::OpenFile(const char* filter, const std::filesystem::path& basePath)
+	Filepath FileUtility::OpenFile(const char* filter, const Filepath& basePath)
 	{
 		if (!FileDialogsUtilityCheck())
-			return std::string();
+			return Filepath();
 
 		const char* file_extension = std::strchr(filter, 0) + 1;
 
@@ -50,7 +50,7 @@ namespace Mahakam
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
 		{
 			pclose(fp);
-			return std::filesystem::path();
+			return Filepath();
 		}
 
 		pclose(fp);
@@ -61,10 +61,10 @@ namespace Mahakam
 		return file_choice;
 	}
 
-	std::filesystem::path FileUtility::SaveFile(const char* filter, const std::filesystem::path& basePath)
+	Filepath FileUtility::SaveFile(const char* filter, const Filepath& basePath)
 	{
 		if (!FileDialogsUtilityCheck())
-			return std::string();
+			return Filepath();
 
 		FILE* fp;
 		char path[LINUX_PATH_MAX];
@@ -83,7 +83,7 @@ namespace Mahakam
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
 		{
 			pclose(fp);
-			return std::filesystem::path();
+			return Filepath();
 		}
 
 		pclose(fp);
@@ -94,11 +94,11 @@ namespace Mahakam
 		return file_choice;
 	}
 
-	std::filesystem::path FileUtility::OpenDirectory()
+	Filepath FileUtility::OpenDirectory()
 	{
 		if (!FileDialogsUtilityCheck())
-			return std::string();
+			return Filepath();
 
-		return std::string();
+		return Filepath();
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/SharedLibrary.h"
+#include "Mahakam/Core/Types.h"
 
 #include <ktl/containers/unordered_multimap.h>
 

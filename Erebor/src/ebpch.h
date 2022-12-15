@@ -1,4 +1,3 @@
-#include <iostream>
 #include <memory>
 #include <utility>
 #include <algorithm>
@@ -9,8 +8,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <unordered_set>
 
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
