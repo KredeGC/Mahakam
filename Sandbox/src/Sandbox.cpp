@@ -124,8 +124,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 	// Create glTF skinned model
 	Asset<Mesh> skinnedModel = Asset<Mesh>("import/assets/models/mannequin_clap.glb.import");
-	//Asset<Mesh> skinnedModel = Asset<Mesh>(Mesh::LoadMesh("assets/models/mannequin_clap.glb"));
-	Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.glb");
+	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.glb");
+	Asset<Animation> skinnedAnimation = Asset<Animation>("import/assets/models/ClapAnimation.anim.import");
+	//Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.glb");
 
 	//Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
 

@@ -80,6 +80,31 @@ namespace Mahakam
 		ComponentInterface animatorInterface;
 		animatorInterface.Icon = u8"\uecb4"; // video-clapper
 		animatorInterface.SetComponent<AnimatorComponent>();
+		animatorInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
+		{
+			Animator& animator = entity.GetComponent<AnimatorComponent>();
+
+			node["Animation"] << animator.GetAnimation().GetID();
+
+			return true;
+		};
+		animatorInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		{
+			Animator& animator = entity.AddComponent<AnimatorComponent>();
+
+			if (node.has_child("Animation"))
+			{
+				uint64_t assetID;
+				node["Animation"] >> assetID;
+				Asset<Animation> animation = Asset<Animation>(assetID);
+				if (animation)
+				{
+					animator.SetAnimation(animation);
+				}
+			}
+
+			return true;
+		};
 
 		RegisterComponent("Animator", animatorInterface);
 #pragma endregion

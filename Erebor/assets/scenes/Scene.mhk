@@ -6,24 +6,20 @@ Skybox:
 Entities:
   - ID: 0
     Tag: Main Camera
-    Transform:
-      Translation: [4.5,4.5,12.5]
-      Rotation: [1,0,0,0]
-      Scale: [1,1,1]
     Camera:
       Projection: 0
       FOV: 0.785398
       NearZ: 0.01
       FarZ: 100
       Size: 10
-      Ratio: 1.74667
+      Ratio: 1.74958
       FixedRatio: 0
+    Transform:
+      Translation: [2.59853,5.77776,19.5433]
+      Rotation: [1,0,0,0]
+      Scale: [1,1,1]
   - ID: 1
     Tag: Main Light
-    Transform:
-      Translation: [0,0,0]
-      Rotation: [0.0664486,-0.0242556,-0.93702,-0.342039]
-      Scale: [1,1,1]
     Light:
       LightType: 0
       Range: 20
@@ -31,12 +27,12 @@ Entities:
       Color: [1,1,1]
       ShadowCasting: 1
       ShadowBias: 0.005
+    Transform:
+      Translation: [0,0,0]
+      Rotation: [0.0664486,-0.0242556,-0.93702,-0.342039]
+      Scale: [1,1,1]
   - ID: 2
     Tag: Spot Light
-    Transform:
-      Translation: [1,2.5,4]
-      Rotation: [-1.13133e-08,4.2222e-08,0.258819,0.965926]
-      Scale: [1,1,1]
     Light:
       LightType: 2
       Range: 10
@@ -44,6 +40,10 @@ Entities:
       Color: [1,1,1]
       ShadowCasting: 1
       ShadowBias: 0
+    Transform:
+      Translation: [1,2.5,4]
+      Rotation: [-1.13133e-08,4.2222e-08,0.258819,0.965926]
+      Scale: [1,1,1]
   - ID: 3
     Tag: Plane
     Transform:
@@ -63,12 +63,8 @@ Entities:
   - ID: 6
     Tag: Skinned glTF
     Parent: 5
-    Transform:
-      Translation: [2.5,4,7.5]
-      Rotation: [1,0,0,0]
-      Scale: [1,1,1]
-    Mesh:
-      Mesh: 11945816250811211738
+    Animator:
+      Animation: 1494460746093480384
     Skin:
       Bones:
         - 7
@@ -151,6 +147,12 @@ Entities:
         - 84
         - 85
         - 86
+    Transform:
+      Translation: [2.5,4,7.5]
+      Rotation: [1,0,0,0]
+      Scale: [1,1,1]
+    Mesh:
+      Mesh: 11945816250811211738
   - ID: 7
     Tag: Armature
     Parent: 6
@@ -169,547 +171,547 @@ Entities:
     Tag: 'mixamorig1:Hips'
     Parent: 7
     Transform:
-      Translation: [0.103956,0.659951,-59.9976]
-      Rotation: [0.706109,-0.708077,0.00580724,0.00161069]
+      Translation: [0.177478,0.732502,-59.9438]
+      Rotation: [0.704609,-0.709579,0.00471484,0.00111305]
       Scale: [1,1,1]
   - ID: 10
     Tag: 'mixamorig1:Spine'
     Parent: 9
     Transform:
-      Translation: [-1.78814e-07,9.71727,-1.18025]
-      Rotation: [0.999443,0.0277559,-0.0013231,-0.018492]
+      Translation: [-1.78814e-07,9.71727,-1.18024]
+      Rotation: [0.999422,0.027806,-0.00123754,-0.0194995]
       Scale: [1,1,1]
   - ID: 11
     Tag: 'mixamorig1:Spine1'
     Parent: 10
     Transform:
-      Translation: [-9.83776e-08,11.4201,1.45423e-06]
-      Rotation: [0.999916,-0.0084222,0.000728993,-0.00985599]
+      Translation: [2.38419e-07,11.4201,1.60933e-06]
+      Rotation: [0.999911,-0.00831484,0.000934388,-0.0103607]
       Scale: [1,1,1]
   - ID: 12
     Tag: 'mixamorig1:Spine2'
     Parent: 11
     Transform:
-      Translation: [-3.10184e-07,13.0516,-1.38885e-06]
-      Rotation: [0.999919,-0.00847981,0.00103342,-0.009456]
+      Translation: [-8.82646e-07,13.0516,-1.5979e-06]
+      Rotation: [0.999915,-0.00834665,0.00123066,-0.00998386]
       Scale: [1,1,1]
   - ID: 13
     Tag: 'mixamorig1:Neck'
     Parent: 12
     Transform:
-      Translation: [-4.76837e-07,14.683,1.33872e-06]
-      Rotation: [0.997953,0.0556795,-0.00161203,-0.0314139]
+      Translation: [0,14.683,8.1417e-07]
+      Rotation: [0.99851,0.0455125,-0.00192197,-0.0300623]
       Scale: [1,0.999999,0.999999]
   - ID: 14
     Tag: 'mixamorig1:Head'
     Parent: 13
     Transform:
-      Translation: [-6.20367e-07,6.7202,1.97216]
-      Rotation: [0.999493,-0.00469513,-0.00350354,-0.0312818]
+      Translation: [2.00868e-06,6.7202,1.97216]
+      Rotation: [0.999435,-0.014877,-0.00373409,-0.0298914]
       Scale: [1,1,1]
   - ID: 15
     Tag: 'mixamorig1:HeadTop_End'
     Parent: 14
     Transform:
-      Translation: [2.81477e-06,20.9999,6.16276]
-      Rotation: [1,-5.26244e-09,-7.68575e-10,3.57327e-09]
+      Translation: [1.33912e-06,20.9998,6.16276]
+      Rotation: [1,-2.41755e-09,-2.79882e-10,2.12086e-09]
       Scale: [1,1,1]
   - ID: 16
     Tag: 'mixamorig1:HeadTop_End_end'
     Parent: 15
     Transform:
-      Translation: [3.14808e-06,21.8855,-3.95691e-07]
-      Rotation: [1,1.04536e-09,-3.02914e-10,3.42775e-09]
+      Translation: [2.11002e-06,21.8855,4.08212e-07]
+      Rotation: [1,3.69233e-09,-1.16415e-10,-1.66852e-09]
       Scale: [1,1,1]
   - ID: 17
     Tag: 'mixamorig1:LeftShoulder'
     Parent: 12
     Transform:
-      Translation: [6.14015,13.0007,-0.233593]
-      Rotation: [0.432852,0.632691,0.380154,-0.517518]
+      Translation: [6.14015,13.0007,-0.233592]
+      Rotation: [0.427236,0.654826,0.352574,-0.514163]
       Scale: [1,1,0.999999]
   - ID: 18
     Tag: 'mixamorig1:LeftArm'
     Parent: 17
     Transform:
-      Translation: [-1.38533e-06,13.0059,-8.21217e-09]
-      Rotation: [0.88625,0.456185,-0.0301936,0.0744679]
+      Translation: [-3.77778e-07,13.0059,-1.33914e-06]
+      Rotation: [0.880323,0.440836,-0.0130166,0.174716]
       Scale: [1,1,1]
   - ID: 19
     Tag: 'mixamorig1:LeftForeArm'
     Parent: 18
     Transform:
-      Translation: [5.41016e-06,25.5608,1.49638e-05]
-      Rotation: [0.751828,0.0780812,-0.00209728,0.654717]
+      Translation: [-6.21308e-07,25.5608,9.27943e-06]
+      Rotation: [0.747422,0.0786717,-0.00208532,0.659672]
       Scale: [1,1,1]
   - ID: 20
     Tag: 'mixamorig1:LeftHand'
     Parent: 19
     Transform:
-      Translation: [8.93508e-07,23.4041,1.49148e-05]
-      Rotation: [0.983656,-0.0501459,-0.164296,-0.0539811]
+      Translation: [3.76989e-06,23.4041,1.41952e-05]
+      Rotation: [0.844892,-0.362448,-0.329362,-0.215197]
       Scale: [1,1,1]
   - ID: 21
     Tag: 'mixamorig1:LeftHandThumb1'
     Parent: 20
     Transform:
-      Translation: [-2.86771,3.93583,1.1883]
-      Rotation: [0.950225,0.0246263,0.195359,0.241455]
+      Translation: [-2.8677,3.93584,1.1883]
+      Rotation: [0.890675,-0.0469371,0.218496,0.395923]
       Scale: [1,1,1]
   - ID: 22
     Tag: 'mixamorig1:LeftHandThumb2'
     Parent: 21
     Transform:
-      Translation: [-0.405404,3.98958,2.23899e-05]
-      Rotation: [0.984552,0.0926034,-0.135364,-0.0613011]
+      Translation: [-0.405408,3.98958,2.68984e-05]
+      Rotation: [0.98818,0.0939824,-0.0572784,-0.106705]
       Scale: [1,1,1]
   - ID: 23
     Tag: 'mixamorig1:LeftHandThumb3'
     Parent: 22
     Transform:
-      Translation: [-0.0373146,3.59991,4.11737e-06]
-      Rotation: [0.993615,0.0227453,-0.0694407,-0.0859656]
-      Scale: [1,0.999999,1]
+      Translation: [-0.0373155,3.59991,4.87708e-06]
+      Rotation: [0.995953,-0.0364875,-0.0686715,-0.0450716]
+      Scale: [1,1,1]
   - ID: 24
     Tag: 'mixamorig1:LeftHandThumb4'
     Parent: 23
     Transform:
-      Translation: [0.442714,2.97905,5.00679e-06]
-      Rotation: [1,9.8739e-09,2.59229e-07,3.43912e-08]
+      Translation: [0.442714,2.97905,8.0506e-06]
+      Rotation: [1,1.68027e-08,2.61751e-07,2.98916e-08]
       Scale: [1,1,1]
   - ID: 25
     Tag: 'mixamorig1:LeftHandThumb4_end'
     Parent: 24
     Transform:
-      Translation: [-3.62013e-06,3.01177,-1.74995e-05]
-      Rotation: [1,-1.11759e-07,5.78497e-07,3.38447e-07]
+      Translation: [-1.39396e-05,3.01177,-1.96417e-05]
+      Rotation: [1,-1.14374e-07,5.73051e-07,3.41062e-07]
       Scale: [1,1,1]
   - ID: 26
     Tag: 'mixamorig1:LeftHandIndex1'
     Parent: 20
     Transform:
-      Translation: [-3.48426,11.7579,0.113073]
-      Rotation: [0.996911,0.0657957,0.0145255,-0.0403568]
+      Translation: [-3.48424,11.7579,0.113066]
+      Rotation: [0.992723,-0.0909681,0.0566878,0.05489]
       Scale: [1,1,1]
   - ID: 27
     Tag: 'mixamorig1:LeftHandIndex2'
     Parent: 26
     Transform:
-      Translation: [0.0231115,3.2984,8.03244e-06]
-      Rotation: [0.999256,0.0373267,5.6555e-05,-0.00969346]
+      Translation: [0.0231201,3.2984,8.75972e-06]
+      Rotation: [0.990964,0.132214,-0.000172331,-0.0225977]
       Scale: [1,1,1]
   - ID: 28
     Tag: 'mixamorig1:LeftHandIndex3'
     Parent: 27
     Transform:
-      Translation: [-0.00680651,3.08104,-5.42503e-06]
-      Rotation: [0.999859,-0.016766,-0.000172075,0.000384577]
+      Translation: [-0.00680518,3.08105,-4.20853e-06]
+      Rotation: [0.998971,0.0446417,8.04168e-05,-0.00798701]
       Scale: [1,1,1]
   - ID: 29
     Tag: 'mixamorig1:LeftHandIndex4'
     Parent: 28
     Transform:
-      Translation: [-0.0163008,2.71209,3.59452e-06]
-      Rotation: [1,8.17891e-07,4.81937e-09,6.35153e-08]
+      Translation: [-0.0162995,2.71209,9.83471e-07]
+      Rotation: [1,8.06704e-07,4.29962e-09,7.99851e-08]
       Scale: [1,1,1]
   - ID: 30
     Tag: 'mixamorig1:LeftHandIndex4_end'
     Parent: 29
     Transform:
-      Translation: [5.81933e-06,2.71214,1.61352e-05]
-      Rotation: [1,-2.40291e-08,-5.75068e-09,1.28532e-08]
+      Translation: [-4.76837e-07,2.71213,1.36236e-05]
+      Rotation: [1,-2.22625e-08,-8.46144e-09,9.06491e-09]
       Scale: [1,1,1]
   - ID: 31
     Tag: 'mixamorig1:LeftHandMiddle1'
     Parent: 20
     Transform:
-      Translation: [-1.02928,12.3471,-0.315824]
-      Rotation: [0.994715,-0.0630249,-0.00775573,-0.0806821]
+      Translation: [-1.02927,12.3471,-0.315825]
+      Rotation: [0.997231,-0.0725993,-0.00340308,0.0157427]
       Scale: [1,1,1]
   - ID: 32
     Tag: 'mixamorig1:LeftHandMiddle2'
     Parent: 31
     Transform:
-      Translation: [0.00993454,3.43217,-1.13531e-05]
-      Rotation: [0.981752,0.187906,1.91471e-05,-0.0292256]
+      Translation: [0.0099399,3.43217,-8.32488e-06]
+      Rotation: [0.98461,0.172652,1.69852e-05,-0.0271029]
       Scale: [1,1,1]
   - ID: 33
     Tag: 'mixamorig1:LeftHandMiddle3'
     Parent: 32
     Transform:
-      Translation: [-0.00998213,3.16093,2.45475e-06]
-      Rotation: [0.992982,0.117333,0.000228974,-0.0148205]
+      Translation: [-0.00997852,3.16093,-4.43645e-07]
+      Rotation: [0.998731,0.0500716,0.000122725,-0.00541502]
       Scale: [1,1,0.999999]
   - ID: 34
     Tag: 'mixamorig1:LeftHandMiddle4'
     Parent: 33
     Transform:
-      Translation: [4.01735e-05,2.87637,-2.00156e-05]
-      Rotation: [1,-8.51973e-09,1.56472e-08,8.57191e-09]
+      Translation: [3.4817e-05,2.87638,-1.779e-05]
+      Rotation: [1,-6.18956e-10,2.01763e-08,1.56151e-08]
       Scale: [1,1,1]
   - ID: 35
     Tag: 'mixamorig1:LeftHandMiddle4_end'
     Parent: 34
     Transform:
-      Translation: [2.99598e-06,2.87637,4.35782e-06]
-      Rotation: [1,-6.57143e-09,2.7569e-08,1.04346e-08]
+      Translation: [-4.23986e-06,2.87638,4.08688e-06]
+      Rotation: [1,-4.0076e-09,2.83355e-08,3.5699e-10]
       Scale: [1,1,1]
   - ID: 36
     Tag: 'mixamorig1:LeftHandRing1'
     Parent: 20
     Transform:
-      Translation: [1.26675,12.5059,-0.277084]
-      Rotation: [0.99698,0.0314638,-0.00299646,-0.0709307]
+      Translation: [1.26675,12.5059,-0.277085]
+      Rotation: [0.999809,-0.0153049,-0.00980806,0.00716465]
       Scale: [1,1,1]
   - ID: 37
     Tag: 'mixamorig1:LeftHandRing2'
     Parent: 36
     Transform:
-      Translation: [-0.00658073,2.72606,2.46476e-05]
-      Rotation: [0.988794,0.147851,0.000103563,-0.0206558]
+      Translation: [-0.00658167,2.72607,2.14486e-05]
+      Rotation: [0.99419,0.106678,8.07084e-05,-0.0143818]
       Scale: [1,1,1]
   - ID: 38
     Tag: 'mixamorig1:LeftHandRing3'
     Parent: 37
     Transform:
-      Translation: [0.00341501,2.6203,1.2695e-05]
-      Rotation: [0.992229,0.12302,-0.000170795,-0.0186443]
+      Translation: [0.00341368,2.6203,1.23625e-05]
+      Rotation: [0.99826,0.0583007,-8.25011e-05,-0.00879861]
       Scale: [1,1,1]
   - ID: 39
     Tag: 'mixamorig1:LeftHandRing4'
     Parent: 38
     Transform:
-      Translation: [0.00317178,2.22689,-4.86994e-06]
-      Rotation: [1,-2.36691e-08,1.12133e-09,9.87857e-09]
+      Translation: [0.00316548,2.2269,-4.08292e-06]
+      Rotation: [1,-2.25535e-08,1.7186e-09,-9.4219e-09]
       Scale: [1,1,1]
   - ID: 40
     Tag: 'mixamorig1:LeftHandRing4_end'
     Parent: 39
     Transform:
-      Translation: [2.04848e-06,2.2269,7.82705e-06]
-      Rotation: [1,8.33908e-09,-7.68388e-08,-5.39264e-08]
+      Translation: [7.15255e-07,2.2269,1.02182e-05]
+      Rotation: [1,9.83322e-09,-7.62394e-08,-4.91428e-08]
       Scale: [1,1,1]
   - ID: 41
     Tag: 'mixamorig1:LeftHandPinky1'
     Parent: 20
     Transform:
-      Translation: [3.24679,11.102,-0.112836]
-      Rotation: [0.984622,-0.0178163,-0.138992,-0.104324]
+      Translation: [3.24679,11.102,-0.112833]
+      Rotation: [0.998761,-0.0248239,-0.042369,-0.00811437]
       Scale: [1,1,1]
   - ID: 42
     Tag: 'mixamorig1:LeftHandPinky2'
     Parent: 41
     Transform:
-      Translation: [0.00841322,2.7346,-2.77719e-05]
-      Rotation: [0.977083,0.21009,-0.000149699,-0.0342269]
-      Scale: [1,0.999999,1]
+      Translation: [0.00841416,2.7346,-2.59351e-05]
+      Rotation: [0.993496,0.112219,-6.35619e-05,-0.0193181]
+      Scale: [1,1,1]
   - ID: 43
     Tag: 'mixamorig1:LeftHandPinky3'
     Parent: 42
     Transform:
-      Translation: [-0.00291216,2.19396,-9.66083e-06]
-      Rotation: [0.982078,0.186207,0.00035499,-0.0291514]
+      Translation: [-0.00291216,2.19396,-1.12878e-05]
+      Rotation: [0.99201,0.1246,0.000228326,-0.0197516]
       Scale: [1,1,0.999999]
   - ID: 44
     Tag: 'mixamorig1:LeftHandPinky4'
     Parent: 43
     Transform:
-      Translation: [-0.00550451,1.97554,-3.90955e-06]
-      Rotation: [1,9.04103e-07,2.18172e-08,1.74485e-07]
+      Translation: [-0.00551925,1.97554,-8.52739e-06]
+      Rotation: [1,9.06427e-07,1.22625e-08,1.75787e-07]
       Scale: [1,1,1]
   - ID: 45
     Tag: 'mixamorig1:LeftHandPinky4_end'
     Parent: 44
     Transform:
-      Translation: [-3.95583e-06,1.97556,-1.13857e-05]
-      Rotation: [1,-8.70974e-09,-1.86786e-08,-3.25963e-09]
+      Translation: [-4.89551e-06,1.97556,-9.54071e-06]
+      Rotation: [1,-9.65473e-09,-1.83745e-09,1.97132e-09]
       Scale: [1,1,1]
   - ID: 46
     Tag: 'mixamorig1:RightShoulder'
     Parent: 12
     Transform:
-      Translation: [-6.14016,12.9938,-0.175913]
-      Rotation: [0.379399,0.539015,-0.455879,0.598075]
+      Translation: [-6.14016,12.9937,-0.175913]
+      Rotation: [0.360357,0.596121,-0.400182,0.595515]
       Scale: [1,0.999999,0.999999]
   - ID: 47
     Tag: 'mixamorig1:RightArm'
     Parent: 46
     Transform:
-      Translation: [2.19457e-06,13.0059,1.67695e-06]
-      Rotation: [0.85726,0.448478,-0.0299514,-0.25115]
+      Translation: [2.73972e-06,13.0059,1.579e-05]
+      Rotation: [0.840242,0.420976,-0.00779912,-0.341632]
       Scale: [1,1,1]
   - ID: 48
     Tag: 'mixamorig1:RightForeArm'
     Parent: 47
     Transform:
-      Translation: [5.63322e-07,25.5711,1.30238e-05]
-      Rotation: [0.705761,0.0810578,0.002077,-0.703795]
+      Translation: [1.54856e-06,25.5711,1.30432e-05]
+      Rotation: [0.774269,0.0724511,0.00222602,-0.628692]
       Scale: [1,1,1]
   - ID: 49
     Tag: 'mixamorig1:RightHand'
     Parent: 48
     Transform:
-      Translation: [3.1492e-06,23.4017,2.19292e-05]
-      Rotation: [0.970326,-0.147794,-0.005282,0.191301]
+      Translation: [-5.649e-06,23.4017,1.80839e-05]
+      Rotation: [0.96491,-0.2497,-0.0626594,-0.0517025]
       Scale: [1,1,1]
   - ID: 50
     Tag: 'mixamorig1:RightHandThumb1'
     Parent: 49
     Transform:
-      Translation: [2.88509,4.05434,1.21201]
-      Rotation: [0.889405,0.101722,0.342749,-0.28484]
+      Translation: [2.88508,4.05434,1.21201]
+      Rotation: [0.798957,0.188487,0.425773,-0.380601]
       Scale: [0.999999,0.999999,1]
   - ID: 51
     Tag: 'mixamorig1:RightHandThumb2'
     Parent: 50
     Transform:
-      Translation: [0.428417,4.07479,-1.40053e-05]
-      Rotation: [0.988161,0.0725154,0.105529,0.0845222]
-      Scale: [1,1,0.999999]
+      Translation: [0.428413,4.07479,-1.63305e-05]
+      Rotation: [0.986273,0.042769,-0.0131776,0.158943]
+      Scale: [1,1,1]
   - ID: 52
     Tag: 'mixamorig1:RightHandThumb3'
     Parent: 51
     Transform:
-      Translation: [0.0364931,3.53041,-1.02242e-05]
-      Rotation: [0.967003,-0.252069,0.036358,0.00664555]
+      Translation: [0.036487,3.5304,-1.01611e-05]
+      Rotation: [0.975056,-0.173438,-0.0131098,0.137888]
       Scale: [1,1,1]
   - ID: 53
     Tag: 'mixamorig1:RightHandThumb4'
     Parent: 52
     Transform:
-      Translation: [-0.46489,2.87356,5.53228e-06]
-      Rotation: [1,8.30053e-08,-1.44529e-07,5.4853e-08]
+      Translation: [-0.464895,2.87356,-1.62323e-06]
+      Rotation: [1,8.79013e-08,-1.45286e-07,6.47269e-08]
       Scale: [1,1,1]
   - ID: 54
     Tag: 'mixamorig1:RightHandThumb4_end'
     Parent: 53
     Transform:
-      Translation: [1.01109e-05,2.9109,-1.03931e-05]
-      Rotation: [1,1.86264e-09,-2.00881e-07,-1.17161e-07]
+      Translation: [1.13645e-06,2.91091,-1.28036e-05]
+      Rotation: [1,-2.21963e-09,-1.95756e-07,-1.21615e-07]
       Scale: [1,1,1]
   - ID: 55
     Tag: 'mixamorig1:RightHandIndex1'
     Parent: 49
     Transform:
-      Translation: [3.61449,12.3466,-0.00775125]
-      Rotation: [0.997423,-0.0269305,-0.00400024,-0.0663827]
+      Translation: [3.61449,12.3466,-0.00775138]
+      Rotation: [0.992697,0.0393326,-0.0114833,-0.11346]
       Scale: [0.999999,1,0.999999]
   - ID: 56
     Tag: 'mixamorig1:RightHandIndex2'
     Parent: 55
     Transform:
-      Translation: [-0.011873,3.11741,5.36909e-06]
-      Rotation: [0.999026,0.0435011,1.29188e-06,0.00742366]
+      Translation: [-0.0118744,3.1174,4.47006e-06]
+      Rotation: [0.992065,0.124758,6.26969e-05,0.0155506]
       Scale: [1,1,1]
   - ID: 57
     Tag: 'mixamorig1:RightHandIndex3'
     Parent: 56
     Transform:
-      Translation: [0.0066097,2.85606,-1.79147e-05]
-      Rotation: [0.995542,0.0938556,-0.000210059,0.00929824]
+      Translation: [0.00661064,2.85606,-1.56348e-05]
+      Rotation: [0.971129,0.237376,-0.000525936,0.0236876]
       Scale: [1,1,1]
   - ID: 58
     Tag: 'mixamorig1:RightHandIndex4'
     Parent: 57
     Transform:
-      Translation: [0.00526142,2.5346,-1.17123e-05]
-      Rotation: [1,3.25511e-08,-1.84632e-08,6.95085e-10]
+      Translation: [0.00525152,2.5346,-1.39852e-05]
+      Rotation: [1,2.08461e-08,-1.60887e-08,6.0536e-09]
       Scale: [1,1,1]
   - ID: 59
     Tag: 'mixamorig1:RightHandIndex4_end'
     Parent: 58
     Transform:
-      Translation: [8.82149e-06,2.53461,-1.19915e-05]
-      Rotation: [1,-3.60327e-07,9.13211e-08,1.14398e-07]
+      Translation: [5.41213e-06,2.53461,-1.28667e-05]
+      Rotation: [1,-3.53794e-07,8.36017e-08,1.13047e-07]
       Scale: [1,1,1]
   - ID: 60
     Tag: 'mixamorig1:RightHandMiddle1'
     Parent: 49
     Transform:
-      Translation: [0.922426,12.1764,-0.222209]
-      Rotation: [0.99721,-0.0261995,-0.000585607,-0.0698968]
-      Scale: [0.999999,1,0.999999]
+      Translation: [0.922433,12.1764,-0.222207]
+      Rotation: [0.99754,0.0384694,0.000523982,-0.0586008]
+      Scale: [0.999999,1,1]
   - ID: 61
     Tag: 'mixamorig1:RightHandMiddle2'
     Parent: 60
     Transform:
-      Translation: [-0.0161532,3.47921,-7.16552e-06]
-      Rotation: [0.998195,0.0591393,-2.37357e-06,0.0104196]
+      Translation: [-0.0161656,3.4792,-1.13036e-05]
+      Rotation: [0.981157,0.191747,2.48706e-05,0.0237445]
       Scale: [1,1,1]
   - ID: 62
     Tag: 'mixamorig1:RightHandMiddle3'
     Parent: 61
     Transform:
-      Translation: [0.0136685,3.22595,1.63948e-05]
-      Rotation: [0.999919,0.0127529,-0.000102009,-0.000408307]
+      Translation: [0.0136738,3.22596,1.84819e-05]
+      Rotation: [0.990184,0.139223,-0.000423835,0.0123778]
       Scale: [1,0.999999,1]
   - ID: 63
     Tag: 'mixamorig1:RightHandMiddle4'
     Parent: 62
     Transform:
-      Translation: [0.002485,2.92797,1.15409e-05]
-      Rotation: [1,-2.73813e-08,-6.61533e-09,-1.80794e-08]
+      Translation: [0.00248902,2.92796,1.53556e-05]
+      Rotation: [1,-1.80366e-08,-6.98492e-09,-1.80521e-08]
       Scale: [1,1,1]
   - ID: 64
     Tag: 'mixamorig1:RightHandMiddle4_end'
     Parent: 63
     Transform:
-      Translation: [3.56223e-06,2.92797,2.32128e-06]
-      Rotation: [1,9.94164e-09,8.2248e-09,5.47035e-10]
+      Translation: [-9.95371e-07,2.92796,9.011e-06]
+      Rotation: [1,2.32831e-09,-4.73431e-09,1.44045e-08]
       Scale: [1,1,1]
   - ID: 65
     Tag: 'mixamorig1:RightHandRing1'
     Parent: 49
     Transform:
       Translation: [-1.21657,12.2821,-0.150966]
-      Rotation: [0.996915,-0.0256504,0.00388549,-0.0740757]
+      Rotation: [0.998723,0.014476,0.00468846,-0.0481763]
       Scale: [0.999999,1,1]
   - ID: 66
     Tag: 'mixamorig1:RightHandRing2'
     Parent: 65
     Transform:
-      Translation: [-0.00370646,2.82159,1.86103e-06]
-      Rotation: [0.998357,0.056691,-9.95353e-06,0.00835738]
+      Translation: [-0.00370337,2.82158,-4.79468e-07]
+      Rotation: [0.992611,0.120361,-6.08023e-05,0.0153693]
       Scale: [1,1,0.999999]
   - ID: 67
     Tag: 'mixamorig1:RightHandRing3'
     Parent: 66
     Transform:
-      Translation: [0.00779834,2.68769,-9.34056e-06]
-      Rotation: [0.999997,0.00103646,-2.90877e-05,-0.00220235]
+      Translation: [0.0077802,2.6877,-4.7264e-06]
+      Rotation: [0.972261,0.232724,-0.000164028,0.0234225]
       Scale: [1,1,1]
   - ID: 68
     Tag: 'mixamorig1:RightHandRing4'
     Parent: 67
     Transform:
-      Translation: [-0.00407994,2.36845,-1.60634e-05]
-      Rotation: [1,4.55896e-08,1.84275e-08,3.16697e-09]
+      Translation: [-0.00409942,2.36845,-4.61936e-06]
+      Rotation: [1,3.61042e-08,1.79668e-08,5.78979e-09]
       Scale: [1,1,1]
   - ID: 69
     Tag: 'mixamorig1:RightHandRing4_end'
     Parent: 68
     Transform:
-      Translation: [-9.53674e-07,2.36845,-6.04987e-06]
-      Rotation: [1,1.85077e-09,-1.37088e-08,1.23424e-09]
+      Translation: [-7.85195e-06,2.36846,-3.77697e-06]
+      Rotation: [1,-1.40048e-08,-6.04585e-09,-1.75397e-09]
       Scale: [1,1,1]
   - ID: 70
     Tag: 'mixamorig1:RightHandPinky1'
     Parent: 49
     Transform:
-      Translation: [-3.32036,11.1946,-0.137944]
-      Rotation: [0.99308,-0.0363854,0.0817073,-0.0761021]
-      Scale: [0.999999,1,0.999999]
+      Translation: [-3.32035,11.1946,-0.137941]
+      Rotation: [0.996915,-0.0282903,0.0384183,-0.0623308]
+      Scale: [0.999999,1,1]
   - ID: 71
     Tag: 'mixamorig1:RightHandPinky2'
     Parent: 70
     Transform:
-      Translation: [-0.00805166,2.64045,1.72483e-05]
-      Rotation: [0.999483,0.0315103,-6.65233e-06,0.00644699]
+      Translation: [-0.00805949,2.64045,1.80778e-05]
+      Rotation: [0.99962,0.0269052,-7.6329e-06,0.0059194]
       Scale: [1,1,1]
   - ID: 72
     Tag: 'mixamorig1:RightHandPinky3'
     Parent: 71
     Transform:
-      Translation: [0.00558803,2.14904,1.63711e-07]
-      Rotation: [0.999736,0.0228737,-8.41963e-05,0.00198022]
+      Translation: [0.00558937,2.14904,2.81324e-06]
+      Rotation: [0.956102,0.291197,-0.000609737,0.0327509]
       Scale: [1,1,1]
   - ID: 73
     Tag: 'mixamorig1:RightHandPinky4'
     Parent: 72
     Transform:
-      Translation: [0.00247507,1.88843,-1.59035e-05]
-      Rotation: [1,-5.04078e-08,5.69764e-09,5.84335e-09]
+      Translation: [0.00248384,1.88843,-1.27554e-05]
+      Rotation: [1,-5.78584e-08,3.0268e-09,5.13776e-09]
       Scale: [1,1,1]
   - ID: 74
     Tag: 'mixamorig1:RightHandPinky4_end'
     Parent: 73
     Transform:
-      Translation: [-7.51018e-06,1.88843,8.67796e-06]
-      Rotation: [1,1.48062e-08,1.66262e-09,-2.25816e-11]
+      Translation: [2.79745e-06,1.88843,8.34465e-06]
+      Rotation: [1,1.50098e-08,-6.69775e-09,1.75397e-09]
       Scale: [1,1,1]
   - ID: 75
     Tag: 'mixamorig1:LeftUpLeg'
     Parent: 9
     Transform:
       Translation: [8.0782,-5.40238,-0.535869]
-      Rotation: [0.0991459,-0.0378941,-0.674238,-0.730847]
-      Scale: [0.999993,1,0.999996]
+      Rotation: [0.0996845,-0.0385574,-0.672956,-0.731919]
+      Scale: [0.999993,1,0.999997]
   - ID: 76
     Tag: 'mixamorig1:LeftLeg'
     Parent: 75
     Transform:
-      Translation: [1.42802e-07,42.7898,2.81565e-06]
-      Rotation: [0.744105,-0.666008,-0.043008,0.0298479]
+      Translation: [-1.84851e-07,42.7898,-3.02735e-06]
+      Rotation: [0.743082,-0.667192,-0.0425294,0.0295876]
       Scale: [1,1,1]
   - ID: 77
     Tag: 'mixamorig1:LeftFoot'
     Parent: 76
     Transform:
-      Translation: [-9.6363e-08,42.1737,1.07503e-05]
-      Rotation: [0.894521,0.444756,0.0380171,-0.0240516]
+      Translation: [-1.6513e-06,42.1737,3.26099e-06]
+      Rotation: [0.893895,0.446028,0.0382928,-0.0233296]
       Scale: [1,1,1]
   - ID: 78
     Tag: 'mixamorig1:LeftToeBase'
     Parent: 77
     Transform:
-      Translation: [-3.43028e-08,16.1822,-2.02308e-06]
+      Translation: [2.05681e-06,16.1822,-2.32492e-06]
       Rotation: [0.954902,0.290975,-0.056578,0.0171759]
       Scale: [1,1,0.999999]
   - ID: 79
     Tag: 'mixamorig1:LeftToe_End'
     Parent: 78
     Transform:
-      Translation: [-5.86942e-07,6.20585,-1.02786e-07]
-      Rotation: [1,-1.1186e-08,7.73983e-07,-2.5472e-07]
+      Translation: [-2.30857e-06,6.20585,-8.19518e-08]
+      Rotation: [1,-1.14793e-08,7.73786e-07,-2.49489e-07]
       Scale: [1,1,1]
   - ID: 80
     Tag: 'mixamorig1:LeftToe_End_end'
     Parent: 79
     Transform:
-      Translation: [-4.36921e-06,6.20593,-1.18627e-08]
-      Rotation: [1,-3.97847e-09,-3.09943e-07,3.08857e-07]
+      Translation: [-8.6874e-07,6.20592,2.98029e-08]
+      Rotation: [1,-4.25534e-09,-3.10063e-07,2.88725e-07]
       Scale: [1,1,1]
   - ID: 81
     Tag: 'mixamorig1:RightUpLeg'
     Parent: 9
     Transform:
       Translation: [-8.0782,-5.40238,-0.75177]
-      Rotation: [0.0885571,-0.00541866,0.677042,0.730577]
+      Rotation: [0.087942,-0.00581593,0.675583,0.731997]
       Scale: [1,1,1]
   - ID: 82
     Tag: 'mixamorig1:RightLeg'
     Parent: 81
     Transform:
-      Translation: [-1.52925e-06,42.7759,-2.68852e-06]
-      Rotation: [0.747199,-0.662214,0.0366015,-0.0427329]
+      Translation: [-1.08388e-06,42.7759,-1.09087e-06]
+      Rotation: [0.746847,-0.662645,0.0362687,-0.0424925]
       Scale: [1,1,1]
   - ID: 83
     Tag: 'mixamorig1:RightFoot'
     Parent: 82
     Transform:
-      Translation: [1.15275e-06,42.1797,4.62384e-07]
-      Rotation: [0.899761,0.435758,0.0220602,0.00770231]
+      Translation: [1.07734e-06,42.1797,-3.28503e-06]
+      Rotation: [0.899324,0.436633,0.022382,0.00819425]
       Scale: [0.999999,0.999999,0.999999]
   - ID: 84
     Tag: 'mixamorig1:RightToeBase'
     Parent: 83
     Transform:
-      Translation: [-8.00171e-07,16.2605,2.51476e-06]
+      Translation: [2.31727e-07,16.2605,5.8001e-07]
       Rotation: [0.955104,0.290122,0.0574817,-0.0173397]
       Scale: [1,1,1]
   - ID: 85
     Tag: 'mixamorig1:RightToe_End'
     Parent: 84
     Transform:
-      Translation: [4.28518e-06,6.18002,-6.85713e-08]
-      Rotation: [1,9.61302e-09,-3.12217e-07,-8.3754e-08]
+      Translation: [4.09522e-06,6.18002,-2.92308e-07]
+      Rotation: [1,9.52762e-09,-3.12042e-07,-1.12639e-07]
       Scale: [1,1,1]
   - ID: 86
     Tag: 'mixamorig1:RightToe_End_end'
     Parent: 85
     Transform:
-      Translation: [-2.69762e-06,6.18003,4.47035e-08]
-      Rotation: [1,-1.11244e-09,1.10255e-09,2.05049e-08]
+      Translation: [1.20448e-07,6.18003,1.63913e-07]
+      Rotation: [1,-1.14001e-09,1.07733e-09,-1.36337e-08]
       Scale: [1,1,1]
   - ID: 87
     Tag: Spheres

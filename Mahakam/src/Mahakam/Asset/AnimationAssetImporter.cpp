@@ -23,7 +23,7 @@ namespace Mahakam
 
 	void AnimationAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
-		GUI::DrawIntDrag("Size", m_Index, 1, 0, 0);
+		GUI::DrawIntDrag("Animation Index", m_Index, 1, 0, 0);
 	}
 
 	void AnimationAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)

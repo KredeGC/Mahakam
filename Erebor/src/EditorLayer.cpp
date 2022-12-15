@@ -72,11 +72,18 @@ namespace Mahakam::Editor
 
 			Asset<Animation> animation = animator.GetAnimation();
 
+			std::filesystem::path importPath = animation.GetImportPath();
+			if (GUI::DrawDragDropField("Animation", ".anim", importPath))
+			{
+				animation = Asset<Animation>(importPath);
+				animator.SetAnimation(Asset<Sound>(importPath));
+			}
+
 			if (animation)
 			{
 				float duration = animation->GetDuration();
 
-				ImGui::Text("Animation: %s", animation->GetName().c_str());
+				ImGui::TextWrapped("Animation: %s", animation->GetName().c_str());
 				ImGui::Text("Duration: %.1fs", duration);
 
 				float progress = animator.GetTime() / animation->GetDuration();
@@ -84,6 +91,9 @@ namespace Mahakam::Editor
 
 				ImGui::ProgressBar(progress, ImVec2(-FLT_MIN, 0), std::to_string(realtime).c_str());
 			}
+
+			bool playOnStart = true;
+			ImGui::Checkbox("Play on start", &playOnStart);
 		};
 
 		PropertyRegistry::Register("Animator", animatorInspector);
