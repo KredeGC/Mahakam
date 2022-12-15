@@ -71,7 +71,7 @@ namespace Mahakam
 
 
 		// Creating the window
-#ifndef MH_RUNTIME
+#ifndef MH_STANDALONE
 		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 		m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 #else
@@ -80,8 +80,10 @@ namespace Mahakam
 		width = mode->width;
 		height = mode->height;
 
-		window = glfwCreateWindow(width, height, data.title.c_str(), glfwGetPrimaryMonitor(), nullptr);
+		m_Window = glfwCreateWindow(width, height, m_Data.Title.c_str(), glfwGetPrimaryMonitor(), nullptr);
 #endif
+
+		// Creating the rendering context
 		m_Context = RenderingContext::Create(m_Window, (void*)glfwGetProcAddress);
 		m_Context->Init();
 		glfwSetWindowUserPointer(m_Window, &m_Data);

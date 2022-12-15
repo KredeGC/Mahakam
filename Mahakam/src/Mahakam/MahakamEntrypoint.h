@@ -35,10 +35,10 @@ namespace Mahakam
 			ComponentRegistry::RegisterDefaultComponents();
 
 			// Load default asset importers
-			AssetDatabase::LoadDefaultAssetImporters();
+			AssetDatabase::RegisterDefaultAssetImporters();
 
 			// Refresh asset imports
-			AssetDatabase::ReloadAssetImports();
+			AssetDatabase::ReloadAssets();
 
 			// Create a swapchain target for blitting
 			FrameBufferProps mProps;
@@ -90,7 +90,7 @@ namespace Mahakam
 
 			ComponentRegistry::DeregisterDefaultComponents();
 			
-			AssetDatabase::UnloadDefaultAssetImporters();
+			AssetDatabase::DeregisterDefaultAssetImporters();
 		}
 
 		virtual void OnUpdate(Timestep dt) override

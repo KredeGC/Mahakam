@@ -31,8 +31,7 @@ namespace Mahakam
         typedef uint64_t AssetID;
 
 #ifdef MH_STANDALONE
-		// TODO: Make this an enum or ID or something, as strings are slow
-		typedef std::string ExtensionType;
+		typedef uint64_t ExtensionType;
 #else
 		typedef std::string ExtensionType;
 #endif
@@ -41,7 +40,7 @@ namespace Mahakam
 		{
 			AssetID ID = 0;
 			std::filesystem::path Filepath = "";
-			ExtensionType Extension = "";
+			ExtensionType Extension;
 		};
 
 	private:
@@ -66,10 +65,8 @@ namespace Mahakam
 		using LoadedMap = UnorderedMap<AssetID, ControlBlock*>;
 
 		// TODO: Use AssetInfo instead of filepath
-// #ifndef MH_STANDALONE
 		inline static AssetMap s_AssetPaths;
 		inline static ExtensionMap s_AssetExtensions;
-// #endif
 
 		inline static ImporterMap s_AssetImporters;
 		inline static LoadedMap s_LoadedAssets;

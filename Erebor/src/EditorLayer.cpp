@@ -403,23 +403,29 @@ namespace Mahakam::Editor
 		SceneManager::SetActiveScene(activeScene);
 
 
+#ifndef MH_STANDALONE
 		// Load the runtime
 		Runtime::LoadRuntime("runtime", "Sandbox");
 
 		// TEMP: Run the game, as we don't have a playmode yet
 		Runtime::RunScene(activeScene);
+#endif
 	}
 
 	void EditorLayer::OnDetach()
 	{
+#ifndef MH_STANDALONE
 		// TEMP: Stop the game, as we don't have a playmode yet
 		Runtime::StopScene(SceneManager::GetActiveScene());
+#endif
 		
 		// IMPORTANT: Unload the scene before unloading the runtime
 		SceneManager::SetActiveScene(nullptr);
 
+#ifndef MH_STANDALONE
 		// Unload the runtime
 		Runtime::UnloadRuntime();
+#endif
 
 		ComponentRegistry::DeregisterDefaultComponents();
 
@@ -430,8 +436,10 @@ namespace Mahakam::Editor
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
+#ifndef MH_STANDALONE
 		// Call runtime update
 		Runtime::UpdateScene(SceneManager::GetActiveScene(), dt);
+#endif
 
 		static const bool m_PlayMode = false;
 		if (m_PlayMode)

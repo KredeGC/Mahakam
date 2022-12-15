@@ -5,6 +5,7 @@
 #include "Mahakam/Asset/Asset.h"
 
 #include <filesystem>
+#include <functional>
 #include <string>
 
 #include <ryml/rapidyaml-0.4.1.hpp>
@@ -42,6 +43,7 @@ namespace Mahakam
 		{
 #ifdef MH_STANDALONE
 			props.Extension = std::hash<std::string>()(extension);
+			//props.Extension = extension;
 #else
 			props.Name = name;
 			props.Extension = extension;

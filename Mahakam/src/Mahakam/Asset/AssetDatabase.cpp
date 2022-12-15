@@ -44,7 +44,7 @@ namespace Mahakam
 			// 2 references should exist at this point, the extension itself and this iterator
 			if (useCount <= 2)
 			{
-				std::string ext = iter->second->GetImporterProps().Extension;
+				ExtensionType ext = iter->second->GetImporterProps().Extension;
 
 				s_AssetImporters.erase(ext);
 			}
@@ -279,8 +279,15 @@ namespace Mahakam
 				info.Filepath = filepathUnix;
 			}
 
+			std::string extension;
 			if (root.has_child("Extension"))
-				root["Extension"] >> info.Extension;
+				root["Extension"] >> extension;
+
+#ifdef MH_STANDALONE
+			info.Extension = std::hash<std::string>()(extension);
+#else
+			info.Extension = extension;
+#endif
 
 			return info;
 		}
@@ -429,7 +436,11 @@ namespace Mahakam
 			if (root.has_child("Extension"))
 				root["Extension"] >> extension;
 
+#ifdef MH_STANDALONE
+			auto importIter = s_AssetImporters.find(std::hash<std::string>()(extension));
+#else
 			auto importIter = s_AssetImporters.find(extension);
+#endif
 			if (importIter == s_AssetImporters.end())
 				return nullptr;
 

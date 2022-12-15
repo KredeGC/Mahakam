@@ -538,6 +538,7 @@ namespace Mahakam
 			}
 		}
 
+#ifndef MH_STANDALONE
 		// Setup scene data for the material
 		m_SceneData->shaderIDLookup.clear();
 		m_SceneData->materialIDLookup.clear();
@@ -555,6 +556,7 @@ namespace Mahakam
 			m_SceneData->materialIDLookup[0] = m_Material;
 			m_SceneData->materialRefLookup[m_Material] = 0;
 		}
+#endif
 	}
 }
 

@@ -19,7 +19,9 @@ namespace Mahakam
 
 		inline static void MakeSceneInactive()
 		{
+#ifndef MH_STANDALONE
 			s_InactiveScene = s_ActiveScene;
+#endif
 		}
 	};
 }
