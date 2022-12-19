@@ -2,6 +2,8 @@
 #include "PhysicsEngine.h"
 #include "PhysicsContext.h"
 
+#include "Mahakam/Core/Allocator.h"
+
 #include "Mahakam/Scene/Components/BoxColliderComponent.h"
 #include "Mahakam/Scene/Components/FlagComponents.h"
 #include "Mahakam/Scene/Components/RigidbodyComponent.h"
@@ -17,10 +19,10 @@ namespace Mahakam
 
 	void PhysicsEngine::Shutdown()
 	{
-		delete s_Context;
+		Allocator::Delete(s_Context);
 	}
 
-	//void PhysicsEngine::Update()
+	//void PhysicsEngine::Update(Timestep ts)
 	MH_DEFINE_FUNC(PhysicsEngine::Update, void, Timestep ts)
 	{
 		// TODO: Go through each collider component and check its rigidbody

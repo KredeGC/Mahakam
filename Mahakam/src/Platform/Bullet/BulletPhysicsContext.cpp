@@ -1,17 +1,19 @@
 #include "Mahakam/mhpch.h"
 #include "BulletPhysicsContext.h"
 
+#include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Profiler.h"
 
 namespace Mahakam
 {
-	PhysicsContext* PhysicsContext::Create()
+	MH_DEFINE_FUNC(PhysicsContext::CreateImpl, PhysicsContext*, const PhysicsProps& props)
 	{
-		return new BulletPhysicsContext;
-	}
+		return Allocator::New<BulletPhysicsContext>(props);
+	};
 
-	BulletPhysicsContext::BulletPhysicsContext()
+	BulletPhysicsContext::BulletPhysicsContext(const PhysicsProps& props) :
+		m_Props(props)
 	{
 		//collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
 		m_CollisionConfiguration = new btDefaultCollisionConfiguration();
@@ -37,6 +39,8 @@ namespace Mahakam
 
 	BulletPhysicsContext::~BulletPhysicsContext()
 	{
+		// TODO: Use Allocator
+
 		delete m_DynamicsWorld;
 		delete m_Solver;
 		delete m_OverlappingPairCache;
@@ -48,7 +52,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		m_DynamicsWorld->stepSimulation(ts, 1, 1.0f / 60.0f);
+		m_DynamicsWorld->stepSimulation(ts, 1, m_Props.Timestep);
 
 		//print positions of all objects
 		//for (int j = m_DynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)

@@ -307,7 +307,7 @@ namespace Mahakam
 					auto entityIter = translation.find(entityID);
 					if (entityIter != translation.end())
 					{
-						Entity translatedEntity{ entityIter->second, entity };
+						Entity translatedEntity{ entityIter->second, static_cast<Scene*>(entity) };
 						boneEntities.push_back(translatedEntity);
 					}
 					else

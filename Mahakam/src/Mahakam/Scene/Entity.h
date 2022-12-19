@@ -22,10 +22,10 @@ namespace Mahakam
 		Entity(entt::entity handle, Scene* scene);
 		Entity(const Entity& ent) = default;
 
-		operator bool() const;
-		operator entt::entity() const { return m_Handle; }
-		operator uint32_t() const { return (uint32_t)m_Handle; }
-		operator Scene*() const { return m_Scene; }
+		explicit operator bool() const;
+		explicit operator entt::entity() const { return m_Handle; }
+		explicit operator uint32_t() const { return static_cast<uint32_t>(m_Handle); }
+		explicit operator Scene*() const { return m_Scene; }
 
 		bool operator==(const Entity& other) const
 		{
@@ -128,8 +128,8 @@ namespace std {
 	{
 		size_t operator()(const Mahakam::Entity& k) const
 		{
-			return hash<Mahakam::Scene*>()(k)
-				^ (hash<uint32_t>()(k) << 1);
+			return hash<Mahakam::Scene*>()(static_cast<Mahakam::Scene*>(k))
+				^ (hash<uint32_t>()(static_cast<uint32_t>(k)) << 1);
 		}
 	};
 }

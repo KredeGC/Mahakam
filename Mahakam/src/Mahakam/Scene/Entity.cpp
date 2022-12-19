@@ -28,7 +28,7 @@ namespace Mahakam
 		// Clear the relationship
 		relation.Prev = entt::null;
 		relation.Next = entt::null;
-		relation.Parent = parent;
+		relation.Parent = parent.m_Handle;
 
 		// If the want-to-be parent isn't valid
 		if (!parent) return;
@@ -49,13 +49,13 @@ namespace Mahakam
 		if (current != entt::null)
 		{
 			// Append this entity to the last child
-			m_Scene->m_Registry.get<RelationshipComponent>(current).Next = *this;
+			m_Scene->m_Registry.get<RelationshipComponent>(current).Next = m_Handle;
 			relation.Prev = current;
 		}
 		else
 		{
 			// If no children, append as the first
-			parentRelation.First = *this;
+			parentRelation.First = m_Handle;
 		}
 	}
 
@@ -80,12 +80,12 @@ namespace Mahakam
 		// Get our old first
 		entt::entity oldFirst = relation.First;
 
-		relation.First = first;
+		relation.First = first.m_Handle;
 
 		if (oldFirst != entt::null)
 		{
 			firstRelation.Next = oldFirst;
-			m_Scene->m_Registry.get<RelationshipComponent>(oldFirst).Prev = first;
+			m_Scene->m_Registry.get<RelationshipComponent>(oldFirst).Prev = first.m_Handle;
 		}
 	}
 
@@ -113,10 +113,10 @@ namespace Mahakam
 		if (relation.Next != entt::null)
 		{
 			nextRelation.Next = relation.Next;
-			m_Scene->m_Registry.get<RelationshipComponent>(relation.Next).Prev = next;
+			m_Scene->m_Registry.get<RelationshipComponent>(relation.Next).Prev = next.m_Handle;
 		}
 
-		relation.Next = next;
+		relation.Next = next.m_Handle;
 		nextRelation.Prev = m_Handle;
 	}
 
@@ -175,7 +175,7 @@ namespace Mahakam
 			current = currentRelation.Next;
 		}
 
-		if (!entity.m_Scene->m_Registry.any_of<DeleteComponent>(entity))
-			entity.m_Scene->m_Registry.emplace<DeleteComponent>(entity);
+		if (!entity.m_Scene->m_Registry.any_of<DeleteComponent>(entity.m_Handle))
+			entity.m_Scene->m_Registry.emplace<DeleteComponent>(entity.m_Handle);
 	}
 }

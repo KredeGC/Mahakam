@@ -4,6 +4,11 @@
 
 namespace Mahakam
 {
+	struct PhysicsProps
+	{
+		float Timestep = 1.0f / 60.0f;
+	};
+
 	class PhysicsContext
 	{
 	public:
@@ -11,6 +16,9 @@ namespace Mahakam
 
 		virtual void Update(Timestep ts) = 0;
 
-		static PhysicsContext* Create();
+		inline static PhysicsContext* Create(const PhysicsProps& props = PhysicsProps()) { return CreateImpl(props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateImpl, PhysicsContext*, const PhysicsProps& props);
 	};
 }

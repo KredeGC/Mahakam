@@ -23,6 +23,8 @@
 
 #include "Mahakam/Math/Math.h"
 
+#include "Mahakam/Physics/PhysicsContext.h"
+
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/RenderData.h"
@@ -81,7 +83,8 @@ namespace Mahakam
 			return 0;
 	}
 
-	Scene::Scene()
+	Scene::Scene(PhysicsContext* physics) :
+		m_PhysicsContext(physics)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -90,7 +93,8 @@ namespace Mahakam
 		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, GL::GetTextureCubeWhite());
 	}
 
-	Scene::Scene(const std::string& filepath)
+	Scene::Scene(const std::string& filepath, PhysicsContext* physics) :
+		m_PhysicsContext(physics)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -111,6 +115,14 @@ namespace Mahakam
 	void Scene::OnUpdate(Timestep ts, bool editor)
 	{
 		MH_PROFILE_FUNCTION();
+
+		// Update physics
+		if (m_PhysicsContext)
+		{
+			MH_PROFILE_SCOPE("Scene::OnUpdate - Physics");
+
+			m_PhysicsContext->Update(ts);
+		}
 
 		// Update animators
 		{
@@ -447,7 +459,7 @@ namespace Mahakam
 
 	void Scene::DestroyEntity(Entity entity)
 	{
-		m_Registry.destroy(entity);
+		m_Registry.destroy(static_cast<entt::entity>(entity));
 	}
 
 	void Scene::Sort()
@@ -486,15 +498,15 @@ namespace Mahakam
 		});
 	}
 
-	//Ref<Scene> Scene::CreateEmpty()
-	MH_DEFINE_FUNC(Scene::CreateEmpty, Ref<Scene>)
+	//Ref<Scene> Scene::CreateEmpty(PhysicsContext* physics)
+	MH_DEFINE_FUNC(Scene::CreateEmpty, Ref<Scene>, PhysicsContext* physics)
 	{
-		return CreateRef<Scene>();
+		return CreateRef<Scene>(physics);
 	};
 
-	//Ref<Scene> Scene::CreateFilepath(const std::string& filepath)
-	MH_DEFINE_FUNC(Scene::CreateFilepath, Ref<Scene>, const std::string& filepath)
+	//Ref<Scene> Scene::CreateFilepath(const std::string& filepath, PhysicsContext* physics)
+	MH_DEFINE_FUNC(Scene::CreateFilepath, Ref<Scene>, const std::string& filepath, PhysicsContext* physics)
 	{
-		return CreateRef<Scene>(filepath);
+		return CreateRef<Scene>(filepath, physics);
 	};
 }

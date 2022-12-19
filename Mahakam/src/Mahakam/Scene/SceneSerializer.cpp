@@ -191,7 +191,7 @@ namespace Mahakam
 					}
 				}
 
-				m_Entities[id] = deserializedEntity;
+				m_Entities[id] = static_cast<entt::entity>(deserializedEntity);
 			}
 
 			// Deserialize other components

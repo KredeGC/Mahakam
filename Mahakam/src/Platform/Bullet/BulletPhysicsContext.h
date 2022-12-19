@@ -9,6 +9,8 @@ namespace Mahakam
 	class BulletPhysicsContext : public PhysicsContext
 	{
 	private:
+		PhysicsProps m_Props;
+
 		btDefaultCollisionConfiguration* m_CollisionConfiguration;
 		btCollisionDispatcher* m_Dispatcher;
 		btBroadphaseInterface* m_OverlappingPairCache;
@@ -16,7 +18,7 @@ namespace Mahakam
 		btDiscreteDynamicsWorld* m_DynamicsWorld;
 
 	public:
-		BulletPhysicsContext();
+		BulletPhysicsContext(const PhysicsProps& props);
 		~BulletPhysicsContext();
 
 		virtual void Update(Timestep ts) override;
