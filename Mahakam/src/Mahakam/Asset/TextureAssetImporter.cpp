@@ -18,7 +18,7 @@ namespace Mahakam
 		FrameBufferProps gProps;
 		gProps.Width = 128;
 		gProps.Height = 128;
-		gProps.ColorAttachments = { TextureFormat::RGBA8 };
+		gProps.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RGBA8 };
 
 		m_PreviewBuffer = FrameBuffer::Create(gProps);
 	}

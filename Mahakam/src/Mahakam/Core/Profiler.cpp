@@ -50,7 +50,7 @@ namespace Mahakam
 		Instrumentor::Get().WriteProfile(result);
 
 		auto iter = s_ResultsBck.rbegin();
-		if (iter != s_ResultsBck.rend() && iter->Name == name)
+		if (iter != s_ResultsBck.rend() && strcmp(iter->Name, name) == 0)
 		{
 			iter->Count++;
 			iter->ElapsedTime += duration;

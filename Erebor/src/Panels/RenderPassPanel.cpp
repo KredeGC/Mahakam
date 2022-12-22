@@ -41,7 +41,7 @@ namespace Mahakam::Editor
 		FrameBufferProps viewportProps;
 		viewportProps.Width = 1024;
 		viewportProps.Height = 1024;
-		viewportProps.ColorAttachments = { TextureFormat::RGB8 };
+		viewportProps.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RGB8 };
 		viewportProps.DepthAttachment = TextureFormat::Depth24;
 
 		m_ViewportFramebuffer = FrameBuffer::Create(viewportProps);

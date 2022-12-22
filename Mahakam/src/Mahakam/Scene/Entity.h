@@ -124,11 +124,11 @@ namespace Mahakam
 
 namespace std {
 	template <>
-	struct hash<Mahakam::Entity>
+	struct hash<::Mahakam::Entity>
 	{
-		size_t operator()(const Mahakam::Entity& k) const
+		size_t operator()(const ::Mahakam::Entity& k) const
 		{
-			return hash<Mahakam::Scene*>()(static_cast<Mahakam::Scene*>(k))
+			return hash<::Mahakam::Scene*>()(static_cast<::Mahakam::Scene*>(k))
 				^ (hash<uint32_t>()(static_cast<uint32_t>(k)) << 1);
 		}
 	};

@@ -71,6 +71,9 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#ifdef MH_ENABLE_ASSERT
+#define KTL_DEBUG_ASSERT
+#endif
 #include <ktl/containers/trivial_vector.h>
 #include <ktl/containers/trivial_array.h>
 #include <ktl/containers/unordered_map.h>

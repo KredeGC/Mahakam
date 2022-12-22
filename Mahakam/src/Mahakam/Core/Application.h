@@ -15,13 +15,13 @@ namespace Mahakam
 	class Application
 	{
 	private:
-		Scope<Window> window;
-		ImGuiLayer* imGuiLayer = nullptr;
-		bool running = true;
-		bool minimized = false;
-		LayerStack layerStack;
-		double lastFrameTime = 0.0;
-		static Application* instance;
+		Scope<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer = nullptr;
+		bool m_Running = true;
+		bool m_Minimized = false;
+		LayerStack m_LayerStack;
+		double m_LastFrameTime = 0.0;
+		static Application* s_Instance;
 
 	public:
 		Application(const WindowProps& props = WindowProps());
@@ -41,12 +41,12 @@ namespace Mahakam
 
 		static Application* GetInstance();
 
-		inline static bool IsRunning() { return instance->running; }
-		inline static bool IsMinimized() { return instance->minimized; }
+		inline static bool IsRunning() { return s_Instance->m_Running; }
+		inline static bool IsMinimized() { return s_Instance->m_Minimized; }
 
-		inline ImGuiLayer* GetImGuiLayer() { return imGuiLayer; }
+		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 
-		inline Window& GetWindow() { return *window; }
+		inline Window& GetWindow() { return *m_Window; }
 
 	private:
 		bool OnWindowClose(WindowCloseEvent& event);

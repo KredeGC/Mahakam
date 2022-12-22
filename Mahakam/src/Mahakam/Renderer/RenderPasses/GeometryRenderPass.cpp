@@ -27,7 +27,7 @@ namespace Mahakam
 		FrameBufferProps gProps;
 		gProps.Width = width;
 		gProps.Height = height;
-		gProps.ColorAttachments = {
+		gProps.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{
 			TextureFormat::RGBA8, // RGB - Albedo, A - Occlussion
 			TextureFormat::RGBA8, // RG - Unused, B - Metallic, A - Roughness
 			TextureFormat::RG11B10F, // RGB - Emission (not affected by light)

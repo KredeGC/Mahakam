@@ -15,7 +15,7 @@ namespace Mahakam
 		FrameBufferProps viewportProps;
 		viewportProps.Width = width;
 		viewportProps.Height = height;
-		viewportProps.ColorAttachments = { TextureFormat::RGBA8 };
+		viewportProps.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RGBA8 };
 
 		viewportFramebuffer = FrameBuffer::Create(viewportProps);
 

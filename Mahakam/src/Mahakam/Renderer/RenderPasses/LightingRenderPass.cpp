@@ -110,7 +110,7 @@ namespace Mahakam
 		FrameBufferProps lightingProps;
 		lightingProps.Width = width;
 		lightingProps.Height = height;
-		lightingProps.ColorAttachments = { TextureFormat::RG11B10F };
+		lightingProps.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RG11B10F };
 		lightingProps.DepthAttachment = { TextureFormat::Depth24 };
 
 		m_HDRFrameBuffer = FrameBuffer::Create(lightingProps);
@@ -568,7 +568,7 @@ namespace Mahakam
 			FrameBufferProps framebufferProps;
 			framebufferProps.Width = width;
 			framebufferProps.Height = height;
-			framebufferProps.ColorAttachments = { format };
+			framebufferProps.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ format };
 			framebufferProps.DontUseDepth = true;
 			Asset<FrameBuffer> framebuffer = FrameBuffer::Create(framebufferProps);
 

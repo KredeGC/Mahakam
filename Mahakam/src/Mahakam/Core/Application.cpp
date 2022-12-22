@@ -17,17 +17,17 @@
 
 namespace Mahakam
 {
-	Application* Application::instance = nullptr;
+	Application* Application::s_Instance = nullptr;
 
 	Application::Application(const WindowProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_ASSERT(!instance, "Application instance already created!");
-		instance = this;
+		MH_CORE_ASSERT(!s_Instance, "Application instance already created!");
+		s_Instance = this;
 
-		window = Window::Create(props);
-		window->SetEventCallback(MH_BIND_EVENT(Application::OnEvent));
+		m_Window = Window::Create(props);
+		m_Window->SetEventCallback(MH_BIND_EVENT(Application::OnEvent));
 
 		YAMLGuard::Init();
 
@@ -39,8 +39,8 @@ namespace Mahakam
 
 		if (RendererAPI::GetAPI() != RendererAPI::API::None)
 		{
-			imGuiLayer = new ImGuiLayer();
-			PushOverlay(imGuiLayer);
+			m_ImGuiLayer = new ImGuiLayer();
+			PushOverlay(m_ImGuiLayer);
 		}
 	}
 
@@ -48,7 +48,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		for (Layer* layer : layerStack)
+		for (Layer* layer : m_LayerStack)
 			layer->OnDetach();
 
 		AudioEngine::Shutdown();
@@ -62,27 +62,27 @@ namespace Mahakam
 
 	void Application::Run()
 	{
-		while (running)
+		while (m_Running)
 		{
-			double time = window->GetTime();
-			Timestep timestep = (float)(time - lastFrameTime);
-			lastFrameTime = time;
+			double time = m_Window->GetTime();
+			Timestep timestep = (float)(time - m_LastFrameTime);
+			m_LastFrameTime = time;
 
-			if (!minimized)
+			if (!m_Minimized)
 			{
-				for (Layer* layer : layerStack)
+				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate(timestep);
 			}
 
-			if (imGuiLayer)
+			if (m_ImGuiLayer)
 			{
-				imGuiLayer->Begin();
-				for (Layer* layer : layerStack)
+				m_ImGuiLayer->Begin();
+				for (Layer* layer : m_LayerStack)
 					layer->OnImGuiRender();
-				imGuiLayer->End();
+				m_ImGuiLayer->End();
 			}
 
-			window->OnUpdate();
+			m_Window->OnUpdate();
 
 #ifdef MH_ENABLE_PROFILING
 			Profiler::ClearResults();
@@ -92,7 +92,7 @@ namespace Mahakam
 
 	void Application::Close()
 	{
-		running = false;
+		m_Running = false;
 	}
 
 	void Application::OnEvent(Event& event)
@@ -102,7 +102,7 @@ namespace Mahakam
 		dispatcher.DispatchEvent<WindowCloseEvent>(MH_BIND_EVENT(Application::OnWindowClose));
 		dispatcher.DispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(Application::OnWindowResize));
 
-		for (auto iter = layerStack.end(); iter != layerStack.begin();)
+		for (auto iter = m_LayerStack.end(); iter != m_LayerStack.begin();)
 		{
 			if (event.handled)
 				break;
@@ -112,20 +112,20 @@ namespace Mahakam
 
 	void Application::PushLayer(Layer* layer)
 	{
-		layerStack.PushLayer(layer);
+		m_LayerStack.PushLayer(layer);
 		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* overlay)
 	{
-		layerStack.PushOverlay(overlay);
+		m_LayerStack.PushOverlay(overlay);
 		overlay->OnAttach();
 	}
 
 	void Application::PopLayer(Layer* layer)
 	{
 		layer->OnDetach();
-		layerStack.PopLayer(layer);
+		m_LayerStack.PopLayer(layer);
 
 		delete layer;
 	}
@@ -133,19 +133,19 @@ namespace Mahakam
 	void Application::PopOverlay(Layer* overlay)
 	{
 		overlay->OnDetach();
-		layerStack.PopOverlay(overlay);
+		m_LayerStack.PopOverlay(overlay);
 
 		delete overlay;
 	}
 
 	Application* Application::GetInstance()
 	{
-		return instance;
+		return s_Instance;
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
-		running = false;
+		m_Running = false;
 		return true;
 	}
 
@@ -153,11 +153,11 @@ namespace Mahakam
 	{
 		if (event.GetWidth() == 0 || event.GetHeight() == 0)
 		{
-			minimized = true;
+			m_Minimized = true;
 			return false;
 		}
 
-		minimized = false;
+		m_Minimized = false;
 
 		Renderer::OnWindowResize(event.GetWidth(), event.GetHeight());
 

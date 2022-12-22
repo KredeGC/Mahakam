@@ -16,7 +16,7 @@ namespace Mahakam::Editor
 		float m_Time = 1.0f;
 		float m_SmoothDelta = 0.0f;
 
-		Profiler::ProfileVector m_AverageResults;
+		Profiler::ProfileVector m_AverageResults { Allocator::GetAllocator<Profiler::ProfileResult>() };
 
 	public:
 		virtual bool IsOpen() const override { return m_Open; }

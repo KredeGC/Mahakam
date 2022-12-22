@@ -1,12 +1,11 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Types.h"
 
 #include "Mahakam/Asset/Asset.h"
 
 #include "TextureFormats.h"
-
-#include <vector>
 
 namespace Mahakam
 {
@@ -15,12 +14,15 @@ namespace Mahakam
 
 	struct FrameBufferAttachmentProps
 	{
-		TextureFormat Format = TextureFormat::RGBA8;
-		TextureFilter FilterMode = TextureFilter::Bilinear;
-		bool Immutable = false;
+		TextureFormat Format;
+		TextureFilter FilterMode;
+		bool Immutable;
+        
+        FrameBufferAttachmentProps() :
+            Format(TextureFormat::RGBA8), FilterMode(TextureFilter::Bilinear), Immutable(false) {}
 
 		FrameBufferAttachmentProps(TextureFormat format)
-			: Format(format) {}
+			: Format(format), FilterMode(TextureFilter::Bilinear), Immutable(false)  {}
 
 		FrameBufferAttachmentProps(TextureFormat format, TextureFilter filterMode, bool immutable = false)
 			: Format(format), FilterMode(filterMode), Immutable(immutable) {}
@@ -30,7 +32,7 @@ namespace Mahakam
 	{
 		uint32_t Width;
 		uint32_t Height;
-		std::vector<FrameBufferAttachmentProps> ColorAttachments;
+		TrivialVector<FrameBufferAttachmentProps> ColorAttachments;
 		FrameBufferAttachmentProps DepthAttachment = { TextureFormat::Depth24, TextureFilter::Bilinear, true };
 
 		bool DontUseDepth = false;

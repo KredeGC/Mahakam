@@ -1,10 +1,12 @@
 #pragma once
 
 #include <ktl/allocators/cascading_allocator.h>
+#include <ktl/allocators/fallback_allocator.h>
 #include <ktl/allocators/freelist_allocator.h>
 #include <ktl/allocators/linear_allocator.h>
 #include <ktl/allocators/mallocator.h>
 #include <ktl/allocators/segragator_allocator.h>
+#include <ktl/allocators/stack_allocator.h>
 
 #include <cstdint>
 
@@ -12,11 +14,24 @@ namespace Mahakam
 {
 	class Allocator
 	{
-	public:
+	private:
+        static constexpr size_t MAX_STACK_SIZE = 128;
+        static constexpr size_t MAX_LINEAR_SIZE = 512;
+        static constexpr size_t BUFFER_SIZE = 64;
+        
+        using Stack = ktl::stack_allocator<MAX_STACK_SIZE * BUFFER_SIZE>;
+        using Linear = ktl::linear_allocator<MAX_LINEAR_SIZE * BUFFER_SIZE>;
+        
+        using FreelistStack = ktl::freelist_allocator<0, MAX_STACK_SIZE, Stack>;
+        using FreelistLinear = ktl::freelist_allocator<0, MAX_LINEAR_SIZE, Linear>;
+        
+        using CascadingFreelistLinear = ktl::cascading_allocator<FreelistLinear>;
+        
+        using Fallback = ktl::fallback_allocator<FreelistStack, CascadingFreelistLinear>;
+        
+    public:
 		template<typename T>
-		using BaseAllocator = ktl::type_segragator_allocator<T, 512,
-			ktl::cascading_allocator<ktl::freelist_allocator<0, 512, ktl::linear_allocator<512 * 64>>>,
-			ktl::mallocator>;
+		using BaseAllocator = ktl::type_segragator_allocator<T, MAX_LINEAR_SIZE, Fallback, ktl::mallocator>;
 
 		template<typename T>
 		using BaseTraits = std::allocator_traits<BaseAllocator<T>>;
@@ -42,14 +57,14 @@ namespace Mahakam
 		template<typename T, typename ...Args>
 		static void Construct(T* p, Args&&... args)
 		{
-			BaseAllocator<T> alloc = static_cast<BaseAllocator<T>>(s_Alloc);
+			BaseAllocator<T> alloc(std::move(static_cast<BaseAllocator<T>>(s_Alloc)));
 			BaseTraits<T>::construct(alloc, p, std::forward<Args>(args)...);
 		}
 
 		template<typename T>
 		static void Deconstruct(T* p)
 		{
-			BaseAllocator<T> alloc = static_cast<BaseAllocator<T>>(s_Alloc);
+			BaseAllocator<T> alloc(std::move(static_cast<BaseAllocator<T>>(s_Alloc)));
 			BaseTraits<T>::destroy(alloc, p);
 		}
 
@@ -69,6 +84,7 @@ namespace Mahakam
 		}
 
 	private:
-		inline static BaseAllocator<uint8_t> s_Alloc;
+        inline static ktl::stack<MAX_STACK_SIZE * BUFFER_SIZE> s_Buffer;
+		inline static BaseAllocator<uint8_t> s_Alloc { Fallback(FreelistStack(Stack(s_Buffer))) };
 	};
 }
