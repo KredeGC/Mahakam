@@ -14,7 +14,7 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 
 [![License](https://img.shields.io/github/license/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/blob/master/LICENSE)
 [![Issues](https://img.shields.io/github/issues/KredeGC/Mahakam?style=flat-square)](https://github.com/KredeGC/Mahakam/issues)
-[![Build](https://img.shields.io/github/workflow/status/KredeGC/Mahakam/Build?style=flat-square)](https://github.com/KredeGC/Mahakam/actions/workflows/main.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/KredeGC/Mahakam/main.yml?branch=master&style=flat-square)](https://github.com/KredeGC/Mahakam/actions/workflows/main.yml)
 
 </div>
 
@@ -44,6 +44,7 @@ Refer to the [BUILDING.md](BUILDING.md) file.
 * [GLFW](https://github.com/glfw/glfw) for window creation and management.
 * [OpenGL Mathematics](https://github.com/g-truc/glm) for fast SIMD vector math.
 * [glslang](https://github.com/KhronosGroup/glslang) for shader compilation.
+* [KTL](https://github.com/KredeGC/KTL) for various allocators and containers.
 * [Dear ImGui](https://github.com/ocornut/imgui) for GUI interaction and rendering.
 * [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) for editor interaction and rendering.
 * [miniaudio](https://github.com/mackron/miniaudio) for audio playback.
