@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Core.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
@@ -26,7 +27,7 @@ namespace Mahakam::Editor
 			template<typename T>
 			void SetWindow()
 			{
-				OpenWindow = []() { return (EditorWindow*)new T(); };
+				OpenWindow = []() { return (EditorWindow*)Allocator::New<T>(); };
 			}
 		};
 

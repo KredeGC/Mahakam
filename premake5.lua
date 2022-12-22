@@ -44,9 +44,10 @@ newoption {
 }
 
 require "Scripts/build"
+require "Scripts/clean"
 require "Scripts/unity"
 
-outputdir = "%{cfg.buildcfg}-%{_OPTIONS['target']}-%{cfg.architecture}"
+outputdir = "%{cfg.buildcfg}-%{_OPTIONS['target']}-%{_OPTIONS['toolset']}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["bullet"]            = "../Mahakam/vendor/bullet/src"

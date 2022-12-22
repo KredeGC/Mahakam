@@ -1,6 +1,3 @@
-targetdir ("bin/%{outputdir}/%{prj.name}")
-objdir ("bin-obj/%{outputdir}/%{prj.name}")
-
 --dofile ("findOpenCL.lua")
 
 if _OPTIONS["double"] then

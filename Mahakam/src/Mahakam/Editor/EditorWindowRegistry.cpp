@@ -55,6 +55,8 @@ namespace Mahakam::Editor
 		}
 
 		auto iter = windows.find(window);
+        
+        Allocator::Delete<EditorWindow>(window);
 
 		return windows.erase(iter);
 	};

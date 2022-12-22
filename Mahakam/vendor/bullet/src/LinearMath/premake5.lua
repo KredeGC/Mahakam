@@ -5,6 +5,9 @@ project "LinearMath"
     staticruntime "off"
     pic "on"
     
+    targetdir ("bin/%{outputdir}/%{prj.name}")
+    objdir ("bin-obj/%{outputdir}/%{prj.name}")
+    
 	includedirs { ".." }
     
 	files {
