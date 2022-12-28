@@ -42,7 +42,7 @@ namespace Mahakam
 		GL::Init();
 
 		// Initialize camera buffer
-		s_SceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
+		s_SceneData->CameraBuffer = UniformBuffer::Create(sizeof(CameraData));
 		s_SceneData->UniformValueBuffer = UniformBuffer::Create(2 << 14); // 16KB
 	}
 
@@ -80,16 +80,16 @@ namespace Mahakam
 			renderPass->Init(s_RendererData->Width, s_RendererData->Height);
 	};
 
-	//void Renderer::BeginSceneImpl(const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
-	MH_DEFINE_FUNC(Renderer::BeginSceneImpl, void, const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
+	//void Renderer::BeginSceneImpl(const Camera& cam, const glm::mat4& transform, const EnvironmentData& Environment)
+	MH_DEFINE_FUNC(Renderer::BeginSceneImpl, void, const Camera& cam, const glm::mat4& transform, const EnvironmentData& Environment)
 	{
-		s_SceneData->environment = environment;
+		s_SceneData->Environment = Environment;
 
 		// Setup camera matrices
-		s_SceneData->cameraData = CameraData(cam, glm::vec2(s_RendererData->Width, s_RendererData->Height), transform);
+		s_SceneData->CameraMatrix = CameraData(cam, glm::vec2(s_RendererData->Width, s_RendererData->Height), transform);
 
-		s_SceneData->cameraBuffer->Bind(0);
-		s_SceneData->cameraBuffer->SetData(&s_SceneData->cameraData, 0, sizeof(CameraData));
+		s_SceneData->CameraBuffer->Bind(0);
+		s_SceneData->CameraBuffer->SetData(&s_SceneData->CameraMatrix, 0, sizeof(CameraData));
 
 		// Setup uniforms buffer
 		s_SceneData->UniformValueBuffer->Bind(3);
@@ -104,8 +104,8 @@ namespace Mahakam
 	MH_DEFINE_FUNC(Renderer::EndSceneImpl, void)
 	{
 		// Sort the render queue
-		std::sort(s_SceneData->renderQueue.begin(), s_SceneData->renderQueue.end());
-		std::sort(s_SceneData->particleQueue.begin(), s_SceneData->particleQueue.end());
+		std::sort(s_SceneData->RenderQueue.begin(), s_SceneData->RenderQueue.end());
+		std::sort(s_SceneData->ParticleQueue.begin(), s_SceneData->ParticleQueue.end());
 
 		// Render each render pass
 		s_RendererData->GBuffer = s_RendererData->RenderPasses[0]->GetFrameBuffer();
@@ -123,16 +123,16 @@ namespace Mahakam
 		s_RendererData->FrameResults.TriCount /= 3;
 
 		// Clear render queues
-		s_SceneData->renderQueue.clear();
+		s_SceneData->RenderQueue.clear();
 
-		s_SceneData->shaderRefLookup.clear();
-		s_SceneData->materialRefLookup.clear();
-		s_SceneData->meshRefLookup.clear();
+		s_SceneData->ShaderRefLookup.clear();
+		s_SceneData->MaterialRefLookup.clear();
+		s_SceneData->MeshRefLookup.clear();
 
-		s_SceneData->shaderIDLookup.clear();
-		s_SceneData->materialIDLookup.clear();
-		s_SceneData->meshIDLookup.clear();
-		s_SceneData->transformIDLookup.clear();
+		s_SceneData->ShaderIDLookup.clear();
+		s_SceneData->MaterialIDLookup.clear();
+		s_SceneData->MeshIDLookup.clear();
+		s_SceneData->TransformIDLookup.clear();
 	};
 
 	//void Renderer::SubmitImpl(const glm::mat4& transform, Ref<Mesh> mesh, Ref<Material> material)
@@ -144,12 +144,12 @@ namespace Mahakam
 
 		// Add shader if it doesn't exist
 		uint64_t shaderID;
-		auto shaderIter = s_SceneData->shaderRefLookup.find(shader);
-		if (shaderIter == s_SceneData->shaderRefLookup.end())
+		auto shaderIter = s_SceneData->ShaderRefLookup.find(shader);
+		if (shaderIter == s_SceneData->ShaderRefLookup.end())
 		{
-			shaderID = s_SceneData->shaderRefLookup.size();
-			s_SceneData->shaderRefLookup[shader] = shaderID;
-			s_SceneData->shaderIDLookup[shaderID] = shader;
+			shaderID = s_SceneData->ShaderRefLookup.size();
+			s_SceneData->ShaderRefLookup[shader] = shaderID;
+			s_SceneData->ShaderIDLookup[shaderID] = shader;
 		}
 		else
 		{
@@ -158,12 +158,12 @@ namespace Mahakam
 
 		// Add material if it doesn't exist
 		uint64_t materialID;
-		auto matIter = s_SceneData->materialRefLookup.find(material);
-		if (matIter == s_SceneData->materialRefLookup.end())
+		auto matIter = s_SceneData->MaterialRefLookup.find(material);
+		if (matIter == s_SceneData->MaterialRefLookup.end())
 		{
-			materialID = s_SceneData->materialRefLookup.size();
-			s_SceneData->materialRefLookup[material] = materialID;
-			s_SceneData->materialIDLookup[materialID] = std::move(material);
+			materialID = s_SceneData->MaterialRefLookup.size();
+			s_SceneData->MaterialRefLookup[material] = materialID;
+			s_SceneData->MaterialIDLookup[materialID] = std::move(material);
 		}
 		else
 		{
@@ -172,12 +172,12 @@ namespace Mahakam
 
 		// Add mesh if it doesn't exist
 		uint64_t meshID;
-		auto meshIter = s_SceneData->meshRefLookup.find(mesh);
-		if (meshIter == s_SceneData->meshRefLookup.end())
+		auto meshIter = s_SceneData->MeshRefLookup.find(mesh);
+		if (meshIter == s_SceneData->MeshRefLookup.end())
 		{
-			meshID = s_SceneData->meshRefLookup.size();
-			s_SceneData->meshRefLookup[mesh] = meshID;
-			s_SceneData->meshIDLookup[meshID] = std::move(mesh);
+			meshID = s_SceneData->MeshRefLookup.size();
+			s_SceneData->MeshRefLookup[mesh] = meshID;
+			s_SceneData->MeshIDLookup[meshID] = std::move(mesh);
 		}
 		else
 		{
@@ -185,8 +185,8 @@ namespace Mahakam
 		}
 
 		// Add transform
-		uint64_t transformID = s_SceneData->transformIDLookup.size();
-		s_SceneData->transformIDLookup[transformID] = transform;
+		uint64_t transformID = s_SceneData->TransformIDLookup.size();
+		s_SceneData->TransformIDLookup[transformID] = transform;
 
 		uint64_t drawID = 0;
 
@@ -208,26 +208,26 @@ namespace Mahakam
 		{
 			drawID |= (2ULL << 62ULL);
 
-			float depth = (s_SceneData->cameraData.u_m4_VP * transform[3]).z;
+			float depth = (s_SceneData->CameraMatrix.u_m4_VP * transform[3]).z;
 
 			uint64_t depthInt = (uint64_t)(depth * (1ULL << 31ULL));
 
 			drawID |= ((depthInt & 0xFFFFFFFFULL) << 30ULL);
 		}
 
-		s_SceneData->renderQueue.push_back(drawID);
+		s_SceneData->RenderQueue.push_back(drawID);
 	};
 
 	//void Renderer::SubmitParticlesImpl(const glm::mat4& transform, const ParticleSystem& particles)
 	MH_DEFINE_FUNC(Renderer::SubmitParticlesImpl, void, const glm::mat4& transform, const ParticleSystem& particles)
 	{
-		uint64_t particleID = s_SceneData->particleIDLookup.size();
-		s_SceneData->particleIDLookup[particleID] = particles;
+		uint64_t particleID = s_SceneData->ParticleIDLookup.size();
+		s_SceneData->ParticleIDLookup[particleID] = particles;
 
-		uint64_t transformID = s_SceneData->transformIDLookup.size();
-		s_SceneData->transformIDLookup[transformID] = transform;
+		uint64_t transformID = s_SceneData->TransformIDLookup.size();
+		s_SceneData->TransformIDLookup[transformID] = transform;
 
-		float depth = (s_SceneData->cameraData.u_m4_VP * transform[3]).z;
+		float depth = (s_SceneData->CameraMatrix.u_m4_VP * transform[3]).z;
 
 		uint64_t depthInt = (uint64_t)(depth * (1ULL << 31ULL));
 
@@ -235,16 +235,16 @@ namespace Mahakam
 		drawID |= ((particleID & 0xFFFFULL) << 16ULL);
 		drawID |= (transformID & 0xFFFFULL);
 
-		s_SceneData->particleQueue.push_back(drawID);
+		s_SceneData->ParticleQueue.push_back(drawID);
 	};
 
 	//void Renderer::DrawSkyboxImpl(SceneData* sceneData)
 	MH_DEFINE_FUNC(Renderer::DrawSkyboxImpl, void, SceneData* sceneData)
 	{
-		if (sceneData->environment.SkyboxMaterial)
+		if (sceneData->Environment.SkyboxMaterial)
 		{
-			sceneData->environment.SkyboxMaterial->BindShader("GEOMETRY");
-			sceneData->environment.SkyboxMaterial->Bind(sceneData->UniformValueBuffer);
+			sceneData->Environment.SkyboxMaterial->BindShader("GEOMETRY");
+			sceneData->Environment.SkyboxMaterial->Bind(sceneData->UniformValueBuffer);
 			DrawScreenQuad();
 		}
 	};
@@ -284,37 +284,37 @@ namespace Mahakam
 	//void Renderer::EnableWireframeImpl(bool enable)
 	MH_DEFINE_FUNC(Renderer::EnableWireframeImpl, void, bool enable)
 	{
-		s_SceneData->wireframe = enable;
+		s_SceneData->Wireframe = enable;
 	};
 
 	//void Renderer::EnableBoundingBoxImpl(bool enable)
 	MH_DEFINE_FUNC(Renderer::EnableBoundingBoxImpl, void, bool enable)
 	{
-		s_SceneData->boundingBox = enable;
+		s_SceneData->BoundingBox = enable;
 	};
 
 	//void Renderer::EnableGBufferImpl(bool enable)
 	MH_DEFINE_FUNC(Renderer::EnableGBufferImpl, void, bool enable)
 	{
-		s_SceneData->gBuffer = enable;
+		s_SceneData->GBuffer = enable;
 	};
 
 	//bool Renderer::HasWireframeEnabledImpl()
 	MH_DEFINE_FUNC(Renderer::HasWireframeEnabledImpl, bool)
 	{
-		return s_SceneData->wireframe;
+		return s_SceneData->Wireframe;
 	};
 
 	//bool Renderer::HasBoundingBoxEnabledImpl()
 	MH_DEFINE_FUNC(Renderer::HasBoundingBoxEnabledImpl, bool)
 	{
-		return s_SceneData->boundingBox;
+		return s_SceneData->BoundingBox;
 	};
 
 	//bool Renderer::HasGBufferEnabledImpl()
 	MH_DEFINE_FUNC(Renderer::HasGBufferEnabledImpl, bool)
 	{
-		return s_SceneData->gBuffer;
+		return s_SceneData->GBuffer;
 	};
 
 	//void Renderer::AddFrameBufferImpl(const std::string& name, WeakRef<FrameBuffer> frameBuffer)

@@ -43,7 +43,7 @@ namespace Mahakam
 		m_DeferredShader->SetTexture("u_BRDFLUT", m_BRDFLut);
 		m_DeferredShader->SetTexture("u_ShadowMap", m_ShadowFramebuffer->GetDepthTexture());
 		
-		m_DeferredShader->SetTexture("u_IrradianceMap", sceneData->environment.IrradianceMap);
-		m_DeferredShader->SetTexture("u_SpecularMap", sceneData->environment.SpecularMap);
+		m_DeferredShader->SetTexture("u_IrradianceMap", sceneData->Environment.IrradianceMap);
+		m_DeferredShader->SetTexture("u_SpecularMap", sceneData->Environment.SpecularMap);
 	}
 }

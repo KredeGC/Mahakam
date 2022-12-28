@@ -2,6 +2,8 @@
 
 #include "RendererAPI.h"
 
+#include "Mahakam/Core/Types.h"
+
 #include "Mahakam/Asset/Asset.h"
 
 namespace Mahakam

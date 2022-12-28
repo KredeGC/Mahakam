@@ -33,7 +33,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		GL::SetFillMode(!sceneData->wireframe);
+		GL::SetFillMode(!sceneData->Wireframe);
 
 		src->Bind();
 
@@ -45,19 +45,19 @@ namespace Mahakam
 		uint16_t lastShaderID = ~0;
 		uint16_t lastMaterialID = ~0;
 		uint16_t lastMeshID = ~0;
-		for (uint64_t drawID : sceneData->renderQueue)
+		for (uint64_t drawID : sceneData->RenderQueue)
 		{
 			// Choose a particle system
 			const uint16_t particleID = (drawID >> 16ULL) & 0xFFFFULL;
-			ParticleSystem& particles = sceneData->particleIDLookup[particleID];
+			ParticleSystem& particles = sceneData->ParticleIDLookup[particleID];
 
 			// Choose a transform
 			const uint16_t transformID = drawID & 0xFFFFULL;
-			const glm::mat4& transform = sceneData->transformIDLookup[transformID];
+			const glm::mat4& transform = sceneData->TransformIDLookup[transformID];
 
 			particles.BindBuffers(transform);
 
-			particles.Simulate(sceneData->deltaTime);
+			particles.Simulate(sceneData->DeltaTime);
 
 			//Renderer::AddPerformanceResult(6, 6);
 

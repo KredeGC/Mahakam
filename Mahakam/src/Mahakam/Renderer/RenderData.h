@@ -63,11 +63,11 @@ namespace Mahakam
 
 	struct SceneData
 	{
-		bool wireframe = false;
-		bool boundingBox = false;
-		bool gBuffer = false;
+		bool Wireframe = false;
+		bool BoundingBox = false;
+		bool GBuffer = false;
 
-		float deltaTime;
+		float DeltaTime;
 
 		// Render queue ID
 		// 2 bits - Geometry(0), AlphaTest(1), Transparent(2), Fullscreen(3)
@@ -80,38 +80,38 @@ namespace Mahakam
 		//  30 bits - Depth
 		//  16 bits - Mesh index
 		//  16 bits - Transform index
-		TrivialVector<uint64_t> renderQueue;
+		TrivialVector<uint64_t> RenderQueue;
 
-		UnorderedMap<Asset<Shader>, uint64_t> shaderRefLookup;
-		UnorderedMap<Asset<Material>, uint64_t> materialRefLookup;
-		UnorderedMap<Ref<SubMesh>, uint64_t> meshRefLookup;
+		UnorderedMap<Asset<Shader>, uint64_t> ShaderRefLookup;
+		UnorderedMap<Asset<Material>, uint64_t> MaterialRefLookup;
+		UnorderedMap<Ref<SubMesh>, uint64_t> MeshRefLookup;
 
-		UnorderedMap<uint64_t, Asset<Shader>> shaderIDLookup;
-		UnorderedMap<uint64_t, Asset<Material>> materialIDLookup;
-		UnorderedMap<uint64_t, Ref<SubMesh>> meshIDLookup;
-		UnorderedMap<uint64_t, glm::mat4> transformIDLookup;
+		UnorderedMap<uint64_t, Asset<Shader>> ShaderIDLookup;
+		UnorderedMap<uint64_t, Asset<Material>> MaterialIDLookup;
+		UnorderedMap<uint64_t, Ref<SubMesh>> MeshIDLookup;
+		UnorderedMap<uint64_t, glm::mat4> TransformIDLookup;
 
 		// Particle queue ID
 		// 32 bits - Depth
 		// 16 bits - ParticleSystem index
 		// 16 bits - Transform index
-		TrivialVector<uint64_t> particleQueue;
+		TrivialVector<uint64_t> ParticleQueue;
 
-		UnorderedMap<uint64_t, ParticleSystem> particleIDLookup;
+		UnorderedMap<uint64_t, ParticleSystem> ParticleIDLookup;
 
 		// Environment data, provided by scene
-		EnvironmentData environment;
+		EnvironmentData Environment;
 
 		// Render camera matrices
-		CameraData cameraData;
-		Ref<UniformBuffer> cameraBuffer;
+		CameraData CameraMatrix;
+		Ref<UniformBuffer> CameraBuffer;
 
 		// Uniform values
 		Ref<UniformBuffer> UniformValueBuffer;
 
 		// Lighting buffers
-		Ref<StorageBuffer> directionalLightBuffer;
-		Ref<StorageBuffer> pointLightBuffer;
-		Ref<StorageBuffer> spotLightBuffer;
+		Ref<StorageBuffer> DirectionalLightBuffer;
+		Ref<StorageBuffer> PointLightBuffer;
+		Ref<StorageBuffer> SpotLightBuffer;
 	};
 }

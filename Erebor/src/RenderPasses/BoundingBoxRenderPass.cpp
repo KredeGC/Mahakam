@@ -24,7 +24,7 @@ namespace Mahakam::Editor
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		if (!sceneData->boundingBox)
+		if (!sceneData->BoundingBox)
 			return false;
 
 		src->Bind();
@@ -37,13 +37,13 @@ namespace Mahakam::Editor
 		auto wireMesh = GL::GetCube();
 		wireMesh->Bind();
 
-		for (uint64_t drawID : sceneData->renderQueue)
+		for (uint64_t drawID : sceneData->RenderQueue)
 		{
 			const uint64_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-			Ref<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
+			Ref<SubMesh>& mesh = sceneData->MeshIDLookup[meshID];
 
 			const uint64_t transformID = drawID & 0xFFFFULL;
-			const glm::mat4& transform = sceneData->transformIDLookup[transformID];
+			const glm::mat4& transform = sceneData->TransformIDLookup[transformID];
 
 			const Bounds transformedBounds = Bounds::TransformBounds(mesh->GetBounds(), transform);
 
@@ -53,7 +53,7 @@ namespace Mahakam::Editor
 			const glm::mat4 wireTransform = glm::translate(glm::mat4(1.0f), center)
 				* glm::scale(glm::mat4(1.0f), scale);
 
-			sceneData->cameraBuffer->SetData(&wireTransform, 0, sizeof(glm::mat4));
+			sceneData->CameraBuffer->SetData(&wireTransform, 0, sizeof(glm::mat4));
 
 			Renderer::AddPerformanceResult(wireMesh->GetVertexCount(), wireMesh->GetIndexCount());
 

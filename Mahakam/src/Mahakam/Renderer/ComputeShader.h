@@ -3,6 +3,7 @@
 #include "Mahakam/Asset/Asset.h"
 
 #include <filesystem>
+#include <string>
 
 namespace Mahakam
 {

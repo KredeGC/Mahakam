@@ -281,7 +281,7 @@ namespace Mahakam::Editor
 								ImGui::SetDragDropPayload(info.Extension.c_str(), importBuffer, strlen(importBuffer) + 1);
 								
 								ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
-								ImGui::TextWrapped("%s", pathName.c_str());
+								ImGui::Text("%s", pathName.c_str());
 
 								ImGui::EndDragDropSource();
 							}

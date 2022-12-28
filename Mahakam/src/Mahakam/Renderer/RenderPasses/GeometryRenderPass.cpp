@@ -57,33 +57,33 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		GL::SetFillMode(!sceneData->wireframe);
+		GL::SetFillMode(!sceneData->Wireframe);
 
 		gBuffer->Bind();
 		GL::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		GL::Clear();
 
-		sceneData->cameraBuffer->Bind(0);
+		sceneData->CameraBuffer->Bind(0);
 
 		// Create view projection frustum
-		Frustum frustum(sceneData->cameraData.u_m4_VP);
+		Frustum frustum(sceneData->CameraMatrix.u_m4_VP);
 
 		// Render all objects in queue
 		uint16_t lastShaderID = ~0;
 		uint16_t lastMaterialID = ~0;
 		uint16_t lastMeshID = ~0;
-		for (uint64_t drawID : sceneData->renderQueue)
+		for (uint64_t drawID : sceneData->RenderQueue)
 		{
 			const uint16_t passMask = (drawID >> 62ULL);
 			if (passMask == 0ULL) // Opaque
 			{
 				// Choose a mesh
 				const uint16_t meshID = (drawID >> 16ULL) & 0xFFFFULL;
-				Ref<SubMesh>& mesh = sceneData->meshIDLookup[meshID];
+				Ref<SubMesh>& mesh = sceneData->MeshIDLookup[meshID];
 
 				// Choose a transform
 				const uint16_t transformID = drawID & 0xFFFFULL;
-				const glm::mat4& transform = sceneData->transformIDLookup[transformID];
+				const glm::mat4& transform = sceneData->TransformIDLookup[transformID];
 
 				// Perform AABB test
 				const Bounds transformedBounds = Bounds::TransformBounds(mesh->GetBounds(), transform);
@@ -94,7 +94,7 @@ namespace Mahakam
 					const uint16_t shaderID = (drawID >> 47ULL) & 0x7FFFULL;
 					if (shaderID != lastShaderID)
 					{
-						Asset<Shader>& shader = sceneData->shaderIDLookup[shaderID];
+						Asset<Shader>& shader = sceneData->ShaderIDLookup[shaderID];
 						if (!shader->HasShaderPass("GEOMETRY"))
 							continue;
 						lastShaderID = shaderID;
@@ -103,7 +103,7 @@ namespace Mahakam
 
 					// Choose a material
 					const uint16_t materialID = (drawID >> 32ULL) & 0x7FFFULL;
-					Asset<Material>& material = sceneData->materialIDLookup[materialID];
+					Asset<Material>& material = sceneData->MaterialIDLookup[materialID];
 					if (materialID != lastMaterialID)
 					{
 						lastMaterialID = materialID;
@@ -117,7 +117,7 @@ namespace Mahakam
 						mesh->Bind();
 					}
 
-					sceneData->cameraBuffer->SetData(&transform, 0, sizeof(glm::mat4));
+					sceneData->CameraBuffer->SetData(&transform, 0, sizeof(glm::mat4));
 
 					Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
 

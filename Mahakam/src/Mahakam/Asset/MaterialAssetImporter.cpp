@@ -64,24 +64,24 @@ namespace Mahakam
 
 		// Setup scene data
 		m_SceneData = CreateRef<SceneData>();
-		m_SceneData->meshIDLookup[0] = m_PreviewSphereMesh;
-		m_SceneData->meshRefLookup[m_PreviewSphereMesh] = 0;
-		m_SceneData->transformIDLookup[0] = glm::mat4(1.0f);
+		m_SceneData->MeshIDLookup[0] = m_PreviewSphereMesh;
+		m_SceneData->MeshRefLookup[m_PreviewSphereMesh] = 0;
+		m_SceneData->TransformIDLookup[0] = glm::mat4(1.0f);
 
-		m_SceneData->renderQueue.push_back(0);
+		m_SceneData->RenderQueue.push_back(0);
 
 		// Lights
 		glm::quat rot = glm::quat({ -0.7f, -glm::radians(45.0f), 0.0f });
 		Light light(Light::LightType::Directional, 10.0f, { 1.0f, 1.0f, 1.0f });
-		m_SceneData->environment.DirectionalLights.push_back({ glm::vec3{ 0.0f }, rot, light });
+		m_SceneData->Environment.DirectionalLights.push_back({ glm::vec3{ 0.0f }, rot, light });
 
 		// Camera
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0, 0, 2 });
 		CameraData cameraData(m_PreviewCamera, { 512, 512 }, transform);
 
-		m_SceneData->cameraBuffer = UniformBuffer::Create(sizeof(CameraData));
-		m_SceneData->cameraBuffer->Bind(0);
-		m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
+		m_SceneData->CameraBuffer = UniformBuffer::Create(sizeof(CameraData));
+		m_SceneData->CameraBuffer->Bind(0);
+		m_SceneData->CameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
 
 		// Uniform values
 		m_SceneData->UniformValueBuffer = UniformBuffer::Create(2 << 14); // 16KB
@@ -105,9 +105,9 @@ namespace Mahakam
 		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/internal/previewirradiance.hdr.import");
 		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/internal/previewspecular.hdr.import");
 
-		m_SceneData->environment.SkyboxMaterial = skyboxMaterial;
-		m_SceneData->environment.IrradianceMap = skyboxIrradiance;
-		m_SceneData->environment.SpecularMap = skyboxSpecular;
+		m_SceneData->Environment.SkyboxMaterial = skyboxMaterial;
+		m_SceneData->Environment.IrradianceMap = skyboxIrradiance;
+		m_SceneData->Environment.SpecularMap = skyboxSpecular;
 
 		// Reset orbit angles
 		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
@@ -290,8 +290,8 @@ namespace Mahakam
 
 			CameraData cameraData(m_PreviewCamera, { 512, 512 }, transform);
 
-			m_SceneData->cameraBuffer->Bind(0);
-			m_SceneData->cameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
+			m_SceneData->CameraBuffer->Bind(0);
+			m_SceneData->CameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
 
 			// Setup uniform values
 			m_SceneData->UniformValueBuffer->Bind(3);
@@ -540,21 +540,21 @@ namespace Mahakam
 
 #ifndef MH_STANDALONE
 		// Setup scene data for the material
-		m_SceneData->shaderIDLookup.clear();
-		m_SceneData->materialIDLookup.clear();
+		m_SceneData->ShaderIDLookup.clear();
+		m_SceneData->MaterialIDLookup.clear();
 
-		m_SceneData->shaderRefLookup.clear();
-		m_SceneData->materialRefLookup.clear();
+		m_SceneData->ShaderRefLookup.clear();
+		m_SceneData->MaterialRefLookup.clear();
 
 		if (m_Material)
 		{
 			Asset<Shader> shader = m_Material->GetShader();
 
-			m_SceneData->shaderIDLookup[0] = shader;
-			m_SceneData->shaderRefLookup[shader] = 0;
+			m_SceneData->ShaderIDLookup[0] = shader;
+			m_SceneData->ShaderRefLookup[shader] = 0;
 
-			m_SceneData->materialIDLookup[0] = m_Material;
-			m_SceneData->materialRefLookup[m_Material] = 0;
+			m_SceneData->MaterialIDLookup[0] = m_Material;
+			m_SceneData->MaterialRefLookup[m_Material] = 0;
 		}
 #endif
 	}

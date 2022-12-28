@@ -39,7 +39,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		if (sceneData->wireframe)
+		if (sceneData->Wireframe)
 		{
 			src->Blit(viewportFramebuffer);
 			return false;
