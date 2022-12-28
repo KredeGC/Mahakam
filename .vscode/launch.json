@@ -8,7 +8,7 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "",
+            "program": "${workspaceFolder}/Erebor/bin/Debug-linux-gcc-x86_64/Erebor",
             "args": [],
             "cwd": "${workspaceFolder}/Erebor",
             "stopAtEntry": false,
@@ -20,26 +20,39 @@
                   "ignoreFailures": true
                 }
             ],
-            "linux": {
-                "environment": [
-                    {
-                        "name": "LD_LIBRARY_PATH",
-                        "value": "${workspaceFolder}/Erebor/bin/Debug-linux-gcc-x86_64/"
-                    }
-                ],
-                "program": "${workspaceFolder}/Erebor/bin/Debug-linux-gcc-x86_64/Erebor",
-                "MIMode": "gdb",
-                "miDebuggerPath": "/usr/bin/gdb"
-            },
-            "osx": {
-                "program": "${workspaceFolder}/Erebor/bin/Debug-osx-x86_64/Erebor",
-                "MIMode": "lldb"
-            },
-            "windows": {
-                "program": "${workspaceFolder}/Erebor/bin/Debug-windows-x86_64/Erebor.exe",
-                "MIMode": "gdb",
-                "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
-            }
+            "environment": [
+                {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "${workspaceFolder}/Erebor/bin/Debug-linux-gcc-x86_64/"
+                }
+            ],
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Release",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Erebor/bin/Release-linux-gcc-x86_64/Erebor",
+            "args": [],
+            "cwd": "${workspaceFolder}/Erebor",
+            "stopAtEntry": false,
+            "externalConsole": false,
+            "setupCommands": [
+                {
+                  "description": "Enable pretty-printing for gdb",
+                  "text": "-enable-pretty-printing",
+                  "ignoreFailures": true
+                }
+            ],
+            "environment": [
+                {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "${workspaceFolder}/Erebor/bin/Release-linux-gcc-x86_64/"
+                }
+            ],
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
 }

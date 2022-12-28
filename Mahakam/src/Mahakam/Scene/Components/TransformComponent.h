@@ -13,8 +13,6 @@
 
 namespace Mahakam
 {
-	// TODO: Compare the the performance of this more cache-friendly implementation
-
 	struct TransformComponent
 	{
 	private:

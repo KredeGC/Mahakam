@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
-#include "Mahakam/Scene/Entity.h"
-
 #include "Mahakam/Core/SharedLibrary.h"
+#include "Mahakam/Core/Types.h"
+
+#include "Mahakam/Scene/Entity.h"
 
 namespace Mahakam::Editor
 {

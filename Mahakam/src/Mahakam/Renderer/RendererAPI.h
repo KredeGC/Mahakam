@@ -16,7 +16,8 @@ namespace Mahakam
 			OpenGL = 1
 		};
 
-		enum class BlendMode {
+		enum class BlendMode
+        {
 			Zero = 0,
 			One,
 			SrcColor,

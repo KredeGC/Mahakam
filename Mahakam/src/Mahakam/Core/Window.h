@@ -1,8 +1,8 @@
 #pragma once
 #include "Core.h"
-#include "Types.h"
-
 #include "SharedLibrary.h"
+#include "Types.h"
+#include "WindowProps.h"
 
 #include <filesystem>
 
@@ -10,16 +10,6 @@ namespace Mahakam
 {
 	class Event;
 	class RenderingContext;
-
-	struct WindowProps
-	{
-		std::string Title;
-		std::filesystem::path Iconpath;
-		uint32_t Width, Height;
-
-		WindowProps(const std::string& title = "Mahakam", const std::filesystem::path& iconpath = "", uint32_t width = 1600, uint32_t height = 900)
-			: Title(title), Iconpath(iconpath), Width(width), Height(height) {}
-	};
 
 	class Window
 	{

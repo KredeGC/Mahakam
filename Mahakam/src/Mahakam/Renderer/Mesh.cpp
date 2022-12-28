@@ -104,10 +104,10 @@ namespace Mahakam
 		const tinygltf::Node& node = model.nodes[id];
 
 		MeshNode bone;
-		bone.name = node.name;
-		bone.id = id;
-		bone.mesh = node.mesh;
-		bone.parentID = parentID;
+		bone.Name = node.name;
+		bone.ID = id;
+		bone.Mesh = node.mesh;
+		bone.ParentID = parentID;
 
 		if (node.matrix.size() > 0)
 		{
@@ -117,7 +117,7 @@ namespace Mahakam
 				m[4], m[5], m[6], m[7],
 				m[8], m[9], m[10], m[11],
 				m[12], m[13], m[14], m[15] };
-			bone.offset = glm::inverse(matrix);
+			bone.Offset = glm::inverse(matrix);
 		}
 		else
 		{
@@ -133,7 +133,7 @@ namespace Mahakam
 			if (!nodeScale.empty())
 				matrix *= glm::scale(glm::mat4(1.0f), glm::vec3{ (float)nodeScale[0], (float)nodeScale[1], (float)nodeScale[2] });
 
-			bone.offset = glm::inverse(matrix);
+			bone.Offset = glm::inverse(matrix);
 		}
 
 		nodeIndex[id] = skinnedMesh->NodeHierarchy.size();
@@ -386,7 +386,7 @@ namespace Mahakam
 
 								// TODO: The spec is vague on when to do 'inv(parentMat) * nodeMat * invBindMatrix'
 								// For now it is done inside the Scene, once per frame
-								skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].offset = invMatrices[i]; // Override offset to be the bone's inverse matrix
+								skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].Offset = invMatrices[i]; // Override offset to be the bone's inverse matrix
 								skinnedMesh->BoneInfoMap.insert(node.name, (int)i);
 							}
 						}

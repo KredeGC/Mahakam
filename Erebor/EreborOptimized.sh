@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:bin/DebugOptimized-linux-x86_64
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:bin/DebugOptimized-linux-gcc-x86_64
 export LD_LIBRARY_PATH
-bin/DebugOptimized-linux-x86_64/Erebor $@
+bin/DebugOptimized-linux-gcc-x86_64/Erebor $@

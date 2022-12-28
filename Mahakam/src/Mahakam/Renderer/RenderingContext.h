@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Core/Types.h"
+
 namespace Mahakam
 {
 	class RenderingContext

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Mahakam/Events/KeyEvent.h"
-#include "Mahakam/Events/MouseEvent.h"
 #include "Mahakam/Core/Timestep.h"
 
 #include "Mahakam/Renderer/Camera.h"
@@ -12,6 +10,12 @@
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
+
+namespace Mahakam
+{
+    class KeyPressedEvent;
+    class MouseScrolledEvent;
+}
 
 namespace Mahakam::Editor
 {

@@ -5,10 +5,11 @@
 
 namespace Mahakam
 {
-	void Animator::SetAnimation(Asset<Animation> animation)
+	void Animator::SetAnimation(Asset<Animation> animation, bool play)
 	{
 		m_Animation = std::move(animation);
 		m_Time = 0.0f;
+        m_Playing = play;
 
 		m_Translations.clear();
 		m_Rotations.clear();
@@ -25,6 +26,7 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		if (!m_Animation) return;
+        if (!m_Playing) return;
 
 		const auto& samplers = m_Animation->GetSamplers();
 

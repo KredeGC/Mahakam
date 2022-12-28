@@ -299,7 +299,7 @@ namespace Mahakam::Editor
 					if (bones.size() == hierarchy.size())
 					{
 						for (size_t i = 0; i < bones.size(); i++)
-							GUI::DrawDragDropEntity(hierarchy[i].name, "Transform", bones[i]);
+							GUI::DrawDragDropEntity(hierarchy[i].Name, "Transform", bones[i]);
 					}
 				}
 				else

@@ -165,15 +165,15 @@ namespace Mahakam
 					{
 						if (TransformComponent* transform = boneEntity.TryGetComponent<TransformComponent>())
 						{
-							auto tranIter = translations.find(index.id);
+							auto tranIter = translations.find(index.ID);
 							if (tranIter != translations.end())
 								transform->SetPosition(tranIter->second);
 
-							auto rotIter = rotations.find(index.id);
+							auto rotIter = rotations.find(index.ID);
 							if (rotIter != rotations.end())
 								transform->SetRotation(rotIter->second);
 
-							auto sclIter = scales.find(index.id);
+							auto sclIter = scales.find(index.ID);
 							if (sclIter != scales.end())
 								transform->SetScale(sclIter->second);
 						}
@@ -243,12 +243,12 @@ namespace Mahakam
 
 								// TODO: Find some better way?
 								// Currently the bones are part of the uniform buffer, but that seems a bit unwieldy
-								auto boneIter = bones.find(node.name);
+								auto boneIter = bones.find(node.Name);
 								if (boneIter != bones.end())
 								{
 									glm::mat4 transform = invTransform
 										* boneTransform->GetModelMatrix()
-										* node.offset;
+										* node.Offset;
 									material->SetMat4("Uniforms.BoneMatrices[" + std::to_string(boneIter->second) + "]", transform);
 								}
 							}
@@ -378,15 +378,15 @@ namespace Mahakam
 									auto& index = hierarchy.at(i);
 									auto& boneEntity = boneEntities.at(i);
 
-									if (boneEntity && index.mesh > -1)
+									if (boneEntity && index.Mesh > -1)
 									{
 										if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
 										{
 											// TODO: Undo the skin transformation instead. This doesn't actually seem to work though
 											glm::mat4 transform = boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
-												* index.offset;
+												* index.Offset;
 
-											Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount]);
+											Renderer::Submit(transform, meshes[index.Mesh], materials[index.Mesh < materialCount ? index.Mesh : materialCount]);
 										}
 									}
 								}
@@ -398,13 +398,13 @@ namespace Mahakam
 									auto& index = hierarchy.at(i);
 									auto& boneEntity = boneEntities.at(i);
 
-									if (boneEntity && index.mesh > -1)
+									if (boneEntity && index.Mesh > -1)
 									{
 										if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
 										{
 											const glm::mat4& transform = transformComponent.GetModelMatrix();
 
-											Renderer::Submit(transform, meshes[index.mesh], materials[index.mesh < materialCount ? index.mesh : materialCount]);
+											Renderer::Submit(transform, meshes[index.Mesh], materials[index.Mesh < materialCount ? index.Mesh : materialCount]);
 										}
 									}
 								}

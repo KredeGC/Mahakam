@@ -23,18 +23,20 @@ namespace Mahakam
 			m_Source->SetSound(sound);
 		}
 
-		void Play() { m_Source->Play(); }
-		void Stop() { m_Source->Stop(); }
+		inline void Play() { m_Source->Play(); }
+		inline void Stop() { m_Source->Stop(); }
 
-		void SetSound(Asset<Sound> sound) { m_Source->SetSound(std::move(sound)); }
-		Asset<Sound> GetSound() const { return m_Source->GetSound(); }
+		inline void SetSound(Asset<Sound> sound) { m_Source->SetSound(std::move(sound)); }
+		inline Asset<Sound> GetSound() const { return m_Source->GetSound(); }
 
-		void SetInterpolation(bool interpolate) { m_Source->SetInterpolation(interpolate); }
-		bool GetInterpolation() const { return m_Source->GetInterpolation(); }
+		inline void SetInterpolation(bool interpolate) { m_Source->SetInterpolation(interpolate); }
+		inline bool GetInterpolation() const { return m_Source->GetInterpolation(); }
 
-		void SetSpatialBlend(float blend) { m_Source->SetSpatialBlend(blend); }
-		float GetSpatialBlend() const { return m_Source->GetSpatialBlend(); }
+		inline void SetSpatialBlend(float blend) { m_Source->SetSpatialBlend(blend); }
+		inline float GetSpatialBlend() const { return m_Source->GetSpatialBlend(); }
 
-		Ref<AudioSource> GetAudioSource() { return m_Source; }
+		inline operator Ref<AudioSource>() const { return m_Source; }
+
+		inline Ref<AudioSource> GetAudioSource() { return m_Source; }
 	};
 }

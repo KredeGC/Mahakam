@@ -8,6 +8,10 @@
 
 #include "Mahakam/Audio/AudioEngine.h"
 
+#include "Mahakam/Events/ApplicationEvent.h"
+
+#include "Mahakam/ImGui/ImGuiLayer.h"
+
 #include "Mahakam/Physics/PhysicsEngine.h"
 
 #include "Mahakam/Renderer/Renderer.h"

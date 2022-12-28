@@ -13,7 +13,7 @@
 // Function declarations which should be reachable in DLLs
 #ifdef MH_ENABLE_DYNAMIC_LINKING
 #define MH_DECLARE_FUNC_LINE2(line, func, returnType, ...) static returnType (*func)(__VA_ARGS__); \
-	inline static uint8_t generated_##line = (::Mahakam::SharedLibrary::AddExportFunction((void**)&func), 0);
+	inline static uint8_t generated_##func_##line = (::Mahakam::SharedLibrary::AddExportFunction((void**)&func), 0);
 #define MH_DECLARE_FUNC_LINE(line, func, returnType, ...) MH_DECLARE_FUNC_LINE2(line, func, returnType, __VA_ARGS__)
 
 #define MH_DECLARE_FUNC(func, returnType, ...) MH_DECLARE_FUNC_LINE(__LINE__, func, returnType, __VA_ARGS__)
@@ -28,7 +28,7 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
-		static constexpr int NUM_FUNC_PTRS = 113;
+		static constexpr int NUM_FUNC_PTRS = 114;
 
 		typedef void** FuncPtr;
 
@@ -41,8 +41,8 @@ namespace Mahakam
 #endif
 
 		inline static bool s_Initialized = false;
-		inline static FuncPtr s_FuncPointers[NUM_FUNC_PTRS];
 		inline static int s_FuncPointerCounter = 0;
+		inline static FuncPtr s_FuncPointers[NUM_FUNC_PTRS];
 
 	public:
 		SharedLibrary() = default;

@@ -32,11 +32,11 @@ namespace Mahakam
 	public:
 		Animation(const std::filesystem::path& filepath, int index);
 
-		const std::string& GetName() const { return m_Name; }
-		int GetIndex() const { return m_AnimationIndex; }
-		float GetDuration() const { return m_Duration; }
+		inline const std::string& GetName() const { return m_Name; }
+		inline int GetIndex() const { return m_AnimationIndex; }
+		inline float GetDuration() const { return m_Duration; }
 
-		const std::vector<Sampler>& GetSamplers() const { return m_Samplers; }
+		inline const std::vector<Sampler>& GetSamplers() const { return m_Samplers; }
 
 		inline static Asset<Animation> Load(const std::filesystem::path& filepath, int index = 0) { return LoadImpl(filepath, index); }
 

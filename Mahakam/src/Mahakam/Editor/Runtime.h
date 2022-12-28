@@ -2,6 +2,7 @@
 
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/Timestep.h"
+#include "Mahakam/Core/Types.h"
 
 #include <filesystem>
 #include <string>

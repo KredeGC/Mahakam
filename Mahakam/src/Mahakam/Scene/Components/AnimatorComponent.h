@@ -7,7 +7,7 @@ namespace Mahakam
 	struct AnimatorComponent
 	{
 	private:
-		Animator animator;
+		Animator m_Animator;
 
 	public:
 		AnimatorComponent() = default;
@@ -16,12 +16,12 @@ namespace Mahakam
 
 		AnimatorComponent(Asset<Animation> animation)
 		{
-			animator.SetAnimation(std::move(animation));
+			m_Animator.SetAnimation(std::move(animation));
 		}
 
-		operator Animator& () { return animator; }
-		operator const Animator& () const { return animator; }
+		inline operator Animator& () { return m_Animator; }
+		inline operator const Animator& () const { return m_Animator; }
 
-		Animator& GetAnimator() { return animator; }
+		inline Animator& GetAnimator() { return m_Animator; }
 	};
 }

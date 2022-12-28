@@ -85,8 +85,7 @@ namespace Mahakam
 			glm::ivec4* boneIDs = nullptr;
 			glm::vec4* boneWeights = nullptr;
 
-			operator void** () { return (void**)this; }
-			operator const void** () const { return (const void**)this; }
+			operator const void** () const { return reinterpret_cast<const void**>(const_cast<InterleavedStruct*>(this)); }
 		};
 
 		static constexpr uint32_t BUFFER_ELEMENTS_SIZE = 7U;

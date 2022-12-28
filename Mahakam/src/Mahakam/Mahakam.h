@@ -12,7 +12,6 @@
 #include "Mahakam/Math/Math.h"
 #include "Mahakam/Core/MouseButtonCodes.h"
 #include "Mahakam/Core/Profiler.h"
-#include "Mahakam/Core/SceneManager.h"
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Timestep.h"
 #include "Mahakam/Core/Types.h"
@@ -102,6 +101,7 @@
 #include "Mahakam/Scene/ComponentRegistry.h"
 #include "Mahakam/Scene/Entity.h"
 #include "Mahakam/Scene/Scene.h"
+#include "Mahakam/Scene/SceneManager.h"
 #include "Mahakam/Scene/SceneSerializer.h"
 
 //Serialization

@@ -142,10 +142,10 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 	for (auto& node : skinnedModel->NodeHierarchy)
 	{
-		Entity boneEntity = scene->CreateEntity(node.name);
+		Entity boneEntity = scene->CreateEntity(node.Name);
 
-		if (node.parentID > -1)
-			boneEntity.SetParent(boneEntities[node.parentID]);
+		if (node.ParentID > -1)
+			boneEntity.SetParent(boneEntities[node.ParentID]);
 		else
 			boneEntity.SetParent(skinnedEntity);
 
@@ -155,9 +155,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 		Entity parent = boneEntity.GetParent();
 		glm::mat4 transform{ 1.0f };
-		if (node.parentID > -1)
+		if (node.ParentID > -1)
 			transform *= glm::inverse(parent.GetComponent<TransformComponent>().GetModelMatrix());
-		transform *= glm::inverse(node.offset);
+		transform *= glm::inverse(node.Offset);
 
 		Math::DecomposeTransform(transform, pos, rot, scale);
 
@@ -166,14 +166,14 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 		boneEntity.GetComponent<TransformComponent>().SetRotation(rot);
 		boneEntity.GetComponent<TransformComponent>().SetScale(scale);
 
-		if (node.parentID > -1)
+		if (node.ParentID > -1)
 			boneEntity.GetComponent<TransformComponent>().UpdateModelMatrix(parent.GetComponent<TransformComponent>().GetModelMatrix());
 		else
 			boneEntity.GetComponent<TransformComponent>().UpdateModelMatrix(glm::mat4(1.0f));
 
 		skin.AddBoneEntity(boneEntity);
 
-		boneEntities[node.id] = boneEntity;
+		boneEntities[node.ID] = boneEntity;
 	}
 #endif
 

@@ -2,13 +2,12 @@
 
 #include "Mahakam/Core/Layer.h"
 
-#include "Mahakam/Events/MouseEvent.h"
-#include "Mahakam/Events/KeyEvent.h"
-#include "Mahakam/Events/ApplicationEvent.h"
-
 struct ImFont;
 
-namespace Mahakam {
+namespace Mahakam
+{
+    class Event;
+    
 	class ImGuiLayer : public Layer
 	{
 	private:

@@ -4,6 +4,10 @@
 #include "Mahakam/Core/Application.h"
 #include "Mahakam/Core/Profiler.h"
 
+#include "Mahakam/Events/MouseEvent.h"
+#include "Mahakam/Events/KeyEvent.h"
+#include "Mahakam/Events/ApplicationEvent.h"
+
 #include <imgui/imgui.h>
 
 #include "imgui_impl_glfw.h" //#include <imgui/backends/imgui_impl_glfw.cpp>
@@ -100,9 +104,11 @@ namespace Mahakam
 		m_MonoFont = io.Fonts->AddFontFromFileTTF("assets/fonts/ProggyVector/ProggyVector Regular.ttf", 15.0f, &monoConfig);
 
 		io.Fonts->Build();
-
+        
+        // Dark mode
 		ImGui::StyleColorsDark();
 
+        // VS-like Styling
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.WindowRounding = 0.0f;
 		style.WindowBorderSize = 0.0f;

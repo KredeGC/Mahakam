@@ -2,16 +2,17 @@
 #include "Core.h"
 #include "LayerStack.h"
 #include "Timestep.h"
-#include "Window.h"
 #include "Types.h"
-
-#include "Mahakam/Events/Event.h"
-#include "Mahakam/Events/ApplicationEvent.h"
-
-#include "Mahakam/ImGui/ImGuiLayer.h"
+#include "WindowProps.h"
 
 namespace Mahakam
 {
+    class Event;
+    class ImGuiLayer;
+    class Window;
+    class WindowCloseEvent;
+    class WindowResizeEvent;
+    
 	class Application
 	{
 	private:

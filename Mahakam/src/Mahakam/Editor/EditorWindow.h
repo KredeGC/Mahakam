@@ -2,7 +2,10 @@
 
 #include "Mahakam/Core/Timestep.h"
 
-#include "Mahakam/Events/Event.h"
+namespace Mahakam
+{
+    class Event;
+}
 
 namespace Mahakam::Editor
 {

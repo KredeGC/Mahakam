@@ -11,7 +11,7 @@ namespace Mahakam
 	private:
 		Camera camera;
 
-		bool fixedAspectRatio = false;
+		bool m_FixedAspectRatio = false;
 
 	public:
 		CameraComponent() = default;
@@ -20,13 +20,13 @@ namespace Mahakam
 		CameraComponent(Camera::ProjectionType projection, float fov, float nearPlane = 0.03f, float farPlane = 1000.0f)
 			: camera(projection, fov, nearPlane, farPlane) {}
 
-		operator Camera& () { return camera; }
-		operator const Camera& () const { return camera; }
+		inline operator Camera& () { return camera; }
+		inline operator const Camera& () const { return camera; }
 
-		void SetFixedAspectRatio(bool fixed) { fixedAspectRatio = fixed; }
+		inline void SetFixedAspectRatio(bool fixed) { m_FixedAspectRatio = fixed; }
 
-		bool HasFixedAspectRatio() const { return fixedAspectRatio; }
+		inline bool HasFixedAspectRatio() const { return m_FixedAspectRatio; }
 
-		Camera& GetCamera() { return camera; }
+		inline Camera& GetCamera() { return camera; }
 	};
 }

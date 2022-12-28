@@ -41,20 +41,20 @@ namespace Mahakam
 
 		void SetOrthographic(float size, float nearPlane = 0.03f, float farPlane = 1000.0f);
 
-		void SetFov(float f) { m_Fov = f; m_Changed = true; }
-		void SetSize(float s) { m_Size = s; m_Changed = true; }
-		void SetRatio(float r) { m_Ratio = r; m_Changed = true; }
-		void SetNearPlane(float nearPlane) { m_NearZ = nearPlane; m_Changed = true; }
-		void SetFarPlane(float farPlane) { m_FarZ = farPlane; m_Changed = true; }
-		void SetProjectionType(ProjectionType type) { m_ProjectionType = type; m_Changed = true; }
-		void SetProjectionMatrix(const glm::mat4& projection) { m_ProjectionMatrix = projection; }
+		inline void SetFov(float f) { m_Fov = f; m_Changed = true; }
+		inline void SetSize(float s) { m_Size = s; m_Changed = true; }
+		inline void SetRatio(float r) { m_Ratio = r; m_Changed = true; }
+		inline void SetNearPlane(float nearPlane) { m_NearZ = nearPlane; m_Changed = true; }
+		inline void SetFarPlane(float farPlane) { m_FarZ = farPlane; m_Changed = true; }
+		inline void SetProjectionType(ProjectionType type) { m_ProjectionType = type; m_Changed = true; }
+		inline void SetProjectionMatrix(const glm::mat4& projection) { m_ProjectionMatrix = projection; }
 
-		float GetFov() const { return m_Fov; }
-		float GetSize() const { return m_Size; }
-		float GetRatio() const { return m_Ratio; }
-		float GetNearPlane() const { return m_NearZ; }
-		float GetFarPlane() const { return m_FarZ; }
-		ProjectionType GetProjectionType() const { return m_ProjectionType; }
-		const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
+		inline float GetFov() const { return m_Fov; }
+		inline float GetSize() const { return m_Size; }
+		inline float GetRatio() const { return m_Ratio; }
+		inline float GetNearPlane() const { return m_NearZ; }
+		inline float GetFarPlane() const { return m_FarZ; }
+		inline ProjectionType GetProjectionType() const { return m_ProjectionType; }
+		inline const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 	};
 }

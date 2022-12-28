@@ -25,11 +25,11 @@ namespace Mahakam
 
 	struct MeshNode
 	{
-		std::string name; // Node name
-		int id; // Node ID
-		int parentID; // Parent node ID
-		int mesh; // Index of the submesh
-		glm::mat4 offset; // Offset. In order of priority: invMatrix, matrix, TRS
+		std::string Name; // Node name
+		int ID; // Node ID
+		int ParentID; // Parent node ID
+		int Mesh; // Index of the submesh
+		glm::mat4 Offset; // Offset. In order of priority: invMatrix, matrix, TRS
 	};
 
 	struct MeshProps
