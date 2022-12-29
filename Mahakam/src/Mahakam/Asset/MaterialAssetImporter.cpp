@@ -335,6 +335,11 @@ namespace Mahakam
 		m_Material = nullptr;
 		SetupMaterialProperties({});
 	}
+    
+    bool MaterialAssetImporter::OnIconRender(Asset<void> asset)
+    {
+        return false;
+    }
 #endif
 
 	void MaterialAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)

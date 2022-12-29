@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**"
             ],
             "defines": ["MH_PLATFORM_LINUX", "MH_DEBUG"],
-            "compilerPath": "/usr/bin/clang++",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu17",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64"

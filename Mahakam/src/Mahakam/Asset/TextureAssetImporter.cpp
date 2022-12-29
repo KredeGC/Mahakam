@@ -4,6 +4,7 @@
 #include "Mahakam/ImGui/GUI.h"
 
 #include "Mahakam/Renderer/FrameBuffer.h"
+#include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Texture.h"
 
 #include <imgui/imgui.h>
@@ -326,6 +327,24 @@ namespace Mahakam
 
 		m_Texture = nullptr;
 	}
+    
+    bool TextureAssetImporter::OnIconRender(Asset<void> asset)
+    {
+        Asset<Texture> textureAsset(asset);
+        
+        if (!textureAsset->IsCubemap())
+        {
+			Asset<Texture2D> texture2D(textureAsset);
+            
+            texture2D->Bind();
+            
+            GL::DrawScreenQuad();
+            
+            return true;
+        }
+        
+        return false;
+    }
 #endif
 
 	void TextureAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)

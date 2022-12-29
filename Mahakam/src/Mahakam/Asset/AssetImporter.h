@@ -34,6 +34,7 @@ namespace Mahakam
 		virtual void OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& rootNode) = 0;
 		virtual void OnWizardRender(const std::filesystem::path& filepath) = 0;
 		virtual void OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath) = 0;
+        virtual bool OnIconRender(Asset<void> asset) { return false; }
 #endif
 
 		virtual void Serialize(ryml::NodeRef& node, Asset<void> asset) = 0;

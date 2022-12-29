@@ -25,7 +25,7 @@ namespace Mahakam::Editor
 	{
 		m_Time += dt;
 
-		// Only update every 3 seconds
+		// Only update every 2 seconds
 		if (m_Time >= 2.0f)
 		{
 			m_Time -= 2.0f;
@@ -35,6 +35,8 @@ namespace Mahakam::Editor
 			CreateFileStructure(m_RootDir, FileUtility::ASSET_PATH);
 
 			CreateDirectories(m_CurrentDirectory);
+            
+            CreateIcons(m_CurrentDirectory);
 		}
 	}
 
@@ -157,6 +159,52 @@ namespace Mahakam::Editor
 			}
 		}
 	}
+    
+    void ContentBrowserPanel::CreateIcons(const Filepath& path)
+    {
+        return; // TODO: Fix all this stuff for custom icons
+        
+        //m_Icons.clear();
+        
+        Filepath importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(m_CurrentDirectory, FileUtility::PROJECT_PATH);
+        for (auto& file : std::filesystem::directory_iterator(importDirectory))
+        {
+            if (std::filesystem::is_directory(file)) continue;
+            if (m_Icons.find(file.path()) != m_Icons.end()) continue;
+            
+            auto info = AssetDatabase::ReadAssetInfo(file.path());
+            auto importer = AssetDatabase::GetAssetImporter(info.Extension);
+            
+            if (!importer) continue;
+            
+            Asset<void> asset(file.path());
+            
+            if (!asset) continue;
+            
+            // Make sure it's always loaded
+            m_CachedAssets.push_back(asset);
+            
+            // Render the icon
+            FrameBufferProps props;
+            props.Width = ICON_SIZE;
+            props.Height = ICON_SIZE;
+            props.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RGBA8 };
+            props.DontUseDepth = true;
+            
+            Asset<FrameBuffer> framebuffer = FrameBuffer::Create(props);
+            
+            framebuffer->Bind();
+            
+            GL::Clear();
+            
+            bool useIcon = importer->OnIconRender(asset);
+            
+            framebuffer->Unbind();
+            
+            if (useIcon)
+                m_Icons.insert(file.path(), framebuffer);
+        }
+    }
 
 	void ContentBrowserPanel::DrawDirectoryRecursive(DirNode* parent, const std::filesystem::path& path)
 	{
@@ -173,6 +221,7 @@ namespace Mahakam::Editor
 		{
 			m_CurrentDirectory = path;
 			CreateDirectories(m_CurrentDirectory);
+			CreateIcons(m_CurrentDirectory);
 		}
 
 		if (open)
@@ -191,9 +240,7 @@ namespace Mahakam::Editor
 
 	void ContentBrowserPanel::DrawDirectoryContents(std::filesystem::path basePath)
 	{
-		float padding = 20.0f;
-		float thumbnailSize = 80.0f;
-		float cellSize = padding + thumbnailSize;
+		static constexpr float cellSize = ICON_PADDING + ICON_SIZE;
 
 		float panelWidth = ImGui::GetContentRegionAvail().x;
 		int numColumns = glm::max((int)(panelWidth / cellSize), 1);
@@ -208,17 +255,18 @@ namespace Mahakam::Editor
 				{
 					ImGui::TableNextColumn();
 
-					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
 					ImGui::PushID("..");
-					ImGui::ImageButton((ImTextureID)(uintptr_t)m_DirectoryIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+					ImGui::ImageButton((ImTextureID)(uintptr_t)m_DirectoryIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
 
 					if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 					{
 						m_CurrentDirectory = basePath.parent_path();
 						CreateDirectories(m_CurrentDirectory);
+			            CreateIcons(m_CurrentDirectory);
 					}
 
-					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
 					ImGui::TextWrapped("%s", "..");
 					ImGui::PopID();
 				}
@@ -230,17 +278,18 @@ namespace Mahakam::Editor
 					{
 						ImGui::TableNextColumn();
 
-						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
 						ImGui::PushID(directory.c_str());
-						ImGui::ImageButton((ImTextureID)(uintptr_t)m_DirectoryIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+						ImGui::ImageButton((ImTextureID)(uintptr_t)m_DirectoryIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
 
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 						{
 							m_CurrentDirectory = basePath / directory;
 							CreateDirectories(m_CurrentDirectory);
+			                CreateIcons(m_CurrentDirectory);
 						}
 
-						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+						ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
 						ImGui::TextWrapped("%s", directory.c_str());
 						ImGui::PopID();
 					}
@@ -267,9 +316,15 @@ namespace Mahakam::Editor
 
 							ImGui::TableNextColumn();
 
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
 							ImGui::PushID(importPath.string().c_str());
-							ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+							//ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
+                            
+                            auto iconIter = m_Icons.find(file.path());
+                            if (iconIter != m_Icons.end())
+                                ImGui::ImageButton((ImTextureID)(uintptr_t)iconIter->second->GetColorTexture(0)->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
+                            else
+							    ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
 
 							if (ImGui::BeginDragDropSource())
 							{
@@ -280,7 +335,7 @@ namespace Mahakam::Editor
 
 								ImGui::SetDragDropPayload(info.Extension.c_str(), importBuffer, strlen(importBuffer) + 1);
 								
-								ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+								ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
 								ImGui::Text("%s", pathName.c_str());
 
 								ImGui::EndDragDropSource();
@@ -293,7 +348,7 @@ namespace Mahakam::Editor
 								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
 							}
 
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
 							ImGui::TextWrapped("%s", pathName.c_str());
 							ImGui::PopID();
 						}
@@ -319,9 +374,9 @@ namespace Mahakam::Editor
 
 							ImGui::TableNextColumn();
 
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
 							ImGui::PushID(file.path().string().c_str());
-							ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, { 0.48f, 0.5f, 0.53f, 1 });
+							ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, { 0.48f, 0.5f, 0.53f, 1 });
 
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{
@@ -361,7 +416,7 @@ namespace Mahakam::Editor
 								ImGui::EndPopup();
 							}
 
-							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padding / 2);
+							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
 							ImGui::TextWrapped("%s", pathName.c_str());
 							ImGui::PopID();
 						}

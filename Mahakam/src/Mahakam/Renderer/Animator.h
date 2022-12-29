@@ -28,6 +28,9 @@ namespace Mahakam
 		void SetAnimation(Asset<Animation> animation, bool play = true);
 
 		inline Asset<Animation> GetAnimation() const { return m_Animation; }
+        
+        inline void Play() { m_Playing = true; }
+        inline void Pause() { m_Playing = false; }
 
 		inline float GetTime() const { return m_Time; }
 

@@ -38,7 +38,7 @@ namespace Mahakam
 		static ComponentMap s_ComponentInterfaces;
 
 	public:
-		MH_DECLARE_FUNC(RegisterComponent, void, const std::string& name, ComponentInterface componentInterface);
+		MH_DECLARE_FUNC(RegisterComponent, void, const std::string& name, const ComponentInterface& componentInterface);
 		MH_DECLARE_FUNC(DeregisterComponent, void, const std::string& name);
 		MH_DECLARE_FUNC(RegisterDefaultComponents, void);
 		MH_DECLARE_FUNC(DeregisterDefaultComponents, void);

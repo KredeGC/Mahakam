@@ -27,8 +27,8 @@ namespace Mahakam
 {
 	ComponentRegistry::ComponentMap ComponentRegistry::s_ComponentInterfaces;
 
-	//void ComponentRegistry::RegisterComponent(const std::string& name, ComponentInterface componentInterface)
-	MH_DEFINE_FUNC(ComponentRegistry::RegisterComponent, void, const std::string& name, ComponentInterface componentInterface)
+	//void ComponentRegistry::RegisterComponent(const std::string& name, const ComponentInterface& componentInterface)
+	MH_DEFINE_FUNC(ComponentRegistry::RegisterComponent, void, const std::string& name, const ComponentInterface& componentInterface)
 	{
 		s_ComponentInterfaces.insert(name, componentInterface);
 	};
