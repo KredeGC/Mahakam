@@ -170,7 +170,7 @@ namespace Mahakam::Editor
         for (auto& file : std::filesystem::directory_iterator(importDirectory))
         {
             if (std::filesystem::is_directory(file)) continue;
-            if (m_Icons.find(file.path()) != m_Icons.end()) continue;
+            if (m_Icons.find(file.path().string()) != m_Icons.end()) continue;
             
             auto info = AssetDatabase::ReadAssetInfo(file.path());
             auto importer = AssetDatabase::GetAssetImporter(info.Extension);
