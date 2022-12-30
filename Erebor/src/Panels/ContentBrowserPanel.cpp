@@ -202,7 +202,7 @@ namespace Mahakam::Editor
             framebuffer->Unbind();
             
             if (useIcon)
-                m_Icons.insert(file.path(), framebuffer);
+                m_Icons.insert(file.path().string(), framebuffer);
         }
     }
 
