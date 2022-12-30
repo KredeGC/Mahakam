@@ -320,7 +320,7 @@ namespace Mahakam::Editor
 							ImGui::PushID(importPath.string().c_str());
 							//ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
                             
-                            auto iconIter = m_Icons.find(file.path());
+                            auto iconIter = m_Icons.find(file.path().string());
                             if (iconIter != m_Icons.end())
                                 ImGui::ImageButton((ImTextureID)(uintptr_t)iconIter->second->GetColorTexture(0)->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
                             else
