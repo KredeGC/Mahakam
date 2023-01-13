@@ -28,7 +28,7 @@ void main() {
         o.v_ScreenPos = gl_Position.xyw;
     #else
         // Directional lights are screen-space
-        gl_Position = vec4(i_Pos, 1.0);
+        gl_Position = vec4(i_Pos.xy, 1.0, 1.0);
         o.v_ScreenPos = vec3(gl_Position.xy * 0.5 + 0.5, 1.0);
     #endif
 }
@@ -106,12 +106,15 @@ void main() {
     
     // Final render
     vec3 color = BRDF(albedo, metallic, roughness, ao, viewDir, worldPos, worldNormal);
-    color += emission;
+    
+    #ifdef DIRECTIONAL
+        color += emission;
+    #endif
 
     o_Color = vec4(color, 1.0);
     
     // #if defined(DIRECTIONAL) || defined(SPOT)
-    //     o_Color = vec4(CalculateShadowAttenuation(lights[0], worldPos, worldNormal));
+    //     o_Color = vec4(PBR_SHADOW(lights[0], worldPos, worldNormal));
     // #else
     //     o_Color = vec4(0.0);
     // #endif

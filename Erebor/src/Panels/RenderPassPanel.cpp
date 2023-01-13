@@ -128,11 +128,11 @@ namespace Mahakam::Editor
 
 		m_BlitShader->SetUniformInt("u_Depth", depth);
 
-		GL::EnableZTesting(false);
+		GL::EnableZTesting(RendererAPI::DepthMode::Always, false);
 		GL::EnableZWriting(false);
 		Renderer::DrawScreenQuad();
 		GL::EnableZWriting(true);
-		GL::EnableZTesting(true);
+		GL::EnableZTesting(RendererAPI::DepthMode::LEqual, true);
 
 		m_ViewportFramebuffer->Unbind();
 

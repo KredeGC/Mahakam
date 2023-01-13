@@ -22,7 +22,7 @@ namespace Mahakam
 
 	void HeadlessRendererAPI::EnableZWriting(bool enable) {}
 
-	void HeadlessRendererAPI::EnableZTesting(bool enable) {}
+	void HeadlessRendererAPI::EnableZTesting(RendererAPI::DepthMode mode, bool enable) {}
 
 	void HeadlessRendererAPI::SetFillMode(bool fill) {}
 

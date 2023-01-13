@@ -6,7 +6,8 @@
         vec3 direction;
         vec3 color;
         mat4 worldToLight;
-        vec4 offset;
+        vec4 volumetric; // xyz - color, w - scattering
+        vec4 offset; // xy - offset in shadow map, z - scale in shadow map, w - bias
     };
 #elif defined(POINT)
     struct Light {
@@ -18,7 +19,8 @@
         mat4 objectToWorld;
         vec4 color; // xyz - color, w - 1.0 / (range * range)
         mat4 worldToLight;
-        vec4 offset;
+        vec4 volumetric; // xyz - color, w - scattering
+        vec4 offset; // xy - offset in shadow map, z - scale in shadow map, w - bias
     };
 #endif
 

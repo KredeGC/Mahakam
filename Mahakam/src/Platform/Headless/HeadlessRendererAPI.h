@@ -20,7 +20,7 @@ namespace Mahakam
 
 		virtual void EnableZWriting(bool enable) override;
 
-		virtual void EnableZTesting(bool enable) override;
+		virtual void EnableZTesting(DepthMode mode, bool enable) override;
 
 		virtual void SetFillMode(bool fill) override;
 

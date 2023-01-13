@@ -60,7 +60,7 @@ namespace Mahakam
 		GL::SetFillMode(!sceneData->Wireframe);
 
 		gBuffer->Bind();
-		GL::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
 		GL::Clear();
 
 		sceneData->CameraBuffer->Bind(0);
@@ -126,9 +126,20 @@ namespace Mahakam
 			}
 		}
 
+		// Render skybox
+		if (!sceneData->GBuffer)
+		{
+			GL::EnableZWriting(false);
+
+			Renderer::DrawSkybox(sceneData);
+
+			GL::EnableZWriting(true);
+		}
+
 		gBuffer->Unbind();
 
-		GL::SetFillMode(true);
+		if (sceneData->Wireframe)
+			GL::SetFillMode(true);
 
 		return true;
 	}

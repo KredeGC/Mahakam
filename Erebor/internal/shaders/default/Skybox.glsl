@@ -31,14 +31,20 @@ struct v2f {
 
 layout(location = 0) in v2f i;
 
-layout(location = 0) out vec4 o_Color;
+layout(location = 0) out vec4 o_Albedo;
+layout(location = 1) out vec4 o_Specular;
+layout(location = 2) out vec4 o_Emission;
+layout(location = 3) out vec4 o_Normal;
 
 layout(binding = 0, location = 0) uniform samplerCube u_Environment;
 
 void main() {
     vec3 normal = normalize(i.v_Normal);
     
-    o_Color = texture(u_Environment, normal);
+    o_Albedo = vec4(0.0);
+    o_Specular = vec4(0.0, 0.0, 0.0, 1.0);
+    o_Emission = texture(u_Environment, normal);
+    o_Normal = vec4(normal * 0.5 + 0.5, 0.0);
     
     //o_Color = vec4(1.0, 1.0, 0.0, 1.0);
 }

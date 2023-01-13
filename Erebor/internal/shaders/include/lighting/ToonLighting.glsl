@@ -19,6 +19,7 @@ vec3 ToonIndirect(vec3 albedo, float metallic, float roughness, float ao, vec3 V
 #define PBR_DIRECT ToonDirect
 #define PBR_INDIRECT ToonIndirect
 #define PBR_SHADOW CalculateShadowAttenuation
+#define PBR_SHADOW_RAW CalculateShadowAttenuationRaw
 
 #include "internal/shaders/include/lighting/PBR.glsl"
 

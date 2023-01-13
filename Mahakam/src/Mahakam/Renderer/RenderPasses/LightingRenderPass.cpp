@@ -193,15 +193,14 @@ namespace Mahakam
 
 		// Don't write or read depth
 		GL::EnableZWriting(false);
-		GL::EnableZTesting(false);
+		GL::EnableZTesting(RendererAPI::DepthMode::Always, false);
 
 		// Directional lights + ambient
 		RenderDirectionalLights(sceneData);
 
 		// Render additional lights with additive blend mode
 		GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, true);
-		// TODO: Implement GL_GEQUAL with z-testing
-		// GL::enableZTesting(true);
+		GL::EnableZTesting(RendererAPI::DepthMode::Greater, true); // TODO: Remove when implementing volumetric spotlights
 
 		// Point lights
 		RenderPointLights(sceneData);
@@ -211,11 +210,7 @@ namespace Mahakam
 
 		// Disable blending
 		GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
-		GL::EnableZTesting(true);
-
-		// Render skybox
-		if (!sceneData->GBuffer)
-			Renderer::DrawSkybox(sceneData);
+		GL::EnableZTesting(RendererAPI::DepthMode::LEqual, true);
 
 		m_HDRFrameBuffer->Unbind();
 	}

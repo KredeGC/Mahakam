@@ -61,7 +61,7 @@ namespace Mahakam
 		inline static void EnableCulling(bool enable, bool cullFront = false) { EnableCullingImpl(enable, cullFront); }
 
 		MH_DECLARE_FUNC(EnableZWriting, void, bool enable);
-		MH_DECLARE_FUNC(EnableZTesting, void, bool enable);
+		MH_DECLARE_FUNC(EnableZTesting, void, RendererAPI::DepthMode mode, bool enable);
 
 		MH_DECLARE_FUNC(SetFillMode, void, bool fill);
 		MH_DECLARE_FUNC(SetBlendMode, void, RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable);

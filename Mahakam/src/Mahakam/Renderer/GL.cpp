@@ -230,10 +230,10 @@ namespace Mahakam
 		rendererAPI->EnableZWriting(enable);
 	};
 
-	//void GL::EnableZTesting(bool enable)
-	MH_DEFINE_FUNC(GL::EnableZTesting, void, bool enable)
+	//void GL::EnableZTesting(RendererAPI::DepthMode mode, bool enable)
+	MH_DEFINE_FUNC(GL::EnableZTesting, void, RendererAPI::DepthMode mode, bool enable)
 	{
-		rendererAPI->EnableZTesting(enable);
+		rendererAPI->EnableZTesting(mode, enable);
 	};
 
 	//void GL::SetFillMode(bool enable)

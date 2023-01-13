@@ -25,16 +25,16 @@ namespace Mahakam
 
 		float m_Range = 10.0f;
 		float m_Fov = glm::radians(60.0f);
-		float m_ShadowBias = 0.005f;
+		float m_ShadowBias = 0.05f;
 
 		bool m_ShadowCasting = false;
 
 	public:
 		Light() = default;
 
-		Light(LightType lightType, float range, const glm::vec3& color, bool shadowCasting = false, float bias = 0.005f); // Directional
+		Light(LightType lightType, float range, const glm::vec3& color, bool shadowCasting = false, float bias = 0.05f); // Directional
 
-		Light(LightType lightType, float fov, float range, const glm::vec3& color, bool shadowCasting = false, float bias = 0.0f); // Spot
+		Light(LightType lightType, float fov, float range, const glm::vec3& color, bool shadowCasting = false, float bias = 0.1f); // Spot
 
 		inline void SetLightType(LightType type) { m_LightType = type; }
 		inline void SetColor(const glm::vec3& col) { m_Color = col; }

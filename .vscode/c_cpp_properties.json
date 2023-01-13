@@ -7,7 +7,7 @@
             ],
             "defines": ["MH_PLATFORM_LINUX", "MH_DEBUG"],
             "compilerPath": "/usr/bin/gcc",
-            "cStandard": "gnu17",
+            "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64"
         },
@@ -18,7 +18,7 @@
             ],
             "defines": ["MH_PLATFORM_WINDOWS", "MH_DEBUG"],
             "compilerPath": "cl.exe",
-            "cStandard": "gnu17",
+            "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-msvc-x64"
         }

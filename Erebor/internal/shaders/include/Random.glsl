@@ -2,8 +2,8 @@
 #define RANDOM_INCLUDED
 
 float rand2dTo1d(vec2 value, vec2 dotDir) {
-    vec2 smallValue = cos(value); // Removing might be faster
-    float random = dot(smallValue, dotDir);
+    //vec2 smallValue = cos(value); // Removing might be faster
+    float random = dot(value, dotDir);
     random = fract(sin(random) * 143758.5453);
     return random;
 }
@@ -16,8 +16,8 @@ vec2 rand2dTo2d(vec2 value) {
 }
 
 float rand3dTo1d(vec3 value, vec3 dotDir) {
-    vec3 smallValue = cos(value); // Removing might be faster
-    float random = dot(smallValue, dotDir);
+    //vec3 smallValue = cos(value); // Removing might be faster
+    float random = dot(value, dotDir);
     random = fract(sin(random) * 143758.5453);
     return random;
 }

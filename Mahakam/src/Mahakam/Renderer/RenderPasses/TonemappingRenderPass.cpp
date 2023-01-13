@@ -61,11 +61,11 @@ namespace Mahakam
 		m_TonemappingShader->Bind("POSTPROCESSING");
 		m_TonemappingShader->SetTexture("u_Albedo", src->GetColorTexture(0));
 
-		GL::EnableZTesting(false);
+		GL::EnableZTesting(RendererAPI::DepthMode::Always, false);
 		GL::EnableZWriting(false);
 		Renderer::DrawScreenQuad();
 		GL::EnableZWriting(true);
-		GL::EnableZTesting(true);
+		GL::EnableZTesting(RendererAPI::DepthMode::LEqual, true);
 
 		m_ViewportFramebuffer->Unbind();
 

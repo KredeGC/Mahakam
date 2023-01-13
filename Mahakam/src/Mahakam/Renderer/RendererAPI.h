@@ -28,6 +28,18 @@ namespace Mahakam
 			DstAlpha
 		};
 
+		enum class DepthMode
+		{
+			Never,
+			Less,
+			LEqual,
+			Equal,
+			NotEqual,
+			GEqual,
+			Greater,
+			Always
+		};
+
 	private:
 		static API s_API;
 
@@ -47,7 +59,7 @@ namespace Mahakam
 
 		virtual void EnableZWriting(bool enable) = 0;
 
-		virtual void EnableZTesting(bool enable) = 0;
+		virtual void EnableZTesting(DepthMode mode, bool enable) = 0;
 
 		virtual void SetFillMode(bool fill) = 0;
 

@@ -35,6 +35,33 @@ namespace Mahakam
 		return 0;
 	}
 
+	static GLenum DepthModeToOpenGLDepthMode(RendererAPI::DepthMode depthMode)
+	{
+		switch (depthMode)
+		{
+		case RendererAPI::DepthMode::Never:
+			return GL_NEVER;
+		case RendererAPI::DepthMode::Less:
+			return GL_LESS;
+		case RendererAPI::DepthMode::LEqual:
+			return GL_LEQUAL;
+		case RendererAPI::DepthMode::Equal:
+			return GL_EQUAL;
+		case RendererAPI::DepthMode::NotEqual:
+			return GL_NOTEQUAL;
+		case RendererAPI::DepthMode::GEqual:
+			return GL_GEQUAL;
+		case RendererAPI::DepthMode::Greater:
+			return GL_GREATER;
+		case RendererAPI::DepthMode::Always:
+			return GL_ALWAYS;
+		}
+
+		MH_CORE_BREAK("DepthMode not supported!");
+
+		return 0;
+	}
+
 #ifdef MH_ENABLE_GL_ERRORS
 	static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
@@ -124,7 +151,7 @@ namespace Mahakam
 		glDepthMask(enable ? GL_TRUE : GL_FALSE);
 	}
 
-	void OpenGLRendererAPI::EnableZTesting(bool enable)
+	void OpenGLRendererAPI::EnableZTesting(DepthMode mode, bool enable)
 	{
 		// https://www.khronos.org/opengl/wiki/Common_Mistakes#Disable_depth_test_and_allow_depth_writes
 		/*if (enable)
@@ -133,7 +160,7 @@ namespace Mahakam
 			glDisable(GL_DEPTH_TEST);*/
 
 		if (enable)
-			glDepthFunc(GL_LEQUAL);
+			glDepthFunc(DepthModeToOpenGLDepthMode(mode));
 		else
 			glDepthFunc(GL_ALWAYS);
 	}
