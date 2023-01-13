@@ -56,11 +56,11 @@ namespace Mahakam
 		pixelationShader->SetTexture("u_Albedo", src->GetColorTexture(0));
 		pixelationShader->SetTexture("u_Depth", src->GetDepthTexture());
 
-		GL::EnableZTesting(RendererAPI::DepthMode::Always, false);
+		GL::SetZTesting(RendererAPI::DepthMode::Always);
 		GL::EnableZWriting(false);
 		Renderer::DrawScreenQuad();
 		GL::EnableZWriting(true);
-		GL::EnableZTesting(RendererAPI::DepthMode::LEqual, true);
+		GL::SetZTesting(RendererAPI::DepthMode::LEqual);
 
 		viewportFramebuffer->Unbind();
 

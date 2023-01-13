@@ -20,17 +20,13 @@ namespace Mahakam
 		virtual void Clear(bool color, bool depth) override;
 
 		virtual void EnableCulling(bool enable, bool cullFront) override;
-
 		virtual void EnableZWriting(bool enable) override;
 
-		virtual void EnableZTesting(DepthMode mode, bool enable) override;
-
+		virtual void SetZTesting(DepthMode mode) override;
 		virtual void SetFillMode(bool fill) override;
-
 		virtual void SetBlendMode(BlendMode src, BlendMode dst, bool enable) override;
 
 		virtual void DrawIndexed(uint32_t count) override;
-
 		virtual void DrawInstanced(uint32_t indexCount, uint32_t count) override;
 	};
 }

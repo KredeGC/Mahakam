@@ -151,7 +151,7 @@ namespace Mahakam
 		glDepthMask(enable ? GL_TRUE : GL_FALSE);
 	}
 
-	void OpenGLRendererAPI::EnableZTesting(DepthMode mode, bool enable)
+	void OpenGLRendererAPI::SetZTesting(DepthMode mode)
 	{
 		// https://www.khronos.org/opengl/wiki/Common_Mistakes#Disable_depth_test_and_allow_depth_writes
 		/*if (enable)
@@ -159,10 +159,7 @@ namespace Mahakam
 		else
 			glDisable(GL_DEPTH_TEST);*/
 
-		if (enable)
-			glDepthFunc(DepthModeToOpenGLDepthMode(mode));
-		else
-			glDepthFunc(GL_ALWAYS);
+		glDepthFunc(DepthModeToOpenGLDepthMode(mode));
 	}
 
 	void OpenGLRendererAPI::SetFillMode(bool fill)

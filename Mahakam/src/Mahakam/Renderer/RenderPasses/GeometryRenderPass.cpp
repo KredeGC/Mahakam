@@ -127,7 +127,7 @@ namespace Mahakam
 		}
 
 		// Render skybox
-		if (!sceneData->GBuffer)
+		if (!sceneData->GBuffer && !sceneData->Wireframe)
 		{
 			GL::EnableZWriting(false);
 

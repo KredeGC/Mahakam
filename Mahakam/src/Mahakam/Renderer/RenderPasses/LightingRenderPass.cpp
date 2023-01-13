@@ -193,14 +193,14 @@ namespace Mahakam
 
 		// Don't write or read depth
 		GL::EnableZWriting(false);
-		GL::EnableZTesting(RendererAPI::DepthMode::Always, false);
+		GL::SetZTesting(RendererAPI::DepthMode::Always);
 
 		// Directional lights + ambient
 		RenderDirectionalLights(sceneData);
 
 		// Render additional lights with additive blend mode
 		GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, true);
-		GL::EnableZTesting(RendererAPI::DepthMode::Greater, true); // TODO: Remove when implementing volumetric spotlights
+		GL::SetZTesting(RendererAPI::DepthMode::GEqual); // TODO: Remove when implementing volumetric spotlights
 
 		// Point lights
 		RenderPointLights(sceneData);
@@ -210,7 +210,7 @@ namespace Mahakam
 
 		// Disable blending
 		GL::SetBlendMode(RendererAPI::BlendMode::One, RendererAPI::BlendMode::One, false);
-		GL::EnableZTesting(RendererAPI::DepthMode::LEqual, true);
+		GL::SetZTesting(RendererAPI::DepthMode::LEqual);
 
 		m_HDRFrameBuffer->Unbind();
 	}

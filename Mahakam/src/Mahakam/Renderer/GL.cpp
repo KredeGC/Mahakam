@@ -4,52 +4,40 @@
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
-#include "Platform/Headless/HeadlessRendererAPI.h"
-#include "Platform/OpenGL/OpenGLRendererAPI.h"
-
 #include "Mesh.h"
 #include "Texture.h"
 
 namespace Mahakam
 {
-	Scope<RendererAPI> GL::rendererAPI;
+	Scope<RendererAPI> GL::s_RendererAPI;
 
-	Ref<SubMesh> GL::staticScreenQuad;
-	Ref<SubMesh> GL::staticSphereMesh;
-	Ref<SubMesh> GL::staticInvertedPyramid;
-	Ref<SubMesh> GL::staticInvertedSphereMesh;
-	Ref<SubMesh> GL::staticInvertedCubemapMesh;
-	Ref<SubMesh> GL::staticCube;
+	Ref<SubMesh> GL::s_StaticScreenQuad;
+	Ref<SubMesh> GL::s_StaticSphereMesh;
+	Ref<SubMesh> GL::s_StaticInvertedPyramid;
+	Ref<SubMesh> GL::s_StaticInvertedSphereMesh;
+	Ref<SubMesh> GL::s_StaticInvertedCubemapMesh;
+	Ref<SubMesh> GL::s_StaticCube;
 	
-	Asset<Texture2D> GL::texture2DRed;
-	Asset<Texture2D> GL::texture2DWhite;
-	Asset<Texture2D> GL::texture2DBlack;
-	Asset<Texture2D> GL::texture2DBump;
-	Asset<TextureCube> GL::textureCubeWhite;
-	Asset<TextureCube> GL::textureCubeGrey;
+	Asset<Texture2D> GL::s_Texture2DRed;
+	Asset<Texture2D> GL::s_Texture2DWhite;
+	Asset<Texture2D> GL::s_Texture2DBlack;
+	Asset<Texture2D> GL::s_Texture2DBump;
+	Asset<TextureCube> GL::s_TextureCubeWhite;
+	Asset<TextureCube> GL::s_TextureCubeGrey;
 
 	void GL::Init()
 	{
 		MH_PROFILE_FUNCTION();
 
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPI::API::None:
-			rendererAPI = CreateScope<HeadlessRendererAPI>();
-			break;
-		case RendererAPI::API::OpenGL:
-			rendererAPI = CreateScope<OpenGLRendererAPI>();
-			break;
-		}
+		s_RendererAPI = RendererAPI::Create();
+		s_RendererAPI->Init();
 
-		rendererAPI->Init();
-
-		staticScreenQuad = CreateScreenQuad();
-		staticSphereMesh = SubMesh::CreateUVSphere(10, 10);
-		staticInvertedPyramid = CreatePyramid();
-		staticInvertedSphereMesh = SubMesh::CreateCubeSphere(5, true);
-		staticInvertedCubemapMesh = SubMesh::CreateCube(2, true);
-		staticCube = SubMesh::CreateCube(2);
+		s_StaticScreenQuad = CreateScreenQuad();
+		s_StaticSphereMesh = SubMesh::CreateUVSphere(10, 10);
+		s_StaticInvertedPyramid = CreatePyramid();
+		s_StaticInvertedSphereMesh = SubMesh::CreateCubeSphere(5, true);
+		s_StaticInvertedCubemapMesh = SubMesh::CreateCube(2, true);
+		s_StaticCube = SubMesh::CreateCube(2);
 
 		uint8_t redData = 255;
 
@@ -76,77 +64,77 @@ namespace Mahakam
 			127
 		};
 
-		texture2DRed = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		texture2DRed->SetData(&redData, 0);
+		s_Texture2DRed = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		s_Texture2DRed->SetData(&redData, 0);
 
-		texture2DWhite = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		texture2DWhite->SetData(whiteData, 0);
+		s_Texture2DWhite = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		s_Texture2DWhite->SetData(whiteData, 0);
 
-		texture2DBlack = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		texture2DBlack->SetData(&blackData, 0);
+		s_Texture2DBlack = Texture2D::Create({ 1, 1, TextureFormat::R8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		s_Texture2DBlack->SetData(&blackData, 0);
 
-		texture2DBump = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
-		texture2DBump->SetData(&bumpData, 0);
+		s_Texture2DBump = Texture2D::Create({ 1, 1, TextureFormat::RGB8, TextureFilter::Point, TextureWrapMode::Repeat, TextureWrapMode::Repeat, false });
+		s_Texture2DBump->SetData(&bumpData, 0);
 
-		textureCubeWhite = TextureCube::Create({ 1, TextureFormat::RGB8, TextureFilter::Point, TextureCubePrefilter::None, false });
-		textureCubeWhite->SetData(whiteData, 0);
+		s_TextureCubeWhite = TextureCube::Create({ 1, TextureFormat::RGB8, TextureFilter::Point, TextureCubePrefilter::None, false });
+		s_TextureCubeWhite->SetData(whiteData, 0);
 
-		textureCubeGrey = TextureCube::Create({ 1, TextureFormat::RGB8, TextureFilter::Point, TextureCubePrefilter::None, false });
-		textureCubeGrey->SetData(greyData, 0);
+		s_TextureCubeGrey = TextureCube::Create({ 1, TextureFormat::RGB8, TextureFilter::Point, TextureCubePrefilter::None, false });
+		s_TextureCubeGrey->SetData(greyData, 0);
 	}
 
 	void GL::Shutdown()
 	{
-		staticScreenQuad = nullptr;
-		staticSphereMesh = nullptr;
-		staticInvertedPyramid = nullptr;
-		staticInvertedSphereMesh = nullptr;
-		staticInvertedCubemapMesh = nullptr;
-		staticCube = nullptr;
+		s_StaticScreenQuad = nullptr;
+		s_StaticSphereMesh = nullptr;
+		s_StaticInvertedPyramid = nullptr;
+		s_StaticInvertedSphereMesh = nullptr;
+		s_StaticInvertedCubemapMesh = nullptr;
+		s_StaticCube = nullptr;
 
-		texture2DRed = nullptr;
-		texture2DWhite = nullptr;
-		texture2DBlack = nullptr;
-		texture2DBump = nullptr;
-		textureCubeWhite = nullptr;
-		textureCubeGrey = nullptr;
+		s_Texture2DRed = nullptr;
+		s_Texture2DWhite = nullptr;
+		s_Texture2DBlack = nullptr;
+		s_Texture2DBump = nullptr;
+		s_TextureCubeWhite = nullptr;
+		s_TextureCubeGrey = nullptr;
 	}
 
 #pragma region Mesh
 	//Ref<Mesh> GL::GetScreenQuad()
 	MH_DEFINE_FUNC(GL::GetScreenQuad, Ref<SubMesh>)
 	{
-		return staticScreenQuad;
+		return s_StaticScreenQuad;
 	};
 
 	//Ref<Mesh> GL::GetSphere()
 	MH_DEFINE_FUNC(GL::GetSphere, Ref<SubMesh>)
 	{
-		return staticSphereMesh;
+		return s_StaticSphereMesh;
 	};
 
 	//Ref<Mesh> GL::GetInvertedPyramid()
 	MH_DEFINE_FUNC(GL::GetInvertedPyramid, Ref<SubMesh>)
 	{
-		return staticInvertedPyramid;
+		return s_StaticInvertedPyramid;
 	};
 
 	//Ref<Mesh> GL::GetInvertedSphere()
 	MH_DEFINE_FUNC(GL::GetInvertedSphere, Ref<SubMesh>)
 	{
-		return staticInvertedSphereMesh;
+		return s_StaticInvertedSphereMesh;
 	};
 
 	//Ref<Mesh> GL::GetInvertedCube()
 	MH_DEFINE_FUNC(GL::GetInvertedCube, Ref<SubMesh>)
 	{
-		return staticInvertedCubemapMesh;
+		return s_StaticInvertedCubemapMesh;
 	};
 
 	//Ref<Mesh> GL::GetCube()
 	MH_DEFINE_FUNC(GL::GetCube, Ref<SubMesh>)
 	{
-		return staticCube;
+		return s_StaticCube;
 	};
 #pragma endregion
 
@@ -154,118 +142,118 @@ namespace Mahakam
 	//Ref<Texture2D> GL::GetTexture2DRed()
 	MH_DEFINE_FUNC(GL::GetTexture2DRed, Asset<Texture2D>)
 	{
-		return texture2DRed;
+		return s_Texture2DRed;
 	};
 
 	//Ref<Texture2D> GL::GetTexture2DWhite()
 	MH_DEFINE_FUNC(GL::GetTexture2DWhite, Asset<Texture2D>)
 	{
-		return texture2DWhite;
+		return s_Texture2DWhite;
 	};
 
 	//Ref<Texture2D> GL::GetTexture2DBlack()
 	MH_DEFINE_FUNC(GL::GetTexture2DBlack, Asset<Texture2D>)
 	{
-		return texture2DBlack;
+		return s_Texture2DBlack;
 	};
 
 	//Ref<Texture2D> GL::GetTexture2DBump()
 	MH_DEFINE_FUNC(GL::GetTexture2DBump, Asset<Texture2D>)
 	{
-		return texture2DBump;
+		return s_Texture2DBump;
 	};
 
 	//Ref<TextureCube> GL::GetTextureCubeWhite()
 	MH_DEFINE_FUNC(GL::GetTextureCubeWhite, Asset<TextureCube>)
 	{
-		return textureCubeWhite;
+		return s_TextureCubeWhite;
 	};
 
 	//Ref<TextureCube> GL::GetTextureCubeGrey()
 	MH_DEFINE_FUNC(GL::GetTextureCubeGrey, Asset<TextureCube>)
 	{
-		return textureCubeGrey;
+		return s_TextureCubeGrey;
 	};
 #pragma endregion
 
 	//const char* GL::GetGraphicsVendor()
 	MH_DEFINE_FUNC(GL::GetGraphicsVendor, const char*)
 	{
-		return rendererAPI->GetGraphicsVendor();
+		return s_RendererAPI->GetGraphicsVendor();
 	};
 
 	//void GL::SetViewportImpl(uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor)
 	MH_DEFINE_FUNC(GL::SetViewportImpl, void, uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor)
 	{
-		rendererAPI->SetViewport(x, y, w, h, scissor);
+		s_RendererAPI->SetViewport(x, y, w, h, scissor);
 	};
 
 	//void GL::FinishRendering()
 	MH_DEFINE_FUNC(GL::FinishRendering, void)
 	{
-		rendererAPI->FinishRendering();
+		s_RendererAPI->FinishRendering();
 	};
 
 	//void GL::SetClearColor(const glm::vec4& color)
 	MH_DEFINE_FUNC(GL::SetClearColor, void, const glm::vec4& color)
 	{
-		rendererAPI->SetClearColor(color);
+		s_RendererAPI->SetClearColor(color);
 	};
 
 	//void GL::ClearImpl(bool color, bool depth)
 	MH_DEFINE_FUNC(GL::ClearImpl, void, bool color, bool depth)
 	{
-		rendererAPI->Clear(color, depth);
+		s_RendererAPI->Clear(color, depth);
 	};
 
 	//void GL::EnableCullingImpl(bool enable, bool cullFront)
 	MH_DEFINE_FUNC(GL::EnableCullingImpl, void, bool enable, bool cullFront)
 	{
-		rendererAPI->EnableCulling(enable, cullFront);
+		s_RendererAPI->EnableCulling(enable, cullFront);
 	};
 
 	//void GL::EnableZWriting(bool enable)
 	MH_DEFINE_FUNC(GL::EnableZWriting, void, bool enable)
 	{
-		rendererAPI->EnableZWriting(enable);
+		s_RendererAPI->EnableZWriting(enable);
 	};
 
-	//void GL::EnableZTesting(RendererAPI::DepthMode mode, bool enable)
-	MH_DEFINE_FUNC(GL::EnableZTesting, void, RendererAPI::DepthMode mode, bool enable)
+	//void GL::SetZTesting(RendererAPI::DepthMode mode)
+	MH_DEFINE_FUNC(GL::SetZTesting, void, RendererAPI::DepthMode mode)
 	{
-		rendererAPI->EnableZTesting(mode, enable);
+		s_RendererAPI->SetZTesting(mode);
 	};
 
 	//void GL::SetFillMode(bool enable)
 	MH_DEFINE_FUNC(GL::SetFillMode, void, bool enable)
 	{
-		rendererAPI->SetFillMode(enable);
+		s_RendererAPI->SetFillMode(enable);
 	};
 
 	//void GL::SetBlendMode(RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable)
 	MH_DEFINE_FUNC(GL::SetBlendMode, void, RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable)
 	{
-		rendererAPI->SetBlendMode(src, dst, enable);
+		s_RendererAPI->SetBlendMode(src, dst, enable);
 	};
 
 #pragma region Draw
 	//void GL::DrawScreenQuad()
 	MH_DEFINE_FUNC(GL::DrawScreenQuad, void)
 	{
-		staticScreenQuad->Bind();
-		rendererAPI->DrawIndexed(staticScreenQuad->GetIndexCount());
+		s_StaticScreenQuad->Bind();
+		s_RendererAPI->DrawIndexed(s_StaticScreenQuad->GetIndexCount());
 	};
 
 	//void GL::DrawIndexed(uint32_t indexCount)
 	MH_DEFINE_FUNC(GL::DrawIndexed, void, uint32_t indexCount)
 	{
-		rendererAPI->DrawIndexed(indexCount);
+		s_RendererAPI->DrawIndexed(indexCount);
 	};
 
 	//void GL::DrawInstanced(uint32_t indexCount, uint32_t count)
 	MH_DEFINE_FUNC(GL::DrawInstanced, void, uint32_t indexCount, uint32_t count)
 	{
-		rendererAPI->DrawInstanced(indexCount, count);
+		s_RendererAPI->DrawInstanced(indexCount, count);
 	};
 #pragma endregion
 

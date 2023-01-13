@@ -15,21 +15,21 @@ namespace Mahakam
 	class GL
 	{
 	private:
-		static Scope<RendererAPI> rendererAPI;
+		static Scope<RendererAPI> s_RendererAPI;
 		
-		static Ref<SubMesh> staticScreenQuad;
-		static Ref<SubMesh> staticSphereMesh;
-		static Ref<SubMesh> staticInvertedPyramid;
-		static Ref<SubMesh> staticInvertedSphereMesh;
-		static Ref<SubMesh> staticInvertedCubemapMesh;
-		static Ref<SubMesh> staticCube;
+		static Ref<SubMesh> s_StaticScreenQuad;
+		static Ref<SubMesh> s_StaticSphereMesh;
+		static Ref<SubMesh> s_StaticInvertedPyramid;
+		static Ref<SubMesh> s_StaticInvertedSphereMesh;
+		static Ref<SubMesh> s_StaticInvertedCubemapMesh;
+		static Ref<SubMesh> s_StaticCube;
 
-		static Asset<Texture2D> texture2DRed;
-		static Asset<Texture2D> texture2DWhite;
-		static Asset<Texture2D> texture2DBlack;
-		static Asset<Texture2D> texture2DBump;
-		static Asset<TextureCube> textureCubeWhite;
-		static Asset<TextureCube> textureCubeGrey;
+		static Asset<Texture2D> s_Texture2DRed;
+		static Asset<Texture2D> s_Texture2DWhite;
+		static Asset<Texture2D> s_Texture2DBlack;
+		static Asset<Texture2D> s_Texture2DBump;
+		static Asset<TextureCube> s_TextureCubeWhite;
+		static Asset<TextureCube> s_TextureCubeGrey;
 
 	public:
 		static void Init();
@@ -61,8 +61,8 @@ namespace Mahakam
 		inline static void EnableCulling(bool enable, bool cullFront = false) { EnableCullingImpl(enable, cullFront); }
 
 		MH_DECLARE_FUNC(EnableZWriting, void, bool enable);
-		MH_DECLARE_FUNC(EnableZTesting, void, RendererAPI::DepthMode mode, bool enable);
 
+		MH_DECLARE_FUNC(SetZTesting, void, RendererAPI::DepthMode mode);
 		MH_DECLARE_FUNC(SetFillMode, void, bool fill);
 		MH_DECLARE_FUNC(SetBlendMode, void, RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable);
 

@@ -206,6 +206,8 @@ namespace Mahakam
 			node["Color"] << light.GetColor();
 			node["ShadowCasting"] << light.IsShadowCasting();
 			node["ShadowBias"] << light.GetBias();
+			node["VolumetricScattering"] << light.GetVolumetricScattering();
+			node["VolumetricColor"] << light.GetVolumetricColor();
 
 			return true;
 		};
@@ -219,6 +221,8 @@ namespace Mahakam
 			MH_DESERIALIZE_NODE(light.SetColor(value), glm::vec3, "Color");
 			MH_DESERIALIZE_NODE(light.SetShadowCasting(value), bool, "ShadowCasting");
 			MH_DESERIALIZE_NODE(light.SetBias(value), float, "ShadowBias");
+			MH_DESERIALIZE_NODE(light.SetVolumetricScattering(value), float, "VolumetricScattering");
+			MH_DESERIALIZE_NODE(light.SetVolumetricColor(value), glm::vec3, "VolumetricColor");
 
 			return true;
 		};
