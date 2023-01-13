@@ -3,7 +3,7 @@
 
 #if defined(DIRECTIONAL) || defined(SPOT)
     #define SHADOWS_ENABLED
-#endif
+#endif // DIRECTIONAL || SPOT
 
 #include "internal/shaders/include/lighting/LightStruct.glsl"
 #include "internal/shaders/include/Random.glsl"
@@ -31,9 +31,9 @@
     float SampleShadowMapDirect(vec2 projCoords, float depth, vec2 texSize, vec2 texelSize) {
         #if defined(BILINEAR_SHADOWS)
             return SampleShadowMapBilinear(projCoords, depth, texSize, texelSize);
-        #else
+        #else // BILINEAR_SHADOWS
             return depth > texture(u_ShadowMap, projCoords).r ? 0.0 : 1.0;
-        #endif
+        #endif // BILINEAR_SHADOWS
     }
 
     float SamplePCFShadow(vec2 projCoords, float depth, vec3 worldPos, vec2 texSize, vec2 texelSize) {
@@ -48,9 +48,9 @@
             }
             
             return shadow / FILTER_SQUARE;
-        #else
+        #else // PCF_SHADOWS
             return SampleShadowMapDirect(projCoords.xy, depth, texSize, texelSize);
-        #endif
+        #endif // PCF_SHADOWS
     }
     
     vec3 CalculateShadowDirection(Light light, vec3 worldPos) {
@@ -58,7 +58,7 @@
             return normalize(-light.direction);
         #elif defined(SPOT)
             return normalize(light.objectToWorld[3].xyz - worldPos);
-        #endif
+        #endif // DIRECTIONAL || SPOT
     }
     
     vec3 CalculateShadowNormalBias(Light light, vec3 worldPos, vec3 normal, float texSize) {
@@ -70,7 +70,7 @@
             float distanceToLightPlane = dot(distSurface, spotDir);
             
             vec3 normalBias = normal * light.offset.w * light.offset.z * distanceToLightPlane;
-        #endif
+        #endif // DIRECTIONAL || SPOT
         
         return normalBias;
     }
@@ -142,6 +142,6 @@
         
         return shadow;
     }
-#endif
+#endif // SHADOWS_ENABLED
 
 #endif // SHADOWS_INCLUDED

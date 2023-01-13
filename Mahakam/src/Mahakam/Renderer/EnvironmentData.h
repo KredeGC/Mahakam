@@ -26,7 +26,7 @@ namespace Mahakam
 		glm::vec3 color;
 		float padding02 = 0.0f;
 		glm::mat4 worldToLight;
-		glm::vec4 volumetric = { 1.0f, 1.0f, 1.0f, 0.95f }; // xyz - color, w - scattering
+		glm::vec4 volumetric; // xyz - color, w - scattering
 		glm::vec4 offset = { 0.0f, 0.0f, 0.0f, 0.0f }; // xy - offset in shadow map, z - scale in shadow map, w - bias
 
 		DirectionalLight() = default;

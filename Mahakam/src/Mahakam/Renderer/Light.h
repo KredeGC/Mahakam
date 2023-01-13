@@ -22,10 +22,12 @@ namespace Mahakam
 	private:
 		LightType m_LightType = LightType::Directional;
 		glm::vec3 m_Color = { 1.0f, 1.0f, 1.0f };
+		glm::vec3 m_VolumetricColor = { 1.0f, 1.0f, 1.0f };
 
 		float m_Range = 10.0f;
 		float m_Fov = glm::radians(60.0f);
 		float m_ShadowBias = 0.05f;
+		float m_VolumetricScattering = 0.9f;
 
 		bool m_ShadowCasting = false;
 
@@ -42,6 +44,8 @@ namespace Mahakam
 		inline void SetFov(float fieldOfView) { m_Fov = fieldOfView; }
 		inline void SetBias(float bias) { m_ShadowBias = bias; }
 		inline void SetShadowCasting(bool shadows) { m_ShadowCasting = shadows; }
+		inline void SetVolumetricScattering(float scattering) { m_VolumetricScattering = scattering; }
+		inline void SetVolumetricColor(const glm::vec3& color) { m_VolumetricColor = color; }
 
 		inline LightType GetLightType() const { return m_LightType; }
 		inline const glm::vec3& GetColor() const { return m_Color; }
@@ -49,5 +53,7 @@ namespace Mahakam
 		inline float GetFov() const { return m_Fov; }
 		inline float GetBias() const { return m_ShadowBias; }
 		inline bool IsShadowCasting() const { return m_ShadowCasting; }
+		inline float GetVolumetricScattering() const { return m_VolumetricScattering; }
+		inline const glm::vec3& GetVolumetricColor() const { return m_VolumetricColor; }
 	};
 }

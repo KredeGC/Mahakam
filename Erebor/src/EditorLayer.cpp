@@ -236,6 +236,14 @@ namespace Mahakam::Editor
 				if (ImGui::DragFloat("Shadow bias", &bias, 0.001f, 0.0f, 1.0f))
 					light.SetBias(bias);
 			}
+
+			float scattering = light.GetVolumetricScattering();
+			if (ImGui::DragFloat("Volumetric Scattering", &scattering, 0.001f, 0.0f, 1.0f))
+				light.SetVolumetricScattering(scattering);
+
+			glm::vec3 scatteringColor = light.GetVolumetricColor();
+			if (GUI::DrawColor3Edit("Scattering Color", scatteringColor, ImGuiColorEditFlags_HDR))
+				light.SetVolumetricColor(scatteringColor);
 		};
 
 		PropertyRegistry::Register("Light", lightInspector);

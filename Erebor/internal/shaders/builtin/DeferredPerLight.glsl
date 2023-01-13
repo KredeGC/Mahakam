@@ -2,7 +2,7 @@
 #version 430 core
 #if defined(POINT) || defined(SPOT)
     layout(location = 0) out flat int v_InstanceID;
-#endif
+#endif // POINT || SPOT
 
 #include "internal/shaders/include/Matrix.glsl"
 #include "internal/shaders/include/lighting/LightStruct.glsl"
@@ -21,16 +21,16 @@ void main() {
         #if defined(POINT)
             // Point lights only have position, no rotation
             gl_Position = MATRIX_P * MATRIX_V * vec4(i_Pos * 2.0 * lights[v_InstanceID].position.w + lights[v_InstanceID].position.xyz, 1.0);
-        #else
+        #else // POINT
             // Spot lights need both position and rotation (and scale). Thus, a matrix
             gl_Position = MATRIX_P * MATRIX_V * lights[v_InstanceID].objectToWorld * vec4(i_Pos, 1.0);
-        #endif
+        #endif // POINT
         o.v_ScreenPos = gl_Position.xyw;
-    #else
+    #else // POINT || SPOT
         // Directional lights are screen-space
         gl_Position = vec4(i_Pos.xy, 1.0, 1.0);
         o.v_ScreenPos = vec3(gl_Position.xy * 0.5 + 0.5, 1.0);
-    #endif
+    #endif // POINT || SPOT
 }
 
 
@@ -39,7 +39,7 @@ void main() {
 #version 430 core
 #if defined(POINT) || defined(SPOT)
     layout(location = 0) in flat int v_InstanceID;
-#endif
+#endif // POINT || SPOT
 
 #include "internal/shaders/include/Matrix.glsl"
 #include "internal/shaders/include/lighting/StandardLighting.glsl"
@@ -70,9 +70,9 @@ vec3 DepthToWorldSpace(vec2 uv, float depth) {
 void main() {
     #if defined(POINT) || defined(SPOT)
         vec2 screenUV = (i.v_ScreenPos.xy / i.v_ScreenPos.z) * 0.5 + 0.5;
-    #else
+    #else // POINT || SPOT
         vec2 screenUV = i.v_ScreenPos.xy;
-    #endif
+    #endif // POINT || SPOT
     
     #ifdef DEBUG
         screenUV *= 2.0;
@@ -109,7 +109,7 @@ void main() {
     
     #ifdef DIRECTIONAL
         color += emission;
-    #endif
+    #endif // DIRECTIONAL
 
     o_Color = vec4(color, 1.0);
     

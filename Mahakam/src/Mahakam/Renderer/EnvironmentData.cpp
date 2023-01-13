@@ -13,7 +13,8 @@ namespace Mahakam
 {
 	DirectionalLight::DirectionalLight(const glm::vec3& position, const glm::quat& rotation, const Light& light) :
 		direction(rotation* glm::vec3(0.0f, 0.0f, -1.0f)),
-		color(light.GetColor())
+		color(light.GetColor()),
+		volumetric({ light.GetVolumetricColor(), light.GetVolumetricScattering() })
 	{
 		worldToLight = glm::ortho(-light.GetRange(), light.GetRange(), -light.GetRange(), light.GetRange(), -light.GetRange(), light.GetRange())
 			* glm::inverse(glm::translate(glm::mat4(1.0f), position) * glm::mat4(rotation));
@@ -52,7 +53,8 @@ namespace Mahakam
 
 	SpotLight::SpotLight(const glm::vec3& position, const glm::quat& rotation, const Light& light) :
 		worldToLight(glm::perspective(light.GetFov(), 1.0f, 0.001f, light.GetRange())* glm::inverse(glm::translate(glm::mat4(1.0f), position)* glm::mat4(rotation))),
-		color(light.GetColor(), 1.0f / (light.GetRange() * light.GetRange()))
+		color(light.GetColor(), 1.0f / (light.GetRange() * light.GetRange())),
+		volumetric({ light.GetVolumetricColor(), light.GetVolumetricScattering() })
 	{
 		float xy = glm::tan(light.GetFov() / 2.0f) * light.GetRange();
 		objectToWorld = glm::translate(glm::mat4(1.0f), position)

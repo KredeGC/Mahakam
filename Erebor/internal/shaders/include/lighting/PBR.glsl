@@ -74,7 +74,7 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
                 discard;
             
             vec3 color = light.color.rgb * cookie;
-        #endif
+        #endif // POINT || SPOT
         
         vec3 L = normalize(lightVec);
         
@@ -105,9 +105,11 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             Lo += PBR_DIRECT(albedo, metallic, roughness, viewDir, worldNormal, L, light.color, attenuation);
             
             // Volumetric scattering
-            float LdotV = dot(L, -viewDir);
-            float scattering = VolumetricScattering(light, startPos, viewDir, worldNormal, LdotV, stepSize);
-            Lo += scattering * light.volumetric.rgb * light.color.rgb;
+            if (light.volumetric.w < 1.0 - Epsilon) {
+                float LdotV = dot(L, -viewDir);
+                float scattering = VolumetricScattering(light, startPos, viewDir, worldNormal, LdotV, stepSize);
+                Lo += scattering * light.volumetric.rgb * light.color.rgb;
+            }
         }
         
         vec3 ambient = PBR_INDIRECT(albedo, metallic, roughness, ao, viewDir, worldNormal);
