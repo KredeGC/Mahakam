@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Core/Types.h"
+
 #include "Mahakam/Asset/Asset.h"
 
 #define GLM_FORCE_INLINE

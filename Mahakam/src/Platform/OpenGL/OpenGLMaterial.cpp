@@ -1,6 +1,9 @@
 #include "Mahakam/mhpch.h"
 #include "OpenGLMaterial.h"
 
+#include "OpenGLShader.h"
+
+#include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Profiler.h"
 
@@ -29,7 +32,7 @@ namespace Mahakam
 		if (iter != properties.end())
 		{
 			if (iter->second.Offset != -1)
-				memcpy(data + iter->second.Offset + offset, value, sizeof(T));
+				std::memcpy(data + iter->second.Offset + offset, value, sizeof(T));
 		}
 		else
 		{
@@ -38,17 +41,17 @@ namespace Mahakam
 	}
 
 	OpenGLMaterial::OpenGLMaterial(Asset<Shader> shader)
-		: m_Shader(shader)
+		: m_Shader(std::move(shader))
 	{
 		MH_PROFILE_FUNCTION();
 
-		auto& defaultProps = shader->GetProperties();
+		auto& defaultProps = m_Shader->GetProperties();
 
 		ResetShaderProperties(defaultProps);
 
 		m_DataSize = m_Shader->GetUniformSize();
 		if (m_DataSize > 0)
-			m_Data = new uint8_t[m_DataSize];
+			m_Data = Allocator::Allocate<uint8_t>(m_DataSize);
 	}
 
 	OpenGLMaterial::OpenGLMaterial(const Asset<Material>& material) :
@@ -66,15 +69,15 @@ namespace Mahakam
 		if (m_DataSize > 0)
 		{
 			Asset<OpenGLMaterial> glMaterial = static_cast<Asset<OpenGLMaterial>>(material);
-			m_Data = new uint8_t[m_DataSize];
-			memcpy(m_Data, glMaterial->m_Data, glMaterial->m_DataSize);
+			m_Data = Allocator::Allocate<uint8_t>(m_DataSize);
+			std::memcpy(m_Data, glMaterial->m_Data, glMaterial->m_DataSize);
 		}
 	}
 
 	OpenGLMaterial::~OpenGLMaterial()
 	{
 		if (m_Data)
-			delete[] m_Data;
+			Allocator::Deallocate<uint8_t>(m_Data, m_DataSize);
 	}
 
 	uint64_t OpenGLMaterial::Hash() const
@@ -84,7 +87,7 @@ namespace Mahakam
 		for (auto& kv : m_Textures)
 		{
 			unsigned char bytes[sizeof(Texture*)];
-			memcpy(bytes, &kv.second, sizeof(Texture*));
+			std::memcpy(bytes, &kv.second, sizeof(Texture*));
 
 			for (uint64_t i = 0; i < sizeof(Texture*); ++i)
 				hash = (hash * 16777619ULL) ^ bytes[i];
@@ -93,7 +96,7 @@ namespace Mahakam
 		for (auto& kv : m_Mat3s)
 		{
 			unsigned char bytes[sizeof(glm::mat3)];
-			memcpy(bytes, &kv.second, sizeof(glm::mat3));
+			std::memcpy(bytes, &kv.second, sizeof(glm::mat3));
 
 			for (uint64_t i = 0; i < sizeof(glm::mat3); ++i)
 				hash = (hash * 16777619ULL) ^ bytes[i];
@@ -102,7 +105,7 @@ namespace Mahakam
 		for (auto& kv : m_Mat4s)
 		{
 			unsigned char bytes[sizeof(glm::mat4)];
-			memcpy(bytes, &kv.second, sizeof(glm::mat4));
+			std::memcpy(bytes, &kv.second, sizeof(glm::mat4));
 
 			for (uint64_t i = 0; i < sizeof(glm::mat4); ++i)
 				hash = (hash * 16777619ULL) ^ bytes[i];
@@ -111,7 +114,7 @@ namespace Mahakam
 		for (auto& kv : m_Ints)
 		{
 			unsigned char bytes[sizeof(int32_t)];
-			memcpy(bytes, &kv.second, sizeof(int32_t));
+			std::memcpy(bytes, &kv.second, sizeof(int32_t));
 
 			for (uint64_t i = 0; i < sizeof(int32_t); ++i)
 				hash = (hash * 16777619ULL) ^ bytes[i];
@@ -120,7 +123,7 @@ namespace Mahakam
 		for (auto& kv : m_Floats)
 		{
 			unsigned char bytes[sizeof(float)];
-			memcpy(bytes, &kv.second, sizeof(float));
+			std::memcpy(bytes, &kv.second, sizeof(float));
 
 			for (uint64_t i = 0; i < sizeof(float); ++i)
 				hash = (hash * 16777619ULL) ^ bytes[i];
@@ -129,7 +132,7 @@ namespace Mahakam
 		for (auto& kv : m_Float2s)
 		{
 			unsigned char bytes[sizeof(glm::vec2)];
-			memcpy(bytes, &kv.second, sizeof(glm::vec2));
+			std::memcpy(bytes, &kv.second, sizeof(glm::vec2));
 
 			for (uint64_t i = 0; i < sizeof(glm::vec2); ++i)
 				hash = (hash * 16777619ULL) ^ bytes[i];
@@ -138,7 +141,7 @@ namespace Mahakam
 		for (auto& kv : m_Float3s)
 		{
 			unsigned char bytes[sizeof(glm::vec3)];
-			memcpy(bytes, &kv.second, sizeof(glm::vec3));
+			std::memcpy(bytes, &kv.second, sizeof(glm::vec3));
 
 			for (uint64_t i = 0; i < sizeof(glm::vec3); ++i)
 				hash = (hash * 16777619ULL) ^ bytes[i];
@@ -147,7 +150,7 @@ namespace Mahakam
 		for (auto& kv : m_Float4s)
 		{
 			unsigned char bytes[sizeof(glm::vec4)];
-			memcpy(bytes, &kv.second, sizeof(glm::vec4));
+			std::memcpy(bytes, &kv.second, sizeof(glm::vec4));
 
 			for (uint64_t i = 0; i < sizeof(glm::vec4); ++i)
 				hash = (hash * 16777619ULL) ^ bytes[i];
@@ -156,36 +159,18 @@ namespace Mahakam
 		return hash;
 	}
 
+	void OpenGLMaterial::BindShader(const std::string& shaderPass)
+	{
+		m_Shader->Bind(shaderPass);
+	}
+
 	void OpenGLMaterial::Bind(Ref<UniformBuffer> uniformBuffer)
 	{
-		//MH_PROFILE_FUNCTION();
-
 		for (auto& [name, texture] : m_Textures)
 			m_Shader->SetTexture(name, texture);
 
 		if (uniformBuffer && m_Data && m_DataSize > 0)
 			uniformBuffer->SetData(m_Data, 0, m_DataSize);
-
-		/*for (auto& [name, mat] : m_Mat3s)
-			m_Shader->SetUniformMat3(name, mat);
-
-		for (auto& [name, mat] : m_Mat4s)
-			m_Shader->SetUniformMat4(name, mat);
-
-		for (auto& [name, value] : m_Ints)
-			m_Shader->SetUniformInt(name, value);
-
-		for (auto& [name, value] : m_Floats)
-			m_Shader->SetUniformFloat(name, value);
-
-		for (auto& [name, value] : m_Float2s)
-			m_Shader->SetUniformFloat2(name, value);
- 
-		for (auto& [name, value] : m_Float3s)
-			m_Shader->SetUniformFloat3(name, value);
- 
-		for (auto& [name, value] : m_Float4s)
-			m_Shader->SetUniformFloat4(name, value);*/
 	}
 
 	void OpenGLMaterial::SetMat3(const std::string& name, const glm::mat3& value)

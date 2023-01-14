@@ -1,17 +1,18 @@
 #pragma once
 
 #include "Mahakam/Renderer/Material.h"
-
-#include "OpenGLShader.h"
+#include "Mahakam/Renderer/ShaderProps.h"
 
 namespace Mahakam
 {
+	class OpenGLShader;
+
 	class OpenGLMaterial : public Material
 	{
 	private:
 		Asset<OpenGLShader> m_Shader;
 
-		uint8_t* m_Data = nullptr;
+		uint8_t* m_Data;
 		uint32_t m_DataSize;
 
 		UnorderedMap<std::string, Asset<Texture>> m_Textures;
@@ -35,7 +36,7 @@ namespace Mahakam
 
 		inline virtual Asset<Shader> GetShader() const override { return m_Shader; }
 
-		virtual void BindShader(const std::string& shaderPass) override { m_Shader->Bind(shaderPass); }
+		virtual void BindShader(const std::string& shaderPass) override;
 		virtual void Bind(Ref<UniformBuffer> uniformBuffer) override;
 
 		virtual void SetTexture(const std::string& name, int slot, Asset<Texture> tex) override { m_Textures[name] = std::move(tex); }
