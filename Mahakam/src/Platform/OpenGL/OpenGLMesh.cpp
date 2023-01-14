@@ -42,21 +42,22 @@ namespace Mahakam
 		}
 	}
 
-	OpenGLMesh::OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
-		: vertexCount(vertexCount), indexCount(indexCount), indices(new uint32_t[indexCount])
+	OpenGLMesh::OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) :
+		m_InterleavedVertices(Allocator::GetAllocator<uint8_t>()),
+		m_Vertices{ Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>() },
+		m_Indices(Allocator::GetAllocator<uint32_t>()),
+		m_VertexCount(vertexCount),
+		m_IndexCount(indexCount)
 	{
-		std::memcpy(this->indices, indices, indexCount * sizeof(uint32_t));
+		m_Indices.assign(indices, indices + indexCount);
 
 		// Setup vertices
-		interleavedSize = 0;
-		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
+		for (uint32_t i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
 			if (verts[i])
 			{
-				const uint32_t elementSize = vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
-				vertices[i] = new uint8_t[elementSize]{ 0 };
-				std::memcpy(vertices[i], verts[i], elementSize);
-				interleavedSize += elementSize;
+				uint32_t elementSize = vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
+				m_Vertices[i].assign(reinterpret_cast<const uint8_t*>(verts[i]), reinterpret_cast<const uint8_t*>(verts[i]) + elementSize);
 			}
 		}
 
@@ -74,23 +75,15 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		if (interleavedVertices)
-			delete[] interleavedVertices;
+		MH_GL_CALL(glDeleteVertexArrays(1, &m_RendererID));
 
-		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
-			delete[] vertices[i];
-
-		delete[] indices;
-
-		MH_GL_CALL(glDeleteVertexArrays(1, &rendererID));
-
-		MH_GL_CALL(glDeleteBuffers(1, &vertexBufferID));
-		MH_GL_CALL(glDeleteBuffers(1, &indexBufferID));
+		MH_GL_CALL(glDeleteBuffers(1, &m_VertexBufferID));
+		MH_GL_CALL(glDeleteBuffers(1, &m_IndexBufferID));
 	}
 
 	void OpenGLMesh::Bind() const
 	{
-		MH_GL_CALL(glBindVertexArray(rendererID));
+		MH_GL_CALL(glBindVertexArray(m_RendererID));
 	}
 
 	void OpenGLMesh::Unbind() const
@@ -100,16 +93,22 @@ namespace Mahakam
 
 	void OpenGLMesh::RecalculateBounds()
 	{
-		bounds = Bounds::CalculateBounds(GetPositions(), vertexCount);
+		MH_PROFILE_FUNCTION();
+
+		m_Bounds = Bounds::CalculateBounds(GetPositions(), m_VertexCount);
 	}
 
 	void OpenGLMesh::RecalculateNormals()
 	{
+		MH_PROFILE_FUNCTION();
+
 		MH_CORE_BREAK("Not currently supported");
 	}
 
 	void OpenGLMesh::RecalculateTangents()
 	{
+		MH_PROFILE_FUNCTION();
+
 		MH_CORE_BREAK("Not currently supported");
 	}
 
@@ -118,12 +117,6 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		MH_CORE_BREAK("Changing an active mesh not currently supported!");
-
-		uint32_t elementSize = ShaderDataTypeSize(BUFFER_ELEMENTS[slot]);
-		uint32_t size = elementSize * vertexCount;
-
-		// The buffer already exists
-		std::memcpy(vertices[slot], data, size);
 	}
 
 	void OpenGLMesh::Init()
@@ -131,26 +124,26 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		// Create VAO
-		MH_GL_CALL(glGenVertexArrays(1, &rendererID));
-		MH_GL_CALL(glBindVertexArray(rendererID));
+		MH_GL_CALL(glGenVertexArrays(1, &m_RendererID));
+		MH_GL_CALL(glBindVertexArray(m_RendererID));
 
 		// Create vertex buffer
-		MH_GL_CALL(glGenBuffers(1, &vertexBufferID));
-		MH_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID));
-		MH_GL_CALL(glBufferData(GL_ARRAY_BUFFER, interleavedSize, interleavedVertices, GL_STATIC_DRAW));
+		MH_GL_CALL(glGenBuffers(1, &m_VertexBufferID));
+		MH_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferID));
+		MH_GL_CALL(glBufferData(GL_ARRAY_BUFFER, m_InterleavedVertices.size(), m_InterleavedVertices.data(), GL_STATIC_DRAW));
 
 		// Create index buffer
-		MH_GL_CALL(glGenBuffers(1, &indexBufferID));
-		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID));
-		MH_GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(uint32_t), indices, GL_STATIC_DRAW));
+		MH_GL_CALL(glGenBuffers(1, &m_IndexBufferID));
+		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferID));
+		MH_GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_IndexCount * sizeof(uint32_t), m_Indices.data(), GL_STATIC_DRAW));
 
 		// Setup vertex buffer layout
-		uint32_t vertexBufferOffset = 0;
+		size_t vertexBufferOffset = 0;
 		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
-			if (vertices[i])
+			if (!m_Vertices[i].empty())
 			{
-				const ShaderDataType& type = BUFFER_ELEMENTS[i];
+				ShaderDataType type = BUFFER_ELEMENTS[i];
 
 				GLenum dataType = ShaderDataTypeToOpenGLBaseType(type);
 				uint32_t dataTypeSize = ShaderDataTypeSize(type);
@@ -175,7 +168,7 @@ namespace Mahakam
 						(void*)(uintptr_t)vertexBufferOffset));
 				}
 
-				vertexBufferOffset += vertexCount * dataTypeSize;
+				vertexBufferOffset += m_Vertices[i].size();
 			}
 		}
 
@@ -187,29 +180,22 @@ namespace Mahakam
 
 	void OpenGLMesh::InterleaveBuffers()
 	{
-		uint32_t totalSize = 0;
-		uint32_t sizes[BUFFER_ELEMENTS_SIZE]{ 0 };
-		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
+		size_t totalSize = 0;
+		for (uint32_t i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
-			if (vertices[i])
-			{
-				totalSize += vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
-				sizes[i] = ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
-			}
+			if (!m_Vertices[i].empty())
+				totalSize += m_Vertices[i].size();
 		}
 
-		if (interleavedVertices)
-			delete[] interleavedVertices;
-		interleavedVertices = new uint8_t[totalSize]{ 0 };
+		m_InterleavedVertices.resize(totalSize);
 
-		uint32_t dstOffset = 0;
+		size_t dstOffset = 0;
 		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
 		{
-			if (vertices[i])
+			if (!m_Vertices[i].empty())
 			{
-				uint32_t size = vertexCount * sizes[i];
-				std::memcpy(interleavedVertices + dstOffset, vertices[i], size);
-				dstOffset += size;
+				std::memcpy(m_InterleavedVertices.begin() + dstOffset, m_Vertices[i].begin(), m_Vertices[i].size());
+				dstOffset += m_Vertices[i].size();
 			}
 		}
 	}

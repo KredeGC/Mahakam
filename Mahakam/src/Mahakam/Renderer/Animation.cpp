@@ -10,8 +10,10 @@
 
 namespace Mahakam
 {
-	Animation::Animation(const std::filesystem::path& filepath, int index)
-		: m_Filepath(filepath), m_AnimationIndex(index)
+	Animation::Animation(const std::filesystem::path& filepath, int index) :
+		m_Filepath(filepath),
+		m_AnimationIndex(index),
+		m_Samplers(Allocator::GetAllocator<Sampler>())
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -41,7 +43,7 @@ namespace Mahakam
 		auto& animation = animations[m_AnimationIndex];
 		m_Name = animation.name;
 
-		UnorderedMap<int, Sampler> samplers;
+		UnorderedMap<int, Sampler, Allocator::BaseAllocator<std::pair<const int, Sampler>>> samplers(Allocator::GetAllocator<std::pair<const int, Sampler>>());
 		samplers.reserve(animation.samplers.size());
 
 		// Each channel refers to a node/bone's target
@@ -109,16 +111,5 @@ namespace Mahakam
 	MH_DEFINE_FUNC(Animation::LoadImpl, Asset<Animation>, const std::filesystem::path& filepath, int index)
 	{
 		return CreateAsset<Animation>(filepath, index);
-
-		/*Animation* animation = Allocator::Allocate<Animation>(1);
-		Allocator::Construct<Animation>(animation, filepath, index);
-
-		auto deleter = [](void* p)
-		{
-			Allocator::Deconstruct<Animation>(static_cast<Animation*>(p));
-			Allocator::Deallocate<Animation>(static_cast<Animation*>(p), 1);
-		};
-
-		return Asset<Animation>(animation, deleter);*/
 	};
 }

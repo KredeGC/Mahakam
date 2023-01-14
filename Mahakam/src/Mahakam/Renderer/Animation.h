@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Types.h"
 
 #include "Mahakam/Asset/Asset.h"
@@ -27,7 +28,7 @@ namespace Mahakam
 		int m_AnimationIndex;
 		float m_Duration = 0.0f;
 
-		std::vector<Sampler> m_Samplers;
+		std::vector<Sampler, Allocator::BaseAllocator<Sampler>> m_Samplers;
 
 	public:
 		Animation(const std::filesystem::path& filepath, int index);
@@ -36,7 +37,7 @@ namespace Mahakam
 		inline int GetIndex() const { return m_AnimationIndex; }
 		inline float GetDuration() const { return m_Duration; }
 
-		inline const std::vector<Sampler>& GetSamplers() const { return m_Samplers; }
+		inline const std::vector<Sampler, Allocator::BaseAllocator<Sampler>>& GetSamplers() const { return m_Samplers; }
 
 		inline static Asset<Animation> Load(const std::filesystem::path& filepath, int index = 0) { return LoadImpl(filepath, index); }
 

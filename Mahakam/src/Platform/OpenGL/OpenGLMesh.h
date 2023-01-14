@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Core/Allocator.h"
+#include "Mahakam/Core/Types.h"
 #include "Mahakam/Math/Bounds.h"
 #include "Mahakam/Renderer/Mesh.h"
 
@@ -8,21 +10,19 @@ namespace Mahakam
 	class OpenGLMesh : public SubMesh
 	{
 	private:
-		uint32_t rendererID;
+		uint32_t m_RendererID;
 
-		uint8_t* interleavedVertices = 0;
-		uint32_t interleavedSize;
-		uint8_t* vertices[BUFFER_ELEMENTS_SIZE]{ 0 };
+		TrivialArray<uint8_t, Allocator::BaseAllocator<uint8_t>> m_InterleavedVertices;
+		TrivialArray<uint8_t, Allocator::BaseAllocator<uint8_t>> m_Vertices[BUFFER_ELEMENTS_SIZE];
+		TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> m_Indices;
 
-		uint32_t* indices = 0;
+		uint32_t m_VertexCount;
+		uint32_t m_IndexCount;
 
-		uint32_t vertexCount;
-		uint32_t indexCount;
+		Bounds m_Bounds;
 
-		Bounds bounds;
-
-		uint32_t vertexBufferID;
-		uint32_t indexBufferID;
+		uint32_t m_VertexBufferID;
+		uint32_t m_IndexBufferID;
 
 	public:
 		OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
@@ -37,15 +37,15 @@ namespace Mahakam
 
 		virtual void SetVertices(int slot, const void* data) override;
 
-		virtual const Bounds& GetBounds() const override { return bounds; }
+		virtual const Bounds& GetBounds() const override { return m_Bounds; }
 
-		inline uint32_t GetVertexCount() const override { return vertexCount; }
+		inline uint32_t GetVertexCount() const override { return m_VertexCount; }
 
-		inline virtual bool HasVertices(int index) const override { return vertices[index]; }
-		inline virtual const void* GetVertices(int index) const override { return vertices[index]; }
+		inline virtual bool HasVertices(int index) const override { return m_Vertices[index].data(); }
+		inline virtual const void* GetVertices(int index) const override { return m_Vertices[index].data(); }
 
-		inline const uint32_t* GetIndices() const override { return indices; }
-		inline uint32_t GetIndexCount() const override { return indexCount; }
+		inline const uint32_t* GetIndices() const override { return m_Indices.data(); }
+		inline uint32_t GetIndexCount() const override { return m_IndexCount; }
 
 	private:
 		void Init();

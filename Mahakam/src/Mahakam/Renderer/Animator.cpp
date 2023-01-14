@@ -5,6 +5,13 @@
 
 namespace Mahakam
 {
+	Animator::Animator() :
+		m_Indices(Allocator::GetAllocator<size_t>()),
+		m_Translations(Allocator::GetAllocator<std::pair<const int, glm::vec3>>()),
+		m_Rotations(Allocator::GetAllocator<std::pair<const int, glm::quat>>()),
+		m_Scales(Allocator::GetAllocator<std::pair<const int, glm::vec3>>())
+	{}
+
 	void Animator::SetAnimation(Asset<Animation> animation, bool play)
 	{
 		m_Animation = std::move(animation);
@@ -18,7 +25,7 @@ namespace Mahakam
 		const auto& samplers = m_Animation->GetSamplers();
 
 		m_Indices.resize(samplers.size());
-		memset(m_Indices.data(), 0, m_Indices.size() * sizeof(size_t));
+		std::memset(m_Indices.data(), 0, m_Indices.size() * sizeof(size_t));
 	}
 
 	void Animator::Update(Timestep dt)
@@ -35,7 +42,7 @@ namespace Mahakam
 		if (m_Time > m_Animation->GetDuration())
 		{
 			m_Time -= m_Animation->GetDuration();
-			memset(m_Indices.data(), 0, m_Indices.size() * sizeof(size_t));
+			std::memset(m_Indices.data(), 0, m_Indices.size() * sizeof(size_t));
 		}
 
 		for (size_t i = 0; i < samplers.size(); i++)

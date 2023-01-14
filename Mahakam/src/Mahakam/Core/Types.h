@@ -21,8 +21,8 @@ namespace Mahakam
 	template<typename T, typename Alloc = std::allocator<T>>
 	using TrivialVector = ktl::trivial_vector<T, Alloc>;
 
-	template<typename K, typename V>
-	using UnorderedMap = ktl::unordered_map<K, V>;
+	template<typename K, typename V, typename Alloc = std::allocator<std::pair<const K, V>>>
+	using UnorderedMap = ktl::unordered_map<K, V, std::hash<K>, std::equal_to<K>, Alloc>;
 
 	template<typename K>
 	using UnorderedSet = std::unordered_set<K>;
