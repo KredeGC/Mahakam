@@ -14,7 +14,6 @@
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float4.hpp>
 #include <glm/ext/vector_int4.hpp>
-#include <glm/ext/matrix_float4x4.hpp>
 
 namespace tinygltf
 {
@@ -88,8 +87,8 @@ namespace Mahakam
 			operator const void** () const { return reinterpret_cast<const void**>(const_cast<InterleavedStruct*>(this)); }
 		};
 
-		static constexpr uint32_t BUFFER_ELEMENTS_SIZE = 7U;
-		static constexpr ShaderDataType BUFFER_ELEMENTS[BUFFER_ELEMENTS_SIZE]
+		inline static constexpr uint32_t BUFFER_ELEMENTS_SIZE = 7U;
+		inline static constexpr ShaderDataType BUFFER_ELEMENTS[BUFFER_ELEMENTS_SIZE]
 		{
 			ShaderDataType::Float3, // Pos
 			ShaderDataType::Float2, // UV
