@@ -27,6 +27,8 @@ namespace Mahakam
 #ifndef MH_STANDALONE
 	void TextureAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node)
 	{
+		m_Filepath = filepath;
+
 		m_Props2D = TextureProps{};
 		m_PropsCube = CubeTextureProps{};
 
@@ -91,14 +93,17 @@ namespace Mahakam
 			}
 		}
 
-		if (m_TextureType == 0)
-			m_Texture = Texture2D::Create(filepath.string(), m_Props2D);
-		else
-			m_Texture = TextureCube::Create(filepath.string(), m_PropsCube);
+		CreateTexture(filepath);
 	}
 
 	void TextureAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
 	{
+		if (filepath != m_Filepath && std::filesystem::exists(filepath))
+		{
+			m_Filepath = filepath;
+			CreateTexture(filepath);
+		}
+
 		// Type (2D, Cube)
 		const char* projectionTypeStrings[] = { "Texture2D", "TextureCube" };
 		const char* currentTextureType = projectionTypeStrings[m_TextureType];
@@ -324,6 +329,8 @@ namespace Mahakam
 	void TextureAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
 		m_Texture.Save(m_ImporterProps.Extension, filepath, importPath);
+
+		//AssetDatabase::ReloadAsset(m_Texture.GetID());
 
 		m_Texture = nullptr;
 	}

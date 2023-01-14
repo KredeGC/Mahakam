@@ -7,32 +7,12 @@ layout(binding = 9, location = 9) uniform sampler2D u_AttenuationLUT;
 layout(binding = 10, location = 10) uniform sampler2D u_LightCookie;
 
 
-// Mie scaterring approximated with Henyey-Greenstein phase function.
+// TODO: Move this to a separate pass
+// BUG: The material viewer in Erebor shouldn't use volumetric lighting
+#define NUM_VOLUMETRIC_STEPS 10
 #if defined(DIRECTIONAL) || defined(SPOT)
-    #define NUM_VOLUMETRIC_STEPS 10
-    
-    float HenyeyGreensteinScattering(float scattering, float LdotV)
-    {
-        float result = 1.0 - scattering * scattering;
-        result /= (4.0 * PI * pow(1.0 + scattering * scattering - (2.0 * scattering) * LdotV, 1.5));
-        return result;
-    }
-    
-    float VolumetricScattering(Light light, vec3 startPos, vec3 viewDir, vec3 worldNormal, float LdotV, float stepSize) {
-        float mieScattering = HenyeyGreensteinScattering(light.volumetric.w, LdotV);
-        
-        float fog = 0.0;
-        
-        for (int j = 1; j <= NUM_VOLUMETRIC_STEPS; j++) {
-            vec3 samplePos = startPos - viewDir * (stepSize * j);
-            float sampleAttenuation = PBR_SHADOW_RAW(light, samplePos, worldNormal);
-            
-            fog += sampleAttenuation;
-        }
-        
-        return ((mieScattering * fog) / NUM_VOLUMETRIC_STEPS);
-    }
-#endif
+#include "internal/shaders/include/lighting/Volumetric.glsl"
+#endif // DIRECTIONAL || SPOT
 
 
 vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, vec3 worldPos, vec3 worldNormal) {
@@ -92,7 +72,7 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
         vec3 Lo = vec3(0.0);
         
         // Volumetric parameters
-        float stepSize = length(u_CameraPos - worldPos) / NUM_VOLUMETRIC_STEPS;
+        float stepSize = length(u_CameraPos - worldPos) / (NUM_VOLUMETRIC_STEPS + 1);
         float randOffset = rand3dTo1d(worldPos, vec3(12.989, 78.233, 37.719)) - 0.5;
         vec3 startPos = u_CameraPos + viewDir * stepSize * randOffset;
         
@@ -105,11 +85,7 @@ vec3 BRDF(vec3 albedo, float metallic, float roughness, float ao, vec3 viewDir, 
             Lo += PBR_DIRECT(albedo, metallic, roughness, viewDir, worldNormal, L, light.color, attenuation);
             
             // Volumetric scattering
-            if (light.volumetric.w < 1.0 - Epsilon) {
-                float LdotV = dot(L, -viewDir);
-                float scattering = VolumetricScattering(light, startPos, viewDir, worldNormal, LdotV, stepSize);
-                Lo += scattering * light.volumetric.rgb * light.color.rgb;
-            }
+            Lo += VolumetricScattering(light, startPos, viewDir, worldNormal, L, stepSize, NUM_VOLUMETRIC_STEPS);
         }
         
         vec3 ambient = PBR_INDIRECT(albedo, metallic, roughness, ao, viewDir, worldNormal);

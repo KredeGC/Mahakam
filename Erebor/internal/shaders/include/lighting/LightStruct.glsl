@@ -3,9 +3,9 @@
 
 #if defined(DIRECTIONAL)
     struct Light {
-        vec3 direction;
-        vec3 color;
-        mat4 worldToLight;
+        vec3 direction; // Direction as a normal vector
+        vec3 color; // xyz - color
+        mat4 worldToLight; // View-projection matrix for the light
         vec4 volumetric; // xyz - color, w - scattering
         vec4 offset; // xy - offset in shadow map, z - scale in shadow map, w - bias
     };
@@ -16,9 +16,9 @@
     };
 #elif defined(SPOT)
     struct Light {
-        mat4 objectToWorld;
+        mat4 objectToWorld; // Model matrix
         vec4 color; // xyz - color, w - 1.0 / (range * range)
-        mat4 worldToLight;
+        mat4 worldToLight; // View-projection matrix for the light
         vec4 volumetric; // xyz - color, w - scattering
         vec4 offset; // xy - offset in shadow map, z - scale in shadow map, w - bias
     };

@@ -535,7 +535,7 @@ namespace Mahakam
 				positions[index] = pointOnCube;
 				uvs[index] = percent;
 				normals[index] = { 0.0f, 1.0f, 0.0f };
-				tangents[index] = { -1.0f, 0.0f, 0.0f, 1.0f }; // Positive or negative?
+				tangents[index] = { 1.0f, 0.0f, 0.0f, 1.0f }; // Positive or negative?
 
 				if (x != rows - 1 && y != columns - 1)
 				{

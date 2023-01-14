@@ -100,7 +100,7 @@ namespace Mahakam::Editor
 				textureNames.push_back("Depth");
 			}
 
-			if (m_TextureIndex > textures.size())
+			if (m_TextureIndex >= textures.size())
 				m_TextureIndex = 0;
 
 			if (textures.size() == 0)

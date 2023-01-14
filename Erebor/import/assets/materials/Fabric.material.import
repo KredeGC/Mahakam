@@ -1,0 +1,15 @@
+Filepath: assets/materials/Material.material
+Extension: .material
+ID: 10127498216877445756
+Shader: 11869644962294522068
+Properties:
+  u_Metallic: 0
+  Uniforms.RoughnessMul: 1
+  Uniforms.UVTransform: [4,4,0,0]
+  Uniforms.MetallicMul: 0
+  u_Roughness: 10341743577412507490
+  u_Albedo: 7949174308391436228
+  Uniforms.EmissionColor: [0,0,0]
+  u_Occlussion: 8361894711875152675
+  Uniforms.Color: [1,1,1]
+  u_Bump: 13572513555684069288

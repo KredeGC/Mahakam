@@ -85,10 +85,10 @@
         // Calculate various properties of the light
         vec3 lightDir = CalculateShadowDirection(light, worldPos);
         float bias = 0.0;
-        vec3 normalBias = CalculateShadowNormalBias(light, worldPos, normal, texSize.x);
+        //vec3 normalBias = CalculateShadowNormalBias(light, worldPos, normal, texSize.x);
         
         // Transform worldPos into lightspace
-        vec4 lightSpacePos = light.worldToLight * vec4(worldPos + normalBias, 1.0);
+        vec4 lightSpacePos = light.worldToLight * vec4(worldPos, 1.0);
         lightSpacePos.xy /= lightSpacePos.w;
         
         // Offset xy into the depth texture atlas

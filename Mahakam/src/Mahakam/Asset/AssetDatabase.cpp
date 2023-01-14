@@ -356,10 +356,12 @@ namespace Mahakam
 
 				// Move the pointer and destructor to the existing control block
 				loadedControl->Ptr = control->Ptr;
-				loadedControl->DeleteData = std::move(control->DeleteData);
+				loadedControl->DeleteData = control->DeleteData;
 
+				// Invalidate the old control block, but don't delete it as others may reference it
 				control->Ptr = nullptr;
 				control->DeleteData = nullptr;
+				control->ID = 0;
 			}
 
 			return loadedControl;

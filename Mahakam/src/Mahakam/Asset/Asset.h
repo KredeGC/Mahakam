@@ -3,6 +3,7 @@
 #include "AssetDatabase.h"
 
 #include "Mahakam/Core/Allocator.h"
+#include "Mahakam/Core/Log.h"
 
 #include <cstddef>
 #include <filesystem>
@@ -176,7 +177,13 @@ namespace Mahakam
 
 		void Save(const ExtensionType& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 		{
-			m_Control = AssetDatabase::SaveAsset(m_Control, extension, filepath, importPath);
+			auto control = AssetDatabase::SaveAsset(m_Control, extension, filepath, importPath);
+
+			// If the control block is changed, we might need to remove the old one
+			if (control != m_Control)
+				DecrementRef();
+
+			m_Control = control;
 		}
 
 		AssetID GetID() const

@@ -14,6 +14,8 @@ namespace Mahakam
 	private:
 		ImporterProps m_ImporterProps;
 
+		std::filesystem::path m_Filepath;
+
 		TextureProps m_Props2D;
 		CubeTextureProps m_PropsCube;
 
