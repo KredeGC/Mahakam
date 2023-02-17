@@ -1,1 +1,1 @@
-call "bin/DebugOptimized-windows-x86_64/Erebor.exe"
+call "bin/DebugOptimized-windows-msc-x86_64/Erebor.exe"

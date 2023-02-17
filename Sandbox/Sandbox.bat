@@ -1,2 +1,2 @@
 cd "../Erebor"
-call "../Sandbox/bin/Release-windows-x86_64/Sandbox.exe"
+call "../Sandbox/bin/Release-windows-msc-x86_64/Sandbox.exe"
