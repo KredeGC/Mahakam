@@ -1,1 +1,1 @@
-call "bin/Release-windows-x86_64/Erebor.exe"
+call "bin/Release-windows-msc-x86_64/Erebor.exe"
