@@ -27,7 +27,7 @@ namespace Mahakam::Editor
 	{
 #ifndef MH_STANDALONE
 		// Add the console panel to the logger
-		auto sink = std::make_shared<ConsoleLogSinkMt>();
+		auto sink = CreateRef<ConsoleLogSinkMt>();
 
 		Log::GetEngineLogger()->sinks().push_back(sink);
 		Log::GetGameLogger()->sinks().push_back(sink);

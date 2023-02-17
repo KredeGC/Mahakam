@@ -55,9 +55,9 @@ namespace Mahakam
 	}
 #endif
 
-	void SoundAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
+	void SoundAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
-		Asset<Sound> sound(asset);
+		Sound* sound = static_cast<Sound*>(asset);
 
 		node["Volume"] << sound->GetProps().Volume;
 		node["Loop"] << sound->GetProps().Loop;

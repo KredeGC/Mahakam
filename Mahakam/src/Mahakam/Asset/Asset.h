@@ -55,13 +55,6 @@ namespace Mahakam
 				m_Control = nullptr;
 		}
 
-		explicit Asset(ControlBlock* control)
-			: m_Control(control)
-		{
-			// Increment the count
-			IncrementRef();
-		}
-
 		explicit Asset(const std::filesystem::path& importPath)
 		{
 			// Register if the ID is valid
@@ -253,13 +246,11 @@ namespace Mahakam
 	template<typename T, typename ... Args>
 	constexpr Asset<T> CreateAsset(Args&& ... args)
 	{
-		T* value = Allocator::Allocate<T>(1);
-		Allocator::Construct<T>(value, std::forward<Args>(args)...);
+		T* value = Allocator::New<T>(std::forward<Args>(args)...);
 
 		auto deleter = [](void* p)
 		{
-			Allocator::Deconstruct<T>(static_cast<T*>(p));
-			Allocator::Deallocate<T>(static_cast<T*>(p), 1);
+			Allocator::Delete<T>(static_cast<T*>(p));
 		};
 
 		return Asset<T>(value, deleter);

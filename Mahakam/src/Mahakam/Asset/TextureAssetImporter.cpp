@@ -354,13 +354,13 @@ namespace Mahakam
     }
 #endif
 
-	void TextureAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
+	void TextureAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
-		Asset<Texture> textureAsset(asset);
+		Texture* textureAsset = static_cast<Texture*>(asset);
 
 		if (!textureAsset->IsCubemap())
 		{
-			Asset<Texture2D> texture2D(textureAsset);
+			Texture2D* texture2D = static_cast<Texture2D*>(textureAsset);
 
 			node["Type"] << 0;
 			node["Format"] << (int)texture2D->GetProps().Format;
@@ -371,7 +371,7 @@ namespace Mahakam
 		}
 		else
 		{
-			Asset<TextureCube> textureCube(textureAsset);
+			TextureCube* textureCube = static_cast<TextureCube*>(textureAsset);
 
 			node["Type"] << 1;
 			node["Format"] << (int)textureCube->GetProps().Format;

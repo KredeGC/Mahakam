@@ -152,9 +152,9 @@ namespace Mahakam
 	}
 #endif
 
-	void MeshAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
+	void MeshAssetImporter::Serialize(ryml::NodeRef& node, void *asset)
 	{
-		Asset<Mesh> mesh(asset);
+		Mesh* mesh = static_cast<Mesh*>(asset);
 
 		ryml::NodeRef materialsNode = node["Materials"];
 		materialsNode |= ryml::SEQ;

@@ -332,9 +332,7 @@ namespace Mahakam
 		root["Extension"] << iter->second->GetImporterProps().Extension;
 		root["ID"] << id;
 
-		Asset<void> asset(control);
-
-		iter->second->Serialize(root, asset);
+		iter->second->Serialize(root, control->Ptr);
 
 		std::ofstream filestream(importPath);
 		filestream << tree;

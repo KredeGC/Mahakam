@@ -22,10 +22,6 @@ int main(int argc, char** argv)
 {
 	signal(SIGINT, intercept_interrupt);
 
-	Mahakam::Log::Init();
-	MH_CORE_INFO("Logging initialized");
-	MH_INFO("Logging initialized");
-
 	if (argc > 1)
 	{
 		if (strcmp(argv[1], "--headless") == 0)
@@ -36,6 +32,10 @@ int main(int argc, char** argv)
 	if (Mahakam::RendererAPI::GetAPI() != Mahakam::RendererAPI::API::None)
 		FreeConsole();
 #endif
+
+	Mahakam::Log::Init();
+	MH_CORE_INFO("Logging initialized");
+	MH_INFO("Logging initialized");
 
 #ifdef MH_ENABLE_PROFILING
 	Mahakam::FileUtility::CreateDirectories("profiling/");

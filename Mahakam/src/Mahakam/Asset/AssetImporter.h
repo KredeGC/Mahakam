@@ -37,7 +37,7 @@ namespace Mahakam
         virtual bool OnIconRender(Asset<void> asset) { return false; }
 #endif
 
-		virtual void Serialize(ryml::NodeRef& node, Asset<void> asset) = 0;
+		virtual void Serialize(ryml::NodeRef& node, void* asset) = 0;
 		virtual Asset<void> Deserialize(ryml::NodeRef& node) = 0;
 
 		inline static void Setup(ImporterProps& props, const std::string& name, const std::string& extension)

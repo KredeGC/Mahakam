@@ -59,7 +59,7 @@ namespace Mahakam
         virtual bool OnIconRender(Asset<void> asset) override;
 #endif
 
-		virtual void Serialize(ryml::NodeRef& node, Asset<void> asset) override;
+		virtual void Serialize(ryml::NodeRef& node, void* asset) override;
 		virtual Asset<void> Deserialize(ryml::NodeRef& node) override;
 
 	private:

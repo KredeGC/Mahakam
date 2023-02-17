@@ -30,7 +30,7 @@ namespace Mahakam
 	}
 #endif
 
-	void ComputeShaderAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
+	void ComputeShaderAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
 		//Ref<Shader> shader = StaticCastRef<Shader>(asset);
 	}

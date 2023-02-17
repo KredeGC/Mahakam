@@ -34,9 +34,9 @@ namespace Mahakam
 	}
 #endif
 
-	void AnimationAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
+	void AnimationAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
-		Asset<Animation> animationAsset(asset);
+		Animation* animationAsset = static_cast<Animation*>(asset);
 
 		node["Index"] << animationAsset->GetIndex();
 	}

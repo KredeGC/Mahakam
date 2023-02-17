@@ -44,5 +44,20 @@ namespace Mahakam
 		MH_DECLARE_FUNC(DeregisterDefaultComponents, void);
 
 		MH_DECLARE_FUNC(GetComponents, const ComponentMap&);
+
+		template<typename T>
+		static void RegisterComponentInterface(const char* componentName, const char* icon, bool (*serialize)(ryml::NodeRef&, Entity), bool (*deserialize)(ryml::NodeRef&, SceneSerializer::EntityMap&, Entity))
+		{
+			ComponentInterface componentInterface;
+			componentInterface.Icon = icon;
+			componentInterface.HasComponent = [](Entity entity) { return entity.HasComponent<T>(); };
+			componentInterface.AddComponent = [](Entity entity) { entity.AddComponent<T>(); };
+			componentInterface.CopyComponent = [](Entity src, Entity dst) { dst.AddComponent<T>(src.GetComponent<T>()); };
+			componentInterface.RemoveComponent = [](Entity entity) { entity.RemoveComponent<T>(); };
+			componentInterface.Serialize = serialize;
+			componentInterface.Deserialize = deserialize;
+
+			RegisterComponent(componentName, componentInterface);
+		}
 	};
 }

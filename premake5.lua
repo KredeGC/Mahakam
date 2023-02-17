@@ -2,7 +2,7 @@ newoption {
     trigger = "toolset",
     value = "Toolset (eg. gcc, clang, msc)",
     description = "The toolset to use to compile with",
-    default = "gcc",
+    default = os.host() == "windows" and "msc" or "gcc",
     allowed = {
         { "gcc", "gcc and g++ using ld and ar" },
         { "clang", "clang and clang++ using lld and llvm-ar" },

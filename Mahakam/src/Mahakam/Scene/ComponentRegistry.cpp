@@ -49,10 +49,10 @@ namespace Mahakam
 	MH_DEFINE_FUNC(ComponentRegistry::RegisterDefaultComponents, void)
 	{
 #pragma region Transform
-		ComponentInterface transformInterface;
-		transformInterface.Icon = u8"\uf020"; // vector
-		transformInterface.SetComponent<TransformComponent>();
-		transformInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
+		RegisterComponentInterface<TransformComponent>(
+			"Transform",
+			u8"\uf020", // vector
+			[](ryml::NodeRef& node, Entity entity)
 		{
 			TransformComponent& transform = entity.GetComponent<TransformComponent>();
 
@@ -61,8 +61,8 @@ namespace Mahakam
 			node["Scale"] << transform.GetScale();
 
 			return true;
-		};
-		transformInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		},
+			[](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			TransformComponent& transform = entity.AddComponent<TransformComponent>();
 
@@ -71,9 +71,7 @@ namespace Mahakam
 			MH_DESERIALIZE_NODE(transform.SetScale(value), glm::vec3, "Scale");
 
 			return true;
-		};
-
-		RegisterComponent("Transform", transformInterface);
+		});
 #pragma endregion
 
 #pragma region Animator

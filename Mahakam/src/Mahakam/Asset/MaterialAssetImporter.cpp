@@ -342,9 +342,9 @@ namespace Mahakam
     }
 #endif
 
-	void MaterialAssetImporter::Serialize(ryml::NodeRef& node, Asset<void> asset)
+	void MaterialAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
-		Asset<Material> material(asset);
+		Material* material = static_cast<Material*>(asset);
 
 		// Shader ID
 		node["Shader"] << material->GetShader().GetID();
