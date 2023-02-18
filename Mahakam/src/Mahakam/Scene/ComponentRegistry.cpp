@@ -14,6 +14,8 @@
 #include "Components/TransformComponent.h"
 #include "Entity.h"
 
+#include "Mahakam/Renderer/Animation.h"
+
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include "Mahakam/Serialization/YAMLSerialization.h"
@@ -48,11 +50,32 @@ namespace Mahakam
 	//void ComponentRegistry::RegisterDefaultComponents()
 	MH_DEFINE_FUNC(ComponentRegistry::RegisterDefaultComponents, void)
 	{
+		ComponentInterface componentInterface;
+
 #pragma region Transform
-		RegisterComponentInterface<TransformComponent>(
-			"Transform",
-			u8"\uf020", // vector
-			[](ryml::NodeRef& node, Entity entity)
+		// vector icon
+		componentInterface.SetEditor(u8"\uf020", [](Entity entity)
+		{
+			TransformComponent& transform = entity.GetComponent<TransformComponent>();
+
+			bool noMatrix = transform.HasNoMatrix();
+			if (ImGui::Checkbox("Skip matrix update", &noMatrix))
+				transform.SetNoMatrix(noMatrix);
+
+			glm::vec3 pos = transform.GetPosition();
+			if (GUI::DrawVec3Control("Position", pos, 0.0f))
+				transform.SetPosition(pos);
+
+			glm::vec3 eulerAngles = glm::degrees(transform.GetEulerAngles());
+			if (GUI::DrawVec3Control("Rotation", eulerAngles, 0.0f))
+				transform.SetEulerangles(glm::radians(eulerAngles));
+
+			glm::vec3 scale = transform.GetScale();
+			if (GUI::DrawVec3Control("Scale", scale, 1.0f))
+				transform.SetScale(scale);
+		});
+		componentInterface.SetComponent<TransformComponent>();
+		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			TransformComponent& transform = entity.GetComponent<TransformComponent>();
 
@@ -61,8 +84,8 @@ namespace Mahakam
 			node["Scale"] << transform.GetScale();
 
 			return true;
-		},
-			[](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		};
+		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			TransformComponent& transform = entity.AddComponent<TransformComponent>();
 
@@ -71,14 +94,44 @@ namespace Mahakam
 			MH_DESERIALIZE_NODE(transform.SetScale(value), glm::vec3, "Scale");
 
 			return true;
-		});
+		};
+
+		RegisterComponent("Transform", componentInterface);
 #pragma endregion
 
 #pragma region Animator
-		ComponentInterface animatorInterface;
-		animatorInterface.Icon = u8"\uecb4"; // video-clapper
-		animatorInterface.SetComponent<AnimatorComponent>();
-		animatorInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
+		// video-clapper icon
+		componentInterface.SetEditor(u8"\uecb4", [](Entity entity)
+		{
+			Animator& animator = entity.GetComponent<AnimatorComponent>();
+
+			Asset<Animation> animation = animator.GetAnimation();
+
+			std::filesystem::path importPath = animation.GetImportPath();
+			if (GUI::DrawDragDropField("Animation", ".anim", importPath))
+			{
+				animation = Asset<Animation>(importPath);
+				animator.SetAnimation(Asset<Sound>(importPath));
+			}
+
+			if (animation)
+			{
+				float duration = animation->GetDuration();
+
+				ImGui::TextWrapped("Animation: %s", animation->GetName().c_str());
+				ImGui::Text("Duration: %.1fs", duration);
+
+				float progress = animator.GetTime() / animation->GetDuration();
+				float realtime = animator.GetTime();
+
+				ImGui::ProgressBar(progress, ImVec2(-FLT_MIN, 0), std::to_string(realtime).c_str());
+			}
+
+			bool playOnStart = true;
+			ImGui::Checkbox("Play on start", &playOnStart);
+		});
+		componentInterface.SetComponent<AnimatorComponent>();
+		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			Animator& animator = entity.GetComponent<AnimatorComponent>();
 
@@ -86,7 +139,7 @@ namespace Mahakam
 
 			return true;
 		};
-		animatorInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			Animator& animator = entity.AddComponent<AnimatorComponent>();
 
@@ -104,22 +157,43 @@ namespace Mahakam
 			return true;
 		};
 
-		RegisterComponent("Animator", animatorInterface);
+		RegisterComponent("Animator", componentInterface);
 #pragma endregion
 
 #pragma region AudioListener
-		ComponentInterface audioListenerInterface;
-		audioListenerInterface.Icon = u8"\uea33"; // headphone
-		audioListenerInterface.SetComponent<AudioListenerComponent>();
+		// headphone icon
+		componentInterface.SetEditor(u8"\uea33");
+		componentInterface.SetComponent<AudioListenerComponent>();
+		componentInterface.Serialize = nullptr;
+		componentInterface.Deserialize = nullptr;
 
-		RegisterComponent("Audio Listener", audioListenerInterface);
+		RegisterComponent("Audio Listener", componentInterface);
 #pragma endregion
 
 #pragma region AudioSource
-		ComponentInterface audioSourceInterface;
-		audioSourceInterface.Icon = u8"\ueea8"; // audio
-		audioSourceInterface.SetComponent<AudioSourceComponent>();
-		audioSourceInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
+		// audio icon
+		componentInterface.SetEditor(u8"\ueea8", [](Entity entity)
+		{
+			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
+			Asset<Sound> sound = source.GetSound();
+
+			std::filesystem::path importPath = sound.GetImportPath();
+			if (GUI::DrawDragDropField("Sound", ".sound", importPath))
+			{
+				source.SetSound(Asset<Sound>(importPath));
+				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
+			}
+
+			float spatialBlend = source.GetSpatialBlend();
+			if (ImGui::DragFloat("Spatial blend", &spatialBlend, 0.01f, 0.0f, 1.0f))
+				source.SetSpatialBlend(spatialBlend);
+
+			bool interpolate = source.GetInterpolation();
+			if (ImGui::Checkbox("Interpolate", &interpolate))
+				source.SetInterpolation(interpolate);
+		});
+		componentInterface.SetComponent<AudioSourceComponent>();
+		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			AudioSourceComponent& source = entity.GetComponent<AudioSourceComponent>();
 
@@ -128,7 +202,7 @@ namespace Mahakam
 
 			return true;
 		};
-		audioSourceInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			AudioSourceComponent& source = entity.AddComponent<AudioSourceComponent>();
 
@@ -149,14 +223,64 @@ namespace Mahakam
 			return true;
 		};
 
-		RegisterComponent("Audio Source", audioSourceInterface);
+		RegisterComponent("Audio Source", componentInterface);
 #pragma endregion
 
 #pragma region Camera
-		ComponentInterface cameraInterface;
-		cameraInterface.Icon = u8"\uecb5"; // video
-		cameraInterface.SetComponent<CameraComponent>();
-		cameraInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
+		// video icon
+		componentInterface.SetEditor(u8"\uecb5", [](Entity entity)
+		{
+			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
+			Camera& camera = cameraComponent;
+
+			const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
+
+			if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					bool selected = currentProjectionTypeString == projectionTypeStrings[i];
+					if (ImGui::Selectable(projectionTypeStrings[i], selected))
+					{
+						currentProjectionTypeString = projectionTypeStrings[i];
+						camera.SetProjectionType((Camera::ProjectionType)i);
+					}
+
+					if (selected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+
+			if (camera.GetProjectionType() == Camera::ProjectionType::Perspective)
+			{
+				float fov = glm::degrees(camera.GetFov());
+				if (ImGui::DragFloat("Field of view", &fov, 0.1f, 0.0f, 180.0f))
+					camera.SetFov(glm::radians(fov));
+			}
+			else
+			{
+				float size = camera.GetSize();
+				if (ImGui::DragFloat("Size", &size, 0.1f, 0.0f))
+					camera.SetSize(size);
+			}
+
+			float nearClip = camera.GetNearPlane();
+			if (ImGui::DragFloat("Near clip-plane", &nearClip, 0.1f, 0.0f))
+				camera.SetNearPlane(nearClip);
+
+			float farClip = camera.GetFarPlane();
+			if (ImGui::DragFloat("Far clip-plane", &farClip, 0.1f, 0.0f))
+				camera.SetFarPlane(farClip);
+
+			bool fixedAspectRatio = cameraComponent.HasFixedAspectRatio();
+			if (ImGui::Checkbox("Fixed aspect ratio", &fixedAspectRatio))
+				cameraComponent.SetFixedAspectRatio(fixedAspectRatio);
+		});
+		componentInterface.SetComponent<CameraComponent>();
+		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			CameraComponent& cameraComponent = entity.GetComponent<CameraComponent>();
 			Camera& camera = cameraComponent;
@@ -171,7 +295,7 @@ namespace Mahakam
 
 			return true;
 		};
-		cameraInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			CameraComponent& cameraComponent = entity.AddComponent<CameraComponent>();
 			Camera& camera = cameraComponent;
@@ -187,14 +311,72 @@ namespace Mahakam
 			return true;
 		};
 
-		RegisterComponent("Camera", cameraInterface);
+		RegisterComponent("Camera", componentInterface);
 #pragma endregion
 
 #pragma region Light
-		ComponentInterface lightInterface;
-		lightInterface.Icon = u8"\uef6b"; // light-bulb
-		lightInterface.SetComponent<LightComponent>();
-		lightInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
+		// light-bulb icon
+		componentInterface.SetEditor(u8"\uef6b", [](Entity entity)
+		{
+			Light& light = entity.GetComponent<LightComponent>();
+
+			const char* projectionTypeStrings[] = { "Directional", "Point", "Spot" };
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)light.GetLightType()];
+
+			if (ImGui::BeginCombo("Light Type", currentProjectionTypeString))
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					bool selected = currentProjectionTypeString == projectionTypeStrings[i];
+					if (ImGui::Selectable(projectionTypeStrings[i], selected))
+					{
+						currentProjectionTypeString = projectionTypeStrings[i];
+						light.SetLightType((Light::LightType)i);
+					}
+
+					if (selected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+
+			float range = light.GetRange();
+			if (ImGui::DragFloat("Range", &range, 0.1f, 0.0f, std::numeric_limits<float>::infinity()))
+				light.SetRange(range);
+
+			if (light.GetLightType() == Light::LightType::Spot)
+			{
+				float fov = glm::degrees(light.GetFov());
+				if (ImGui::DragFloat("Field of view", &fov, 0.1f, 0.0f, 180.0f))
+					light.SetFov(glm::radians(fov));
+			}
+
+			glm::vec3 color = light.GetColor();
+			if (GUI::DrawColor3Edit("Color", color, ImGuiColorEditFlags_HDR))
+				light.SetColor(color);
+
+			bool hasShadows = light.IsShadowCasting();
+			if (ImGui::Checkbox("Shadow casting", &hasShadows))
+				light.SetShadowCasting(hasShadows);
+
+			if (hasShadows)
+			{
+				float bias = light.GetBias();
+				if (ImGui::DragFloat("Shadow bias", &bias, 0.001f, 0.0f, 1.0f))
+					light.SetBias(bias);
+			}
+
+			float scattering = light.GetVolumetricScattering();
+			if (ImGui::DragFloat("Volumetric Scattering", &scattering, 0.001f, 0.0f, 1.0f))
+				light.SetVolumetricScattering(scattering);
+
+			glm::vec3 scatteringColor = light.GetVolumetricColor();
+			if (GUI::DrawColor3Edit("Scattering Color", scatteringColor, ImGuiColorEditFlags_HDR))
+				light.SetVolumetricColor(scatteringColor);
+		});
+		componentInterface.SetComponent<LightComponent>();
+		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			Light& light = entity.GetComponent<LightComponent>();
 
@@ -209,7 +391,7 @@ namespace Mahakam
 
 			return true;
 		};
-		lightInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			Light& light = entity.AddComponent<LightComponent>();
 
@@ -225,14 +407,49 @@ namespace Mahakam
 			return true;
 		};
 
-		RegisterComponent("Light", lightInterface);
+		RegisterComponent("Light", componentInterface);
 #pragma endregion
 
 #pragma region Mesh
-		ComponentInterface meshInterface;
-		meshInterface.Icon = u8"\ueef7"; // cube
-		meshInterface.SetComponent<MeshComponent>();
-		meshInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
+		// cube icon
+		componentInterface.SetEditor(u8"\ueef7", [](Entity entity)
+		{
+			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
+
+			// Mesh dragdrop
+			std::filesystem::path importPath = meshComponent.GetMesh().GetImportPath();
+			if (GUI::DrawDragDropField("Mesh", ".mesh", importPath))
+			{
+				Asset<Mesh> mesh = Asset<Mesh>(importPath);
+				if (mesh)
+					meshComponent.SetMesh(mesh);
+				else
+					meshComponent.SetMesh(nullptr);
+			}
+
+			if (!meshComponent.HasMesh()) return;
+
+			auto& meshes = meshComponent.GetSubMeshes();
+
+			uint32_t vertexCount = 0;
+			uint32_t indexCount = 0;
+			for (auto& mesh : meshes)
+			{
+				if (mesh)
+				{
+					vertexCount += mesh->GetVertexCount();
+					indexCount += mesh->GetIndexCount();
+				}
+			}
+
+			if (vertexCount > 0 && indexCount > 0)
+			{
+				ImGui::Text("Vertex count: %d", vertexCount);
+				ImGui::Text("Triangle count: %d", indexCount / 3);
+			}
+		});
+		componentInterface.SetComponent<MeshComponent>();
+		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
 
@@ -242,7 +459,7 @@ namespace Mahakam
 
 			return true;
 		};
-		meshInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			if (node.has_child("Mesh"))
 			{
@@ -261,22 +478,54 @@ namespace Mahakam
 			return true;
 		};
 
-		RegisterComponent("Mesh", meshInterface);
+		RegisterComponent("Mesh", componentInterface);
 #pragma endregion
 
 #pragma region Particle
-		ComponentInterface particleInterface;
-		particleInterface.Icon = u8"\uefbe"; // pixels
-		particleInterface.SetComponent<ParticleSystemComponent>();
+		// pixels icon
+		componentInterface.SetEditor(u8"\uefbe", nullptr);
+		componentInterface.SetComponent<ParticleSystemComponent>();
+		componentInterface.Serialize = nullptr;
+		componentInterface.Deserialize = nullptr;
 
-		RegisterComponent("Particle system", particleInterface);
+		RegisterComponent("Particle system", componentInterface);
 #pragma endregion
 
 #pragma region Skin
-		ComponentInterface skinInterface;
-		skinInterface.Icon = u8"\uef89"; // male
-		skinInterface.SetComponent<SkinComponent>();
-		skinInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
+		// male icon
+		componentInterface.SetEditor(u8"\uef89", [](Entity entity)
+		{
+			SkinComponent& skinComponent = entity.GetComponent<SkinComponent>();
+
+			if (MeshComponent* meshComponent = entity.TryGetComponent<MeshComponent>())
+			{
+				if (meshComponent->HasMesh())
+				{
+					auto& bones = skinComponent.GetBoneEntities();
+					auto& hierarchy = meshComponent->GetNodeHierarchy();
+
+					ImGui::Button("Create bone entities");
+					ImGui::SameLine();
+					ImGui::Button("Set bones from Mesh");
+
+					if (bones.size() == hierarchy.size())
+					{
+						for (size_t i = 0; i < bones.size(); i++)
+							GUI::DrawDragDropEntity(hierarchy[i].Name, "Transform", bones[i]);
+					}
+				}
+				else
+				{
+					ImGui::Text("Skin requires a Mesh");
+				}
+			}
+			else
+			{
+				ImGui::Text("Skin requires a Mesh Component");
+			}
+		});
+		componentInterface.SetComponent<SkinComponent>();
+		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
 			SkinComponent& skin = entity.GetComponent<SkinComponent>();
 
@@ -291,7 +540,7 @@ namespace Mahakam
 
 			return true;
 		};
-		skinInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
 			SkinComponent& skin = entity.AddComponent<SkinComponent>();
 			auto& boneEntities = skin.GetBoneEntities();
@@ -322,7 +571,7 @@ namespace Mahakam
 			return true;
 		};
 
-		RegisterComponent("Skin", skinInterface);
+		RegisterComponent("Skin", componentInterface);
 #pragma endregion
 	};
 

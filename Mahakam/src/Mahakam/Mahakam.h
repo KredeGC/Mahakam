@@ -37,7 +37,6 @@
 #include "Mahakam/Editor/EditorCamera.h"
 #include "Mahakam/Editor/EditorWindow.h"
 #include "Mahakam/Editor/EditorWindowRegistry.h"
-#include "Mahakam/Editor/PropertyRegistry.h"
 #include "Mahakam/Editor/Runtime.h"
 #include "Mahakam/Editor/Selection.h"
 #endif

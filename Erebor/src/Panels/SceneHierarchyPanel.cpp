@@ -263,6 +263,7 @@ namespace Mahakam::Editor
 
 				std::string tagString = tagStream.str();
 
+				// Draw header for component
 				bool markedForDeletion = false;
 				if (ImGui::CollapsingHeader(tagString.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 				{
@@ -287,11 +288,13 @@ namespace Mahakam::Editor
 						ImGui::EndPopup();
 					}
 
-					ImGui::Indent();
-					PropertyRegistry::PropertyPtr onInspector = PropertyRegistry::GetProperty(name);
-					if (onInspector)
-						onInspector(entity);
-					ImGui::Unindent();
+					auto onPropertyDraw = componentInterface.OnPropertyDraw;
+					if (onPropertyDraw)
+					{
+						ImGui::Indent();
+						onPropertyDraw(entity);
+						ImGui::Unindent();
+					}
 				}
 
 				if (markedForDeletion)

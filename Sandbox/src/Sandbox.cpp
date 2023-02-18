@@ -45,18 +45,14 @@ MH_EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 	ComponentRegistry::ComponentInterface rotatorInterface;
 	rotatorInterface.SetComponent<RotatorComponent>();
 
-	ComponentRegistry::RegisterComponent("Rotator", rotatorInterface);
-
-#ifndef MH_STANDALONE
-	Editor::PropertyRegistry::PropertyPtr rotatorInspector = [](Entity entity)
+	rotatorInterface.SetEditor(nullptr, [](Entity entity)
 	{
 		RotatorComponent& rotator = entity.GetComponent<RotatorComponent>();
 
 		ImGui::DragFloat("Rotation speed", &rotator.rotationSpeed, 0.1f);
-	};
+	});
 
-	Editor::PropertyRegistry::Register("Rotator", rotatorInspector);
-#endif
+	ComponentRegistry::RegisterComponent("Rotator", rotatorInterface);
 #pragma endregion
 }
 
@@ -338,9 +334,5 @@ MH_EXTERN_EXPORTED void Unload()
 
 #pragma region Rotator
 	ComponentRegistry::DeregisterComponent("Rotator");
-
-#ifndef MH_STANDALONE
-	Editor::PropertyRegistry::Deregister("Rotator");
-#endif
 #pragma endregion
 }
