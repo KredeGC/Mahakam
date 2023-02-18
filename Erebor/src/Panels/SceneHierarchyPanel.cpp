@@ -289,7 +289,7 @@ namespace Mahakam::Editor
 					}
 
 					auto onPropertyDraw = componentInterface.OnPropertyDraw;
-					if (onPropertyDraw)
+					if (onPropertyDraw && !markedForDeletion)
 					{
 						ImGui::Indent();
 						onPropertyDraw(entity);

@@ -56,9 +56,6 @@ MH_EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
 #pragma endregion
 }
 
-// TEMPORARY
-std::unordered_map<uint32_t, Entity> boneEntities;
-
 MH_EXTERN_EXPORTED void Run(Scene* scene)
 {
 	// Scene camera
@@ -134,43 +131,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	skinnedEntity.AddComponent<AnimatorComponent>().GetAnimator().SetAnimation(skinnedAnimation);
 	SkinComponent& skin = skinnedEntity.AddComponent<SkinComponent>();
 
-	boneEntities.reserve(skinnedModel->NodeHierarchy.size());
-
-	for (auto& node : skinnedModel->NodeHierarchy)
-	{
-		Entity boneEntity = scene->CreateEntity(node.Name);
-
-		if (node.ParentID > -1)
-			boneEntity.SetParent(boneEntities[node.ParentID]);
-		else
-			boneEntity.SetParent(skinnedEntity);
-
-		// Extract matrix
-		glm::vec3 pos, scale;
-		glm::quat rot;
-
-		Entity parent = boneEntity.GetParent();
-		glm::mat4 transform{ 1.0f };
-		if (node.ParentID > -1)
-			transform *= glm::inverse(parent.GetComponent<TransformComponent>().GetModelMatrix());
-		transform *= glm::inverse(node.Offset);
-
-		Math::DecomposeTransform(transform, pos, rot, scale);
-
-		// Set transform
-		boneEntity.AddComponent<TransformComponent>().SetPosition(pos);
-		boneEntity.GetComponent<TransformComponent>().SetRotation(rot);
-		boneEntity.GetComponent<TransformComponent>().SetScale(scale);
-
-		if (node.ParentID > -1)
-			boneEntity.GetComponent<TransformComponent>().UpdateModelMatrix(parent.GetComponent<TransformComponent>().GetModelMatrix());
-		else
-			boneEntity.GetComponent<TransformComponent>().UpdateModelMatrix(glm::mat4(1.0f));
-
-		skin.AddBoneEntity(boneEntity);
-
-		boneEntities[node.ID] = boneEntity;
-	}
+	skin.CreateBoneEntities(skinnedEntity, skinnedModel->NodeHierarchy);
 #endif
 
 

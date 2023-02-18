@@ -504,9 +504,17 @@ namespace Mahakam
 					auto& bones = skinComponent.GetBoneEntities();
 					auto& hierarchy = meshComponent->GetNodeHierarchy();
 
-					ImGui::Button("Create bone entities");
+					if (ImGui::Button("Create bone entities"))
+					{
+						skinComponent.CreateBoneEntities(entity, hierarchy);
+					}
+
 					ImGui::SameLine();
-					ImGui::Button("Set bones from Mesh");
+
+					if (ImGui::Button("Clear bone entities"))
+					{
+						skinComponent.ClearBoneEntities(hierarchy);
+					}
 
 					if (bones.size() == hierarchy.size())
 					{

@@ -154,7 +154,7 @@ namespace Mahakam
 				const auto& hierarchy = meshComponent.GetNodeHierarchy();
 
 				if (boneEntities.size() != hierarchy.size())
-					boneEntities.resize(hierarchy.size());
+					return;
 
 				for (size_t i = 0; i < boneEntities.size(); i++)
 				{
@@ -369,6 +369,9 @@ namespace Mahakam
 						{
 							const auto& boneEntities = skinComponent->GetBoneEntities();
 							const auto& hierarchy = meshComponent.GetNodeHierarchy();
+
+							if (boneEntities.size() != hierarchy.size())
+								return;
 
 							// I've yet to make the inverse skin transform to work. For now it has a toggle instead
 							if (skinComponent->HasTargetOrigin())

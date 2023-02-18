@@ -18,6 +18,10 @@ void intercept_interrupt(int signal)
 	g_App->Close();
 }
 
+#if defined(MH_PLATFORM_WINDOWS) && defined(MH_STANDALONE)
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+#endif
+
 int main(int argc, char** argv)
 {
 	signal(SIGINT, intercept_interrupt);
@@ -27,11 +31,6 @@ int main(int argc, char** argv)
 		if (strcmp(argv[1], "--headless") == 0)
 			Mahakam::RendererAPI::SetAPI(Mahakam::RendererAPI::API::None);
 	}
-
-#if defined(MH_PLATFORM_WINDOWS) && defined(MH_RELEASE)
-	if (Mahakam::RendererAPI::GetAPI() != Mahakam::RendererAPI::API::None)
-		FreeConsole();
-#endif
 
 	Mahakam::Log::Init();
 	MH_CORE_INFO("Logging initialized");

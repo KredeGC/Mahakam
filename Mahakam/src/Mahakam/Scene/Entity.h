@@ -36,6 +36,8 @@ namespace Mahakam
 			return !operator==(other);
 		}
 
+		Scene* GetScene();
+
 		void SetParent(Entity parent);
 		Entity GetParent() const;
 		void SetFirstChild(Entity first);
