@@ -78,7 +78,7 @@ namespace Mahakam::Editor
 		std::string tagString = CreateTagIcons(entity, tag);
 		const char* tagName = tagString.c_str();
 
-		bool open = ImGui::TreeNodeEx((void*)(uint64_t)uint32_t(entity), flags, "%s", tagName);
+		bool open = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetHandle(), flags, "%s", tagName);
 
 		// If entity is clicked (not the arrow)
 		if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen())

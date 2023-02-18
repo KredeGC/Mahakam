@@ -18,7 +18,7 @@ namespace Mahakam
 		return m_Scene->m_Registry.valid(m_Handle);
 	}
 
-	Scene* Entity::GetScene()
+	Scene* Entity::GetScene() const
 	{
 		return m_Scene;
 	}

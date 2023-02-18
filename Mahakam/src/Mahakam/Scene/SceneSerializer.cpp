@@ -191,7 +191,7 @@ namespace Mahakam
 					}
 				}
 
-				m_Entities[id] = static_cast<entt::entity>(deserializedEntity);
+				m_Entities[id] = deserializedEntity.GetEntt();
 			}
 
 			// Deserialize other components
@@ -220,7 +220,7 @@ namespace Mahakam
 		{
 			TagComponent& tag = entity.GetComponent<TagComponent>();
 
-			entityNode["ID"] << uint32_t(entity);
+			entityNode["ID"] << entity.GetHandle();
 			entityNode["Tag"] << tag.Tag;
 		}
 

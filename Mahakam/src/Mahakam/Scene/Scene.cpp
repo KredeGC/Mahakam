@@ -462,7 +462,7 @@ namespace Mahakam
 
 	void Scene::DestroyEntity(Entity entity)
 	{
-		m_Registry.destroy(static_cast<entt::entity>(entity));
+		m_Registry.destroy(entity.GetEntt());
 	}
 
 	void Scene::Sort()

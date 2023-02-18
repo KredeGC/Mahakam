@@ -543,7 +543,7 @@ namespace Mahakam
 			const auto& boneEntities = skin.GetBoneEntities();
 			for (auto& boneEntity : boneEntities)
 			{
-				bones.append_child() << uint32_t(boneEntity);
+				bones.append_child() << boneEntity.GetHandle();
 			}
 
 			return true;
@@ -566,7 +566,7 @@ namespace Mahakam
 					auto entityIter = translation.find(entityID);
 					if (entityIter != translation.end())
 					{
-						Entity translatedEntity{ entityIter->second, static_cast<Scene*>(entity) };
+						Entity translatedEntity{ entityIter->second, entity.GetScene() };
 						boneEntities.push_back(translatedEntity);
 					}
 					else

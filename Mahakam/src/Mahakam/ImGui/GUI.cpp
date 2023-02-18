@@ -124,7 +124,7 @@ namespace Mahakam::GUI
 			if (TagComponent* tag = entity.TryGetComponent<TagComponent>())
 				entityLabel = tag->Tag;
 			else
-				entityLabel = std::to_string(uint32_t(entity));
+				entityLabel = std::to_string(entity.GetHandle());
 		}
 
 		ImGui::Button(entityLabel.c_str());
@@ -182,7 +182,7 @@ namespace Mahakam::GUI
 			if (TagComponent* tag = entity.TryGetComponent<TagComponent>())
 				entityLabel = tag->Tag;
 			else
-				entityLabel = std::to_string(uint32_t(entity));
+				entityLabel = std::to_string(entity.GetHandle());
 		}
 
 		ImGui::Button(entityLabel.c_str());

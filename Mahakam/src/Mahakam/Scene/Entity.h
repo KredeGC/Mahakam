@@ -23,9 +23,6 @@ namespace Mahakam
 		Entity(const Entity& ent) = default;
 
 		explicit operator bool() const;
-		explicit operator entt::entity() const { return m_Handle; }
-		explicit operator uint32_t() const { return static_cast<uint32_t>(m_Handle); }
-		explicit operator Scene*() const { return m_Scene; }
 
 		bool operator==(const Entity& other) const
 		{
@@ -36,7 +33,9 @@ namespace Mahakam
 			return !operator==(other);
 		}
 
-		Scene* GetScene();
+		entt::entity GetEntt() const { return m_Handle; }
+		uint32_t GetHandle() const { return static_cast<uint32_t>(m_Handle); }
+		Scene* GetScene() const;
 
 		void SetParent(Entity parent);
 		Entity GetParent() const;
@@ -130,8 +129,8 @@ namespace std {
 	{
 		size_t operator()(const ::Mahakam::Entity& k) const
 		{
-			return hash<::Mahakam::Scene*>()(static_cast<::Mahakam::Scene*>(k))
-				^ (hash<uint32_t>()(static_cast<uint32_t>(k)) << 1);
+			return hash<::Mahakam::Scene*>()(k.GetScene())
+				^ (hash<uint32_t>()(k.GetHandle()) << 1);
 		}
 	};
 }
