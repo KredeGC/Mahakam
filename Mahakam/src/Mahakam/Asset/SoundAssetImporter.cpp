@@ -49,8 +49,6 @@ namespace Mahakam
 			Asset<Sound> sound = Sound::Create(filepath.string(), m_Props);
 
 			sound.Save(m_ImporterProps.Extension, filepath, importPath);
-
-			AssetDatabase::ReloadAsset(sound.GetID());
 		}
 	}
 #endif

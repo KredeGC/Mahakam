@@ -34,7 +34,7 @@ namespace Mahakam
 				RemoveComponent = [](Entity entity) { entity.RemoveComponent<T>(); };
 			}
 
-			void SetEditor(const char* icon = nullptr, void (*onPropertyDraw)(Entity) = nullptr)
+			inline void SetEditor(const char* icon = nullptr, void (*onPropertyDraw)(Entity) = nullptr)
 			{
 #ifndef MH_STANDALONE
 				Icon = icon;

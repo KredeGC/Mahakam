@@ -31,6 +31,9 @@ namespace Mahakam
 		virtual void SetSpatialBlend(float blend) = 0;
 		virtual float GetSpatialBlend() const = 0;
 
+		virtual float GetTime() const = 0;
+		virtual float GetDuration() const = 0;
+
 		virtual void SetPosition(const glm::vec3& source) = 0;
 
 		inline static Ref<AudioSource> Create() { return CreateImpl(AudioEngine::GetContext()); }

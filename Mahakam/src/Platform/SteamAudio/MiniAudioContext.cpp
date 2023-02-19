@@ -34,7 +34,7 @@ namespace Mahakam
 		iplContextSettings.version = STEAMAUDIO_VERSION;
 
 		result = ma_result_from_IPLerror(iplContextCreate(&iplContextSettings, &m_IplContext));
-		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize audio context.");
+		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize Steam Audio context.");
 
 		IPLHRTFSettings iplHRTFSettings;
 
@@ -57,7 +57,7 @@ namespace Mahakam
 		iplHRTFSettings.type = IPL_HRTFTYPE_DEFAULT;
 
 		result = ma_result_from_IPLerror(iplHRTFCreate(m_IplContext, &m_IplAudioSettings, &iplHRTFSettings, &m_IPLHRTF));
-		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize audio HRTF.");
+		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize Steam Audio HRTF.");
 	}
 
 	MiniAudioContext::~MiniAudioContext()

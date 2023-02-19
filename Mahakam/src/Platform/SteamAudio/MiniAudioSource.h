@@ -20,8 +20,8 @@ namespace Mahakam
 		// ma_sound is internally ref-counted, so this doesn't matter performance-wise
 		ma_sound m_MaSound;
 
-		// Need to keep a reference to the sound itself, in case it changes
-		MiniAudioSound* m_SoundSwitch = nullptr;
+		// Need to keep a reference to the filepath, in case it changes
+		std::filesystem::path m_SoundFilepath;
 
 		// Need to keep a reference to props, in case they change
 		SoundProps m_SoundProps;
@@ -45,6 +45,9 @@ namespace Mahakam
 
 		virtual void SetSpatialBlend(float blend) override;
 		virtual float GetSpatialBlend() const override { return m_Node.spatialBlend; }
+
+		virtual float GetTime() const override;
+		virtual float GetDuration() const override;
 
 		virtual void SetPosition(const glm::vec3& source) override;
 

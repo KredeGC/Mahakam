@@ -66,9 +66,13 @@ namespace Mahakam
 		{
 			m_Sound = static_cast<Asset<MiniAudioSound>>(sound);
 			m_SoundProps = m_Sound->GetProps();
-			m_SoundSwitch = m_Sound.get();
+			m_SoundFilepath = m_Sound->GetFilepath();
 
 			InitSound();
+		}
+		else
+		{
+			m_Sound = nullptr;
 		}
 	}
 
@@ -87,6 +91,30 @@ namespace Mahakam
 		m_Source = { source, 1.0f };
 	}
 
+	float MiniAudioSource::GetTime() const
+	{
+		if (!m_Sound)
+			return 0.0f;
+
+		float out;
+		ma_result result = ma_sound_get_cursor_in_seconds(const_cast<ma_sound*>(&m_MaSound), &out);
+		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to get current time of sound.");
+
+		return out;
+	}
+
+	float MiniAudioSource::GetDuration() const
+	{
+		if (!m_Sound)
+			return 0.0f;
+
+		float out;
+		ma_result result = ma_sound_get_length_in_seconds(const_cast<ma_sound*>(&m_MaSound), &out);
+		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to get current time of sound.");
+
+		return out;
+	}
+
 	void MiniAudioSource::UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos)
 	{
 		if (!m_Sound) return;
@@ -94,12 +122,13 @@ namespace Mahakam
 		const SoundProps& props = m_Sound->GetProps();
 
 		// Reload the sound if the path changed
-		if (m_Sound.get() != m_SoundSwitch)
+		// A better solution might be to have a callback system on Assets when they get reloaded
+		if (m_Sound->GetFilepath() != m_SoundFilepath)
 		{
 			UninitSound();
 
 			m_SoundProps = props;
-			m_SoundSwitch = m_Sound.get();
+			m_SoundFilepath = m_Sound->GetFilepath();
 
 			InitSound();
 
@@ -162,7 +191,7 @@ namespace Mahakam
 
 	void MiniAudioSource::UninitSound()
 	{
-		ma_sound_stop(&m_MaSound);
+		ma_sound_stop(&m_MaSound); // TODO: Does calling this twice cause any problems?
 		ma_node_detach_output_bus(&m_MaSound, 0);
 		ma_sound_uninit(&m_MaSound);
 	}
