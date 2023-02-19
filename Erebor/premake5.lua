@@ -59,11 +59,6 @@ project "Erebor"
     -- Unity build
     filter "options:unity"
         unity "on"
-        
-    -- Standalone
-    filter "options:standalone"
-        removefiles { "**/Panels/**" }
-        defines { "MH_STANDALONE" }
     
     filter "configurations:Debug"
         defines "MH_DEBUG"

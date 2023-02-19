@@ -126,7 +126,7 @@ LinuxLinks = {
 
 workspace "Mahakam"
     architecture "x64"
-    startproject "Erebor"
+    startproject(_OPTIONS["standalone"] and "Sandbox" or "Erebor")
     toolset(_OPTIONS["toolset"])
     
     configurations {
@@ -151,5 +151,9 @@ group "Dependencies"
 group ""
 
 include "Mahakam"
-include "Erebor"
+
+if (not _OPTIONS["standalone"]) then
+    include "Erebor"
+end
+
 include "Sandbox"

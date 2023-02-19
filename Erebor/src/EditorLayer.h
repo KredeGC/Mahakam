@@ -1,8 +1,6 @@
 #pragma once
 
-#ifndef MH_STANDALONE // MH_RUNTIME?
 #include "Panels/DockSpace.h"
-#endif
 
 #include <Mahakam/Mahakam.h>
 
@@ -11,9 +9,7 @@ namespace Mahakam::Editor
 	class EditorLayer : public Layer
 	{
 	private:
-#ifndef MH_STANDALONE
 		DockSpace m_DockSpace;
-#endif
 
 	public:
 		EditorLayer() : Layer("Editor") {}

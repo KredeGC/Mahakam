@@ -1,7 +1,6 @@
 #include "ebpch.h"
 #include "EditorLayer.h"
 
-#ifndef MH_STANDALONE
 #include "Panels/AssetManagerPanel.h"
 #include "Panels/BuildPanel.h"
 #include "Panels/ConsolePanel.h"
@@ -14,7 +13,6 @@
 #include "Panels/SceneViewPanel.h"
 #include "Panels/StatsPanel.h"
 #include "ConsoleLogSink.h"
-#endif
 
 #include "RenderPasses/BoundingBoxRenderPass.h"
 
@@ -25,13 +23,11 @@ namespace Mahakam::Editor
 {
 	void EditorLayer::OnAttach()
 	{
-#ifndef MH_STANDALONE
 		// Add the console panel to the logger
 		auto sink = CreateRef<ConsoleLogSinkMt>();
 
 		Log::GetEngineLogger()->sinks().push_back(sink);
 		Log::GetGameLogger()->sinks().push_back(sink);
-#endif
 
 		ComponentRegistry::RegisterDefaultComponents();
 
@@ -40,7 +36,6 @@ namespace Mahakam::Editor
 		AssetDatabase::ReloadAssets();
 
 #pragma region Windows
-#ifndef MH_STANDALONE
 		// AssetManagerPanel
 		EditorWindowRegistry::RegisterWindowClass<AssetManagerPanel>("Asset Manager");
 		//EditorWindowRegistry::OpenWindow("Asset Manager");
@@ -88,7 +83,6 @@ namespace Mahakam::Editor
 		// StatsPanel
 		EditorWindowRegistry::RegisterWindowClass<StatsPanel>("Stats");
 		EditorWindowRegistry::OpenWindow("Stats");
-#endif
 #pragma endregion
 
 		// Setup render passes for the default renderer
@@ -125,29 +119,23 @@ namespace Mahakam::Editor
 		SceneManager::SetActiveScene(activeScene);
 
 
-#ifndef MH_STANDALONE
 		// Load the runtime
 		Runtime::LoadRuntime("runtime", "Sandbox");
 
 		// TEMP: Run the game, as we don't have a playmode yet
 		Runtime::RunScene(activeScene);
-#endif
 	}
 
 	void EditorLayer::OnDetach()
 	{
-#ifndef MH_STANDALONE
 		// TEMP: Stop the game, as we don't have a playmode yet
 		Runtime::StopScene(SceneManager::GetActiveScene());
-#endif
 		
 		// IMPORTANT: Unload the scene before unloading the runtime
 		SceneManager::SetActiveScene(nullptr);
 
-#ifndef MH_STANDALONE
 		// Unload the runtime
 		Runtime::UnloadRuntime();
-#endif
 
 		ComponentRegistry::DeregisterDefaultComponents();
 
@@ -158,10 +146,8 @@ namespace Mahakam::Editor
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-#ifndef MH_STANDALONE
 		// Call runtime update
 		Runtime::UpdateScene(SceneManager::GetActiveScene(), dt);
-#endif
 
 		static const bool m_PlayMode = false;
 		if (m_PlayMode)
@@ -176,11 +162,9 @@ namespace Mahakam::Editor
 
 		m_SceneViewPanel.SetFrameBuffer(debugComputeTexture);*/
 
-#ifndef MH_STANDALONE
 		auto& windows = EditorWindowRegistry::GetWindows();
 		for (auto& window : windows)
 			window->OnUpdate(dt);
-#endif
 
 		// Delete any entities marked for deletion
 		SceneManager::GetActiveScene()->DestroyAllEntities<DeleteComponent>();
@@ -190,7 +174,6 @@ namespace Mahakam::Editor
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-#ifndef MH_STANDALONE
 		m_DockSpace.Begin();
 
 		auto& windows = EditorWindowRegistry::GetWindows();
@@ -207,7 +190,6 @@ namespace Mahakam::Editor
 		}
 
 		m_DockSpace.End();
-#endif
 	}
 
 	void EditorLayer::OnEvent(Event& event)
@@ -215,15 +197,11 @@ namespace Mahakam::Editor
 		EventDispatcher dispatcher(event);
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(EditorLayer::OnKeyPressed));
 
-#ifndef MH_STANDALONE
 		dispatcher.DispatchEvent<KeyPressedEvent>(MH_BIND_EVENT(m_DockSpace.OnKeyPressed));
 
 		auto& windows = EditorWindowRegistry::GetWindows();
 		for (auto& window : windows)
 			window->OnEvent(event); // TODO: Fix to be blocking if true
-#else
-		dispatcher.DispatchEvent<WindowResizeEvent>(MH_BIND_EVENT(EditorLayer::OnWindowResized));
-#endif
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& event)
