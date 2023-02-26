@@ -11,34 +11,22 @@ jobs:
     strategy:
       matrix:
         config: [debug, debugoptimized, release]
-        option: [~, --standalone]
+        standalone: [~, --standalone]
         machine:
         - os: ubuntu-latest
           action: gmake2
           toolset: gcc
-          cc: gcc
-          cxx: g++
-          ld: ld
-          ar: ar
         - os: ubuntu-latest
           action: gmake2
           toolset: clang
-          cc: clang
-          cxx: clang++
-          ld: ld.lld
-          ar: llvm-ar
         - os: windows-latest
           action: vs2019
           toolset: msc
-          cc: cl
-          cxx: cl
-          ld: link
-          ar: cl
         exclude:
         - config: debug
-          option: --standalone
+          standalone: --standalone
         - config: debugoptimized
-          option: --standalone
+          standalone: --standalone
     runs-on: ${{ matrix.machine.os }}
     steps:
     - name: Checkout
@@ -62,14 +50,9 @@ jobs:
       if: matrix.machine.os == 'windows-latest' && matrix.machine.toolset == 'msc'
       uses: microsoft/setup-msbuild@v1.1
     - name: Run premake
-      run: premake5 ${{ matrix.machine.action }} --toolset=${{ matrix.machine.toolset }} ${{ matrix.option }} --unity
+      run: premake5 ${{ matrix.machine.action }} --toolset=${{ matrix.machine.toolset }} ${{ matrix.standalone }} --unity
     - name: Build
-      run: premake5 build --config=${{ matrix.config }}
-      env:
-        CC: ${{ matrix.machine.cc }}
-        CXX: ${{ matrix.machine.cxx }}
-        LD: ${{ matrix.machine.ld }}
-        AR: ${{ matrix.machine.ar }}
+      run: premake5 build --config=${{ matrix.config }} ${{ matrix.standalone }}
     - name: Upload build
       if: failure()
       uses: actions/upload-artifact@v3
