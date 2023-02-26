@@ -26,28 +26,26 @@ namespace Mahakam
 	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImporter)
 	{
 		if (s_AssetImporters.find(assetImporter->GetImporterProps().Extension) == s_AssetImporters.end())
-			s_AssetImporters.insert(assetImporter->GetImporterProps().Extension, assetImporter);
+			s_AssetImporters.insert({ assetImporter->GetImporterProps().Extension, assetImporter });
 
-		s_AssetExtensions.insert(extension, assetImporter);
+		s_AssetExtensions.insert({ extension, assetImporter });
 	};
 
 	//void AssetDatabase::DeregisterAssetImporter(const std::string& extension)
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterAssetImporter, void, const std::string& extension)
 	{
 		auto iter = s_AssetExtensions.find(extension);
-		if (iter)
+		if (iter != s_AssetExtensions.end())
 		{
 			long useCount = iter->second.use_count();
 
+			ExtensionType ext = iter->second->GetImporterProps().Extension;
+
 			s_AssetExtensions.erase(iter);
 
-			// 2 references should exist at this point, the extension itself and this iterator
+			// 2 references should exist before the erase, 1 in s_AssetExtensions and 1 in s_AssetImporters
 			if (useCount <= 2)
-			{
-				ExtensionType ext = iter->second->GetImporterProps().Extension;
-
 				s_AssetImporters.erase(ext);
-			}
 		}
 	};
 
@@ -74,10 +72,10 @@ namespace Mahakam
 		return s_AssetImporters;
 	};
 
-	//AssetDatabase::ExtensionMap::key_iterator AssetDatabase::GetAssetImporterExtension(const std::string& extension)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporterExtension, AssetDatabase::ExtensionMap::key_iterator, const std::string& extension)
+	//AssetDatabase::ExtensionIter AssetDatabase::GetAssetImporterExtension(const std::string& extension)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporterExtension, AssetDatabase::ExtensionIter, const std::string& extension)
 	{
-		return s_AssetExtensions.find(extension);
+		return s_AssetExtensions.equal_range(extension);
 	};
 
 	//void AssetDatabase::RegisterDefaultAssetImporters()
@@ -124,7 +122,8 @@ namespace Mahakam
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterDefaultAssetImporters, void)
 	{
 		// Animation
-		AssetDatabase::DeregisterAssetImporter(".anim");
+		AssetDatabase::DeregisterAssetImporter(".gltf");
+		AssetDatabase::DeregisterAssetImporter(".glb");
 
 		// Material
 		AssetDatabase::DeregisterAssetImporter(".material");
@@ -368,7 +367,7 @@ namespace Mahakam
 		{
 			control->ID = id;
 
-			s_LoadedAssets.insert(id, control);
+			s_LoadedAssets.insert({ id, control });
 
 			return control;
 		}
@@ -391,7 +390,7 @@ namespace Mahakam
 			ControlBlock* control = LoadAndIncrementAsset(id);
 
 			if (control)
-				s_LoadedAssets.insert(id, control);
+				s_LoadedAssets.insert({ id, control });
 
 			return control;
 		}
@@ -402,7 +401,10 @@ namespace Mahakam
 	{
 		MH_CORE_ASSERT(control->UseCount == 0, "Attempting to unload multiple instances of Asset");
 
-		s_LoadedAssets.erase(control->ID);
+		if (s_LoadedAssets.find(control->ID) != s_LoadedAssets.end())
+			s_LoadedAssets.erase(control->ID);
+		else
+			MH_CORE_WARN("Attempting to unload an already unloaded asset ({0})", control->ID);
 	};
 
 	AssetDatabase::ControlBlock* AssetDatabase::LoadAndIncrementAsset(AssetID id)

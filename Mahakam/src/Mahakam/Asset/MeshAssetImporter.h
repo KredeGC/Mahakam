@@ -16,7 +16,7 @@ namespace Mahakam
 #ifndef MH_STANDALONE
 		MeshProps m_MeshProps;
 
-		Ref<Mesh> m_PreviewMesh;
+		Asset<Mesh> m_PreviewMesh;
 #endif
 
 	public:

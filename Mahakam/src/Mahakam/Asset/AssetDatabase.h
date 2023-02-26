@@ -4,8 +4,6 @@
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Types.h"
 
-#include <ktl/containers/unordered_multimap.h>
-
 #include <filesystem>
 #include <string>
 
@@ -59,7 +57,8 @@ namespace Mahakam
 		// ImporterMap is used by the runtime to equate some key (string for editor, ID for standalone) to an importer
 
 		using AssetMap = UnorderedMap<AssetID, std::filesystem::path>;
-		using ExtensionMap = ktl::unordered_multimap<std::string, Ref<AssetImporter>>;
+		using ExtensionMap = std::unordered_multimap<std::string, Ref<AssetImporter>>;
+		using ExtensionIter = std::pair<ExtensionMap::const_iterator, ExtensionMap::const_iterator>;
 
 		using ImporterMap = UnorderedMap<ExtensionType, Ref<AssetImporter>>;
 		using LoadedMap = UnorderedMap<AssetID, ControlBlock*>;
@@ -78,7 +77,7 @@ namespace Mahakam
 		MH_DECLARE_FUNC(DeregisterAllAssetImporters, void); // Removes all currently assigned asset importers
 		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const ExtensionType& extension); // Returns a specific importer, given an extension
 		MH_DECLARE_FUNC(GetAssetImporters, const ImporterMap&); // Returns a map of extensions and importers
-		MH_DECLARE_FUNC(GetAssetImporterExtension, ExtensionMap::key_iterator, const std::string& extension); // Returns an iterator to an importer, given an extension
+		MH_DECLARE_FUNC(GetAssetImporterExtension, ExtensionIter, const std::string& extension); // Returns an iterator to an importer, given an extension
 		MH_DECLARE_FUNC(RegisterDefaultAssetImporters, void); // Register default asset importers
 		MH_DECLARE_FUNC(DeregisterDefaultAssetImporters, void); // Deregister default asset importers
 
