@@ -57,14 +57,14 @@ namespace Mahakam
 		template<typename T, typename ...Args>
 		static void Construct(T* p, Args&&... args)
 		{
-			BaseAllocator<T> alloc(std::move(static_cast<BaseAllocator<T>>(s_Alloc)));
+			BaseAllocator<T> alloc(static_cast<BaseAllocator<T>>(s_Alloc));
 			BaseTraits<T>::construct(alloc, p, std::forward<Args>(args)...);
 		}
 
 		template<typename T>
 		static void Deconstruct(T* p)
 		{
-			BaseAllocator<T> alloc(std::move(static_cast<BaseAllocator<T>>(s_Alloc)));
+			BaseAllocator<T> alloc(static_cast<BaseAllocator<T>>(s_Alloc));
 			BaseTraits<T>::destroy(alloc, p);
 		}
 
@@ -80,7 +80,7 @@ namespace Mahakam
 		static void Delete(T* p)
 		{
 			Deconstruct(p);
-			Deallocate<T>(p, 1);
+			Deallocate(p, 1);
 		}
 
 	private:
