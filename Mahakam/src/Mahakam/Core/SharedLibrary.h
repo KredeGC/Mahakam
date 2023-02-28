@@ -13,7 +13,9 @@
 // Function declarations which should be reachable in DLLs
 #ifdef MH_ENABLE_DYNAMIC_LINKING
 #define MH_DECLARE_FUNC_LINE2(line, func, returnType, ...) static returnType (*func)(__VA_ARGS__); \
-	inline static uint8_t generated_##func_##line = (::Mahakam::SharedLibrary::AddExportFunction((void**)&func), 0);
+	struct generated_struct_##func##_##line { generated_struct_##func##_##line() { ::Mahakam::SharedLibrary::AddExportFunction(reinterpret_cast<void**>(&func)); } }; \
+	inline static generated_struct_##func##_##line generated_var_##func##_##line;
+
 #define MH_DECLARE_FUNC_LINE(line, func, returnType, ...) MH_DECLARE_FUNC_LINE2(line, func, returnType, __VA_ARGS__)
 
 #define MH_DECLARE_FUNC(func, returnType, ...) MH_DECLARE_FUNC_LINE(__LINE__, func, returnType, __VA_ARGS__)
