@@ -34,7 +34,7 @@ namespace Mahakam
 		else
 			data = stbi_load(filepath, w, h, channels, desiredChannels);
 
-		MH_CORE_ASSERT(data, "Failed to load image!");
+		MH_ASSERT(data, "Failed to load image!");
 
 		return data;
 	}
@@ -56,7 +56,7 @@ namespace Mahakam
 			MH_GL_CALL(glTexParameteri(targetID, axis, GL_CLAMP_TO_BORDER));
 			break;
 		default:
-			MH_CORE_BREAK("Unsupported TextureWrapMode!");
+			MH_BREAK("Unsupported TextureWrapMode!");
 		}
 	}
 
@@ -191,7 +191,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_ASSERT(!mipmaps || !m_Compressed, "Compressed mipmaps are currently not supported!");
+		MH_ASSERT(!mipmaps || !m_Compressed, "Compressed mipmaps are currently not supported!");
 
 		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(m_Props.Width, m_Props.Height))));
 		uint32_t maxMipLevels = mipmaps ? mipLevels : 1;
@@ -363,14 +363,14 @@ namespace Mahakam
 
 	void OpenGLTextureCube::Resize(uint32_t width, uint32_t height)
 	{
-		MH_CORE_BREAK("UNSUPPORTED");
+		MH_BREAK("UNSUPPORTED");
 	}
 
 	void OpenGLTextureCube::SetData(void* data, uint32_t size, bool mipmaps)
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_ASSERT(!mipmaps || !m_Compressed, "Compressed mipmaps are currently not supported!");
+		MH_ASSERT(!mipmaps || !m_Compressed, "Compressed mipmaps are currently not supported!");
 
 		MH_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID));
 

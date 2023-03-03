@@ -13,7 +13,7 @@ namespace Mahakam
 		switch (type)
 		{
 		case Mahakam::ShaderDataType::None:
-			MH_CORE_BREAK("None is not a supported shader type!");
+			MH_BREAK("None is not a supported shader type!");
 		case Mahakam::ShaderDataType::Float:
 			return GL_FLOAT;
 		case Mahakam::ShaderDataType::Float2:
@@ -37,7 +37,7 @@ namespace Mahakam
 		case Mahakam::ShaderDataType::Bool:
 			return GL_BOOL;
 		default:
-			MH_CORE_BREAK("Unknown shader data type!");
+			MH_BREAK("Unknown shader data type!");
 			return 0;
 		}
 	}
@@ -102,21 +102,21 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_BREAK("Not currently supported");
+		MH_BREAK("Not currently supported");
 	}
 
 	void OpenGLMesh::RecalculateTangents()
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_BREAK("Not currently supported");
+		MH_BREAK("Not currently supported");
 	}
 
 	void OpenGLMesh::SetVertices(int slot, const void* data)
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_BREAK("Changing an active mesh not currently supported!");
+		MH_BREAK("Changing an active mesh not currently supported!");
 	}
 
 	void OpenGLMesh::Init()

@@ -17,11 +17,11 @@ namespace Mahakam
 
 		fp = popen("which zenity", "r");
 		if (fp == NULL)
-			MH_CORE_ERROR("Null file pointer in FileUtility::OpenFile().\n");
+			MH_ERROR("Null file pointer in FileUtility::OpenFile().\n");
 
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
 		{
-			MH_CORE_WARN("Zenity not found in path!");
+			MH_WARN("Zenity not found in path!");
 			pclose(fp);
 			return false;
 		}
@@ -44,7 +44,7 @@ namespace Mahakam
 			std::string(file_extension) + std::string("\" --title=\"Open File\"");
 		fp = popen(cmdline.c_str(), "r");
 		if (fp == NULL)
-			MH_CORE_ERROR("Null file pointer in FileUtility::OpenFile().\n");
+			MH_ERROR("Null file pointer in FileUtility::OpenFile().\n");
 
 		//Check for File dialog cancellation.
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)
@@ -77,7 +77,7 @@ namespace Mahakam
 			+ ("\" --title=\"Save As File\" --save --confirm-overwrite");
 		fp = popen(cmdline.c_str(), "r");
 		if (fp == NULL)
-			MH_CORE_ERROR("Null file pointer in FileUtility::SaveFile().\n");
+			MH_ERROR("Null file pointer in FileUtility::SaveFile().\n");
 
 		//Check for File dialog cancellation.
 		if (fgets(path, LINUX_PATH_MAX, fp) == NULL)

@@ -21,19 +21,32 @@ namespace Mahakam
 #endif
 
 		if (!m_Handle)
-			MH_CORE_WARN("Failed to open shared library {0}", m_Filepath);
+			MH_WARN("Failed to open shared library {0}", m_Filepath);
 
 		if (!s_Initialized)
 			ExportFuncPointers();
+        
+        auto contextPtr = GetFunction<void, ImGuiContext*, spdlog::logger*, FuncPtr*>("LoadContext");
+
+		ImGuiContext* context = ImGui::GetCurrentContext();
+        std::shared_ptr<spdlog::logger> logger = Log::GetLogger();
+
+		if (contextPtr)
+			contextPtr(context, logger.get(), s_FuncPointers);
 	}
 
 	SharedLibrary::~SharedLibrary()
 	{
 		MH_PROFILE_FUNCTION();
+        
+        auto contextPtr = GetFunction<void>("UnloadContext");
+
+		if (contextPtr)
+			contextPtr();
 
 #if defined(MH_PLATFORM_WINDOWS)
 		if (!FreeLibrary(m_Handle))
-			MH_CORE_WARN("Failed to close shared library {0}", m_Filepath);
+			MH_WARN("Failed to close shared library {0}", m_Filepath);
 #elif defined(MH_PLATFORM_LINUX)
 		dlclose(m_Handle);
 #endif
@@ -43,12 +56,10 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		auto loadPtr = GetFunction<void, ImGuiContext*, FuncPtr*>("Load");
-
-		ImGuiContext* context = ImGui::GetCurrentContext();
+		auto loadPtr = GetFunction<void>("Load");
 
 		if (loadPtr)
-			loadPtr(context, s_FuncPointers);
+			loadPtr();
 	}
 
 	void SharedLibrary::Unload()
@@ -70,7 +81,7 @@ namespace Mahakam
 	{
 		s_Initialized = true;
 
-		MH_CORE_ASSERT(s_FuncPointerCounter == NUM_FUNC_PTRS, "Inconsisent amount of func pointers exported!");
+		MH_ASSERT(s_FuncPointerCounter == NUM_FUNC_PTRS, "Inconsisent amount of func pointers exported!");
 	}
 
 	void SharedLibrary::ImportFuncPointers(FuncPtr ptrs[NUM_FUNC_PTRS])

@@ -45,7 +45,7 @@ namespace Mahakam
 		auto passIter = m_ShaderPasses.find(shaderPass);
 		if (passIter == m_ShaderPasses.end())
 		{
-			MH_CORE_WARN("Attempted to use unknown shader pass: {0} on {1}", shaderPass, m_Name);
+			MH_WARN("Attempted to use unknown shader pass: {0} on {1}", shaderPass, m_Name);
 		}
 	}
 

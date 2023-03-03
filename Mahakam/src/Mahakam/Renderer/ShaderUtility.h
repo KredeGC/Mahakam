@@ -70,7 +70,7 @@ namespace Mahakam
 			}
 			else
 			{
-				MH_CORE_WARN("Could not open file {0}", filepath);
+				MH_WARN("Could not open file {0}", filepath);
 			}
 
 			return result;

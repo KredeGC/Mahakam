@@ -17,7 +17,7 @@ namespace Mahakam
 			return CreateScope<GLFWindow>(props);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};

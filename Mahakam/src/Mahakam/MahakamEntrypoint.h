@@ -1,17 +1,20 @@
 #pragma once
 
 #include <Mahakam/Mahakam.h>
-#include <Mahakam/Core/EntryPoint.h>
 
-#if !defined(MH_STANDALONE_TITLE)
+#ifndef MH_STANDALONE_TITLE
 #define MH_STANDALONE_TITLE "" // Just so VS stops nagging me about this
 #error MH_STANDALONE_TITLE not defined
-#endif
+#endif // MH_STANDALONE_TITLE
 
-#if !defined(MH_STANDALONE_ICON)
+#ifndef MH_STANDALONE_ICON
 #define MH_STANDALONE_ICON ""
 #error MH_STANDALONE_ICON not defined
-#endif
+#endif // MH_STANDALONE_ICON
+
+#ifdef MH_STANDALONE
+
+#include <Mahakam/Core/EntryPoint.h>
 
 void Load(ImGuiContext* context, void*** funcPtrs);
 void Run(Mahakam::Scene* scene);
@@ -141,7 +144,7 @@ namespace Mahakam
 
 	public:
 		StandaloneApplication()
-			: Application({ MH_STANDALONE_TITLE, MH_STANDALONE_ICON })
+			: Application(MH_STANDALONE_TITLE, { MH_STANDALONE_TITLE, MH_STANDALONE_ICON })
 		{
 			// Create standalone layer
 			m_Layer = new StandaloneLayer();
@@ -155,3 +158,21 @@ extern Mahakam::Application* Mahakam::CreateApplication()
 {
 	return new Mahakam::StandaloneApplication();
 }
+
+#else // MH_STANDALONE
+
+MH_EXTERN_EXPORTED void LoadContext(ImGuiContext* context, spdlog::logger* logger, void*** funcPtrs)
+{
+    ImGui::SetCurrentContext(context);
+    Mahakam::Log::Init(MH_STANDALONE_TITLE);
+    Mahakam::Log::ImportSinks(logger->sinks());
+	Mahakam::SharedLibrary::ImportFuncPointers(funcPtrs);
+}
+
+MH_EXTERN_EXPORTED void UnloadContext()
+{
+    ImGui::SetCurrentContext(nullptr);
+    Mahakam::Log::Shutdown();
+}
+
+#endif // MH_STANDALONE

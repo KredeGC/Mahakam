@@ -30,7 +30,7 @@ namespace Mahakam
 			return GL_DST_ALPHA;
 		}
 
-		MH_CORE_BREAK("BlendMode not supported!");
+		MH_BREAK("BlendMode not supported!");
 
 		return 0;
 	}
@@ -57,7 +57,7 @@ namespace Mahakam
 			return GL_ALWAYS;
 		}
 
-		MH_CORE_BREAK("DepthMode not supported!");
+		MH_BREAK("DepthMode not supported!");
 
 		return 0;
 	}
@@ -66,9 +66,9 @@ namespace Mahakam
 	static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
 		if (type == GL_DEBUG_TYPE_PERFORMANCE)
-			MH_CORE_WARN("[OpenGL Performance] {0}", message);
+			MH_WARN("[OpenGL Performance] {0}", message);
 		else if (type != GL_DEBUG_TYPE_OTHER)
-			MH_CORE_ERROR("[OpenGL Error] {0}", message);
+			MH_ERROR("[OpenGL Error] {0}", message);
 	}
 #endif
 

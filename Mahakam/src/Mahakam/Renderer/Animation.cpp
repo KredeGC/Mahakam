@@ -29,13 +29,13 @@ namespace Mahakam
 			success = loader.LoadBinaryFromFile(&model, &err, &warn, filepath.string());
 
 		if (!warn.empty())
-			MH_CORE_WARN("[GLTF] Warning: {0}", warn);
+			MH_WARN("[GLTF] Warning: {0}", warn);
 
 		if (!err.empty())
-			MH_CORE_ERROR("[GLTF] Error: {0}", err);
+			MH_ERROR("[GLTF] Error: {0}", err);
 
 		if (!success) {
-			MH_CORE_ERROR("[GLTF] Failed to parse glTF animation at {0}", filepath.string());
+			MH_ERROR("[GLTF] Failed to parse glTF animation at {0}", filepath.string());
 			return;
 		}
 
@@ -73,7 +73,7 @@ namespace Mahakam
 			const auto& outputBufferView = model.bufferViews[outputAccessor.bufferView];
 			const auto& outputBuffer = model.buffers[outputBufferView.buffer];
 
-			//MH_CORE_ASSERT(outputAccessor.count == inputAccessor.count, "The number of keyframes and sampler values must match");
+			//MH_ASSERT(outputAccessor.count == inputAccessor.count, "The number of keyframes and sampler values must match");
 
 			if (channel.target_path == "translation")
 			{
@@ -98,7 +98,7 @@ namespace Mahakam
 			}
 			else if (channel.target_path == "weights")
 			{
-				MH_CORE_BREAK("Weight animations are not yet supported");
+				MH_BREAK("Weight animations are not yet supported");
 			}
 		}
 

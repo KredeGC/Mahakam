@@ -454,7 +454,7 @@ namespace Mahakam
 				else if (defaultString == "Bump")
 					return GL::GetTexture2DBump();
 				else
-					MH_CORE_WARN("Could not find default Texture2D of type: {0}", defaultString);
+					MH_WARN("Could not find default Texture2D of type: {0}", defaultString);
 
 				break;
 			case ShaderDataType::SamplerCube:
@@ -465,7 +465,7 @@ namespace Mahakam
 				else if (defaultString == "Black")
 					return GL::GetTextureCubeWhite();
 				else
-					MH_CORE_WARN("Could not find default TextureCube of type: {0}", defaultString);
+					MH_WARN("Could not find default TextureCube of type: {0}", defaultString);
 
 				break;
 			default:
@@ -519,7 +519,7 @@ namespace Mahakam
 					else if (defaultString == "Bump")
 						m_DefaultTextures[propertyName] = GL::GetTexture2DBump();
 					else
-						MH_CORE_WARN("Could not find default Texture2D of type: {0}", defaultString);
+						MH_WARN("Could not find default Texture2D of type: {0}", defaultString);
 
 					m_Material->SetTexture(propertyName, 0, m_DefaultTextures[propertyName]);
 
@@ -532,7 +532,7 @@ namespace Mahakam
 					else if (defaultString == "Black")
 						m_DefaultTextures[propertyName] = GL::GetTextureCubeWhite();
 					else
-						MH_CORE_WARN("Could not find default TextureCube of type: {0}", defaultString);
+						MH_WARN("Could not find default TextureCube of type: {0}", defaultString);
 
 					m_Material->SetTexture(propertyName, 0, m_DefaultTextures[propertyName]);
 

@@ -246,7 +246,7 @@ namespace Mahakam
 	{
 		if (!std::filesystem::exists(importPath) || std::filesystem::is_directory(importPath))
 		{
-			MH_CORE_WARN("AssetDatabase::ReadAssetInfo: The path '{0}' doesn't exist", importPath.string());
+			MH_WARN("AssetDatabase::ReadAssetInfo: The path '{0}' doesn't exist", importPath.string());
 			return {};
 		}
 
@@ -292,7 +292,7 @@ namespace Mahakam
 		}
 		catch (std::runtime_error const& e)
 		{
-			MH_CORE_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.what());
+			MH_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.what());
 		}
 
 		return {};
@@ -376,7 +376,7 @@ namespace Mahakam
 	//AssetDatabase::ControlBlock* AssetDatabase::IncrementAsset(AssetDatabase::AssetID id)
 	MH_DEFINE_FUNC(AssetDatabase::IncrementAsset, AssetDatabase::ControlBlock*, AssetDatabase::AssetID id)
 	{
-		MH_CORE_ASSERT(id, "Attempting to load an Asset with id 0");
+		MH_ASSERT(id, "Attempting to load an Asset with id 0");
 
 		auto iter = s_LoadedAssets.find(id);
 		if (iter != s_LoadedAssets.end())
@@ -399,17 +399,17 @@ namespace Mahakam
 	//void AssetDatabase::DecrementAsset(ControlBlock* control)
 	MH_DEFINE_FUNC(AssetDatabase::UnloadAsset, void, ControlBlock* control)
 	{
-		MH_CORE_ASSERT(control->UseCount == 0, "Attempting to unload multiple instances of Asset");
+		MH_ASSERT(control->UseCount == 0, "Attempting to unload multiple instances of Asset");
 
 		if (s_LoadedAssets.find(control->ID) != s_LoadedAssets.end())
 			s_LoadedAssets.erase(control->ID);
 		else
-			MH_CORE_WARN("Attempting to unload an already unloaded asset ({0})", control->ID);
+			MH_WARN("Attempting to unload an already unloaded asset ({0})", control->ID);
 	};
 
 	AssetDatabase::ControlBlock* AssetDatabase::LoadAndIncrementAsset(AssetID id)
 	{
-		MH_CORE_ASSERT(id, "Asset ID to be loaded cannot be 0");
+		MH_ASSERT(id, "Asset ID to be loaded cannot be 0");
 
 		// Find the import path from the ID
 		std::filesystem::path importPath;
@@ -419,7 +419,7 @@ namespace Mahakam
 
 		if (!std::filesystem::exists(importPath))
 		{
-			MH_CORE_WARN("AssetDatabase::LoadAssetFromID: The path '{0}' doesn't exist", importPath.string());
+			MH_WARN("AssetDatabase::LoadAssetFromID: The path '{0}' doesn't exist", importPath.string());
 			return nullptr;
 		}
 
@@ -459,7 +459,7 @@ namespace Mahakam
 		}
 		catch (std::runtime_error const& e)
 		{
-			MH_CORE_WARN("AssetDatabase encountered exception trying to import yaml file {0}: {1}", importPath.string(), e.what());
+			MH_WARN("AssetDatabase encountered exception trying to import yaml file {0}: {1}", importPath.string(), e.what());
 		}
 
 		return nullptr;
@@ -469,7 +469,7 @@ namespace Mahakam
 	{
 		if (!FileUtility::Exists(filepath))
 		{
-			MH_CORE_WARN("Could not import assets. Does the import folder exist?");
+			MH_WARN("Could not import assets. Does the import folder exist?");
 			return;
 		}
 
@@ -494,7 +494,7 @@ namespace Mahakam
 
 					auto iter = s_AssetPaths.find(id);
 					if (iter != s_AssetPaths.end())
-						MH_CORE_WARN("Attempting to load multiple Assets with ID {0} at {1} and {2}", id, iter->second.string(), filepathUnix);
+						MH_WARN("Attempting to load multiple Assets with ID {0} at {1} and {2}", id, iter->second.string(), filepathUnix);
 
 					s_AssetPaths[id] = filepathUnix;
 				}

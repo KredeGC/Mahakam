@@ -24,7 +24,7 @@ namespace Mahakam
 		static Application* s_Instance;
 
 	public:
-		Application(const WindowProps& props = WindowProps());
+		Application(const std::string& logName = "Mahakam", const WindowProps& props = WindowProps());
 		virtual ~Application();
 
 		void Run();

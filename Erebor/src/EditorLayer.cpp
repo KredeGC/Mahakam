@@ -26,8 +26,7 @@ namespace Mahakam::Editor
 		// Add the console panel to the logger
 		auto sink = CreateRef<ConsoleLogSinkMt>();
 
-		Log::GetEngineLogger()->sinks().push_back(sink);
-		Log::GetGameLogger()->sinks().push_back(sink);
+		Log::GetLogger()->sinks().push_back(sink);
 
 		ComponentRegistry::RegisterDefaultComponents();
 

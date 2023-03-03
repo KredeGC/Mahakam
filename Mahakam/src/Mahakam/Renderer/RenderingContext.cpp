@@ -21,7 +21,7 @@ namespace Mahakam
 			return CreateScope<OpenGLContext>(window, proc);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	}

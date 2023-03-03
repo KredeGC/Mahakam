@@ -22,7 +22,7 @@ namespace Mahakam
 			return CreateRef<OpenGLUniformBuffer>(size);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};
@@ -39,7 +39,7 @@ namespace Mahakam
 			return CreateRef<OpenGLStorageBuffer>(size);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};

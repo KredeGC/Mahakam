@@ -77,7 +77,7 @@ namespace Mahakam
 	template<typename T, typename... Args>
 	void Entity::AddEmptyComponent(Args&&... args)
 	{
-		MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
+		MH_ASSERT(!HasComponent<T>(), "Entity already has component!");
 
 		m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
 	}
@@ -85,7 +85,7 @@ namespace Mahakam
 	template<typename T, typename... Args>
 	T& Entity::AddComponent(Args&&... args)
 	{
-		MH_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
+		MH_ASSERT(!HasComponent<T>(), "Entity already has component!");
 
 		T& component = m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
 
@@ -103,7 +103,7 @@ namespace Mahakam
 	template<typename T>
 	T& Entity::GetComponent() const
 	{
-		MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
+		MH_ASSERT(HasComponent<T>(), "Entity has no such component!");
 
 		return m_Scene->m_Registry.template get<T>(m_Handle);
 	}
@@ -111,7 +111,7 @@ namespace Mahakam
 	template<typename T>
 	bool Entity::RemoveComponent()
 	{
-		MH_CORE_ASSERT(HasComponent<T>(), "Entity has no such component!");
+		MH_ASSERT(HasComponent<T>(), "Entity has no such component!");
 
 		return m_Scene->m_Registry.template remove<T>(m_Handle);
 	}

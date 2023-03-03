@@ -142,7 +142,7 @@ namespace Mahakam
 		else if (type == "fragment" || type == "pixel")
 			return ShaderStage::Fragment;
 
-		MH_CORE_WARN("Shader stage {0} not supported!", type);
+		MH_WARN("Shader stage {0} not supported!", type);
 		return ShaderStage::None;
 	}
 
@@ -158,10 +158,10 @@ namespace Mahakam
 		while (pos != std::string::npos)
 		{
 			size_t eol = source.find_first_of("\r\n", pos);
-			MH_CORE_ASSERT(eol != std::string::npos, "Syntax error!");
+			MH_ASSERT(eol != std::string::npos, "Syntax error!");
 			size_t begin = pos + typeTokenLength + 1;
 			std::string type = source.substr(begin, eol - begin);
-			MH_CORE_ASSERT(ShaderTypeFromString(type) != ShaderStage::None, "Invalid shader type!");
+			MH_ASSERT(ShaderTypeFromString(type) != ShaderStage::None, "Invalid shader type!");
 
 			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
 			pos = source.find(typeToken, nextLinePos);
@@ -207,7 +207,7 @@ namespace Mahakam
 
 			if (!root.valid())
 			{
-				MH_CORE_WARN("Loaded empty shader file {0}!", filepath);
+				MH_WARN("Loaded empty shader file {0}!", filepath);
 				return false;
 			}
 
@@ -215,7 +215,7 @@ namespace Mahakam
 			{
 				ryml::NodeRef propertiesNode = root["Properties"];
 
-				MH_CORE_INFO("Loading properties for shader: {0}", filepath.string());
+				MH_INFO("Loading properties for shader: {0}", filepath.string());
 				for (auto propertyNode : propertiesNode)
 				{
 					ryml::csubstr key = propertyNode.key();
@@ -252,7 +252,7 @@ namespace Mahakam
 
 					properties[propertyName] = { propertyType, ShaderDataType::None, min, max, "Value: " + defaultValue, 1, 0 };
 
-					MH_CORE_INFO("  {0}: {1}", propertyName, defaultValue);
+					MH_INFO("  {0}: {1}", propertyName, defaultValue);
 				}
 			}
 
@@ -306,7 +306,7 @@ namespace Mahakam
 		}
 		catch (std::runtime_error const& e)
 		{
-			MH_CORE_WARN("Shader encountered exception trying to parse YAML file {0}: {1}", filepath, e.what());
+			MH_WARN("Shader encountered exception trying to parse YAML file {0}: {1}", filepath, e.what());
 		}
 
 		return false;
@@ -350,8 +350,8 @@ namespace Mahakam
 
 			if (!shader->parse(&DefaultTBuiltInResource, 100, false, messages))
 			{
-				MH_CORE_WARN(shader->getInfoLog());
-				MH_CORE_WARN(shader->getInfoDebugLog());
+				MH_WARN(shader->getInfoLog());
+				MH_WARN(shader->getInfoDebugLog());
 
 				success = false;
 			}
@@ -364,8 +364,8 @@ namespace Mahakam
 		// Link program with shaders
 		if (!program->link(messages))
 		{
-			MH_CORE_WARN(program->getInfoLog());
-			MH_CORE_WARN(program->getInfoDebugLog());
+			MH_WARN(program->getInfoLog());
+			MH_WARN(program->getInfoDebugLog());
 
 			success = false;
 		}
@@ -407,7 +407,7 @@ namespace Mahakam
 		//		// Compile to GLSL, ready to give to GL driver.
 		//		std::string source = glsl.compile();
 
-		//		MH_CORE_TRACE(source);
+		//		MH_TRACE(source);
 		//	}
 
 		//	// HLSL
@@ -421,7 +421,7 @@ namespace Mahakam
 		//		// Compile to HLSL, ready to give to DX driver.
 		//		std::string source = hlsl.compile();
 
-		//		MH_CORE_TRACE(source);
+		//		MH_TRACE(source);
 		//	}
 		//}
 
@@ -439,7 +439,7 @@ namespace Mahakam
 			return CreateAsset<OpenGLShader>(filepath);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};
@@ -453,7 +453,7 @@ namespace Mahakam
 		case 4:
 			return ShaderStage::Fragment;
 		default:
-			MH_CORE_BREAK("Unknown shader data type!");
+			MH_BREAK("Unknown shader data type!");
 			return ShaderStage::None;
 		}
 	}
@@ -467,7 +467,7 @@ namespace Mahakam
 		case ShaderStage::Fragment:
 			return 4;
 		default:
-			MH_CORE_BREAK("Unknown shader data type!");
+			MH_BREAK("Unknown shader data type!");
 			return 0;
 		}
 	}
@@ -499,7 +499,7 @@ namespace Mahakam
 		case ShaderDataType::Bool:
 			return 1;
 		default:
-			MH_CORE_BREAK("Unknown shader data type!");
+			MH_BREAK("Unknown shader data type!");
 			return 0;
 		}
 	}
@@ -531,7 +531,7 @@ namespace Mahakam
 		case ShaderDataType::Bool:
 			return 1;
 		default:
-			MH_CORE_BREAK("Unknown shader data type!");
+			MH_BREAK("Unknown shader data type!");
 			return 0;
 		}
 	}

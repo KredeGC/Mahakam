@@ -22,7 +22,7 @@ namespace Mahakam
 			return CreateAsset<OpenGLRenderBuffer>(width, height, format);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};

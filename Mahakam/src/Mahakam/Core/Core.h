@@ -23,18 +23,14 @@
 #define MH_BREAKPOINT()
 #endif
 
-#define MH_CORE_BREAK(...) { MH_CORE_ERROR("Assertion failed: {0}", __VA_ARGS__); MH_BREAKPOINT(); }
 #define MH_BREAK(...) { MH_ERROR("Assertion failed: {0}", __VA_ARGS__); MH_BREAKPOINT(); }
 
-#define MH_CORE_ASSERT(x, ...) { if(!(x)) { MH_CORE_BREAK(__VA_ARGS__) } }
 #define MH_ASSERT(x, ...) { if(!(x)) { MH_BREAK(__VA_ARGS__) } }
 #else // MH_ENABLE_ASSERT
 #define MH_BREAKPOINT()
 
-#define MH_CORE_BREAK(...)
 #define MH_BREAK(...)
 
-#define MH_CORE_ASSERT(x, ...)
 #define MH_ASSERT(x, ...)
 #endif // MH_ENABLE_ASSERT
 

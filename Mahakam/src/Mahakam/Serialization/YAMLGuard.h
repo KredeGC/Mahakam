@@ -23,7 +23,7 @@ namespace Mahakam
 					loc.name, loc.line, loc.col, loc.offset, ryml::csubstr(msg, len)));
 #else
 				// Infinite loops you say :)?
-				MH_CORE_ERROR("[rapidyaml Error] {0}", msg);
+				MH_ERROR("[rapidyaml Error] {0}", msg);
 #endif
 			}
 

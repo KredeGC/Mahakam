@@ -34,7 +34,4 @@
 
 #define MH_EXTERN_EXPORTED extern "C" MH_EXPORTED
 
-#define MH_RUNTIME_LOAD(context, funcPtrs) ImGui::SetCurrentContext(context); \
-	SharedLibrary::ImportFuncPointers(funcPtrs);
-
 #endif // MH_ENABLE_DYNAMIC_LINKING

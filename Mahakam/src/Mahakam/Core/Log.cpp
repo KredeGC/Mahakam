@@ -5,35 +5,30 @@
 
 namespace Mahakam
 {
-	Ref<spdlog::logger> Log::s_EngineLogger;
-	Ref<spdlog::logger> Log::s_GameLogger;
+	std::shared_ptr<spdlog::logger> Log::s_Logger;
 
-	void Log::Init()
+	void Log::Init(const char* name)
 	{
-		spdlog::set_pattern("%^[%T] %n: %v%$");
+        auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        consoleSink->set_pattern("%T %^%n %16!s::%-16!! :%$ %v");
 
-		s_EngineLogger = spdlog::stdout_color_mt("Mahakam");
-		s_EngineLogger->set_level(spdlog::level::trace);
-
-		s_GameLogger = spdlog::stdout_color_mt("Game");
-		s_GameLogger->set_level(spdlog::level::trace);
+		s_Logger = std::make_shared<spdlog::logger>(name, consoleSink);
+		s_Logger->set_level(spdlog::level::trace);
 	}
 
 	void Log::Shutdown()
 	{
-		s_EngineLogger = nullptr;
-		s_GameLogger = nullptr;
+		s_Logger = nullptr;
+	}
+    
+    void Log::ImportSinks(const std::vector<spdlog::sink_ptr>& sinks)
+	{
+        auto& logSinks = s_Logger->sinks();
+		logSinks = sinks;
 	}
 
-	//Ref<spdlog::logger>& Log::GetEngineLogger()
-	MH_DEFINE_FUNC(Log::GetEngineLogger, Ref<spdlog::logger>&)
+	std::shared_ptr<spdlog::logger> Log::GetLogger()
 	{
-		return s_EngineLogger;
-	};
-
-	//Ref<spdlog::logger>& Log::GetGameLogger()
-	MH_DEFINE_FUNC(Log::GetGameLogger, Ref<spdlog::logger>&)
-	{
-		return s_GameLogger;
-	};
+		return s_Logger;
+	}
 }

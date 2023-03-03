@@ -79,7 +79,7 @@ namespace Mahakam
 
 		if (componentSize * componentCount > sizeof(T))
 		{
-			MH_CORE_BREAK("[GLTF] Downscaling attributes is not currently supported");
+			MH_BREAK("[GLTF] Downscaling attributes is not currently supported");
 		}
 		else if (componentSize * componentCount < sizeof(T)) // Ex: the file uses 8 bits, but the buffer we allocate uses 32 bits
 		{
@@ -178,24 +178,24 @@ namespace Mahakam
 			success = loader.LoadBinaryFromFile(&model, &err, &warn, filepath.string());
 
 		if (!warn.empty())
-			MH_CORE_WARN("[GLTF] Warning: {0}", warn);
+			MH_WARN("[GLTF] Warning: {0}", warn);
 
 		if (!err.empty())
-			MH_CORE_ERROR("[GLTF] Error: {0}", err);
+			MH_ERROR("[GLTF] Error: {0}", err);
 
 		if (!success) {
-			MH_CORE_ERROR("[GLTF] Failed to parse glTF model at {0}", filepath.string());
+			MH_ERROR("[GLTF] Failed to parse glTF model at {0}", filepath.string());
 			return nullptr;
 		}
 
-		MH_CORE_ASSERT(!model.scenes.empty(), "[GLTF] Model scenes are empty!");
+		MH_ASSERT(!model.scenes.empty(), "[GLTF] Model scenes are empty!");
 
 		auto& scene = model.scenes[model.defaultScene];
 
 		if (model.scenes.size() > 1)
-			MH_CORE_WARN("[GLTF] Only 1 scene is supported. Other scenes will be ignored");
+			MH_WARN("[GLTF] Only 1 scene is supported. Other scenes will be ignored");
 
-		MH_CORE_ASSERT(!scene.nodes.empty(), "[GLTF] Model nodes are empty!");
+		MH_ASSERT(!scene.nodes.empty(), "[GLTF] Model nodes are empty!");
 
 
 		// TODO: Support interleaved data
@@ -296,21 +296,21 @@ namespace Mahakam
 					switch (accessor.componentType)
 					{
 					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
-						MH_CORE_INFO("[GLTF] Loading indices with uint32_t");
+						MH_INFO("[GLTF] Loading indices with uint32_t");
 						memcpy(indices.data() + indexOffset, indexData, accessor.count * sizeof(uint32_t));
 						break;
 					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-						MH_CORE_INFO("[GLTF] Loading indices with uint16_t");
+						MH_INFO("[GLTF] Loading indices with uint16_t");
 						for (size_t i = 0; i < accessor.count; i++)
 							memcpy(indices.data() + i + indexOffset, indexData + i * sizeof(uint16_t), sizeof(uint16_t));
 						break;
 					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-						MH_CORE_INFO("[GLTF] Loading indices with uint8_t");
+						MH_INFO("[GLTF] Loading indices with uint8_t");
 						for (size_t i = 0; i < accessor.count; i++)
 							memcpy(indices.data() + i + indexOffset, indexData + i * sizeof(uint8_t), sizeof(uint8_t));
 						break;
 					default:
-						MH_CORE_BREAK("[GLTF] Unsupported index format");
+						MH_BREAK("[GLTF] Unsupported index format");
 						break;
 					}
 
@@ -318,8 +318,8 @@ namespace Mahakam
 				}
 			}
 
-			MH_CORE_ASSERT(vertexCount == positionOffset, "Vertex count mismatch");
-			MH_CORE_ASSERT(indexCount == indexOffset, "Index count mismatch");
+			MH_ASSERT(vertexCount == positionOffset, "Vertex count mismatch");
+			MH_ASSERT(indexCount == indexOffset, "Index count mismatch");
 
 			// Interleave vertices
 			SubMesh::InterleavedStruct interleavedVertices;
@@ -371,7 +371,7 @@ namespace Mahakam
 							const auto& bufferView = model.bufferViews[accessor.bufferView];
 							const auto& buffer = model.buffers[bufferView.buffer];
 
-							MH_CORE_ASSERT(joints.size() == accessor.count, "Bone count doesn't match joint count");
+							MH_ASSERT(joints.size() == accessor.count, "Bone count doesn't match joint count");
 
 							const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
 
@@ -394,7 +394,7 @@ namespace Mahakam
 				}
 			}
 
-			MH_CORE_ASSERT(skinnedMesh->NodeHierarchy.size() == model.nodes.size(), "Node hierarchy doesn't match model");
+			MH_ASSERT(skinnedMesh->NodeHierarchy.size() == model.nodes.size(), "Node hierarchy doesn't match model");
 		}
 
 		return Asset<Mesh>(skinnedMesh, deleter);
@@ -411,7 +411,7 @@ namespace Mahakam
 			return CreateRef<OpenGLMesh>(vertexCount, indexCount, verts, indices);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};

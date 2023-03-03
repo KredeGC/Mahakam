@@ -10,28 +10,20 @@ namespace Mahakam
 	class Log
 	{
 	private:
-		static Ref<spdlog::logger> s_EngineLogger;
-		static Ref<spdlog::logger> s_GameLogger;
+		static std::shared_ptr<spdlog::logger> s_Logger;
 
 	public:
-		static void Init();
+		static void Init(const char* name);
 		static void Shutdown();
+        static void ImportSinks(const std::vector<spdlog::sink_ptr>& sinks);
 
-		MH_DECLARE_FUNC(GetEngineLogger, Ref<spdlog::logger>&);
-		MH_DECLARE_FUNC(GetGameLogger, Ref<spdlog::logger>&);
+		static std::shared_ptr<spdlog::logger> GetLogger();
 	};
 }
 
-// Core log macros
-#define MH_CORE_TRACE(...)    ::Mahakam::Log::GetEngineLogger()->trace(__VA_ARGS__)
-#define MH_CORE_INFO(...)     ::Mahakam::Log::GetEngineLogger()->info(__VA_ARGS__)
-#define MH_CORE_WARN(...)     ::Mahakam::Log::GetEngineLogger()->warn(__VA_ARGS__)
-#define MH_CORE_ERROR(...)    ::Mahakam::Log::GetEngineLogger()->error(__VA_ARGS__)
-#define MH_CORE_FATAL(...)    ::Mahakam::Log::GetEngineLogger()->critical(__VA_ARGS__)
-
-// Game log macros
-#define MH_TRACE(...)	      ::Mahakam::Log::GetGameLogger()->trace(__VA_ARGS__)
-#define MH_INFO(...)	      ::Mahakam::Log::GetGameLogger()->info(__VA_ARGS__)
-#define MH_WARN(...)	      ::Mahakam::Log::GetGameLogger()->warn(__VA_ARGS__)
-#define MH_ERROR(...)	      ::Mahakam::Log::GetGameLogger()->error(__VA_ARGS__)
-#define MH_FATAL(...)	      ::Mahakam::Log::GetGameLogger()->critical(__VA_ARGS__) 
+// Log macros
+#define MH_TRACE(...)    ::Mahakam::Log::GetLogger()->log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, spdlog::level::trace, __VA_ARGS__)
+#define MH_INFO(...)     ::Mahakam::Log::GetLogger()->log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, spdlog::level::info, __VA_ARGS__)
+#define MH_WARN(...)     ::Mahakam::Log::GetLogger()->log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, spdlog::level::warn, __VA_ARGS__)
+#define MH_ERROR(...)    ::Mahakam::Log::GetLogger()->log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, spdlog::level::err, __VA_ARGS__)
+#define MH_FATAL(...)    ::Mahakam::Log::GetLogger()->log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, spdlog::level::critical, __VA_ARGS__)

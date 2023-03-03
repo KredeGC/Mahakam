@@ -9,7 +9,7 @@ namespace Mahakam
 {
 	HeadlessContext::HeadlessContext(void* window, void* proc) : m_Window(window), m_ProcAddress(proc)
 	{
-		MH_CORE_ASSERT(m_Window, "Window is nullptr!");
+		MH_ASSERT(m_Window, "Window is nullptr!");
 	}
 	
 	void HeadlessContext::Init()

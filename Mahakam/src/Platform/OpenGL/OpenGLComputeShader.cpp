@@ -96,8 +96,8 @@ namespace Mahakam
 
 				MH_GL_CALL(glDeleteShader(shader));
 
-				MH_CORE_ERROR("{0}\r\n\r\n{1}", src, infoLog.data());
-				MH_CORE_BREAK("ComputeShader failed to compile!");
+				MH_ERROR("{0}\r\n\r\n{1}", src, infoLog.data());
+				MH_BREAK("ComputeShader failed to compile!");
 
 				return;
 			}
@@ -121,8 +121,8 @@ namespace Mahakam
 
 				MH_GL_CALL(glDeleteShader(shader));
 
-				MH_CORE_ERROR("{0}\r\n\r\n{1}", src, infoLog.data());
-				MH_CORE_BREAK("ComputeShader failed to link!");
+				MH_ERROR("{0}\r\n\r\n{1}", src, infoLog.data());
+				MH_BREAK("ComputeShader failed to link!");
 
 				return;
 			}
@@ -171,8 +171,8 @@ namespace Mahakam
 
 				MH_GL_CALL(glDeleteProgram(program));
 
-				MH_CORE_ERROR("{0}\r\n\r\n{1}", src, infoLog.data());
-				MH_CORE_BREAK("ComputeShader failed to link!");
+				MH_ERROR("{0}\r\n\r\n{1}", src, infoLog.data());
+				MH_BREAK("ComputeShader failed to link!");
 
 				return;
 			}
@@ -191,7 +191,7 @@ namespace Mahakam
 		if (uniformID != -1)
 			m_UniformIDCache[name] = uniformID;
 		else
-			MH_CORE_WARN("Uniform {0} unused or optimized away", name);
+			MH_WARN("Uniform {0} unused or optimized away", name);
 
 		return uniformID;
 	}

@@ -64,7 +64,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_BREAK("Changing an active mesh not currently supported!");
+		MH_BREAK("Changing an active mesh not currently supported!");
 
 		uint32_t elementSize = ShaderDataTypeSize(BUFFER_ELEMENTS[slot]);
 		uint32_t size = elementSize * vertexCount;

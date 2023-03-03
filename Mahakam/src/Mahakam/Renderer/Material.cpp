@@ -22,7 +22,7 @@ namespace Mahakam
 			return CreateAsset<OpenGLMaterial>(shader);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};
@@ -38,7 +38,7 @@ namespace Mahakam
 			return CreateAsset<OpenGLMaterial>(material);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};

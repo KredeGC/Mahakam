@@ -24,7 +24,7 @@ namespace Mahakam
 			return CreateAsset<OpenGLTexture2D>(props);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};
@@ -40,7 +40,7 @@ namespace Mahakam
 			return CreateAsset<OpenGLTexture2D>(filepath, props);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};
@@ -57,7 +57,7 @@ namespace Mahakam
 			return CreateAsset<OpenGLTextureCube>(props);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};
@@ -73,7 +73,7 @@ namespace Mahakam
 			return CreateAsset<OpenGLTextureCube>(filepath, props);
 		}
 
-		MH_CORE_BREAK("Unknown renderer API!");
+		MH_BREAK("Unknown renderer API!");
 
 		return nullptr;
 	};

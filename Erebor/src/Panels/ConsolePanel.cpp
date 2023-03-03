@@ -36,6 +36,8 @@ namespace Mahakam::Editor
 
 			m_CurrentLevel = spdlog::level::level_enum::off;
 
+            ImGui::PushFont(Application::GetInstance()->GetImGuiLayer()->GetMonoFont());
+
 			ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f, 1.0f, 1.0f, 1.0f });
 			
 			for (auto& kv : s_Lines)
@@ -46,6 +48,8 @@ namespace Mahakam::Editor
 			}
 
 			ImGui::PopStyleColor();
+
+            ImGui::PopFont();
 		}
 
 		ImGui::End();

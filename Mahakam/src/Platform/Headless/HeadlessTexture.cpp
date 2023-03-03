@@ -91,7 +91,7 @@ namespace Mahakam
 
 	void HeadlessTextureCube::Resize(uint32_t width, uint32_t height)
 	{
-		MH_CORE_BREAK("UNSUPPORTED");
+		MH_BREAK("UNSUPPORTED");
 	}
 
 	void HeadlessTextureCube::SetData(void* data, uint32_t size, bool mipmaps)

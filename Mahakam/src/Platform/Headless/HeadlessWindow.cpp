@@ -14,7 +14,7 @@ namespace Mahakam
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
 
-		MH_CORE_INFO("Creating Headless window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		MH_INFO("Creating Headless window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 		m_Context = RenderingContext::Create(this, this);
 		m_Context->Init();

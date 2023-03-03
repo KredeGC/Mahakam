@@ -32,10 +32,6 @@ int main(int argc, char** argv)
 			Mahakam::RendererAPI::SetAPI(Mahakam::RendererAPI::API::None);
 	}
 
-	Mahakam::Log::Init();
-	MH_CORE_INFO("Logging initialized");
-	MH_INFO("Logging initialized");
-
 #ifdef MH_ENABLE_PROFILING
 	Mahakam::FileUtility::CreateDirectories("profiling/");
 #endif
@@ -49,11 +45,6 @@ int main(int argc, char** argv)
 	MH_PROFILE_BEGIN_SESSION("shutdown", "profiling/Shutdown.json");
 	delete g_App;
 	MH_PROFILE_END_SESSION();
-
-	MH_CORE_INFO("Logging uninitialized");
-	MH_INFO("Logging uninitialized");
-
-	Mahakam::Log::Shutdown();
 
 	return 0;
 }

@@ -23,7 +23,7 @@ namespace Mahakam
 		binauralNodeConfig = ma_steamaudio_binaural_node_config_init(m_Context->GetEngineConfig().channels, m_Context->GetAudioSettings(), m_Context->GetIPLContext(), m_Context->GetHRTF());
 
 		ma_result result = ma_steamaudio_binaural_node_init(ma_engine_get_node_graph(&m_Context->GetEngine()), &binauralNodeConfig, NULL, &m_Node);
-		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize binaural node.");
+		MH_ASSERT(result == MA_SUCCESS, "Failed to initialize binaural node.");
 
 		/* Set the spatial blend to full spatialization. */
 		m_Node.spatialBlend = 1.0f;
@@ -98,7 +98,7 @@ namespace Mahakam
 
 		float out;
 		ma_result result = ma_sound_get_cursor_in_seconds(const_cast<ma_sound*>(&m_MaSound), &out);
-		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to get current time of sound.");
+		MH_ASSERT(result == MA_SUCCESS, "Failed to get current time of sound.");
 
 		return out;
 	}
@@ -110,7 +110,7 @@ namespace Mahakam
 
 		float out;
 		ma_result result = ma_sound_get_length_in_seconds(const_cast<ma_sound*>(&m_MaSound), &out);
-		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to get current time of sound.");
+		MH_ASSERT(result == MA_SUCCESS, "Failed to get current time of sound.");
 
 		return out;
 	}
@@ -178,7 +178,7 @@ namespace Mahakam
 		soundConfig.flags = MA_SOUND_FLAG_NO_DEFAULT_ATTACHMENT | MA_SOUND_FLAG_NO_SPATIALIZATION;  /* We'll attach this to the graph later. */
 
 		ma_result result = ma_sound_init_ex(&m_Context->GetEngine(), &soundConfig, &m_MaSound);
-		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize sound.");
+		MH_ASSERT(result == MA_SUCCESS, "Failed to initialize sound.");
 
 		/* We'll let the Steam Audio binaural effect do the directional attenuation for us. */
 		ma_sound_set_directional_attenuation_factor(&m_MaSound, 0);

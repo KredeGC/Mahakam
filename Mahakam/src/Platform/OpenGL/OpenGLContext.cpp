@@ -13,7 +13,7 @@ namespace Mahakam
 {
 	OpenGLContext::OpenGLContext(void* window, void* proc) : m_Window((GLFWwindow*)window), m_ProcAddress(proc)
 	{
-		MH_CORE_ASSERT(m_Window, "Window is nullptr!");
+		MH_ASSERT(m_Window, "Window is nullptr!");
 	}
 	
 	void OpenGLContext::Init()
@@ -29,9 +29,9 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		int status = gladLoadGL(glfwGetProcAddress);
-		MH_CORE_ASSERT(status, "Could not initialize glad!");
+		MH_ASSERT(status, "Could not initialize glad!");
 
-		MH_CORE_ASSERT(glGetError, "Could not initialize OpenGL functions!");
+		MH_ASSERT(glGetError, "Could not initialize OpenGL functions!");
 	}
 	
 	void OpenGLContext::SwapBuffers()

@@ -22,7 +22,7 @@ namespace Mahakam
 
 	static void GLFWErrorCallback(int error, const char* message)
 	{
-		MH_CORE_ERROR("[GLFW Error] (Code {0}): {1}", error, message);
+		MH_ERROR("[GLFW Error] (Code {0}): {1}", error, message);
 	}
 
 	void GLFWindow::Init(const WindowProps& props)
@@ -36,7 +36,7 @@ namespace Mahakam
 		if (!glfwInitialized)
 		{
 			int success = glfwInit();
-			MH_CORE_ASSERT(success, "Could not initialize GLFW!");
+			MH_ASSERT(success, "Could not initialize GLFW!");
 
 			glfwSetErrorCallback(GLFWErrorCallback);
 
@@ -46,10 +46,10 @@ namespace Mahakam
 
 			glfwGetVersion(&major, &minor, &rev);
 
-			MH_CORE_INFO("Initialized GLFW version {0}.{1}.{2}", major, minor, rev);
+			MH_INFO("Initialized GLFW version {0}.{1}.{2}", major, minor, rev);
 		}
 
-		MH_CORE_INFO("Creating GLFW window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		MH_INFO("Creating GLFW window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);

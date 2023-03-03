@@ -25,7 +25,7 @@ namespace Mahakam
 		m_EngineConfig.periodSizeInFrames = MH_AUDIO_SIZE;
 
 		result = ma_engine_init(&m_EngineConfig, &m_Engine);
-		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize audio engine.");
+		MH_ASSERT(result == MA_SUCCESS, "Failed to initialize audio engine.");
 
 		IPLContextSettings iplContextSettings;
 
@@ -34,7 +34,7 @@ namespace Mahakam
 		iplContextSettings.version = STEAMAUDIO_VERSION;
 
 		result = ma_result_from_IPLerror(iplContextCreate(&iplContextSettings, &m_IplContext));
-		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize Steam Audio context.");
+		MH_ASSERT(result == MA_SUCCESS, "Failed to initialize Steam Audio context.");
 
 		IPLHRTFSettings iplHRTFSettings;
 
@@ -57,7 +57,7 @@ namespace Mahakam
 		iplHRTFSettings.type = IPL_HRTFTYPE_DEFAULT;
 
 		result = ma_result_from_IPLerror(iplHRTFCreate(m_IplContext, &m_IplAudioSettings, &iplHRTFSettings, &m_IPLHRTF));
-		MH_CORE_ASSERT(result == MA_SUCCESS, "Failed to initialize Steam Audio HRTF.");
+		MH_ASSERT(result == MA_SUCCESS, "Failed to initialize Steam Audio HRTF.");
 	}
 
 	MiniAudioContext::~MiniAudioContext()

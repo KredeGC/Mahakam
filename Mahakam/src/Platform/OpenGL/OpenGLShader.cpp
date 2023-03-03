@@ -63,7 +63,7 @@ namespace Mahakam
 		}
 		else
 		{
-			MH_CORE_WARN("Attempted to use unknown shader pass: {0} on {1}", shaderPass, m_Name);
+			MH_WARN("Attempted to use unknown shader pass: {0} on {1}", shaderPass, m_Name);
 		}
 	}
 
@@ -138,7 +138,7 @@ namespace Mahakam
 
 		if (sources.empty())
 		{
-			MH_CORE_WARN("At least one shader source is required to compile!");
+			MH_WARN("At least one shader source is required to compile!");
 			return 0;
 		}
 
@@ -180,7 +180,7 @@ namespace Mahakam
 
 				std::string source = glsl.compile();
 
-				MH_CORE_WARN("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, infoLog.data());
+				MH_WARN("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, infoLog.data());
 
 				break;
 			}
@@ -207,7 +207,7 @@ namespace Mahakam
 			for (auto& id : shaderIDs)
 				MH_GL_CALL(glDeleteShader(id));
 
-			MH_CORE_WARN("{0}\r\n\r\n{1}", directives, infoLog.data());
+			MH_WARN("{0}\r\n\r\n{1}", directives, infoLog.data());
 
 			return 0;
 		}
@@ -302,7 +302,7 @@ namespace Mahakam
 
 		// Inform the user that a property is unused
 		if (cacheIter == m_UniformIDCache.end() && uniformID == -1)
-			MH_CORE_WARN("Shader {0} Uniform {1} unused or optimized away", m_Filepath.string(), name);
+			MH_WARN("Shader {0} Uniform {1} unused or optimized away", m_Filepath.string(), name);
 
 		return uniformID;
 	}

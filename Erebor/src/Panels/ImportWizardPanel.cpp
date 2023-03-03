@@ -93,7 +93,7 @@ namespace Mahakam::Editor
 					}
 					catch (std::runtime_error const& e)
 					{
-						MH_CORE_WARN("Asset Import Wizard experienced an error when reading {0}: {1}", filepath.string(), e.what());
+						MH_WARN("Asset Import Wizard experienced an error when reading {0}: {1}", filepath.string(), e.what());
 					}
 				}
 				else

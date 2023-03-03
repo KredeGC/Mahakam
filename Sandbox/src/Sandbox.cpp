@@ -4,10 +4,7 @@
 #define MH_STANDALONE_ICON "internal/icons/icon-64.png"
 
 #include <Mahakam/MahakamRuntime.h>
-
-#if MH_STANDALONE
 #include <Mahakam/MahakamEntrypoint.h>
-#endif
 
 using namespace Mahakam;
 
@@ -27,11 +24,9 @@ struct MH_EXPORTED CamerControllerComponent
 	CamerControllerComponent() {}
 };
 
-MH_EXTERN_EXPORTED void Load(ImGuiContext* context, void*** funcPtrs)
+MH_EXTERN_EXPORTED void Load()
 {
-	MH_RUNTIME_LOAD(context, funcPtrs);
-
-	MH_CORE_TRACE("DLL Loaded!");
+	MH_TRACE("DLL Loaded!");
 
 	// Setup render passes for pixel renderer
 	/*Renderer::SetRenderPasses({
@@ -291,7 +286,7 @@ MH_EXTERN_EXPORTED void Stop(Scene* scene)
 
 MH_EXTERN_EXPORTED void Unload()
 {
-	MH_CORE_TRACE("DLL Unloaded!");
+	MH_TRACE("DLL Unloaded!");
 
 #pragma region Rotator
 	ComponentRegistry::DeregisterComponent("Rotator");

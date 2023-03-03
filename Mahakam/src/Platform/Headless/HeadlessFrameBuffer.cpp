@@ -29,7 +29,7 @@ namespace Mahakam
 	{
 		if (width == 0 || height == 0 || width > MAX_FRAMEBUFFER_SIZE || height > MAX_FRAMEBUFFER_SIZE)
 		{
-			MH_CORE_WARN("Attempted to resize framebuffer to an unsupported size: ({0},{1})", width, height);
+			MH_WARN("Attempted to resize framebuffer to an unsupported size: ({0},{1})", width, height);
 			return;
 		}
 
@@ -54,7 +54,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_CORE_ASSERT(attachmentSlot < m_ColorAttachments.size(), "Index outside range of framebuffer textures!");
+		MH_ASSERT(attachmentSlot < m_ColorAttachments.size(), "Index outside range of framebuffer textures!");
 	}
 
 	void HeadlessFrameBuffer::Invalidate()

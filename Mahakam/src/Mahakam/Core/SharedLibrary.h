@@ -30,7 +30,7 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
-		static constexpr int NUM_FUNC_PTRS = 112;
+		static constexpr int NUM_FUNC_PTRS = 110;
 
 		typedef void** FuncPtr;
 
@@ -60,9 +60,9 @@ namespace Mahakam
 		auto GetFunction(const char* name)
 		{
 #if defined(MH_PLATFORM_WINDOWS)
-			return (R(*)(Args...))GetProcAddress(m_Handle, name);
+			return reinterpret_cast<R(*)(Args...)>(GetProcAddress(m_Handle, name));
 #elif defined(MH_PLATFORM_LINUX)
-			return (R(*)(Args...))dlsym(m_Handle, name);
+			return reinterpret_cast<R(*)(Args...)>(dlsym(m_Handle, name));
 #endif
 		}
 

@@ -20,7 +20,7 @@ namespace Mahakam::Editor
 
             // If needed (very likely but not mandatory), the sink formats the message before sending it to its final destination:
             spdlog::memory_buf_t formatted;
-            spdlog::sinks::base_sink<Mutex>::set_pattern_("%^[%T] %n: %v%$");
+            spdlog::sinks::base_sink<Mutex>::set_pattern_("%T %n %16!s::%-16!! : %v");
             spdlog::sinks::base_sink<Mutex>::formatter_->format(msg, formatted);
 
             std::string formattedString = fmt::to_string(formatted);

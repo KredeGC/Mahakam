@@ -24,11 +24,14 @@ namespace Mahakam
 {
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application(const WindowProps& props)
+	Application::Application(const std::string& logName, const WindowProps& props)
 	{
 		MH_PROFILE_FUNCTION();
+        
+        Log::Init(logName.c_str());
+	    MH_INFO("Logging initialized");
 
-		MH_CORE_ASSERT(!s_Instance, "Application instance already created!");
+		MH_ASSERT(!s_Instance, "Application instance already created!");
 		s_Instance = this;
 
 		m_Window = Window::Create(props);
@@ -63,6 +66,9 @@ namespace Mahakam
 		Renderer::Shutdown();
 
 		YAMLGuard::Shutdown();
+
+        MH_INFO("Logging uninitialized");
+        Log::Shutdown();
 	}
 
 	void Application::Run()

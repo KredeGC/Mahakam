@@ -16,10 +16,8 @@ namespace Mahakam
 			// Subsequent profiling output meant for the original session will end up in the
 			// newly opened session instead.  That's better than having badly formatted
 			// profiling output.
-			if (Log::GetEngineLogger()) // Edge case: BeginSession() might be before Log::Init()
-			{
-				MH_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, m_CurrentSession->Name);
-			}
+			if (Log::GetLogger()) // Edge case: BeginSession() might be before Log::Init()
+				MH_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, m_CurrentSession->Name);
 			InternalEndSession();
 		}
 		m_OutputStream.open(filepath);
@@ -31,10 +29,8 @@ namespace Mahakam
 		}
 		else
 		{
-			if (Log::GetEngineLogger()) // Edge case: BeginSession() might be before Log::Init()
-			{
-				MH_CORE_ERROR("Instrumentor could not open results file '{0}'.", filepath);
-			}
+			if (Log::GetLogger()) // Edge case: BeginSession() might be before Log::Init()
+				MH_ERROR("Instrumentor could not open results file '{0}'.", filepath);
 		}
 	}
 

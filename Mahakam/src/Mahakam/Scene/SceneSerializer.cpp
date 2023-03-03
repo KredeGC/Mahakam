@@ -74,7 +74,7 @@ namespace Mahakam
 		}
 		catch (std::runtime_error const& e)
 		{
-			MH_CORE_WARN("Scene was unable to load from YAML source: {0}", e.what());
+			MH_WARN("Scene was unable to load from YAML source: {0}", e.what());
 		}
 
 		return false;
@@ -103,7 +103,7 @@ namespace Mahakam
 		}
 		catch (std::runtime_error const& e)
 		{
-			MH_CORE_WARN("Scene was unable to load from YAML file {0}: {1}", filepath.string(), e.what());
+			MH_WARN("Scene was unable to load from YAML file {0}: {1}", filepath.string(), e.what());
 		}
 
 		return false;

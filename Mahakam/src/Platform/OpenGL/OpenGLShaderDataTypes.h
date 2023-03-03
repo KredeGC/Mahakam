@@ -37,7 +37,7 @@ namespace Mahakam
 		if (enumString == "SamplerCube")
 			return ShaderDataType::SamplerCube;
 
-		MH_CORE_BREAK("Unknown ShaderDataType provided!");
+		MH_BREAK("Unknown ShaderDataType provided!");
 		return ShaderDataType::None;
 	}*/
 
@@ -50,7 +50,7 @@ namespace Mahakam
 		case ShaderStage::Fragment:
 			return GL_FRAGMENT_SHADER;
 		default:
-			MH_CORE_BREAK("Unknown shader stage!");
+			MH_BREAK("Unknown shader stage!");
 			return 0;
 		}
 	}
@@ -86,7 +86,7 @@ namespace Mahakam
 		case ShaderDataType::SamplerCube:
 			return GL_SAMPLER_CUBE;
 		default:
-			MH_CORE_BREAK("Unknown ShaderDataType provided!");
+			MH_BREAK("Unknown ShaderDataType provided!");
 			return 0;
 		}
 	}
@@ -124,7 +124,7 @@ namespace Mahakam
 		case GL_SAMPLER_2D_SHADOW:
 			return ShaderDataType::Sampler2D;
 		default:
-			MH_CORE_BREAK("Unknown OpenGL data type provided!");
+			MH_BREAK("Unknown OpenGL data type provided!");
 			return ShaderDataType::None;
 		}
 	}
