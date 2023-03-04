@@ -16,7 +16,7 @@
 
 #include <Mahakam/Core/EntryPoint.h>
 
-void Load(ImGuiContext* context, void*** funcPtrs);
+void Load();
 void Run(Mahakam::Scene* scene);
 void Update(Mahakam::Scene* scene, Mahakam::Timestep dt);
 void Stop(Mahakam::Scene* scene);
@@ -72,10 +72,8 @@ namespace Mahakam
 			SceneManager::SetActiveScene(activeScene);
 
 			// Run the library functions, as if it was a shared library
-			ImGuiContext* context = ImGui::GetCurrentContext(); // TODO: This seems wrong. This heavily relies on ImGui
-
 			// Load the runtime
-			Load(context, nullptr);
+			Load();
 
 			// Run the game
 			Run(activeScene.get());
