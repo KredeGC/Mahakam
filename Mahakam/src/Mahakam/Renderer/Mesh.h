@@ -32,6 +32,7 @@ namespace Mahakam
 	public:
 		MeshProps Props;
 		std::vector<Ref<SubMesh>> Meshes;
+		std::vector<int> Skins;
 		std::vector<MeshNode> NodeHierarchy;
 		UnorderedMap<std::string, int> BoneInfoMap; // Name to Joint ID
 
@@ -61,7 +62,7 @@ namespace Mahakam
 		inline static Asset<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
 
 	private:
-		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Mesh* skinnedMesh);
+		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Asset<Mesh>& skinnedMesh);
 
 		MH_DECLARE_FUNC(LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
 

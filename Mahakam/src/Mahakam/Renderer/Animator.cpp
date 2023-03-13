@@ -22,6 +22,8 @@ namespace Mahakam
 		m_Rotations.clear();
 		m_Scales.clear();
 
+		if (!m_Animation) return;
+
 		const auto& samplers = m_Animation->GetSamplers();
 
 		m_Indices.resize(samplers.size());

@@ -224,33 +224,45 @@ namespace Mahakam
 				if (!meshComponent.HasMesh()) return;
 
 				const auto& boneEntities = skinComponent.GetBoneEntities();
+				const auto& skins = meshComponent.GetMesh()->Skins;
 				const auto& hierarchy = meshComponent.GetNodeHierarchy();
 				const auto& bones = meshComponent.GetBoneInfo();
 				const auto& materials = meshComponent.GetMaterials();
 
-				glm::mat4 invTransform = glm::inverse(transformComponent.GetModelMatrix());
-
+				// TODO: Separate materials based on submesh
 				for (auto& material : materials)
 				{
-					for (size_t i = 0; i < boneEntities.size(); i++)
+					for (auto skin : skins)
 					{
-						auto& boneEntity = boneEntities.at(i);
-						if (boneEntity)
-						{
-							if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
-							{
-								const auto& node = hierarchy.at(i);
+						Entity skinEntity = boneEntities.at(skin);
 
-								// TODO: Find some better way?
-								// Currently the bones are part of the uniform buffer, but that seems a bit unwieldy
-								auto boneIter = bones.find(node.Name);
-								if (boneIter != bones.end())
-								{
-									glm::mat4 transform = invTransform
-										* boneTransform->GetModelMatrix()
-										* node.Offset;
-									material->SetMat4("Uniforms.BoneMatrices[" + std::to_string(boneIter->second) + "]", transform);
-								}
+						if (!skinEntity) continue;
+
+						TransformComponent* skinTransform = skinEntity.TryGetComponent<TransformComponent>();
+						if (!skinTransform) continue;
+
+						glm::mat4 invTransform = glm::inverse(skinTransform->GetModelMatrix());
+
+						for (size_t i = 0; i < boneEntities.size(); i++)
+						{
+							auto& boneEntity = boneEntities.at(i);
+
+							if (!boneEntity) continue;
+
+							TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>();
+							if (!boneTransform) continue;
+
+							const auto& node = hierarchy.at(i);
+
+							// TODO: Find some better way?
+							// Currently the bones are part of the uniform buffer, but that seems a bit unwieldy
+							auto boneIter = bones.find(node.Name);
+							if (boneIter != bones.end())
+							{
+								glm::mat4 transform = invTransform
+									* boneTransform->GetModelMatrix()
+									* node.Offset;
+								material->SetMat4("Uniforms.BoneMatrices[" + std::to_string(boneIter->second) + "]", transform);
 							}
 						}
 					}
@@ -363,63 +375,65 @@ namespace Mahakam
 					const auto& materials = meshComponent.GetMaterials();
 					int materialCount = (int)materials.size() - 1;
 
-					if (materialCount >= 0)
+					if (materialCount < 0) return;
+
+					if (SkinComponent* skinComponent = m_Registry.try_get<SkinComponent>(entity))
 					{
-						if (SkinComponent* skinComponent = m_Registry.try_get<SkinComponent>(entity))
+						const auto& boneEntities = skinComponent->GetBoneEntities();
+						const auto& hierarchy = meshComponent.GetNodeHierarchy();
+
+						if (boneEntities.size() != hierarchy.size())
+							return;
+
+						// TODO: Is this necessary anymore? I don't seem to use it anywhere
+						if (skinComponent->HasTargetOrigin())
 						{
-							const auto& boneEntities = skinComponent->GetBoneEntities();
-							const auto& hierarchy = meshComponent.GetNodeHierarchy();
-
-							if (boneEntities.size() != hierarchy.size())
-								return;
-
-							// I've yet to make the inverse skin transform to work. For now it has a toggle instead
-							if (skinComponent->HasTargetOrigin())
+							for (size_t i = 0; i < hierarchy.size(); i++)
 							{
-								for (size_t i = 0; i < hierarchy.size(); i++)
+								auto& index = hierarchy.at(i);
+								auto& boneEntity = boneEntities.at(i);
+
+								if (boneEntity && index.Mesh > -1)
 								{
-									auto& index = hierarchy.at(i);
-									auto& boneEntity = boneEntities.at(i);
-
-									if (boneEntity && index.Mesh > -1)
+									if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
 									{
-										if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
-										{
-											// TODO: Undo the skin transformation instead. This doesn't actually seem to work though
-											glm::mat4 transform = boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
-												* index.Offset;
+										// TODO: Undo the skin transformation instead. This doesn't actually seem to work though
+										glm::mat4 transform = boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
+											* index.Offset;
 
-											Renderer::Submit(transform, meshes[index.Mesh], materials[index.Mesh < materialCount ? index.Mesh : materialCount]);
-										}
-									}
-								}
-							}
-							else
-							{
-								for (size_t i = 0; i < hierarchy.size(); i++)
-								{
-									auto& index = hierarchy.at(i);
-									auto& boneEntity = boneEntities.at(i);
-
-									if (boneEntity && index.Mesh > -1)
-									{
-										if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
-										{
-											const glm::mat4& transform = transformComponent.GetModelMatrix();
-
-											Renderer::Submit(transform, meshes[index.Mesh], materials[index.Mesh < materialCount ? index.Mesh : materialCount]);
-										}
+										Renderer::Submit(transform, meshes[index.Mesh], materials[index.Mesh < materialCount ? index.Mesh : materialCount]);
 									}
 								}
 							}
 						}
 						else
 						{
-							const glm::mat4& modelMatrix = transformComponent.GetModelMatrix();
+							for (size_t i = 0; i < hierarchy.size(); i++)
+							{
+								auto& index = hierarchy.at(i);
+								if (index.Mesh < 0)
+									continue;
 
-							for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
-								Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
+								auto& boneEntity = boneEntities.at(i);
+								if (!boneEntity)
+									continue;
+
+								TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>();
+								if (!boneTransform)
+									continue;
+
+								const glm::mat4& transform = boneTransform->GetModelMatrix();
+
+								Renderer::Submit(transform, meshes[index.Mesh], materials[index.Mesh < materialCount ? index.Mesh : materialCount]);
+							}
 						}
+					}
+					else
+					{
+						const glm::mat4& modelMatrix = transformComponent.GetModelMatrix();
+
+						for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
+							Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
 					}
 				});
 			}

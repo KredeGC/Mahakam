@@ -99,7 +99,7 @@ namespace Mahakam
 		offset += accessor.count;
 	}
 
-	void Mesh::GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Mesh* skinnedMesh)
+	void Mesh::GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Asset<Mesh>& skinnedMesh)
 	{
 		const tinygltf::Node& node = model.nodes[id];
 
@@ -109,8 +109,10 @@ namespace Mahakam
 		bone.Mesh = node.mesh;
 		bone.ParentID = parentID;
 
+		// Construct local offset
 		if (node.matrix.size() > 0)
 		{
+			// If it contains a matrix
 			auto& m = node.matrix;
 			glm::mat4 matrix = glm::mat4{
 				m[0], m[1], m[2], m[3],
@@ -121,6 +123,7 @@ namespace Mahakam
 		}
 		else
 		{
+			// If it contains individual TRS fields
 			auto& nodePos = node.translation;
 			auto& nodeRot = node.rotation;
 			auto& nodeScale = node.scale;
@@ -138,6 +141,9 @@ namespace Mahakam
 
 		nodeIndex[id] = skinnedMesh->NodeHierarchy.size();
 		skinnedMesh->NodeHierarchy.push_back(bone);
+
+		if (node.skin > -1)
+			skinnedMesh->Skins.push_back(static_cast<int>(skinnedMesh->NodeHierarchy.size()) - 1);
 
 		for (auto& child : node.children)
 			GLTFReadNodeHierarchy(model, nodeIndex, child, id, skinnedMesh);
@@ -202,14 +208,7 @@ namespace Mahakam
 		// TODO: Support sparse data sets
 
 
-		Mesh* skinnedMesh = Allocator::Allocate<Mesh>(1);
-		Allocator::Construct<Mesh>(skinnedMesh);
-
-		auto deleter = [](void* p)
-		{
-			Allocator::Deconstruct<Mesh>(static_cast<Mesh*>(p));
-			Allocator::Deallocate<Mesh>(static_cast<Mesh*>(p), 1);
-		};
+		Asset<Mesh> skinnedMesh = CreateAsset<Mesh>();
 
 		skinnedMesh->Props = props;
 
@@ -384,9 +383,8 @@ namespace Mahakam
 								int nodeID = joints[i];
 								const auto& node = model.nodes[nodeID];
 
-								// TODO: The spec is vague on when to do 'inv(parentMat) * nodeMat * invBindMatrix'
-								// For now it is done inside the Scene, once per frame
-								skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].Offset = invMatrices[i]; // Override offset to be the bone's inverse matrix
+								// Override offset to be the bone's inverse matrix
+								skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].Offset = invMatrices[i];
 								skinnedMesh->BoneInfoMap.insert({ node.name, static_cast<int>(i) });
 							}
 						}
@@ -397,7 +395,7 @@ namespace Mahakam
 			MH_ASSERT(skinnedMesh->NodeHierarchy.size() == model.nodes.size(), "Node hierarchy doesn't match model");
 		}
 
-		return Asset<Mesh>(skinnedMesh, deleter);
+		return skinnedMesh;
 	};
 
 	//Ref<SubMesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)

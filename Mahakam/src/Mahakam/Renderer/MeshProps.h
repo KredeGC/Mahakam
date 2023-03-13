@@ -27,8 +27,8 @@ namespace Mahakam
 	{
 		std::string Name; // Node name
 		int ID; // Node ID
-		int ParentID; // Parent node ID
-		int Mesh; // Index of the submesh
+		int ParentID; // Parent node ID or -1
+		int Mesh; // Index of the submesh or -1
 		glm::mat4 Offset; // Offset. In order of priority: invMatrix, matrix, TRS
 	};
 
