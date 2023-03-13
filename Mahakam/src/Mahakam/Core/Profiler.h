@@ -25,11 +25,12 @@ namespace Mahakam
 
 	private:
 		const char* m_Name;
+		std::chrono::steady_clock::time_point m_StartPoint;
 		bool m_FlushRenderer;
 		bool m_Stopped;
-		std::chrono::steady_clock::time_point m_StartPoint;
-		static ProfileVector s_ResultsFwd;
-		static ProfileVector s_ResultsBck;
+
+		inline static ProfileVector* s_ResultsFwd = nullptr;
+		inline static ProfileVector* s_ResultsBck = nullptr;
 
 	public:
 		Profiler(const char* name, bool flushRenderer)
@@ -47,6 +48,9 @@ namespace Mahakam
 #endif
 
 		static void ClearResults();
-		static const ProfileVector& GetResults();
+		static const ProfileVector* GetResults();
+
+		static void Init();
+		static void Shutdown();
 	};
 }

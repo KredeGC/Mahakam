@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SharedLibrary.h"
+
 #include <ktl/allocators/cascading_allocator.h>
 #include <ktl/allocators/fallback_allocator.h>
 #include <ktl/allocators/freelist_allocator.h>
@@ -39,32 +41,32 @@ namespace Mahakam
 		template<typename T>
 		static BaseAllocator<T> GetAllocator()
 		{
-			return s_Alloc;
+			return GetAllocatorImpl();
 		}
 
 		template<typename T>
 		static T* Allocate(size_t n)
 		{
-			return static_cast<BaseAllocator<T>>(s_Alloc).allocate(n);
+			return static_cast<BaseAllocator<T>>(GetAllocatorImpl()).allocate(n);
 		}
 
 		template<typename T>
 		static void Deallocate(T* p, size_t n)
 		{
-			static_cast<BaseAllocator<T>>(s_Alloc).deallocate(p, n);
+			static_cast<BaseAllocator<T>>(GetAllocatorImpl()).deallocate(p, n);
 		}
 
 		template<typename T, typename ...Args>
 		static void Construct(T* p, Args&&... args)
 		{
-			BaseAllocator<T> alloc(static_cast<BaseAllocator<T>>(s_Alloc));
+			BaseAllocator<T> alloc(static_cast<BaseAllocator<T>>(GetAllocatorImpl()));
 			BaseTraits<T>::construct(alloc, p, std::forward<Args>(args)...);
 		}
 
 		template<typename T>
 		static void Deconstruct(T* p)
 		{
-			BaseAllocator<T> alloc(static_cast<BaseAllocator<T>>(s_Alloc));
+			BaseAllocator<T> alloc(static_cast<BaseAllocator<T>>(GetAllocatorImpl()));
 			BaseTraits<T>::destroy(alloc, p);
 		}
 
@@ -86,5 +88,7 @@ namespace Mahakam
 	private:
         inline static ktl::stack<MAX_STACK_SIZE * BUFFER_SIZE> s_Buffer;
 		inline static BaseAllocator<uint8_t> s_Alloc { Fallback(FreelistStack(Stack(s_Buffer))) };
+
+		MH_DECLARE_FUNC(GetAllocatorImpl, BaseAllocator<uint8_t>);
 	};
 }

@@ -142,7 +142,8 @@ namespace Mahakam
 
 			m_Registry.view<AnimatorComponent, SkinComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
 			{
-				if (!meshComponent.HasMesh()) return;
+				if (!meshComponent.HasMesh())
+					return;
 
 				auto& animator = animatorComponent.GetAnimator();
 
@@ -158,26 +159,27 @@ namespace Mahakam
 
 				for (size_t i = 0; i < boneEntities.size(); i++)
 				{
-					auto& index = hierarchy.at(i);
 					auto& boneEntity = boneEntities.at(i);
+					if (!boneEntity)
+						continue;
+					
+					TransformComponent* transform = boneEntity.TryGetComponent<TransformComponent>();
+					if (!transform)
+						continue;
 
-					if (boneEntity)
-					{
-						if (TransformComponent* transform = boneEntity.TryGetComponent<TransformComponent>())
-						{
-							auto tranIter = translations.find(index.ID);
-							if (tranIter != translations.end())
-								transform->SetPosition(tranIter->second);
+					const auto& index = hierarchy.at(i);
 
-							auto rotIter = rotations.find(index.ID);
-							if (rotIter != rotations.end())
-								transform->SetRotation(rotIter->second);
+					auto tranIter = translations.find(index.ID);
+					if (tranIter != translations.end())
+						transform->SetPosition(tranIter->second);
 
-							auto sclIter = scales.find(index.ID);
-							if (sclIter != scales.end())
-								transform->SetScale(sclIter->second);
-						}
-					}
+					auto rotIter = rotations.find(index.ID);
+					if (rotIter != rotations.end())
+						transform->SetRotation(rotIter->second);
+
+					auto sclIter = scales.find(index.ID);
+					if (sclIter != scales.end())
+						transform->SetScale(sclIter->second);
 				}
 			});
 		}
@@ -221,50 +223,62 @@ namespace Mahakam
 
 			m_Registry.view<TransformComponent, SkinComponent, MeshComponent>().each([=](TransformComponent& transformComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
 			{
-				if (!meshComponent.HasMesh()) return;
+				if (!meshComponent.HasMesh())
+					return;
 
 				const auto& boneEntities = skinComponent.GetBoneEntities();
-				const auto& skins = meshComponent.GetMesh()->Skins;
+				const auto& skins = meshComponent.GetSkins();
 				const auto& hierarchy = meshComponent.GetNodeHierarchy();
 				const auto& bones = meshComponent.GetBoneInfo();
 				const auto& materials = meshComponent.GetMaterials();
+				const auto& submeshMap = meshComponent.GetSubMeshMap();
 
-				// TODO: Separate materials based on submesh
-				for (auto& material : materials)
+				for (uint32_t skin : skins)
 				{
-					for (auto skin : skins)
+					if (skin >= boneEntities.size())
+						continue;
+
+					// If the mesh doesn't have a material there's nothing to do
+					uint32_t submeshID = submeshMap.at(skin);
+					if (submeshID >= materials.size())
+						continue;
+
+					Asset<Material> material = materials.at(submeshID);
+					if (!material)
+						continue;
+
+					Entity skinEntity = boneEntities.at(skin);
+					if (!skinEntity)
+						continue;
+
+					TransformComponent* skinTransform = skinEntity.TryGetComponent<TransformComponent>();
+					if (!skinTransform)
+						continue;
+
+					glm::mat4 invTransform = glm::inverse(skinTransform->GetModelMatrix());
+
+					for (uint32_t i = 0; i < boneEntities.size(); i++)
 					{
-						Entity skinEntity = boneEntities.at(skin);
+						auto& boneEntity = boneEntities.at(i);
+						if (!boneEntity)
+							continue;
 
-						if (!skinEntity) continue;
+						TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>();
+						if (!boneTransform)
+							continue;
 
-						TransformComponent* skinTransform = skinEntity.TryGetComponent<TransformComponent>();
-						if (!skinTransform) continue;
+						// TODO: Find some better way?
+						// Currently the bones are part of the uniform buffer, but that seems a bit unwieldy
+						auto boneIter = bones.find(i);
+						if (boneIter == bones.end())
+							continue;
 
-						glm::mat4 invTransform = glm::inverse(skinTransform->GetModelMatrix());
+						const auto& node = hierarchy.at(i);
 
-						for (size_t i = 0; i < boneEntities.size(); i++)
-						{
-							auto& boneEntity = boneEntities.at(i);
-
-							if (!boneEntity) continue;
-
-							TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>();
-							if (!boneTransform) continue;
-
-							const auto& node = hierarchy.at(i);
-
-							// TODO: Find some better way?
-							// Currently the bones are part of the uniform buffer, but that seems a bit unwieldy
-							auto boneIter = bones.find(node.Name);
-							if (boneIter != bones.end())
-							{
-								glm::mat4 transform = invTransform
-									* boneTransform->GetModelMatrix()
-									* node.Offset;
-								material->SetMat4("Uniforms.BoneMatrices[" + std::to_string(boneIter->second) + "]", transform);
-							}
-						}
+						glm::mat4 transform = invTransform
+							* boneTransform->GetModelMatrix()
+							* node.Offset;
+						material->SetMat4("Uniforms.BoneMatrices[" + std::to_string(boneIter->second) + "]", transform);
 					}
 				}
 			});
@@ -369,13 +383,15 @@ namespace Mahakam
 
 				m_Registry.view<TransformComponent, MeshComponent>().each([&](entt::entity entity, TransformComponent& transformComponent, MeshComponent& meshComponent)
 				{
-					if (!meshComponent.HasMesh()) return;
+					if (!meshComponent.HasMesh())
+						return;
 
 					const auto& meshes = meshComponent.GetSubMeshes();
 					const auto& materials = meshComponent.GetMaterials();
-					int materialCount = (int)materials.size() - 1;
+					uint32_t materialCount = static_cast<uint32_t>(materials.size());
 
-					if (materialCount < 0) return;
+					if (materialCount-- < 0)
+						return;
 
 					if (SkinComponent* skinComponent = m_Registry.try_get<SkinComponent>(entity))
 					{
@@ -385,54 +401,26 @@ namespace Mahakam
 						if (boneEntities.size() != hierarchy.size())
 							return;
 
-						// TODO: Is this necessary anymore? I don't seem to use it anywhere
-						if (skinComponent->HasTargetOrigin())
+						for (auto& [nodeIndex, meshID] : meshComponent.GetSubMeshMap())
 						{
-							for (size_t i = 0; i < hierarchy.size(); i++)
-							{
-								auto& index = hierarchy.at(i);
-								auto& boneEntity = boneEntities.at(i);
+							auto& boneEntity = boneEntities.at(nodeIndex);
+							if (!boneEntity)
+								continue;
 
-								if (boneEntity && index.Mesh > -1)
-								{
-									if (TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>())
-									{
-										// TODO: Undo the skin transformation instead. This doesn't actually seem to work though
-										glm::mat4 transform = boneEntity.GetComponent<TransformComponent>().GetModelMatrix()
-											* index.Offset;
+							TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>();
+							if (!boneTransform)
+								continue;
 
-										Renderer::Submit(transform, meshes[index.Mesh], materials[index.Mesh < materialCount ? index.Mesh : materialCount]);
-									}
-								}
-							}
-						}
-						else
-						{
-							for (size_t i = 0; i < hierarchy.size(); i++)
-							{
-								auto& index = hierarchy.at(i);
-								if (index.Mesh < 0)
-									continue;
+							const glm::mat4& transform = boneTransform->GetModelMatrix();
 
-								auto& boneEntity = boneEntities.at(i);
-								if (!boneEntity)
-									continue;
-
-								TransformComponent* boneTransform = boneEntity.TryGetComponent<TransformComponent>();
-								if (!boneTransform)
-									continue;
-
-								const glm::mat4& transform = boneTransform->GetModelMatrix();
-
-								Renderer::Submit(transform, meshes[index.Mesh], materials[index.Mesh < materialCount ? index.Mesh : materialCount]);
-							}
+							Renderer::Submit(transform, meshes[meshID], materials[meshID < materialCount ? meshID : materialCount]);
 						}
 					}
 					else
 					{
 						const glm::mat4& modelMatrix = transformComponent.GetModelMatrix();
 
-						for (int i = 0; i < meshComponent.GetSubMeshCount(); i++)
+						for (uint32_t i = 0; i < meshComponent.GetSubMeshCount(); i++)
 							Renderer::Submit(modelMatrix, meshes[i], materials[i < materialCount ? i : materialCount]);
 					}
 				});

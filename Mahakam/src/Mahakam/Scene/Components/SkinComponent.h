@@ -13,11 +13,10 @@ namespace Mahakam
 	struct SkinComponent
 	{
 	private:
-		TrivialVector<Entity> m_BoneEntities;
-		bool m_TargetOrigin = false;
+		TrivialVector<Entity, Allocator::BaseAllocator<Entity>> m_BoneEntities;
 
 	public:
-		SkinComponent() {}
+		SkinComponent() : m_BoneEntities(Allocator::GetAllocator<Entity>()) {}
 
 		inline void ClearBoneEntities(const std::vector<MeshNode>& hierarchy)
 		{
@@ -34,9 +33,6 @@ namespace Mahakam
 
 		void CreateBoneEntities(Entity entity, const std::vector<MeshNode>& hierarchy);
 
-		inline void EnableTargetOrigin(bool enable) { m_TargetOrigin = enable; }
-		inline bool HasTargetOrigin() const { return m_TargetOrigin; }
-
-		inline TrivialVector<Entity>& GetBoneEntities() { return m_BoneEntities; }
+		inline TrivialVector<Entity, Allocator::BaseAllocator<Entity>>& GetBoneEntities() { return m_BoneEntities; }
 	};
 }

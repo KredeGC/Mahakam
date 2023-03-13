@@ -2,6 +2,8 @@
 
 #include "Application.h"
 #include "FileUtility.h"
+#include "Instrumentor.h"
+#include "Profiler.h"
 
 #include "Mahakam/Renderer/RendererAPI.h"
 
@@ -34,17 +36,25 @@ int main(int argc, char** argv)
 
 #ifdef MH_ENABLE_PROFILING
 	Mahakam::FileUtility::CreateDirectories("profiling/");
+
+	Mahakam::Profiler::Init();
 #endif
 
-	MH_PROFILE_BEGIN_SESSION("startup", "profiling/Startup.json");
-	g_App = Mahakam::CreateApplication();
-	MH_PROFILE_END_SESSION();
+	{
+		MH_PROFILE_BEGIN_SESSION("startup", "profiling/Startup.json");
+		g_App = Mahakam::CreateApplication();
+		MH_PROFILE_END_SESSION();
 
-	g_App->Run();
+		g_App->Run();
 
-	MH_PROFILE_BEGIN_SESSION("shutdown", "profiling/Shutdown.json");
-	delete g_App;
-	MH_PROFILE_END_SESSION();
+		MH_PROFILE_BEGIN_SESSION("shutdown", "profiling/Shutdown.json");
+		delete g_App;
+		MH_PROFILE_END_SESSION();
+	}
+
+#ifdef MH_ENABLE_PROFILING
+	Mahakam::Profiler::Shutdown();
+#endif
 
 	return 0;
 }

@@ -385,16 +385,20 @@ namespace Mahakam::Editor
 								auto ext = AssetDatabase::GetAssetImporterExtension(m_ImporterExtension);
 								auto iter = ext.first;
 								auto iterEnd = ext.second;
-								auto props = iter->second->GetImporterProps();
-								if (++iter != iterEnd)
-								{
-									ImGui::OpenPopup("ImportAssetSelectPopup");
-								}
-								else
-								{
-									std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
 
-									ImportWizardPanel::ImportAsset(file.path(), props.Extension, importPath);
+								if (iter != iterEnd)
+								{
+									auto props = iter->second->GetImporterProps();
+									if (++iter != iterEnd)
+									{
+										ImGui::OpenPopup("ImportAssetSelectPopup");
+									}
+									else
+									{
+										std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
+
+										ImportWizardPanel::ImportAsset(file.path(), props.Extension, importPath);
+									}
 								}
 							}
 

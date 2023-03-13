@@ -31,10 +31,11 @@ namespace Mahakam
 	{
 	public:
 		MeshProps Props;
-		std::vector<Ref<SubMesh>> Meshes;
-		std::vector<int> Skins;
-		std::vector<MeshNode> NodeHierarchy;
-		UnorderedMap<std::string, int> BoneInfoMap; // Name to Joint ID
+		std::vector<Ref<SubMesh>> Meshes; // List of sub meshes
+		std::vector<MeshNode> NodeHierarchy; // Hierarchy of nodes. Parents are always before children
+		TrivialVector<uint32_t> Skins; // List of node indices that are skin roots
+		UnorderedMap<uint32_t, uint32_t> SubMeshMap; // Hierarchy index to SubMesh index
+		UnorderedMap<uint32_t, uint32_t> BoneMap; // Hierarchy index to Joint ID
 
 		Mesh() = default;
 
@@ -62,8 +63,6 @@ namespace Mahakam
 		inline static Asset<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
 
 	private:
-		static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Asset<Mesh>& skinnedMesh);
-
 		MH_DECLARE_FUNC(LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
 
 		MH_DECLARE_FUNC(CreatePropsImpl, Asset<Mesh>, const MeshProps& props);

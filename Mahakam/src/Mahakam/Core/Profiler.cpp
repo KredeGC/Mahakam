@@ -8,33 +8,33 @@
 
 namespace Mahakam
 {
-	Profiler::ProfileVector Profiler::s_ResultsFwd(Allocator::GetAllocator<Profiler::ProfileResult>());
-	Profiler::ProfileVector Profiler::s_ResultsBck(Allocator::GetAllocator<Profiler::ProfileResult>());
-
 #ifdef MH_ENABLE_PROFILING
 	Profiler::~Profiler()
 	{
-		if (!m_Stopped)
-		{
-			m_Stopped = true;
+		if (!s_ResultsFwd)
+			return;
 
-			auto endPoint = std::chrono::steady_clock::now();
+		if (m_Stopped)
+			return;
+
+		m_Stopped = true;
+
+		auto endPoint = std::chrono::steady_clock::now();
 
 #ifdef MH_ENABLE_RENDER_PROFILING
-			if (m_FlushRenderer)
-			{
-				GL::FinishRendering();
+		if (m_FlushRenderer)
+		{
+			GL::FinishRendering();
 
-				auto renderPoint = std::chrono::steady_clock::now();
+			auto renderPoint = std::chrono::steady_clock::now();
 
-				AddResult(m_Name, m_StartPoint, renderPoint);
-				AddResult("Waiting on GPU", endPoint, renderPoint);
-			}
-			else
+			AddResult(m_Name, m_StartPoint, renderPoint);
+			AddResult("Waiting on GPU", endPoint, renderPoint);
+		}
+		else
 #endif
-			{
-				AddResult(m_Name, m_StartPoint, endPoint);
-			}
+		{
+			AddResult(m_Name, m_StartPoint, endPoint);
 		}
 	}
 
@@ -49,32 +49,47 @@ namespace Mahakam
 
 		Instrumentor::Get().WriteProfile(result);
 
-		auto iter = s_ResultsBck.rbegin();
-		if (iter != s_ResultsBck.rend() && strcmp(iter->Name, name) == 0)
+		auto iter = s_ResultsBck->rbegin();
+		if (iter != s_ResultsBck->rend() && strcmp(iter->Name, name) == 0)
 		{
 			iter->Count++;
 			iter->ElapsedTime += duration;
 		}
 		else
 		{
-			s_ResultsBck.push_back(result);
+			s_ResultsBck->push_back(result);
 		}
 	}
 #endif
 
 	void Profiler::ClearResults()
 	{
+		if (!s_ResultsFwd)
+			return;
+
 #ifdef MH_ENABLE_PROFILING
-		s_ResultsFwd.resize(s_ResultsBck.size());
+		s_ResultsFwd->resize(s_ResultsBck->size());
 
-		s_ResultsFwd = s_ResultsBck;
+		*s_ResultsFwd = *s_ResultsBck;
 
-		s_ResultsBck.clear();
+		s_ResultsBck->clear();
 #endif
 	}
 
-	const Profiler::ProfileVector& Profiler::GetResults()
+	const Profiler::ProfileVector* Profiler::GetResults()
 	{
 		return s_ResultsFwd;
+	}
+
+	void Profiler::Init()
+	{
+		s_ResultsFwd = new ProfileVector(Allocator::GetAllocator<ProfileResult>());
+		s_ResultsBck = new ProfileVector(Allocator::GetAllocator<ProfileResult>());
+	}
+
+	void Profiler::Shutdown()
+	{
+		delete s_ResultsFwd;
+		delete s_ResultsBck;
 	}
 }

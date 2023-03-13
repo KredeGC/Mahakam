@@ -63,12 +63,9 @@ namespace Mahakam
 	}
 
 	template<typename T>
-	void GLTFLoadAttribute(tinygltf::Model& model, tinygltf::Primitive& p, const std::string& attribute, size_t& offset, TrivialArray<T>& dst)
+	static void GLTFLoadIndex(tinygltf::Model& model, int index, size_t& offset, TrivialArray<T>& dst)
 	{
-		auto iter = p.attributes.find(attribute);
-		if (iter == p.attributes.end()) return;
-
-		const auto& accessor = model.accessors[iter->second];
+		const auto& accessor = model.accessors[index];
 		const auto& bufferView = model.bufferViews[accessor.bufferView];
 		const auto& buffer = model.buffers[bufferView.buffer];
 
@@ -89,7 +86,7 @@ namespace Mahakam
 			// Copy each component of the type individually
 			memset(dst.data() + offset, 0, accessor.count * sizeof(T));
 			for (size_t i = 0; i < accessor.count * componentCount; i++)
-				memcpy(reinterpret_cast<uint8_t*>(dst.data()) + offset * sizeof(T) + i * outComponentSize, ((uint8_t*)bufferData) + i * componentSize, componentSize);
+				memcpy(reinterpret_cast<uint8_t*>(dst.data()) + offset * sizeof(T) + i * outComponentSize, static_cast<const uint8_t*>(bufferData) + i * componentSize, componentSize);
 		}
 		else // Copy straight, no mismatch. Type should be interpreted, so it doesn't matter
 		{
@@ -99,14 +96,23 @@ namespace Mahakam
 		offset += accessor.count;
 	}
 
-	void Mesh::GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<int, size_t>& nodeIndex, int id, int parentID, Asset<Mesh>& skinnedMesh)
+	template<typename T>
+	static void GLTFLoadAttribute(tinygltf::Model& model, tinygltf::Primitive& p, const std::string& attribute, size_t& offset, TrivialArray<T>& dst)
+	{
+		auto iter = p.attributes.find(attribute);
+		if (iter == p.attributes.end())
+			return;
+
+		GLTFLoadIndex<T>(model, iter->second, offset, dst);
+	}
+
+	static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<uint32_t, uint32_t>& nodeIndex, uint32_t id, int parentID, Asset<Mesh>& skinnedMesh)
 	{
 		const tinygltf::Node& node = model.nodes[id];
 
 		MeshNode bone;
 		bone.Name = node.name;
 		bone.ID = id;
-		bone.Mesh = node.mesh;
 		bone.ParentID = parentID;
 
 		// Construct local offset
@@ -139,11 +145,19 @@ namespace Mahakam
 			bone.Offset = glm::inverse(matrix);
 		}
 
-		nodeIndex[id] = skinnedMesh->NodeHierarchy.size();
-		skinnedMesh->NodeHierarchy.push_back(bone);
+		// Map ID to position in vector
+		nodeIndex[id] = static_cast<uint32_t>(skinnedMesh->NodeHierarchy.size());
 
+		// Add this node to list of skins
 		if (node.skin > -1)
-			skinnedMesh->Skins.push_back(static_cast<int>(skinnedMesh->NodeHierarchy.size()) - 1);
+			skinnedMesh->Skins.push_back(static_cast<uint32_t>(skinnedMesh->NodeHierarchy.size()));
+
+		// Add this node to map of submeshes
+		if (node.mesh > -1)
+			skinnedMesh->SubMeshMap[static_cast<uint32_t>(skinnedMesh->NodeHierarchy.size())] = node.mesh;
+
+		// Add to list of nodes
+		skinnedMesh->NodeHierarchy.push_back(bone);
 
 		for (auto& child : node.children)
 			GLTFReadNodeHierarchy(model, nodeIndex, child, id, skinnedMesh);
@@ -284,37 +298,7 @@ namespace Mahakam
 				}
 
 				// Extract indices
-				{
-					const auto& accessor = model.accessors[p.indices];
-					const auto& bufferView = model.bufferViews[accessor.bufferView];
-					const auto& buffer = model.buffers[bufferView.buffer];
-					const auto byteStride = accessor.ByteStride(bufferView);
-
-					const uint8_t* indexData = &buffer.data[bufferView.byteOffset + accessor.byteOffset];
-
-					switch (accessor.componentType)
-					{
-					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
-						MH_INFO("[GLTF] Loading indices with uint32_t");
-						memcpy(indices.data() + indexOffset, indexData, accessor.count * sizeof(uint32_t));
-						break;
-					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-						MH_INFO("[GLTF] Loading indices with uint16_t");
-						for (size_t i = 0; i < accessor.count; i++)
-							memcpy(indices.data() + i + indexOffset, indexData + i * sizeof(uint16_t), sizeof(uint16_t));
-						break;
-					case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-						MH_INFO("[GLTF] Loading indices with uint8_t");
-						for (size_t i = 0; i < accessor.count; i++)
-							memcpy(indices.data() + i + indexOffset, indexData + i * sizeof(uint8_t), sizeof(uint8_t));
-						break;
-					default:
-						MH_BREAK("[GLTF] Unsupported index format");
-						break;
-					}
-
-					indexOffset += accessor.count;
-				}
+				GLTFLoadIndex<uint32_t>(model, p.indices, indexOffset, indices);
 			}
 
 			MH_ASSERT(vertexCount == positionOffset, "Vertex count mismatch");
@@ -347,10 +331,10 @@ namespace Mahakam
 		// Extract nodes and bones
 		if (props.IncludeNodes)
 		{
+			UnorderedMap<uint32_t, uint32_t> nodeIndex; // Node ID to hierarchy index
+
 			for (int rootNode : scene.nodes)
 			{
-				UnorderedMap<int, size_t> nodeIndex; // Node ID to hierarchy index
-
 				// Populate node hierarchy
 				GLTFReadNodeHierarchy(model, nodeIndex, rootNode, -1, skinnedMesh);
 
@@ -359,34 +343,34 @@ namespace Mahakam
 				{
 					for (auto& skinNode : model.nodes)
 					{
-						if (skinNode.skin > -1)
+						if (skinNode.skin < 0)
+							continue;
+
+						// Get the skin from the node
+						auto& skin = model.skins[skinNode.skin];
+
+						// Get the affected nodes and their bind matrices
+						auto& joints = skin.joints;
+						const auto& accessor = model.accessors[skin.inverseBindMatrices];
+						const auto& bufferView = model.bufferViews[accessor.bufferView];
+						const auto& buffer = model.buffers[bufferView.buffer];
+
+						MH_ASSERT(joints.size() == accessor.count, "Bone count doesn't match joint count");
+
+						const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
+
+						// Extract joint data
+						skinnedMesh->BoneMap.reserve(joints.size());
+
+						// Add the bones to the skinned mesh
+						for (uint32_t i = 0; i < joints.size(); i++)
 						{
-							// Get the skin from the node
-							auto& skin = model.skins[skinNode.skin];
+							int nodeID = joints[i];
+							const auto& node = model.nodes[nodeID];
 
-							// Get the affected nodes and their bind matrices
-							auto& joints = skin.joints;
-							const auto& accessor = model.accessors[skin.inverseBindMatrices];
-							const auto& bufferView = model.bufferViews[accessor.bufferView];
-							const auto& buffer = model.buffers[bufferView.buffer];
-
-							MH_ASSERT(joints.size() == accessor.count, "Bone count doesn't match joint count");
-
-							const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
-
-							// Extract joint data
-							skinnedMesh->BoneInfoMap.reserve(skinnedMesh->BoneInfoMap.size() + joints.size());
-
-							// Add the bones to the skinned mesh
-							for (size_t i = 0; i < joints.size(); i++)
-							{
-								int nodeID = joints[i];
-								const auto& node = model.nodes[nodeID];
-
-								// Override offset to be the bone's inverse matrix
-								skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].Offset = invMatrices[i];
-								skinnedMesh->BoneInfoMap.insert({ node.name, static_cast<int>(i) });
-							}
+							// Override offset to be the bone's inverse matrix
+							skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].Offset = invMatrices[i];
+							skinnedMesh->BoneMap.insert({ nodeIndex[nodeID], i });
 						}
 					}
 				}

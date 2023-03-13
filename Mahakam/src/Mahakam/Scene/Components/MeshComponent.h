@@ -31,13 +31,15 @@ namespace Mahakam
 
 		inline size_t GetSubMeshCount() const { return m_SkinnedMesh->Meshes.size(); }
 
-		inline Ref<SubMesh> GetSubMesh() { return m_SkinnedMesh->Meshes.at(0); }
-		inline const std::vector<Ref<SubMesh>>& GetSubMeshes() { return m_SkinnedMesh->Meshes; }
+		inline Ref<SubMesh> GetSubMesh() const { return m_SkinnedMesh->Meshes.at(0); }
+		inline const std::vector<Ref<SubMesh>>& GetSubMeshes() const { return m_SkinnedMesh->Meshes; }
 
-		inline Asset<Material> GetMaterial() { return m_SkinnedMesh->Props.Materials.at(0); }
-		inline const std::vector<Asset<Material>>& GetMaterials() { return m_SkinnedMesh->Props.Materials; }
+		inline Asset<Material> GetMaterial() const { return m_SkinnedMesh->Props.Materials.at(0); }
+		inline const std::vector<Asset<Material>>& GetMaterials() const { return m_SkinnedMesh->Props.Materials; }
 
 		inline const std::vector<MeshNode>& GetNodeHierarchy() const { return m_SkinnedMesh->NodeHierarchy; }
-		inline const UnorderedMap<std::string, int>& GetBoneInfo() const { return m_SkinnedMesh->BoneInfoMap; }
+		inline const TrivialVector<uint32_t>& GetSkins() const { return m_SkinnedMesh->Skins; }
+		inline const UnorderedMap<uint32_t, uint32_t>& GetSubMeshMap() const { return m_SkinnedMesh->SubMeshMap; }
+		inline const UnorderedMap<uint32_t, uint32_t>& GetBoneInfo() const { return m_SkinnedMesh->BoneMap; }
 	};
 }

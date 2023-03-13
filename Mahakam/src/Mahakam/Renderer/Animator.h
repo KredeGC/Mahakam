@@ -13,6 +13,9 @@ namespace Mahakam
 	class Animator
 	{
 	private:
+		template<typename V>
+		using MapAlloc = Allocator::BaseAllocator<std::pair<const int, V>>;
+
 		Asset<Animation> m_Animation;
 
 		float m_Time = 0.0f;
@@ -20,9 +23,9 @@ namespace Mahakam
 
 		TrivialArray<size_t, Allocator::BaseAllocator<size_t>> m_Indices;
 
-		UnorderedMap<int, glm::vec3, Allocator::BaseAllocator<std::pair<const int, glm::vec3>>> m_Translations;
-		UnorderedMap<int, glm::quat, Allocator::BaseAllocator<std::pair<const int, glm::quat>>> m_Rotations;
-		UnorderedMap<int, glm::vec3, Allocator::BaseAllocator<std::pair<const int, glm::vec3>>> m_Scales;
+		UnorderedMap<int, glm::vec3, MapAlloc<glm::vec3>> m_Translations;
+		UnorderedMap<int, glm::quat, MapAlloc<glm::quat>> m_Rotations;
+		UnorderedMap<int, glm::vec3, MapAlloc<glm::vec3>> m_Scales;
 
 	public:
 		Animator();
@@ -36,9 +39,9 @@ namespace Mahakam
 
 		inline float GetTime() const { return m_Time; }
 
-		inline const UnorderedMap<int, glm::vec3, Allocator::BaseAllocator<std::pair<const int, glm::vec3>>>& GetTranslations() const { return m_Translations; }
-		inline const UnorderedMap<int, glm::quat, Allocator::BaseAllocator<std::pair<const int, glm::quat>>>& GetRotations() const { return m_Rotations; }
-		inline const UnorderedMap<int, glm::vec3, Allocator::BaseAllocator<std::pair<const int, glm::vec3>>>& GetScales() const { return m_Scales; }
+		inline const UnorderedMap<int, glm::vec3, MapAlloc<glm::vec3>>& GetTranslations() const { return m_Translations; }
+		inline const UnorderedMap<int, glm::quat, MapAlloc<glm::quat>>& GetRotations() const { return m_Rotations; }
+		inline const UnorderedMap<int, glm::vec3, MapAlloc<glm::vec3>>& GetScales() const { return m_Scales; }
 
 		void Update(Timestep dt);
 	};

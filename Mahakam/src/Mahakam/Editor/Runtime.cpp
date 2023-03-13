@@ -2,7 +2,10 @@
 #include "Runtime.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
+
 #include "Mahakam/Scene/Scene.h"
+#include "Mahakam/Scene/SceneManager.h"
+#include "Mahakam/Scene/SceneSerializer.h"
 
 namespace Mahakam::Editor
 {
@@ -44,6 +47,35 @@ namespace Mahakam::Editor
 		s_RunPtr = nullptr;
 		s_StopPtr = nullptr;
 		s_UpdatePtr = nullptr;
+	}
+
+	void Runtime::ReloadRuntime()
+	{
+		//std::string serializedScene;
+
+		//// Serialize and unload scene
+		//{
+		//	Ref<Scene> scene = SceneManager::GetActiveScene();
+
+		//	SceneSerializer serializer(scene);
+
+		//	serializedScene = serializer.Serialize();
+
+		//	SceneManager::SetActiveScene(nullptr);
+		//}
+
+		LoadRuntime(s_Filepath, s_Filename);
+
+		//// Deserialize and load scene
+		//{
+		//	Ref<Scene> scene = Scene::Create();
+
+		//	SceneSerializer serializer(scene);
+
+		//	serializer.Deserialize(serializedScene);
+
+		//	SceneManager::SetActiveScene(scene);
+		//}
 	}
 
 	bool Runtime::HasRuntime(bool& hasRun, bool& hasStop, bool& hasUpdate)

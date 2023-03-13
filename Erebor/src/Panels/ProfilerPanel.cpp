@@ -77,10 +77,13 @@ namespace Mahakam::Editor
 
 	void ProfilerPanel::UpdateProfilerResults()
 	{
-		auto& results = Profiler::GetResults();
+		const auto* results = Profiler::GetResults();
 
-		m_AverageResults.resize(results.size());
-		m_AverageResults = results;
+		if (!results)
+			return;
+
+		m_AverageResults.resize(results->size());
+		m_AverageResults = *results;
 
 		std::sort(m_AverageResults.begin(), m_AverageResults.end(), [](Profiler::ProfileResult& a, Profiler::ProfileResult& b)
 		{

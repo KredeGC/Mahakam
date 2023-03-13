@@ -32,12 +32,9 @@ namespace Mahakam::Editor
 
 		static void UnloadRuntime();
 
-		static bool HasRuntime(bool& hasRun, bool& hasStop, bool& hasUpdate);
+		static void ReloadRuntime();
 
-		inline static void ReloadRuntime()
-		{
-			LoadRuntime(s_Filepath, s_Filename);
-		}
+		static bool HasRuntime(bool& hasRun, bool& hasStop, bool& hasUpdate);
 
 		inline static void RunScene(const Ref<Scene>& scene)
 		{
