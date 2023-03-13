@@ -12,11 +12,13 @@
 #include "Components/SkinComponent.h"
 #include "Components/TagComponent.h"
 #include "Components/TransformComponent.h"
-#include "Entity.h"
 
-#include "Mahakam/Renderer/Animation.h"
+#include "Entity.h"
+#include "SceneSerializer.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
+
+#include "Mahakam/Renderer/Animation.h"
 
 #include "Mahakam/Serialization/YAMLSerialization.h"
 

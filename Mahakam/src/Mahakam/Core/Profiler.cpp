@@ -64,10 +64,10 @@ namespace Mahakam
 
 	void Profiler::ClearResults()
 	{
+#ifdef MH_ENABLE_PROFILING
 		if (!s_ResultsFwd)
 			return;
 
-#ifdef MH_ENABLE_PROFILING
 		s_ResultsFwd->resize(s_ResultsBck->size());
 
 		*s_ResultsFwd = *s_ResultsBck;
@@ -83,13 +83,17 @@ namespace Mahakam
 
 	void Profiler::Init()
 	{
-		s_ResultsFwd = new ProfileVector(Allocator::GetAllocator<ProfileResult>());
-		s_ResultsBck = new ProfileVector(Allocator::GetAllocator<ProfileResult>());
+#ifdef MH_ENABLE_PROFILING
+		s_ResultsFwd = Allocator::New<ProfileVector>(Allocator::GetAllocator<ProfileResult>());
+		s_ResultsBck = Allocator::New<ProfileVector>(Allocator::GetAllocator<ProfileResult>());
+#endif
 	}
 
 	void Profiler::Shutdown()
 	{
-		delete s_ResultsFwd;
-		delete s_ResultsBck;
+#ifdef MH_ENABLE_PROFILING
+		Allocator::Delete(s_ResultsFwd);
+		Allocator::Delete(s_ResultsBck);
+#endif
 	}
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Entity.h"
-#include "SceneSerializer.h"
 
 #include <ryml/rapidyaml-0.4.1.hpp>
 
@@ -23,7 +22,7 @@ namespace Mahakam
 			void (*RemoveComponent)(Entity) = nullptr;
 
 			bool (*Serialize)(ryml::NodeRef&, Entity) = nullptr;
-			bool (*Deserialize)(ryml::NodeRef&, SceneSerializer::EntityMap&, Entity) = nullptr;
+			bool (*Deserialize)(ryml::NodeRef&, UnorderedMap<uint32_t, entt::entity>&, Entity) = nullptr;
 
 			template<typename T>
 			void SetComponent()

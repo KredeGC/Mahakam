@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Scene.h"
-
 #include <ryml/rapidyaml-0.4.1.hpp>
 
 #include <filesystem>
 
 namespace Mahakam
 {
+	class Scene;
+
 	class SceneSerializer
 	{
 	public:

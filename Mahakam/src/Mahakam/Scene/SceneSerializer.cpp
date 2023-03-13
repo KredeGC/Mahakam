@@ -4,14 +4,15 @@
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Shader.h"
 
+#include "Mahakam/Serialization/YAMLGuard.h"
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
 #include "Components/RelationshipComponent.h"
 #include "Components/TagComponent.h"
 
 #include "ComponentRegistry.h"
 #include "Entity.h"
-
-#include "Mahakam/Serialization/YAMLGuard.h"
-#include "Mahakam/Serialization/YAMLSerialization.h"
+#include "Scene.h"
 
 #include <ryml/rapidyaml-0.4.1.hpp>
 

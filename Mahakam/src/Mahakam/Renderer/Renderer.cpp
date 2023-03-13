@@ -43,7 +43,7 @@ namespace Mahakam
 
 		// Initialize camera buffer
 		s_SceneData->CameraBuffer = UniformBuffer::Create(sizeof(CameraData));
-		s_SceneData->UniformValueBuffer = UniformBuffer::Create(2 << 14); // 16KB
+		s_SceneData->UniformValueBuffer = UniformBuffer::Create(2 << 13); // 16KB
 	}
 
 	void Renderer::Shutdown()
