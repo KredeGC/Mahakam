@@ -481,7 +481,7 @@ namespace Mahakam
 				ryml::NodeRef materialsNode = node["Materials"];
 				materialsNode |= ryml::SEQ;
 
-				for (auto& material : mesh->GetProps().Materials)
+				/*for (auto& material : mesh->GetProps().Materials)
 					materialsNode.append_child() << material.GetID();
 
 				meshNode["Primitive"] << (int)mesh->Primitive;
@@ -495,7 +495,7 @@ namespace Mahakam
 					meshNode["Columns"] << props.Columns;
 					break;
 				}
-				}
+				}*/
 			}
 
 			return true;

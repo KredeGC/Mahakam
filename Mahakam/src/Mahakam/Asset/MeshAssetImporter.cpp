@@ -13,7 +13,9 @@ namespace Mahakam
 
 		m_ImporterProps.CreateMenu = true;
 
+#ifndef MH_STANDALONE
 		m_Primitive = MeshPrimitive::Model;
+#endif
 	}
 
 #ifndef MH_STANDALONE
