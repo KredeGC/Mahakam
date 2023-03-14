@@ -111,7 +111,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
 
 	// Create glTF skinned model
-	Asset<Mesh> skinnedModel = Asset<Mesh>("import/assets/models/mannequin_clap.glb.import");
+	Asset<BoneMesh> skinnedModel = Asset<BoneMesh>("import/assets/models/mannequin_clap.glb.import");
 	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.glb");
 	Asset<Animation> skinnedAnimation = Asset<Animation>("import/assets/models/ClapAnimation.anim.import");
 	//Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.glb");
@@ -124,7 +124,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	skinnedEntity.AddComponent<MeshComponent>(skinnedModel);
 	skinnedEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
 	skinnedEntity.AddComponent<AnimatorComponent>().GetAnimator().SetAnimation(skinnedAnimation);
-	SkinComponent& skin = skinnedEntity.AddComponent<SkinComponent>();
+	SkeletonComponent& skin = skinnedEntity.AddComponent<SkeletonComponent>();
 
 	skin.CreateBoneEntities(skinnedEntity, skinnedModel->NodeHierarchy);
 #endif
@@ -166,7 +166,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 		for (int x = 0; x < 10; x++)
 		{
 			// Setup material with texture
-			Asset<Material> material = Material::Copy(sphereMesh->Props.Materials[0]);
+			Asset<Material> material = Material::Copy(sphereMesh->GetProps().Materials[0]);
 			material->SetFloat("Uniforms.MetallicMul", y / 10.0f);
 			material->SetFloat("Uniforms.RoughnessMul", x / 10.0f);
 

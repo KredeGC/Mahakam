@@ -10,13 +10,13 @@
 
 namespace Mahakam
 {
-	struct SkinComponent
+	struct SkeletonComponent
 	{
 	private:
 		TrivialVector<Entity, Allocator::BaseAllocator<Entity>> m_BoneEntities;
 
 	public:
-		SkinComponent() : m_BoneEntities(Allocator::GetAllocator<Entity>()) {}
+		SkeletonComponent() : m_BoneEntities(Allocator::GetAllocator<Entity>()) {}
 
 		inline void ClearBoneEntities(const std::vector<MeshNode>& hierarchy)
 		{

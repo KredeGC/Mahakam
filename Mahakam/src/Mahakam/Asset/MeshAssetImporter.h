@@ -14,7 +14,8 @@ namespace Mahakam
 		ImporterProps m_ImporterProps;
 
 #ifndef MH_STANDALONE
-		MeshProps m_MeshProps;
+		MeshPrimitive m_Primitive;
+		Scope<MeshProps> m_MeshProps;
 
 		Asset<Mesh> m_PreviewMesh;
 #endif
@@ -32,5 +33,8 @@ namespace Mahakam
 
 		virtual void Serialize(ryml::NodeRef& node, void* asset) override;
 		virtual Asset<void> Deserialize(ryml::NodeRef& node) override;
+
+	private:
+		Scope<MeshProps> DeserializeProps(MeshPrimitive primitive, ryml::NodeRef& node);
 	};
 }

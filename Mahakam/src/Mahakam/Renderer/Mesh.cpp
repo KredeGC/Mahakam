@@ -106,7 +106,7 @@ namespace Mahakam
 		GLTFLoadIndex<T>(model, iter->second, offset, dst);
 	}
 
-	static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<uint32_t, uint32_t>& nodeIndex, uint32_t id, int parentID, Asset<Mesh>& skinnedMesh)
+	static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<uint32_t, uint32_t>& nodeIndex, uint32_t id, int parentID, Asset<BoneMesh>& skinnedMesh)
 	{
 		const tinygltf::Node& node = model.nodes[id];
 
@@ -163,26 +163,30 @@ namespace Mahakam
 			GLTFReadNodeHierarchy(model, nodeIndex, child, id, skinnedMesh);
 	}
 
-	//Asset<Mesh> Mesh::CreatePropsImpl(const MeshProps& props)
-	MH_DEFINE_FUNC(Mesh::CreatePropsImpl, Asset<Mesh>, const MeshProps& props)
-	{
-		return CreateAsset<Mesh>(props);
-	};
-
-	//Asset<Mesh> Mesh::CreateSubMeshImpl(Ref<SubMesh> subMesh, const MeshProps& props)
-	MH_DEFINE_FUNC(Mesh::CreateSubMeshImpl, Asset<Mesh>, Ref<SubMesh> subMesh, const MeshProps& props)
-	{
-		return CreateAsset<Mesh>(subMesh, props);
-	};
-
-	//Asset<Mesh> Mesh::CreatePropsImpl(const MeshProps& props)
+	//Asset<Mesh> Mesh::CopyImpl(Asset<Mesh> other)
 	MH_DEFINE_FUNC(Mesh::CopyImpl, Asset<Mesh>, Asset<Mesh> other)
 	{
-		return CreateAsset<Mesh>(*other.get());
+		switch (other->Primitive)
+		{
+		case MeshPrimitive::Model:
+			return CreateAsset<BoneMesh>(static_cast<BoneMesh&>(*other.get()));
+		case MeshPrimitive::Plane:
+			return CreateAsset<PlaneMesh>(static_cast<PlaneMesh&>(*other.get()));
+		case MeshPrimitive::Cube:
+			return CreateAsset<CubeMesh>(static_cast<CubeMesh&>(*other.get()));
+		case MeshPrimitive::CubeSphere:
+			return CreateAsset<CubeSphereMesh>(static_cast<CubeSphereMesh&>(*other.get()));
+		case MeshPrimitive::UVSphere:
+			return CreateAsset<UVSphereMesh>(static_cast<UVSphereMesh&>(*other.get()));
+		}
+
+		MH_BREAK("Unknown MeshPrimitive");
+
+		return nullptr;
 	};
 
-	//Asset<Mesh> Mesh::LoadMeshImpl(const std::filesystem::path& filepath, const MeshProps& props)
-	MH_DEFINE_FUNC(Mesh::LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props)
+	//Asset<BoneMesh> BoneMesh::CreateImpl(const BoneMeshProps& props)
+	MH_DEFINE_FUNC(BoneMesh::CreateImpl, Asset<BoneMesh>, const BoneMeshProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -192,10 +196,10 @@ namespace Mahakam
 		std::string warn;
 
 		bool success;
-		if (filepath.extension().string() == ".gltf")
-			success = loader.LoadASCIIFromFile(&model, &err, &warn, filepath.string());
+		if (props.Filepath.extension().string() == ".gltf")
+			success = loader.LoadASCIIFromFile(&model, &err, &warn, props.Filepath.string());
 		else
-			success = loader.LoadBinaryFromFile(&model, &err, &warn, filepath.string());
+			success = loader.LoadBinaryFromFile(&model, &err, &warn, props.Filepath.string());
 
 		if (!warn.empty())
 			MH_WARN("[GLTF] Warning: {0}", warn);
@@ -204,7 +208,7 @@ namespace Mahakam
 			MH_ERROR("[GLTF] Error: {0}", err);
 
 		if (!success) {
-			MH_ERROR("[GLTF] Failed to parse glTF model at {0}", filepath.string());
+			MH_ERROR("[GLTF] Failed to parse glTF model at {0}", props.Filepath.string());
 			return nullptr;
 		}
 
@@ -221,10 +225,7 @@ namespace Mahakam
 		// TODO: Support interleaved data
 		// TODO: Support sparse data sets
 
-
-		Asset<Mesh> skinnedMesh = CreateAsset<Mesh>();
-
-		skinnedMesh->Props = props;
+		Asset<BoneMesh> skinnedMesh = CreateAsset<BoneMesh>(std::move(props));
 
 		// Extract vertex and index values
 		for (auto& m : model.meshes)
@@ -278,7 +279,7 @@ namespace Mahakam
 				// Extract vertex colors
 				GLTFLoadAttribute<glm::vec4>(model, p, "COLOR_0", colorOffset, colors);
 
-				if (props.IncludeBones)
+				if (skinnedMesh->Props.IncludeBones)
 				{
 					// Extract joint information
 					GLTFLoadAttribute<glm::ivec4>(model, p, "JOINTS_0", boneIDOffset, boneIDs);
@@ -329,7 +330,7 @@ namespace Mahakam
 		}
 
 		// Extract nodes and bones
-		if (props.IncludeNodes)
+		if (skinnedMesh->Props.IncludeNodes)
 		{
 			UnorderedMap<uint32_t, uint32_t> nodeIndex; // Node ID to hierarchy index
 
@@ -339,7 +340,7 @@ namespace Mahakam
 				GLTFReadNodeHierarchy(model, nodeIndex, rootNode, -1, skinnedMesh);
 
 				// Extract bone transformations
-				if (props.IncludeBones)
+				if (skinnedMesh->Props.IncludeBones)
 				{
 					for (auto& skinNode : model.nodes)
 					{
@@ -380,6 +381,30 @@ namespace Mahakam
 		}
 
 		return skinnedMesh;
+	};
+
+	//Asset<PlaneMesh> PlaneMesh::CreateImpl(const PlaneMeshProps& props)
+	MH_DEFINE_FUNC(PlaneMesh::CreateImpl, Asset<PlaneMesh>, const PlaneMeshProps& props)
+	{
+		return CreateAsset<PlaneMesh>(SubMesh::CreatePlane(props.Rows, props.Columns), props);
+	};
+
+	//Asset<CubeMesh> CubeMesh::CreateImpl(const CubeMeshProps& props)
+	MH_DEFINE_FUNC(CubeMesh::CreateImpl, Asset<CubeMesh>, const CubeMeshProps& props)
+	{
+		return CreateAsset<CubeMesh>(SubMesh::CreateCube(props.Tessellation, props.Invert), props);
+	};
+
+	//Asset<CubeSphereMesh> CubeSphereMesh::CreateImpl(const CubeSphereMeshProps& props)
+	MH_DEFINE_FUNC(CubeSphereMesh::CreateImpl, Asset<CubeSphereMesh>, const CubeSphereMeshProps& props)
+	{
+		return CreateAsset<CubeSphereMesh>(SubMesh::CreateCubeSphere(props.Tessellation, props.Invert), props);
+	};
+
+	//Asset<UVSphereMesh> UVSphereMesh::CreateImpl(const UVSphereMeshProps& props)
+	MH_DEFINE_FUNC(UVSphereMesh::CreateImpl, Asset<UVSphereMesh>, const UVSphereMeshProps& props)
+	{
+		return CreateAsset<UVSphereMesh>(SubMesh::CreateUVSphere(props.Rows, props.Columns), props);
 	};
 
 	//Ref<SubMesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)

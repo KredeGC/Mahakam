@@ -9,7 +9,7 @@
 #include "Components/MeshComponent.h"
 #include "Components/ParticleSystemComponent.h"
 #include "Components/RigidbodyComponent.h"
-#include "Components/SkinComponent.h"
+#include "Components/SkeletonComponent.h"
 #include "Components/TagComponent.h"
 #include "Components/TransformComponent.h"
 
@@ -469,25 +469,59 @@ namespace Mahakam
 
 			Asset<Mesh> mesh = meshComponent.GetMesh();
 
-			node["Mesh"] << mesh.GetID();
+			auto meshNode = node["Mesh"];
+			meshNode |= ryml::MAP;
+
+			if (mesh.GetID())
+			{
+				meshNode["ID"] << mesh.GetID();
+			}
+			else
+			{
+				ryml::NodeRef materialsNode = node["Materials"];
+				materialsNode |= ryml::SEQ;
+
+				for (auto& material : mesh->GetProps().Materials)
+					materialsNode.append_child() << material.GetID();
+
+				meshNode["Primitive"] << (int)mesh->Primitive;
+
+				switch (mesh->Primitive)
+				{
+				case MeshPrimitive::Plane:
+				{
+					PlaneMeshProps& props = static_cast<PlaneMeshProps&>(mesh->GetProps());
+					meshNode["Rows"] << props.Rows;
+					meshNode["Columns"] << props.Columns;
+					break;
+				}
+				}
+			}
 
 			return true;
 		};
 		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
-			if (node.has_child("Mesh"))
-			{
-				uint64_t meshID;
-				node["Mesh"] >> meshID;
-
-				Asset<Mesh> mesh = Asset<Mesh>(meshID);
-
-				MeshComponent& meshComponent = entity.AddComponent<MeshComponent>(mesh);
-			}
-			else
+			if (!node.has_child("Mesh"))
 			{
 				MeshComponent& meshComponent = entity.AddComponent<MeshComponent>();
+				return true;
 			}
+
+			auto meshNode = node["Mesh"];
+
+			if (!meshNode.has_child("ID"))
+			{
+				MeshComponent& meshComponent = entity.AddComponent<MeshComponent>();
+				return true;
+			}
+
+			uint64_t meshID;
+			meshNode["ID"] >> meshID;
+
+			Asset<Mesh> mesh = Asset<Mesh>(meshID);
+
+			MeshComponent& meshComponent = entity.AddComponent<MeshComponent>(mesh);
 
 			return true;
 		};
@@ -505,29 +539,29 @@ namespace Mahakam
 		RegisterComponent("Particle system", componentInterface);
 #pragma endregion
 
-#pragma region Skin
+#pragma region Skeleton
 		// male icon
 		componentInterface.SetEditor(u8"\uef89", [](Entity entity)
 		{
-			SkinComponent& skinComponent = entity.GetComponent<SkinComponent>();
+			SkeletonComponent& skeletonComponent = entity.GetComponent<SkeletonComponent>();
 
 			if (MeshComponent* meshComponent = entity.TryGetComponent<MeshComponent>())
 			{
 				if (meshComponent->HasMesh())
 				{
-					auto& bones = skinComponent.GetBoneEntities();
+					auto& bones = skeletonComponent.GetBoneEntities();
 					auto& hierarchy = meshComponent->GetNodeHierarchy();
 
 					if (ImGui::Button("Create bone entities"))
 					{
-						skinComponent.CreateBoneEntities(entity, hierarchy);
+						skeletonComponent.CreateBoneEntities(entity, hierarchy);
 					}
 
 					ImGui::SameLine();
 
 					if (ImGui::Button("Clear bone entities"))
 					{
-						skinComponent.ClearBoneEntities(hierarchy);
+						skeletonComponent.ClearBoneEntities(hierarchy);
 					}
 
 					if (bones.size() == hierarchy.size())
@@ -546,15 +580,15 @@ namespace Mahakam
 				ImGui::Text("Skin requires a Mesh Component");
 			}
 		});
-		componentInterface.SetComponent<SkinComponent>();
+		componentInterface.SetComponent<SkeletonComponent>();
 		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
-			SkinComponent& skin = entity.GetComponent<SkinComponent>();
+			SkeletonComponent& skeletonComponent = entity.GetComponent<SkeletonComponent>();
 
 			ryml::NodeRef bones = node["Bones"];
 			bones |= ryml::SEQ;
 
-			const auto& boneEntities = skin.GetBoneEntities();
+			const auto& boneEntities = skeletonComponent.GetBoneEntities();
 			for (auto& boneEntity : boneEntities)
 			{
 				bones.append_child() << boneEntity.GetHandle();
@@ -564,8 +598,8 @@ namespace Mahakam
 		};
 		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
 		{
-			SkinComponent& skin = entity.AddComponent<SkinComponent>();
-			auto& boneEntities = skin.GetBoneEntities();
+			SkeletonComponent& skeletonComponent = entity.AddComponent<SkeletonComponent>();
+			auto& boneEntities = skeletonComponent.GetBoneEntities();
 
 			if (node.has_child("Bones"))
 			{
@@ -593,7 +627,7 @@ namespace Mahakam
 			return true;
 		};
 
-		RegisterComponent("Skin", componentInterface);
+		RegisterComponent("Skeleton", componentInterface);
 #pragma endregion
 	};
 

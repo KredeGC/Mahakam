@@ -44,6 +44,7 @@ Refer to the [BUILDING.md](BUILDING.md) file.
 * [GLFW](https://github.com/glfw/glfw) for window creation and management.
 * [OpenGL Mathematics](https://github.com/g-truc/glm) for fast SIMD vector math.
 * [glslang](https://github.com/KhronosGroup/glslang) for shader compilation.
+* [json](https://github.com/nlohmann/json) for parsing JSON in tinygltf.
 * [KTL](https://github.com/KredeGC/KTL) for various allocators and containers.
 * [Dear ImGui](https://github.com/ocornut/imgui) for GUI interaction and rendering.
 * [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) for editor interaction and rendering.

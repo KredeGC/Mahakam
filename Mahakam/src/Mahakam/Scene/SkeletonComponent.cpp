@@ -1,11 +1,11 @@
 #include "Mahakam/mhpch.h"
 
-#include "Components/SkinComponent.h"
+#include "Components/SkeletonComponent.h"
 #include "Components/TransformComponent.h"
 
 namespace Mahakam
 {
-	void SkinComponent::CreateBoneEntities(Entity entity, const std::vector<MeshNode>& hierarchy)
+	void SkeletonComponent::CreateBoneEntities(Entity entity, const std::vector<MeshNode>& hierarchy)
 	{
 		m_BoneEntities.clear();
 

@@ -14,16 +14,15 @@ namespace Mahakam
 
 		MeshComponent(const MeshComponent&) = default;
 
-		MeshComponent(Asset<Mesh> skinnedMesh) : m_SkinnedMesh(std::move(skinnedMesh)) {}
+		MeshComponent(Asset<Mesh> skinnedMesh) :
+			m_SkinnedMesh(std::move(skinnedMesh)) {}
 
-		MeshComponent(Asset<Mesh> skinnedMesh, Asset<Material> material) : m_SkinnedMesh(std::move(skinnedMesh))
+		MeshComponent(Asset<Mesh> skinnedMesh, Asset<Material> material) :
+			m_SkinnedMesh(std::move(skinnedMesh))
 		{
-			m_SkinnedMesh->Props.Materials.clear();
-			m_SkinnedMesh->Props.Materials.push_back(std::move(material));
+			m_SkinnedMesh->GetProps().Materials.clear();
+			m_SkinnedMesh->GetProps().Materials.push_back(std::move(material));
 		}
-
-		MeshComponent(Ref<SubMesh> mesh, Asset<Material> material)
-			: m_SkinnedMesh(CreateAsset<Mesh>(std::move(mesh), std::move(material))) {}
 
 		inline void SetMesh(Asset<Mesh> skinnedMesh) { m_SkinnedMesh = std::move(skinnedMesh); }
 		inline Asset<Mesh> GetMesh() const { return m_SkinnedMesh; }
@@ -34,12 +33,13 @@ namespace Mahakam
 		inline Ref<SubMesh> GetSubMesh() const { return m_SkinnedMesh->Meshes.at(0); }
 		inline const std::vector<Ref<SubMesh>>& GetSubMeshes() const { return m_SkinnedMesh->Meshes; }
 
-		inline Asset<Material> GetMaterial() const { return m_SkinnedMesh->Props.Materials.at(0); }
-		inline const std::vector<Asset<Material>>& GetMaterials() const { return m_SkinnedMesh->Props.Materials; }
+		inline Asset<Material> GetMaterial() const { return m_SkinnedMesh->GetProps().Materials.at(0); }
+		inline const std::vector<Asset<Material>>& GetMaterials() const { return m_SkinnedMesh->GetProps().Materials; }
 
-		inline const std::vector<MeshNode>& GetNodeHierarchy() const { return m_SkinnedMesh->NodeHierarchy; }
-		inline const TrivialVector<uint32_t>& GetSkins() const { return m_SkinnedMesh->Skins; }
-		inline const UnorderedMap<uint32_t, uint32_t>& GetSubMeshMap() const { return m_SkinnedMesh->SubMeshMap; }
-		inline const UnorderedMap<uint32_t, uint32_t>& GetBoneInfo() const { return m_SkinnedMesh->BoneMap; }
+		inline MeshPrimitive GetPrimitive() const { return m_SkinnedMesh->Primitive; }
+		inline const std::vector<MeshNode>& GetNodeHierarchy() const { return static_cast<BoneMesh&>(*m_SkinnedMesh.get()).NodeHierarchy; }
+		inline const TrivialVector<uint32_t>& GetSkins() const { return static_cast<BoneMesh&>(*m_SkinnedMesh.get()).Skins; }
+		inline const UnorderedMap<uint32_t, uint32_t>& GetSubMeshMap() const { return static_cast<BoneMesh&>(*m_SkinnedMesh.get()).SubMeshMap; }
+		inline const UnorderedMap<uint32_t, uint32_t>& GetBoneInfo() const { return static_cast<BoneMesh&>(*m_SkinnedMesh.get()).BoneMap; }
 	};
 }

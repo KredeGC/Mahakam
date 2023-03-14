@@ -10,7 +10,7 @@
 #include "Components/MeshComponent.h"
 #include "Components/ParticleSystemComponent.h"
 #include "Components/RelationshipComponent.h"
-#include "Components/SkinComponent.h"
+#include "Components/SkeletonComponent.h"
 #include "Components/TagComponent.h"
 #include "Components/TransformComponent.h"
 #include "Entity.h"
@@ -136,13 +136,17 @@ namespace Mahakam
 			});
 		}
 
-		// Update entities of skinned animators
+		// Update entities of skeleton animators
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - Animations");
 
-			m_Registry.view<AnimatorComponent, SkinComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
+			m_Registry.view<AnimatorComponent, SkeletonComponent, MeshComponent>().each([=](AnimatorComponent& animatorComponent, SkeletonComponent& skeletonComponent, MeshComponent& meshComponent)
 			{
 				if (!meshComponent.HasMesh())
+					return;
+
+				// Skeleton requires a bone mesh
+				if (meshComponent.GetPrimitive() != MeshPrimitive::Model)
 					return;
 
 				auto& animator = animatorComponent.GetAnimator();
@@ -151,7 +155,7 @@ namespace Mahakam
 				const auto& rotations = animator.GetRotations();
 				const auto& scales = animator.GetScales();
 
-				auto& boneEntities = skinComponent.GetBoneEntities();
+				auto& boneEntities = skeletonComponent.GetBoneEntities();
 				const auto& hierarchy = meshComponent.GetNodeHierarchy();
 
 				if (boneEntities.size() != hierarchy.size())
@@ -221,12 +225,16 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - SkinComponent");
 
-			m_Registry.view<TransformComponent, SkinComponent, MeshComponent>().each([=](TransformComponent& transformComponent, SkinComponent& skinComponent, MeshComponent& meshComponent)
+			m_Registry.view<TransformComponent, SkeletonComponent, MeshComponent>().each([=](TransformComponent& transformComponent, SkeletonComponent& skeletonComponent, MeshComponent& meshComponent)
 			{
 				if (!meshComponent.HasMesh())
 					return;
 
-				const auto& boneEntities = skinComponent.GetBoneEntities();
+				// Skeleton requires a bone mesh
+				if (meshComponent.GetPrimitive() != MeshPrimitive::Model)
+					return;
+
+				const auto& boneEntities = skeletonComponent.GetBoneEntities();
 				const auto& skins = meshComponent.GetSkins();
 				const auto& hierarchy = meshComponent.GetNodeHierarchy();
 				const auto& bones = meshComponent.GetBoneInfo();
@@ -393,9 +401,13 @@ namespace Mahakam
 					if (materialCount-- < 0)
 						return;
 
-					if (SkinComponent* skinComponent = m_Registry.try_get<SkinComponent>(entity))
+					if (SkeletonComponent* skeletonComponent = m_Registry.try_get<SkeletonComponent>(entity))
 					{
-						const auto& boneEntities = skinComponent->GetBoneEntities();
+						// Skeleton requires a bone mesh
+						if (meshComponent.GetPrimitive() != MeshPrimitive::Model)
+							return;
+
+						const auto& boneEntities = skeletonComponent->GetBoneEntities();
 						const auto& hierarchy = meshComponent.GetNodeHierarchy();
 
 						if (boneEntities.size() != hierarchy.size())
@@ -464,7 +476,7 @@ namespace Mahakam
 
 	void Scene::DestroyEntity(Entity entity)
 	{
-		m_Registry.destroy(entity.GetEntt());
+		entity.Delete();
 	}
 
 	void Scene::Sort()
@@ -485,6 +497,7 @@ namespace Mahakam
 
 		//registry.sort<RelationshipComponent, TransformComponent>();
 
+		// This is necessary to ensure that transforms get updated in the correct order
 		m_Registry.sort<TransformComponent>([&](const entt::entity lhs, const entt::entity rhs)
 		{
 			auto& clhs = m_Registry.get<RelationshipComponent>(lhs);

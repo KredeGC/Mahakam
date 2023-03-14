@@ -34,10 +34,36 @@ namespace Mahakam
 	struct MeshProps
 	{
 		std::vector<Asset<Material>> Materials;
-		MeshPrimitive Primitive = MeshPrimitive::Model;
+	};
+
+	struct BoneMeshProps : public MeshProps
+	{
+		std::filesystem::path Filepath;
 		bool IncludeNodes = true; // TODO: Use flags instead of bools?
 		bool IncludeBones = true;
+	};
+
+	struct PlaneMeshProps : public MeshProps
+	{
+		int Rows = 10;
+		int Columns = 10;
+	};
+
+	struct CubeMeshProps : public MeshProps
+	{
+		int Tessellation = 10;
 		bool Invert = false;
+	};
+
+	struct CubeSphereMeshProps : public MeshProps
+	{
+		int Tessellation = 10;
+		bool Invert = false;
+		bool Equirectangular = false;
+	};
+
+	struct UVSphereMeshProps : public MeshProps
+	{
 		int Rows = 10;
 		int Columns = 10;
 	};

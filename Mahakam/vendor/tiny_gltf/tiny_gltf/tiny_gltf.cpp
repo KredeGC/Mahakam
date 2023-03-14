@@ -4,6 +4,7 @@
 #define TINYGLTF_USE_CPP14
 #define TINYGLTF_NO_INCLUDE_STB_IMAGE
 #define TINYGLTF_NO_INCLUDE_STB_IMAGE_WRITE
+#define TINYGLTF_NO_EXTERNAL_IMAGE
 // #define TINYGLTF_NOEXCEPTION // optional. disable exception handling.
 #include <stb_image.h>
 #include <stb_image_write.h>

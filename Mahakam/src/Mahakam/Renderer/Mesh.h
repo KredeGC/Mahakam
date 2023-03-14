@@ -30,45 +30,123 @@ namespace Mahakam
 	class Mesh
 	{
 	public:
-		MeshProps Props;
+		MeshPrimitive Primitive;
 		std::vector<Ref<SubMesh>> Meshes; // List of sub meshes
+
+		Mesh() = default;
+
+		explicit Mesh(MeshPrimitive primitive) :
+			Primitive(primitive) {}
+
+		virtual MeshProps& GetProps() = 0;
+
+		inline const MeshProps& GetProps() const { return GetProps(); }
+
+		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
+
+	private:
+		MH_DECLARE_FUNC(CopyImpl, Asset<Mesh>, Asset<Mesh> other);
+	};
+
+	class BoneMesh : public Mesh
+	{
+	public:
+		BoneMeshProps Props;
 		std::vector<MeshNode> NodeHierarchy; // Hierarchy of nodes. Parents are always before children
 		TrivialVector<uint32_t> Skins; // List of node indices that are skin roots
 		UnorderedMap<uint32_t, uint32_t> SubMeshMap; // Hierarchy index to SubMesh index
 		UnorderedMap<uint32_t, uint32_t> BoneMap; // Hierarchy index to Joint ID
 
-		Mesh() = default;
-
-		explicit Mesh(const MeshProps& props) :
+		BoneMesh(const BoneMeshProps& props) :
+			Mesh(MeshPrimitive::Model),
 			Props(props) {}
 
-		Mesh(Ref<SubMesh> mesh, Asset<Material> material)
-		{
-			Meshes.push_back(std::move(mesh));
-			Props.Materials.push_back(std::move(material));
-		}
+		inline virtual MeshProps& GetProps() override { return Props; }
 
-		Mesh(Ref<SubMesh> mesh, const MeshProps& props) :
-			Props(props)
-		{
-			Meshes.push_back(std::move(mesh));
-		}
-
-		inline static Asset<Mesh> Create(const MeshProps& props) { return CreatePropsImpl(props); }
-
-		inline static Asset<Mesh> Create(Ref<SubMesh> subMesh, const MeshProps& props) { return CreateSubMeshImpl(std::move(subMesh), props); }
-
-		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
-
-		inline static Asset<Mesh> LoadMesh(const std::filesystem::path& filepath, const MeshProps& props = MeshProps()) { return LoadMeshImpl(filepath, props); }
+		inline static Asset<BoneMesh> Create(const BoneMeshProps& props) { return CreateImpl(props); }
 
 	private:
-		MH_DECLARE_FUNC(LoadMeshImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
+		MH_DECLARE_FUNC(CreateImpl, Asset<BoneMesh>, const BoneMeshProps& props);
+	};
 
-		MH_DECLARE_FUNC(CreatePropsImpl, Asset<Mesh>, const MeshProps& props);
-		MH_DECLARE_FUNC(CreateSubMeshImpl, Asset<Mesh>, Ref<SubMesh> subMesh, const MeshProps& props);
+	class PlaneMesh : public Mesh
+	{
+	public:
+		PlaneMeshProps Props;
 
-		MH_DECLARE_FUNC(CopyImpl, Asset<Mesh>, Asset<Mesh> other);
+		PlaneMesh(Ref<SubMesh> submesh, const PlaneMeshProps& props) :
+			Mesh(MeshPrimitive::Plane),
+			Props(props)
+		{
+			Meshes.push_back(std::move(submesh));
+		}
+
+		inline virtual MeshProps& GetProps() override { return Props; }
+
+		inline static Asset<PlaneMesh> Create(const PlaneMeshProps& props) { return CreateImpl(props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateImpl, Asset<PlaneMesh>, const PlaneMeshProps& props);
+	};
+
+	class CubeMesh : public Mesh
+	{
+	public:
+		CubeMeshProps Props;
+
+		CubeMesh(Ref<SubMesh> submesh, const CubeMeshProps& props) :
+			Mesh(MeshPrimitive::Cube),
+			Props(props)
+		{
+			Meshes.push_back(std::move(submesh));
+		}
+
+		inline virtual MeshProps& GetProps() override { return Props; }
+
+		inline static Asset<CubeMesh> Create(const CubeMeshProps& props) { return CreateImpl(props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateImpl, Asset<CubeMesh>, const CubeMeshProps& props);
+	};
+
+	class CubeSphereMesh : public Mesh
+	{
+	public:
+		CubeSphereMeshProps Props;
+
+		CubeSphereMesh(Ref<SubMesh> submesh, const CubeSphereMeshProps& props) :
+			Mesh(MeshPrimitive::CubeSphere),
+			Props(props)
+		{
+			Meshes.push_back(std::move(submesh));
+		}
+
+		inline virtual MeshProps& GetProps() override { return Props; }
+
+		inline static Asset<CubeSphereMesh> Create(const CubeSphereMeshProps& props) { return CreateImpl(props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateImpl, Asset<CubeSphereMesh>, const CubeSphereMeshProps& props);
+	};
+
+	class UVSphereMesh : public Mesh
+	{
+	public:
+		UVSphereMeshProps Props;
+
+		UVSphereMesh(Ref<SubMesh> submesh, const UVSphereMeshProps& props) :
+			Mesh(MeshPrimitive::UVSphere),
+			Props(props)
+		{
+			Meshes.push_back(std::move(submesh));
+		}
+
+		inline virtual MeshProps& GetProps() override { return Props; }
+
+		inline static Asset<UVSphereMesh> Create(const UVSphereMeshProps& props) { return CreateImpl(props); }
+
+	private:
+		MH_DECLARE_FUNC(CreateImpl, Asset<UVSphereMesh>, const UVSphereMeshProps& props);
 	};
 
 	class SubMesh
