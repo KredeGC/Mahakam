@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "MeshAssetImporter.h"
 
+#include "AssetSerializeTraits.h"
+
 #include "Mahakam/Renderer/Mesh.h"
 
 #include <imgui/imgui.h>
@@ -186,7 +188,9 @@ namespace Mahakam
 	{
 		Mesh* mesh = static_cast<Mesh*>(asset);
 
-		ryml::NodeRef materialsNode = node["Materials"];
+		AssetSerializeTraits<Mesh>::Serialize(node, mesh);
+
+		/*ryml::NodeRef materialsNode = node["Materials"];
 		materialsNode |= ryml::SEQ;
 
 		for (auto& material : mesh->GetProps().Materials)
@@ -234,12 +238,14 @@ namespace Mahakam
 		default:
 			MH_WARN("Unsupported Mesh primitive");
 			break;
-		}
+		}*/
 	}
 
 	Asset<void> MeshAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
-		MeshPrimitive primitive;
+		return AssetSerializeTraits<Mesh>::Deserialize(node);
+
+		/*MeshPrimitive primitive;
 		if (node.has_child("Primitive"))
 		{
 			int primitiveInt;
@@ -269,7 +275,7 @@ namespace Mahakam
 
 		MH_WARN("Unsupported Mesh primitive");
 
-		return nullptr;
+		return nullptr;*/
 	}
 
 	Scope<MeshProps> MeshAssetImporter::DeserializeProps(MeshPrimitive primitive, ryml::NodeRef& node)
