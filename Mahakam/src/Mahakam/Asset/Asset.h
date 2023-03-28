@@ -36,14 +36,11 @@ namespace Mahakam
 		Asset(const std::nullptr_t&) :
 			m_Control(nullptr) {}
 
-		explicit Asset(T* value, void (*deleter)(void*))
+		explicit Asset(ControlBlock* control) :
+			m_Control(control)
 		{
-			m_Control = Allocator::Allocate<ControlBlock>(1);
-
-			m_Control->UseCount = 1;
-			m_Control->ID = 0;
-			m_Control->Ptr = value;
-			m_Control->DeleteData = deleter;
+			// Increment the count
+			IncrementRef();
 		}
 
 		explicit Asset(AssetID id)
@@ -198,18 +195,18 @@ namespace Mahakam
 
 		T* get() const noexcept
 		{
-			return m_Control ? static_cast<T*>(m_Control->Ptr) : nullptr;
+			return m_Control ? reinterpret_cast<T*>(m_Control + 1) : nullptr;
 		}
 
 		template<typename Ty = T, std::enable_if_t<!std::is_void<Ty>::value, bool> = true>
 		Ty& operator*() const noexcept
 		{
-			return *static_cast<T*>(m_Control->Ptr);
+			return *reinterpret_cast<T*>(m_Control + 1);
 		}
 
 		T* operator->() const noexcept
 		{
-			return m_Control ? static_cast<T*>(m_Control->Ptr) : nullptr;
+			return m_Control ? reinterpret_cast<T*>(m_Control + 1) : nullptr;
 		}
 
 		explicit operator bool() const noexcept
@@ -235,10 +232,12 @@ namespace Mahakam
 					AssetDatabase::UnloadAsset(m_Control);
 
 				auto destroy = m_Control->DeleteData;
-				if (destroy)
-					destroy(m_Control->Ptr);
 
-				Allocator::Deallocate<ControlBlock>(m_Control, 1);
+				MH_ASSERT(destroy, "Asset destructor encountered invalid control block");
+
+				destroy(m_Control);
+
+				//Allocator::Deallocate<ControlBlock>(m_Control, 1);
 			}
 		}
 	};
@@ -246,14 +245,36 @@ namespace Mahakam
 	template<typename T, typename ... Args>
 	constexpr Asset<T> CreateAsset(Args&& ... args)
 	{
-		T* value = Allocator::New<T>(std::forward<Args>(args)...);
+		struct DataBlock
+		{
+			AssetDatabase::ControlBlock Control;
+			T Data;
+		};
+
+		DataBlock* block = Allocator::Allocate<DataBlock>(1);
+
+		Allocator::Construct<T>(&block->Data, std::forward<Args>(args)...);
+
+		auto mover = [](void* from, void* to)
+		{
+			*static_cast<T*>(to) = std::move(*static_cast<T*>(from));
+		};
 
 		auto deleter = [](void* p)
 		{
-			Allocator::Delete<T>(static_cast<T*>(p));
+			DataBlock* block = static_cast<DataBlock*>(p);
+
+			Allocator::Deconstruct<T>(&block->Data);
+
+			Allocator::Deallocate<DataBlock>(block, 1);
 		};
 
-		return Asset<T>(value, deleter);
+		block->Control.UseCount = 0;
+		block->Control.ID = 0;
+		block->Control.MoveData = mover;
+		block->Control.DeleteData = deleter;
+
+		return Asset<T>(&block->Control);
 	}
 
 	template<typename T1, typename T2>

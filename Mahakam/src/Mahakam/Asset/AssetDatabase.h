@@ -41,16 +41,16 @@ namespace Mahakam
 			ExtensionType Extension;
 		};
 
-	private:
 		struct ControlBlock
 		{
 			// ID 0 is guaranteed to be invalid
 			size_t UseCount;
 			AssetID ID;
+			void (*MoveData)(void*, void*);
 			void (*DeleteData)(void*);
-			void* Ptr;
 		};
 
+	private:
 		// Asset importers are divided into editor and standalone
 		// ExtensionMap is used by the editor to equate various file formats to the importers
 		// The same format can use multiple importers

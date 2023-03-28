@@ -154,26 +154,26 @@ namespace Mahakam
 			RefreshAssetImports();
 
 		// TODO: Is this even needed anymore? SaveAsset does something similar
-		auto iter = s_LoadedAssets.find(id);
-		if (iter != s_LoadedAssets.end())
-		{
-			// Delete our previous data
-			auto destroy = iter->second->DeleteData;
-			destroy(iter->second->Ptr);
+		//auto iter = s_LoadedAssets.find(id);
+		//if (iter != s_LoadedAssets.end())
+		//{
+		//	// Delete our previous data
+		//	auto destroy = iter->second->DeleteData;
+		//	destroy(iter->second->Ptr);
 
-			// Load the asset
-			ControlBlock* control = LoadAndIncrementAsset(id);
+		//	// Load the asset
+		//	ControlBlock* control = LoadAndIncrementAsset(id);
 
-			if (control)
-			{
-				// Move the pointer and destructor to the existing control block
-				iter->second->Ptr = control->Ptr;
-				iter->second->DeleteData = control->DeleteData;
+		//	if (control)
+		//	{
+		//		// Move the pointer and destructor to the existing control block
+		//		iter->second->Ptr = control->Ptr;
+		//		iter->second->DeleteData = control->DeleteData;
 
-				// Delete the control block
-				Allocator::Deallocate<ControlBlock>(control, 1);
-			}
-		}
+		//		// Delete the control block
+		//		Allocator::Deallocate<ControlBlock>(control, 1);
+		//	}
+		//}
 	};
 
 	//void AssetDatabase::ReloadAssets()
@@ -187,25 +187,25 @@ namespace Mahakam
 		RefreshAssetImports();
 
 		// Reimport all imported assets
-		for (auto& kv : s_LoadedAssets)
-		{
-			// Delete our previous data
-			auto destroy = kv.second->DeleteData;
-			destroy(kv.second->Ptr);
+		//for (auto& kv : s_LoadedAssets)
+		//{
+		//	// Delete our previous data
+		//	auto destroy = kv.second->DeleteData;
+		//	destroy(kv.second->Ptr);
 
-			// Load the asset
-			ControlBlock* control = LoadAndIncrementAsset(kv.first);
+		//	// Load the asset
+		//	ControlBlock* control = LoadAndIncrementAsset(kv.first);
 
-			if (control)
-			{
-				// Move the pointer and destructor to the existing control block
-				kv.second->Ptr = control->Ptr;
-				kv.second->DeleteData = control->DeleteData;
+		//	if (control)
+		//	{
+		//		// Move the pointer and destructor to the existing control block
+		//		kv.second->Ptr = control->Ptr;
+		//		kv.second->DeleteData = control->DeleteData;
 
-				// Delete the control block
-				Allocator::Deallocate<ControlBlock>(control, 1);
-			}
-		}
+		//		// Delete the control block
+		//		Allocator::Deallocate<ControlBlock>(control, 1);
+		//	}
+		//}
 	};
 
 	//void AssetDatabase::RefreshAssetImports()
@@ -331,7 +331,7 @@ namespace Mahakam
 		root["Extension"] << iter->second->GetImporterProps().Extension;
 		root["ID"] << id;
 
-		iter->second->Serialize(root, control->Ptr);
+		iter->second->Serialize(root, control + 1);
 
 		std::ofstream filestream(importPath);
 		filestream << tree;
@@ -347,17 +347,13 @@ namespace Mahakam
 				// Increment the UseCount
 				loadedControl->UseCount++;
 
-				// Delete our previous data
-				auto destroy = loadedControl->DeleteData;
-				destroy(loadedControl->Ptr);
-
 				// Move the pointer and destructor to the existing control block
-				loadedControl->Ptr = control->Ptr;
+				loadedControl->MoveData(control + 1, loadedControl + 1);
 				loadedControl->DeleteData = control->DeleteData;
 
 				// Invalidate the old control block, but don't delete it as others may reference it
-				control->Ptr = nullptr;
-				control->DeleteData = nullptr;
+				control->MoveData = nullptr;
+				//control->DeleteData = nullptr;
 				control->ID = 0;
 			}
 

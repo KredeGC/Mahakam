@@ -33,9 +33,9 @@ namespace Mahakam
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			return CreateAsset<HeadlessMaterial>(material);
+			return CreateAsset<HeadlessMaterial>(*static_cast<HeadlessMaterial*>(material.get()));
 		case RendererAPI::API::OpenGL:
-			return CreateAsset<OpenGLMaterial>(material);
+			return CreateAsset<OpenGLMaterial>(*static_cast<OpenGLMaterial*>(material.get()));
 		}
 
 		MH_BREAK("Unknown renderer API!");

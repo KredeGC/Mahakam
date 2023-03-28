@@ -24,8 +24,14 @@ namespace Mahakam
 
 	public:
 		HeadlessMaterial(Asset<Shader> shader);
-		HeadlessMaterial(const Asset<Material>& material);
+
+		HeadlessMaterial(const HeadlessMaterial& other);
+		HeadlessMaterial(HeadlessMaterial&& other) noexcept;
+
 		virtual ~HeadlessMaterial();
+
+		HeadlessMaterial& operator=(const HeadlessMaterial& rhs);
+		HeadlessMaterial& operator=(HeadlessMaterial&& rhs) noexcept;
 
 		virtual uint64_t Hash() const override;
 

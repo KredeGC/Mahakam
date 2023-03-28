@@ -22,18 +22,59 @@ namespace Mahakam
 		ResetShaderProperties(defaultProps);
 	}
 
-	HeadlessMaterial::HeadlessMaterial(const Asset<Material>& material) :
-		m_Shader(static_cast<Asset<HeadlessMaterial>>(material)->m_Shader),
-		m_Textures(static_cast<Asset<HeadlessMaterial>>(material)->m_Textures),
-		m_Mat3s(static_cast<Asset<HeadlessMaterial>>(material)->m_Mat3s),
-		m_Mat4s(static_cast<Asset<HeadlessMaterial>>(material)->m_Mat4s),
-		m_Ints(static_cast<Asset<HeadlessMaterial>>(material)->m_Ints),
-		m_Floats(static_cast<Asset<HeadlessMaterial>>(material)->m_Floats),
-		m_Float2s(static_cast<Asset<HeadlessMaterial>>(material)->m_Float2s),
-		m_Float3s(static_cast<Asset<HeadlessMaterial>>(material)->m_Float3s),
-		m_Float4s(static_cast<Asset<HeadlessMaterial>>(material)->m_Float4s) {}
+	HeadlessMaterial::HeadlessMaterial(const HeadlessMaterial& other) :
+		m_Shader(other.m_Shader),
+		m_Textures(other.m_Textures),
+		m_Mat3s(other.m_Mat3s),
+		m_Mat4s(other.m_Mat4s),
+		m_Ints(other.m_Ints),
+		m_Floats(other.m_Floats),
+		m_Float2s(other.m_Float2s),
+		m_Float3s(other.m_Float3s),
+		m_Float4s(other.m_Float4s) {}
+
+	HeadlessMaterial::HeadlessMaterial(HeadlessMaterial&& other) noexcept :
+		m_Shader(std::move(other.m_Shader)),
+		m_Textures(std::move(other.m_Textures)),
+		m_Mat3s(std::move(other.m_Mat3s)),
+		m_Mat4s(std::move(other.m_Mat4s)),
+		m_Ints(std::move(other.m_Ints)),
+		m_Floats(std::move(other.m_Floats)),
+		m_Float2s(std::move(other.m_Float2s)),
+		m_Float3s(std::move(other.m_Float3s)),
+		m_Float4s(std::move(other.m_Float4s)) {}
 
 	HeadlessMaterial::~HeadlessMaterial() {}
+
+	HeadlessMaterial& HeadlessMaterial::operator=(const HeadlessMaterial& rhs)
+	{
+		m_Shader = rhs.m_Shader;
+		m_Textures = rhs.m_Textures;
+		m_Mat3s = rhs.m_Mat3s;
+		m_Mat4s = rhs.m_Mat4s;
+		m_Ints = rhs.m_Ints;
+		m_Floats = rhs.m_Floats;
+		m_Float2s = rhs.m_Float2s;
+		m_Float3s = rhs.m_Float3s;
+		m_Float4s = rhs.m_Float4s;
+
+		return *this;
+	}
+
+	HeadlessMaterial& HeadlessMaterial::operator=(HeadlessMaterial&& rhs) noexcept
+	{
+		m_Shader = std::move(rhs.m_Shader);
+		m_Textures = std::move(rhs.m_Textures);
+		m_Mat3s = std::move(rhs.m_Mat3s);
+		m_Mat4s = std::move(rhs.m_Mat4s);
+		m_Ints = std::move(rhs.m_Ints);
+		m_Floats = std::move(rhs.m_Floats);
+		m_Float2s = std::move(rhs.m_Float2s);
+		m_Float3s = std::move(rhs.m_Float3s);
+		m_Float4s = std::move(rhs.m_Float4s);
+
+		return *this;
+	}
 
 	uint64_t HeadlessMaterial::Hash() const
 	{

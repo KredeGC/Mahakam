@@ -54,24 +54,86 @@ namespace Mahakam
 			m_Data = Allocator::Allocate<uint8_t>(m_DataSize);
 	}
 
-	OpenGLMaterial::OpenGLMaterial(const Asset<Material>& material) :
-		m_Shader(static_cast<Asset<OpenGLMaterial>>(material)->m_Shader),
-		m_Textures(static_cast<Asset<OpenGLMaterial>>(material)->m_Textures),
-		m_Mat3s(static_cast<Asset<OpenGLMaterial>>(material)->m_Mat3s),
-		m_Mat4s(static_cast<Asset<OpenGLMaterial>>(material)->m_Mat4s),
-		m_Ints(static_cast<Asset<OpenGLMaterial>>(material)->m_Ints),
-		m_Floats(static_cast<Asset<OpenGLMaterial>>(material)->m_Floats),
-		m_Float2s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float2s),
-		m_Float3s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float3s),
-		m_Float4s(static_cast<Asset<OpenGLMaterial>>(material)->m_Float4s)
+	OpenGLMaterial::OpenGLMaterial(const OpenGLMaterial& other) :
+		m_Shader(other.m_Shader),
+		m_Data(nullptr),
+		m_DataSize(other.m_DataSize),
+		m_Textures(other.m_Textures),
+		m_Mat3s(other.m_Mat3s),
+		m_Mat4s(other.m_Mat4s),
+		m_Ints(other.m_Ints),
+		m_Floats(other.m_Floats),
+		m_Float2s(other.m_Float2s),
+		m_Float3s(other.m_Float3s),
+		m_Float4s(other.m_Float4s)
 	{
-		m_DataSize = m_Shader->GetUniformSize();
 		if (m_DataSize > 0)
 		{
-			Asset<OpenGLMaterial> glMaterial = static_cast<Asset<OpenGLMaterial>>(material);
 			m_Data = Allocator::Allocate<uint8_t>(m_DataSize);
-			std::memcpy(m_Data, glMaterial->m_Data, glMaterial->m_DataSize);
+			std::memcpy(m_Data, other.m_Data, other.m_DataSize);
 		}
+	}
+
+	OpenGLMaterial::OpenGLMaterial(OpenGLMaterial&& other) noexcept :
+		m_Shader(std::move(other.m_Shader)),
+		m_Data(other.m_Data),
+		m_DataSize(other.m_DataSize),
+		m_Textures(std::move(other.m_Textures)),
+		m_Mat3s(std::move(other.m_Mat3s)),
+		m_Mat4s(std::move(other.m_Mat4s)),
+		m_Ints(std::move(other.m_Ints)),
+		m_Floats(std::move(other.m_Floats)),
+		m_Float2s(std::move(other.m_Float2s)),
+		m_Float3s(std::move(other.m_Float3s)),
+		m_Float4s(std::move(other.m_Float4s))
+	{
+		other.m_Data = nullptr;
+	}
+
+	OpenGLMaterial& OpenGLMaterial::operator=(const OpenGLMaterial& rhs)
+	{
+		m_Shader = rhs.m_Shader;
+		m_Textures = rhs.m_Textures;
+		m_Mat3s = rhs.m_Mat3s;
+		m_Mat4s = rhs.m_Mat4s;
+		m_Ints = rhs.m_Ints;
+		m_Floats = rhs.m_Floats;
+		m_Float2s = rhs.m_Float2s;
+		m_Float3s = rhs.m_Float3s;
+		m_Float4s = rhs.m_Float4s;
+
+		m_DataSize = rhs.m_DataSize;
+		if (m_DataSize > 0)
+		{
+			m_Data = Allocator::Allocate<uint8_t>(m_DataSize);
+			std::memcpy(m_Data, rhs.m_Data, rhs.m_DataSize);
+		}
+		else
+		{
+			m_Data = nullptr;
+		}
+
+		return *this;
+	}
+
+	OpenGLMaterial& OpenGLMaterial::operator=(OpenGLMaterial&& rhs) noexcept
+	{
+		m_Shader = std::move(rhs.m_Shader);
+		m_Textures = std::move(rhs.m_Textures);
+		m_Mat3s = std::move(rhs.m_Mat3s);
+		m_Mat4s = std::move(rhs.m_Mat4s);
+		m_Ints = std::move(rhs.m_Ints);
+		m_Floats = std::move(rhs.m_Floats);
+		m_Float2s = std::move(rhs.m_Float2s);
+		m_Float3s = std::move(rhs.m_Float3s);
+		m_Float4s = std::move(rhs.m_Float4s);
+
+		m_DataSize = rhs.m_DataSize;
+		m_Data = rhs.m_Data;
+
+		rhs.m_Data = nullptr;
+
+		return *this;
 	}
 
 	OpenGLMaterial::~OpenGLMaterial()

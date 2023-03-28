@@ -29,8 +29,14 @@ namespace Mahakam
 
 	public:
 		OpenGLMaterial(Asset<Shader> shader);
-		OpenGLMaterial(const Asset<Material>& material);
+
+		OpenGLMaterial(const OpenGLMaterial& other);
+		OpenGLMaterial(OpenGLMaterial&& other) noexcept;
+
 		virtual ~OpenGLMaterial();
+
+		OpenGLMaterial& operator=(const OpenGLMaterial& rhs);
+		OpenGLMaterial& operator=(OpenGLMaterial&& rhs) noexcept;
 
 		virtual uint64_t Hash() const override;
 
