@@ -179,33 +179,27 @@ namespace Mahakam
 	//void AssetDatabase::ReloadAssets()
 	MH_DEFINE_FUNC(AssetDatabase::ReloadAssets, void)
 	{
-		// Import any assets that haven't been imported yet
-		// TODO: Think about whether this is needed? Maybe people don't want to import everything
-		//RecursiveImportAssets(FileUtility::ASSET_PATH);
-
 		// Recreate asset ID to filepath mapping
 		RefreshAssetImports();
 
 		// Reimport all imported assets
-		//for (auto& kv : s_LoadedAssets)
-		//{
-		//	// Delete our previous data
-		//	auto destroy = kv.second->DeleteData;
-		//	destroy(kv.second->Ptr);
+		for (auto& [id, loadedControl] : s_LoadedAssets)
+		{
+			// Load the asset
+			ControlBlock* control = LoadAndIncrementAsset(id);
 
-		//	// Load the asset
-		//	ControlBlock* control = LoadAndIncrementAsset(kv.first);
+			if (control)
+			{
+				loadedControl->MoveData(control + 1, loadedControl + 1);
 
-		//	if (control)
-		//	{
-		//		// Move the pointer and destructor to the existing control block
-		//		kv.second->Ptr = control->Ptr;
-		//		kv.second->DeleteData = control->DeleteData;
-
-		//		// Delete the control block
-		//		Allocator::Deallocate<ControlBlock>(control, 1);
-		//	}
-		//}
+				auto destroy = control->DeleteData;
+				destroy(control);
+			}
+			else
+			{
+				MH_WARN("Could not reload previously loaded Asset with ID: {0}", id);
+			}
+		}
 	};
 
 	//void AssetDatabase::RefreshAssetImports()
@@ -336,6 +330,8 @@ namespace Mahakam
 		std::ofstream filestream(importPath);
 		filestream << tree;
 
+		filestream.close();
+
 		auto controlIter = s_LoadedAssets.find(id);
 		if (controlIter != s_LoadedAssets.end())
 		{
@@ -349,7 +345,6 @@ namespace Mahakam
 
 				// Move the pointer and destructor to the existing control block
 				loadedControl->MoveData(control + 1, loadedControl + 1);
-				loadedControl->DeleteData = control->DeleteData;
 
 				// Invalidate the old control block, but don't delete it as others may reference it
 				control->MoveData = nullptr;
@@ -364,6 +359,8 @@ namespace Mahakam
 			control->ID = id;
 
 			s_LoadedAssets.insert({ id, control });
+
+			RefreshAssetImports();
 
 			return control;
 		}

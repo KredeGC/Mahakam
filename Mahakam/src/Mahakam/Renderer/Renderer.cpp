@@ -26,15 +26,15 @@
 
 namespace Mahakam
 {
-	Renderer::RendererData* Renderer::s_RendererData;
-	SceneData* Renderer::s_SceneData;
+	Scope<Renderer::RendererData> Renderer::s_RendererData;
+	Scope<SceneData> Renderer::s_SceneData;
 
 	void Renderer::Init(uint32_t width, uint32_t height)
 	{
 		MH_PROFILE_FUNCTION();
 
-		s_RendererData = new RendererData;
-		s_SceneData = new SceneData;
+		s_RendererData = CreateScope<RendererData>();
+		s_SceneData = CreateScope<SceneData>();
 
 		s_RendererData->Width = width;
 		s_RendererData->Height = height;
@@ -55,8 +55,8 @@ namespace Mahakam
 		s_RendererData->GBuffer = nullptr;
 		s_RendererData->ViewportFramebuffer = nullptr;
 
-		delete s_RendererData;
-		delete s_SceneData;
+		s_RendererData = nullptr;
+		s_SceneData = nullptr;
 	}
 
 	//void Renderer::OnWindowResizeImpl(uint32_t width, uint32_t height)
@@ -81,9 +81,9 @@ namespace Mahakam
 	};
 
 	//void Renderer::BeginSceneImpl(const Camera& cam, const glm::mat4& transform, const EnvironmentData& Environment)
-	MH_DEFINE_FUNC(Renderer::BeginSceneImpl, void, const Camera& cam, const glm::mat4& transform, const EnvironmentData& Environment)
+	MH_DEFINE_FUNC(Renderer::BeginSceneImpl, void, const Camera& cam, const glm::mat4& transform, const EnvironmentData& environment)
 	{
-		s_SceneData->Environment = Environment;
+		s_SceneData->Environment = environment;
 
 		// Setup camera matrices
 		s_SceneData->CameraMatrix = CameraData(cam, glm::vec2(s_RendererData->Width, s_RendererData->Height), transform);
@@ -113,7 +113,7 @@ namespace Mahakam
 		Asset<FrameBuffer> prevBuffer = nullptr;
 		for (auto& renderPass : s_RendererData->RenderPasses)
 		{
-			if (renderPass->Render(s_SceneData, prevBuffer))
+			if (renderPass->Render(s_SceneData.get(), prevBuffer))
 				prevBuffer = renderPass->GetFrameBuffer();
 		}
 
@@ -148,8 +148,8 @@ namespace Mahakam
 		if (shaderIter == s_SceneData->ShaderRefLookup.end())
 		{
 			shaderID = s_SceneData->ShaderRefLookup.size();
-			s_SceneData->ShaderRefLookup[shader] = shaderID;
-			s_SceneData->ShaderIDLookup[shaderID] = shader;
+			s_SceneData->ShaderRefLookup.insert({ shader, shaderID });
+			s_SceneData->ShaderIDLookup.insert({ shaderID, std::move(shader) });
 		}
 		else
 		{
@@ -162,8 +162,8 @@ namespace Mahakam
 		if (matIter == s_SceneData->MaterialRefLookup.end())
 		{
 			materialID = s_SceneData->MaterialRefLookup.size();
-			s_SceneData->MaterialRefLookup[material] = materialID;
-			s_SceneData->MaterialIDLookup[materialID] = std::move(material);
+			s_SceneData->MaterialRefLookup.insert({ material, materialID });
+			s_SceneData->MaterialIDLookup.insert({ materialID, std::move(material) });
 		}
 		else
 		{
@@ -176,8 +176,8 @@ namespace Mahakam
 		if (meshIter == s_SceneData->MeshRefLookup.end())
 		{
 			meshID = s_SceneData->MeshRefLookup.size();
-			s_SceneData->MeshRefLookup[mesh] = meshID;
-			s_SceneData->MeshIDLookup[meshID] = std::move(mesh);
+			s_SceneData->MeshRefLookup.insert({ mesh, meshID });
+			s_SceneData->MeshIDLookup.insert({ meshID, std::move(mesh) });
 		}
 		else
 		{
@@ -186,7 +186,7 @@ namespace Mahakam
 
 		// Add transform
 		uint64_t transformID = s_SceneData->TransformIDLookup.size();
-		s_SceneData->TransformIDLookup[transformID] = transform;
+		s_SceneData->TransformIDLookup.insert({ transformID, transform });
 
 		uint64_t drawID = 0;
 
@@ -320,7 +320,7 @@ namespace Mahakam
 	//void Renderer::AddFrameBufferImpl(const std::string& name, WeakRef<FrameBuffer> frameBuffer)
 	MH_DEFINE_FUNC(Renderer::AddFrameBufferImpl, void, const std::string& name, Asset<FrameBuffer> frameBuffer)
 	{
-		s_RendererData->FrameBuffers[name] = frameBuffer;
+		s_RendererData->FrameBuffers[name] = std::move(frameBuffer);
 	};
 
 	//const robin_hood::unordered_map<std::string, WeakRef<FrameBuffer>>& Renderer::GetFrameBuffersImpl()

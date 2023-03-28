@@ -45,8 +45,8 @@ namespace Mahakam
 			uint32_t Height;
 		};
 
-		static RendererData* s_RendererData;
-		static SceneData* s_SceneData;
+		static Scope<RendererData> s_RendererData;
+		static Scope<SceneData> s_SceneData;
 
 	public:
 		static void Init(uint32_t width, uint32_t height);

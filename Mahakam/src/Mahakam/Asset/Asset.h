@@ -236,8 +236,6 @@ namespace Mahakam
 				MH_ASSERT(destroy, "Asset destructor encountered invalid control block");
 
 				destroy(m_Control);
-
-				//Allocator::Deallocate<ControlBlock>(m_Control, 1);
 			}
 		}
 	};
@@ -253,7 +251,7 @@ namespace Mahakam
 
 		DataBlock* block = Allocator::Allocate<DataBlock>(1);
 
-		Allocator::Construct<T>(&block->Data, std::forward<Args>(args)...);
+		Allocator::Construct(&block->Data, std::forward<Args>(args)...);
 
 		auto mover = [](void* from, void* to)
 		{
@@ -264,9 +262,9 @@ namespace Mahakam
 		{
 			DataBlock* block = static_cast<DataBlock*>(p);
 
-			Allocator::Deconstruct<T>(&block->Data);
+			Allocator::Deconstruct(&block->Data);
 
-			Allocator::Deallocate<DataBlock>(block, 1);
+			Allocator::Deallocate(block, 1);
 		};
 
 		block->Control.UseCount = 0;

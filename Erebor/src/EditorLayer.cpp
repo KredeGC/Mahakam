@@ -32,7 +32,7 @@ namespace Mahakam::Editor
 
 		AssetDatabase::RegisterDefaultAssetImporters();
 
-		AssetDatabase::ReloadAssets();
+		AssetDatabase::RefreshAssetImports();
 
 #pragma region Windows
 		// AssetManagerPanel
