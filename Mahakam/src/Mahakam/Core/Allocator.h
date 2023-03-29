@@ -2,12 +2,13 @@
 
 #include "SharedLibrary.h"
 
-#include <ktl/allocators/cascading_allocator.h>
-#include <ktl/allocators/fallback_allocator.h>
-#include <ktl/allocators/freelist_allocator.h>
+#include <ktl/allocators/cascading.h>
+#include <ktl/allocators/fallback.h>
+#include <ktl/allocators/freelist.h>
 #include <ktl/allocators/linear_allocator.h>
 #include <ktl/allocators/mallocator.h>
-#include <ktl/allocators/segragator_allocator.h>
+#include <ktl/allocators/segragator.h>
+#include <ktl/allocators/shared.h>
 #include <ktl/allocators/stack_allocator.h>
 
 #include <cstdint>
@@ -24,16 +25,16 @@ namespace Mahakam
         using Stack = ktl::stack_allocator<MAX_STACK_SIZE * BUFFER_SIZE>;
         using Linear = ktl::linear_allocator<MAX_LINEAR_SIZE * BUFFER_SIZE>;
         
-        using FreelistStack = ktl::freelist_allocator<0, MAX_STACK_SIZE, Stack>;
-        using FreelistLinear = ktl::freelist_allocator<0, MAX_LINEAR_SIZE, Linear>;
+        using FreelistStack = ktl::freelist<0, MAX_STACK_SIZE, Stack>;
+        using FreelistLinear = ktl::freelist<0, MAX_LINEAR_SIZE, Linear>;
         
-        using CascadingFreelistLinear = ktl::cascading_allocator<FreelistLinear>;
+        using CascadingFreelistLinear = ktl::cascading<FreelistLinear>;
         
-        using Fallback = ktl::fallback_allocator<FreelistStack, CascadingFreelistLinear>;
+        using Fallback = ktl::fallback<FreelistStack, CascadingFreelistLinear>;
         
     public:
 		template<typename T>
-		using BaseAllocator = ktl::type_segragator_allocator<T, MAX_LINEAR_SIZE, Fallback, ktl::mallocator>;
+		using BaseAllocator = ktl::type_shared_segragator_allocator<T, MAX_LINEAR_SIZE, Fallback, ktl::mallocator>;
 
 		template<typename T>
 		using BaseTraits = std::allocator_traits<BaseAllocator<T>>;
@@ -87,7 +88,7 @@ namespace Mahakam
 
 	private:
         inline static ktl::stack<MAX_STACK_SIZE * BUFFER_SIZE> s_Buffer;
-		inline static BaseAllocator<uint8_t> s_Alloc { Fallback(FreelistStack(Stack(s_Buffer))) };
+		inline static BaseAllocator<uint8_t> s_Alloc{ s_Buffer };
 
 		MH_DECLARE_FUNC(GetAllocatorImpl, BaseAllocator<uint8_t>);
 	};

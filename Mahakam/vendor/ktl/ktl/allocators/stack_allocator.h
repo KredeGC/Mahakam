@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../utility/alignment_utility.h"
+#include "../utility/alignment.h"
+#include "stack_allocator_fwd.h"
 #include "type_allocator.h"
 
 #include <memory>
@@ -8,10 +9,13 @@
 
 namespace ktl
 {
+	/**
+	 * @brief A stack object of a given @p Size
+	*/
 	template<size_t Size>
 	struct stack
 	{
-		alignas(ALIGNMENT) char Data[Size];
+		alignas(detail::ALIGNMENT) char Data[Size];
 		char* Free;
 		size_t ObjectCount;
 
@@ -21,23 +25,29 @@ namespace ktl
 			ObjectCount(0) {}
 	};
 
+	/**
+	 * @brief A linear allocator which gives out chunks of its allocated stack.
+	 * Increments a counter during allocation, which makes it very fast but also unlikely to deallocate it again.
+	 * Has a max allocation size of the @p Size given.
+	 * @note Cannot be default constructed because it needs a reference to a stack
+	*/
 	template<size_t Size>
 	class stack_allocator
 	{
 	public:
-		stack_allocator(stack<Size>& block) noexcept :
+		explicit stack_allocator(stack<Size>& block) noexcept :
 			m_Block(&block) {}
 
-		stack_allocator(stack<Size>* block) noexcept
+		explicit stack_allocator(stack<Size>* block) noexcept
 			: m_Block(block) {}
 
-		stack_allocator(const stack_allocator& other) noexcept = default;
+		stack_allocator(const stack_allocator&) noexcept = default;
 
-		stack_allocator(stack_allocator&& other) noexcept = default;
+		stack_allocator(stack_allocator&&) noexcept = default;
 
-		stack_allocator& operator=(const stack_allocator& other) noexcept = default;
+		stack_allocator& operator=(const stack_allocator&) noexcept = default;
 
-		stack_allocator& operator=(stack_allocator&& other) noexcept = default;
+		stack_allocator& operator=(stack_allocator&&) noexcept = default;
 
 		bool operator==(const stack_allocator& rhs) const noexcept
 		{
@@ -52,7 +62,7 @@ namespace ktl
 #pragma region Allocation
 		void* allocate(size_t n)
 		{
-			size_t totalSize = n + align_to_architecture(n);
+			size_t totalSize = n + detail::align_to_architecture(n);
 
 			if ((size_t(m_Block->Free - m_Block->Data) + totalSize) > Size)
 				return nullptr;
@@ -67,7 +77,7 @@ namespace ktl
 
 		void deallocate(void* p, size_t n) noexcept
 		{
-			size_t totalSize = n + align_to_architecture(n);
+			size_t totalSize = n + detail::align_to_architecture(n);
 
 			if (m_Block->Free - totalSize == p)
 				m_Block->Free -= totalSize;
@@ -86,17 +96,13 @@ namespace ktl
 			return Size;
 		}
 
-		bool owns(void* p)
+		bool owns(void* p) const
 		{
-			char* ptr = reinterpret_cast<char*>(p);
-			return ptr >= m_Block->Data && ptr < m_Block->Data + Size;
+			return p >= m_Block->Data && p < m_Block->Data + Size;
 		}
 #pragma endregion
 
 	private:
 		stack<Size>* m_Block;
 	};
-
-	template<typename T, size_t Size>
-	using type_stack_allocator = type_allocator<T, stack_allocator<Size>>;
 }

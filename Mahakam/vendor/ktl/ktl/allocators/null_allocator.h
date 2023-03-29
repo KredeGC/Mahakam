@@ -1,21 +1,25 @@
 #pragma once
 
-#include "../utility/assert_utility.h"
+#include "../utility/assert.h"
 
 namespace ktl
 {
+	/**
+	 * @brief An allocator which does nothing.
+	 * Useful for debugging composite allocators, like ensuring a specific path in a composite allocator is not used.
+	*/
 	class null_allocator
 	{
 	public:
 		null_allocator() noexcept = default;
 
-		null_allocator(const null_allocator& other) noexcept = default;
+		null_allocator(const null_allocator&) noexcept = default;
 
-		null_allocator(null_allocator&& other) noexcept = default;
+		null_allocator(null_allocator&&) noexcept = default;
 
-		null_allocator& operator=(const null_allocator& rhs) noexcept = default;
+		null_allocator& operator=(const null_allocator&) noexcept = default;
 
-		null_allocator& operator=(null_allocator&& rhs) noexcept = default;
+		null_allocator& operator=(null_allocator&&) noexcept = default;
 
 		bool operator==(const null_allocator& rhs) const noexcept
 		{
@@ -40,7 +44,7 @@ namespace ktl
 #pragma endregion
 
 #pragma region Utility
-		bool owns(void* p)
+		bool owns(void* p) const
 		{
 			return p == nullptr;
 		}

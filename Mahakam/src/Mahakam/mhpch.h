@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 #include <unordered_set>
+#include <unordered_map>
 
 #include "Mahakam/Asset/Asset.h"
 
@@ -76,7 +77,6 @@
 #endif
 #include <ktl/containers/trivial_vector.h>
 #include <ktl/containers/trivial_array.h>
-#include <ktl/containers/unordered_map.h>
 
 #ifdef MH_BUILD
 #include <miniaudio/miniaudio.h>

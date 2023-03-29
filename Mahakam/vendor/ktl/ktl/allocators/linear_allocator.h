@@ -1,145 +1,139 @@
 #pragma once
 
-#include "../utility/assert_utility.h"
-#include "../utility/alignment_utility.h"
-#include "type_allocator.h"
+#include "../utility/assert.h"
+#include "../utility/alignment.h"
+#include "linear_allocator_fwd.h"
 
-#include <atomic>
 #include <memory>
 #include <type_traits>
 
 namespace ktl
 {
-	template<size_t Size>
+    /**
+     * @brief A linear allocator which gives out chunks of its internal stack.
+	 * Increments a counter during allocation, which makes it very fast but also unlikely to deallocate it again.
+	 * Has a max allocation size of the @p Size given.
+    */
+    template<size_t Size>
 	class linear_allocator
 	{
-	private:
-		struct arena
-		{
-			alignas(ALIGNMENT) char Data[Size];
-			std::atomic<size_t> UseCount;
-			char* Free;
-			size_t ObjectCount;
-
-			arena() noexcept :
-				Data{},
-				UseCount(1),
-				Free(Data),
-				ObjectCount(0) {}
-		};
-
 	public:
-		linear_allocator() noexcept
-		{
-			m_Block = new arena;
-		}
+		linear_allocator() noexcept :
+			m_Data{},
+			m_Free(m_Data),
+			m_ObjectCount(0) {}
 
-		linear_allocator(const linear_allocator& other) noexcept :
-			m_Block(other.m_Block)
-		{
-			m_Block->UseCount++;
-		}
+		linear_allocator(const linear_allocator&) noexcept = delete;
 
+		/**
+		 * @brief Move constructor
+		 * @note Moving is only allowed if the original allocator has no allocations
+		 * @param other The original allocator
+		*/
 		linear_allocator(linear_allocator&& other) noexcept :
-			m_Block(other.m_Block)
+			m_Data{},
+			m_Free(m_Data),
+			m_ObjectCount(0)
 		{
-			KTL_ASSERT(other.m_Block);
-			other.m_Block = nullptr;
+			// Moving raw allocators in use is undefined
+			KTL_ASSERT(other.m_ObjectCount == 0);
 		}
 
-		~linear_allocator()
-		{
-			if (m_Block)
-				decrement();
-		}
+		linear_allocator& operator=(const linear_allocator&) noexcept = delete;
 
-		linear_allocator& operator=(const linear_allocator& rhs) noexcept
-		{
-			if (m_Block)
-				decrement();
-
-			m_Block = rhs.m_Block;
-			m_Block->UseCount++;
-
-			return *this;
-		}
-
+		/**
+		 * @brief Move assignment operator
+		 * @note Moving is only allowed if the original allocator has no allocations
+		 * @param rhs The original allocator
+		*/
 		linear_allocator& operator=(linear_allocator&& rhs) noexcept
 		{
-			if (m_Block)
-				decrement();
+			m_Free = m_Data;
 
-			m_Block = rhs.m_Block;
-
-			rhs.m_Block = nullptr;
+			// Moving raw allocators in use is undefined
+			KTL_ASSERT(rhs.m_ObjectCount == 0);
 
 			return *this;
 		}
 
 		bool operator==(const linear_allocator& rhs) const noexcept
 		{
-			return m_Block == rhs.m_Block;
+			return m_Data == rhs.m_Data;
 		}
 
 		bool operator!=(const linear_allocator& rhs) const noexcept
 		{
-			return m_Block != rhs.m_Block;
+			return m_Data != rhs.m_Data;
 		}
 
 #pragma region Allocation
+		/**
+		 * @brief Attempts to allocate a chunk of memory defined by @p n
+		 * @param n The amount of bytes to allocate memory for
+		 * @return A location in memory that is at least @p n bytes big or nullptr if it could not be allocated
+		*/
 		void* allocate(size_t n)
 		{
-			size_t totalSize = n + align_to_architecture(n);
+			size_t totalSize = n + detail::align_to_architecture(n);
 
-			if ((size_t(m_Block->Free - m_Block->Data) + totalSize) > Size)
+			if ((size_t(m_Free - m_Data) + totalSize) > Size)
 				return nullptr;
 
-			char* current = m_Block->Free;
+			char* current = m_Free;
 
-			m_Block->Free += totalSize;
-			m_Block->ObjectCount += totalSize;
+			m_Free += totalSize;
+			m_ObjectCount += totalSize;
 
 			return current;
 		}
 
+		/**
+		 * @brief Attempts to deallocate the memory at location @p p
+		 * @note The memory is only completely deallocated if it was the last allocation made or all memory has been deallocated
+		 * @param p The location in memory to deallocate
+		 * @param n The size that was initially allocated
+		*/
 		void deallocate(void* p, size_t n) noexcept
 		{
-			size_t totalSize = n + align_to_architecture(n);
+			KTL_ASSERT(p != nullptr);
 
-			if (m_Block->Free - totalSize == p)
-				m_Block->Free -= totalSize;
+			size_t totalSize = n + detail::align_to_architecture(n);
 
-			m_Block->ObjectCount -= totalSize;
+			if (m_Free - totalSize == p)
+				m_Free -= totalSize;
+
+			m_ObjectCount -= totalSize;
 
 			// Assumes that people don't deallocate the same memory twice
-			if (m_Block->ObjectCount == 0)
-				m_Block->Free = m_Block->Data;
+			if (m_ObjectCount == 0)
+				m_Free = m_Data;
 		}
 #pragma endregion
 
 #pragma region Utility
+		/**
+		 * @brief Returns the maximum size that an allocation can be
+		 * @return The maximum size an allocation may be
+		*/
 		size_t max_size() const noexcept
 		{
 			return Size;
 		}
 
-		bool owns(void* p)
+		/**
+		 * @brief Returns whether or not the allocator owns the given location in memory
+		 * @param p The location of the object in memory
+		 * @return Whether the allocator owns @p p
+		*/
+		bool owns(void* p) const
 		{
-			char* ptr = reinterpret_cast<char*>(p);
-			return ptr >= m_Block->Data && ptr < m_Block->Data + Size;
+			return p >= m_Data && p < m_Data + Size;
 		}
 #pragma endregion
 
 	private:
-		void decrement()
-		{
-			if (m_Block->UseCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
-				delete m_Block;
-		}
-
-		arena* m_Block;
+		alignas(detail::ALIGNMENT) char m_Data[Size];
+		char* m_Free;
+		size_t m_ObjectCount;
 	};
-
-	template<typename T, size_t Size>
-	using type_linear_allocator = type_allocator<T, linear_allocator<Size>>;
 }

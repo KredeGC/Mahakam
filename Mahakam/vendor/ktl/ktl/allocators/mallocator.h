@@ -1,23 +1,29 @@
 #pragma once
 
-#include "../utility/alignment_malloc.h"
-#include "../utility/alignment_utility.h"
+#include "../utility/aligned_malloc.h"
+#include "../utility/alignment.h"
+#include "mallocator_fwd.h"
 #include "type_allocator.h"
 
 namespace ktl
 {
+	/**
+	 * @brief An allocator which uses an aligned malloc for allocation.
+	 * @note Like std::allocator it holds no state, so any instance can de/allocate mememory from any other instance.
+	 * Similar to std::allocator, except it's untyped.
+	*/
 	class mallocator
 	{
 	public:
 		mallocator() noexcept = default;
 
-		mallocator(const mallocator& other) noexcept = default;
+		mallocator(const mallocator&) noexcept = default;
 
-		mallocator(mallocator&& other) noexcept = default;
+		mallocator(mallocator&&) noexcept = default;
 
-		mallocator& operator=(const mallocator& rhs) noexcept = default;
+		mallocator& operator=(const mallocator&) noexcept = default;
 
-		mallocator& operator=(mallocator&& rhs) noexcept = default;
+		mallocator& operator=(mallocator&&) noexcept = default;
 
 		bool operator==(const mallocator& rhs) const noexcept
 		{
@@ -32,16 +38,13 @@ namespace ktl
 #pragma region Allocation
 		void* allocate(size_t n)
 		{
-			return aligned_malloc(n, ALIGNMENT);
+			return detail::aligned_malloc(n, detail::ALIGNMENT);
 		}
 
 		void deallocate(void* p, size_t n) noexcept
 		{
-			aligned_free(p);
+			detail::aligned_free(p);
 		}
 #pragma endregion
 	};
-
-	template<typename T>
-	using type_mallocator = type_allocator<T, mallocator>;
 }
