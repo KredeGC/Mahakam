@@ -31,16 +31,28 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		// Naming
-		m_Name = filepath.stem().string();
+		m_Name = m_Filepath.stem().string();
 
 		// Read YAML file for shader passes
 		UnorderedMap<std::string, SourceDefinition> sources;
-		if (ParseYAMLFile(filepath, sources, m_Properties))
+		if (ParseYAMLFile(m_Filepath, sources, m_Properties))
 		{
 			// Compile binaries for each shader pass
 			for (auto& [shaderPass, sourceDef]: sources)
 				m_ShaderPasses[shaderPass] = CompileBinary(sourceDef.Sources, sourceDef.Defines);
 		}
+	}
+
+	OpenGLShader::OpenGLShader(OpenGLShader&& other) noexcept :
+		m_RendererID(other.m_RendererID),
+		m_Filepath(std::move(other.m_Filepath)),
+		m_Name(std::move(other.m_Name)),
+		m_ShaderPasses(std::move(other.m_ShaderPasses)),
+		m_UniformIDCache(std::move(other.m_UniformIDCache)),
+		m_Properties(std::move(other.m_Properties)),
+		m_UniformSize(other.m_UniformSize)
+	{
+		other.m_UniformSize = 0;
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -51,6 +63,21 @@ namespace Mahakam
 		{
 			MH_GL_CALL(glDeleteProgram(pass.second));
 		}
+	}
+
+	OpenGLShader& OpenGLShader::operator=(OpenGLShader&& rhs) noexcept
+	{
+		m_RendererID = rhs.m_RendererID;
+		m_Filepath = std::move(rhs.m_Filepath);
+		m_Name = std::move(rhs.m_Name);
+		m_ShaderPasses = std::move(rhs.m_ShaderPasses);
+		m_UniformIDCache = std::move(rhs.m_UniformIDCache);
+		m_Properties = std::move(rhs.m_Properties);
+		m_UniformSize = rhs.m_UniformSize;
+
+		rhs.m_UniformSize = 0;
+
+		return *this;
 	}
 
 	void OpenGLShader::Bind(const std::string& shaderPass)
@@ -149,7 +176,7 @@ namespace Mahakam
 		GLuint program = glCreateProgram();
 
 		// Create shader stages
-		std::vector<GLuint> shaderIDs;
+		TrivialVector<GLuint> shaderIDs;
 		shaderIDs.reserve(sources.size());
 		for (auto& kv : spirv)
 		{
@@ -167,7 +194,7 @@ namespace Mahakam
 				GLint maxLength = 0;
 				MH_GL_CALL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength));
 
-				std::vector<GLchar> infoLog(maxLength);
+				TrivialVector<GLchar> infoLog(maxLength);
 				MH_GL_CALL(glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]));
 
 				MH_GL_CALL(glDeleteShader(shader));
@@ -199,7 +226,7 @@ namespace Mahakam
 			GLint maxLength = 0;
 			MH_GL_CALL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength));
 
-			std::vector<GLchar> infoLog(maxLength);
+			TrivialVector<GLchar> infoLog(maxLength);
 			MH_GL_CALL(glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]));
 
 			MH_GL_CALL(glDeleteProgram(program));
@@ -245,9 +272,9 @@ namespace Mahakam
 			if (values[0] != uniformIndex && values[0] != -1)
 				continue;
 
-			// Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
+			// Get the name. Must use a vector rather than a std::string for C++03 standards issues.
 			// C++11 would let you use a std::string directly.
-			std::vector<char> nameData(values[2]);
+			TrivialVector<char> nameData(values[2]);
 			MH_GL_CALL(glGetProgramResourceName(program, GL_UNIFORM, unif, (GLsizei)nameData.size(), NULL, &nameData[0]));
 			std::string propertyName(nameData.begin(), nameData.end() - 1);
 
@@ -288,6 +315,8 @@ namespace Mahakam
 		int uniformID = -1;
 		if (m_RendererID != ~0)
 			MH_GL_CALL(uniformID = glGetUniformLocation(m_RendererID, name.c_str()));
+
+		// Otherwise try to find it in other shader passes
 		if (uniformID == -1)
 		{
 			for (auto& [pass, id] : m_ShaderPasses)

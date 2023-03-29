@@ -23,7 +23,14 @@ namespace Mahakam
 	public:
 		OpenGLTexture2D(const TextureProps& props);
 		OpenGLTexture2D(const std::filesystem::path& filepath, const TextureProps& props);
+
+		OpenGLTexture2D(const OpenGLTexture2D& other);
+		OpenGLTexture2D(OpenGLTexture2D&& other) noexcept;
+
 		virtual ~OpenGLTexture2D();
+
+		OpenGLTexture2D& operator=(const OpenGLTexture2D& rhs);
+		OpenGLTexture2D& operator=(OpenGLTexture2D&& rhs) noexcept;
 
 		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
 
@@ -56,6 +63,9 @@ namespace Mahakam
 	private:
 		uint32_t m_RendererID;
 		std::filesystem::path m_Filepath;
+
+		CubeTextureProps m_Props;
+
 		uint32_t m_InternalFormat;
 		uint32_t m_DataFormat;
 		uint32_t m_FormatType;
@@ -64,13 +74,17 @@ namespace Mahakam
 		uint32_t m_Size;
 		uint32_t m_TotalSize;
 
-		CubeTextureProps m_Props;
-
 	public:
 		OpenGLTextureCube(const CubeTextureProps& props);
 		OpenGLTextureCube(const std::filesystem::path& filepath, const CubeTextureProps& props);
-		//OpenGLTextureCube(Asset<TextureCube> cubemap, TextureCubePrefilter prefilter, const CubeTextureProps& props);
+
+		OpenGLTextureCube(const OpenGLTextureCube& other);
+		OpenGLTextureCube(OpenGLTextureCube&& other) noexcept;
+
 		virtual ~OpenGLTextureCube();
+
+		OpenGLTextureCube& operator=(const OpenGLTextureCube& rhs);
+		OpenGLTextureCube& operator=(OpenGLTextureCube&& rhs) noexcept;
 
 		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
 

@@ -29,11 +29,6 @@ namespace Mahakam
 		m_TotalSize = 0;
 	}
 
-	HeadlessTexture2D::~HeadlessTexture2D()
-	{
-		
-	}
-
 	void HeadlessTexture2D::SetData(void* data, uint32_t size, bool mipmaps)
 	{
 		
@@ -82,11 +77,6 @@ namespace Mahakam
 		// Calculate the size
 		m_Size = 0;
 		m_TotalSize = 0;
-	}
-
-	HeadlessTextureCube::~HeadlessTextureCube()
-	{
-		
 	}
 
 	void HeadlessTextureCube::Resize(uint32_t width, uint32_t height)

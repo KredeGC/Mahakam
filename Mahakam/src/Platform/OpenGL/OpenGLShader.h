@@ -20,7 +20,14 @@ namespace Mahakam
 
 	public:
 		OpenGLShader(const std::filesystem::path& filepath);
+
+		OpenGLShader(const OpenGLShader&) = delete;
+		OpenGLShader(OpenGLShader&& other) noexcept;
+
 		virtual ~OpenGLShader();
+
+		OpenGLShader& operator=(const OpenGLShader&) = delete;
+		OpenGLShader& operator=(OpenGLShader&& rhs) noexcept;
 
 		virtual void Bind(const std::string& shaderPass) override;
 

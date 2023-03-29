@@ -18,7 +18,14 @@ namespace Mahakam
 
 	public:
 		HeadlessShader(const std::filesystem::path& filepath);
+
+		HeadlessShader(const HeadlessShader&) = delete;
+		HeadlessShader(HeadlessShader&&) noexcept = default;
+
 		virtual ~HeadlessShader();
+
+		HeadlessShader& operator=(const HeadlessShader&) = delete;
+		HeadlessShader& operator=(HeadlessShader&&) noexcept = default;
 
 		virtual void Bind(const std::string& shaderPass) override;
 

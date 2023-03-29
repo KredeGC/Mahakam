@@ -323,7 +323,7 @@ namespace Mahakam
 		bool success = true;
 
 		// Parse each shader stage
-		std::vector<glslang::TShader*> shaders;
+		TrivialVector<glslang::TShader*> shaders;
 		shaders.reserve(sourceDef.Sources.size());
 		for (auto& source : sourceDef.Sources)
 		{

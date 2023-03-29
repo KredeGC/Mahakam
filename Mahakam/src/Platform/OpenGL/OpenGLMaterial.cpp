@@ -90,6 +90,12 @@ namespace Mahakam
 		other.m_Data = nullptr;
 	}
 
+	OpenGLMaterial::~OpenGLMaterial()
+	{
+		if (m_Data)
+			Allocator::Deallocate<uint8_t>(m_Data, m_DataSize);
+	}
+
 	OpenGLMaterial& OpenGLMaterial::operator=(const OpenGLMaterial& rhs)
 	{
 		m_Shader = rhs.m_Shader;
@@ -134,12 +140,6 @@ namespace Mahakam
 		rhs.m_Data = nullptr;
 
 		return *this;
-	}
-
-	OpenGLMaterial::~OpenGLMaterial()
-	{
-		if (m_Data)
-			Allocator::Deallocate<uint8_t>(m_Data, m_DataSize);
 	}
 
 	uint64_t OpenGLMaterial::Hash() const

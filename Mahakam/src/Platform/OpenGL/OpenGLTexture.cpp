@@ -180,11 +180,73 @@ namespace Mahakam
 		stbi_image_free(data);
 	}
 
+	OpenGLTexture2D::OpenGLTexture2D(const OpenGLTexture2D& other) :
+		m_Filepath(other.m_Filepath),
+		m_Props(other.m_Props),
+		m_InternalFormat(other.m_InternalFormat),
+		m_DataFormat(other.m_DataFormat),
+		m_FormatType(other.m_FormatType),
+		m_Compressed(other.m_Compressed),
+		m_Size(other.m_Size),
+		m_TotalSize(other.m_TotalSize)
+	{
+		// TODO: Create new renderer ID
+		// Copy the texture data from other
+
+		MH_BREAK("Copying textures is currently not supported!");
+	}
+
+	OpenGLTexture2D::OpenGLTexture2D(OpenGLTexture2D&& other) noexcept :
+		m_RendererID(other.m_RendererID),
+		m_Filepath(std::move(other.m_Filepath)),
+		m_Props(std::move(other.m_Props)),
+		m_InternalFormat(other.m_InternalFormat),
+		m_DataFormat(other.m_DataFormat),
+		m_FormatType(other.m_FormatType),
+		m_Compressed(other.m_Compressed),
+		m_Size(other.m_Size),
+		m_TotalSize(other.m_TotalSize)
+	{
+		other.m_RendererID = 0;
+		other.m_Size = 0;
+		other.m_TotalSize = 0;
+	}
+
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		MH_PROFILE_FUNCTION();
 
-		MH_GL_CALL(glDeleteTextures(1, &m_RendererID));
+		if (m_RendererID != 0)
+			MH_GL_CALL(glDeleteTextures(1, &m_RendererID));
+	}
+
+	OpenGLTexture2D& OpenGLTexture2D::operator=(const OpenGLTexture2D& rhs)
+	{
+		// TODO: Create new renderer ID
+		// Copy the texture data from other
+
+		MH_BREAK("Copying textures is currently not supported!");
+
+		return *this;
+	}
+
+	OpenGLTexture2D& OpenGLTexture2D::operator=(OpenGLTexture2D&& rhs) noexcept
+	{
+		m_RendererID = rhs.m_RendererID;
+		m_Filepath = std::move(rhs.m_Filepath);
+		m_Props = std::move(rhs.m_Props);
+		m_InternalFormat = rhs.m_InternalFormat;
+		m_DataFormat = rhs.m_DataFormat;
+		m_FormatType = rhs.m_FormatType;
+		m_Compressed = rhs.m_Compressed;
+		m_Size = rhs.m_Size;
+		m_TotalSize = rhs.m_TotalSize;
+
+		rhs.m_RendererID = 0;
+		rhs.m_Size = 0;
+		rhs.m_TotalSize = 0;
+
+		return *this;
 	}
 
 	void OpenGLTexture2D::SetData(void* data, uint32_t size, bool mipmaps)
@@ -354,11 +416,72 @@ namespace Mahakam
 			CreatePrefilter(m_RendererID);
 	}
 
+	OpenGLTextureCube::OpenGLTextureCube(const OpenGLTextureCube& other) :
+		m_Filepath(other.m_Filepath),
+		m_Props(other.m_Props),
+		m_InternalFormat(other.m_InternalFormat),
+		m_DataFormat(other.m_DataFormat),
+		m_FormatType(other.m_FormatType),
+		m_Compressed(other.m_Compressed),
+		m_Size(other.m_Size),
+		m_TotalSize(other.m_TotalSize)
+	{
+		// TODO: Create new renderer ID
+		// Copy the texture data from other
+
+		MH_BREAK("Copying textures is currently not supported!");
+	}
+
+	OpenGLTextureCube::OpenGLTextureCube(OpenGLTextureCube&& other) noexcept :
+		m_RendererID(other.m_RendererID),
+		m_Filepath(std::move(other.m_Filepath)),
+		m_Props(std::move(other.m_Props)),
+		m_InternalFormat(other.m_InternalFormat),
+		m_DataFormat(other.m_DataFormat),
+		m_FormatType(other.m_FormatType),
+		m_Compressed(other.m_Compressed),
+		m_Size(other.m_Size),
+		m_TotalSize(other.m_TotalSize)
+	{
+		other.m_RendererID = 0;
+		other.m_Size = 0;
+		other.m_TotalSize = 0;
+	}
+
 	OpenGLTextureCube::~OpenGLTextureCube()
 	{
 		MH_PROFILE_FUNCTION();
 
 		MH_GL_CALL(glDeleteTextures(1, &m_RendererID));
+	}
+
+	OpenGLTextureCube& OpenGLTextureCube::operator=(const OpenGLTextureCube& rhs)
+	{
+		// TODO: Create new renderer ID
+		// Copy the texture data from other
+
+		MH_BREAK("Copying textures is currently not supported!");
+
+		return *this;
+	}
+
+	OpenGLTextureCube& OpenGLTextureCube::operator=(OpenGLTextureCube&& rhs) noexcept
+	{
+		m_RendererID = rhs.m_RendererID;
+		m_Filepath = std::move(rhs.m_Filepath);
+		m_Props = std::move(rhs.m_Props);
+		m_InternalFormat = rhs.m_InternalFormat;
+		m_DataFormat = rhs.m_DataFormat;
+		m_FormatType = rhs.m_FormatType;
+		m_Compressed = rhs.m_Compressed;
+		m_Size = rhs.m_Size;
+		m_TotalSize = rhs.m_TotalSize;
+
+		rhs.m_RendererID = 0;
+		rhs.m_Size = 0;
+		rhs.m_TotalSize = 0;
+
+		return *this;
 	}
 
 	void OpenGLTextureCube::Resize(uint32_t width, uint32_t height)

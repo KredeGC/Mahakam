@@ -17,7 +17,14 @@ namespace Mahakam
 	public:
 		HeadlessTexture2D(const TextureProps& props);
 		HeadlessTexture2D(const std::filesystem::path& filepath, const TextureProps& props);
-		virtual ~HeadlessTexture2D();
+
+		HeadlessTexture2D(const HeadlessTexture2D&) = default;
+		HeadlessTexture2D(HeadlessTexture2D&&) noexcept = default;
+
+		virtual ~HeadlessTexture2D() = default;
+
+		HeadlessTexture2D& operator=(const HeadlessTexture2D&) = default;
+		HeadlessTexture2D& operator=(HeadlessTexture2D&&) noexcept = default;
 
 		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
 
@@ -55,7 +62,14 @@ namespace Mahakam
 	public:
 		HeadlessTextureCube(const CubeTextureProps& props);
 		HeadlessTextureCube(const std::filesystem::path& filepath, const CubeTextureProps& props);
-		virtual ~HeadlessTextureCube();
+
+		HeadlessTextureCube(const HeadlessTextureCube&) = default;
+		HeadlessTextureCube(HeadlessTextureCube&&) noexcept = default;
+
+		virtual ~HeadlessTextureCube() = default;
+
+		HeadlessTextureCube& operator=(const HeadlessTextureCube&) = default;
+		HeadlessTextureCube& operator=(HeadlessTextureCube&&) noexcept = default;
 
 		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
 
