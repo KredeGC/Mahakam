@@ -50,9 +50,5 @@ namespace Mahakam
 		virtual inline void* GetProcess() const override { return (void*)this; }
 
 		virtual inline RenderingContext& GetContext() const override { return *m_Context; }
-
-	private:
-		virtual void Init(const WindowProps& props);
-		virtual void Shutdown();
 	};
 }

@@ -26,7 +26,7 @@ namespace Mahakam
 
 	public:
 		GLFWindow(const WindowProps& props);
-		virtual ~GLFWindow();
+		virtual ~GLFWindow() override;
 
 		virtual void OnUpdate() override;
 
@@ -50,9 +50,5 @@ namespace Mahakam
 		virtual inline void* GetProcess() const override { return (void*)glfwGetProcAddress; }
 
 		virtual inline RenderingContext& GetContext() const override { return *m_Context; }
-
-	private:
-		virtual void Init(const WindowProps& props);
-		virtual void Shutdown();
 	};
 }

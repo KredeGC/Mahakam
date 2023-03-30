@@ -22,7 +22,7 @@ namespace Mahakam
 		IPLHRTF m_IPLHRTF;
 		IPLAudioSettings m_IplAudioSettings;
 
-		std::vector<MiniAudioSource*> m_Sources;
+		TrivialVector<MiniAudioSource*> m_Sources;
 
 	public:
 		MiniAudioContext();

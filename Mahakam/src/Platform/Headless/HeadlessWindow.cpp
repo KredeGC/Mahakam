@@ -6,7 +6,7 @@
 
 namespace Mahakam
 {
-	void HeadlessWindow::Init(const WindowProps& props)
+	HeadlessWindow::HeadlessWindow(const WindowProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -23,19 +23,9 @@ namespace Mahakam
         m_Start = std::chrono::steady_clock::now();
 	}
 
-	void HeadlessWindow::Shutdown()
-	{
-		MH_PROFILE_FUNCTION();
-	}
-
-	HeadlessWindow::HeadlessWindow(const WindowProps& props)
-	{
-		Init(props);
-	}
-
 	HeadlessWindow::~HeadlessWindow()
 	{
-		Shutdown();
+		MH_PROFILE_FUNCTION();
 	}
 
 	void HeadlessWindow::OnUpdate()

@@ -16,7 +16,14 @@ namespace Mahakam
 
 	public:
 		HeadlessRenderBuffer(uint32_t width, uint32_t height, TextureFormat format);
-		virtual ~HeadlessRenderBuffer() override;
+
+		HeadlessRenderBuffer(const HeadlessRenderBuffer&) = default;
+		HeadlessRenderBuffer(HeadlessRenderBuffer&&) noexcept = default;
+
+		virtual ~HeadlessRenderBuffer() override = default;
+
+		HeadlessRenderBuffer& operator=(const HeadlessRenderBuffer&) = default;
+		HeadlessRenderBuffer& operator=(HeadlessRenderBuffer&&) noexcept = default;
 
 		virtual uint32_t GetWidth() const override { return m_Width; }
 		virtual uint32_t GetHeight() const override { return m_Height; }

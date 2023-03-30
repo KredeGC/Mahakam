@@ -25,7 +25,7 @@ namespace Mahakam
 		MH_ERROR("[GLFW Error] (Code {0}): {1}", error, message);
 	}
 
-	void GLFWindow::Init(const WindowProps& props)
+	GLFWindow::GLFWindow(const WindowProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -188,21 +188,11 @@ namespace Mahakam
 		});
 	}
 
-	void GLFWindow::Shutdown()
+	GLFWindow::~GLFWindow()
 	{
 		MH_PROFILE_FUNCTION();
 
 		glfwDestroyWindow(m_Window);
-	}
-
-	GLFWindow::GLFWindow(const WindowProps& props)
-	{
-		Init(props);
-	}
-
-	GLFWindow::~GLFWindow()
-	{
-		Shutdown();
 	}
 
 	void GLFWindow::OnUpdate()

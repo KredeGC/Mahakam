@@ -17,7 +17,14 @@ namespace Mahakam
 
 	public:
 		OpenGLRenderBuffer(uint32_t width, uint32_t height, TextureFormat format);
+
+		OpenGLRenderBuffer(const OpenGLRenderBuffer& other);
+		OpenGLRenderBuffer(OpenGLRenderBuffer&& other) noexcept;
+
 		virtual ~OpenGLRenderBuffer() override;
+
+		OpenGLRenderBuffer& operator=(const OpenGLRenderBuffer& rhs);
+		OpenGLRenderBuffer& operator=(OpenGLRenderBuffer&& rhs) noexcept;
 
 		virtual uint32_t GetWidth() const override { return m_Width; }
 		virtual uint32_t GetHeight() const override { return m_Height; }
