@@ -494,35 +494,4 @@ namespace Mahakam
 			}
 		}
 	}
-
-	void AssetDatabase::RecursiveImportAssets(const std::filesystem::path& filepath)
-	{
-		/*auto iter = std::filesystem::directory_iterator(filepath);
-
-		for (auto& directory : iter)
-		{
-			if (directory.is_directory())
-			{
-				RecursiveImportAssets(directory.path());
-			}
-			else
-			{
-				Ref<AssetImporter> importer = GetAssetImporter(directory.path().extension().string());
-				if (importer)
-				{
-					std::filesystem::path importPath = FileUtility::GetImportPath(directory.path());
-
-					if (!std::filesystem::exists(importPath))
-					{
-						YAML::Node node;
-						importer->OnWizardOpen(directory.path(), node);
-
-						Asset<void> asset(importPath);
-
-						importer->OnWizardImport(asset, directory.path(), importPath);
-					}
-				}
-			}
-		}*/
-	}
 }

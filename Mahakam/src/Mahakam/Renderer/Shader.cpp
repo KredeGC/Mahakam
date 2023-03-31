@@ -316,7 +316,7 @@ namespace Mahakam
 	{
 		glslang::InitializeProcess();
 
-		glslang::TProgram* program = new glslang::TProgram;
+		glslang::TProgram* program = Allocator::New<glslang::TProgram>();
 
 		EShMessages messages = (EShMessages)(EShMsgSpvRules | EShMsgEnhanced);
 
@@ -327,7 +327,7 @@ namespace Mahakam
 		shaders.reserve(sourceDef.Sources.size());
 		for (auto& source : sourceDef.Sources)
 		{
-			glslang::TShader* shader = new glslang::TShader((EShLanguage)ShaderStageToEShLanguage(source.first));
+			glslang::TShader* shader = Allocator::New<glslang::TShader>((EShLanguage)ShaderStageToEShLanguage(source.first));
 			const char* shaderStrings[1];
 
 			std::string sortedSource = ShaderUtility::SortIncludes(source.second);
@@ -386,9 +386,9 @@ namespace Mahakam
 		}
 
 		// Cleanup
-		delete program;
+		Allocator::Delete(program);
 		for (auto& shader : shaders)
-			delete shader;
+			Allocator::Delete(shader);
 
 		glslang::FinalizeProcess();
 

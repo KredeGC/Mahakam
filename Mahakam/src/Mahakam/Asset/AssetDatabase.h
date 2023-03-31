@@ -21,9 +21,10 @@ namespace Mahakam
 		// Basic reference resource policy:
 		// - Ref<T> and Asset<T> are no longer interchangable
 		// - Ref<T> should be used for internal objects that are not assets, like buffers
-		// - Asset<T> should be used for asset objects, like texures
+		// - Asset<T> should be used for asset objects, like texures, that should be serializable
 		// - Having an Asset<T> object means that it is always loaded
-		// - Asset<T> uses a pointer and ID. If the ID is set, it's a saved asset, if not then it's a runtime asset
+		// - Asset<T> uses a block and ID. If the ID is set, it's a saved asset, if not then it's a runtime asset
+		// - A move function is used in the control block for moving another asset (of the same type) into this space
 		// - A delete function is used in the control block for deleting when no longer used
         
         typedef uint64_t AssetID;
@@ -104,8 +105,6 @@ namespace Mahakam
 		static ControlBlock* LoadAndIncrementAsset(AssetID id);
 
 		static void RecursiveCacheAssets(const std::filesystem::path& filepath);
-
-		static void RecursiveImportAssets(const std::filesystem::path& filepath);
 
 
 
