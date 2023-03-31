@@ -1,13 +1,28 @@
 #pragma once
 
 #include "Mahakam/Renderer/Mesh.h"
+#include "Mahakam/Renderer/Texture.h"
 
 #include <ryml/rapidyaml-0.4.1.hpp>
+
+#include <cstdint>
 
 namespace Mahakam
 {
 	template<typename>
 	struct AssetSerializeTraits;
+
+	template<>
+	struct AssetSerializeTraits<Texture>
+	{
+		static void Serialize(ryml::NodeRef& node, Texture* asset) {}
+
+		static Asset<Texture> Deserialize(ryml::NodeRef& node) {}
+
+		static void Build(uint8_t* buffer, Texture* asset) {}
+
+		static Asset<Texture> Read(uint8_t* buffer) {}
+	};
 
 	template<>
 	struct AssetSerializeTraits<Mesh>

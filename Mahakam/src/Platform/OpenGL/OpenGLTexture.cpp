@@ -41,6 +41,8 @@ namespace Mahakam
 
 	static void SetWrapMode(uint32_t targetID, GLenum axis, TextureWrapMode wrapMode)
 	{
+		MH_PROFILE_FUNCTION();
+
 		const float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 		switch (wrapMode)
@@ -62,6 +64,8 @@ namespace Mahakam
 
 	static void SetFilterMode(uint32_t targetID, bool mipmaps, TextureFilter filterMode)
 	{
+		MH_PROFILE_FUNCTION();
+
 		// Minification
 		if (mipmaps)
 		{
@@ -91,6 +95,8 @@ namespace Mahakam
 
 	static uint32_t CalculateTextureByteSize(uint32_t targetID, uint32_t bpp, bool compressed, bool mipmaps, uint32_t width, uint32_t height)
 	{
+		MH_PROFILE_FUNCTION();
+
 		uint32_t mipLevels = 1 + (uint32_t)(std::floor(std::log2(std::max(width, height))));
 		uint32_t maxMipLevels = (!compressed && mipmaps) ? mipLevels : 1; // TODO: Support compressed mipmaps
 
