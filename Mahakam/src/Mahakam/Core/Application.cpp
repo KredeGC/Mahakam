@@ -6,6 +6,7 @@
 #include "Profiler.h"
 #include "SharedLibrary.h"
 #include "Timestep.h"
+#include "Window.h"
 
 #include "Mahakam/Audio/AudioEngine.h"
 

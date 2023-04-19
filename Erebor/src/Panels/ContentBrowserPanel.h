@@ -3,6 +3,7 @@
 #include <Mahakam/Mahakam.h>
 
 #include <vector>
+#include <set>
 
 namespace Mahakam::Editor
 {

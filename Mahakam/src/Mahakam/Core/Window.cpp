@@ -1,6 +1,10 @@
 #include "Mahakam/mhpch.h"
 #include "Window.h"
 
+#include "Mahakam/Core/Log.h"
+
+#include "Mahakam/Renderer/RendererAPI.h"
+
 #include "Platform/GLFW/GLFWindow.h"
 #include "Platform/Headless/HeadlessWindow.h"
 

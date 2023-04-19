@@ -3,13 +3,21 @@
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/Log.h"
 
-#include <entt/entt.hpp>
+#include "Scene.h"
+
+#include <entt/entity/entity.hpp>
+
+#include <type_traits>
 
 namespace Mahakam
 {
 	class Scene;
 
 	struct RelationshipComponent;
+	struct TagComponent;
+	struct DeleteComponent;
+	struct DirtyRelationshipComponent;
+	struct DirtyColliderComponent;
 
 	class Entity
 	{
@@ -47,80 +55,76 @@ namespace Mahakam
 		void Delete();
 
 		template<typename T, typename... Args>
-		void AddEmptyComponent(Args&&... args);
+		void AddEmptyComponent(Args&&... args)
+		{
+			static_assert(!std::is_same_v<T, TagComponent>);
+			static_assert(!std::is_same_v<T, RelationshipComponent>);
+			static_assert(!std::is_same_v<T, DeleteComponent>);
+			static_assert(!std::is_same_v<T, DirtyRelationshipComponent>);
+			static_assert(!std::is_same_v<T, DirtyColliderComponent>);
+
+			MH_ASSERT(!HasComponent<T>(), "Entity already has component!");
+
+			m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
+		}
 
 		template<typename T, typename... Args>
-		T& AddComponent(Args&&... args);
+		T& AddComponent(Args&&... args)
+		{
+			static_assert(!std::is_same_v<T, TagComponent>);
+			static_assert(!std::is_same_v<T, RelationshipComponent>);
+			static_assert(!std::is_same_v<T, DeleteComponent>);
+			static_assert(!std::is_same_v<T, DirtyRelationshipComponent>);
+			static_assert(!std::is_same_v<T, DirtyColliderComponent>);
+
+			MH_ASSERT(!HasComponent<T>(), "Entity already has component!");
+
+			T& component = m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
+
+			m_Scene->OnComponentAdded<T>(*this, component);
+
+			return component;
+		}
 
 		template<typename T>
-		T* TryGetComponent() const;
+		T* TryGetComponent() const
+		{
+			return m_Scene->m_Registry.template try_get<T>(m_Handle);
+		}
 
 		template<typename T>
-		T& GetComponent() const;
+		T& GetComponent() const
+		{
+			MH_ASSERT(HasComponent<T>(), "Entity has no such component!");
+
+			return m_Scene->m_Registry.template get<T>(m_Handle);
+		}
 
 		template<typename T>
-		bool RemoveComponent();
+		bool RemoveComponent()
+		{
+			static_assert(!std::is_same_v<T, TagComponent>);
+			static_assert(!std::is_same_v<T, RelationshipComponent>);
+			static_assert(!std::is_same_v<T, DeleteComponent>);
+			static_assert(!std::is_same_v<T, DirtyRelationshipComponent>);
+			static_assert(!std::is_same_v<T, DirtyColliderComponent>);
+
+			MH_ASSERT(HasComponent<T>(), "Entity has no such component!");
+
+			return m_Scene->m_Registry.template remove<T>(m_Handle);
+		}
 
 		template<typename T>
-		bool HasComponent() const;
+		bool HasComponent() const
+		{
+			return m_Scene->m_Registry.template any_of<T>(m_Handle);
+		}
 	};
 }
 
-#include "Scene.h"
-
-namespace Mahakam
+namespace std
 {
-	template<typename T, typename... Args>
-	void Entity::AddEmptyComponent(Args&&... args)
-	{
-		MH_ASSERT(!HasComponent<T>(), "Entity already has component!");
-
-		m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
-	}
-
-	template<typename T, typename... Args>
-	T& Entity::AddComponent(Args&&... args)
-	{
-		MH_ASSERT(!HasComponent<T>(), "Entity already has component!");
-
-		T& component = m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
-
-		m_Scene->OnComponentAdded<T>(*this, component);
-
-		return component;
-	}
-
-	template<typename T>
-	T* Entity::TryGetComponent() const
-	{
-		return m_Scene->m_Registry.template try_get<T>(m_Handle);
-	}
-
-	template<typename T>
-	T& Entity::GetComponent() const
-	{
-		MH_ASSERT(HasComponent<T>(), "Entity has no such component!");
-
-		return m_Scene->m_Registry.template get<T>(m_Handle);
-	}
-
-	template<typename T>
-	bool Entity::RemoveComponent()
-	{
-		MH_ASSERT(HasComponent<T>(), "Entity has no such component!");
-
-		return m_Scene->m_Registry.template remove<T>(m_Handle);
-	}
-
-	template<typename T>
-	bool Entity::HasComponent() const
-	{
-		return m_Scene->m_Registry.template any_of<T>(m_Handle);
-	}
-}
-
-namespace std {
-	template <>
+	template<>
 	struct hash<::Mahakam::Entity>
 	{
 		size_t operator()(const ::Mahakam::Entity& k) const

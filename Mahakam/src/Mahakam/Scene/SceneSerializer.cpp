@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "SceneSerializer.h"
 
+#include "Mahakam/Core/FileUtility.h"
+
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Shader.h"
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Timestep.h"
+#include "Mahakam/Core/SharedLibrary.h"
 
 namespace Mahakam
 {

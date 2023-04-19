@@ -2,6 +2,7 @@
 
 #include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Types.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
 

@@ -18,6 +18,8 @@
 
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Mahakam/ImGui/GUI.h"
+
 #include "Mahakam/Renderer/Animation.h"
 
 #include "Mahakam/Serialization/YAMLSerialization.h"

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Core/Types.h"
+
 #include "PhysicsEngine.h"
 
 #define GLM_FORCE_INLINE

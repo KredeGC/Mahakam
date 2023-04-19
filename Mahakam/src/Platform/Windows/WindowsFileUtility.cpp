@@ -2,6 +2,7 @@
 #include "Mahakam/Core/FileUtility.h"
 
 #include "Mahakam/Core/Application.h"
+#include "Mahakam/Core/Window.h"
 
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32

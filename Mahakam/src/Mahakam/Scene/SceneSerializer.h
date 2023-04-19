@@ -1,8 +1,13 @@
 #pragma once
 
+#include "Mahakam/Core/Types.h"
+
+#include "Mahakam/Scene/Entity.h"
+
 #include <ryml/rapidyaml-0.4.1.hpp>
 
 #include <filesystem>
+#include <string>
 
 namespace Mahakam
 {

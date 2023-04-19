@@ -3,6 +3,8 @@
 #include "Components/SkeletonComponent.h"
 #include "Components/TransformComponent.h"
 
+#include "Mahakam/Math/Math.h"
+
 namespace Mahakam
 {
 	void SkeletonComponent::CreateBoneEntities(Entity entity, const std::vector<MeshNode>& hierarchy)

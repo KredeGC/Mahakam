@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "Animator.h"
 
+#include "Mahakam/Core/Profiler.h"
+
 #include "Animation.h"
 
 namespace Mahakam

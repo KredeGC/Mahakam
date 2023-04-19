@@ -5,6 +5,7 @@
 #include "ShaderUtility.h"
 
 #include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
 #include "Platform/Headless/HeadlessShader.h"

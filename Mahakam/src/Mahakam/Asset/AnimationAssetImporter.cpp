@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "AnimationAssetImporter.h"
 
+#include "Mahakam/ImGui/GUI.h"
+
 #include "Mahakam/Renderer/Animation.h"
 
 #include <imgui/imgui.h>

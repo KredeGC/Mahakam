@@ -3,6 +3,7 @@
 
 #include "Mahakam/Core/Application.h"
 #include "Mahakam/Core/Profiler.h"
+#include "Mahakam/Core/Window.h"
 
 #include "Mahakam/Events/MouseEvent.h"
 #include "Mahakam/Events/KeyEvent.h"

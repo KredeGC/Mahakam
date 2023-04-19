@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Core/Types.h"
+
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
 #define GLM_ENABLE_EXPERIMENTAL

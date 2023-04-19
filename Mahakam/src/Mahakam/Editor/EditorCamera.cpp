@@ -5,9 +5,12 @@
 
 #include "Mahakam/Core/Application.h"
 #include "Mahakam/Core/Input.h"
+#include "Mahakam/Core/Window.h"
 
 #include "Mahakam/Events/KeyEvent.h"
 #include "Mahakam/Events/MouseEvent.h"
+
+#include "Mahakam/Renderer/RendererAPI.h"
 
 #include "Mahakam/Scene/Components/TransformComponent.h"
 

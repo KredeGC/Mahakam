@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "RendererAPI.h"
 
+#include "Mahakam/Core/Log.h"
+
 #include "Platform/Headless/HeadlessRendererAPI.h"
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
 

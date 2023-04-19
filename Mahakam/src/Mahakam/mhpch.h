@@ -49,7 +49,7 @@
 
 #include "Mahakam/Renderer/RendererAPI.h"
 
-#include <entt/entt.hpp>
+#include <entt/entity/registry.hpp>
 
 #include <imgui/imgui.h>
 #include <imguizmo/ImGuizmo.h>

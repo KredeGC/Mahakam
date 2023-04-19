@@ -3,6 +3,8 @@
 
 #include "AssetSerializeTraits.h"
 
+#include "Mahakam/ImGui/GUI.h"
+
 #include "Mahakam/Renderer/Mesh.h"
 
 #include <imgui/imgui.h>

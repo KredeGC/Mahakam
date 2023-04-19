@@ -1,5 +1,6 @@
 #pragma once
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Core/Profiler.h"
 
 #include <string>

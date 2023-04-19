@@ -1,5 +1,5 @@
 #include "Mahakam/mhpch.h"
-#include "Scene.h"
+#include "SceneDef.h"
 
 #include "Components/AnimatorComponent.h"
 #include "Components/AudioListenerComponent.h"
@@ -494,10 +494,11 @@ namespace Mahakam
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
+		entt::entity handle = m_Registry.create();
 		std::string tagName = name.empty() ? "Entity" : name;
-		Entity entity(m_Registry.create(), this);
-		auto& tag = entity.AddComponent<TagComponent>(tagName);
-		auto& relation = entity.AddComponent<RelationshipComponent>();
+		Entity entity(handle, this);
+		m_Registry.emplace<TagComponent>(handle, tagName);
+		m_Registry.emplace<RelationshipComponent>(handle);
 		return entity;
 	}
 

@@ -2,6 +2,7 @@
 
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/SharedLibrary.h"
+#include "Mahakam/Core/Types.h"
 
 namespace Mahakam
 {

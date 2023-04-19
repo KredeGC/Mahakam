@@ -1,6 +1,9 @@
 #include "Mahakam/mhpch.h"
 #include "Navigation.h"
 
+#include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Log.h"
+
 namespace Mahakam
 {
     void Navigation::AddNode(const glm::vec3& pos)

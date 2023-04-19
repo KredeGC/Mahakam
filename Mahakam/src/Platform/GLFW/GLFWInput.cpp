@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "Mahakam/Core/Input.h"
+
 #include "Mahakam/Core/Application.h"
+#include "Mahakam/Core/Window.h"
 
 #include <GLFW/glfw3.h>
 
