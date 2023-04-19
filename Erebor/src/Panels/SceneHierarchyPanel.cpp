@@ -54,7 +54,6 @@ namespace Mahakam::Editor
 					}
 
 					func(entity, move);
-					context->Sort();
 				}
 			}
 

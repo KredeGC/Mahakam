@@ -63,10 +63,6 @@ namespace Mahakam
 
 		template<typename T>
 		bool HasComponent() const;
-
-	private:
-		static void ClearParent(Entity entity, RelationshipComponent& relation);
-		static void MarkForDeletion(Entity entity, RelationshipComponent& relation);
 	};
 }
 

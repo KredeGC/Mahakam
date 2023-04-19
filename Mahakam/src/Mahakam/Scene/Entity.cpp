@@ -8,6 +8,78 @@
 
 namespace Mahakam
 {
+	static void ClearParent(entt::registry& registry, entt::entity entity, RelationshipComponent& relation)
+	{
+		if (relation.Parent != entt::null)
+		{
+			auto& parentRelation = registry.get<RelationshipComponent>(relation.Parent);
+
+			entt::entity prev = relation.Prev;
+			entt::entity next = relation.Next;
+
+			// Update the surrounding children
+			if (prev != entt::null)
+				registry.get<RelationshipComponent>(prev).Next = next;
+			if (next != entt::null)
+				registry.get<RelationshipComponent>(next).Prev = prev;
+			if (parentRelation.First == entity)
+				parentRelation.First = next;
+		}
+	}
+
+	static void MarkForDeletion(entt::registry& registry, entt::entity entity, RelationshipComponent& relation)
+	{
+		// Recursively mark children for deletion
+		entt::entity current = relation.First;
+		while (current != entt::null)
+		{
+			auto& currentRelation = registry.get<RelationshipComponent>(current);
+
+			MarkForDeletion(registry, current, currentRelation);
+
+			current = currentRelation.Next;
+		}
+
+		registry.emplace_or_replace<DeleteComponent>(entity);
+	}
+
+	static void MarkParentForSort(entt::registry& registry, entt::entity parent, RelationshipComponent& relation)
+	{
+		registry.emplace_or_replace<DirtyRelationshipComponent>(parent);
+		parent = registry.get<RelationshipComponent>(parent).Parent;
+
+		// Add dirty flag to parents
+		while (parent != entt::null)
+		{
+			registry.emplace_or_replace<DirtyRelationshipComponent>(parent);
+
+			RelationshipComponent& relation = registry.get<RelationshipComponent>(parent);
+			parent = relation.Parent;
+		}
+	}
+
+	static void MarkChildrenForSort(entt::registry& registry, entt::entity parent, RelationshipComponent& relation)
+	{
+		// Recursively mark children as dirty relationship
+		entt::entity current = relation.First;
+		while (current != entt::null)
+		{
+			auto& currentRelation = registry.get<RelationshipComponent>(current);
+
+			MarkChildrenForSort(registry, current, currentRelation);
+
+			current = currentRelation.Next;
+		}
+
+		registry.emplace_or_replace<DirtyRelationshipComponent>(parent);
+	}
+
+	static void MarkForSort(entt::registry& registry, entt::entity parent, RelationshipComponent& relation)
+	{
+		MarkParentForSort(registry, parent, relation);
+		MarkChildrenForSort(registry, parent, relation);
+	}
+
 	Entity::Entity(entt::entity handle, Scene* scene)
 		: m_Handle(handle), m_Scene(scene) {}
 
@@ -28,7 +100,7 @@ namespace Mahakam
 		auto& relation = m_Scene->m_Registry.get<RelationshipComponent>(m_Handle);
 
 		// Clear our current parent
-		ClearParent(*this, relation);
+		ClearParent(m_Scene->m_Registry, m_Handle, relation);
 
 		// Clear the relationship
 		relation.Prev = entt::null;
@@ -62,6 +134,8 @@ namespace Mahakam
 			// If no children, append as the first
 			parentRelation.First = m_Handle;
 		}
+
+		MarkForSort(m_Scene->m_Registry, parent.m_Handle, parentRelation);
 	}
 
 	Entity Entity::GetParent() const
@@ -75,7 +149,7 @@ namespace Mahakam
 		auto& firstRelation = m_Scene->m_Registry.get<RelationshipComponent>(first.m_Handle);
 
 		// Clear first's current parent
-		ClearParent(first, firstRelation);
+		ClearParent(m_Scene->m_Registry, first.m_Handle, firstRelation);
 
 		// Clear their relationship
 		firstRelation.Prev = entt::null;
@@ -92,6 +166,8 @@ namespace Mahakam
 			firstRelation.Next = oldFirst;
 			m_Scene->m_Registry.get<RelationshipComponent>(oldFirst).Prev = first.m_Handle;
 		}
+
+		MarkForSort(m_Scene->m_Registry, m_Handle, relation);
 	}
 
 	Entity Entity::GetFirstChild() const
@@ -105,7 +181,7 @@ namespace Mahakam
 		auto& nextRelation = m_Scene->m_Registry.get<RelationshipComponent>(next.m_Handle);
 
 		// Clear next's current parent
-		ClearParent(next, nextRelation);
+		ClearParent(m_Scene->m_Registry, next.m_Handle, nextRelation);
 
 		// Clear their relationship
 		nextRelation.Prev = entt::null;
@@ -123,6 +199,8 @@ namespace Mahakam
 
 		relation.Next = next.m_Handle;
 		nextRelation.Prev = m_Handle;
+
+		MarkForSort(m_Scene->m_Registry, relation.Parent, m_Scene->m_Registry.get<RelationshipComponent>(relation.Parent));
 	}
 
 	Entity Entity::GetNext() const
@@ -140,47 +218,10 @@ namespace Mahakam
 		auto& relation = m_Scene->m_Registry.get<RelationshipComponent>(m_Handle);
 
 		// Clear our current parent
-		ClearParent(*this, relation);
+		ClearParent(m_Scene->m_Registry, m_Handle, relation);
 
 		// Mark children for deletion
 		// No need to reset their parents, they will soon be gone :)
-		MarkForDeletion(*this, relation);
-	}
-
-	void Entity::ClearParent(Entity entity, RelationshipComponent& relation)
-	{
-		if (relation.Parent != entt::null)
-		{
-			auto& parentRelation = entity.m_Scene->m_Registry.get<RelationshipComponent>(relation.Parent);
-
-			entt::entity prev = relation.Prev;
-			entt::entity next = relation.Next;
-
-			// Update the surrounding children
-			if (prev != entt::null)
-				entity.m_Scene->m_Registry.get<RelationshipComponent>(prev).Next = next;
-			if (next != entt::null)
-				entity.m_Scene->m_Registry.get<RelationshipComponent>(next).Prev = prev;
-			if (parentRelation.First == entity.m_Handle)
-				parentRelation.First = next;
-		}
-	}
-
-	void Entity::MarkForDeletion(Entity entity, RelationshipComponent& relation)
-	{
-		// Recursively mark children for deletion
-		entt::entity current = relation.First;
-		while (current != entt::null)
-		{
-			auto& currentRelation = entity.m_Scene->m_Registry.get<RelationshipComponent>(current);
-
-			Entity currentEntity{ current, entity.m_Scene };
-			MarkForDeletion(currentEntity, currentRelation);
-
-			current = currentRelation.Next;
-		}
-
-		if (!entity.m_Scene->m_Registry.any_of<DeleteComponent>(entity.m_Handle))
-			entity.m_Scene->m_Registry.emplace<DeleteComponent>(entity.m_Handle);
+		MarkForDeletion(m_Scene->m_Registry, m_Handle, relation);
 	}
 }

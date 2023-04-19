@@ -199,8 +199,6 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	entity5.SetParent(entity2);
 	entity7.SetParent(entity5);
 	entity8.SetParent(entity4);
-
-	scene->Sort();
 }
 
 

@@ -30,6 +30,7 @@ namespace Mahakam
 		entt::registry m_Registry;
 
 		float m_ViewportRatio = 1.0f;
+		bool m_Unsorted = true;
 
 		PhysicsContext* m_PhysicsContext;
 
@@ -45,8 +46,6 @@ namespace Mahakam
 
 		Entity CreateEntity(const std::string& name = "Entity");
 		void DestroyEntity(Entity entity);
-
-		void Sort();
 
 		template<typename Fn>
 		void ForEachEntity(Fn func);

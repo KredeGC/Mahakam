@@ -10,6 +10,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/hash.hpp>
 
 namespace Mahakam
 {
@@ -25,7 +26,7 @@ namespace Mahakam
 
 		glm::mat4 m_ModelMatrix{ 1.0f };
 
-		uint32_t m_ParentHash = 0;
+		size_t m_ParentHash = 0;
 		uint8_t m_Flags = 0;
 
 	public:
@@ -65,15 +66,12 @@ namespace Mahakam
 			if ((m_Flags & FLAG_NO_MATRIX) != 0)
 				return;
 
-			uint32_t hash = 2166136261U;
-			const uint8_t* modelPtr = (const uint8_t*)glm::value_ptr(modelMatrix);
-			for (uint32_t i = 0; i < sizeof(glm::mat4); ++i)
-				hash = (hash * 16777619U) ^ *(modelPtr + i);
+			size_t hash = std::hash<glm::mat4>()(modelMatrix);
 
 			if (m_ParentHash != hash || (m_Flags & FLAG_DIRTY) != 0)
 			{
 				m_ParentHash = hash;
-				m_Flags ^= FLAG_DIRTY;
+				m_Flags &= ~FLAG_DIRTY;
 				m_ModelMatrix = modelMatrix * glm::translate(glm::mat4(1.0f), m_Position)
 					* glm::toMat4(m_Rotation)
 					* glm::scale(glm::mat4(1.0f), m_Scale);

@@ -45,7 +45,5 @@ namespace Mahakam
 
 			boneEntities[node.ID] = boneEntity;
 		}
-
-		entity.GetScene()->Sort();
 	}
 }

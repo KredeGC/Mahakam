@@ -75,12 +75,17 @@ namespace Mahakam
 
 
 
-	static uint16_t RecursiveDepth(entt::registry& registry, const RelationshipComponent& relation)
+	static size_t GetDepth(entt::registry& registry, entt::entity parent)
 	{
-		if (relation.Parent != entt::null)
-			return 1 + RecursiveDepth(registry, registry.get<RelationshipComponent>(relation.Parent));
-		else
-			return 0;
+		size_t depth = 0;
+		while (parent != entt::null)
+		{
+			RelationshipComponent& relation = registry.get<RelationshipComponent>(parent);
+			parent = relation.Parent;
+			depth++;
+		}
+
+		return depth;
 	}
 
 	Scene::Scene(PhysicsContext* physics) :
@@ -115,6 +120,28 @@ namespace Mahakam
 	void Scene::OnUpdate(Timestep ts, bool editor)
 	{
 		MH_PROFILE_FUNCTION();
+
+		// Sort dirty relationships
+		if (!m_Registry.view<DirtyRelationshipComponent>().empty())
+		{
+			auto group = m_Registry.group<DirtyRelationshipComponent, TransformComponent>();
+
+			group.sort([&](const entt::entity lhs, const entt::entity rhs)
+			{
+				const RelationshipComponent& clhs = m_Registry.get<RelationshipComponent>(lhs);
+				const RelationshipComponent& crhs = m_Registry.get<RelationshipComponent>(rhs);
+
+				size_t lhsDepth = GetDepth(m_Registry, clhs.Parent);
+				size_t rhsDepth = GetDepth(m_Registry, crhs.Parent);
+
+				bool lowerParent = lhsDepth < rhsDepth;
+				bool lowerAddress = (clhs.Parent == crhs.Parent && &clhs < &crhs);
+
+				return lowerParent || lowerAddress;
+			});
+
+			m_Registry.clear<DirtyRelationshipComponent>();
+		}
 
 		// Update physics
 		if (m_PhysicsContext)
@@ -477,43 +504,6 @@ namespace Mahakam
 	void Scene::DestroyEntity(Entity entity)
 	{
 		entity.Delete();
-	}
-
-	void Scene::Sort()
-	{
-		m_Registry.sort<RelationshipComponent>([&](const RelationshipComponent& clhs, const RelationshipComponent& crhs)
-		{
-			uint16_t lhsDepth = RecursiveDepth(m_Registry, clhs);
-			uint16_t rhsDepth = RecursiveDepth(m_Registry, crhs);
-
-			// TODO: Store the depth somehow
-			// Possibly sort by parents as well
-
-			bool lowerParent = lhsDepth < rhsDepth;
-			bool lowerAddress = (clhs.Parent == crhs.Parent && &clhs < &crhs);
-
-			return lowerParent || lowerAddress;
-		});
-
-		//registry.sort<RelationshipComponent, TransformComponent>();
-
-		// This is necessary to ensure that transforms get updated in the correct order
-		m_Registry.sort<TransformComponent>([&](const entt::entity lhs, const entt::entity rhs)
-		{
-			auto& clhs = m_Registry.get<RelationshipComponent>(lhs);
-			auto& crhs = m_Registry.get<RelationshipComponent>(rhs);
-
-			uint16_t lhsDepth = RecursiveDepth(m_Registry, clhs);
-			uint16_t rhsDepth = RecursiveDepth(m_Registry, crhs);
-
-			// TODO: Store the depth somehow
-			// Possibly sort by parents as well
-
-			bool lowerParent = lhsDepth < rhsDepth;
-			bool lowerAddress = (clhs.Parent == crhs.Parent && &clhs < &crhs);
-
-			return lowerParent || lowerAddress;
-		});
 	}
 
 	//Ref<Scene> Scene::CreateEmpty(PhysicsContext* physics)
