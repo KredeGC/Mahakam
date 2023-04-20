@@ -3,7 +3,7 @@
 #include "Mahakam/Core/Core.h"
 #include "Mahakam/Core/Log.h"
 
-#include "Scene.h"
+#include "SceneDef.h"
 
 #include <entt/entity/entity.hpp>
 
@@ -11,8 +11,6 @@
 
 namespace Mahakam
 {
-	class Scene;
-
 	struct RelationshipComponent;
 	struct TagComponent;
 	struct DeleteComponent;
