@@ -425,7 +425,7 @@ namespace Mahakam
 					const auto& materials = meshComponent.GetMaterials();
 					uint32_t materialCount = static_cast<uint32_t>(materials.size());
 
-					if (materialCount-- < 0)
+					if (materialCount-- <= 0)
 						return;
 
 					if (SkeletonComponent* skeletonComponent = m_Registry.try_get<SkeletonComponent>(entity))

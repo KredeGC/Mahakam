@@ -23,10 +23,64 @@ namespace Mahakam
 	SceneSerializer::SceneSerializer(Ref<Scene> scene)
 		: m_Scene(scene) {}
 
-	std::string SceneSerializer::Serialize()
+	std::string SceneSerializer::SerializeToString()
 	{
 		ryml::Tree tree;
+		SerializeToTree(tree);
 
+		std::stringstream ss;
+		ss << tree;
+		return ss.str();
+	}
+
+	bool SceneSerializer::DeserializeFromString(const std::string& src)
+	{
+		try
+		{
+			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(src));
+
+			return DeserializeFromTree(tree);
+		}
+		catch (std::runtime_error const& e)
+		{
+			MH_WARN("Scene was unable to load from YAML source: {0}", e.what());
+		}
+
+		return false;
+	}
+
+	void SceneSerializer::SerializeToPath(const std::filesystem::path& filepath)
+	{
+		ryml::Tree tree;
+		SerializeToTree(tree);
+
+		std::ofstream filestream(filepath);
+		filestream << tree;
+	}
+
+	bool SceneSerializer::DeserializeFromPath(const std::filesystem::path& filepath)
+	{
+		TrivialVector<char> buffer;
+
+		if (!FileUtility::ReadFile(filepath, buffer))
+			return false;
+
+		try
+		{
+			ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
+
+			return DeserializeFromTree(tree);
+		}
+		catch (std::runtime_error const& e)
+		{
+			MH_WARN("Scene was unable to load from YAML file {0}: {1}", filepath.string(), e.what());
+		}
+
+		return false;
+	}
+
+	void SceneSerializer::SerializeToTree(ryml::Tree& tree)
+	{
 		ryml::NodeRef root = tree.rootref();
 		root |= ryml::MAP;
 
@@ -61,55 +115,6 @@ namespace Mahakam
 				SerializeEntity(entities, entity);
 			}
 		});
-
-		std::stringstream ss;
-		ss << tree;
-		return ss.str();
-	}
-
-	bool SceneSerializer::Deserialize(const std::string& src)
-	{
-		try
-		{
-			ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr(src));
-
-			return DeserializeFromTree(tree);
-		}
-		catch (std::runtime_error const& e)
-		{
-			MH_WARN("Scene was unable to load from YAML source: {0}", e.what());
-		}
-
-		return false;
-	}
-
-	void SceneSerializer::Serialize(const std::filesystem::path& filepath)
-	{
-		std::string yamlString = Serialize();
-
-		std::ofstream filestream(filepath);
-		filestream << yamlString;
-	}
-
-	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath)
-	{
-		TrivialVector<char> buffer;
-
-		if (!FileUtility::ReadFile(filepath, buffer))
-			return false;
-
-		try
-		{
-			ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
-
-			return DeserializeFromTree(tree);
-		}
-		catch (std::runtime_error const& e)
-		{
-			MH_WARN("Scene was unable to load from YAML file {0}: {1}", filepath.string(), e.what());
-		}
-
-		return false;
 	}
 
 	bool SceneSerializer::DeserializeFromTree(ryml::Tree& tree)

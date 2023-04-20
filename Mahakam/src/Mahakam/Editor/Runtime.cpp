@@ -51,31 +51,31 @@ namespace Mahakam::Editor
 
 	void Runtime::ReloadRuntime()
 	{
-		//std::string serializedScene;
+		ryml::Tree serializedScene;
 
-		//// Serialize and unload scene
-		//{
-		//	Ref<Scene> scene = SceneManager::GetActiveScene();
+		// Serialize and unload scene
+		{
+			Ref<Scene> scene = SceneManager::GetActiveScene();
 
-		//	SceneSerializer serializer(scene);
+			SceneSerializer serializer(scene);
 
-		//	serializedScene = serializer.Serialize();
+			serializer.SerializeToTree(serializedScene);
 
-		//	SceneManager::SetActiveScene(nullptr);
-		//}
+			SceneManager::SetActiveScene(nullptr);
+		}
 
 		LoadRuntime(s_Filepath, s_Filename);
 
-		//// Deserialize and load scene
-		//{
-		//	Ref<Scene> scene = Scene::Create();
+		// Deserialize and load scene
+		{
+			Ref<Scene> scene = Scene::Create();
 
-		//	SceneSerializer serializer(scene);
+			SceneSerializer serializer(scene);
 
-		//	serializer.Deserialize(serializedScene);
+			serializer.DeserializeFromTree(serializedScene);
 
-		//	SceneManager::SetActiveScene(scene);
-		//}
+			SceneManager::SetActiveScene(scene);
+		}
 	}
 
 	bool Runtime::HasRuntime(bool& hasRun, bool& hasStop, bool& hasUpdate)

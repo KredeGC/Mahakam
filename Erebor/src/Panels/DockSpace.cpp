@@ -179,7 +179,7 @@ namespace Mahakam::Editor
 			SceneManager::SetActiveScene(scene);
 
 			SceneSerializer serializer(scene);
-			serializer.Deserialize(filepath);
+			serializer.DeserializeFromPath(filepath);
 		}
 	}
 
@@ -195,7 +195,7 @@ namespace Mahakam::Editor
 		if (!filepath.empty())
 		{
 			SceneSerializer serializer(SceneManager::GetActiveScene());
-			serializer.Serialize(filepath);
+			serializer.SerializeToPath(filepath);
 		}
 	}
 }

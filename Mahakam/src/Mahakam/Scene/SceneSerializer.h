@@ -25,15 +25,16 @@ namespace Mahakam
 	public:
 		SceneSerializer(Ref<Scene> scene);
 
-		std::string Serialize();
-		bool Deserialize(const std::string& src);
+		std::string SerializeToString();
+		bool DeserializeFromString(const std::string& src);
 
-		void Serialize(const std::filesystem::path& filepath);
-		bool Deserialize(const std::filesystem::path& filepath);
+		void SerializeToPath(const std::filesystem::path& filepath);
+		bool DeserializeFromPath(const std::filesystem::path& filepath);
 
-	private:
+		void SerializeToTree(ryml::Tree& tree);
 		bool DeserializeFromTree(ryml::Tree& tree);
 
+	private:
 		void SerializeEntity(ryml::NodeRef& entities, Entity entity);
 		void DeserializeEntity(ryml::NodeRef& node, Entity entity);
 	};
