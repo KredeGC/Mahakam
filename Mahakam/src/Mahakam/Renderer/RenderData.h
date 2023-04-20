@@ -104,14 +104,14 @@ namespace Mahakam
 
 		// Render camera matrices
 		CameraData CameraMatrix;
-		Ref<UniformBuffer> CameraBuffer;
+		Scope<UniformBuffer> CameraBuffer;
 
 		// Uniform values
-		Ref<UniformBuffer> UniformValueBuffer;
+		Scope<UniformBuffer> UniformValueBuffer;
 
 		// Lighting buffers
-		Ref<StorageBuffer> DirectionalLightBuffer;
-		Ref<StorageBuffer> PointLightBuffer;
-		Ref<StorageBuffer> SpotLightBuffer;
+		Scope<StorageBuffer> DirectionalLightBuffer;
+		Scope<StorageBuffer> PointLightBuffer;
+		Scope<StorageBuffer> SpotLightBuffer;
 	};
 }

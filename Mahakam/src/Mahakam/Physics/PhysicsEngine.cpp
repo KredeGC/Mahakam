@@ -10,7 +10,7 @@
 
 namespace Mahakam
 {
-	PhysicsContext* PhysicsEngine::s_Context = nullptr;
+	Scope<PhysicsContext> PhysicsEngine::s_Context = nullptr;
 
 	void PhysicsEngine::Init()
 	{
@@ -19,7 +19,7 @@ namespace Mahakam
 
 	void PhysicsEngine::Shutdown()
 	{
-		Allocator::Delete(s_Context);
+		s_Context = nullptr;
 	}
 
 	//void PhysicsEngine::Update(Timestep ts)
@@ -51,6 +51,6 @@ namespace Mahakam
 	//PhysicsContext* PhysicsEngine::GetContext()
 	MH_DEFINE_FUNC(PhysicsEngine::GetContext, PhysicsContext*)
 	{
-		return s_Context;
+		return s_Context.get();
 	};
 }

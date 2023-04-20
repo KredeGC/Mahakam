@@ -8,12 +8,12 @@
 #include "Mahakam/Physics/PhysicsEngine.h"
 
 #include "Mahakam/Renderer/EnvironmentData.h"
-#include "Mahakam/Renderer/Camera.h"
 
 #include <entt/entity/registry.hpp>
 
 namespace Mahakam
 {
+	class Camera;
 	class Entity;
 	class Material;
 	class PhysicsContext;

@@ -160,7 +160,7 @@ namespace Mahakam
         m_Shader->Bind(shaderPass);
     }
 
-	void HeadlessMaterial::Bind(Ref<UniformBuffer> uniformBuffer)
+	void HeadlessMaterial::Bind(UniformBuffer& uniformBuffer)
 	{
 		for (auto& [name, texture] : m_Textures)
 			m_Shader->SetTexture(name, texture);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Types.h"
 #include "Mahakam/Physics/Colliders/BoxCollider.h"
 
 namespace Mahakam
@@ -8,7 +9,7 @@ namespace Mahakam
 	struct BoxColliderComponent
 	{
 	private:
-		Ref<BoxCollider> m_Collider;
+		Scope<BoxCollider> m_Collider;
 
 	public:
 		BoxColliderComponent()
@@ -17,6 +18,6 @@ namespace Mahakam
 
 		BoxColliderComponent(const BoxColliderComponent&) = default;
 
-		Ref<BoxCollider> GetCollider() const { return m_Collider; }
+		BoxCollider& GetCollider() const { return *m_Collider; }
 	};
 }

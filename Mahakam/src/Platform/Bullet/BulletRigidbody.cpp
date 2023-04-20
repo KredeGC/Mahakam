@@ -8,9 +8,9 @@
 
 namespace Mahakam
 {
-	Ref<Rigidbody> Rigidbody::CreateImpl(PhysicsContext* context)
+	Scope<Rigidbody> Rigidbody::CreateImpl(PhysicsContext* context)
 	{
-		return CreateRef<BulletRigidbody>(context);
+		return CreateScope<BulletRigidbody>(context);
 	}
 
 	BulletRigidbody::BulletRigidbody(PhysicsContext* context)

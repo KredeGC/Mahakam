@@ -43,7 +43,7 @@ namespace Mahakam
 		inline virtual Asset<Shader> GetShader() const override { return m_Shader; }
 
 		virtual void BindShader(const std::string& shaderPass) override;
-		virtual void Bind(Ref<UniformBuffer> uniformBuffer) override;
+		virtual void Bind(UniformBuffer& uniformBuffer) override;
 
 		virtual void SetTexture(const std::string& name, int slot, Asset<Texture> tex) override { m_Textures[name] = std::move(tex); }
 

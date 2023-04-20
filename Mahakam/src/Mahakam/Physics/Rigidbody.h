@@ -30,9 +30,9 @@ namespace Mahakam
 		virtual void SetVelocity(const glm::vec3& velocity) = 0;
 		virtual glm::vec3 GetVelocity() const = 0;
 
-		inline static Ref<Rigidbody> Create(PhysicsContext* physics = PhysicsEngine::GetContext()) { return CreateImpl(physics); }
+		inline static Scope<Rigidbody> Create(PhysicsContext* physics = PhysicsEngine::GetContext()) { return CreateImpl(physics); }
 
 	private:
-		static Ref<Rigidbody> CreateImpl(PhysicsContext* context);
+		static Scope<Rigidbody> CreateImpl(PhysicsContext* context);
 	};
 }

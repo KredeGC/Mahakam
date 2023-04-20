@@ -17,11 +17,11 @@ namespace Mahakam
 	{
 		static void Serialize(ryml::NodeRef& node, Texture* asset) {}
 
-		static Asset<Texture> Deserialize(ryml::NodeRef& node) {}
+		static Asset<Texture> Deserialize(ryml::NodeRef& node) { return nullptr; }
 
 		static void Build(uint8_t* buffer, Texture* asset) {}
 
-		static Asset<Texture> Read(uint8_t* buffer) {}
+		static Asset<Texture> Read(uint8_t* buffer) { return nullptr; }
 	};
 
 	template<>

@@ -7,9 +7,9 @@
 
 namespace Mahakam
 {
-	MH_DEFINE_FUNC(PhysicsContext::CreateImpl, PhysicsContext*, const PhysicsProps& props)
+	MH_DEFINE_FUNC(PhysicsContext::CreateImpl, Scope<PhysicsContext>, const PhysicsProps& props)
 	{
-		return Allocator::New<BulletPhysicsContext>(props);
+		return CreateScope<BulletPhysicsContext>(props);
 	};
 
 	BulletPhysicsContext::BulletPhysicsContext(const PhysicsProps& props) :

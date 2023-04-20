@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Mahakam/Core/Timestep.h"
 #include "Mahakam/Core/SharedLibrary.h"
+#include "Mahakam/Core/Timestep.h"
+#include "Mahakam/Core/Types.h"
 
 namespace Mahakam
 {
@@ -17,9 +18,9 @@ namespace Mahakam
 
 		virtual void Update(Timestep ts) = 0;
 
-		inline static PhysicsContext* Create(const PhysicsProps& props = PhysicsProps()) { return CreateImpl(props); }
+		inline static Scope<PhysicsContext> Create(const PhysicsProps& props = PhysicsProps()) { return CreateImpl(props); }
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, PhysicsContext*, const PhysicsProps& props);
+		MH_DECLARE_FUNC(CreateImpl, Scope<PhysicsContext>, const PhysicsProps& props);
 	};
 }

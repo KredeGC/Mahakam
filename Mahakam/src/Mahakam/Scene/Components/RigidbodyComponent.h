@@ -8,7 +8,7 @@ namespace Mahakam
 	struct RigidbodyComponent
 	{
 	private:
-		Ref<Rigidbody> m_Rigidbody;
+		Scope<Rigidbody> m_Rigidbody;
 
 	public:
 		RigidbodyComponent()
@@ -17,6 +17,6 @@ namespace Mahakam
 
 		RigidbodyComponent(const RigidbodyComponent&) = default;
 
-		Ref<Rigidbody> GetRigidbody() const { return m_Rigidbody; }
+		Rigidbody& GetRigidbody() const { return *m_Rigidbody; }
 	};
 }

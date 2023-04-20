@@ -313,8 +313,18 @@ namespace Mahakam::Editor
 				{
 					// Draw each entity in the hierarchy
 					ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
-					context->ForEachEntity([&](Entity entity)
+
+					TrivialVector<entt::entity> roots;
+					context->ForEach<RelationshipComponent>([&](entt::entity entity, RelationshipComponent& relation)
 					{
+						if (relation.Parent == entt::null)
+							roots.push_back(entity);
+					});
+
+					for (auto iter = roots.rbegin(); iter != roots.rend(); ++iter)
+					{
+						Entity entity{ *iter, context.get() };
+
 						// https://skypjack.github.io/2019-08-20-ecs-baf-part-4-insights/
 						auto& relation = entity.GetComponent<RelationshipComponent>();
 
@@ -322,7 +332,7 @@ namespace Mahakam::Editor
 						// Recursively draw their children
 						if (relation.Parent == entt::null)
 							DrawEntityNode(entity, context);
-					});
+					}
 
 					// Use the remaining space as drop target
 					if (ImGui::GetDragDropPayload())

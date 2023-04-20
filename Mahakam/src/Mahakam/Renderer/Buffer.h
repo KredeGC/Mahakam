@@ -18,7 +18,7 @@ namespace Mahakam
 
 		virtual void SetData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
 
-		MH_DECLARE_FUNC(Create, Ref<StorageBuffer>, uint32_t size);
+		MH_DECLARE_FUNC(Create, Scope<StorageBuffer>, uint32_t size);
 	};
 
 
@@ -32,6 +32,6 @@ namespace Mahakam
 
 		virtual void SetData(const void* data, uint32_t offset = 0, uint32_t size = 0) = 0;
 
-		MH_DECLARE_FUNC(Create, Ref<UniformBuffer>, uint32_t size);
+		MH_DECLARE_FUNC(Create, Scope<UniformBuffer>, uint32_t size);
 	};
 }

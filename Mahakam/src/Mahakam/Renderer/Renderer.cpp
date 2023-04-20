@@ -244,7 +244,7 @@ namespace Mahakam
 		if (sceneData->Environment.SkyboxMaterial)
 		{
 			sceneData->Environment.SkyboxMaterial->BindShader("GEOMETRY");
-			sceneData->Environment.SkyboxMaterial->Bind(sceneData->UniformValueBuffer);
+			sceneData->Environment.SkyboxMaterial->Bind(*sceneData->UniformValueBuffer);
 			DrawScreenQuad();
 		}
 	};

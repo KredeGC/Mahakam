@@ -31,7 +31,7 @@ namespace Mahakam
 		virtual Asset<Shader> GetShader() const = 0;
 
 		virtual void BindShader(const std::string& shaderPass) = 0;
-		virtual void Bind(Ref<UniformBuffer> uniformBuffer) = 0;
+		virtual void Bind(UniformBuffer& uniformBuffer) = 0;
 
 		virtual void SetTexture(const std::string& name, int slot, Asset<Texture> tex) = 0;
 

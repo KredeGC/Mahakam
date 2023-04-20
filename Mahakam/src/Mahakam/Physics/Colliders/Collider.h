@@ -13,8 +13,8 @@ namespace Mahakam
 	public:
 		virtual ~Collider() = default;
 
-		virtual void SetRigidbody(Ref<Rigidbody> rigidbody) = 0;
-		virtual Ref<Rigidbody> GetRigidbody() = 0;
+		virtual void SetRigidbody(Rigidbody* rigidbody) = 0;
+		virtual Rigidbody* GetRigidbody() = 0;
 
 		//virtual bool Intersect(PhysicsContext* context) = 0;
 	};
