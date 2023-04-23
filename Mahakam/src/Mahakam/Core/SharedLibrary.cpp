@@ -6,6 +6,10 @@
 
 #include <imgui/imgui.h>
 
+#if MH_PLATFORM_WINDOWS
+#include <windows.h>
+#endif
+
 namespace Mahakam
 {
 	SharedLibrary::SharedLibrary(const std::filesystem::path& filepath) : m_Filepath(filepath)
@@ -45,7 +49,7 @@ namespace Mahakam
 			contextPtr();
 
 #if defined(MH_PLATFORM_WINDOWS)
-		if (!FreeLibrary(m_Handle))
+		if (!FreeLibrary(reinterpret_cast<HINSTANCE>(m_Handle)))
 			MH_WARN("Failed to close shared library {0}", m_Filepath);
 #elif defined(MH_PLATFORM_LINUX)
 		dlclose(m_Handle);
@@ -70,6 +74,15 @@ namespace Mahakam
 
 		if (unloadPtr)
 			unloadPtr();
+	}
+
+	void* SharedLibrary::GetFunction(const char* name)
+	{
+#if defined(MH_PLATFORM_WINDOWS)
+		return GetProcAddress(reinterpret_cast<HINSTANCE>(m_Handle), name);
+#elif defined(MH_PLATFORM_LINUX)
+		return dlsym(m_Handle, name);
+#endif
 	}
 
 	void SharedLibrary::AddExportFunction(FuncPtr funcPtr)

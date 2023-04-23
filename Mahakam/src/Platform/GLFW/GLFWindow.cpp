@@ -10,10 +10,6 @@
 
 #include "Platform/OpenGL/OpenGLContext.h"
 
-#if MH_PLATFORM_WINDOWS
-#include <windows.h>
-#endif
-
 #include <stb_image.h>
 
 namespace Mahakam

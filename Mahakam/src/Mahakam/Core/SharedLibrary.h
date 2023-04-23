@@ -4,9 +4,7 @@
 
 #include <filesystem>
 
-#if MH_PLATFORM_WINDOWS
-#include <windows.h>
-#elif MH_PLATFORM_LINUX
+#if MH_PLATFORM_LINUX
 #include <dlfcn.h>
 #endif
 
@@ -36,11 +34,7 @@ namespace Mahakam
 
 	private:
 		std::filesystem::path m_Filepath;
-#if defined(MH_PLATFORM_WINDOWS)
-		HINSTANCE m_Handle = 0;
-#elif defined(MH_PLATFORM_LINUX)
 		void* m_Handle = nullptr;
-#endif
 
 		inline static bool s_Initialized = false;
 		inline static int s_FuncPointerCounter = 0;
@@ -55,15 +49,12 @@ namespace Mahakam
 
 		void Load();
 		void Unload();
+		void* GetFunction(const char* name);
 
 		template<typename R, typename ...Args>
 		auto GetFunction(const char* name)
 		{
-#if defined(MH_PLATFORM_WINDOWS)
-			return reinterpret_cast<R(*)(Args...)>(GetProcAddress(m_Handle, name));
-#elif defined(MH_PLATFORM_LINUX)
-			return reinterpret_cast<R(*)(Args...)>(dlsym(m_Handle, name));
-#endif
+			return reinterpret_cast<R(*)(Args...)>(GetFunction(name));
 		}
 
 		static void AddExportFunction(FuncPtr funcPtr);

@@ -16,6 +16,10 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#if MH_PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
+
 #include "Mahakam/Asset/Asset.h"
 
 #include "Mahakam/Core/Core.h"
