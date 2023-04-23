@@ -30,4 +30,10 @@ namespace Mahakam
 	{
 		component.GetCamera().SetRatio(m_ViewportRatio);
 	}
+
+	//template<>
+	//inline void Scene::OnComponentAdded<RigidbodyComponent>(const Entity& entity, RigidbodyComponent& component)
+	//{
+	//	// TODO: Add any child colliders to this rigidbody
+	//}
 }

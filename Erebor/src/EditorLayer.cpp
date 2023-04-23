@@ -92,23 +92,10 @@ namespace Mahakam::Editor
 			CreateRef<BoundingBoxRenderPass>(),
 			CreateRef<TonemappingRenderPass>() });
 
-		// Create a new active scene
-		//s_ActiveScene = Scene::Create("assets/textures/pines.hdr");
-
 		// Use this once scenes are setup correctly
 		Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/Skybox.material.import");
 		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/pines.irradiance.import");
 		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/pines.specular.import");
-
-		/*Asset<Shader> skyboxShader = Shader::Create("assets/shaders/Skybox.shader");
-		Asset<Material> skyboxMaterial = Material::Create(skyboxShader);
-
-		Asset<TextureCube> skyboxTexture = Asset<TextureCube>("import/assets/textures/pines.hdr.import");
-		skyboxMaterial->SetTexture("u_Environment", 0, skyboxTexture);
-
-		skyboxMaterial.Save("assets/shaders/Skybox.shader", "import/assets/materials/Skybox.material.import");
-
-		AssetDatabase::ReloadAsset(skyboxMaterial.GetID());*/
 
 		Ref<Scene> activeScene = Scene::Create();
 		activeScene->SetSkyboxMaterial(skyboxMaterial);
@@ -164,9 +151,6 @@ namespace Mahakam::Editor
 		auto& windows = EditorWindowRegistry::GetWindows();
 		for (auto& window : windows)
 			window->OnUpdate(dt);
-
-		// Delete any entities marked for deletion
-		SceneManager::GetActiveScene()->DestroyAllEntities<DeleteComponent>();
 	}
 
 	void EditorLayer::OnImGuiRender()

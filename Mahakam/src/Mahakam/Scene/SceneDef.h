@@ -30,14 +30,14 @@ namespace Mahakam
 		entt::registry m_Registry;
 
 		float m_ViewportRatio = 1.0f;
-		bool m_Unsorted = true;
 
 		PhysicsContext* m_PhysicsContext;
 
 	public:
 		Scene(PhysicsContext* physics);
 		Scene(const std::string& filepath, PhysicsContext* physics);
-		~Scene();
+		Scene(const Scene&);
+		Scene(Scene&&) noexcept = default;
 
 		void OnUpdate(Timestep ts, bool editor = false);
 		void OnRender(Camera& camera, const glm::mat4& cameraTransform);
@@ -59,20 +59,13 @@ namespace Mahakam
 			return m_Registry.view<Args...>().each(func);
 		}
 
-		template<typename... Args>
-		void DestroyAllEntities()
-		{
-			auto view = m_Registry.view<Args...>();
-			m_Registry.destroy(view.begin(), view.end());
-		}
+		inline void SetSkyboxMaterial(Asset<Material> material) { m_Environment.SkyboxMaterial = std::move(material); }
+		inline void SetSkyboxIrradiance(Asset<TextureCube> irradiance) { m_Environment.IrradianceMap = std::move(irradiance); }
+		inline void SetSkyboxSpecular(Asset<TextureCube> specular) { m_Environment.SpecularMap = std::move(specular); }
 
-		void SetSkyboxMaterial(Asset<Material> material) { m_Environment.SkyboxMaterial = std::move(material); }
-		void SetSkyboxIrradiance(Asset<TextureCube> irradiance) { m_Environment.IrradianceMap = std::move(irradiance); }
-		void SetSkyboxSpecular(Asset<TextureCube> specular) { m_Environment.SpecularMap = std::move(specular); }
-
-		Asset<Material> GetSkyboxMaterial() const { return m_Environment.SkyboxMaterial; }
-		Asset<TextureCube> GetSkyboxIrradiance() const { return m_Environment.IrradianceMap; }
-		Asset<TextureCube> GetSkyboxSpecular() const { return m_Environment.SpecularMap; }
+		inline Asset<Material> GetSkyboxMaterial() const { return m_Environment.SkyboxMaterial; }
+		inline Asset<TextureCube> GetSkyboxIrradiance() const { return m_Environment.IrradianceMap; }
+		inline Asset<TextureCube> GetSkyboxSpecular() const { return m_Environment.SpecularMap; }
 
 		inline static Ref<Scene> Create(PhysicsContext* physics = PhysicsEngine::GetContext()) { return CreateEmpty(physics); }
 		inline static Ref<Scene> Create(const std::string& filepath, PhysicsContext* physics = PhysicsEngine::GetContext()) { return CreateFilepath(filepath, physics); }

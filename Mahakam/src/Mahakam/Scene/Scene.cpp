@@ -94,7 +94,7 @@ namespace Mahakam
 		MH_PROFILE_FUNCTION();
 
 		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/default/Skybox.shader");
-		m_Environment.SkyboxMaterial = std::move(Material::Create(skyboxShader));
+		m_Environment.SkyboxMaterial = Material::Create(skyboxShader);
 		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, GL::GetTextureCubeWhite());
 	}
 
@@ -111,15 +111,29 @@ namespace Mahakam
 		//skyboxSpecular = AssetDatabase::CreateOrLoadAsset<TextureCube>(filepath + ".specular", skyboxTexture, true, TextureCubePrefilter::Prefilter, { 512, TextureFormat::RG11B10F, true });
 
 		Asset<Shader> skyboxShader = Shader::Create("assets/shaders/default/Skybox.shader");
-		m_Environment.SkyboxMaterial = std::move(Material::Create(skyboxShader));
+		m_Environment.SkyboxMaterial = Material::Create(skyboxShader);
 		m_Environment.SkyboxMaterial->SetTexture("u_Environment", 0, std::move(skyboxTexture));
 	}
 
-	Scene::~Scene() {}
+	Scene::Scene(const Scene& other) :
+		m_Environment(other.m_Environment),
+		m_Registry(),
+		m_ViewportRatio(other.m_ViewportRatio),
+		m_PhysicsContext(nullptr) // TODO: Make a new instance?
+	{
+		// TODO: Create same entities as other
+		// Copy all components from other
+	}
 
 	void Scene::OnUpdate(Timestep ts, bool editor)
 	{
 		MH_PROFILE_FUNCTION();
+
+		// Delete all entities marked for deletion
+		{
+			auto view = m_Registry.view<DeleteComponent>();
+			m_Registry.destroy(view.begin(), view.end());
+		}
 
 		// Sort dirty relationships
 		if (!m_Registry.view<DirtyRelationshipComponent>().empty())
