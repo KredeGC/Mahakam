@@ -53,7 +53,7 @@ namespace Mahakam
 		void Delete();
 
 		template<typename T, typename... Args>
-		void AddEmptyComponent(Args&&... args)
+		decltype(auto) AddComponent(Args&&... args)
 		{
 			static_assert(!std::is_same_v<T, TagComponent>);
 			static_assert(!std::is_same_v<T, RelationshipComponent>);
@@ -63,25 +63,18 @@ namespace Mahakam
 
 			MH_ASSERT(!HasComponent<T>(), "Entity already has component!");
 
-			m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
-		}
+			if constexpr (!std::is_empty_v<T>)
+			{
+				T& component = m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
 
-		template<typename T, typename... Args>
-		T& AddComponent(Args&&... args)
-		{
-			static_assert(!std::is_same_v<T, TagComponent>);
-			static_assert(!std::is_same_v<T, RelationshipComponent>);
-			static_assert(!std::is_same_v<T, DeleteComponent>);
-			static_assert(!std::is_same_v<T, DirtyRelationshipComponent>);
-			static_assert(!std::is_same_v<T, DirtyColliderComponent>);
+				m_Scene->OnComponentAdded<T>(*this, component);
 
-			MH_ASSERT(!HasComponent<T>(), "Entity already has component!");
-
-			T& component = m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
-
-			m_Scene->OnComponentAdded<T>(*this, component);
-
-			return component;
+				return component;
+			}
+			else
+			{
+				m_Scene->m_Registry.template emplace<T>(m_Handle, std::forward<Args>(args)...);
+			}
 		}
 
 		template<typename T>

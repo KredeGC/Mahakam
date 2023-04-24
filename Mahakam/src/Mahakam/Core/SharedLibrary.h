@@ -28,17 +28,11 @@ namespace Mahakam
 	class SharedLibrary
 	{
 	public:
-		static constexpr int NUM_FUNC_PTRS = 113;
-
 		typedef void** FuncPtr;
 
 	private:
 		std::filesystem::path m_Filepath;
 		void* m_Handle = nullptr;
-
-		inline static bool s_Initialized = false;
-		inline static int s_FuncPointerCounter = 0;
-		inline static FuncPtr s_FuncPointers[NUM_FUNC_PTRS];
 
 	public:
 		SharedLibrary() = default;
@@ -60,6 +54,6 @@ namespace Mahakam
 		static void AddExportFunction(FuncPtr funcPtr);
 
 		static void ExportFuncPointers();
-		static void ImportFuncPointers(FuncPtr ptrs[NUM_FUNC_PTRS]);
+		static void ImportFuncPointers(FuncPtr* ptrs);
 	};
 }

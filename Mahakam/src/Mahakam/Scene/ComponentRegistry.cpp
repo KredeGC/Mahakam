@@ -168,8 +168,15 @@ namespace Mahakam
 		// headphone icon
 		componentInterface.SetEditor(u8"\uea33");
 		componentInterface.SetComponent<AudioListenerComponent>();
-		componentInterface.Serialize = nullptr;
-		componentInterface.Deserialize = nullptr;
+		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
+		{
+			return true;
+		};
+		componentInterface.Deserialize = [](ryml::NodeRef& node, SceneSerializer::EntityMap& translation, Entity entity)
+		{
+			entity.AddComponent<AudioListenerComponent>();
+			return true;
+		};
 
 		RegisterComponent("Audio Listener", componentInterface);
 #pragma endregion
@@ -178,32 +185,32 @@ namespace Mahakam
 		// audio icon
 		componentInterface.SetEditor(u8"\ueea8", [](Entity entity)
 		{
-			Ref<AudioSource> source = entity.GetComponent<AudioSourceComponent>();
-			Asset<Sound> sound = source->GetSound();
+			AudioSource& source = entity.GetComponent<AudioSourceComponent>();
+			Asset<Sound> sound = source.GetSound();
 
 			std::filesystem::path importPath = sound.GetImportPath();
 			if (GUI::DrawDragDropField("Sound", ".sound", importPath))
 			{
-				source->SetSound(Asset<Sound>(importPath));
-				source->Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
+				source.SetSound(Asset<Sound>(importPath));
+				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
 			}
 
-			float spatialBlend = source->GetSpatialBlend();
+			float spatialBlend = source.GetSpatialBlend();
 			if (ImGui::DragFloat("Spatial blend", &spatialBlend, 0.01f, 0.0f, 1.0f))
-				source->SetSpatialBlend(spatialBlend);
+				source.SetSpatialBlend(spatialBlend);
 
-			bool interpolate = source->GetInterpolation();
+			bool interpolate = source.GetInterpolation();
 			if (ImGui::Checkbox("Interpolate", &interpolate))
-				source->SetInterpolation(interpolate);
+				source.SetInterpolation(interpolate);
 
 			if (sound)
 			{
-				float duration = source->GetDuration();
+				float duration = source.GetDuration();
 
 				ImGui::Text("Duration: %.1fs", duration);
 
-				float progress = source->GetTime() / source->GetDuration();
-				float realtime = source->GetTime();
+				float progress = source.GetTime() / source.GetDuration();
+				float realtime = source.GetTime();
 
 				ImGui::ProgressBar(progress, ImVec2(-FLT_MIN, 0), std::to_string(realtime).c_str());
 			}

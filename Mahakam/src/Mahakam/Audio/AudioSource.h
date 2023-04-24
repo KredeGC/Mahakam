@@ -19,6 +19,8 @@ namespace Mahakam
 	class AudioSource
 	{
 	public:
+		virtual ~AudioSource() = default;
+
 		virtual void Play() = 0;
 		virtual void Stop() = 0;
 		
@@ -36,10 +38,12 @@ namespace Mahakam
 
 		virtual void SetPosition(const glm::vec3& source) = 0;
 
-		inline static Ref<AudioSource> Create() { return CreateImpl(AudioEngine::GetContext()); }
-		inline static Ref<AudioSource> Create(AudioContext* context) { return CreateImpl(context); }
+		virtual AudioContext* GetContext() const = 0;
+
+		inline static Scope<AudioSource> Create() { return CreateImpl(AudioEngine::GetContext()); }
+		inline static Scope<AudioSource> Create(AudioContext* context) { return CreateImpl(context); }
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Ref<AudioSource>, AudioContext* context);
+		MH_DECLARE_FUNC(CreateImpl, Scope<AudioSource>, AudioContext* context);
 	};
 }

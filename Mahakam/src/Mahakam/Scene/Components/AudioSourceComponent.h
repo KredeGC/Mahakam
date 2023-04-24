@@ -9,18 +9,35 @@ namespace Mahakam
 	struct AudioSourceComponent
 	{
 	private:
-		Ref<AudioSource> m_Source;
+		Scope<AudioSource> m_Source;
 
 	public:
 		AudioSourceComponent()
 			: m_Source(AudioSource::Create())
 		{ }
 
-		AudioSourceComponent(const AudioSourceComponent&) = default;
+		AudioSourceComponent(const AudioSourceComponent& other) noexcept :
+			m_Source(AudioSource::Create(other.GetContext()))
+		{
+			m_Source->SetSound(other.GetSound());
+			m_Source->SetInterpolation(other.GetInterpolation());
+			m_Source->SetSpatialBlend(other.GetSpatialBlend());
+		}
 
 		AudioSourceComponent(Asset<Sound> sound)
 		{
 			m_Source->SetSound(sound);
+		}
+
+		AudioSourceComponent& operator=(const AudioSourceComponent& other) noexcept
+		{
+			m_Source = AudioSource::Create(other.GetContext());
+
+			m_Source->SetSound(other.GetSound());
+			m_Source->SetInterpolation(other.GetInterpolation());
+			m_Source->SetSpatialBlend(other.GetSpatialBlend());
+
+			return *this;
 		}
 
 		inline void Play() { m_Source->Play(); }
@@ -35,8 +52,10 @@ namespace Mahakam
 		inline void SetSpatialBlend(float blend) { m_Source->SetSpatialBlend(blend); }
 		inline float GetSpatialBlend() const { return m_Source->GetSpatialBlend(); }
 
-		inline operator Ref<AudioSource>() const { return m_Source; }
+		inline AudioContext* GetContext() const { return m_Source->GetContext(); }
 
-		inline Ref<AudioSource> GetAudioSource() { return m_Source; }
+		inline operator AudioSource&() const { return *m_Source; }
+
+		inline AudioSource& GetAudioSource() { return *m_Source; }
 	};
 }

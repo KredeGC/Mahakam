@@ -257,8 +257,8 @@ namespace Mahakam
 			{
 				const glm::mat4& modelMatrix = transformComponent.GetModelMatrix();
 
-				auto source = audioSourceComponent.GetAudioSource();
-				source->SetPosition(modelMatrix[3]);
+				AudioSource& source = audioSourceComponent.GetAudioSource();
+				source.SetPosition(modelMatrix[3]);
 			});
 		}
 
@@ -338,10 +338,10 @@ namespace Mahakam
 		{
 			MH_PROFILE_SCOPE("Scene::OnUpdate - AudioListenerComponent");
 
-			m_Registry.view<TransformComponent, AudioListenerComponent>().each([&](TransformComponent& transform, AudioListenerComponent& audio)
-			{
-				listener = &transform;
-			});
+			auto view = m_Registry.view<TransformComponent, AudioListenerComponent>();
+
+			if (view.begin() != view.end())
+				listener = &m_Registry.get<TransformComponent>(*view.begin());
 		}
 
 		// Update sound buffers

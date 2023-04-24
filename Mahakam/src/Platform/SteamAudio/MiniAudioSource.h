@@ -51,6 +51,8 @@ namespace Mahakam
 
 		virtual void SetPosition(const glm::vec3& source) override;
 
+		virtual AudioContext* GetContext() const override { return m_Context; }
+
 		void UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos);
 
 		ma_steamaudio_binaural_node& GetNode() { return m_Node; }

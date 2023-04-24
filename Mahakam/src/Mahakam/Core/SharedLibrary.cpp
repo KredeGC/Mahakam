@@ -12,6 +12,12 @@
 
 namespace Mahakam
 {
+	static constexpr int NUM_FUNC_PTRS = 113;
+
+	static bool g_SharedLibraryInitialized = false;
+	static int g_FuncPointerCounter = 0;
+	static SharedLibrary::FuncPtr g_FuncPointers[NUM_FUNC_PTRS];
+
 	SharedLibrary::SharedLibrary(const std::filesystem::path& filepath) : m_Filepath(filepath)
 	{
 		MH_PROFILE_FUNCTION();
@@ -27,7 +33,7 @@ namespace Mahakam
 		if (!m_Handle)
 			MH_WARN("Failed to open shared library {0}", m_Filepath);
 
-		if (!s_Initialized)
+		if (!g_SharedLibraryInitialized)
 			ExportFuncPointers();
         
         auto contextPtr = GetFunction<void, ImGuiContext*, spdlog::logger*, FuncPtr*>("LoadContext");
@@ -36,7 +42,7 @@ namespace Mahakam
         std::shared_ptr<spdlog::logger> logger = Log::GetLogger();
 
 		if (contextPtr)
-			contextPtr(context, logger.get(), s_FuncPointers);
+			contextPtr(context, logger.get(), g_FuncPointers);
 	}
 
 	SharedLibrary::~SharedLibrary()
@@ -87,24 +93,24 @@ namespace Mahakam
 
 	void SharedLibrary::AddExportFunction(FuncPtr funcPtr)
 	{
-		s_FuncPointers[s_FuncPointerCounter++] = funcPtr;
+		g_FuncPointers[g_FuncPointerCounter++] = funcPtr;
 	}
 
 	void SharedLibrary::ExportFuncPointers()
 	{
-		s_Initialized = true;
+		g_SharedLibraryInitialized = true;
 
-		MH_ASSERT(s_FuncPointerCounter == NUM_FUNC_PTRS, "Inconsisent amount of func pointers exported!");
+		MH_ASSERT(g_FuncPointerCounter == NUM_FUNC_PTRS, "Inconsisent amount of func pointers exported!");
 	}
 
-	void SharedLibrary::ImportFuncPointers(FuncPtr ptrs[NUM_FUNC_PTRS])
+	void SharedLibrary::ImportFuncPointers(FuncPtr* ptrs)
 	{
-		s_Initialized = true;
+		g_SharedLibraryInitialized = true;
 
 		for (int i = 0; i < NUM_FUNC_PTRS; i++)
 		{
-			if (s_FuncPointers[i] && *s_FuncPointers[i])
-				*s_FuncPointers[i] = *ptrs[i];
+			if (g_FuncPointers[i] && *g_FuncPointers[i])
+				*g_FuncPointers[i] = *ptrs[i];
 		}
 	}
 }

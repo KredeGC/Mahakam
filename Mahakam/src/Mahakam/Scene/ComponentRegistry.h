@@ -4,6 +4,8 @@
 
 #include <ryml/rapidyaml-0.4.1.hpp>
 
+#include <type_traits>
+
 namespace Mahakam
 {
 	class ComponentRegistry
@@ -19,7 +21,7 @@ namespace Mahakam
 			bool (*HasComponent)(Entity) = nullptr;
 			void (*AddComponent)(Entity) = nullptr;
 			void (*CopyComponent)(Entity, Entity) = nullptr;
-			void (*RemoveComponent)(Entity) = nullptr;
+			bool (*RemoveComponent)(Entity) = nullptr;
 
 			bool (*Serialize)(ryml::NodeRef&, Entity) = nullptr;
 			bool (*Deserialize)(ryml::NodeRef&, UnorderedMap<uint32_t, entt::entity>&, Entity) = nullptr;
@@ -27,10 +29,16 @@ namespace Mahakam
 			template<typename T>
 			void SetComponent()
 			{
-				HasComponent = [](Entity entity) { return entity.HasComponent<T>(); };
+				static_assert(std::is_constructible_v<T, const T&>, "Component must be copy constructible");
+
 				AddComponent = [](Entity entity) { entity.AddComponent<T>(); };
-				CopyComponent = [](Entity src, Entity dst) { dst.AddComponent<T>(src.GetComponent<T>()); };
-				RemoveComponent = [](Entity entity) { entity.RemoveComponent<T>(); };
+				HasComponent = [](Entity entity) { return entity.HasComponent<T>(); };
+				RemoveComponent = [](Entity entity) { return entity.RemoveComponent<T>(); };
+
+				if constexpr (!std::is_empty_v<T>)
+					CopyComponent = [](Entity src, Entity dst) { dst.AddComponent<T>(src.GetComponent<T>()); };
+				else
+					CopyComponent = [](Entity src, Entity dst) { dst.AddComponent<T>(); };
 			}
 
 			inline void SetEditor(const char* icon = nullptr, void (*onPropertyDraw)(Entity) = nullptr)
