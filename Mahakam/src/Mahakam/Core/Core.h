@@ -12,6 +12,11 @@
 
 #include "Mahakam/Version.h"
 
+#ifdef MH_PLATFORM_WINDOWS
+#define MH_UNREACHABLE() __assume(0);
+#else
+#define MH_UNREACHABLE() __builtin_unreachable();
+#endif
 
 #ifdef MH_ENABLE_ASSERT
 #if defined(MH_PLATFORM_WINDOWS)

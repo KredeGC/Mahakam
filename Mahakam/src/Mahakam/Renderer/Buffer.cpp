@@ -21,7 +21,7 @@ namespace Mahakam
 
 		MH_BREAK("Unknown renderer API!");
 
-		return nullptr;
+		MH_UNREACHABLE();
 	};
 
 	//Scope<UniformBuffer> UniformBuffer::Create(uint32_t size)
@@ -37,6 +37,6 @@ namespace Mahakam
 
 		MH_BREAK("Unknown renderer API!");
 
-		return nullptr;
+		MH_UNREACHABLE();
 	};
 }

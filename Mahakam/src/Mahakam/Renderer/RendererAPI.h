@@ -78,32 +78,28 @@ namespace Mahakam
 	};
 
 	template<size_t I, typename V, typename F>
-	decltype(auto) SwitchCall(V&& variant, F func)
+	inline decltype(auto) SwitchCall(V&& variant, F func)
 	{
 		static_assert(I == size_t(RendererAPI::API::Count));
 
 		switch (variant.index())
 		{
-		case 0:
-			if constexpr (0 < I)
-				return func(*std::get_if<0>(&variant));
-		case 1:
-			if constexpr (1 < I)
-				return func(*std::get_if<1>(&variant));
+		case 0: return func(*std::get_if<0>(&variant));
+		case 1: return func(*std::get_if<1>(&variant));
 		}
 
-		return decltype(func(*std::get_if<0>(&variant)))();
+		MH_UNREACHABLE();
 	}
 
 	template<typename... Ts, typename F>
-	decltype(auto) SwitchCall(std::variant<Ts...>& variant, F func)
+	inline decltype(auto) SwitchCall(std::variant<Ts...>& variant, F&& func)
 	{
-		return SwitchCall<sizeof...(Ts)>(variant, func);
+		return SwitchCall<sizeof...(Ts)>(variant, std::forward<F>(func));
 	}
 
 	template<typename... Ts, typename F>
-	decltype(auto) SwitchCall(const std::variant<Ts...>& variant, F func)
+	inline decltype(auto) SwitchCall(const std::variant<Ts...>& variant, F&& func)
 	{
-		return SwitchCall<sizeof...(Ts)>(variant, func);
+		return SwitchCall<sizeof...(Ts)>(variant, std::forward<F>(func));
 	}
 }
