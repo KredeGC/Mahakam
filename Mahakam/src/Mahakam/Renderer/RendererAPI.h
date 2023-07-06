@@ -8,6 +8,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext/vector_float4.hpp>
 
+#include <variant>
+
 namespace Mahakam
 {
 	class RendererAPI
@@ -16,7 +18,8 @@ namespace Mahakam
 		enum class API
 		{
 			None = 0,
-			OpenGL = 1
+			OpenGL,
+			Count
 		};
 
 		enum class BlendMode
@@ -73,4 +76,34 @@ namespace Mahakam
 
 		MH_DECLARE_FUNC(Create, Scope<RendererAPI>);
 	};
+
+	template<size_t I, typename V, typename F>
+	decltype(auto) SwitchCall(V&& variant, F func)
+	{
+		static_assert(I == size_t(RendererAPI::API::Count));
+
+		switch (variant.index())
+		{
+		case 0:
+			if constexpr (0 < I)
+				return func(*std::get_if<0>(&variant));
+		case 1:
+			if constexpr (1 < I)
+				return func(*std::get_if<1>(&variant));
+		}
+
+		return decltype(func(*std::get_if<0>(&variant)))();
+	}
+
+	template<typename... Ts, typename F>
+	decltype(auto) SwitchCall(std::variant<Ts...>& variant, F func)
+	{
+		return SwitchCall<sizeof...(Ts)>(variant, func);
+	}
+
+	template<typename... Ts, typename F>
+	decltype(auto) SwitchCall(const std::variant<Ts...>& variant, F func)
+	{
+		return SwitchCall<sizeof...(Ts)>(variant, func);
+	}
 }

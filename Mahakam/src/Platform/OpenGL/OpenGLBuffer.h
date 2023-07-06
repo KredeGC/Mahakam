@@ -1,29 +1,11 @@
 #pragma once
-#include "Mahakam/Renderer/Buffer.h"
+
+#include <cstdint>
 
 namespace Mahakam
 {
-#pragma region OpenGLUniformBuffer
-	class OpenGLUniformBuffer : public UniformBuffer
-	{
-	private:
-		uint32_t m_RendererID;
-		uint32_t m_Size;
-
-	public:
-		OpenGLUniformBuffer(uint32_t size);
-		virtual ~OpenGLUniformBuffer() override;
-
-		virtual void Bind(int slot, int offset, int size) const override;
-		virtual void Unbind(int slot) const override;
-
-		virtual void SetData(const void* data, uint32_t offset, uint32_t size) override;
-	};
-#pragma endregion
-
-
 #pragma region OpenGLStorageBuffer
-	class OpenGLStorageBuffer : public StorageBuffer
+	class OpenGLStorageBuffer
 	{
 	private:
 		uint32_t m_RendererID;
@@ -31,14 +13,33 @@ namespace Mahakam
 
 	public:
 		OpenGLStorageBuffer(uint32_t size);
-		virtual ~OpenGLStorageBuffer() override;
+		~OpenGLStorageBuffer();
 
-		virtual void Bind(int slot, int offset, int size) const override;
-		virtual void Unbind(int slot) const override;
+		void Bind(int slot, int offset, int size) const;
+		void Unbind(int slot) const;
 
-		virtual uint32_t GetSize() const override;
+		uint32_t GetSize() const;
 
-		virtual void SetData(const void* data, uint32_t offset, uint32_t size) override;
+		void SetData(const void* data, uint32_t offset, uint32_t size);
+	};
+#pragma endregion
+
+
+#pragma region OpenGLUniformBuffer
+	class OpenGLUniformBuffer
+	{
+	private:
+		uint32_t m_RendererID;
+		uint32_t m_Size;
+
+	public:
+		OpenGLUniformBuffer(uint32_t size);
+		~OpenGLUniformBuffer();
+
+		void Bind(int slot, int offset, int size) const;
+		void Unbind(int slot) const;
+
+		void SetData(const void* data, uint32_t offset, uint32_t size);
 	};
 #pragma endregion
 }
