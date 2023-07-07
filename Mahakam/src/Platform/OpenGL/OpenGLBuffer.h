@@ -12,15 +12,24 @@ namespace Mahakam
 		uint32_t m_Size;
 
 	public:
-		OpenGLStorageBuffer(uint32_t size);
+		OpenGLStorageBuffer() noexcept;
+		OpenGLStorageBuffer(uint32_t size) noexcept;
+		OpenGLStorageBuffer(const OpenGLStorageBuffer&) = delete;
+		OpenGLStorageBuffer(OpenGLStorageBuffer&&) noexcept;
 		~OpenGLStorageBuffer();
 
-		void Bind(int slot, int offset, int size) const;
-		void Unbind(int slot) const;
+		OpenGLStorageBuffer& operator=(const OpenGLStorageBuffer&) = delete;
+		OpenGLStorageBuffer& operator=(OpenGLStorageBuffer&&) noexcept;
 
-		uint32_t GetSize() const;
+		void Bind(int slot, int offset, int size) const noexcept;
+		void Unbind(int slot) const noexcept;
 
-		void SetData(const void* data, uint32_t offset, uint32_t size);
+		uint32_t GetSize() const noexcept;
+
+		void SetData(const void* data, uint32_t offset, uint32_t size) noexcept;
+
+	private:
+		void release() noexcept;
 	};
 #pragma endregion
 
@@ -33,13 +42,22 @@ namespace Mahakam
 		uint32_t m_Size;
 
 	public:
-		OpenGLUniformBuffer(uint32_t size);
+		OpenGLUniformBuffer() noexcept;
+		OpenGLUniformBuffer(uint32_t size) noexcept;
+		OpenGLUniformBuffer(const OpenGLUniformBuffer&) = delete;
+		OpenGLUniformBuffer(OpenGLUniformBuffer&&) noexcept;
 		~OpenGLUniformBuffer();
 
-		void Bind(int slot, int offset, int size) const;
-		void Unbind(int slot) const;
+		OpenGLUniformBuffer& operator=(const OpenGLUniformBuffer&) = delete;
+		OpenGLUniformBuffer& operator=(OpenGLUniformBuffer&&) noexcept;
 
-		void SetData(const void* data, uint32_t offset, uint32_t size);
+		void Bind(int slot, int offset, int size) const noexcept;
+		void Unbind(int slot) const noexcept;
+
+		void SetData(const void* data, uint32_t offset, uint32_t size) noexcept;
+
+	private:
+		void release() noexcept;
 	};
 #pragma endregion
 }

@@ -53,7 +53,7 @@ namespace Mahakam::Editor
 			const glm::mat4 wireTransform = glm::translate(glm::mat4(1.0f), center)
 				* glm::scale(glm::mat4(1.0f), scale);
 
-			sceneData->CameraBuffer->SetData(&wireTransform, 0, sizeof(glm::mat4));
+			sceneData->CameraBuffer.SetData(&wireTransform, 0, sizeof(glm::mat4));
 
 			Renderer::AddPerformanceResult(wireMesh->GetVertexCount(), wireMesh->GetIndexCount());
 

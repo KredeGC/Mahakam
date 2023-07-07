@@ -4,6 +4,7 @@
 
 #include "Mahakam/Asset/Asset.h"
 
+#include "Buffer.h"
 #include "EnvironmentData.h"
 #include "ParticleSystem.h"
 
@@ -23,8 +24,6 @@ namespace Mahakam
 	class SubMesh;
 	class Shader;
 	class Material;
-	class StorageBuffer;
-	class UniformBuffer;
 
 	struct CameraData
 	{
@@ -104,14 +103,14 @@ namespace Mahakam
 
 		// Render camera matrices
 		CameraData CameraMatrix;
-		Scope<UniformBuffer> CameraBuffer;
+		UniformBuffer CameraBuffer;
 
 		// Uniform values
-		Scope<UniformBuffer> UniformValueBuffer;
+		UniformBuffer UniformValueBuffer;
 
 		// Lighting buffers
-		Scope<StorageBuffer> DirectionalLightBuffer;
-		Scope<StorageBuffer> PointLightBuffer;
-		Scope<StorageBuffer> SpotLightBuffer;
+		StorageBuffer DirectionalLightBuffer;
+		StorageBuffer PointLightBuffer;
+		StorageBuffer SpotLightBuffer;
 	};
 }

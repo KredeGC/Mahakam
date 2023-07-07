@@ -80,8 +80,8 @@ namespace Mahakam
 		CameraData cameraData(m_PreviewCamera, { 512, 512 }, transform);
 
 		m_SceneData->CameraBuffer = UniformBuffer::Create(sizeof(CameraData));
-		m_SceneData->CameraBuffer->Bind(0);
-		m_SceneData->CameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
+		m_SceneData->CameraBuffer.Bind(0);
+		m_SceneData->CameraBuffer.SetData(&cameraData, 0, sizeof(CameraData));
 
 		// Uniform values
 		m_SceneData->UniformValueBuffer = UniformBuffer::Create(2 << 14); // 16KB
@@ -290,11 +290,11 @@ namespace Mahakam
 
 			CameraData cameraData(m_PreviewCamera, { 512, 512 }, transform);
 
-			m_SceneData->CameraBuffer->Bind(0);
-			m_SceneData->CameraBuffer->SetData(&cameraData, 0, sizeof(CameraData));
+			m_SceneData->CameraBuffer.Bind(0);
+			m_SceneData->CameraBuffer.SetData(&cameraData, 0, sizeof(CameraData));
 
 			// Setup uniform values
-			m_SceneData->UniformValueBuffer->Bind(3);
+			m_SceneData->UniformValueBuffer.Bind(3);
 
 			// Render the material
 			Asset<FrameBuffer> nullBuffer = nullptr;

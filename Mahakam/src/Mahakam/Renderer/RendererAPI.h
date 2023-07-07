@@ -77,29 +77,29 @@ namespace Mahakam
 		MH_DECLARE_FUNC(Create, Scope<RendererAPI>);
 	};
 
-	template<size_t I, typename V, typename F>
-	inline decltype(auto) SwitchCall(V&& variant, F func)
+	template<size_t I, typename V, typename F, typename... Ts>
+	inline decltype(auto) SwitchCall(V&& variant, F func, Ts&&... args)
 	{
 		static_assert(I == size_t(RendererAPI::API::Count));
 
 		switch (variant.index())
 		{
-		case 0: return func(*std::get_if<0>(&variant));
-		case 1: return func(*std::get_if<1>(&variant));
+		case 0: return func(*std::get_if<0>(&variant), std::forward<Ts>(args) ...);
+		case 1: return func(*std::get_if<1>(&variant), std::forward<Ts>(args) ...);
 		}
 
 		MH_UNREACHABLE();
 	}
 
-	template<typename... Ts, typename F>
-	inline decltype(auto) SwitchCall(std::variant<Ts...>& variant, F&& func)
+	template<typename... Ts, typename... Us, typename F>
+	inline decltype(auto) SwitchCall(std::variant<Ts...>& variant, F&& func, Us&&... args)
 	{
-		return SwitchCall<sizeof...(Ts)>(variant, std::forward<F>(func));
+		return SwitchCall<sizeof...(Ts)>(variant, std::forward<F>(func), std::forward<Us>(args) ...);
 	}
 
-	template<typename... Ts, typename F>
-	inline decltype(auto) SwitchCall(const std::variant<Ts...>& variant, F&& func)
+	template<typename... Ts, typename... Us, typename F>
+	inline decltype(auto) SwitchCall(const std::variant<Ts...>& variant, F&& func, Us&&... args)
 	{
-		return SwitchCall<sizeof...(Ts)>(variant, std::forward<F>(func));
+		return SwitchCall<sizeof...(Ts)>(variant, std::forward<F>(func), std::forward<Us>(args) ...);
 	}
 }

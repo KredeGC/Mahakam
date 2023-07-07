@@ -22,6 +22,12 @@
 
 namespace Mahakam
 {
+	inline constexpr uint32_t WorldToLightBinding = 1; // Binding for uniform buffer
+	inline constexpr uint32_t LightMatrixBinding = 1; // Binding for storage buffer
+
+	LightingRenderPass::LightingRenderPass() :
+		m_ShadowMatrixBuffer() {}
+
 	bool LightingRenderPass::Init(uint32_t width, uint32_t height)
 	{
 		if (RenderPass::Init(width, height))
@@ -145,7 +151,7 @@ namespace Mahakam
 		m_ShadowShader->Bind("SHADOW");
 
 		// Bind worldToLight matrix
-		m_ShadowMatrixBuffer->Bind(1);
+		m_ShadowMatrixBuffer.Bind(WorldToLightBinding);
 
 		// Directional shadows
 		RenderDirectionalShadows(sceneData, &lastShaderID, &lastMaterialID, &lastMeshID);
@@ -312,7 +318,7 @@ namespace Mahakam
 			if (materialID != *lastMaterialID && *lastShaderID != ~0)
 			{
 				*lastMaterialID = materialID;
-				material->Bind(*sceneData->UniformValueBuffer);
+				material->Bind(sceneData->UniformValueBuffer);
 			}
 
 			// Bind mesh
@@ -323,7 +329,7 @@ namespace Mahakam
 			}
 
 			// Render to depth map
-			sceneData->CameraBuffer->SetData(&transform, 0, sizeof(glm::mat4));
+			sceneData->CameraBuffer.SetData(&transform, 0, sizeof(glm::mat4));
 
 			Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
 
@@ -391,7 +397,7 @@ namespace Mahakam
 				m_LightHashes[currentOffset] = hash;
 
 				// Set light data in buffer
-				m_ShadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
+				m_ShadowMatrixBuffer.SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
@@ -465,7 +471,7 @@ namespace Mahakam
 				m_LightHashes[currentOffset] = hash;
 
 				// Set light data in buffer
-				m_ShadowMatrixBuffer->SetData(&light.worldToLight, 0, sizeof(glm::mat4));
+				m_ShadowMatrixBuffer.SetData(&light.worldToLight, 0, sizeof(glm::mat4));
 
 				// Render all objects in queue
 				GL::SetViewport(currentOffset.x, currentOffset.y, size, size, true);
@@ -482,25 +488,24 @@ namespace Mahakam
 		uint32_t amountSize = 16;
 		uint32_t amount = (uint32_t)sceneData->Environment.DirectionalLights.size();
 
-		if (sceneData->DirectionalLightBuffer)
-			sceneData->DirectionalLightBuffer->Bind(1);
+		sceneData->DirectionalLightBuffer.Bind(LightMatrixBinding);
 
 		if (amount > 0)
 		{
 			uint32_t lightSize = sizeof(DirectionalLight);
 			uint32_t bufferSize = amountSize + amount * lightSize;
 
-			if (!sceneData->DirectionalLightBuffer || sceneData->DirectionalLightBuffer->GetSize() != bufferSize)
+			if (sceneData->DirectionalLightBuffer.GetSize() != bufferSize)
 				sceneData->DirectionalLightBuffer = StorageBuffer::Create(bufferSize);
 
-			sceneData->DirectionalLightBuffer->SetData(&amount, 0, sizeof(int));
-			sceneData->DirectionalLightBuffer->SetData(sceneData->Environment.DirectionalLights.data(), amountSize, amount * lightSize);
+			sceneData->DirectionalLightBuffer.SetData(&amount, 0, sizeof(int));
+			sceneData->DirectionalLightBuffer.SetData(sceneData->Environment.DirectionalLights.data(), amountSize, amount * lightSize);
 		}
-		else if (!sceneData->DirectionalLightBuffer || sceneData->DirectionalLightBuffer->GetSize() != amountSize)
+		else if (sceneData->DirectionalLightBuffer.GetSize() != amountSize)
 		{
 			sceneData->DirectionalLightBuffer = StorageBuffer::Create(amountSize);
 
-			sceneData->DirectionalLightBuffer->SetData(&amount, 0, sizeof(int));
+			sceneData->DirectionalLightBuffer.SetData(&amount, 0, sizeof(int));
 		}
 
 		Renderer::DrawScreenQuad();
@@ -517,11 +522,11 @@ namespace Mahakam
 			uint32_t lightSize = sizeof(PointLight);
 			uint32_t bufferSize = amount * lightSize;
 
-			if (!sceneData->PointLightBuffer || sceneData->PointLightBuffer->GetSize() != bufferSize)
+			if (sceneData->PointLightBuffer.GetSize() != bufferSize)
 				sceneData->PointLightBuffer = StorageBuffer::Create(bufferSize);
 
-			sceneData->PointLightBuffer->Bind(1);
-			sceneData->PointLightBuffer->SetData(sceneData->Environment.PointLights.data(), 0, bufferSize);
+			sceneData->PointLightBuffer.Bind(LightMatrixBinding);
+			sceneData->PointLightBuffer.SetData(sceneData->Environment.PointLights.data(), 0, bufferSize);
 
 			m_DeferredShader->Bind("POINT");
 			m_DeferredShader->SetTexture("u_AttenuationLUT", m_FalloffLut);
@@ -541,11 +546,11 @@ namespace Mahakam
 			uint32_t lightSize = sizeof(SpotLight);
 			uint32_t bufferSize = amount * lightSize;
 
-			if (!sceneData->SpotLightBuffer || sceneData->SpotLightBuffer->GetSize() != bufferSize)
+			if (sceneData->SpotLightBuffer.GetSize() != bufferSize)
 				sceneData->SpotLightBuffer = StorageBuffer::Create(bufferSize);
 
-			sceneData->SpotLightBuffer->Bind(1);
-			sceneData->SpotLightBuffer->SetData(sceneData->Environment.SpotLights.data(), 0, bufferSize);
+			sceneData->SpotLightBuffer.Bind(LightMatrixBinding);
+			sceneData->SpotLightBuffer.SetData(sceneData->Environment.SpotLights.data(), 0, bufferSize);
 
 			m_DeferredShader->Bind("SPOT");
 			m_DeferredShader->SetTexture("u_AttenuationLUT", m_FalloffLut);

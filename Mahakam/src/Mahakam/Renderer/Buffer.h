@@ -20,6 +20,8 @@ namespace Mahakam
 	class StorageBuffer
 	{
 	public:
+		StorageBuffer() = default;
+
 		template<typename T>
 		StorageBuffer(std::in_place_type_t<T> type, uint32_t size) :
 			m_Value(type, size) {}
@@ -44,7 +46,7 @@ namespace Mahakam
 			SwitchCall(m_Value, [&](auto& buffer) { buffer.SetData(data, offset, size); });
 		}
 
-		MH_DECLARE_FUNC(Create, Scope<StorageBuffer>, uint32_t size);
+		MH_DECLARE_FUNC(Create, StorageBuffer, uint32_t size);
 
 	private:
 		StorageBufferVariant m_Value;
@@ -54,6 +56,8 @@ namespace Mahakam
 	class UniformBuffer
 	{
 	public:
+		UniformBuffer() = default;
+
 		template<typename T>
 		UniformBuffer(std::in_place_type_t<T> type, uint32_t size) :
 			m_Value(type, size) {}
@@ -73,7 +77,7 @@ namespace Mahakam
 			SwitchCall(m_Value, [&](auto& buffer) { buffer.SetData(data, offset, size); });
 		}
 
-		MH_DECLARE_FUNC(Create, Scope<UniformBuffer>, uint32_t size);
+		MH_DECLARE_FUNC(Create, UniformBuffer, uint32_t size);
 
 	private:
 		UniformBufferVariant m_Value;

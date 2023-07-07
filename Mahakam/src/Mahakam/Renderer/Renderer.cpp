@@ -29,6 +29,9 @@ namespace Mahakam
 	Scope<Renderer::RendererData> Renderer::s_RendererData;
 	Scope<SceneData> Renderer::s_SceneData;
 
+	inline constexpr uint32_t CameraBinding = 0;
+	inline constexpr uint32_t UniformBinding = 3;
+
 	void Renderer::Init(uint32_t width, uint32_t height)
 	{
 		MH_PROFILE_FUNCTION();
@@ -88,11 +91,11 @@ namespace Mahakam
 		// Setup camera matrices
 		s_SceneData->CameraMatrix = CameraData(cam, glm::vec2(s_RendererData->Width, s_RendererData->Height), transform);
 
-		s_SceneData->CameraBuffer->Bind(0);
-		s_SceneData->CameraBuffer->SetData(&s_SceneData->CameraMatrix, 0, sizeof(CameraData));
+		s_SceneData->CameraBuffer.Bind(CameraBinding);
+		s_SceneData->CameraBuffer.SetData(&s_SceneData->CameraMatrix, 0, sizeof(CameraData));
 
 		// Setup uniforms buffer
-		s_SceneData->UniformValueBuffer->Bind(3);
+		s_SceneData->UniformValueBuffer.Bind(UniformBinding);
 
 		// Setup results
 		s_RendererData->FrameResults.DrawCalls = 0;
@@ -244,7 +247,7 @@ namespace Mahakam
 		if (sceneData->Environment.SkyboxMaterial)
 		{
 			sceneData->Environment.SkyboxMaterial->BindShader("GEOMETRY");
-			sceneData->Environment.SkyboxMaterial->Bind(*sceneData->UniformValueBuffer);
+			sceneData->Environment.SkyboxMaterial->Bind(sceneData->UniformValueBuffer);
 			DrawScreenQuad();
 		}
 	};

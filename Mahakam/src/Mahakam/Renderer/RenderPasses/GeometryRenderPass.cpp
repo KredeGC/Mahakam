@@ -63,7 +63,7 @@ namespace Mahakam
 		GL::SetClearColor({ 1.0f, 0.06f, 0.94f, 1.0f });
 		GL::Clear();
 
-		sceneData->CameraBuffer->Bind(0);
+		sceneData->CameraBuffer.Bind(0);
 
 		// Create view projection frustum
 		Frustum frustum(sceneData->CameraMatrix.u_m4_VP);
@@ -107,7 +107,7 @@ namespace Mahakam
 					if (materialID != lastMaterialID)
 					{
 						lastMaterialID = materialID;
-						material->Bind(*sceneData->UniformValueBuffer);
+						material->Bind(sceneData->UniformValueBuffer);
 					}
 
 					// Choose a mesh
@@ -117,7 +117,7 @@ namespace Mahakam
 						mesh->Bind();
 					}
 
-					sceneData->CameraBuffer->SetData(&transform, 0, sizeof(glm::mat4));
+					sceneData->CameraBuffer.SetData(&transform, 0, sizeof(glm::mat4));
 
 					Renderer::AddPerformanceResult(mesh->GetVertexCount(), mesh->GetIndexCount());
 

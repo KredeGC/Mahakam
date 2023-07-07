@@ -2,6 +2,7 @@
 
 #include "RenderPass.h"
 
+#include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/TextureFormats.h"
 
 #define GLM_FORCE_INLINE
@@ -14,7 +15,6 @@ namespace Mahakam
 	class Frustum;
 	class Shader;
 	class Texture;
-	class UniformBuffer;
 
 	class LightingRenderPass : public RenderPass
 	{
@@ -29,7 +29,7 @@ namespace Mahakam
 		Asset<FrameBuffer> m_ShadowFramebuffer = nullptr;
 		Asset<Shader> m_ShadowShader = nullptr;
 
-		Ref<UniformBuffer> m_ShadowMatrixBuffer = nullptr;
+		UniformBuffer m_ShadowMatrixBuffer;
 
 		UnorderedMap<glm::ivec2, uint64_t> m_LightHashes;
 
@@ -43,6 +43,8 @@ namespace Mahakam
 		static constexpr uint32_t s_SpotShadowSize = 512;
 
 	public:
+		LightingRenderPass();
+
 		virtual bool Init(uint32_t width, uint32_t height) override;
 		virtual ~LightingRenderPass() override;
 
