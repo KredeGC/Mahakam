@@ -429,6 +429,98 @@ namespace Mahakam
 		return success;
 	}
 
+	ShaderDataType SPIRVDimToShaderDataType(spv::Dim dimension)
+	{
+		switch (dimension)
+		{
+		case spv::Dim::Dim2D:
+			return ShaderDataType::Sampler2D;
+		case spv::Dim::DimCube:
+			return ShaderDataType::SamplerCube;
+		default:
+			MH_BREAK("Unknown SPIR V dimension provided!");
+			return ShaderDataType::None;
+		}
+	}
+
+	ShaderDataType SPIRTypeToShaderDataType(spirv_cross::SPIRType::BaseType type, uint32_t size)
+	{
+		switch (type)
+		{
+		case spirv_cross::SPIRType::BaseType::Float:
+			switch (size)
+			{
+			case 1: return ShaderDataType::Float;
+			case 2: return ShaderDataType::Float2;
+			case 3: return ShaderDataType::Float3;
+			case 4: return ShaderDataType::Float4;
+			default:
+				MH_BREAK("Unknown SPIR V data type provided!");
+				return ShaderDataType::None;
+			}
+		default:
+			MH_BREAK("Unknown SPIR V data type provided!");
+			return ShaderDataType::None;
+		}
+	}
+
+	uint32_t Shader::ReflectSPIRV(const std::vector<uint32_t>& spirv, UnorderedMap<std::string, ShaderProperty>& properties)
+	{
+		uint32_t uniform_size = 0;
+
+		spirv_cross::Compiler comp(spirv);
+
+		spirv_cross::ShaderResources resources = comp.get_shader_resources();
+
+		// Reflect samplers
+		for (auto& resource : resources.sampled_images)
+		{
+			const spirv_cross::SPIRType& type = comp.get_type(resource.base_type_id);
+
+			const std::string& propertyName = resource.name;
+
+			// Set property
+			auto& property = properties[propertyName];
+			property.DataType = SPIRVDimToShaderDataType(type.image.dim);
+			property.Count = static_cast<uint32_t>(type.array.size());
+			property.Offset = 0;
+		}
+
+		std::string uboName = "Uniforms";
+
+		// Reflect uniform values
+		for (auto& resource : resources.uniform_buffers)
+		{
+			if (resource.name != uboName)
+				continue;
+
+			const spirv_cross::SPIRType& type = comp.get_type(resource.base_type_id);
+
+			uniform_size = static_cast<uint32_t>(comp.get_declared_struct_size(type));
+
+			for (size_t i = 0; i < type.member_types.size(); i++)
+			{
+				const spirv_cross::SPIRType& member_type = comp.get_type(type.member_types[i]);
+				const std::string& member_name = comp.get_member_name(resource.base_type_id, i);
+				size_t member_offset = comp.type_struct_member_offset(type, i);
+
+				ShaderDataType dataType = SPIRTypeToShaderDataType(member_type.basetype, member_type.vecsize);
+
+				std::string propertyName = uboName + "." + member_name;
+
+				// Set property
+				auto& property = properties[propertyName];
+				property.DataType = dataType;
+				property.Count = static_cast<uint32_t>(member_type.array.size());
+				property.Offset = member_offset;
+			}
+
+			break;
+		}
+
+		return uniform_size;
+	}
+
 	//Asset<Shader> Shader::Create(const std::string& filepath, const std::initializer_list<std::string>& keywords)
 	MH_DEFINE_FUNC(Shader::CreateFilepath, Asset<Shader>, const std::filesystem::path& filepath)
 	{

@@ -242,65 +242,8 @@ namespace Mahakam
 		for (int i = 0; i < sources.size(); i++)
 			MH_GL_CALL(glDetachShader(program, shaderIDs[i]));
 
-
-
-		// TODO: Replace with SPIR-V reflection
-
-		// #define UNIFORM_BINDING 3
-		uint32_t uniformIndex = glGetUniformBlockIndex(program, "Uniforms");
-
-		if (uniformIndex != ~0)
-		{
-			const GLenum blockProps[1] = { GL_BUFFER_DATA_SIZE };
-			GLint values[1];
-			MH_GL_CALL(glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformIndex, 1, blockProps, 1, NULL, values));
-
-			m_UniformSize = values[0];
-		}
-
-		// Shader reflection
-		GLint numUniforms = 0;
-		MH_GL_CALL(glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms));
-		const GLenum props[5] = { GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_OFFSET, GL_ARRAY_SIZE };
-
-		for (int unif = 0; unif < numUniforms; ++unif)
-		{
-			GLint values[5];
-			MH_GL_CALL(glGetProgramResourceiv(program, GL_UNIFORM, unif, 5, props, 5, NULL, values));
-
-			// Skip any uniforms that are in a block.
-			if (values[0] != uniformIndex && values[0] != -1)
-				continue;
-
-			// Get the name. Must use a vector rather than a std::string for C++03 standards issues.
-			// C++11 would let you use a std::string directly.
-			TrivialVector<char> nameData(values[2]);
-			MH_GL_CALL(glGetProgramResourceName(program, GL_UNIFORM, unif, (GLsizei)nameData.size(), NULL, &nameData[0]));
-			std::string propertyName(nameData.begin(), nameData.end() - 1);
-
-			// Trim array postfix
-			size_t isArray = propertyName.find("[0]");
-			if (isArray != std::string::npos)
-				propertyName = propertyName.substr(0, isArray);
-
-			ShaderDataType dataType = OpenGLDataTypeToShaderDataType(values[1]);
-
-			// Set property
-			auto iter = m_Properties.find(propertyName);
-			if (iter != m_Properties.end())
-			{
-				iter->second.DataType = dataType;
-				iter->second.Count = values[4];
-				iter->second.Offset = values[3];
-			}
-			else
-			{
-				auto& property = m_Properties[propertyName];
-				property.DataType = dataType;
-				property.Count = values[4];
-				property.Offset = values[3];
-			}
-		}
+		// Reflect the fragment shader using SPIR V
+		m_UniformSize = ReflectSPIRV(spirv[ShaderStage::Fragment], m_Properties);
 
 		return program;
 	}

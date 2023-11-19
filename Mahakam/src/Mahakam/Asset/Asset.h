@@ -198,7 +198,7 @@ namespace Mahakam
 			return m_Control ? reinterpret_cast<T*>(m_Control + 1) : nullptr;
 		}
 
-		template<typename Ty = T, std::enable_if_t<!std::is_void<Ty>::value, bool> = true>
+		template<typename Ty = T, typename = std::enable_if_t<!std::is_void<Ty>::value>>
 		Ty& operator*() const noexcept
 		{
 			return *reinterpret_cast<T*>(m_Control + 1);

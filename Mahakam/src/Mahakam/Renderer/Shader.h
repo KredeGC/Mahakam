@@ -59,6 +59,7 @@ namespace Mahakam
 		static std::string ParseDefaultValue(const ryml::NodeRef& node);
 		static bool ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, SourceDefinition>& sources, UnorderedMap<std::string, ShaderProperty>& properties);
 		static bool CompileSPIRV(UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv, const SourceDefinition& source);
+		static uint32_t ReflectSPIRV(const std::vector<uint32_t>& spirv, UnorderedMap<std::string, ShaderProperty>& properties);
 
 		inline static Asset<Shader> Create(const std::filesystem::path& filepath) { return CreateFilepath(filepath); }
 
