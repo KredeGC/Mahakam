@@ -159,7 +159,7 @@ extern Mahakam::Application* Mahakam::CreateApplication()
 
 #else // MH_STANDALONE
 
-MH_EXTERN_EXPORTED void LoadContext(ImGuiContext* context, spdlog::logger* logger, void*** funcPtrs)
+MH_EXTERN_EXPORTED void LoadContext(ImGuiContext* context, spdlog::logger* logger, Mahakam::SharedLibrary::SharedFunctor* funcPtrs)
 {
     ImGui::SetCurrentContext(context);
     Mahakam::Log::Init(MH_STANDALONE_TITLE);

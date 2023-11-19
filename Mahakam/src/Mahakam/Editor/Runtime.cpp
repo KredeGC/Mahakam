@@ -1,5 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "Runtime.h"
+#include "Selection.h"
 
 #include "Mahakam/Core/SharedLibrary.h"
 
@@ -40,6 +41,8 @@ namespace Mahakam::Editor
 
 	void Runtime::UnloadRuntime()
 	{
+		Selection::SetSelectedEntity({});
+
 		s_Runtime->Unload();
 
 		s_Runtime = nullptr;
@@ -51,6 +54,8 @@ namespace Mahakam::Editor
 
 	void Runtime::ReloadRuntime()
 	{
+		Selection::SetSelectedEntity({});
+
 		ryml::Tree serializedScene;
 
 		// Serialize and unload scene

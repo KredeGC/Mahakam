@@ -16,7 +16,7 @@ namespace Mahakam
 
 	static bool g_SharedLibraryInitialized = false;
 	static int g_FuncPointerCounter = 0;
-	static SharedLibrary::FuncPtr g_FuncPointers[NUM_FUNC_PTRS];
+	static SharedLibrary::SharedFunctor g_FuncPointers[NUM_FUNC_PTRS];
 
 	SharedLibrary::SharedLibrary(const std::filesystem::path& filepath) : m_Filepath(filepath)
 	{
@@ -36,7 +36,7 @@ namespace Mahakam
 		if (!g_SharedLibraryInitialized)
 			ExportFuncPointers();
         
-        auto contextPtr = GetFunction<void, ImGuiContext*, spdlog::logger*, FuncPtr*>("LoadContext");
+        auto contextPtr = GetFunction<void, ImGuiContext*, spdlog::logger*, SharedFunctor*>("LoadContext");
 
 		ImGuiContext* context = ImGui::GetCurrentContext();
         std::shared_ptr<spdlog::logger> logger = Log::GetLogger();
@@ -91,9 +91,10 @@ namespace Mahakam
 #endif
 	}
 
-	void SharedLibrary::AddExportFunction(FuncPtr funcPtr)
+	void SharedLibrary::AddExportFunction(FuncPtr funcPtr, LocPtr location)
 	{
-		g_FuncPointers[g_FuncPointerCounter++] = funcPtr;
+		g_FuncPointers[g_FuncPointerCounter].Func = funcPtr;
+		g_FuncPointers[g_FuncPointerCounter++].Location = location;
 	}
 
 	void SharedLibrary::ExportFuncPointers()
@@ -103,14 +104,15 @@ namespace Mahakam
 		MH_ASSERT(g_FuncPointerCounter == NUM_FUNC_PTRS, "Inconsisent amount of func pointers exported!");
 	}
 
-	void SharedLibrary::ImportFuncPointers(FuncPtr* ptrs)
+	void SharedLibrary::ImportFuncPointers(SharedFunctor* ptrs)
 	{
 		g_SharedLibraryInitialized = true;
 
 		for (int i = 0; i < NUM_FUNC_PTRS; i++)
 		{
-			if (g_FuncPointers[i] && *g_FuncPointers[i])
-				*g_FuncPointers[i] = *ptrs[i];
+			// Get location from array
+			// Set our location based on the parameters
+			g_FuncPointers[i](*ptrs[i].Location);
 		}
 	}
 }
