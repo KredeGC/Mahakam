@@ -144,7 +144,10 @@ namespace Mahakam
 			// Resolution
 			int32_t resolution = (int32_t)m_PropsCube.Resolution;
 			if (GUI::DrawIntDrag("Size", resolution, 32, 32, 8192))
+			{
 				m_PropsCube.Resolution = (uint32_t)resolution;
+				CreateTexture(filepath);
+			}
 
 			// Prefilter
 			if (GUI::DrawComboBox("Prefilter", m_PropsCube.Prefilter, magic_enum::enum_names<TextureCubePrefilter>()))

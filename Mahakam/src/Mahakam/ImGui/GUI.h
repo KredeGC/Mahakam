@@ -79,14 +79,14 @@ namespace Mahakam::GUI
 	bool DrawComboBox(const std::string& label, T& value, const std::array<std::string_view, Size>& values)
 	{
 		bool modified = false;
-		std::string_view valueName;
 
+		bool open;
 		if constexpr (std::is_enum_v<T>)
-			valueName = values[std::underlying_type_t<T>(value)];
+			open = ImGui::BeginCombo(label.c_str(), values[std::underlying_type_t<T>(value)].data());
 		else
-			valueName = values[value];
+			open = ImGui::BeginCombo(label.c_str(), values[value].data());
 
-		if (ImGui::BeginCombo(label.c_str(), valueName.data()))
+		if (open)
 		{
 			for (size_t i = 0; i < Size; i++)
 			{
