@@ -1,5 +1,6 @@
 #pragma once
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Types.h"
 
 #include <sstream>
 #include <string>
@@ -19,11 +20,11 @@ namespace Mahakam
 	enum EventCategory
 	{
 		None = 0,
-		EventCategoryApplication = BIT(0),
-		EventCategoryInput = BIT(1),
-		EventCategoryKeyboard = BIT(2),
-		EventCategoryMouse = BIT(3),
-		EventCategoryMouseButton = BIT(4)
+		EventCategoryApplication	= Bit(0),
+		EventCategoryInput			= Bit(1),
+		EventCategoryKeyboard		= Bit(2),
+		EventCategoryMouse			= Bit(3),
+		EventCategoryMouseButton	= Bit(4)
 	};
 
 

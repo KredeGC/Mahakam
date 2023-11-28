@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Types.h"
 
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
@@ -17,8 +18,8 @@ namespace Mahakam
 	struct TransformComponent
 	{
 	private:
-		static constexpr uint8_t FLAG_DIRTY = BIT(0);
-		static constexpr uint8_t FLAG_NO_MATRIX = BIT(1);
+		static constexpr uint8_t FLAG_DIRTY		= Bit<uint8_t>(0);
+		static constexpr uint8_t FLAG_NO_MATRIX	= Bit<uint8_t>(1);
 
 		glm::vec3 m_Position{ 0.0f, 0.0f, 0.0f };
 		glm::quat m_Rotation{ 1.0f, 0.0f, 0.0f, 0.0f };

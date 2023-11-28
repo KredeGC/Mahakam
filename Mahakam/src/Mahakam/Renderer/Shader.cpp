@@ -501,8 +501,8 @@ namespace Mahakam
 			for (size_t i = 0; i < type.member_types.size(); i++)
 			{
 				const spirv_cross::SPIRType& member_type = comp.get_type(type.member_types[i]);
-				const std::string& member_name = comp.get_member_name(resource.base_type_id, i);
-				size_t member_offset = comp.type_struct_member_offset(type, i);
+				const std::string& member_name = comp.get_member_name(resource.base_type_id, static_cast<uint32_t>(i));
+				size_t member_offset = comp.type_struct_member_offset(type, static_cast<uint32_t>(i));
 
 				ShaderDataType dataType = SPIRTypeToShaderDataType(member_type.basetype, member_type.vecsize);
 
@@ -512,7 +512,7 @@ namespace Mahakam
 				auto& property = properties[propertyName];
 				property.DataType = dataType;
 				property.Count = static_cast<uint32_t>(member_type.array.size());
-				property.Offset = member_offset;
+				property.Offset = static_cast<int>(member_offset);
 			}
 
 			break;

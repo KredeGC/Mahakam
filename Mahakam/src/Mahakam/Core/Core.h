@@ -57,8 +57,5 @@
 #define MH_PROFILE_END_SESSION()
 #endif // MH_ENABLE_PROFILING
 
-// Returns the bitness of x
-#define BIT(x) (1 << x)
-
 // Returns a non-capturing lambda which calls fn
 #define MH_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }

@@ -71,4 +71,15 @@ namespace Mahakam
 	{
 		return std::static_pointer_cast<T>(ptr);
 	}
+
+	template<typename T>
+	constexpr T Bit(T n)
+	{
+		return static_cast<T>(1ULL << n);
+	}
+
+	inline constexpr size_t Bit(size_t n)
+	{
+		return Bit<size_t>(n);
+	}
 }
