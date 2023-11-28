@@ -48,6 +48,7 @@ Refer to the [BUILDING.md](BUILDING.md) file.
 * [KTL](https://github.com/KredeGC/KTL) for various allocators and containers.
 * [Dear ImGui](https://github.com/ocornut/imgui) for GUI interaction and rendering.
 * [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) for editor interaction and rendering.
+* [magic_enum](https://github.com/Neargye/magic_enum) for enum introspection.
 * [miniaudio](https://github.com/mackron/miniaudio) for audio playback.
 * [spdlog](https://github.com/gabime/spdlog) for easy and fast logging.
 * [spirv-cross](https://github.com/KhronosGroup/SPIRV-Cross) for shader transpiling and reflection.

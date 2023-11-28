@@ -9,6 +9,8 @@
 
 #include <imgui/imgui.h>
 
+#include <magic_enum/magic_enum.hpp>
+
 namespace Mahakam
 {
 	TextureAssetImporter::TextureAssetImporter()
@@ -105,174 +107,54 @@ namespace Mahakam
 		}
 
 		// Type (2D, Cube)
-		const char* projectionTypeStrings[] = { "Texture2D", "TextureCube" };
-		const char* currentTextureType = projectionTypeStrings[m_TextureType];
+		const char* projectionTypeStrings[] { "Texture2D", "TextureCube" };
 
-		if (ImGui::BeginCombo("Texture Type", currentTextureType))
-		{
-			for (int i = 0; i < 2; i++)
-			{
-				bool selected = currentTextureType == projectionTypeStrings[i];
-				if (ImGui::Selectable(projectionTypeStrings[i], selected))
-				{
-					m_TextureType = i;
-					CreateTexture(filepath);
-				}
+		if (GUI::DrawComboBox("Texture Type", m_TextureType, projectionTypeStrings))
+			CreateTexture(filepath);
 
-				if (selected)
-					ImGui::SetItemDefaultFocus();
-			}
-
-			ImGui::EndCombo();
-		}
-
-		// Format
-		const char* textureFormatStrings[(int)TextureFormat::Count];
-
-		for (int i = 0; i < (int)TextureFormat::Count; i++)
-			textureFormatStrings[i] = GetStringTextureFormat((TextureFormat)i);
-
-		const char* currentTextureFormat = textureFormatStrings[(int)(m_TextureType == 0 ? m_Props2D.Format : m_PropsCube.Format)];
-
-		if (ImGui::BeginCombo("Texture Format", currentTextureFormat))
-		{
-			for (int i = 0; i < (int)TextureFormat::Count; i++)
-			{
-				bool selected = currentTextureFormat == textureFormatStrings[i];
-				if (ImGui::Selectable(textureFormatStrings[i], selected))
-				{
-					if (m_TextureType == 0)
-						m_Props2D.Format = (TextureFormat)i;
-					else
-						m_PropsCube.Format = (TextureFormat)i;
-					CreateTexture(filepath);
-				}
-
-				if (selected)
-					ImGui::SetItemDefaultFocus();
-			}
-
-			ImGui::EndCombo();
-		}
-
-		// Filter
-		const char* textureFilterStrings[(int)TextureFilter::Count];
-
-		for (int i = 0; i < (int)TextureFilter::Count; i++)
-			textureFilterStrings[i] = GetStringTextureFilter((TextureFilter)i);
-
-		const char* currentTextureFilter = textureFilterStrings[(int)(m_TextureType == 0 ? m_Props2D.FilterMode : m_PropsCube.FilterMode)];
-
-		if (ImGui::BeginCombo("Texture Filter", currentTextureFilter))
-		{
-			for (int i = 0; i < (int)TextureFilter::Count; i++)
-			{
-				bool selected = currentTextureFilter == textureFilterStrings[i];
-				if (ImGui::Selectable(textureFilterStrings[i], selected))
-				{
-					if (m_TextureType == 0)
-						m_Props2D.FilterMode = (TextureFilter)i;
-					else
-						m_PropsCube.FilterMode = (TextureFilter)i;
-					CreateTexture(filepath);
-				}
-
-				if (selected)
-					ImGui::SetItemDefaultFocus();
-			}
-
-			ImGui::EndCombo();
-		}
-
-		// TextureWrap
+		// Texture2D vs TextureCube
 		if (m_TextureType == 0)
 		{
-			const char* textureWrapStrings[(int)TextureWrapMode::Count];
+			// Format
+			if (GUI::DrawComboBox("Texture Format", m_Props2D.Format, magic_enum::enum_names<TextureFormat>()))
+				CreateTexture(filepath);
 
-			for (int i = 0; i < (int)TextureWrapMode::Count; i++)
-				textureWrapStrings[i] = GetStringTextureWrapMode((TextureWrapMode)i);
+			// Filter
+			if (GUI::DrawComboBox("Texture Filter", m_Props2D.FilterMode, magic_enum::enum_names<TextureFilter>()))
+				CreateTexture(filepath);
 
-			const char* currentWrapX = textureWrapStrings[(int)m_Props2D.WrapX];
-			const char* currentWrapY = textureWrapStrings[(int)m_Props2D.WrapY];
+			// Texture Wrap X
+			if (GUI::DrawComboBox("Texture Wrap X", m_Props2D.WrapX, magic_enum::enum_names<TextureWrapMode>()))
+				CreateTexture(filepath);
 
-			if (ImGui::BeginCombo("Texture Wrap X", currentWrapX))
-			{
-				for (int i = 0; i < (int)TextureWrapMode::Count; i++)
-				{
-					bool selected = currentWrapX == textureWrapStrings[i];
-					if (ImGui::Selectable(textureWrapStrings[i], selected))
-					{
-						m_Props2D.WrapX = (TextureWrapMode)i;
-						CreateTexture(filepath);
-					}
-
-					if (selected)
-						ImGui::SetItemDefaultFocus();
-				}
-
-				ImGui::EndCombo();
-			}
-
-			if (ImGui::BeginCombo("Texture Wrap Y", currentWrapY))
-			{
-				for (int i = 0; i < (int)TextureWrapMode::Count; i++)
-				{
-					bool selected = currentWrapY == textureWrapStrings[i];
-					if (ImGui::Selectable(textureWrapStrings[i], selected))
-					{
-						m_Props2D.WrapY = (TextureWrapMode)i;
-						CreateTexture(filepath);
-					}
-
-					if (selected)
-						ImGui::SetItemDefaultFocus();
-				}
-
-				ImGui::EndCombo();
-			}
+			// Texture Wrap Y
+			if (GUI::DrawComboBox("Texture Wrap Y", m_Props2D.WrapY, magic_enum::enum_names<TextureWrapMode>()))
+				CreateTexture(filepath);
 		}
 		else
 		{
+			// Format
+			if (GUI::DrawComboBox("Texture Format", m_PropsCube.Format, magic_enum::enum_names<TextureFormat>()))
+				CreateTexture(filepath);
+
+			// Filter
+			if (GUI::DrawComboBox("Texture Filter", m_PropsCube.FilterMode, magic_enum::enum_names<TextureFilter>()))
+				CreateTexture(filepath);
+
+			// Resolution
 			int32_t resolution = (int32_t)m_PropsCube.Resolution;
 			if (GUI::DrawIntDrag("Size", resolution, 32, 32, 8192))
 				m_PropsCube.Resolution = (uint32_t)resolution;
 
-			const char* prefilterStrings[(int)TextureCubePrefilter::Count];
-
-			for (int i = 0; i < (int)TextureCubePrefilter::Count; i++)
-				prefilterStrings[i] = GetStringTextureCubePrefilter((TextureCubePrefilter)i);
-
-			const char* currentPrefilter = prefilterStrings[(int)m_PropsCube.Prefilter];
-
-			if (ImGui::BeginCombo("Prefilter", currentPrefilter))
-			{
-				for (int i = 0; i < (int)TextureCubePrefilter::Count; i++)
-				{
-					bool selected = currentPrefilter == prefilterStrings[i];
-					if (ImGui::Selectable(prefilterStrings[i], selected))
-					{
-						m_PropsCube.Prefilter = (TextureCubePrefilter)i;
-						CreateTexture(filepath);
-					}
-
-					if (selected)
-						ImGui::SetItemDefaultFocus();
-				}
-
-				ImGui::EndCombo();
-			}
+			// Prefilter
+			if (GUI::DrawComboBox("Prefilter", m_PropsCube.Prefilter, magic_enum::enum_names<TextureCubePrefilter>()))
+				CreateTexture(filepath);
 		}
 
 		// Mips
 		bool* mipmaps = m_TextureType == 0 ? &m_Props2D.Mipmaps : &m_PropsCube.Mipmaps;
 		if (ImGui::Checkbox("Mipmaps", mipmaps))
-		{
-			if (m_TextureType == 0)
-				m_Props2D.Mipmaps = *mipmaps;
-			else
-				m_PropsCube.Mipmaps = *mipmaps;
 			CreateTexture(filepath);
-		}
 
 		// Render preview texture
 		if (m_Texture)

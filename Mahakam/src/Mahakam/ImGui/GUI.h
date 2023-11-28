@@ -9,6 +9,7 @@
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_float4.hpp>
 
+#include <array>
 #include <string>
 
 namespace Mahakam
@@ -45,4 +46,65 @@ namespace Mahakam::GUI
 	bool DrawFloat4Drag(const std::string& label, glm::vec4& value, float speed, float min, float max);
 
 	bool DrawIntDrag(const std::string& label, int32_t& value, float speed, int32_t min, int32_t max);
+
+	template<typename T, size_t Size>
+	bool DrawComboBox(const std::string& label, T& value, const char* (&values)[Size])
+	{
+		bool modified = false;
+		const char* valueName = values[value];
+
+		if (ImGui::BeginCombo(label.c_str(), valueName))
+		{
+			for (T i = 0; i < Size; i++)
+			{
+				bool selected = value == i;
+
+				if (ImGui::Selectable(values[i], selected))
+				{
+					value = i;
+					modified = true;
+				}
+
+				if (selected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
+		return modified;
+	}
+
+	template<typename T, size_t Size>
+	bool DrawComboBox(const std::string& label, T& value, const std::array<std::string_view, Size>& values)
+	{
+		bool modified = false;
+		std::string_view valueName;
+
+		if constexpr (std::is_enum_v<T>)
+			valueName = values[std::underlying_type_t<T>(value)];
+		else
+			valueName = values[value];
+
+		if (ImGui::BeginCombo(label.c_str(), valueName.data()))
+		{
+			for (size_t i = 0; i < Size; i++)
+			{
+				bool selected = size_t(value) == i;
+
+				if (ImGui::Selectable(values[i].data(), selected))
+				{
+					value = T(i);
+					modified = true;
+				}
+
+				if (selected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
+		return modified;
+	}
 }

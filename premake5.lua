@@ -62,6 +62,7 @@ IncludeDir["glslang"]           = "../Mahakam/vendor/glslang"
 IncludeDir["imgui"]             = "../Mahakam/vendor"
 IncludeDir["imguizmo"]          = "../Mahakam/vendor"
 IncludeDir["ktl"]               = "../Mahakam/vendor/ktl"
+IncludeDir["magic_enum"]        = "../Mahakam/vendor"
 IncludeDir["miniaudio"]         = "../Mahakam/vendor/miniaudio/include"
 IncludeDir["ryml"]              = "../Mahakam/vendor/ryml/include"
 IncludeDir["spdlog"]            = "../Mahakam/vendor/spdlog/include"
@@ -81,6 +82,7 @@ VendorIncludes = {
     "%{IncludeDir.imgui}",
     "%{IncludeDir.imguizmo}",
     "%{IncludeDir.ktl}",
+    "%{IncludeDir.magic_enum}",
     "%{IncludeDir.ryml}",
     "%{IncludeDir.spdlog}"
 }

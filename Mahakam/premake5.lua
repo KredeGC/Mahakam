@@ -39,6 +39,7 @@ project "Mahakam"
         "%{IncludeDir.imgui}",
         "%{IncludeDir.imguizmo}",
         "%{IncludeDir.ktl}",
+        "%{IncludeDir.magic_enum}",
         "%{IncludeDir.miniaudio}",
         "%{IncludeDir.ryml}",
         "%{IncludeDir.spdlog}",

@@ -1,68 +1,55 @@
-#ifndef MH_TEXTURE_FORMATS_INCLUDED
-#define MH_TEXTURE_FORMATS_INCLUDED
-
-#include "Mahakam/Core/Enum.h"
+#pragma once
 
 namespace Mahakam
 {
-	MH_BEGIN_ENUM(TextureFormat)
+	enum class TextureFormat
 	{
-		MH_DECL_ENUM_ELEMENT(R8),
-		MH_DECL_ENUM_ELEMENT(RG8),
-		MH_DECL_ENUM_ELEMENT(RGB8),
-		MH_DECL_ENUM_ELEMENT(RGBA8),
-		MH_DECL_ENUM_ELEMENT(R16F),
-		MH_DECL_ENUM_ELEMENT(RG16F),
-		MH_DECL_ENUM_ELEMENT(RGB16F),
-		MH_DECL_ENUM_ELEMENT(RGBA16F),
-		MH_DECL_ENUM_ELEMENT(R32F),
-		MH_DECL_ENUM_ELEMENT(RG32F),
-		MH_DECL_ENUM_ELEMENT(RGB32F),
-		MH_DECL_ENUM_ELEMENT(RGBA32F),
-		MH_DECL_ENUM_ELEMENT(RG11B10F),
-		MH_DECL_ENUM_ELEMENT(RGB10A2),
-		MH_DECL_ENUM_ELEMENT(SRGB8),
-		MH_DECL_ENUM_ELEMENT(SRGBA8),
-		MH_DECL_ENUM_ELEMENT(R_BC4),
-		MH_DECL_ENUM_ELEMENT(RG_BC5),
-		MH_DECL_ENUM_ELEMENT(RGBA_BC7),
-		MH_DECL_ENUM_ELEMENT(RGB_DXT1),
-		MH_DECL_ENUM_ELEMENT(RGBA_DXT5),
-		MH_DECL_ENUM_ELEMENT(SRGB_DXT1),
-		MH_DECL_ENUM_ELEMENT(SRGB_DXT5),
-		MH_DECL_ENUM_ELEMENT(Depth16),
-		MH_DECL_ENUM_ELEMENT(Depth24),
-		MH_DECL_ENUM_ELEMENT(Depth24Stencil8),
-		MH_DECL_ENUM_ELEMENT(Count)
-	}
-	MH_END_ENUM(TextureFormat);
+		R8,
+		RG8,
+		RGB8,
+		RGBA8,
+		R16F,
+		RG16F,
+		RGB16F,
+		RGBA16F,
+		R32F,
+		RG32F,
+		RGB32F,
+		RGBA32F,
+		RG11B10F,
+		RGB10A2,
+		SRGB8,
+		SRGBA8,
+		R_BC4,
+		RG_BC5,
+		RGBA_BC7,
+		RGB_DXT1,
+		RGBA_DXT5,
+		SRGB_DXT1,
+		SRGBA_DXT5,
+		Depth16,
+		Depth24,
+		Depth24Stencil8
+	};
 
-	MH_BEGIN_ENUM(TextureFilter)
+	enum class TextureFilter
 	{
-		MH_DECL_ENUM_ELEMENT(Point),
-		MH_DECL_ENUM_ELEMENT(Bilinear),
-		MH_DECL_ENUM_ELEMENT(Trilinear),
-		MH_DECL_ENUM_ELEMENT(Count)
-	}
-	MH_END_ENUM(TextureFilter);
+		Point,
+		Bilinear,
+		Trilinear
+	};
 
-	MH_BEGIN_ENUM(TextureWrapMode)
+	enum class TextureWrapMode
 	{
-		MH_DECL_ENUM_ELEMENT(Repeat),
-		MH_DECL_ENUM_ELEMENT(Clamp),
-		MH_DECL_ENUM_ELEMENT(ClampBorder),
-		MH_DECL_ENUM_ELEMENT(Count)
-	}
-	MH_END_ENUM(TextureWrapMode);
+		Repeat,
+		Clamp,
+		ClampBorder
+	};
 
-	MH_BEGIN_ENUM(TextureCubePrefilter)
+	enum class TextureCubePrefilter
 	{
-		MH_DECL_ENUM_ELEMENT(None),
-		MH_DECL_ENUM_ELEMENT(Convolute),
-		MH_DECL_ENUM_ELEMENT(Prefilter),
-		MH_DECL_ENUM_ELEMENT(Count)
-	}
-	MH_END_ENUM(TextureCubePrefilter);
+		None,
+		Convolute,
+		Prefilter
+	};
 }
-
-#endif
