@@ -45,11 +45,11 @@ namespace Mahakam::Math
 
 		// Compute X scale factor and normalize first row.
 		scale.x = length(Row[0]);
-		Row[0] = detail::scale(Row[0], static_cast<T>(1));
+		Row[0] = glm::detail::scale(Row[0], static_cast<T>(1));
 		scale.y = length(Row[1]);
-		Row[1] = detail::scale(Row[1], static_cast<T>(1));
+		Row[1] = glm::detail::scale(Row[1], static_cast<T>(1));
 		scale.z = length(Row[2]);
-		Row[2] = detail::scale(Row[2], static_cast<T>(1));
+		Row[2] = glm::detail::scale(Row[2], static_cast<T>(1));
 
 		// At this point, the matrix (in rows[]) is orthonormal.
 		// Check for a coordinate system flip.  If the determinant
@@ -156,26 +156,26 @@ namespace Mahakam::Math
 		// Compute X scale factor and normalize first row.
 		scale.x = length(Row[0]);// v3Length(Row[0]);
 
-		Row[0] = detail::scale(Row[0], static_cast<T>(1));
+		Row[0] = glm::detail::scale(Row[0], static_cast<T>(1));
 
 		// Compute XY shear factor and make 2nd row orthogonal to 1st.
 		Skew.z = dot(Row[0], Row[1]);
-		Row[1] = detail::combine(Row[1], Row[0], static_cast<T>(1), -Skew.z);
+		Row[1] = glm::detail::combine(Row[1], Row[0], static_cast<T>(1), -Skew.z);
 
 		// Now, compute Y scale and normalize 2nd row.
 		scale.y = length(Row[1]);
-		Row[1] = detail::scale(Row[1], static_cast<T>(1));
+		Row[1] = glm::detail::scale(Row[1], static_cast<T>(1));
 		Skew.z /= scale.y;
 
 		// Compute XZ and YZ shears, orthogonalize 3rd row.
 		Skew.y = glm::dot(Row[0], Row[2]);
-		Row[2] = detail::combine(Row[2], Row[0], static_cast<T>(1), -Skew.y);
+		Row[2] = glm::detail::combine(Row[2], Row[0], static_cast<T>(1), -Skew.y);
 		Skew.x = glm::dot(Row[1], Row[2]);
-		Row[2] = detail::combine(Row[2], Row[1], static_cast<T>(1), -Skew.x);
+		Row[2] = glm::detail::combine(Row[2], Row[1], static_cast<T>(1), -Skew.x);
 
 		// Next, get Z scale and normalize 3rd row.
 		scale.z = length(Row[2]);
-		Row[2] = detail::scale(Row[2], static_cast<T>(1));
+		Row[2] = glm::detail::scale(Row[2], static_cast<T>(1));
 		Skew.y /= scale.z;
 		Skew.x /= scale.z;
 

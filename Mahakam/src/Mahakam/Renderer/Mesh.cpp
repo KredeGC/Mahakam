@@ -334,45 +334,43 @@ namespace Mahakam
 		{
 			UnorderedMap<uint32_t, uint32_t> nodeIndex; // Node ID to hierarchy index
 
+			// Populate node hierarchy
 			for (int rootNode : scene.nodes)
-			{
-				// Populate node hierarchy
 				GLTFReadNodeHierarchy(model, nodeIndex, rootNode, -1, skinnedMesh);
 
-				// Extract bone transformations
-				if (skinnedMesh->Props.IncludeBones)
+			// Extract bone transformations
+			if (skinnedMesh->Props.IncludeBones)
+			{
+				for (auto& skinNode : model.nodes)
 				{
-					for (auto& skinNode : model.nodes)
+					if (skinNode.skin < 0)
+						continue;
+
+					// Get the skin from the node
+					auto& skin = model.skins[skinNode.skin];
+
+					// Get the affected nodes and their bind matrices
+					auto& joints = skin.joints;
+					const auto& accessor = model.accessors[skin.inverseBindMatrices];
+					const auto& bufferView = model.bufferViews[accessor.bufferView];
+					const auto& buffer = model.buffers[bufferView.buffer];
+
+					MH_ASSERT(joints.size() == accessor.count, "Bone count doesn't match joint count");
+
+					const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
+
+					// Extract joint data
+					skinnedMesh->BoneMap.reserve(joints.size());
+
+					// Add the bones to the skinned mesh
+					for (uint32_t i = 0; i < joints.size(); i++)
 					{
-						if (skinNode.skin < 0)
-							continue;
+						int nodeID = joints[i];
+						const auto& node = model.nodes[nodeID];
 
-						// Get the skin from the node
-						auto& skin = model.skins[skinNode.skin];
-
-						// Get the affected nodes and their bind matrices
-						auto& joints = skin.joints;
-						const auto& accessor = model.accessors[skin.inverseBindMatrices];
-						const auto& bufferView = model.bufferViews[accessor.bufferView];
-						const auto& buffer = model.buffers[bufferView.buffer];
-
-						MH_ASSERT(joints.size() == accessor.count, "Bone count doesn't match joint count");
-
-						const glm::mat4* invMatrices = reinterpret_cast<const glm::mat4*>(&buffer.data[bufferView.byteOffset + accessor.byteOffset]);
-
-						// Extract joint data
-						skinnedMesh->BoneMap.reserve(joints.size());
-
-						// Add the bones to the skinned mesh
-						for (uint32_t i = 0; i < joints.size(); i++)
-						{
-							int nodeID = joints[i];
-							const auto& node = model.nodes[nodeID];
-
-							// Override offset to be the bone's inverse matrix
-							skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].Offset = invMatrices[i];
-							skinnedMesh->BoneMap.insert({ nodeIndex[nodeID], i });
-						}
+						// Override offset to be the bone's inverse matrix
+						skinnedMesh->NodeHierarchy[nodeIndex[nodeID]].Offset = invMatrices[i];
+						skinnedMesh->BoneMap.insert({ nodeIndex[nodeID], i });
 					}
 				}
 			}
