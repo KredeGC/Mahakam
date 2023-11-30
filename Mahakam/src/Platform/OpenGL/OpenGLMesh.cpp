@@ -52,10 +52,10 @@ namespace Mahakam
 		m_Indices.assign(indices, indices + indexCount);
 
 		// Copy vertices into interleavedVertices
-		InterleaveBuffers(vertexCount, verts, BUFFER_ELEMENTS, BUFFER_ELEMENTS_SIZE);
+		InterleaveBuffers(verts, BUFFER_ELEMENTS, BUFFER_ELEMENTS_SIZE);
 
 		// Initialize gpu memory
-		Init(vertexCount, verts, BUFFER_ELEMENTS, BUFFER_ELEMENTS_SIZE);
+		Init(verts, BUFFER_ELEMENTS, BUFFER_ELEMENTS_SIZE);
 
 		// Calculate bounds
 		RecalculateBounds();
@@ -109,7 +109,7 @@ namespace Mahakam
 		MH_BREAK("Changing an active mesh not currently supported!");
 	}
 
-	void OpenGLMesh::Init(uint32_t vertexCount, const void** verts, const ShaderDataType* inputs, uint32_t inputCount)
+	void OpenGLMesh::Init(const void** verts, const ShaderDataType* inputs, uint32_t inputCount)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -170,7 +170,7 @@ namespace Mahakam
 		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 	}
 
-	void OpenGLMesh::InterleaveBuffers(uint32_t vertexCount, const void** verts, const ShaderDataType* inputs, uint32_t inputCount)
+	void OpenGLMesh::InterleaveBuffers(const void** verts, const ShaderDataType* inputs, uint32_t inputCount)
 	{
 		size_t totalSize = 0;
 		for (uint32_t i = 0; i < inputCount; i++)

@@ -54,8 +54,8 @@ namespace Mahakam
 		inline uint32_t GetIndexCount() const override { return m_IndexCount; }
 
 	private:
-		void Init(uint32_t vertexCount, const void** verts, const ShaderDataType* inputs, uint32_t inputCount);
+		void Init(const void** verts, const ShaderDataType* inputs, uint32_t inputCount);
 
-		void InterleaveBuffers(uint32_t vertexCount, const void** verts, const ShaderDataType* inputs, uint32_t inputCount);
+		void InterleaveBuffers(const void** verts, const ShaderDataType* inputs, uint32_t inputCount);
 	};
 }
