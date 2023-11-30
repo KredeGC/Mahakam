@@ -305,26 +305,26 @@ namespace Mahakam
 			MH_ASSERT(vertexCount == positionOffset, "Vertex count mismatch");
 			MH_ASSERT(indexCount == indexOffset, "Index count mismatch");
 
-			// Interleave vertices
-			SubMesh::InterleavedStruct interleavedVertices;
+			// Populate a single struct with the vertex data
+			MeshStruct vertexStruct;
 
 			if (positionOffset)
-				interleavedVertices.positions = positions.data();
+				vertexStruct.SetVertices<VertexType::Position>(positions.data());
 			if (texcoordOffset)
-				interleavedVertices.texcoords = texcoords.data();
+				vertexStruct.SetVertices<VertexType::TexCoords>(texcoords.data());
 			if (normalOffset)
-				interleavedVertices.normals = normals.data();
+				vertexStruct.SetVertices<VertexType::Normals>(normals.data());
 			if (tangentOffset)
-				interleavedVertices.tangents = tangents.data();
+				vertexStruct.SetVertices<VertexType::Tangents>(tangents.data());
 			if (colorOffset)
-				interleavedVertices.colors = colors.data();
+				vertexStruct.SetVertices<VertexType::Colors>(colors.data());
 			if (boneIDOffset && boneWeightOffset)
 			{
-				interleavedVertices.boneIDs = boneIDs.data();
-				interleavedVertices.boneWeights = boneWeights.data();
+				vertexStruct.SetVertices<VertexType::BoneIDs>(boneIDs.data());
+				vertexStruct.SetVertices<VertexType::BoneWeights>(boneWeights.data());
 			}
 
-			Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+			Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
 
 			skinnedMesh->Meshes.push_back(mesh);
 		}
@@ -500,13 +500,13 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions.data();
-		interleavedVertices.texcoords = uvs.data();
-		interleavedVertices.normals = normals.data();
-		//interleavedVertices.tangents = tangents.data(); // TODO
+		MeshStruct vertexStruct;
+		vertexStruct.SetVertices<VertexType::Position>(positions.data());
+		vertexStruct.SetVertices<VertexType::TexCoords>(uvs.data());
+		vertexStruct.SetVertices<VertexType::Normals>(normals.data());
+		//vertexStruct.SetVertices<VertexType::Tangents>(tangents.data()); // TODO
 
-		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
 
 		return mesh;
 	}
@@ -562,13 +562,13 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions.data();
-		interleavedVertices.texcoords = uvs.data();
-		interleavedVertices.normals = normals.data();
-		interleavedVertices.tangents = tangents.data();
+		MeshStruct vertexStruct;
+		vertexStruct.SetVertices<VertexType::Position>(positions.data());
+		vertexStruct.SetVertices<VertexType::TexCoords>(uvs.data());
+		vertexStruct.SetVertices<VertexType::Normals>(normals.data());
+		vertexStruct.SetVertices<VertexType::Tangents>(tangents.data());
 
-		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
 
 		return mesh;
 	}
@@ -625,13 +625,13 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions.data();
-		interleavedVertices.texcoords = uvs.data();
-		interleavedVertices.normals = normals.data();
-		interleavedVertices.tangents = tangents.data();
+		MeshStruct vertexStruct;
+		vertexStruct.SetVertices<VertexType::Position>(positions.data());
+		vertexStruct.SetVertices<VertexType::TexCoords>(uvs.data());
+		vertexStruct.SetVertices<VertexType::Normals>(normals.data());
+		vertexStruct.SetVertices<VertexType::Tangents>(tangents.data());
 
-		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
 
 		return mesh;
 	}
@@ -724,13 +724,13 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions.data();
-		interleavedVertices.texcoords = uvs.data();
-		interleavedVertices.normals = normals.data();
-		interleavedVertices.tangents = tangents.data();
+		MeshStruct vertexStruct;
+		vertexStruct.SetVertices<VertexType::Position>(positions.data());
+		vertexStruct.SetVertices<VertexType::TexCoords>(uvs.data());
+		vertexStruct.SetVertices<VertexType::Normals>(normals.data());
+		vertexStruct.SetVertices<VertexType::Tangents>(tangents.data());
 
-		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
 
 		return mesh;
 	}

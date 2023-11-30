@@ -44,28 +44,18 @@ namespace Mahakam
 
 	OpenGLMesh::OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) :
 		m_InterleavedVertices(Allocator::GetAllocator<uint8_t>()),
-		m_Vertices{ Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>(), Allocator::GetAllocator<uint8_t>() },
 		m_Indices(Allocator::GetAllocator<uint32_t>()),
+		m_Offsets(Allocator::GetAllocator<std::pair<const int, size_t>>()),
 		m_VertexCount(vertexCount),
 		m_IndexCount(indexCount)
 	{
 		m_Indices.assign(indices, indices + indexCount);
 
-		// Setup vertices
-		for (uint32_t i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
-		{
-			if (verts[i])
-			{
-				uint32_t elementSize = vertexCount * ShaderDataTypeSize(BUFFER_ELEMENTS[i]);
-				m_Vertices[i].assign(reinterpret_cast<const uint8_t*>(verts[i]), reinterpret_cast<const uint8_t*>(verts[i]) + elementSize);
-			}
-		}
-
 		// Copy vertices into interleavedVertices
-		InterleaveBuffers();
+		InterleaveBuffers(vertexCount, verts, BUFFER_ELEMENTS, BUFFER_ELEMENTS_SIZE);
 
 		// Initialize gpu memory
-		Init();
+		Init(vertexCount, verts, BUFFER_ELEMENTS, BUFFER_ELEMENTS_SIZE);
 
 		// Calculate bounds
 		RecalculateBounds();
@@ -119,7 +109,7 @@ namespace Mahakam
 		MH_BREAK("Changing an active mesh not currently supported!");
 	}
 
-	void OpenGLMesh::Init()
+	void OpenGLMesh::Init(uint32_t vertexCount, const void** verts, const ShaderDataType* inputs, uint32_t inputCount)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -139,37 +129,39 @@ namespace Mahakam
 
 		// Setup vertex buffer layout
 		size_t vertexBufferOffset = 0;
-		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
+		for (uint32_t i = 0; i < inputCount; i++)
 		{
-			if (!m_Vertices[i].empty())
+			if (!verts[i])
+				continue;
+			
+			ShaderDataType type = inputs[i];
+
+			GLenum dataType = ShaderDataTypeToOpenGLBaseType(type);
+			uint32_t dataTypeSize = ShaderDataTypeSize(type);
+			uint32_t componentCount = ShaderDataTypeComponentCount(type);
+
+			MH_GL_CALL(glEnableVertexAttribArray(i));
+			if (dataType == GL_INT)
 			{
-				ShaderDataType type = BUFFER_ELEMENTS[i];
-
-				GLenum dataType = ShaderDataTypeToOpenGLBaseType(type);
-				uint32_t dataTypeSize = ShaderDataTypeSize(type);
-				uint32_t componentCount = ShaderDataTypeComponentCount(type);
-
-				MH_GL_CALL(glEnableVertexAttribArray(i));
-				if (dataType == GL_INT)
-				{
-					MH_GL_CALL(glVertexAttribIPointer(i,
-						componentCount,
-						dataType,
-						0,
-						(void*)(uintptr_t)vertexBufferOffset));
-				}
-				else
-				{
-					MH_GL_CALL(glVertexAttribPointer(i,
-						componentCount,
-						dataType,
-						GL_FALSE, // Why normalize it?
-						0,
-						(void*)(uintptr_t)vertexBufferOffset));
-				}
-
-				vertexBufferOffset += m_Vertices[i].size();
+				MH_GL_CALL(glVertexAttribIPointer(i,
+					componentCount,
+					dataType,
+					0,
+					(void*)(uintptr_t)vertexBufferOffset));
 			}
+			else
+			{
+				MH_GL_CALL(glVertexAttribPointer(i,
+					componentCount,
+					dataType,
+					GL_FALSE, // Why normalize it?
+					0,
+					(void*)(uintptr_t)vertexBufferOffset));
+			}
+
+			size_t vertexSize = m_VertexCount * dataTypeSize;
+
+			vertexBufferOffset += vertexSize;
 		}
 
 		MH_GL_CALL(glBindVertexArray(0));
@@ -178,25 +170,31 @@ namespace Mahakam
 		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 	}
 
-	void OpenGLMesh::InterleaveBuffers()
+	void OpenGLMesh::InterleaveBuffers(uint32_t vertexCount, const void** verts, const ShaderDataType* inputs, uint32_t inputCount)
 	{
 		size_t totalSize = 0;
-		for (uint32_t i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
+		for (uint32_t i = 0; i < inputCount; i++)
 		{
-			if (!m_Vertices[i].empty())
-				totalSize += m_Vertices[i].size();
+			if (!verts[i])
+				continue;
+
+			totalSize += m_VertexCount * ShaderDataTypeSize(inputs[i]);
 		}
 
 		m_InterleavedVertices.resize(totalSize);
 
 		size_t dstOffset = 0;
-		for (int i = 0; i < BUFFER_ELEMENTS_SIZE; i++)
+		for (uint32_t i = 0; i < inputCount; i++)
 		{
-			if (!m_Vertices[i].empty())
-			{
-				std::memcpy(m_InterleavedVertices.begin() + dstOffset, m_Vertices[i].begin(), m_Vertices[i].size());
-				dstOffset += m_Vertices[i].size();
-			}
+			if (!verts[i])
+				continue;
+
+			m_Offsets[i] = dstOffset;
+
+			size_t vertexSize = m_VertexCount * ShaderDataTypeSize(inputs[i]);
+			
+			std::memcpy(m_InterleavedVertices.begin() + dstOffset, verts[i], vertexSize);
+			dstOffset += vertexSize;
 		}
 	}
 }

@@ -281,11 +281,11 @@ namespace Mahakam
 		};
 
 		// Interleave vertices
-		SubMesh::InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions;
-		interleavedVertices.texcoords = uvs;
+		MeshStruct vertexStruct;
+		vertexStruct.SetVertices<VertexType::Position>(positions);
+		vertexStruct.SetVertices<VertexType::TexCoords>(uvs);
 
-		return SubMesh::Create(4, 6, interleavedVertices, indices);
+		return SubMesh::Create(4, 6, vertexStruct.GetData(), indices);
 	}
 
 	Ref<SubMesh> GL::CreatePyramid()
@@ -329,9 +329,9 @@ namespace Mahakam
 		indices[17] = 4;
 
 		// Interleave vertices
-		SubMesh::InterleavedStruct interleavedVertices;
-		interleavedVertices.positions = positions;
+		MeshStruct vertexStruct;
+		vertexStruct.SetVertices<VertexType::Position>(positions);
 
-		return SubMesh::Create(vertexCount, indexCount, interleavedVertices, indices);
+		return SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices);
 	}
 }

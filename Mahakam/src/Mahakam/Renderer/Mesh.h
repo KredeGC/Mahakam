@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/Meta.h"
 
 #include "Mahakam/Asset/Asset.h"
 
@@ -39,8 +40,6 @@ namespace Mahakam
 			Primitive(primitive) {}
 
 		virtual MeshProps& GetProps() = 0;
-
-		inline const MeshProps& GetProps() const { return GetProps(); }
 
 		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
 
@@ -149,22 +148,49 @@ namespace Mahakam
 		MH_DECLARE_FUNC(CreateImpl, Asset<UVSphereMesh>, const UVSphereMeshProps& props);
 	};
 
+	enum class VertexType
+	{
+		Position,
+		TexCoords,
+		Normals,
+		Tangents,
+		Colors,
+		BoneIDs,
+		BoneWeights
+	};
+
+	template<typename... Ts>
+	class RawMeshData
+	{
+	public:
+		inline static constexpr size_t size = sizeof...(Ts);
+
+		// Provide some type safety
+		template<auto I>
+		void SetVertices(const detail::get_nth_from_variadric<size_t(I), Ts...>* data)
+		{
+			m_Vertices[size_t(I)] = data;
+		}
+
+		const void** GetData() { return m_Vertices; }
+
+	private:
+		const void* m_Vertices[size]{ nullptr };
+	};
+
+	using MeshStruct = RawMeshData<
+		glm::vec3,
+		glm::vec2,
+		glm::vec3,
+		glm::vec4,
+		glm::vec4,
+		glm::ivec4,
+		glm::vec4
+	>;
+
 	class SubMesh
 	{
 	public:
-		struct InterleavedStruct
-		{
-			glm::vec3* positions = nullptr;
-			glm::vec2* texcoords = nullptr;
-			glm::vec3* normals = nullptr;
-			glm::vec4* tangents = nullptr;
-			glm::vec4* colors = nullptr;
-			glm::ivec4* boneIDs = nullptr;
-			glm::vec4* boneWeights = nullptr;
-
-			operator const void** () const { return reinterpret_cast<const void**>(const_cast<InterleavedStruct*>(this)); }
-		};
-
 		inline static constexpr uint32_t BUFFER_ELEMENTS_SIZE = 7U;
 		inline static constexpr ShaderDataType BUFFER_ELEMENTS[BUFFER_ELEMENTS_SIZE]
 		{
