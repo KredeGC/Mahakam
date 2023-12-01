@@ -127,6 +127,13 @@ namespace Mahakam
 		MH_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBufferID));
 		MH_GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_IndexCount * sizeof(uint32_t), m_Indices.data(), GL_STATIC_DRAW));
 
+		// TODO: Use VertexStruct or whatever name
+		// for (auto& [index, value] : vertexStruct.GetInput())
+		//   auto& [offset, type] = value;
+		//   GLenum dataType = ShaderDataTypeToOpenGLBaseType(type);
+		//   uint32_t dataTypeSize = ShaderDataTypeSize(type);
+		//   uint32_t componentCount = ShaderDataTypeComponentCount(type);
+
 		// Setup vertex buffer layout
 		size_t vertexBufferOffset = 0;
 		for (uint32_t i = 0; i < inputCount; i++)

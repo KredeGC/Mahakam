@@ -306,22 +306,22 @@ namespace Mahakam
 			MH_ASSERT(indexCount == indexOffset, "Index count mismatch");
 
 			// Populate a single struct with the vertex data
-			MeshStruct vertexStruct;
+			MeshStruct vertexStruct(vertexCount);
 
 			if (positionOffset)
-				vertexStruct.SetVertices<VertexType::Position>(positions.data());
+				vertexStruct.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
 			if (texcoordOffset)
-				vertexStruct.SetVertices<VertexType::TexCoords>(texcoords.data());
+				vertexStruct.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, texcoords.data());
 			if (normalOffset)
-				vertexStruct.SetVertices<VertexType::Normals>(normals.data());
+				vertexStruct.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
 			if (tangentOffset)
-				vertexStruct.SetVertices<VertexType::Tangents>(tangents.data());
+				vertexStruct.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
 			if (colorOffset)
-				vertexStruct.SetVertices<VertexType::Colors>(colors.data());
+				vertexStruct.SetVertices(VertexType::Colors, ShaderDataType::Float4, colors.data());
 			if (boneIDOffset && boneWeightOffset)
 			{
-				vertexStruct.SetVertices<VertexType::BoneIDs>(boneIDs.data());
-				vertexStruct.SetVertices<VertexType::BoneWeights>(boneWeights.data());
+				vertexStruct.SetVertices(VertexType::BoneIDs, ShaderDataType::Int4, boneIDs.data());
+				vertexStruct.SetVertices(VertexType::BoneWeights, ShaderDataType::Float4, boneWeights.data());
 			}
 
 			Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());

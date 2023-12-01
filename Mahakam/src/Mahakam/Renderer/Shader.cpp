@@ -541,9 +541,9 @@ namespace Mahakam
 	{
 		switch (stage)
 		{
-		case 0:
+		case EShLangVertex:
 			return ShaderStage::Vertex;
-		case 4:
+		case EShLangFragment:
 			return ShaderStage::Fragment;
 		default:
 			MH_BREAK("Unknown shader data type!");
@@ -556,9 +556,9 @@ namespace Mahakam
 		switch (stage)
 		{
 		case ShaderStage::Vertex:
-			return 0;
+			return EShLangVertex;
 		case ShaderStage::Fragment:
-			return 4;
+			return EShLangFragment;
 		default:
 			MH_BREAK("Unknown shader data type!");
 			return 0;

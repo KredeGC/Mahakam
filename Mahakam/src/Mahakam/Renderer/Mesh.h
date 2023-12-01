@@ -159,33 +159,87 @@ namespace Mahakam
 		BoneWeights
 	};
 
+	// TODO: Actually just remove the template stuff, it can't be used in OpenGLMesh...
 	template<typename... Ts>
 	class RawMeshData
 	{
 	public:
+		using Input = int;
+
 		inline static constexpr size_t size = sizeof...(Ts);
 
-		// Provide some type safety
+		// Deprecated
+		RawMeshData() :
+			m_VertexCount(0),
+			m_Data(Allocator::GetAllocator<uint8_t>()),
+			m_DataTypes(Allocator::GetAllocator<std::pair<const Input, ShaderDataType>>()),
+			m_Offsets(Allocator::GetAllocator<std::pair<const Input, size_t>>()) {}
+
+		RawMeshData(uint32_t vertexCount) :
+			m_VertexCount(vertexCount),
+			m_Data(Allocator::GetAllocator<uint8_t>()),
+			m_Offsets(Allocator::GetAllocator<std::pair<const Input, size_t>>()),
+			m_DataTypes(Allocator::GetAllocator<std::pair<const Input, ShaderDataType>>()) {}
+
+		// Deprecated
 		template<auto I>
-		void SetVertices(const detail::get_nth_from_variadric<size_t(I), Ts...>* data)
+		void SetVertices(const typename detail::get_nth_from_variadric<size_t(I), Ts...>::type* data)
 		{
 			m_Vertices[size_t(I)] = data;
 		}
 
+		template<typename U, typename T>
+		void SetVertices(U index, ShaderDataType dataType, const T* data)
+		{
+			m_Vertices[size_t(index)] = data; // Deprecated
+
+			auto iter = m_Offsets.find(size_t(index));
+			if (iter != m_Offsets.end())
+			{
+				uint8_t* begin = m_Data.begin() + iter->second;
+
+				std::memcpy(begin, data, m_VertexCount * sizeof(T));
+			}
+			else
+			{
+				m_Offsets[Input(index)] = m_Data.size();
+				m_DataTypes[Input(index)] = dataType;
+				m_Data.push_back(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data + m_VertexCount));
+			}
+		}
+
+		const auto& GetData() const { return m_Data; }
+		const auto& GetOffsets() const { return m_Offsets; }
+		const auto& GetDataTypes() const { return m_DataTypes; }
+
+		// Deprecated
 		const void** GetData() { return m_Vertices; }
 
 	private:
+		// Deprecated
 		const void* m_Vertices[size]{ nullptr };
+
+		uint32_t m_VertexCount;
+		TrivialVector<uint8_t, Allocator::BaseAllocator<uint8_t>> m_Data;
+		UnorderedMap<Input, size_t, Allocator::BaseAllocator<std::pair<const Input, size_t>>> m_Offsets;
+		UnorderedMap<Input, ShaderDataType, Allocator::BaseAllocator<std::pair<const Input, ShaderDataType>>> m_DataTypes;
+	};
+
+	template<ShaderDataType D, typename T>
+	struct VertexData
+	{
+		using type = T;
+		inline static constexpr ShaderDataType DataType = D;
 	};
 
 	using MeshStruct = RawMeshData<
-		glm::vec3,
-		glm::vec2,
-		glm::vec3,
-		glm::vec4,
-		glm::vec4,
-		glm::ivec4,
-		glm::vec4
+		VertexData<ShaderDataType::Float3, glm::vec3>,
+		VertexData<ShaderDataType::Float2, glm::vec2>,
+		VertexData<ShaderDataType::Float3, glm::vec3>,
+		VertexData<ShaderDataType::Float4, glm::vec4>,
+		VertexData<ShaderDataType::Float4, glm::vec4>,
+		VertexData<ShaderDataType::Int4, glm::ivec4>,
+		VertexData<ShaderDataType::Float4, glm::vec4>
 	>;
 
 	class SubMesh

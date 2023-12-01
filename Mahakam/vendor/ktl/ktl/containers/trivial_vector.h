@@ -337,7 +337,7 @@ namespace ktl
 		{
 			const size_t n = (last - first);
 
-			if (m_EndMax - m_End < n)
+			if (size_t(m_EndMax - m_End) < n)
 				expand(n);
 
 			T* lastElement = m_End;
