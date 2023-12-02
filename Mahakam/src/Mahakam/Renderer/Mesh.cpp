@@ -286,16 +286,16 @@ namespace Mahakam
 
 					// Extract weight information
 					GLTFLoadAttribute<glm::vec4>(model, p, "WEIGHTS_0", boneWeightOffset, boneWeights);
-				}
 
-				// Normalize weights
-				{
-					/*for (size_t i = 0; i < boneWeightOffset; i++)
+					// Normalize weights
+					for (size_t i = 0; i < vertexCount; i++)
 					{
 						glm::vec4& weight = boneWeights[i];
 
 						float sum = weight.x + weight.y + weight.z + weight.w;
-					}*/
+
+						weight /= sum;
+					}
 				}
 
 				// Extract indices

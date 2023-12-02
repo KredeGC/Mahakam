@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../utility/empty_base.h"
 #include "../utility/meta.h"
 
 #include "type_allocator_fwd.h"
@@ -20,6 +21,10 @@ namespace ktl
 	private:
 		static_assert(detail::has_no_value_type_v<Alloc>, "Building on top of typed allocators is not allowed. Use allocators without a type");
 		static_assert(!std::is_const_v<T>, "Using an allocator of const T is ill-formed");
+		static_assert(!std::is_copy_constructible_v<Alloc> || std::is_nothrow_copy_constructible_v<Alloc>, "Using a throwing copy constructor is ill-formed");
+		static_assert(!std::is_move_constructible_v<Alloc> || std::is_nothrow_move_constructible_v<Alloc>, "Using a throwing move constructor is ill-formed");
+		static_assert(!std::is_copy_assignable_v<Alloc> || std::is_nothrow_copy_assignable_v<Alloc>, "Using throwing copy assignment is ill-formed");
+		static_assert(!std::is_move_assignable_v<Alloc> || std::is_nothrow_move_assignable_v<Alloc>, "Using throwing move assignment is ill-formed");
 
 		template<typename U, typename A>
 		friend class type_allocator;
@@ -39,29 +44,45 @@ namespace ktl
 		 * @brief Default constructor
 		 * @note Only defined if the underlying allocator defines it
 		*/
-		type_allocator() noexcept = default;
+		type_allocator() = default;
 
 		/**
 		 * @brief Constructor for forwarding any arguments to the underlying allocator
 		*/
 		template<typename... Args,
 			typename = std::enable_if_t<
-			detail::can_construct_v<Alloc, Args...>>>
-		explicit type_allocator(Args&&... alloc) noexcept :
+			std::is_constructible_v<Alloc, Args...>>>
+		explicit type_allocator(Args&&... alloc)
+			noexcept(std::is_nothrow_constructible_v<T, Args...>) :
 			m_Alloc(std::forward<Args>(alloc)...) {}
 
-		type_allocator(const type_allocator&) noexcept = default;
+		type_allocator(const type_allocator&) = default;
 
-		type_allocator(type_allocator&& other) noexcept :
+		// Move construction is essentially forbidden for STL allocators
+		// A al(std::move(a)); a == al
+		// https://en.cppreference.com/w/cpp/named_req/Allocator
+		type_allocator(type_allocator&& other)
+			noexcept(std::is_nothrow_copy_constructible_v<Alloc>) :
 			m_Alloc(other.m_Alloc) {}
 
 		template<typename U>
-		type_allocator(const type_allocator<U, Alloc>& other) noexcept :
+		type_allocator(const type_allocator<U, Alloc>& other)
+			noexcept(std::is_nothrow_constructible_v<Alloc, const type_allocator<U, Alloc>&>) :
 			m_Alloc(other.m_Alloc) {}
 
-		type_allocator& operator=(const type_allocator&) noexcept = default;
+		// Move construction is essentially forbidden for STL allocators
+		// https://en.cppreference.com/w/cpp/named_req/Allocator
+		template<typename U>
+		type_allocator(type_allocator<U, Alloc>&& other)
+			noexcept(std::is_nothrow_constructible_v<Alloc, type_allocator<U, Alloc>&&>) :
+			m_Alloc(other.m_Alloc) {}
 
-		type_allocator& operator=(type_allocator&& rhs) noexcept
+		type_allocator& operator=(const type_allocator&) = default;
+
+		// Move construction is essentially forbidden for STL allocators
+		// https://en.cppreference.com/w/cpp/named_req/Allocator
+		type_allocator& operator=(type_allocator&& rhs)
+			noexcept(std::is_nothrow_copy_assignable_v<Alloc>)
 		{
 			m_Alloc = rhs.m_Alloc;
 
@@ -75,6 +96,7 @@ namespace ktl
 		 * @return A location in memory that is at least @p n objects big or nullptr if it could not be allocated
 		*/
 		value_type* allocate(size_t n)
+			noexcept(noexcept(m_Alloc.allocate(n)))
 		{
 			return reinterpret_cast<value_type*>(m_Alloc.allocate(sizeof(value_type) * n));
 		}
@@ -85,6 +107,7 @@ namespace ktl
 		 * @param n The size that was initially allocated
 		*/
 		void deallocate(value_type* p, size_t n)
+			noexcept(noexcept(m_Alloc.deallocate(p, n)))
 		{
 			m_Alloc.deallocate(p, sizeof(value_type) * n);
 		}
@@ -101,6 +124,7 @@ namespace ktl
 		template<typename... Args>
 		typename std::enable_if<detail::has_construct_v<Alloc, value_type*, Args...>, void>::type
 		construct(value_type* p, Args&&... args)
+			noexcept(detail::has_nothrow_construct_v<Alloc, value_type*, Args...>)
 		{
 			m_Alloc.construct(p, std::forward<Args>(args)...);
 		}
@@ -113,6 +137,7 @@ namespace ktl
 		template<typename A = Alloc>
 		typename std::enable_if<detail::has_destroy_v<A, value_type*>, void>::type
 		destroy(value_type* p)
+			noexcept(detail::has_nothrow_destroy_v<Alloc, value_type*>)
 		{
 			m_Alloc.destroy(p);
 		}
@@ -126,7 +151,8 @@ namespace ktl
 		*/
 		template<typename A = Alloc>
 		typename std::enable_if<detail::has_max_size_v<A>, size_type>::type
-		max_size() const noexcept
+		max_size() const
+			noexcept(detail::has_nothrow_max_size_v<A>)
 		{
 			return m_Alloc.max_size() / sizeof(T);
 		}
@@ -140,6 +166,7 @@ namespace ktl
 		template<typename A = Alloc>
 		typename std::enable_if<detail::has_owns_v<A>, bool>::type
 		owns(value_type* p) const
+			noexcept(detail::has_nothrow_owns_v<A>)
 		{
 			return m_Alloc.owns(p);
 		}
@@ -149,7 +176,7 @@ namespace ktl
 		 * @brief Returns a reference to the underlying allocator
 		 * @return The allocator
 		*/
-		Alloc& get_allocator()
+		Alloc& get_allocator() noexcept
 		{
 			return m_Alloc;
 		}
@@ -158,23 +185,25 @@ namespace ktl
 		 * @brief Returns a const reference to the underlying allocator
 		 * @return The allocator
 		*/
-		const Alloc& get_allocator() const
+		const Alloc& get_allocator() const noexcept
 		{
 			return m_Alloc;
 		}
 
 	private:
-		Alloc m_Alloc;
+		KTL_EMPTY_BASE Alloc m_Alloc;
 	};
 
 	template<typename T, typename U, typename Alloc>
-	bool operator==(const type_allocator<T, Alloc>& lhs, const type_allocator<U, Alloc>& rhs) noexcept
+	bool operator==(const type_allocator<T, Alloc>& lhs, const type_allocator<U, Alloc>& rhs)
+		noexcept(detail::has_nothrow_equal_v<Alloc>)
 	{
 		return lhs.get_allocator() == rhs.get_allocator();
 	}
 
 	template<typename T, typename U, typename Alloc>
-	bool operator!=(const type_allocator<T, Alloc>& lhs, const type_allocator<U, Alloc>& rhs) noexcept
+	bool operator!=(const type_allocator<T, Alloc>& lhs, const type_allocator<U, Alloc>& rhs)
+		noexcept(detail::has_nothrow_not_equal_v<Alloc>)
 	{
 		return lhs.get_allocator() != rhs.get_allocator();
 	}

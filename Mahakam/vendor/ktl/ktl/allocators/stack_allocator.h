@@ -60,7 +60,7 @@ namespace ktl
 		}
 
 #pragma region Allocation
-		void* allocate(size_t n)
+		void* allocate(size_t n) noexcept
 		{
 			size_t totalSize = n + detail::align_to_architecture(n);
 
@@ -96,9 +96,15 @@ namespace ktl
 			return Size;
 		}
 
-		bool owns(void* p) const
+		bool owns(void* p) const noexcept
 		{
-			return p >= m_Block->Data && p < m_Block->Data + Size;
+			// Comparing pointers to different objects is unspecified
+			// But converting them to integers and comparing them isn't...
+			uintptr_t ptr = reinterpret_cast<uintptr_t>(p);
+			uintptr_t low = reinterpret_cast<uintptr_t>(m_Block->Data);
+			uintptr_t high = low + Size;
+
+			return ptr >= low && ptr < high;
 		}
 #pragma endregion
 
