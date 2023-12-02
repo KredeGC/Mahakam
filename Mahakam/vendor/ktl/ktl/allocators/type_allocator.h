@@ -52,7 +52,8 @@ namespace ktl
 
 		type_allocator(const type_allocator&) noexcept = default;
 
-		type_allocator(type_allocator&&) noexcept = default;
+		type_allocator(type_allocator&& other) noexcept :
+			m_Alloc(other.m_Alloc) {}
 
 		template<typename U>
 		type_allocator(const type_allocator<U, Alloc>& other) noexcept :
@@ -60,7 +61,12 @@ namespace ktl
 
 		type_allocator& operator=(const type_allocator&) noexcept = default;
 
-		type_allocator& operator=(type_allocator&&) noexcept = default;
+		type_allocator& operator=(type_allocator&& rhs) noexcept
+		{
+			m_Alloc = rhs.m_Alloc;
+
+			return *this;
+		}
 
 #pragma region Allocation
 		/**

@@ -306,25 +306,27 @@ namespace Mahakam
 			MH_ASSERT(indexCount == indexOffset, "Index count mismatch");
 
 			// Populate a single struct with the vertex data
-			MeshStruct vertexStruct(vertexCount);
+			MeshData meshData(vertexCount);
+
+			meshData.SetIndices(indices.data(), indexCount);
 
 			if (positionOffset)
-				vertexStruct.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
+				meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
 			if (texcoordOffset)
-				vertexStruct.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, texcoords.data());
+				meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, texcoords.data());
 			if (normalOffset)
-				vertexStruct.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
+				meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
 			if (tangentOffset)
-				vertexStruct.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
+				meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
 			if (colorOffset)
-				vertexStruct.SetVertices(VertexType::Colors, ShaderDataType::Float4, colors.data());
+				meshData.SetVertices(VertexType::Colors, ShaderDataType::Float4, colors.data());
 			if (boneIDOffset && boneWeightOffset)
 			{
-				vertexStruct.SetVertices(VertexType::BoneIDs, ShaderDataType::Int4, boneIDs.data());
-				vertexStruct.SetVertices(VertexType::BoneWeights, ShaderDataType::Float4, boneWeights.data());
+				meshData.SetVertices(VertexType::BoneIDs, ShaderDataType::Int4, boneIDs.data());
+				meshData.SetVertices(VertexType::BoneWeights, ShaderDataType::Float4, boneWeights.data());
 			}
 
-			Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
+			Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, std::move(meshData), indices.data());
 
 			skinnedMesh->Meshes.push_back(mesh);
 		}
@@ -405,15 +407,15 @@ namespace Mahakam
 		return CreateAsset<UVSphereMesh>(SubMesh::CreateUVSphere(props.Rows, props.Columns), props);
 	};
 
-	//Ref<SubMesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
-	MH_DEFINE_FUNC(SubMesh::CreateImpl, Ref<SubMesh>, uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices)
+	//Ref<SubMesh> Mesh::CreateImpl(uint32_t vertexCount, uint32_t indexCount, MeshData&& mesh, const uint32_t* indices)
+	MH_DEFINE_FUNC(SubMesh::CreateImpl, Ref<SubMesh>, uint32_t vertexCount, uint32_t indexCount, MeshData&& mesh, const uint32_t* indices)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
-			return CreateRef<HeadlessMesh>(vertexCount, indexCount, verts, indices);
+			return CreateRef<HeadlessMesh>(vertexCount, indexCount, nullptr, indices);
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLMesh>(vertexCount, indexCount, verts, indices);
+			return CreateRef<OpenGLMesh>(vertexCount, indexCount, std::move(mesh), indices);
 		}
 
 		MH_BREAK("Unknown renderer API!");
@@ -438,11 +440,11 @@ namespace Mahakam
 			{  0.0f,  0.0f, -1.0f }
 		};
 
-		TrivialArray<glm::vec3> positions(vertexCount);
-		TrivialArray<glm::vec2> uvs(vertexCount);
-		TrivialArray<glm::vec3> normals(vertexCount);
-		TrivialArray<glm::vec4> tangents(vertexCount);
-		TrivialArray<uint32_t> indices(indexCount);
+		TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> positions(vertexCount, Allocator::GetAllocator<glm::vec3>());
+		TrivialArray<glm::vec2, Allocator::BaseAllocator<glm::vec2>> uvs(vertexCount, Allocator::GetAllocator<glm::vec2>());
+		TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> normals(vertexCount, Allocator::GetAllocator<glm::vec3>());
+		//TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> tangents(vertexCount, Allocator::GetAllocator<glm::vec4>());
+		TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> indices(indexCount, Allocator::GetAllocator<uint32_t>());
 
 		int index = 0;
 		int triIndex = 0;
@@ -498,13 +500,14 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		MeshStruct vertexStruct;
-		vertexStruct.SetVertices<VertexType::Position>(positions.data());
-		vertexStruct.SetVertices<VertexType::TexCoords>(uvs.data());
-		vertexStruct.SetVertices<VertexType::Normals>(normals.data());
-		//vertexStruct.SetVertices<VertexType::Tangents>(tangents.data()); // TODO
+		MeshData meshData(vertexCount);
+		meshData.SetIndices(std::move(indices));
+		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
+		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
+		//meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
 
-		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, std::move(meshData), indices.data());
 
 		return mesh;
 	}
@@ -516,11 +519,11 @@ namespace Mahakam
 		uint32_t vertexCount = rows * columns;
 		uint32_t indexCount = 6 * (rows - 1) * (columns - 1);
 
-		TrivialArray<glm::vec3> positions(vertexCount);
-		TrivialArray<glm::vec2> uvs(vertexCount);
-		TrivialArray<glm::vec3> normals(vertexCount);
-		TrivialArray<glm::vec4> tangents(vertexCount);
-		TrivialArray<uint32_t> indices(indexCount);
+		TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> positions(vertexCount, Allocator::GetAllocator<glm::vec3>());
+		TrivialArray<glm::vec2, Allocator::BaseAllocator<glm::vec2>> uvs(vertexCount, Allocator::GetAllocator<glm::vec2>());
+		TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> normals(vertexCount, Allocator::GetAllocator<glm::vec3>());
+		TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> tangents(vertexCount, Allocator::GetAllocator<glm::vec4>());
+		TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> indices(indexCount, Allocator::GetAllocator<uint32_t>());
 
 		glm::vec3 upwards = { 0.0f, 1.0f, 0.0f };
 		glm::vec3 axisA(upwards.y, upwards.z, upwards.x);
@@ -560,13 +563,14 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		MeshStruct vertexStruct;
-		vertexStruct.SetVertices<VertexType::Position>(positions.data());
-		vertexStruct.SetVertices<VertexType::TexCoords>(uvs.data());
-		vertexStruct.SetVertices<VertexType::Normals>(normals.data());
-		vertexStruct.SetVertices<VertexType::Tangents>(tangents.data());
+		MeshData meshData(vertexCount);
+		meshData.SetIndices(std::move(indices));
+		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
+		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
+		meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
 
-		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, std::move(meshData), indices.data());
 
 		return mesh;
 	}
@@ -578,11 +582,11 @@ namespace Mahakam
 		uint32_t vertexCount = rows * columns;
 		uint32_t indexCount = 6 * (rows - 1) * (columns - 1);
 
-		TrivialArray<glm::vec3> positions(vertexCount);
-		TrivialArray<glm::vec2> uvs(vertexCount);
-		TrivialArray<glm::vec3> normals(vertexCount);
-		TrivialArray<glm::vec4> tangents(vertexCount);
-		TrivialArray<uint32_t> indices(indexCount);
+		TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> positions(vertexCount, Allocator::GetAllocator<glm::vec3>());
+		TrivialArray<glm::vec2, Allocator::BaseAllocator<glm::vec2>> uvs(vertexCount, Allocator::GetAllocator<glm::vec2>());
+		TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> normals(vertexCount, Allocator::GetAllocator<glm::vec3>());
+		TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> tangents(vertexCount, Allocator::GetAllocator<glm::vec4>());
+		TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> indices(indexCount, Allocator::GetAllocator<uint32_t>());
 
 		glm::vec3 upwards = { 0.0f, 1.0f, 0.0f };
 		glm::vec3 axisA(upwards.y, upwards.z, upwards.x);
@@ -623,13 +627,14 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		MeshStruct vertexStruct;
-		vertexStruct.SetVertices<VertexType::Position>(positions.data());
-		vertexStruct.SetVertices<VertexType::TexCoords>(uvs.data());
-		vertexStruct.SetVertices<VertexType::Normals>(normals.data());
-		vertexStruct.SetVertices<VertexType::Tangents>(tangents.data());
+		MeshData meshData(vertexCount);
+		meshData.SetIndices(std::move(indices));
+		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
+		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
+		meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
 
-		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, std::move(meshData), indices.data());
 
 		return mesh;
 	}
@@ -651,11 +656,11 @@ namespace Mahakam
 			{  0.0f,  0.0f, -1.0f }
 		};
 
-		TrivialArray<glm::vec3> positions(vertexCount);
-		TrivialArray<glm::vec2> uvs(vertexCount);
-		TrivialArray<glm::vec3> normals(vertexCount);
-		TrivialArray<glm::vec4> tangents(vertexCount);
-		TrivialArray<uint32_t> indices(indexCount);
+		TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> positions(vertexCount, Allocator::GetAllocator<glm::vec3>());
+		TrivialArray<glm::vec2, Allocator::BaseAllocator<glm::vec2>> uvs(vertexCount, Allocator::GetAllocator<glm::vec2>());
+		TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> normals(vertexCount, Allocator::GetAllocator<glm::vec3>());
+		TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> tangents(vertexCount, Allocator::GetAllocator<glm::vec4>());
+		TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> indices(indexCount, Allocator::GetAllocator<uint32_t>());
 
 		int index = 0;
 		int triIndex = 0;
@@ -722,13 +727,14 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		MeshStruct vertexStruct;
-		vertexStruct.SetVertices<VertexType::Position>(positions.data());
-		vertexStruct.SetVertices<VertexType::TexCoords>(uvs.data());
-		vertexStruct.SetVertices<VertexType::Normals>(normals.data());
-		vertexStruct.SetVertices<VertexType::Tangents>(tangents.data());
+		MeshData meshData(vertexCount);
+		meshData.SetIndices(std::move(indices));
+		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
+		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
+		meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
 
-		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices.data());
+		Ref<SubMesh> mesh = SubMesh::Create(vertexCount, indexCount, std::move(meshData), indices.data());
 
 		return mesh;
 	}

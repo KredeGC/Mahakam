@@ -150,7 +150,7 @@ namespace Mahakam
 
 	enum class VertexType
 	{
-		Position,
+		Position = 0,
 		TexCoords,
 		Normals,
 		Tangents,
@@ -159,92 +159,74 @@ namespace Mahakam
 		BoneWeights
 	};
 
-	// TODO: Actually just remove the template stuff, it can't be used in OpenGLMesh...
-	template<typename... Ts>
-	class RawMeshData
+	class MeshData
 	{
 	public:
 		using Input = int;
 
-		inline static constexpr size_t size = sizeof...(Ts);
-
-		// Deprecated
-		RawMeshData() :
-			m_VertexCount(0),
-			m_Data(Allocator::GetAllocator<uint8_t>()),
-			m_DataTypes(Allocator::GetAllocator<std::pair<const Input, ShaderDataType>>()),
-			m_Offsets(Allocator::GetAllocator<std::pair<const Input, size_t>>()) {}
-
-		RawMeshData(uint32_t vertexCount) :
+		MeshData(uint32_t vertexCount) :
 			m_VertexCount(vertexCount),
-			m_Data(Allocator::GetAllocator<uint8_t>()),
-			m_Offsets(Allocator::GetAllocator<std::pair<const Input, size_t>>()),
-			m_DataTypes(Allocator::GetAllocator<std::pair<const Input, ShaderDataType>>()) {}
+			m_IndexCount(0),
+			m_VertexData(Allocator::GetAllocator<uint8_t>()),
+			m_Indices(Allocator::GetAllocator<uint32_t>()),
+			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
 
-		// Deprecated
-		template<auto I>
-		void SetVertices(const typename detail::get_nth_from_variadric<size_t(I), Ts...>::type* data)
-		{
-			m_Vertices[size_t(I)] = data;
-		}
+		MeshData(const MeshData&) = delete;
+
+		MeshData(MeshData&&) noexcept = default;
 
 		template<typename U, typename T>
 		void SetVertices(U index, ShaderDataType dataType, const T* data)
 		{
-			m_Vertices[size_t(index)] = data; // Deprecated
-
 			auto iter = m_Offsets.find(size_t(index));
 			if (iter != m_Offsets.end())
 			{
-				uint8_t* begin = m_Data.begin() + iter->second;
+				uint8_t* begin = m_VertexData.begin() + iter->second.first;
 
 				std::memcpy(begin, data, m_VertexCount * sizeof(T));
 			}
 			else
 			{
-				m_Offsets[Input(index)] = m_Data.size();
-				m_DataTypes[Input(index)] = dataType;
-				m_Data.push_back(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data + m_VertexCount));
+				m_Offsets[Input(index)] = std::make_pair(m_VertexData.size(), dataType);
+				m_VertexData.push_back(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data + m_VertexCount));
 			}
 		}
 
-		const auto& GetData() const { return m_Data; }
-		const auto& GetOffsets() const { return m_Offsets; }
-		const auto& GetDataTypes() const { return m_DataTypes; }
+		void SetIndices(const uint32_t* data, uint32_t indexCount)
+		{
+			m_IndexCount = indexCount;
 
-		// Deprecated
-		const void** GetData() { return m_Vertices; }
+			m_Indices.assign(data, data + indexCount);
+		}
+
+		template<typename T>
+		void SetIndices(T&& container)
+		{
+			m_IndexCount = static_cast<uint32_t>(container.size());
+
+			m_Indices = std::move(container);
+		}
+
+		uint32_t GetVertexCount() const { return m_VertexCount; }
+		uint32_t GetIndexCount() const { return m_IndexCount; }
+
+		const auto& GetVertexData() const { return m_VertexData; }
+		const auto& GetOffsets() const { return m_Offsets; }
+		const auto& GetIndices() const { return m_Indices; }
 
 	private:
-		// Deprecated
-		const void* m_Vertices[size]{ nullptr };
-
 		uint32_t m_VertexCount;
-		TrivialVector<uint8_t, Allocator::BaseAllocator<uint8_t>> m_Data;
-		UnorderedMap<Input, size_t, Allocator::BaseAllocator<std::pair<const Input, size_t>>> m_Offsets;
-		UnorderedMap<Input, ShaderDataType, Allocator::BaseAllocator<std::pair<const Input, ShaderDataType>>> m_DataTypes;
+		uint32_t m_IndexCount;
+		TrivialVector<uint8_t, Allocator::BaseAllocator<uint8_t>> m_VertexData;
+		TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> m_Indices;
+		UnorderedMap<Input, std::pair<size_t, ShaderDataType>, Allocator::BaseAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>> m_Offsets;
 	};
-
-	template<ShaderDataType D, typename T>
-	struct VertexData
-	{
-		using type = T;
-		inline static constexpr ShaderDataType DataType = D;
-	};
-
-	using MeshStruct = RawMeshData<
-		VertexData<ShaderDataType::Float3, glm::vec3>,
-		VertexData<ShaderDataType::Float2, glm::vec2>,
-		VertexData<ShaderDataType::Float3, glm::vec3>,
-		VertexData<ShaderDataType::Float4, glm::vec4>,
-		VertexData<ShaderDataType::Float4, glm::vec4>,
-		VertexData<ShaderDataType::Int4, glm::ivec4>,
-		VertexData<ShaderDataType::Float4, glm::vec4>
-	>;
 
 	class SubMesh
 	{
 	public:
+		// Deprecated
+		// TODO: Update HeadlessMesh to no longer use it
 		inline static constexpr uint32_t BUFFER_ELEMENTS_SIZE = 7U;
 		inline static constexpr ShaderDataType BUFFER_ELEMENTS[BUFFER_ELEMENTS_SIZE]
 		{
@@ -287,7 +269,7 @@ namespace Mahakam
 		virtual const uint32_t* GetIndices() const = 0;
 		virtual uint32_t GetIndexCount() const = 0;
 
-		inline static Ref<SubMesh> Create(uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, verts, indices); }
+		inline static Ref<SubMesh> Create(uint32_t vertexCount, uint32_t indexCount, MeshData&& mesh, const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, std::move(mesh), indices); }
 		
 		static Ref<SubMesh> CreateCube(int tessellation, bool reverse = false);
 		static Ref<SubMesh> CreatePlane(int rows, int columns);
@@ -295,6 +277,6 @@ namespace Mahakam
 		static Ref<SubMesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Ref<SubMesh>, uint32_t vertexCount, uint32_t indexCount, const void* verts[BUFFER_ELEMENTS_SIZE], const uint32_t* indices);
+		MH_DECLARE_FUNC(CreateImpl, Ref<SubMesh>, uint32_t vertexCount, uint32_t indexCount, MeshData&& mesh, const uint32_t* indices);
 	};
 }

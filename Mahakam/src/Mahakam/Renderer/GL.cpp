@@ -261,6 +261,9 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
+		const uint32_t vertexCount = 4;
+		const uint32_t indexCount = 6;
+
 		glm::vec3 positions[] = {
 			{ -1.0f, 1.0f, 0.0f },
 			{ 1.0f, 1.0f, 0.0f  },
@@ -281,11 +284,12 @@ namespace Mahakam
 		};
 
 		// Interleave vertices
-		MeshStruct vertexStruct;
-		vertexStruct.SetVertices<VertexType::Position>(positions);
-		vertexStruct.SetVertices<VertexType::TexCoords>(uvs);
+		MeshData meshData(vertexCount);
+		meshData.SetIndices(indices, indexCount);
+		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions);
+		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs);
 
-		return SubMesh::Create(4, 6, vertexStruct.GetData(), indices);
+		return SubMesh::Create(vertexCount, indexCount, std::move(meshData), indices);
 	}
 
 	Ref<SubMesh> GL::CreatePyramid()
@@ -329,9 +333,10 @@ namespace Mahakam
 		indices[17] = 4;
 
 		// Interleave vertices
-		MeshStruct vertexStruct;
-		vertexStruct.SetVertices<VertexType::Position>(positions);
+		MeshData meshData(vertexCount);
+		meshData.SetIndices(indices, indexCount);
+		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions);
 
-		return SubMesh::Create(vertexCount, indexCount, vertexStruct.GetData(), indices);
+		return SubMesh::Create(vertexCount, indexCount, std::move(meshData), indices);
 	}
 }
