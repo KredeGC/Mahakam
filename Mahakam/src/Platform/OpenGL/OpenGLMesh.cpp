@@ -42,10 +42,8 @@ namespace Mahakam
 		}
 	}
 
-	OpenGLMesh::OpenGLMesh(uint32_t vertexCount, uint32_t indexCount, MeshData&& mesh, const uint32_t* indices) :
-		m_MeshData(std::move(mesh)),
-		m_VertexCount(vertexCount),
-		m_IndexCount(indexCount)
+	OpenGLMesh::OpenGLMesh(MeshData&& mesh) :
+		m_MeshData(std::move(mesh))
 	{
 		// Copy vertices into interleavedVertices
 		//InterleaveBuffers(verts, BUFFER_ELEMENTS, BUFFER_ELEMENTS_SIZE);
@@ -81,7 +79,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		m_Bounds = Bounds::CalculateBounds(GetPositions(), m_VertexCount);
+		m_Bounds = Bounds::CalculateBounds(GetPositions(), m_MeshData.GetVertexCount());
 	}
 
 	void OpenGLMesh::RecalculateNormals()

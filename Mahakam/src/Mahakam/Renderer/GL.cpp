@@ -289,7 +289,7 @@ namespace Mahakam
 		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions);
 		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs);
 
-		return SubMesh::Create(vertexCount, indexCount, std::move(meshData), indices);
+		return SubMesh::Create(std::move(meshData));
 	}
 
 	Ref<SubMesh> GL::CreatePyramid()
@@ -337,6 +337,6 @@ namespace Mahakam
 		meshData.SetIndices(indices, indexCount);
 		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions);
 
-		return SubMesh::Create(vertexCount, indexCount, std::move(meshData), indices);
+		return SubMesh::Create(std::move(meshData));
 	}
 }

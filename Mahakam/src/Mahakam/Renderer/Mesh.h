@@ -225,21 +225,6 @@ namespace Mahakam
 	class SubMesh
 	{
 	public:
-		// Deprecated
-		// TODO: Update HeadlessMesh to no longer use it
-		inline static constexpr uint32_t BUFFER_ELEMENTS_SIZE = 7U;
-		inline static constexpr ShaderDataType BUFFER_ELEMENTS[BUFFER_ELEMENTS_SIZE]
-		{
-			ShaderDataType::Float3, // Pos
-			ShaderDataType::Float2, // UV
-			ShaderDataType::Float3, // Normal
-			ShaderDataType::Float4, // Tangent
-			ShaderDataType::Float4, // Color
-			ShaderDataType::Int4,   // BoneIDs
-			ShaderDataType::Float4  // BoneWeights
-		};
-
-	public:
 		virtual ~SubMesh() = default;
 
 		virtual void Bind() const = 0;
@@ -269,7 +254,7 @@ namespace Mahakam
 		virtual const uint32_t* GetIndices() const = 0;
 		virtual uint32_t GetIndexCount() const = 0;
 
-		inline static Ref<SubMesh> Create(uint32_t vertexCount, uint32_t indexCount, MeshData&& mesh, const uint32_t* indices) { return CreateImpl(vertexCount, indexCount, std::move(mesh), indices); }
+		inline static Ref<SubMesh> Create(MeshData&& mesh) { return CreateImpl(std::move(mesh)); }
 		
 		static Ref<SubMesh> CreateCube(int tessellation, bool reverse = false);
 		static Ref<SubMesh> CreatePlane(int rows, int columns);
@@ -277,6 +262,6 @@ namespace Mahakam
 		static Ref<SubMesh> CreateCubeSphere(int tessellation, bool reverse = false, bool equirectangular = false);
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Ref<SubMesh>, uint32_t vertexCount, uint32_t indexCount, MeshData&& mesh, const uint32_t* indices);
+		MH_DECLARE_FUNC(CreateImpl, Ref<SubMesh>, MeshData&& mesh);
 	};
 }
