@@ -32,15 +32,14 @@ namespace Mahakam
 
 		virtual void SetVertices(int slot, const void* data) override;
 
-		virtual const Bounds& GetBounds() const override { return m_Bounds; }
+		inline virtual const Bounds& GetBounds() const override { return m_Bounds; }
 
-		inline uint32_t GetVertexCount() const override { return m_MeshData.GetVertexCount(); }
+		inline virtual uint32_t GetVertexCount() const override { return m_MeshData.GetVertexCount(); }
 
-		inline virtual bool HasVertices(int index) const override { return m_MeshData.GetOffsets().find(index) != m_MeshData.GetOffsets().end(); }
-		inline virtual const void* GetVertices(int index) const override { return m_MeshData.GetVertexData().data() + m_MeshData.GetOffsets().at(index).first; }
+		inline virtual const void* GetVertices(int index) const override { return m_MeshData.GetVertices(index); }
 
-		inline const uint32_t* GetIndices() const override { return m_MeshData.GetIndices().data(); }
-		inline uint32_t GetIndexCount() const override { return m_MeshData.GetIndexCount(); }
+		inline virtual const uint32_t* GetIndices() const override { return m_MeshData.GetIndices().data(); }
+		inline virtual uint32_t GetIndexCount() const override { return m_MeshData.GetIndexCount(); }
 
 	private:
 		void Init();

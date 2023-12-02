@@ -225,7 +225,7 @@ namespace Mahakam
 		// TODO: Support interleaved data
 		// TODO: Support sparse data sets
 
-		Asset<BoneMesh> skinnedMesh = CreateAsset<BoneMesh>(std::move(props));
+		Asset<BoneMesh> skinnedMesh = CreateAsset<BoneMesh>(props);
 
 		// Extract vertex and index values
 		for (auto& m : model.meshes)
@@ -306,9 +306,7 @@ namespace Mahakam
 			MH_ASSERT(indexCount == indexOffset, "Index count mismatch");
 
 			// Populate a single struct with the vertex data
-			MeshData meshData(vertexCount);
-
-			meshData.SetIndices(indices.data(), indexCount);
+			MeshData meshData(vertexCount, std::move(indices));
 
 			if (positionOffset)
 				meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
@@ -500,8 +498,7 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		MeshData meshData(vertexCount);
-		meshData.SetIndices(std::move(indices));
+		MeshData meshData(vertexCount, std::move(indices));
 		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
 		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
 		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
@@ -563,8 +560,7 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		MeshData meshData(vertexCount);
-		meshData.SetIndices(std::move(indices));
+		MeshData meshData(vertexCount, std::move(indices));
 		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
 		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
 		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
@@ -627,8 +623,7 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		MeshData meshData(vertexCount);
-		meshData.SetIndices(std::move(indices));
+		MeshData meshData(vertexCount, std::move(indices));
 		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
 		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
 		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
@@ -727,8 +722,7 @@ namespace Mahakam
 		}
 
 		// Interleave vertices
-		MeshData meshData(vertexCount);
-		meshData.SetIndices(std::move(indices));
+		MeshData meshData(vertexCount, std::move(indices));
 		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
 		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
 		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());

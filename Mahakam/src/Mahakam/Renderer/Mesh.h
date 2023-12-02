@@ -171,6 +171,21 @@ namespace Mahakam
 			m_Indices(Allocator::GetAllocator<uint32_t>()),
 			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
 
+		MeshData(uint32_t vertexCount, const uint32_t* indices, uint32_t indexCount) :
+			m_VertexCount(vertexCount),
+			m_IndexCount(indexCount),
+			m_VertexData(Allocator::GetAllocator<uint8_t>()),
+			m_Indices(indices, indices + indexCount, Allocator::GetAllocator<uint32_t>()),
+			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
+
+		template<typename T>
+		MeshData(uint32_t vertexCount, T&& container) :
+			m_VertexCount(vertexCount),
+			m_IndexCount(static_cast<uint32_t>(container.size())),
+			m_VertexData(Allocator::GetAllocator<uint8_t>()),
+			m_Indices(std::forward<T>(container)),
+			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
+
 		MeshData(const MeshData&) = delete;
 
 		MeshData(MeshData&&) noexcept = default;
@@ -192,6 +207,22 @@ namespace Mahakam
 			}
 		}
 
+		template<typename T>
+		const void* GetVertices(T index) const
+		{
+			auto iter = m_Offsets.find(size_t(index));
+			if (iter == m_Offsets.end())
+				return nullptr;
+
+			return m_VertexData.data() + iter->first;
+		}
+
+		template<typename T, typename U>
+		const T* GetVertices(U index) const
+		{
+			return reinterpret_cast<const T*>(GetVertices(index));
+		}
+
 		void SetIndices(const uint32_t* data, uint32_t indexCount)
 		{
 			m_IndexCount = indexCount;
@@ -204,7 +235,7 @@ namespace Mahakam
 		{
 			m_IndexCount = static_cast<uint32_t>(container.size());
 
-			m_Indices = std::move(container);
+			m_Indices = std::forward<T>(container);
 		}
 
 		uint32_t GetVertexCount() const { return m_VertexCount; }
@@ -240,19 +271,20 @@ namespace Mahakam
 
 		virtual uint32_t GetVertexCount() const = 0;
 
-		virtual bool HasVertices(int index) const = 0;
 		virtual const void* GetVertices(int index) const = 0;
-
-		const glm::vec3* GetPositions() const { return (const glm::vec3*)GetVertices(0); }
-		const glm::vec2* GetTexcoords() const { return (const glm::vec2*)GetVertices(1); }
-		const glm::vec3* GetNormals() const { return (const glm::vec3*)GetVertices(2); }
-		const glm::vec4* GetTangents() const { return (const glm::vec4*)GetVertices(3); }
-		const glm::vec4* GetColors() const { return (const glm::vec4*)GetVertices(4); }
-		const glm::ivec4* GetBoneIDs() const { return (const glm::ivec4*)GetVertices(5); }
-		const glm::vec4* GetBoneWeights() const { return (const glm::vec4*)GetVertices(6); }
 
 		virtual const uint32_t* GetIndices() const = 0;
 		virtual uint32_t GetIndexCount() const = 0;
+
+		bool HasVertices(int index) { return GetVertices(index) == nullptr; }
+
+		const glm::vec3* GetPositions() const	{ return reinterpret_cast<const glm::vec3*>(GetVertices(0)); }
+		const glm::vec2* GetTexcoords() const	{ return reinterpret_cast<const glm::vec2*>(GetVertices(1)); }
+		const glm::vec3* GetNormals() const		{ return reinterpret_cast<const glm::vec3*>(GetVertices(2)); }
+		const glm::vec4* GetTangents() const	{ return reinterpret_cast<const glm::vec4*>(GetVertices(3)); }
+		const glm::vec4* GetColors() const		{ return reinterpret_cast<const glm::vec4*>(GetVertices(4)); }
+		const glm::ivec4* GetBoneIDs() const	{ return reinterpret_cast<const glm::ivec4*>(GetVertices(5)); }
+		const glm::vec4* GetBoneWeights() const { return reinterpret_cast<const glm::vec4*>(GetVertices(6)); }
 
 		inline static Ref<SubMesh> Create(MeshData&& mesh) { return CreateImpl(std::move(mesh)); }
 		
