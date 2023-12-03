@@ -36,6 +36,16 @@ namespace Mahakam
 		using AllocatorType = ktl::segragator<MAX_LINEAR_SIZE, Fallback, ktl::mallocator>;
 
     public:
+		struct Deleter
+		{
+			void (*Deleter)(void*);
+
+			void operator()(void* ptr)
+			{
+				Deleter(ptr);
+			}
+		};
+
 		// No need for shared<T>, we can use reference<T> instead since it's global
 		using ReferenceAllocator = ktl::reference<AllocatorType>;
 

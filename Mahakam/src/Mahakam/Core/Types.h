@@ -24,11 +24,11 @@ namespace Mahakam
 	template<typename K, typename V, typename Alloc = std::allocator<std::pair<const K, V>>>
 	using UnorderedMap = std::unordered_map<K, V, std::hash<K>, std::equal_to<K>, Alloc>;
 
-	template<typename K>
-	using UnorderedSet = std::unordered_set<K>;
+	template<typename K, typename Alloc = std::allocator<K>>
+	using UnorderedSet = std::unordered_set<K, std::hash<K>, std::equal_to<K>, Alloc>;
 
 	template<typename T>
-	using Scope = std::unique_ptr<T>;
+	using Scope = std::unique_ptr<T, Allocator::Deleter>;
 
 	template<typename T>
 	using Ref = std::shared_ptr<T>;
@@ -39,7 +39,10 @@ namespace Mahakam
 	template<typename T, typename ... Args>
 	constexpr Scope<T> CreateScope(Args&& ... args)
 	{
-		return std::make_unique<T>(std::forward<Args>(args)...);
+		return Scope<T>(
+			Allocator::New<T>(std::forward<Args>(args)...),
+			{ [](void* ptr) { Allocator::Delete<T>(static_cast<T*>(ptr)); } }
+		);
 	}
 
 	template<typename T, typename ... Args>
