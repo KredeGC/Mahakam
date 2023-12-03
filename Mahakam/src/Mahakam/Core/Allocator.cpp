@@ -4,9 +4,9 @@
 
 namespace Mahakam
 {
-	//Allocator::BaseAllocator<uint8_t> Allocator::GetAllocatorImpl()
-	MH_DEFINE_FUNC(Allocator::GetAllocatorImpl, Allocator::BaseAllocator<uint8_t>)
+	//Allocator::ReferenceAllocator Allocator::GetAllocatorImpl()
+	MH_DEFINE_FUNC(Allocator::GetAllocatorImpl, Allocator::ReferenceAllocator)
 	{
-		return s_Alloc;
+		return ReferenceAllocator(s_Alloc);
 	};
 }
