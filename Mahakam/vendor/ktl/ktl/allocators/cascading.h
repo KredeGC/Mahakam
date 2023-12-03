@@ -3,6 +3,7 @@
 #include "../utility/aligned_malloc.h"
 #include "../utility/alignment.h"
 #include "../utility/assert.h"
+#include "../utility/empty_base.h"
 #include "../utility/meta.h"
 #include "cascading_fwd.h"
 #include "type_allocator.h"
@@ -35,7 +36,7 @@ namespace ktl
 	private:
 		struct node
 		{
-			Alloc Allocator;
+			KTL_EMPTY_BASE Alloc Allocator;
 			size_type Allocations = 0;
 			node* Next = nullptr;
 		};
@@ -44,10 +45,11 @@ namespace ktl
 		cascading() noexcept :
 			m_Node(nullptr) {}
 
-		cascading(const cascading&) noexcept = delete;
+		cascading(const cascading&) = delete;
 
-		cascading(cascading&& other) noexcept :
-			m_Node(other.m_Node)
+		cascading(cascading&& other)
+			noexcept(std::is_nothrow_move_constructible_v<node>) :
+			m_Node(std::move(other.m_Node))
 		{
 			other.m_Node = nullptr;
 		}
@@ -57,13 +59,14 @@ namespace ktl
 			release();
 		}
 
-		cascading& operator=(const cascading&) noexcept = delete;
+		cascading& operator=(const cascading&) = delete;
 
-		cascading& operator=(cascading&& rhs) noexcept
+		cascading& operator=(cascading&& rhs)
+			noexcept(std::is_nothrow_move_assignable_v<node>)
 		{
 			release();
 
-			m_Node = rhs.m_Node;
+			m_Node = std::move(rhs.m_Node);
 
 			rhs.m_Node = nullptr;
 
@@ -87,13 +90,16 @@ namespace ktl
 		 * @param n The amount of bytes to allocate memory for
 		 * @return A location in memory that is at least @p n bytes big or nullptr if it could not be allocated
 		*/
-		void* allocate(size_type n)
+		void* allocate(size_type n) noexcept(
+			std::is_nothrow_default_constructible_v<node> &&
+			detail::has_nothrow_allocate_v<Alloc> &&
+			(!detail::has_max_size_v<Alloc> || detail::has_nothrow_max_size_v<Alloc>))
 		{
 			// Add an initial allocator
 			if (!m_Node)
 				m_Node = detail::aligned_new<node>(detail::ALIGNMENT);
 
-			if constexpr (detail::has_max_size<Alloc>::value)
+			if constexpr (detail::has_max_size_v<Alloc>)
 			{
 				if (n > m_Node->Allocator.max_size())
 					return nullptr;
@@ -124,7 +130,10 @@ namespace ktl
 		 * @param p The location in memory to deallocate
 		 * @param n The size that was initially allocated
 		*/
-		void deallocate(void* p, size_type n) noexcept
+		void deallocate(void* p, size_type n) noexcept(
+			std::is_nothrow_destructible_v<node> &&
+			detail::has_nothrow_owns_v<Alloc> &&
+			detail::has_nothrow_deallocate_v<Alloc>)
 		{
 			KTL_ASSERT(p != nullptr);
 
@@ -164,7 +173,9 @@ namespace ktl
 		*/
 		template<typename T, typename... Args>
 		typename std::enable_if<detail::has_construct_v<Alloc, T*, Args...>, void>::type
-		construct(T* p, Args&&... args)
+		construct(T* p, Args&&... args) noexcept(
+			detail::has_nothrow_owns_v<Alloc> &&
+			detail::has_nothrow_construct_v<Alloc, T*, Args...>)
 		{
             node* next = m_Node;
 			while (next)
@@ -178,6 +189,9 @@ namespace ktl
 				next = next->Next;
 			}
 
+			// If we ever get to this point, something has gone wrong with the internal allocators
+			KTL_ASSERT(false);
+
 			::new(p) T(std::forward<Args>(args)...);
 		}
 
@@ -188,7 +202,9 @@ namespace ktl
 		*/
 		template<typename T>
 		typename std::enable_if<detail::has_destroy_v<Alloc, T*>, void>::type
-		destroy(T* p)
+		destroy(T* p) noexcept(
+			detail::has_nothrow_owns_v<Alloc> &&
+			detail::has_nothrow_destroy_v<Alloc, T*>)
 		{
 			node* next = m_Node;
 			while (next)
@@ -202,6 +218,9 @@ namespace ktl
 				next = next->Next;
 			}
 
+			// If we ever get to this point, something has gone wrong with the internal allocators
+			KTL_ASSERT(false);
+
 			p->~T();
 		}
 #pragma endregion
@@ -214,7 +233,8 @@ namespace ktl
 		*/
 		template<typename A = Alloc>
 		typename std::enable_if<detail::has_max_size_v<A>, size_type>::type
-		max_size() const noexcept
+		max_size() const
+			noexcept(detail::has_nothrow_max_size_v<A>)
 		{
 			return m_Node->Allocator.max_size();
 		}
@@ -225,6 +245,7 @@ namespace ktl
 		 * @return Whether the allocator owns @p p
 		*/
 		bool owns(void* p) const
+			noexcept(detail::has_nothrow_owns_v<Alloc>)
 		{
 			node* next = m_Node;
 			while (next)
@@ -240,7 +261,8 @@ namespace ktl
 #pragma endregion
 
 	private:
-		void release() noexcept
+		void release()
+			noexcept(std::is_nothrow_destructible_v<node>)
 		{
 			node* next = m_Node;
 			while (next)

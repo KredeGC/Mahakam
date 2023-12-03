@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../utility/assert.h"
+#include "../utility/empty_base.h"
 #include "trivial_vector_fwd.h"
 
 #include <cstring>
@@ -45,7 +46,7 @@ namespace ktl
 		 * @brief Construct the vector with the given allocator
 		 * @param allocator The allocator to use
 		*/
-		trivial_vector(const Alloc& allocator) noexcept :
+		explicit trivial_vector(const Alloc& allocator) noexcept :
 			m_Alloc(allocator),
 			m_Begin(nullptr),
 			m_End(nullptr),
@@ -337,7 +338,7 @@ namespace ktl
 		{
 			const size_t n = (last - first);
 
-			if (m_EndMax - m_End < n)
+			if (size_t(m_EndMax - m_End) < n)
 				expand(n);
 
 			T* lastElement = m_End;
@@ -458,7 +459,7 @@ namespace ktl
 		}
 
 	private:
-		Alloc m_Alloc;
+		KTL_EMPTY_BASE Alloc m_Alloc;
 		T* m_Begin;
 		T* m_End;
 		T* m_EndMax;

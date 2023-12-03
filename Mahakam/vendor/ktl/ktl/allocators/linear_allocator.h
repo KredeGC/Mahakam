@@ -72,7 +72,7 @@ namespace ktl
 		 * @param n The amount of bytes to allocate memory for
 		 * @return A location in memory that is at least @p n bytes big or nullptr if it could not be allocated
 		*/
-		void* allocate(size_t n)
+		void* allocate(size_t n) noexcept
 		{
 			size_t totalSize = n + detail::align_to_architecture(n);
 
@@ -125,9 +125,15 @@ namespace ktl
 		 * @param p The location of the object in memory
 		 * @return Whether the allocator owns @p p
 		*/
-		bool owns(void* p) const
+		bool owns(void* p) const noexcept
 		{
-			return p >= m_Data && p < m_Data + Size;
+			// Comparing pointers to different objects is unspecified
+			// But converting them to integers and comparing them isn't...
+			uintptr_t ptr = reinterpret_cast<uintptr_t>(p);
+			uintptr_t low = reinterpret_cast<uintptr_t>(m_Data);
+			uintptr_t high = low + Size;
+
+			return ptr >= low && ptr < high;
 		}
 #pragma endregion
 
