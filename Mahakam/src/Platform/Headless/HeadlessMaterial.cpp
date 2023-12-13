@@ -163,7 +163,7 @@ namespace Mahakam
 	void HeadlessMaterial::Bind(UniformBuffer& uniformBuffer)
 	{
 		for (auto& [name, texture] : m_Textures)
-			m_Shader->SetTexture(name, texture);
+			m_Shader->SetTexture(name, *texture);
 	}
 
 	void HeadlessMaterial::SetMat3(const std::string& name, const glm::mat3& value)

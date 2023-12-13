@@ -38,7 +38,7 @@ namespace Mahakam
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const override;
 
-		virtual void SetTexture(const std::string& name, Asset<Texture> tex) override;
+		virtual void SetTexture(const std::string& name, Texture& tex) override;
 
 		virtual void SetUniformMat3(const std::string& name, const glm::mat3& value) override;
 		virtual void SetUniformMat4(const std::string& name, const glm::mat4& value) override;

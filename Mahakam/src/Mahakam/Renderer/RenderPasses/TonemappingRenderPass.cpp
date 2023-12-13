@@ -59,7 +59,7 @@ namespace Mahakam
 
 		// HDR Tonemapping
 		m_TonemappingShader->Bind("POSTPROCESSING");
-		m_TonemappingShader->SetTexture("u_Albedo", src->GetColorTexture(0));
+		m_TonemappingShader->SetTexture("u_Albedo", *src->GetColorTexture(0));
 
 		GL::SetZTesting(RendererAPI::DepthMode::Always);
 		GL::EnableZWriting(false);

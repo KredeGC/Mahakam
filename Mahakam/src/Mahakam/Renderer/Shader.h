@@ -43,7 +43,7 @@ namespace Mahakam
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const = 0;
 
-		virtual void SetTexture(const std::string& name, Asset<Texture> tex) = 0;
+		virtual void SetTexture(const std::string& name, Texture& tex) = 0;
 
 		virtual void SetUniformMat3(const std::string& name, const glm::mat3& value) = 0;
 		virtual void SetUniformMat4(const std::string& name, const glm::mat4& value) = 0;

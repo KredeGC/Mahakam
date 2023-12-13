@@ -58,7 +58,7 @@ namespace Mahakam
 		return false;
 	}
 
-	void HeadlessShader::SetTexture(const std::string& name, Asset<Texture> tex) {}
+	void HeadlessShader::SetTexture(const std::string& name, Texture& tex) {}
 
 	void HeadlessShader::SetUniformMat3(const std::string& name, const glm::mat3& value) {}
 

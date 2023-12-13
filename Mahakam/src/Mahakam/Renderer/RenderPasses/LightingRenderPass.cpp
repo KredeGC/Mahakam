@@ -161,20 +161,20 @@ namespace Mahakam
 		MH_PROFILE_RENDERING_FUNCTION();
 
 		m_DeferredShader->Bind("DIRECTIONAL");
-		m_DeferredShader->SetTexture("u_GBuffer0", src->GetColorTexture(0));
-		m_DeferredShader->SetTexture("u_GBuffer1", src->GetColorTexture(1));
-		m_DeferredShader->SetTexture("u_GBuffer2", src->GetColorTexture(2));
-		m_DeferredShader->SetTexture("u_GBuffer3", src->GetColorTexture(3));
-		m_DeferredShader->SetTexture("u_Depth", src->GetDepthTexture());
+		m_DeferredShader->SetTexture("u_GBuffer0", *src->GetColorTexture(0));
+		m_DeferredShader->SetTexture("u_GBuffer1", *src->GetColorTexture(1));
+		m_DeferredShader->SetTexture("u_GBuffer2", *src->GetColorTexture(2));
+		m_DeferredShader->SetTexture("u_GBuffer3", *src->GetColorTexture(3));
+		m_DeferredShader->SetTexture("u_Depth", *src->GetDepthTexture());
 
-		m_DeferredShader->SetTexture("u_BRDFLUT", m_BRDFLut);
-		m_DeferredShader->SetTexture("u_ShadowMap", m_ShadowFramebuffer->GetDepthTexture());
+		m_DeferredShader->SetTexture("u_BRDFLUT", *m_BRDFLut);
+		m_DeferredShader->SetTexture("u_ShadowMap", *m_ShadowFramebuffer->GetDepthTexture());
 
 		if (sceneData->Environment.IrradianceMap)
-			m_DeferredShader->SetTexture("u_IrradianceMap", sceneData->Environment.IrradianceMap);
+			m_DeferredShader->SetTexture("u_IrradianceMap", *sceneData->Environment.IrradianceMap);
 
 		if (sceneData->Environment.SpecularMap)
-			m_DeferredShader->SetTexture("u_SpecularMap", sceneData->Environment.SpecularMap);
+			m_DeferredShader->SetTexture("u_SpecularMap", *sceneData->Environment.SpecularMap);
 	}
 
 	void LightingRenderPass::RenderLighting(SceneData* sceneData, const Asset<FrameBuffer>& src)
@@ -524,7 +524,7 @@ namespace Mahakam
 			sceneData->PointLightBuffer->SetData(sceneData->Environment.PointLights.data(), 0, bufferSize);
 
 			m_DeferredShader->Bind("POINT");
-			m_DeferredShader->SetTexture("u_AttenuationLUT", m_FalloffLut);
+			m_DeferredShader->SetTexture("u_AttenuationLUT", *m_FalloffLut);
 
 			Renderer::DrawInstancedSphere(amount);
 		}
@@ -548,8 +548,8 @@ namespace Mahakam
 			sceneData->SpotLightBuffer->SetData(sceneData->Environment.SpotLights.data(), 0, bufferSize);
 
 			m_DeferredShader->Bind("SPOT");
-			m_DeferredShader->SetTexture("u_AttenuationLUT", m_FalloffLut);
-			m_DeferredShader->SetTexture("u_LightCookie", m_SpotlightTexture);
+			m_DeferredShader->SetTexture("u_AttenuationLUT", *m_FalloffLut);
+			m_DeferredShader->SetTexture("u_LightCookie", *m_SpotlightTexture);
 
 			Renderer::DrawInstancedPyramid(amount);
 		}

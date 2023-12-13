@@ -229,7 +229,7 @@ namespace Mahakam
 	void OpenGLMaterial::Bind(UniformBuffer& uniformBuffer)
 	{
 		for (auto& [name, texture] : m_Textures)
-			m_Shader->SetTexture(name, texture);
+			m_Shader->SetTexture(name, *texture);
 
 		if (m_Data && m_DataSize > 0)
 			uniformBuffer.SetData(m_Data, 0, m_DataSize);

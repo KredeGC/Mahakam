@@ -122,9 +122,9 @@ namespace Mahakam::Editor
 
 		m_BlitShader->Bind("POSTPROCESSING");
 		if (depth)
-			m_BlitShader->SetTexture("u_Albedo", frameBuffer->GetDepthTexture());
+			m_BlitShader->SetTexture("u_Albedo", *frameBuffer->GetDepthTexture());
 		else
-			m_BlitShader->SetTexture("u_Albedo", frameBuffer->GetColorTexture(index));
+			m_BlitShader->SetTexture("u_Albedo", *frameBuffer->GetColorTexture(index));
 
 		m_BlitShader->SetUniformInt("u_Depth", depth);
 

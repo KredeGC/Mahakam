@@ -103,11 +103,11 @@ namespace Mahakam
 		return false;
 	}
 
-	void OpenGLShader::SetTexture(const std::string& name, Asset<Texture> tex)
+	void OpenGLShader::SetTexture(const std::string& name, Texture& tex)
 	{
 		int slot = GetUniformLocation(name);
 		if (slot != -1)
-			MH_GL_CALL(glBindTextureUnit(slot, tex->GetRendererID()));
+			MH_GL_CALL(glBindTextureUnit(slot, tex.GetRendererID()));
 	}
 
 	void OpenGLShader::SetUniformMat3(const std::string& name, const glm::mat3& value)
