@@ -565,6 +565,38 @@ namespace Mahakam
 		}
 	}
 
+	ShaderDataType ShaderDataTypeBaseType(ShaderDataType type)
+	{
+		switch (type)
+		{
+		case ShaderDataType::Float:
+			return ShaderDataType::Float;
+		case ShaderDataType::Float2:
+			return ShaderDataType::Float;
+		case ShaderDataType::Float3:
+			return ShaderDataType::Float;
+		case ShaderDataType::Float4:
+			return ShaderDataType::Float;
+		case ShaderDataType::Mat3:
+			return ShaderDataType::Float;
+		case ShaderDataType::Mat4:
+			return ShaderDataType::Float;
+		case ShaderDataType::Int:
+			return ShaderDataType::Int;
+		case ShaderDataType::Int2:
+			return ShaderDataType::Int;
+		case ShaderDataType::Int3:
+			return ShaderDataType::Int;
+		case ShaderDataType::Int4:
+			return ShaderDataType::Int;
+		case ShaderDataType::Bool:
+			return ShaderDataType::Bool;
+		default:
+			MH_BREAK("Unknown shader data type!");
+			return ShaderDataType::None;
+		}
+	}
+
 	uint32_t ShaderDataTypeComponentCount(ShaderDataType type)
 	{
 		switch (type)

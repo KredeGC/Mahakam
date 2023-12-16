@@ -7,6 +7,7 @@
 
 #include "Mahakam/Renderer/Mesh.h"
 
+#include <bitstream.h>
 #include <imgui/imgui.h>
 
 namespace Mahakam
@@ -153,6 +154,46 @@ namespace Mahakam
 			break;
 		}
 
+		// TEST BUILDING
+		if (ImGui::Button("Build"))
+		{
+			TrivialVector<uint32_t> buffer;
+			bitstream::growing_bit_writer<TrivialVector<uint32_t>> writer(buffer);
+
+			Asset<Mesh> meshAsset;
+
+			// TODO: Separate the primitives into their own importers
+			switch (m_Primitive)
+			{
+			case MeshPrimitive::Model:
+				meshAsset = BoneMesh::Create(static_cast<BoneMeshProps&>(*m_MeshProps.get()));
+				break;
+			case MeshPrimitive::Plane:
+				meshAsset = PlaneMesh::Create(static_cast<PlaneMeshProps&>(*m_MeshProps.get()));
+				break;
+			case MeshPrimitive::Cube:
+				meshAsset = CubeMesh::Create(static_cast<CubeMeshProps&>(*m_MeshProps.get()));
+				break;
+			case MeshPrimitive::CubeSphere:
+				meshAsset = CubeSphereMesh::Create(static_cast<CubeSphereMeshProps&>(*m_MeshProps.get()));
+				break;
+			case MeshPrimitive::UVSphere:
+				meshAsset = UVSphereMesh::Create(static_cast<UVSphereMeshProps&>(*m_MeshProps.get()));
+				break;
+			default:
+				MH_WARN("Unsupported Mesh primitive");
+				break;
+			}
+
+			AssetSerializeTraits<Mesh>::Build(writer, meshAsset.get());
+
+			writer.flush();
+			uint32_t num_bytes = writer.get_num_bytes_serialized();
+
+			std::ofstream filestream("test_model.data");
+			filestream.write(reinterpret_cast<char*>(buffer.data()), num_bytes);
+		}
+
 		// TODO: Show a preview of the mesh
 	}
 
@@ -160,6 +201,7 @@ namespace Mahakam
 	{
 		Asset<Mesh> meshAsset;
 
+		// TODO: Separate the primitives into their own importers
 		switch (m_Primitive)
 		{
 		case MeshPrimitive::Model:

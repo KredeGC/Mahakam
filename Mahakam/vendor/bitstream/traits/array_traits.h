@@ -1,9 +1,9 @@
 #pragma once
 #include "../utility/assert.h"
+#include "../utility/meta.h"
+#include "../utility/parameter.h"
 
 #include "../stream/serialize_traits.h"
-#include "../stream/bit_reader.h"
-#include "../stream/bit_writer.h"
 
 #include "../traits/bool_trait.h"
 #include "../traits/integral_traits.h"
@@ -113,8 +113,9 @@ namespace bitstream
 		 * @param ...args Any additional arguments to use when serializing each individual object
 		 * @return Success
 		*/
-		template<typename Compare, typename... Args>
-		static bool serialize(bit_writer& writer, T* values, int max_size, Compare compare, Args&&... args) noexcept
+        template<typename Stream, typename Compare, typename... Args>
+        typename utility::is_writing_t<Stream>
+		static serialize(Stream& writer, T* values, int max_size, Compare compare, Args&&... args) noexcept
 		{
 			int prev_index = -1;
 			for (int index = 0; index < max_size; index++)
@@ -124,7 +125,7 @@ namespace bitstream
 
                 BS_ASSERT(serialize_index(writer, prev_index, index, max_size));
 
-				BS_ASSERT(writer.serialize<Trait>(values[index], std::forward<Args>(args)...));
+				BS_ASSERT(writer.template serialize<Trait>(values[index], std::forward<Args>(args)...));
 			}
 
             BS_ASSERT(serialize_index(writer, prev_index, max_size, max_size));
@@ -134,7 +135,6 @@ namespace bitstream
 
 		/**
 		 * @brief Writes a subset of a serialized array into @p values
-		 * @tparam Compare A stub. Not used on read
 		 * @tparam ...Args The types of any additional arguments
 		 * @param reader The stream to read from
 		 * @param values The array of objects to read into
@@ -143,8 +143,9 @@ namespace bitstream
 		 * @param ...args Any additional arguments to use when serializing each individual object
 		 * @return Success
 		*/
-		template<typename Compare, typename... Args>
-		static bool serialize(bit_reader& reader, T* values, int max_size, Compare compare, Args&&... args) noexcept
+        template<typename Stream, typename... Args>
+        typename utility::is_reading_t<Stream>
+		static serialize(Stream& reader, T* values, int max_size, Args&&... args) noexcept
 		{
 			int prev_index = -1;
             int index = 0;
@@ -155,7 +156,7 @@ namespace bitstream
 				if (index == max_size)
 					break;
 
-				BS_ASSERT(reader.serialize<Trait>(values[index], std::forward<Args>(args)...));
+				BS_ASSERT(reader.template serialize<Trait>(values[index], std::forward<Args>(args)...));
 			}
 
 			return true;

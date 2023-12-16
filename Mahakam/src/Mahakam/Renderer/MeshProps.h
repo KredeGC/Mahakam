@@ -43,6 +43,10 @@ namespace Mahakam
 		bool IncludeBones = true;
 	};
 
+	// Preferably this would only be needed in the editor
+	// Once a mesh has been imported, these settings should not matter
+	// They could even be made into their own Mesh-classes instead of deriving from MeshProps
+	// Compared to BoneMeshProps, these props only specify how to generate the mesh, not how to use it afterwards
 	struct PlaneMeshProps : public MeshProps
 	{
 		int Rows = 10;

@@ -27,6 +27,7 @@ project "Mahakam"
     
     includedirs {
         "src",
+        "%{IncludeDir.bitstream}",
         "%{IncludeDir.bullet}",
         "%{IncludeDir.bullet_dynamics}",
         "%{IncludeDir.bullet_collision}",

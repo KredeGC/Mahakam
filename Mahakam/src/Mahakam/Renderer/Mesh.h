@@ -166,14 +166,12 @@ namespace Mahakam
 
 		MeshData(uint32_t vertexCount) :
 			m_VertexCount(vertexCount),
-			m_IndexCount(0),
 			m_VertexData(Allocator::GetAllocator<uint8_t>()),
 			m_Indices(Allocator::GetAllocator<uint32_t>()),
 			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
 
 		MeshData(uint32_t vertexCount, const uint32_t* indices, uint32_t indexCount) :
 			m_VertexCount(vertexCount),
-			m_IndexCount(indexCount),
 			m_VertexData(Allocator::GetAllocator<uint8_t>()),
 			m_Indices(indices, indices + indexCount, Allocator::GetAllocator<uint32_t>()),
 			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
@@ -181,7 +179,6 @@ namespace Mahakam
 		template<typename T>
 		MeshData(uint32_t vertexCount, T&& container) :
 			m_VertexCount(vertexCount),
-			m_IndexCount(static_cast<uint32_t>(container.size())),
 			m_VertexData(Allocator::GetAllocator<uint8_t>()),
 			m_Indices(std::forward<T>(container)),
 			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
@@ -225,21 +222,17 @@ namespace Mahakam
 
 		void SetIndices(const uint32_t* data, uint32_t indexCount)
 		{
-			m_IndexCount = indexCount;
-
 			m_Indices.assign(data, data + indexCount);
 		}
 
 		template<typename T>
 		void SetIndices(T&& container)
 		{
-			m_IndexCount = static_cast<uint32_t>(container.size());
-
 			m_Indices = std::forward<T>(container);
 		}
 
 		uint32_t GetVertexCount() const { return m_VertexCount; }
-		uint32_t GetIndexCount() const { return m_IndexCount; }
+		uint32_t GetIndexCount() const { return static_cast<uint32_t>(m_Indices.size()); }
 
 		const auto& GetVertexData() const { return m_VertexData; }
 		const auto& GetOffsets() const { return m_Offsets; }
@@ -247,7 +240,6 @@ namespace Mahakam
 
 	private:
 		uint32_t m_VertexCount;
-		uint32_t m_IndexCount;
 		TrivialVector<uint8_t, Allocator::BaseAllocator<uint8_t>> m_VertexData;
 		TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> m_Indices;
 		UnorderedMap<Input, std::pair<size_t, ShaderDataType>, Allocator::BaseAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>> m_Offsets;
@@ -270,6 +262,8 @@ namespace Mahakam
 		virtual const Bounds& GetBounds() const = 0;
 
 		virtual uint32_t GetVertexCount() const = 0;
+
+		virtual const MeshData& GetMeshData() const = 0;
 
 		virtual const void* GetVertices(int index) const = 0;
 

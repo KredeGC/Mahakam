@@ -3,6 +3,9 @@
 #include "Mahakam/Renderer/Mesh.h"
 #include "Mahakam/Renderer/Texture.h"
 
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
+#include <bitstream.h>
 #include <ryml/rapidyaml-0.4.1.hpp>
 
 #include <cstdint>
@@ -33,7 +36,7 @@ namespace Mahakam
 			materialsNode |= ryml::SEQ;
 
 			for (auto& material : asset->GetProps().Materials)
-				materialsNode.append_child() << material.GetID();
+				materialsNode.append_child() << material;
 
 			node["Primitive"] << (int)asset->Primitive;
 
@@ -83,25 +86,20 @@ namespace Mahakam
 		static Asset<Mesh> Deserialize(ryml::NodeRef& node)
 		{
 			MeshPrimitive primitive;
-			if (node.has_child("Primitive"))
-			{
-				int primitiveInt;
-				node["Primitive"] >> primitiveInt;
-				primitive = (MeshPrimitive)primitiveInt;
-			}
-			else
-			{
+
+			int primitiveInt;
+			if (!DeserializeYAMLNode(node, "Primitive", primitiveInt))
 				return nullptr;
-			}
+
+			primitive = (MeshPrimitive)primitiveInt;
 
 			std::vector<Asset<Material>> materials;
 			if (node.has_child("Materials"))
 			{
-				uint64_t materialID;
 				for (auto materialNode : node["Materials"])
 				{
-					materialNode >> materialID;
-					Asset<Material> material = Asset<Material>(materialID);
+					Asset<Material> material;
+					materialNode >> material;
 
 					materials.push_back(material);
 				}
@@ -112,20 +110,14 @@ namespace Mahakam
 			case MeshPrimitive::Model:
 			{
 				BoneMeshProps props;
-				props.Materials = materials;
+				props.Materials = std::move(materials);
 
-				if (node.has_child("Filepath"))
-				{
-					std::string filepath;
-					node["Filepath"] >> filepath;
+				std::string filepath;
+				if (DeserializeYAMLNode(node, "Filepath", filepath))
 					props.Filepath = filepath;
-				}
 
-				if (node.has_child("IncludeNodes"))
-					node["IncludeNodes"] >> props.IncludeNodes;
-
-				if (node.has_child("IncludeBones"))
-					node["IncludeBones"] >> props.IncludeBones;
+				DeserializeYAMLNode(node, "IncludeNodes", props.IncludeNodes);
+				DeserializeYAMLNode(node, "IncludeBones", props.IncludeBones);
 
 				return BoneMesh::Create(props);
 			}
@@ -134,11 +126,8 @@ namespace Mahakam
 				PlaneMeshProps props;
 				props.Materials = materials;
 
-				if (node.has_child("Rows"))
-					node["Rows"] >> props.Rows;
-
-				if (node.has_child("Columns"))
-					node["Columns"] >> props.Columns;
+				DeserializeYAMLNode(node, "Rows", props.Rows);
+				DeserializeYAMLNode(node, "Columns", props.Columns);
 
 				return PlaneMesh::Create(props);
 			}
@@ -147,11 +136,8 @@ namespace Mahakam
 				CubeMeshProps props;
 				props.Materials = materials;
 
-				if (node.has_child("Tessellation"))
-					node["Tessellation"] >> props.Tessellation;
-
-				if (node.has_child("Invert"))
-					node["Invert"] >> props.Invert;
+				DeserializeYAMLNode(node, "Tessellation", props.Tessellation);
+				DeserializeYAMLNode(node, "Invert", props.Invert);
 
 				return CubeMesh::Create(props);
 			}
@@ -160,11 +146,8 @@ namespace Mahakam
 				CubeSphereMeshProps props;
 				props.Materials = materials;
 
-				if (node.has_child("Tessellation"))
-					node["Tessellation"] >> props.Tessellation;
-
-				if (node.has_child("Invert"))
-					node["Invert"] >> props.Invert;
+				DeserializeYAMLNode(node, "Tessellation", props.Tessellation);
+				DeserializeYAMLNode(node, "Invert", props.Invert);
 
 				return CubeSphereMesh::Create(props);
 			}
@@ -173,11 +156,8 @@ namespace Mahakam
 				UVSphereMeshProps props;
 				props.Materials = materials;
 
-				if (node.has_child("Rows"))
-					node["Rows"] >> props.Rows;
-
-				if (node.has_child("Columns"))
-					node["Columns"] >> props.Columns;
+				DeserializeYAMLNode(node, "Rows", props.Rows);
+				DeserializeYAMLNode(node, "Columns", props.Columns);
 
 				return UVSphereMesh::Create(props);
 			}
@@ -185,6 +165,82 @@ namespace Mahakam
 
 			MH_WARN("Unsupported Mesh primitive");
 
+			return nullptr;
+		}
+
+		template<typename Stream>
+		typename bitstream::utility::is_writing_t<Stream>
+		static Build(Stream& writer, Mesh* asset) noexcept
+		{
+			// Write materials
+			BS_ASSERT(writer.serialize<bitstream::bounded_int<size_t>>(asset->GetProps().Materials.size()));
+
+			for (auto& material : asset->GetProps().Materials)
+			{
+				BS_ASSERT(writer.serialize<bitstream::bounded_int<AssetDatabase::AssetID>>(material.GetID()));
+			}
+
+			// Write submeshes
+			BS_ASSERT(writer.serialize<bitstream::bounded_int<size_t>>(asset->Meshes.size()));
+
+			for (auto& submesh : asset->Meshes)
+			{
+				const MeshData& meshData = submesh->GetMeshData();
+
+				auto& offsets = meshData.GetOffsets();
+				auto& vertexData = meshData.GetVertexData();
+				auto& indexData = meshData.GetIndices();
+				uint32_t vertexCount = meshData.GetVertexCount();
+
+				BS_ASSERT(writer.serialize<bitstream::bounded_int<uint32_t>>(vertexCount));
+
+				// Write mappings and offsets
+				BS_ASSERT(writer.serialize<bitstream::bounded_int<uint32_t>>(static_cast<uint32_t>(offsets.size())));
+
+				TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> values(Allocator::GetAllocator<uint32_t>());
+
+				for (auto& [index, value] : offsets)
+				{
+					auto& [offset, type] = value;
+
+					BS_ASSERT(writer.serialize<bitstream::bounded_int<int>>(index));
+					BS_ASSERT(writer.serialize<bitstream::bounded_int<size_t>>(offset));
+					BS_ASSERT(writer.serialize<ShaderDataType>(type));
+
+					ShaderDataType baseType = ShaderDataTypeBaseType(type);
+					uint32_t componentCount = ShaderDataTypeComponentCount(type);
+					uint32_t dataTypeSize = ShaderDataTypeSize(baseType);
+
+					MH_ASSERT(dataTypeSize == 4, "Data types of sizes other than 4 not currently supported");
+
+					uint32_t valueCount = vertexCount * componentCount;
+
+					values.resize(valueCount);
+					std::memcpy(values.data(), vertexData.data() + offset, valueCount);
+
+					// Convert endianness
+					for (uint32_t i = 0; i < valueCount; i++)
+						values[i] = bitstream::utility::to_big_endian32(values[i]);
+
+					// Write buffer
+					BS_ASSERT(writer.serialize_bytes(reinterpret_cast<uint8_t*>(values.data()), valueCount));
+
+					//for (uint32_t i = 0; i < valueCount; i++)
+					//	BS_ASSERT(writer.serialize<bitstream::bounded_int<uint32_t>>(values[i]));
+				}
+
+				// Write indices
+				BS_ASSERT(writer.serialize<bitstream::bounded_int<uint32_t>>(static_cast<uint32_t>(indexData.size())));
+				BS_ASSERT(writer.serialize_bytes(reinterpret_cast<const uint8_t*>(indexData.data()), static_cast<uint32_t>(indexData.size() * 8U)));
+			}
+
+			return true;
+		}
+		
+		template<typename Stream>
+		typename bitstream::utility::is_reading_t<Stream, Asset<Texture>>
+		static Read(Stream& reader) noexcept
+		{
 			return nullptr;
 		}
 	};

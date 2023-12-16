@@ -33,6 +33,8 @@ namespace Mahakam
 
 	uint32_t ShaderStageToEShLanguage(ShaderStage stage);
 
+	ShaderDataType ShaderDataTypeBaseType(ShaderDataType type);
+
 	uint32_t ShaderDataTypeComponentCount(ShaderDataType type);
 
 	uint32_t ShaderDataTypeSize(ShaderDataType type);

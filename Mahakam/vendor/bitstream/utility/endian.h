@@ -2,7 +2,9 @@
 
 #include <cstdint>
 
-#if __cplusplus < 202002L
+#if defined(__cpp_lib_endian) && __cpp_lib_endian >= 201907L
+#include <bit>
+#else // __cpp_lib_endian
 #ifndef BS_LITTLE_ENDIAN
 // Detect with GCC 4.6's macro.
 #if defined(__BYTE_ORDER__)
@@ -39,9 +41,7 @@
 #error "Unknown machine byteorder endianness detected. Need to manually define BS_LITTLE_ENDIAN."
 #endif
 #endif // BS_LITTLE_ENDIAN
-#else // __cplusplus < 202002L
-#include <bit>
-#endif // __cplusplus < 202002L
+#endif // __cpp_lib_endian
 
 
 #if defined(_WIN32)
@@ -63,24 +63,27 @@ namespace bitstream::utility
 #endif // defined(BS_LITTLE_ENDIAN)
     }
 
-	inline uint32_t endian_swap_32(uint32_t value)
-	{
-        if constexpr (little_endian())
-        {
+    inline uint32_t endian_swap32(uint32_t value)
+    {
 #if defined(_WIN32)
-            return _byteswap_ulong(value);
+        return _byteswap_ulong(value);
 #elif defined(__linux__)
-            return __builtin_bswap32(value);
+        return __builtin_bswap32(value);
 #else
-			const uint32_t first =  (value << 24)	& 0xFF000000;
-			const uint32_t second = (value << 8)	& 0x00FF0000;
-			const uint32_t third =  (value >> 8)	& 0x0000FF00;
-			const uint32_t fourth = (value >> 24)	& 0x000000FF;
+        const uint32_t first = (value << 24) & 0xFF000000;
+        const uint32_t second = (value << 8) & 0x00FF0000;
+        const uint32_t third = (value >> 8) & 0x0000FF00;
+        const uint32_t fourth = (value >> 24) & 0x000000FF;
 
-			return first | second | third | fourth;
+        return first | second | third | fourth;
 #endif // _WIN32 || __linux__
-        }
+    }
 
-		return value;
-	}
+    inline uint32_t to_big_endian32(uint32_t value)
+    {
+        if constexpr (little_endian())
+            return endian_swap32(value);
+        else
+            return value;
+    }
 }

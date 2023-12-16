@@ -6,6 +6,7 @@
 
 #include "byte_buffer.h"
 #include "serialize_traits.h"
+#include "stream_traits.h"
 
 #include <cstdint>
 #include <cstring>
@@ -16,8 +17,9 @@ namespace bitstream
 {
 	/**
 	 * @brief A stream for reading objects from a tightly packed buffer
-	 * @note Does not take ownership of the buffer
+	 * @tparam Policy The underlying representation of the buffer
 	*/
+	template<typename Policy>
 	class bit_reader
 	{
 	public:
@@ -25,39 +27,14 @@ namespace bitstream
 		static constexpr bool reading = true;
 
 		/**
-		 * @brief Default construct a reader pointing to a null buffer
+		 * @brief Construct a reader with the parameters passed to the underlying policy
+		 * @param ...args The arguments to pass to the policy
 		*/
-		bit_reader() noexcept :
-			m_Buffer(nullptr),
-			m_NumBitsRead(0),
-			m_TotalBits(0),
-			m_Scratch(0),
-			m_ScratchBits(0),
-			m_WordIndex(0) {}
-
-		/**
-		 * @brief Construct a reader pointing to the given byte array with @p num_bytes size
-		 * @param bytes The byte array to read from. Should be 4-byte aligned if possible. The size of the array must be a multiple of 4
-		 * @param num_bytes The maximum number of bytes that we can read
-		*/
-		explicit bit_reader(const void* bytes, uint32_t num_bytes) noexcept :
-			m_Buffer(static_cast<const uint32_t*>(bytes)),
-			m_NumBitsRead(0),
-			m_TotalBits(num_bytes * 8),
-			m_Scratch(0),
-			m_ScratchBits(0),
-			m_WordIndex(0) {}
-
-		/**
-		 * @brief Construct a reader pointing to the given @p buffer
-		 * @param buffer The buffer to read from
-		 * @param num_bytes The maximum number of bytes that we can read
-		*/
-		template<size_t Size>
-		explicit bit_reader(byte_buffer<Size>& buffer, uint32_t num_bytes) noexcept :
-			m_Buffer(reinterpret_cast<uint32_t*>(buffer.Bytes)),
-			m_NumBitsRead(0),
-			m_TotalBits(num_bytes * 8),
+		template<typename... Ts,
+			typename = std::enable_if_t<std::is_constructible_v<Policy, Ts...>>>
+		bit_reader(Ts&&... args)
+			noexcept(std::is_nothrow_constructible_v<Policy, Ts...>) :
+			m_Policy(std::forward<Ts>(args) ...),
 			m_Scratch(0),
 			m_ScratchBits(0),
 			m_WordIndex(0) {}
@@ -65,16 +42,11 @@ namespace bitstream
 		bit_reader(const bit_reader&) = delete;
         
 		bit_reader(bit_reader&& other) noexcept :
-            m_Buffer(other.m_Buffer),
-            m_NumBitsRead(other.m_NumBitsRead),
-            m_TotalBits(other.m_TotalBits),
+			m_Policy(std::move(other.m_Policy)),
             m_Scratch(other.m_Scratch),
             m_ScratchBits(other.m_ScratchBits),
             m_WordIndex(other.m_WordIndex)
         {
-            other.m_Buffer = nullptr;
-            other.m_NumBitsRead = 0;
-            other.m_TotalBits = 0;
             other.m_Scratch = 0;
             other.m_ScratchBits = 0;
             other.m_WordIndex = 0;
@@ -84,16 +56,11 @@ namespace bitstream
 
 		bit_reader& operator=(bit_reader&& rhs) noexcept
 		{
-			m_Buffer = rhs.m_Buffer;
-			m_NumBitsRead = rhs.m_NumBitsRead;
-			m_TotalBits = rhs.m_TotalBits;
+			m_Policy = std::move(rhs.m_Policy);
 			m_Scratch = rhs.m_Scratch;
 			m_ScratchBits = rhs.m_ScratchBits;
 			m_WordIndex = rhs.m_WordIndex;
 
-			rhs.m_Buffer = nullptr;
-			rhs.m_NumBitsRead = 0;
-			rhs.m_TotalBits = 0;
 			rhs.m_Scratch = 0;
 			rhs.m_ScratchBits = 0;
 			rhs.m_WordIndex = 0;
@@ -105,63 +72,64 @@ namespace bitstream
 		 * @brief Returns the buffer that this reader is currently serializing from
 		 * @return The buffer
 		*/
-		const uint8_t* get_buffer() const noexcept { return reinterpret_cast<const uint8_t*>(m_Buffer); }
+		[[nodiscard]] const uint8_t* get_buffer() const noexcept { return reinterpret_cast<const uint8_t*>(m_Policy.get_buffer()); }
 
 		/**
 		 * @brief Returns the number of bits which have been read from the buffer
 		 * @return The number of bits which have been read
 		*/
-		uint32_t get_num_bits_serialized() const noexcept { return m_NumBitsRead; }
+		[[nodiscard]] uint32_t get_num_bits_serialized() const noexcept { return m_Policy.get_num_bits_serialized(); }
+
+		/**
+		 * @brief Returns the number of bytes which have been read from the buffer
+		 * @return The number of bytes which have been read
+		*/
+		[[nodiscard]] uint32_t get_num_bytes_serialized() const noexcept { return get_num_bits_serialized() > 0U ? ((get_num_bits_serialized() - 1U) / 8U + 1U) : 0U; }
 
 		/**
 		 * @brief Returns whether the @p num_bits be read from the buffer
 		 * @param num_bits The number of bits to test
 		 * @return Whether the number of bits can be read from the buffer
 		*/
-		bool can_serialize_bits(uint32_t num_bits) const noexcept { return m_NumBitsRead + num_bits <= m_TotalBits; }
+		[[nodiscard]] bool can_serialize_bits(uint32_t num_bits) const noexcept { return m_Policy.can_serialize_bits(num_bits); }
 
 		/**
 		 * @brief Returns the number of bits which have not been read yet
 		 * @note The same as get_total_bits() - get_num_bits_serialized()
 		 * @return The remaining space in the buffer
 		*/
-		uint32_t get_remaining_bits() const noexcept { return m_TotalBits - m_NumBitsRead; }
+		[[nodiscard]] uint32_t get_remaining_bits() const noexcept { return get_total_bits() - get_num_bits_serialized(); }
 
 		/**
 		 * @brief Returns the size of the buffer, in bits
 		 * @return The size of the buffer, in bits
 		*/
-		uint32_t get_total_bits() const noexcept { return m_TotalBits; }
+		[[nodiscard]] uint32_t get_total_bits() const noexcept { return m_Policy.get_total_bits(); }
 
 		/**
 		 * @brief Reads the first 32 bits of the buffer and compares it to a checksum of the @p protocol_version and the rest of the buffer
 		 * @param protocol_version A unique version number
 		 * @return Whether the checksum matches what was written
 		*/
-		bool serialize_checksum(uint32_t protocol_version) noexcept
+		[[nodiscard]] bool serialize_checksum(uint32_t protocol_version) noexcept
 		{
-			BS_ASSERT(m_NumBitsRead == 0);
+			BS_ASSERT(get_num_bits_serialized() == 0);
 
 			BS_ASSERT(can_serialize_bits(32U));
 
-			uint32_t num_bytes = (m_TotalBits - 1U) / 8U + 1U;
-
-			// Read the checksum
-			uint32_t checksum = *m_Buffer;
-
-			// Copy protocol version to buffer
-			uint32_t* buffer = const_cast<uint32_t*>(m_Buffer); // Somewhat of a hack, but it's faster to change the checksum twice than allocate memory for it
-			*buffer = protocol_version;
+			uint32_t num_bytes = (get_total_bits() - 1U) / 8U + 1U;
+			const uint32_t* buffer = m_Policy.get_buffer();
 
 			// Generate checksum to compare against
-			uint32_t generated_checksum = utility::crc_uint32(reinterpret_cast<uint8_t*>(buffer), num_bytes);
-
-			// Write the checksum back, just in case
-			*buffer = checksum;
+			uint32_t generated_checksum = utility::crc_uint32(reinterpret_cast<const uint8_t*>(&protocol_version), reinterpret_cast<const uint8_t*>(buffer + 1), num_bytes - 4);
 
 			// Advance the reader by the size of the checksum (32 bits / 1 word)
 			m_WordIndex++;
-			m_NumBitsRead += 32U;
+
+			BS_ASSERT(m_Policy.extend(32U));
+
+			// Read the checksum
+			uint32_t checksum = *buffer;
 
 			// Compare the checksum
 			return generated_checksum == checksum;
@@ -172,30 +140,31 @@ namespace bitstream
 		 * @param num_bytes The byte number to pad to
 		 * @return Returns false if the current size of the buffer is bigger than @p num_bytes or if the padded bits are not zeros.
 		*/
-		bool pad_to_size(uint32_t num_bytes) noexcept
+		[[nodiscard]] bool pad_to_size(uint32_t num_bytes) noexcept
 		{
-			BS_ASSERT(num_bytes * 8U <= m_TotalBits);
-            
-			BS_ASSERT(num_bytes * 8U >= m_NumBitsRead);
+			uint32_t num_bits_read = get_num_bits_serialized();
 
-			uint32_t offset = m_NumBitsRead / 32;
+			BS_ASSERT(num_bytes * 8U >= num_bits_read);
+
+			BS_ASSERT(can_serialize_bits(num_bytes * 8U - num_bits_read));
+
+			uint32_t remainder = (num_bytes * 8U - num_bits_read) % 32U;
 			uint32_t zero;
 
-			// Test for zeros in padding
-			for (uint32_t i = offset; i < num_bytes / 4; i++)
+			// Test the last word more carefully, as it may have data
+			if (remainder != 0U)
 			{
-				bool status = serialize_bits(zero, 32);
-
+				bool status = serialize_bits(zero, remainder);
 				BS_ASSERT(status && zero == 0);
 			}
 
-			uint32_t remainder = num_bytes * 8U - m_NumBitsRead;
+			uint32_t offset = get_num_bits_serialized() / 32;
+            uint32_t max = num_bytes / 4;
 
-			// Test the last word more carefully, as it may have data
-			if (remainder % 32U != 0U)
+			// Test for zeros in padding
+			for (uint32_t i = offset; i < max; i++)
 			{
-				bool status = serialize_bits(zero, remainder);
-
+				bool status = serialize_bits(zero, 32);
 				BS_ASSERT(status && zero == 0);
 			}
 
@@ -203,19 +172,29 @@ namespace bitstream
 		}
 
 		/**
+		 * @brief Pads the buffer up with the given number of bytes
+		 * @param num_bytes The amount of bytes to pad
+		 * @return Returns false if the current size of the buffer is bigger than @p num_bytes or if the padded bits are not zeros.
+		*/
+		[[nodiscard]] bool pad(uint32_t num_bytes) noexcept
+		{
+			return pad_to_size(get_num_bytes_serialized() + num_bytes);
+		}
+
+		/**
 		 * @brief Pads the buffer with up to 8 zeros, so that the next read is byte-aligned
 		 * @notes Return false if the padded bits are not zeros
 		 * @return Returns false if the padded bits are not zeros
 		*/
-		bool align() noexcept
+		[[nodiscard]] bool align() noexcept
 		{
-			uint32_t remainder = m_NumBitsRead % 8U;
+			uint32_t remainder = get_num_bits_serialized() % 8U;
 			if (remainder != 0U)
 			{
 				uint32_t zero;
 				bool status = serialize_bits(zero, 8U - remainder);
 
-                BS_ASSERT(status && zero == 0U && m_NumBitsRead % 8U == 0U);
+                BS_ASSERT(status && zero == 0U && get_num_bits_serialized() % 8U == 0U);
 			}
 
 			return true;
@@ -227,17 +206,29 @@ namespace bitstream
 		 * @param num_bits The number of bits of the @p value to serialize
 		 * @return Returns false if @p num_bits is less than 1 or greater than 32 or if reading the given number of bits would overflow the buffer
 		*/
-		bool serialize_bits(uint32_t& value, uint32_t num_bits) noexcept
+		[[nodiscard]] bool serialize_bits(uint32_t& value, uint32_t num_bits) noexcept
 		{
 			BS_ASSERT(num_bits > 0U && num_bits <= 32U);
 
-			BS_ASSERT(can_serialize_bits(num_bits));
+			BS_ASSERT(m_Policy.extend(num_bits));
+
+			// Fast path
+			if (num_bits == 32U && m_ScratchBits == 0U)
+			{
+				const uint32_t* ptr = m_Policy.get_buffer() + m_WordIndex;
+
+				value = utility::to_big_endian32(*ptr);
+
+				m_WordIndex++;
+
+				return true;
+			}
 
 			if (m_ScratchBits < num_bits)
 			{
-				const uint32_t* ptr = m_Buffer + m_WordIndex;
+				const uint32_t* ptr = m_Policy.get_buffer() + m_WordIndex;
 
-				uint64_t ptr_value = static_cast<uint64_t>(utility::endian_swap_32(*ptr)) << (32U - m_ScratchBits);
+				uint64_t ptr_value = static_cast<uint64_t>(utility::to_big_endian32(*ptr)) << (32U - m_ScratchBits);
 				m_Scratch |= ptr_value;
 				m_ScratchBits += 32U;
 				m_WordIndex++;
@@ -248,7 +239,6 @@ namespace bitstream
 
 			m_Scratch <<= num_bits;
 			m_ScratchBits -= num_bits;
-			m_NumBitsRead += num_bits;
 
 			return true;
 		}
@@ -259,7 +249,7 @@ namespace bitstream
 		 * @param num_bits The number of bits of the @p bytes to serialize
 		 * @return Returns false if @p num_bits is less than 1 or if reading the given number of bits would overflow the buffer
 		*/
-		bool serialize_bytes(uint8_t* bytes, uint32_t num_bits) noexcept
+		[[nodiscard]] bool serialize_bytes(uint8_t* bytes, uint32_t num_bits) noexcept
 		{
 			BS_ASSERT(num_bits > 0U);
             
@@ -271,10 +261,11 @@ namespace bitstream
             
             if (m_ScratchBits % 32U == 0U && num_words > 0U)
             {
+				BS_ASSERT(m_Policy.extend(num_words * 32U));
+
                 // If the read buffer is word-aligned, just memcpy it
-                std::memcpy(word_buffer, m_Buffer + m_WordIndex, num_words * 4U);
+                std::memcpy(word_buffer, m_Policy.get_buffer() + m_WordIndex, num_words * 4U);
                 
-                m_NumBitsRead += num_words * 32U;
                 m_WordIndex += num_words;
             }
             else
@@ -287,7 +278,7 @@ namespace bitstream
                     
                     // Casting a byte-array to an int is wrong on little-endian systems
                     // We have to swap the bytes around
-                    word_buffer[i] = utility::endian_swap_32(value);
+                    word_buffer[i] = utility::to_big_endian32(value);
                 }
             }
             
@@ -317,11 +308,9 @@ namespace bitstream
 		 * @param ...args The arguments to pass to the serialize function
 		 * @return Whether successful or not
 		*/
-		template<typename Trait, typename... Args>
-		bool serialize(Args&&... args) noexcept(utility::is_noexcept_serialize_v<Trait, bit_reader, Args...>)
+		template<typename Trait, typename... Args, typename = utility::has_serialize_t<Trait, bit_reader, Args...>>
+		[[nodiscard]] bool serialize(Args&&... args) noexcept(utility::is_serialize_noexcept_v<Trait, bit_reader, Args...>)
 		{
-			static_assert(utility::has_serialize_v<Trait, bit_reader, Args...>, "Could not find serializable trait for the given type. Remember to specialize serializable_traits<> with the given type");
-
 			return serialize_traits<Trait>::serialize(*this, std::forward<Args>(args)...);
 		}
 
@@ -329,28 +318,25 @@ namespace bitstream
 		 * @brief Reads from the buffer, by trying to deduce the trait.
 		 * @note The Trait type in this function is always implicit and will be deduced from the first argument if possible.
 		 * If the trait cannot be deduced it will not compile.
-		 * @tparam Trait A template specialization of serialize_trait<>
+		 * @tparam Trait The type of the first argument, which will be used to deduce the trait specialization
 		 * @tparam ...Args The types of the arguments to pass to the serialize function
-		 * @param ...args The arguments to pass to the serialize function
+		 * @param arg The first argument to pass to the serialize function
+		 * @param ...args The rest of the arguments to pass to the serialize function
 		 * @return Whether successful or not
 		*/
-		template<typename Trait, typename... Args>
-		bool serialize(Trait&& arg, Args&&... args) noexcept(utility::is_noexcept_serialize_v<utility::deduce_trait_t<Trait, bit_reader, Args...>, bit_reader, Trait, Args...>)
+		template<typename... Args, typename Trait, typename = utility::has_deduce_serialize_t<Trait, bit_reader, Args...>>
+		[[nodiscard]] bool serialize(Trait&& arg, Args&&... args) noexcept(utility::is_deduce_serialize_noexcept_v<Trait, bit_reader, Args...>)
 		{
-			using deduce_t = utility::deduce_trait_t<Trait, bit_reader, Args...>;
-
-			static_assert(utility::has_serialize_v<deduce_t, bit_reader, Trait, Args...>, "Could not deduce serializable trait for the given arguments. Remember to specialize serializable_traits<> with the given type");
-
-			return serialize_traits<deduce_t>::serialize(*this, std::forward<Trait>(arg), std::forward<Args>(args)...);
+			return serialize_traits<utility::deduce_trait_t<Trait, bit_reader, Args...>>::serialize(*this, std::forward<Trait>(arg), std::forward<Args>(args)...);
 		}
 
 	private:
-		const uint32_t* m_Buffer;
-		uint32_t m_NumBitsRead;
-		uint32_t m_TotalBits;
+		Policy m_Policy;
 
 		uint64_t m_Scratch;
 		uint32_t m_ScratchBits;
 		uint32_t m_WordIndex;
 	};
+
+	using fixed_bit_reader = bit_reader<fixed_policy>;
 }

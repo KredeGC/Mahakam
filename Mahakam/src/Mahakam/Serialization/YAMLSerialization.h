@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Asset/Asset.h"
+
 #include <ryml/rapidyaml-0.4.1.hpp>
 
 #define GLM_FORCE_INLINE
@@ -27,4 +29,39 @@ namespace glm
 	bool read(ryml::NodeRef const& n, glm::quat* val);
 	bool read(ryml::NodeRef const& n, glm::mat3* val);
 	bool read(ryml::NodeRef const& n, glm::mat4* val);
+}
+
+namespace Mahakam
+{
+	template<typename V>
+	void SerializeYAMLNode(ryml::NodeRef& node, const c4::csubstr& name, const V& value)
+	{
+		node[name] << value;
+	}
+
+	template<typename V>
+	bool DeserializeYAMLNode(ryml::NodeRef& node, const c4::csubstr& name, V& value)
+	{
+		if (!node.has_child("Primitive"))
+			return false;
+
+		node[name] >> value;
+
+		return true;
+	}
+
+	template<typename T>
+	void write(ryml::NodeRef* n, Asset<T> val)
+	{
+		*n << val.GetID();
+	}
+
+	template<typename T>
+	bool read(ryml::NodeRef const& n, Asset<T>* val)
+	{
+		AssetDatabase::AssetID id;
+		n >> id;
+		*val = Asset<T>(id);
+		return true;
+	}
 }

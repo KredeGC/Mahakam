@@ -29,6 +29,8 @@ namespace Mahakam
 
 		inline virtual uint32_t GetVertexCount() const override { return m_MeshData.GetVertexCount(); }
 
+		virtual const MeshData& GetMeshData() const override { return m_MeshData; }
+
 		inline virtual const void* GetVertices(int index) const override { return m_MeshData.GetVertices(index); }
 
 		inline virtual const uint32_t* GetIndices() const override { return m_MeshData.GetIndices().data(); }
