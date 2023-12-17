@@ -5,12 +5,14 @@
 #include "AnimationAssetImporter.h"
 #include "BoneMeshAssetImporter.h"
 #include "CubeMeshAssetImporter.h"
+#include "CubeSphereMeshAssetImporter.h"
 #include "MaterialAssetImporter.h"
 #include "MeshAssetImporter.h"
 #include "PlaneMeshAssetImporter.h"
 #include "ShaderAssetImporter.h"
 #include "SoundAssetImporter.h"
 #include "TextureAssetImporter.h"
+#include "UVSphereMeshAssetImporter.h"
 
 #include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Core/Log.h"
@@ -112,10 +114,20 @@ namespace Mahakam
 
 		AssetDatabase::RegisterAssetImporter(".cube", cubeAssetImporter);
 
+		// CubeSphereMesh
+		Ref<CubeSphereMeshAssetImporter> cubeSphereAssetImporter = CreateRef<CubeSphereMeshAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".cubesphere", cubeSphereAssetImporter);
+
 		// PlaneMesh
 		Ref<PlaneMeshAssetImporter> planeAssetImporter = CreateRef<PlaneMeshAssetImporter>();
 
 		AssetDatabase::RegisterAssetImporter(".plane", planeAssetImporter);
+
+		// UVSphereMesh
+		Ref<UVSphereMeshAssetImporter> uvSphereAssetImporter = CreateRef<UVSphereMeshAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".uvsphere", uvSphereAssetImporter);
 
 		// Shader
 		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
@@ -154,12 +166,18 @@ namespace Mahakam
 		// CubeMesh
 		AssetDatabase::DeregisterAssetImporter(".cube");
 
+		// CubeSphereMesh
+		AssetDatabase::DeregisterAssetImporter(".cubesphere");
+
 		// BoneMesh
 		AssetDatabase::DeregisterAssetImporter(".gltf");
 		AssetDatabase::DeregisterAssetImporter(".glb");
 
 		// PlaneMesh
 		AssetDatabase::DeregisterAssetImporter(".plane");
+
+		// UVSphereMesh
+		AssetDatabase::DeregisterAssetImporter(".uvsphere");
 
 		// Shader
 		AssetDatabase::DeregisterAssetImporter(".shader");
