@@ -174,15 +174,15 @@ namespace Mahakam
 		static Build(Stream& writer, Mesh* asset) noexcept
 		{
 			// Write materials
-			BS_ASSERT(writer.serialize<size_t>(asset->GetProps().Materials.size()));
+			BS_ASSERT(writer.template serialize<size_t>(asset->GetProps().Materials.size()));
 
 			for (auto& material : asset->GetProps().Materials)
-				BS_ASSERT(writer.serialize<Asset<Material>>(material));
+				BS_ASSERT(writer.template serialize<Asset<Material>>(material));
 
 			// TODO: IncludeNodes and IncludeBones
 
 			// Write submeshes
-			BS_ASSERT(writer.serialize<size_t>(asset->Meshes.size()));
+			BS_ASSERT(writer.template serialize<size_t>(asset->Meshes.size()));
 
 			for (auto& submesh : asset->Meshes)
 			{
@@ -194,10 +194,15 @@ namespace Mahakam
 				uint32_t vertexCount = meshData.GetVertexCount();
 				uint32_t indexCount = meshData.GetIndexCount();
 
-				BS_ASSERT(writer.serialize<uint32_t>(vertexCount));
+				BS_ASSERT(writer.template serialize<uint32_t>(vertexCount));
+				BS_ASSERT(writer.template serialize<uint32_t>(indexCount));
+
+				// Write indices
+				for (uint32_t i = 0; i < indexCount; i++)
+					BS_ASSERT(writer.serialize_bits(indexData[i], 32U));
 
 				// Write mappings and offsets
-				BS_ASSERT(writer.serialize<uint32_t>(static_cast<uint32_t>(offsets.size())));
+				BS_ASSERT(writer.template serialize<uint32_t>(static_cast<uint32_t>(offsets.size())));
 
 				TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> values(Allocator::GetAllocator<uint32_t>());
 
@@ -205,9 +210,9 @@ namespace Mahakam
 				{
 					auto& [offset, type] = value;
 
-					BS_ASSERT(writer.serialize<int>(index));
-					BS_ASSERT(writer.serialize<size_t>(offset));
-					BS_ASSERT(writer.serialize<ShaderDataType>(type));
+					// Write mappings
+					BS_ASSERT(writer.template serialize<int>(index));
+					BS_ASSERT(writer.template serialize<ShaderDataType>(type));
 
 					ShaderDataType baseType = ShaderDataTypeBaseType(type);
 					uint32_t componentCount = ShaderDataTypeComponentCount(type);
@@ -220,15 +225,10 @@ namespace Mahakam
 					values.resize(valueCount);
 					std::memcpy(values.data(), vertexData.data() + offset, valueCount);
 
+					// Write vertices
 					for (uint32_t i = 0; i < valueCount; i++)
 						BS_ASSERT(writer.serialize_bits(values[i], 32U));
 				}
-
-				// Write indices
-				BS_ASSERT(writer.serialize<uint32_t>(indexCount));
-
-				for (uint32_t i = 0; i < indexCount; i++)
-					BS_ASSERT(writer.serialize_bits(indexData[i], 32U));
 			}
 
 			return true;
@@ -242,17 +242,63 @@ namespace Mahakam
 
 			// Read materials
 			size_t materialCount;
-			BS_ASSERT(reader.serialize<size_t>(materialCount));
+			BS_ASSERT(reader.template serialize<size_t>(materialCount));
 			props.Materials.resize(materialCount);
 
 			for (size_t i = 0; i < materialCount; ++i)
-				BS_ASSERT(reader.serialize<Asset<Material>>(props.Materials[i]));
+				BS_ASSERT(reader.template serialize<Asset<Material>>(props.Materials[i]));
 
 			// Read submeshes
 			size_t submeshCount;
-			BS_ASSERT(reader.serialize<size_t>(submeshCount));
+			BS_ASSERT(reader.template serialize<size_t>(submeshCount));
 
-			// TODO
+			for (size_t i = 0; i < submeshCount; ++i)
+			{
+				uint32_t vertexCount;
+				uint32_t indexCount;
+
+				BS_ASSERT(reader.template serialize<uint32_t>(vertexCount));
+				BS_ASSERT(reader.template serialize<uint32_t>(indexCount));
+
+				// Read indices
+				TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> indices(Allocator::GetAllocator<uint32_t>());
+				indices.resize(indexCount);
+				for (uint32_t i = 0; i < indexCount; i++)
+					BS_ASSERT(reader.serialize_bits(indices[i], 32U));
+
+				MeshData meshData(vertexCount, std::move(indices));
+
+				// Read mappings and offsets
+				uint32_t offsetCount;
+				BS_ASSERT(reader.template serialize<uint32_t>(offsetCount));
+
+				TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> values(Allocator::GetAllocator<uint32_t>());
+
+				for (size_t j = 0; j < offsetCount; ++j)
+				{
+					int index;
+					ShaderDataType type;
+
+					// Read mappings
+					BS_ASSERT(reader.template serialize<int>(index));
+					BS_ASSERT(reader.template serialize<ShaderDataType>(type));
+
+					uint32_t componentCount = ShaderDataTypeComponentCount(type);
+					uint32_t valueCount = vertexCount * componentCount;
+
+					// This copy should be optimized away
+					values.resize(valueCount);
+
+					// Read vertices
+					for (uint32_t i = 0; i < valueCount; i++)
+						BS_ASSERT(reader.serialize_bits(values[i], 32U));
+
+					meshData.SetVertices(index, type, values.data());
+				}
+			}
+
+			// We can't actually create a Mesh object, since it's abstract...
+			// TODO: Make it a complete type and move all the specific MeshProps etc into the editor
 
 			return nullptr;
 		}
