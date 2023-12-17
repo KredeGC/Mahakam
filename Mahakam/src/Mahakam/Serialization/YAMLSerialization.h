@@ -42,7 +42,7 @@ namespace Mahakam
 	template<typename V>
 	bool DeserializeYAMLNode(ryml::NodeRef& node, const c4::csubstr& name, V& value)
 	{
-		if (!node.has_child("Primitive"))
+		if (!node.has_child(name))
 			return false;
 
 		node[name] >> value;

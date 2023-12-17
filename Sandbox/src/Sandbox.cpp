@@ -111,7 +111,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
 
 	// Create glTF skinned model
-	Asset<BoneMesh> skinnedModel = Asset<BoneMesh>("import/assets/models/mannequin_clap.glb.import");
+	Asset<BoneMesh> skinnedModel = Asset<BoneMesh>("import/assets/models/mannequin_clap.bone.import");
 	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.glb");
 	Asset<Animation> skinnedAnimation = Asset<Animation>("import/assets/models/ClapAnimation.anim.import");
 	//Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.glb");

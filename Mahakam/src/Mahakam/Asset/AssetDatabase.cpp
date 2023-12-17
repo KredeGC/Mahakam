@@ -3,6 +3,7 @@
 
 #include "AssetImporter.h"
 #include "AnimationAssetImporter.h"
+#include "BoneMeshAssetImporter.h"
 #include "MaterialAssetImporter.h"
 #include "MeshAssetImporter.h"
 #include "PlaneMeshAssetImporter.h"
@@ -99,6 +100,12 @@ namespace Mahakam
 		AssetDatabase::RegisterAssetImporter(".gltf", meshAssetImporter);
 		AssetDatabase::RegisterAssetImporter(".glb", meshAssetImporter);
 
+		// BoneMesh
+		Ref<BoneMeshAssetImporter> boneAssetImporter = CreateRef<BoneMeshAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".gltf", boneAssetImporter);
+		AssetDatabase::RegisterAssetImporter(".glb", boneAssetImporter);
+
 		// PlaneMesh
 		Ref<PlaneMeshAssetImporter> planeAssetImporter = CreateRef<PlaneMeshAssetImporter>();
 
@@ -135,6 +142,10 @@ namespace Mahakam
 		AssetDatabase::DeregisterAssetImporter(".material");
 
 		// Mesh
+		AssetDatabase::DeregisterAssetImporter(".gltf");
+		AssetDatabase::DeregisterAssetImporter(".glb");
+
+		// BoneMesh
 		AssetDatabase::DeregisterAssetImporter(".gltf");
 		AssetDatabase::DeregisterAssetImporter(".glb");
 
