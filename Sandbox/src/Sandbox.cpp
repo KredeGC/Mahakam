@@ -75,7 +75,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<Mesh> planeMesh = Asset<Mesh>("import/assets/models/Plane.mesh.import");
+	Asset<Mesh> planeMesh = Asset<Mesh>("import/assets/models/Plane.plane.import");
 
 	/*Ref<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
 

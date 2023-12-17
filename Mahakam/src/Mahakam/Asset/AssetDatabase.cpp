@@ -5,6 +5,7 @@
 #include "AnimationAssetImporter.h"
 #include "MaterialAssetImporter.h"
 #include "MeshAssetImporter.h"
+#include "PlaneMeshAssetImporter.h"
 #include "ShaderAssetImporter.h"
 #include "SoundAssetImporter.h"
 #include "TextureAssetImporter.h"
@@ -98,6 +99,11 @@ namespace Mahakam
 		AssetDatabase::RegisterAssetImporter(".gltf", meshAssetImporter);
 		AssetDatabase::RegisterAssetImporter(".glb", meshAssetImporter);
 
+		// PlaneMesh
+		Ref<PlaneMeshAssetImporter> planeAssetImporter = CreateRef<PlaneMeshAssetImporter>();
+
+		AssetDatabase::RegisterAssetImporter(".plane", planeAssetImporter);
+
 		// Shader
 		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
 
@@ -131,6 +137,9 @@ namespace Mahakam
 		// Mesh
 		AssetDatabase::DeregisterAssetImporter(".gltf");
 		AssetDatabase::DeregisterAssetImporter(".glb");
+
+		// PlaneMesh
+		AssetDatabase::DeregisterAssetImporter(".plane");
 
 		// Shader
 		AssetDatabase::DeregisterAssetImporter(".shader");

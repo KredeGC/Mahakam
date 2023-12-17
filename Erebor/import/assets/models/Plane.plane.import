@@ -1,8 +1,7 @@
-Filepath: assets/models/backpack.gltf
-Extension: .mesh
+Filepath: assets/models/Plane.plane
+Extension: .plane
 ID: 556425745901094492
 Materials:
   - 10127498216877445756
-Primitive: 1
 Rows: 10
 Columns: 10
