@@ -3,6 +3,8 @@
 
 #include "Mahakam/Audio/Sound.h"
 
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
 #include <imgui/imgui.h>
 
 namespace Mahakam
@@ -15,13 +17,7 @@ namespace Mahakam
 #ifndef MH_STANDALONE
 	void SoundAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node)
 	{
-		m_Props.Volume = 1.0f;
-		if (node.has_child("Volume"))
-			node["Volume"] >> m_Props.Volume;
-
-		m_Props.Loop = false;
-		if (node.has_child("Loop"))
-			node["Loop"] >> m_Props.Loop;
+		m_Props = DeserializeProps(node);
 	}
 
 	void SoundAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
@@ -57,24 +53,29 @@ namespace Mahakam
 	{
 		Sound* sound = static_cast<Sound*>(asset);
 
-		node["Volume"] << sound->GetProps().Volume;
-		node["Loop"] << sound->GetProps().Loop;
+		const SoundProps& props = sound->GetProps();
+
+		node["Volume"] << props.Volume;
+		node["Loop"] << props.Loop;
 	}
 
 	Asset<void> SoundAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
-		std::string filepath;
-		if (node.has_child("Filepath"))
-			node["Filepath"] >> filepath;
+		std::filesystem::path filepath;
+		DeserializeYAMLNode(node, "Filepath", filepath);
 
-		float volume;
-		if (node.has_child("Volume"))
-			node["Volume"] >> volume;
+		SoundProps props = DeserializeProps(node);
 
-		bool loop = false;
-		if (node.has_child("Loop"))
-			node["Loop"] >> loop;
+		return Sound::Create(filepath.string(), props);
+	}
 
-		return Sound::Create(filepath, { volume, loop });
+	SoundProps SoundAssetImporter::DeserializeProps(ryml::NodeRef& node)
+	{
+		SoundProps props;
+
+		DeserializeYAMLNode(node, "Volume", props.Volume);
+		DeserializeYAMLNode(node, "Loop", props.Loop);
+
+		return props;
 	}
 }

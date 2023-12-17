@@ -3,6 +3,8 @@
 
 #include "Mahakam/Renderer/Shader.h"
 
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
 #include <imgui/imgui.h>
 
 namespace Mahakam
@@ -32,14 +34,16 @@ namespace Mahakam
 
 	void ShaderAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
-		//Ref<Shader> shader = StaticCastRef<Shader>(asset);
+		Shader* shader = static_cast<Shader*>(asset);
+
+		SerializeYAMLNode(node, "Filepath", shader->GetFilepath());
 	}
 
 	Asset<void> ShaderAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
 		if (node.has_child("Filepath"))
 		{
-			std::string filepath;
+			std::filesystem::path filepath;
 			node["Filepath"] >> filepath;
 
 			return Shader::Create(filepath);

@@ -127,7 +127,12 @@ namespace c4::yml
 	// Filesystem
 	void write(ryml::NodeRef* n, std::filesystem::path const& val)
 	{
-		*n << val.string();
+		char seperator = std::filesystem::path::preferred_separator;
+
+		std::string filepathUnix = val.string();
+		std::replace(filepathUnix.begin(), filepathUnix.end(), seperator, '/');
+
+		*n << filepathUnix;
 	}
 
 	bool read(ryml::NodeRef const& n, std::filesystem::path* val)

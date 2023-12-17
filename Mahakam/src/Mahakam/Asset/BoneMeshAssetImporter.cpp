@@ -71,8 +71,9 @@ namespace Mahakam
 		for (auto& material : mesh->GetProps().Materials)
 			materialsNode.append_child() << material;
 
-		node["IncludeNodes"] << mesh->Props.IncludeNodes;
-		node["IncludeBones"] << mesh->Props.IncludeBones;
+		SerializeYAMLNode(node, "Filepath", mesh->Props.Filepath);
+		SerializeYAMLNode(node, "IncludeNodes", mesh->Props.IncludeNodes);
+		SerializeYAMLNode(node, "IncludeBones", mesh->Props.IncludeBones);
 	}
 
 	Asset<void> BoneMeshAssetImporter::Deserialize(ryml::NodeRef& node)

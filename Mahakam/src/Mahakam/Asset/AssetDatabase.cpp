@@ -19,6 +19,7 @@
 #include "Mahakam/Core/Random.h"
 
 #include "Mahakam/Serialization/YAMLGuard.h"
+#include "Mahakam/Serialization/YAMLSerialization.h"
 
 #include <ryml/rapidyaml-0.4.1.hpp>
 
@@ -358,18 +359,13 @@ namespace Mahakam
 		FileUtility::CreateDirectories(importPath.parent_path());
 
 		// Serialize the asset
-		char seperator = std::filesystem::path::preferred_separator;
-
-		// TODO: Remove filepath from import file and use it in each importer instead
-		std::string filepathUnix = filepath.string();
-		std::replace(filepathUnix.begin(), filepathUnix.end(), seperator, '/');
-
 		ryml::Tree tree;
 
 		ryml::NodeRef root = tree.rootref();
 		root |= ryml::MAP;
 
-		root["Filepath"] << filepathUnix;
+		// TODO: Remove filepath from import file and use it in each importer instead
+		root["Filepath"] << filepath;
 		root["Extension"] << iter->second->GetImporterProps().Extension;
 		root["ID"] << id;
 
