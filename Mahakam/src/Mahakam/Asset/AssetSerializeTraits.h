@@ -3,6 +3,7 @@
 #include "Mahakam/Renderer/Mesh.h"
 #include "Mahakam/Renderer/Texture.h"
 
+#include "Mahakam/Serialization/BinarySerialization.h"
 #include "Mahakam/Serialization/YAMLSerialization.h"
 
 #include <bitstream.h>
@@ -173,15 +174,15 @@ namespace Mahakam
 		static Build(Stream& writer, Mesh* asset) noexcept
 		{
 			// Write materials
-			BS_ASSERT(writer.serialize<bitstream::bounded_int<size_t>>(asset->GetProps().Materials.size()));
+			BS_ASSERT(writer.serialize<size_t>(asset->GetProps().Materials.size()));
 
 			for (auto& material : asset->GetProps().Materials)
-			{
-				BS_ASSERT(writer.serialize<bitstream::bounded_int<AssetDatabase::AssetID>>(material.GetID()));
-			}
+				BS_ASSERT(writer.serialize<Asset<Material>>(material));
+
+			// TODO: IncludeNodes and IncludeBones
 
 			// Write submeshes
-			BS_ASSERT(writer.serialize<bitstream::bounded_int<size_t>>(asset->Meshes.size()));
+			BS_ASSERT(writer.serialize<size_t>(asset->Meshes.size()));
 
 			for (auto& submesh : asset->Meshes)
 			{
@@ -191,11 +192,12 @@ namespace Mahakam
 				auto& vertexData = meshData.GetVertexData();
 				auto& indexData = meshData.GetIndices();
 				uint32_t vertexCount = meshData.GetVertexCount();
+				uint32_t indexCount = meshData.GetIndexCount();
 
-				BS_ASSERT(writer.serialize<bitstream::bounded_int<uint32_t>>(vertexCount));
+				BS_ASSERT(writer.serialize<uint32_t>(vertexCount));
 
 				// Write mappings and offsets
-				BS_ASSERT(writer.serialize<bitstream::bounded_int<uint32_t>>(static_cast<uint32_t>(offsets.size())));
+				BS_ASSERT(writer.serialize<uint32_t>(static_cast<uint32_t>(offsets.size())));
 
 				TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> values(Allocator::GetAllocator<uint32_t>());
 
@@ -203,35 +205,30 @@ namespace Mahakam
 				{
 					auto& [offset, type] = value;
 
-					BS_ASSERT(writer.serialize<bitstream::bounded_int<int>>(index));
-					BS_ASSERT(writer.serialize<bitstream::bounded_int<size_t>>(offset));
+					BS_ASSERT(writer.serialize<int>(index));
+					BS_ASSERT(writer.serialize<size_t>(offset));
 					BS_ASSERT(writer.serialize<ShaderDataType>(type));
 
 					ShaderDataType baseType = ShaderDataTypeBaseType(type);
 					uint32_t componentCount = ShaderDataTypeComponentCount(type);
 					uint32_t dataTypeSize = ShaderDataTypeSize(baseType);
+					uint32_t valueCount = vertexCount * componentCount;
 
 					MH_ASSERT(dataTypeSize == 4, "Data types of sizes other than 4 not currently supported");
 
-					uint32_t valueCount = vertexCount * componentCount;
-
+					// This copy should be optimized away
 					values.resize(valueCount);
 					std::memcpy(values.data(), vertexData.data() + offset, valueCount);
 
-					// Convert endianness
 					for (uint32_t i = 0; i < valueCount; i++)
-						values[i] = bitstream::utility::to_big_endian32(values[i]);
-
-					// Write buffer
-					BS_ASSERT(writer.serialize_bytes(reinterpret_cast<uint8_t*>(values.data()), valueCount));
-
-					//for (uint32_t i = 0; i < valueCount; i++)
-					//	BS_ASSERT(writer.serialize<bitstream::bounded_int<uint32_t>>(values[i]));
+						BS_ASSERT(writer.serialize_bits(values[i], 32U));
 				}
 
 				// Write indices
-				BS_ASSERT(writer.serialize<bitstream::bounded_int<uint32_t>>(static_cast<uint32_t>(indexData.size())));
-				BS_ASSERT(writer.serialize_bytes(reinterpret_cast<const uint8_t*>(indexData.data()), static_cast<uint32_t>(indexData.size() * 8U)));
+				BS_ASSERT(writer.serialize<uint32_t>(indexCount));
+
+				for (uint32_t i = 0; i < indexCount; i++)
+					BS_ASSERT(writer.serialize_bits(indexData[i], 32U));
 			}
 
 			return true;
@@ -241,6 +238,22 @@ namespace Mahakam
 		typename bitstream::utility::is_reading_t<Stream, Asset<Texture>>
 		static Read(Stream& reader) noexcept
 		{
+			MeshProps props;
+
+			// Read materials
+			size_t materialCount;
+			BS_ASSERT(reader.serialize<size_t>(materialCount));
+			props.Materials.resize(materialCount);
+
+			for (size_t i = 0; i < materialCount; ++i)
+				BS_ASSERT(reader.serialize<Asset<Material>>(props.Materials[i]));
+
+			// Read submeshes
+			size_t submeshCount;
+			BS_ASSERT(reader.serialize<size_t>(submeshCount));
+
+			// TODO
+
 			return nullptr;
 		}
 	};

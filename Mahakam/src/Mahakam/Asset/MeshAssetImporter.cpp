@@ -157,8 +157,8 @@ namespace Mahakam
 		// TEST BUILDING
 		if (ImGui::Button("Build"))
 		{
-			TrivialVector<uint32_t> buffer;
-			bitstream::growing_bit_writer<TrivialVector<uint32_t>> writer(buffer);
+			TrivialVector<uint32_t, Allocator::BaseAllocator<uint32_t>> buffer(Allocator::GetAllocator<uint32_t>());
+			bitstream::growing_bit_writer<TrivialVector<uint32_t, Allocator::BaseAllocator<uint32_t>>> writer(buffer);
 
 			Asset<Mesh> meshAsset;
 
@@ -189,6 +189,10 @@ namespace Mahakam
 
 			writer.flush();
 			uint32_t num_bytes = writer.get_num_bytes_serialized();
+
+			bitstream::fixed_bit_reader reader(buffer.data(), num_bytes * 8U);
+
+			AssetSerializeTraits<Mesh>::Read(reader);
 
 			std::ofstream filestream("test_model.data");
 			filestream.write(reinterpret_cast<char*>(buffer.data()), num_bytes);
