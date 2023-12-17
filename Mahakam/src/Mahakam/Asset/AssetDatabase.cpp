@@ -333,6 +333,7 @@ namespace Mahakam
 		// Serialize the asset
 		char seperator = std::filesystem::path::preferred_separator;
 
+		// TODO: Remove filepath from import file and use it in each importer instead
 		std::string filepathUnix = filepath.string();
 		std::replace(filepathUnix.begin(), filepathUnix.end(), seperator, '/');
 
