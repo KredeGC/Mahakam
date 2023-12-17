@@ -14,8 +14,11 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-namespace glm
+#include <filesystem>
+
+namespace c4::yml
 {
+	// GLM
 	void write(ryml::NodeRef* n, glm::vec2 const& val);
 	void write(ryml::NodeRef* n, glm::vec3 const& val);
 	void write(ryml::NodeRef* n, glm::vec4 const& val);
@@ -29,6 +32,27 @@ namespace glm
 	bool read(ryml::NodeRef const& n, glm::quat* val);
 	bool read(ryml::NodeRef const& n, glm::mat3* val);
 	bool read(ryml::NodeRef const& n, glm::mat4* val);
+
+	// Filesyste,
+	void write(ryml::NodeRef* n, std::filesystem::path const& val);
+
+	bool read(ryml::NodeRef const& n, std::filesystem::path* val);
+
+	// Asset
+	template<typename T>
+	void write(ryml::NodeRef* n, Mahakam::Asset<T> val)
+	{
+		*n << val.GetID();
+	}
+
+	template<typename T>
+	bool read(ryml::NodeRef const& n, Mahakam::Asset<T>* val)
+	{
+		Mahakam::AssetDatabase::AssetID id;
+		n >> id;
+		*val = Mahakam::Asset<T>(id);
+		return true;
+	}
 }
 
 namespace Mahakam
@@ -47,21 +71,6 @@ namespace Mahakam
 
 		node[name] >> value;
 
-		return true;
-	}
-
-	template<typename T>
-	void write(ryml::NodeRef* n, Asset<T> val)
-	{
-		*n << val.GetID();
-	}
-
-	template<typename T>
-	bool read(ryml::NodeRef const& n, Asset<T>* val)
-	{
-		AssetDatabase::AssetID id;
-		n >> id;
-		*val = Asset<T>(id);
 		return true;
 	}
 }

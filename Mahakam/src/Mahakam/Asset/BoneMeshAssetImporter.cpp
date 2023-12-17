@@ -7,6 +7,8 @@
 
 #include "Mahakam/Renderer/Mesh.h"
 
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
 #include <bitstream.h>
 #include <imgui/imgui.h>
 
@@ -75,25 +77,7 @@ namespace Mahakam
 
 	Asset<void> BoneMeshAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
-		BoneMeshProps props;
-
-		if (node.has_child("Materials"))
-		{
-			for (auto materialNode : node["Materials"])
-			{
-				Asset<Material> material;
-				materialNode >> material;
-
-				props.Materials.push_back(std::move(material));
-			}
-		}
-
-		std::string filepath;
-		if (DeserializeYAMLNode(node, "Filepath", filepath))
-			props.Filepath = filepath;
-
-		DeserializeYAMLNode(node, "IncludeNodes", props.IncludeNodes);
-		DeserializeYAMLNode(node, "IncludeBones", props.IncludeBones);
+		BoneMeshProps props = DeserializeProps(node);
 
 		return BoneMesh::Create(props);
 	}
@@ -113,10 +97,7 @@ namespace Mahakam
 			}
 		}
 
-		std::string filepath;
-		if (DeserializeYAMLNode(node, "Filepath", filepath))
-			props.Filepath = filepath;
-
+		DeserializeYAMLNode(node, "Filepath", props.Filepath);
 		DeserializeYAMLNode(node, "IncludeNodes", props.IncludeNodes);
 		DeserializeYAMLNode(node, "IncludeBones", props.IncludeBones);
 

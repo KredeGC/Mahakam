@@ -2,8 +2,9 @@
 
 #include "YAMLSerialization.h"
 
-namespace glm
+namespace c4::yml
 {
+	// GLM
 	void write(ryml::NodeRef* n, glm::vec2 const& val)
 	{
 		*n |= ryml::SEQ;
@@ -120,6 +121,20 @@ namespace glm
 		n[1] >> (*val)[1];
 		n[2] >> (*val)[2];
 		n[3] >> (*val)[3];
+		return true;
+	}
+
+	// Filesystem
+	void write(ryml::NodeRef* n, std::filesystem::path const& val)
+	{
+		*n << val.string();
+	}
+
+	bool read(ryml::NodeRef const& n, std::filesystem::path* val)
+	{
+		std::string path;
+		n >> path;
+		*val = path;
 		return true;
 	}
 }
