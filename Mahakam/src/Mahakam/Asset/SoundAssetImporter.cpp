@@ -55,6 +55,7 @@ namespace Mahakam
 
 		const SoundProps& props = sound->GetProps();
 
+		node["Filepath"] << sound->GetFilepath();
 		node["Volume"] << props.Volume;
 		node["Loop"] << props.Loop;
 	}

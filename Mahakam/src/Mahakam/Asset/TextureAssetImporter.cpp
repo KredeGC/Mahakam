@@ -7,6 +7,8 @@
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Texture.h"
 
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
 #include <imgui/imgui.h>
 
 #include <magic_enum/magic_enum.hpp>
@@ -242,6 +244,8 @@ namespace Mahakam
 	void TextureAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
 		Texture* textureAsset = static_cast<Texture*>(asset);
+
+		node["Filepath"] << textureAsset->GetFilepath();
 
 		if (!textureAsset->IsCubemap())
 		{

@@ -3,6 +3,8 @@
 
 #include "Mahakam/Renderer/ComputeShader.h"
 
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
 #include <imgui/imgui.h>
 
 namespace Mahakam
@@ -32,7 +34,9 @@ namespace Mahakam
 
 	void ComputeShaderAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
-		//Ref<Shader> shader = StaticCastRef<Shader>(asset);
+		ComputeShader* shader = static_cast<ComputeShader*>(asset);
+
+		//node["Filepath"] << shader->GetFilepath();
 	}
 
 	Asset<void> ComputeShaderAssetImporter::Deserialize(ryml::NodeRef& node)
