@@ -103,8 +103,18 @@ namespace Mahakam
 		uint32_t size = 0;
 		for (uint32_t mip = 0; mip < maxMipLevels; ++mip)
 		{
+			int is_compressed;
+
+			MH_GL_CALL(glGetTexLevelParameteriv(targetID, mip, GL_TEXTURE_COMPRESSED, &is_compressed));
+
+			// TODO: Query glGetIntegerV(GL_NUM_COMPRESSED_TEXTURE_FORMATS) to determine DXT and BSTC support
+			//MH_GL_CALL(glGetTexLevelParameteriv(targetID, mip, GL_TEXTURE_INTERNAL_FORMAT, &internal_format));
+
+			if (compressed != is_compressed)
+				MH_WARN("Texture compression does not match preference! {0} != {1}", bool(is_compressed), compressed);
+
 			uint32_t mipSize;
-			if (compressed)
+			if (is_compressed)
 			{
 				int compressed_size;
 				MH_GL_CALL(glGetTexLevelParameteriv(targetID, mip, GL_TEXTURE_COMPRESSED_IMAGE_SIZE, &compressed_size));
@@ -404,8 +414,9 @@ namespace Mahakam
 
 		// Calculate the size
 		uint32_t bpp = TextureFormatToByteSize(m_Props.Format);
-		m_Size = CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, false, false, m_Props.Resolution, m_Props.Resolution);
-		m_TotalSize = 6 * CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, false, m_Props.Mipmaps, m_Props.Resolution, m_Props.Resolution);
+		// TODO: Support properly
+		//m_Size = CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, false, false, m_Props.Resolution, m_Props.Resolution);
+		//m_TotalSize = 6 * CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, false, m_Props.Mipmaps, m_Props.Resolution, m_Props.Resolution);
 
 		if (m_Props.Prefilter != TextureCubePrefilter::None)
 			CreatePrefilter(m_RendererID);
@@ -671,8 +682,8 @@ namespace Mahakam
 
 		// Calculate the size
 		uint32_t bpp = TextureFormatToByteSize(m_Props.Format);
-		m_Size = CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, m_Compressed, false, m_Props.Resolution, m_Props.Resolution);
-		m_TotalSize = 6 * CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, m_Compressed, m_Props.Mipmaps, m_Props.Resolution, m_Props.Resolution);
+		//m_Size = CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, m_Compressed, false, m_Props.Resolution, m_Props.Resolution);
+		//m_TotalSize = 6 * CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, m_Compressed, m_Props.Mipmaps, m_Props.Resolution, m_Props.Resolution);
 
 		MH_GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		MH_GL_CALL(glViewport(viewport[0], viewport[1], viewport[2], viewport[3]));
@@ -814,7 +825,7 @@ namespace Mahakam
 
 		// Calculate the size
 		uint32_t bpp = TextureFormatToByteSize(m_Props.Format);
-		m_Size = CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, m_Compressed, false, m_Props.Resolution, m_Props.Resolution);
-		m_TotalSize = 6 * CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, m_Compressed, m_Props.Mipmaps, m_Props.Resolution, m_Props.Resolution);
+		//m_Size = CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, m_Compressed, false, m_Props.Resolution, m_Props.Resolution);
+		//m_TotalSize = 6 * CalculateTextureByteSize(GL_TEXTURE_CUBE_MAP, bpp, m_Compressed, m_Props.Mipmaps, m_Props.Resolution, m_Props.Resolution);
 	}
 }
