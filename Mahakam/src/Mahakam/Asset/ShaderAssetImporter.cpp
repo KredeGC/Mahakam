@@ -28,7 +28,7 @@ namespace Mahakam
 	{
 		Asset<Shader> shaderAsset = Shader::Create(filepath);
 
-		shaderAsset.Save(m_ImporterProps.Extension, filepath, importPath);
+		shaderAsset.Save(m_ImporterProps.Extension, importPath);
 	}
 #endif
 

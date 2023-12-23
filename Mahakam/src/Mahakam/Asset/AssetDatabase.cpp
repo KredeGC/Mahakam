@@ -329,8 +329,8 @@ namespace Mahakam
 		return {};
 	};
 
-	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, const ExtensionType& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension, const std::filesystem::path& importPath)
+	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, const ExtensionType& extension, const std::filesystem::path& importPath)
 	{
 		// Read asset info and ID
 		AssetID id = 0;
@@ -353,8 +353,6 @@ namespace Mahakam
 		ryml::NodeRef root = tree.rootref();
 		root |= ryml::MAP;
 
-		// TODO: Remove filepath from import file and use it in each importer instead
-		root["Filepath"] << filepath;
 		root["Extension"] << iter->second->GetImporterProps().Extension;
 		root["ID"] << id;
 

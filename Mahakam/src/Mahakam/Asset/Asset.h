@@ -165,9 +165,9 @@ namespace Mahakam
 		}
 #pragma endregion
 
-		void Save(const ExtensionType& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+		void Save(const ExtensionType& extension, const std::filesystem::path& importPath)
 		{
-			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, extension, filepath, importPath);
+			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, extension, importPath);
 
 			// If the control block is changed, we might need to remove the old one
 			if (control != m_Control)

@@ -57,7 +57,7 @@ namespace Mahakam
 
 		Asset<Mesh> meshAsset = BoneMesh::Create(m_MeshProps);
 
-		meshAsset.Save(m_ImporterProps.Extension, filepath, importPath);
+		meshAsset.Save(m_ImporterProps.Extension, importPath);
 	}
 #endif
 

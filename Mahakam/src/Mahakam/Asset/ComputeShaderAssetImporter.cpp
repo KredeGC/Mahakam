@@ -28,7 +28,7 @@ namespace Mahakam
 	{
 		Asset<ComputeShader> shaderAsset = ComputeShader::Create(filepath.string());
 
-		shaderAsset.Save(m_ImporterProps.Extension, filepath, importPath);
+		shaderAsset.Save(m_ImporterProps.Extension, importPath);
 	}
 #endif
 
@@ -36,6 +36,7 @@ namespace Mahakam
 	{
 		ComputeShader* shader = static_cast<ComputeShader*>(asset);
 
+		// TODO
 		//node["Filepath"] << shader->GetFilepath();
 	}
 

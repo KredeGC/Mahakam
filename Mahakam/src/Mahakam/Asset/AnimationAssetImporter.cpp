@@ -34,7 +34,7 @@ namespace Mahakam
 	{
 		Asset<Animation> shaderAsset = Animation::Load(filepath, m_Index);
 
-		shaderAsset.Save(m_ImporterProps.Extension, filepath, importPath);
+		shaderAsset.Save(m_ImporterProps.Extension, importPath);
 	}
 #endif
 

@@ -56,7 +56,7 @@ namespace Mahakam
 	{
 		Asset<Mesh> meshAsset = PlaneMesh::Create(m_MeshProps);
 
-		meshAsset.Save(m_ImporterProps.Extension, filepath, importPath);
+		meshAsset.Save(m_ImporterProps.Extension, importPath);
 	}
 #endif
 

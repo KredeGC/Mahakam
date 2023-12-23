@@ -37,14 +37,14 @@ namespace Mahakam
 
 			sound->SetProps(m_Props);
 
-			sound.Save(m_ImporterProps.Extension, filepath, importPath);
+			sound.Save(m_ImporterProps.Extension, importPath);
 		}
 		else
 		{
 			// If the sound doesn't exist, or the filepath has changed, reload everything
 			Asset<Sound> sound = Sound::Create(filepath.string(), m_Props);
 
-			sound.Save(m_ImporterProps.Extension, filepath, importPath);
+			sound.Save(m_ImporterProps.Extension, importPath);
 		}
 	}
 #endif
