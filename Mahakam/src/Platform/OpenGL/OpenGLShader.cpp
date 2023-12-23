@@ -183,9 +183,28 @@ namespace Mahakam
 			GLenum stage = ShaderStageToOpenGLStage(kv.first);
 			GLuint shader = glCreateShader(stage);
 
+			// AMD GPUs do not load SPIR-V shaders correctly in OpenGL
+			// https://github.com/TheCherno/Hazel/issues/440
+			// TODO: Make this an automatic check based on drivers?
+#if true // ifdef MH_AMD_GPU
+			spirv_cross::CompilerGLSL glsl(kv.second);
+
+			spirv_cross::CompilerGLSL::Options options;
+			options.version = 430;
+			glsl.set_common_options(options);
+
+			std::string source = glsl.compile();
+
+			const char* sourceA[]{ source.c_str() };
+
+			MH_GL_CALL(glShaderSource(shader, 1, sourceA, 0));
+
+			MH_GL_CALL(glCompileShader(shader));
+#else
 			MH_GL_CALL(glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V, kv.second.data(), (int)(kv.second.size() * sizeof(uint32_t))));
 
 			MH_GL_CALL(glSpecializeShaderARB(shader, "main", 0, nullptr, nullptr));
+#endif
 
 			GLint isCompiled = 0;
 			MH_GL_CALL(glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled));
