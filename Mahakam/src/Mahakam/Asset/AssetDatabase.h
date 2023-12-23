@@ -55,8 +55,8 @@ namespace Mahakam
 
 		struct AssetSerializer
 		{
-			bool (*Serialize)(bitstream::growing_bit_writer<TrivialVector<uint32_t>>&) = nullptr;
-			bool (*Deserialize)(bitstream::fixed_bit_reader&) = nullptr;
+			bool (*Serialize)(bitstream::growing_bit_writer<TrivialVector<uint32_t>>&, void* asset) = nullptr;
+			Asset<void> (*Deserialize)(bitstream::fixed_bit_reader&) = nullptr;
 		};
 
 	private:
@@ -84,7 +84,7 @@ namespace Mahakam
 		inline static UnorderedMap<std::string, AssetSerializer> s_Serializers;
 
 		template<typename Stream>
-		bool SerializeAssetHeader(Stream& stream, AssetID& assetID, std::string& extension)
+		bool SerializeAssetHeader(Stream& stream, bitstream::inout<Stream, AssetID> assetID, bitstream::inout<Stream, std::string> extension)
 		{
 			BS_ASSERT(stream.template serialize<AssetID>(assetID));
 			BS_ASSERT(stream.template serialize<std::string>(extension, 32));
@@ -94,6 +94,9 @@ namespace Mahakam
 
 		void LoadDefaultSerializers();
 		AssetInfo ReadAssetHeader(const std::filesystem::path& filepath);
+
+		Asset<void> ReadAsset(const std::filesystem::path& filepath);
+		bool WriteAsset(Asset<void> asset, const std::string& extension, const std::filesystem::path& filepath);
 
 	public:
 		// Registering asset importers

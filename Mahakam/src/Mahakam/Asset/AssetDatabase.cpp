@@ -30,14 +30,15 @@ namespace Mahakam
 	void AssetDatabase::LoadDefaultSerializers()
 	{
 		AssetSerializer serializer;
-		serializer.Serialize = [](bitstream::growing_bit_writer<TrivialVector<uint32_t>>& writer)
-		{
-			return false;
-		};
-		serializer.Deserialize = [](bitstream::fixed_bit_reader& reader)
-		{
-			return false;
-		};
+		serializer.Serialize = [](bitstream::growing_bit_writer<TrivialVector<uint32_t>>& writer, void* asset)
+			{
+				Mesh* meshAsset = static_cast<Mesh*>(asset);
+				return false;
+			};
+		serializer.Deserialize = [](bitstream::fixed_bit_reader& reader) -> Asset<void>
+			{
+				return nullptr;
+			};
 
 		s_Serializers.emplace("mesh", serializer);
 	}
@@ -61,6 +62,55 @@ namespace Mahakam
 		info.Extension = extension;
 
 		return info;
+	}
+
+	Asset<void> AssetDatabase::ReadAsset(const std::filesystem::path& filepath)
+	{
+		TrivialVector<char> buffer;
+
+		if (!FileUtility::ReadFile(filepath, buffer))
+			return nullptr;
+
+		bitstream::fixed_bit_reader reader(buffer.data(), buffer.size() * 8U);
+
+		AssetID assetID;
+		std::string extension;
+		if (!SerializeAssetHeader(reader, assetID, extension))
+			return nullptr;
+
+		auto iter = s_Serializers.find(extension);
+		if (iter == s_Serializers.end())
+			return nullptr;
+
+		return iter->second.Deserialize(reader);
+	}
+
+	bool AssetDatabase::WriteAsset(Asset<void> asset, const std::string& extension, const std::filesystem::path& filepath)
+	{
+		auto iter = s_Serializers.find(extension);
+		if (iter == s_Serializers.end())
+			return false;
+
+		TrivialVector<uint32_t> buffer;
+		bitstream::growing_bit_writer<TrivialVector<uint32_t>> writer(buffer);
+
+		AssetID id = 0;
+		if (asset.GetID())
+			id = asset.GetID();
+		else
+			id = Random::GetRandomID64();
+
+		BS_ASSERT(SerializeAssetHeader(writer, id, extension));
+
+		BS_ASSERT(iter->second.Serialize(writer, asset.get()));
+
+		// TODO
+		//std::ofstream filestream(filepath);
+		//filestream.write(buffer.data(), buffer.size());
+
+		//filestream.close();
+
+		return true;
 	}
 
 	//void AssetDatabase::RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport)
