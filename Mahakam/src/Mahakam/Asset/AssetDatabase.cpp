@@ -27,6 +27,42 @@
 
 namespace Mahakam
 {
+	void AssetDatabase::LoadDefaultSerializers()
+	{
+		AssetSerializer serializer;
+		serializer.Serialize = [](bitstream::growing_bit_writer<TrivialVector<uint32_t>>& writer)
+		{
+			return false;
+		};
+		serializer.Deserialize = [](bitstream::fixed_bit_reader& reader)
+		{
+			return false;
+		};
+
+		s_Serializers.emplace("mesh", serializer);
+	}
+
+	AssetDatabase::AssetInfo AssetDatabase::ReadAssetHeader(const std::filesystem::path& filepath)
+	{
+		TrivialVector<char> buffer;
+
+		if (!FileUtility::ReadFile(filepath, buffer))
+			return {};
+
+		bitstream::fixed_bit_reader reader(buffer.data(), buffer.size() * 8U);
+
+		AssetID assetID;
+		std::string extension;
+		if (!SerializeAssetHeader(reader, assetID, extension))
+			return {};
+
+		AssetInfo info;
+		info.ID = assetID;
+		info.Extension = extension;
+
+		return info;
+	}
+
 	//void AssetDatabase::RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport)
 	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImporter)
 	{

@@ -110,8 +110,8 @@ namespace Mahakam
 			// TODO: Query glGetIntegerV(GL_NUM_COMPRESSED_TEXTURE_FORMATS) to determine DXT and BSTC support
 			//MH_GL_CALL(glGetTexLevelParameteriv(targetID, mip, GL_TEXTURE_INTERNAL_FORMAT, &internal_format));
 
-			if (compressed != is_compressed)
-				MH_WARN("Texture compression does not match preference! {0} != {1}", bool(is_compressed), compressed);
+			if (compressed != bool(is_compressed))
+				MH_WARN("Texture compression does not match preference!");
 
 			uint32_t mipSize;
 			if (is_compressed)

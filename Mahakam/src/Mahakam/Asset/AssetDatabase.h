@@ -4,6 +4,8 @@
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Types.h"
 
+#include <bitstream/bitstream.h>
+
 #include <filesystem>
 #include <string>
 
@@ -51,6 +53,12 @@ namespace Mahakam
 			void (*DeleteData)(void*);
 		};
 
+		struct AssetSerializer
+		{
+			bool (*Serialize)(bitstream::growing_bit_writer<TrivialVector<uint32_t>>&) = nullptr;
+			bool (*Deserialize)(bitstream::fixed_bit_reader&) = nullptr;
+		};
+
 	private:
 		// Asset importers are divided into editor and standalone
 		// ExtensionMap is used by the editor to equate various file formats to the importers
@@ -70,6 +78,22 @@ namespace Mahakam
 
 		inline static ImporterMap s_AssetImporters;
 		inline static LoadedMap s_LoadedAssets;
+
+
+		// TODO: Move into own class
+		inline static UnorderedMap<std::string, AssetSerializer> s_Serializers;
+
+		template<typename Stream>
+		bool SerializeAssetHeader(Stream& stream, AssetID& assetID, std::string& extension)
+		{
+			BS_ASSERT(stream.template serialize<AssetID>(assetID));
+			BS_ASSERT(stream.template serialize<std::string>(extension, 32));
+
+			return true;
+		}
+
+		void LoadDefaultSerializers();
+		AssetInfo ReadAssetHeader(const std::filesystem::path& filepath);
 
 	public:
 		// Registering asset importers
