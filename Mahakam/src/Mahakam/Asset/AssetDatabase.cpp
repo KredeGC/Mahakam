@@ -30,38 +30,20 @@ namespace Mahakam
 	void AssetDatabase::LoadDefaultSerializers()
 	{
 		AssetSerializer serializer;
-		serializer.Serialize = [](bitstream::growing_bit_writer<TrivialVector<uint32_t>>& writer, void* asset)
+		serializer.Serialize = [](bitstream::growing_bit_writer<TrivialVector<uint32_t>>& writer, Asset<void> asset)
 			{
-				Mesh* meshAsset = static_cast<Mesh*>(asset);
-				return false;
+				return writer.serialize<std::string>(asset.GetImportPath().string(), 256);
 			};
 		serializer.Deserialize = [](bitstream::fixed_bit_reader& reader) -> Asset<void>
 			{
-				return nullptr;
+				std::string filepath;
+				BS_ASSERT(reader.serialize<std::string>(filepath, 256));
+
+				// TODO: Move to AssetBaker
+				return Asset<void>(filepath);
 			};
 
 		s_Serializers.emplace("mesh", serializer);
-	}
-
-	AssetDatabase::AssetInfo AssetDatabase::ReadAssetHeader(const std::filesystem::path& filepath)
-	{
-		TrivialVector<char> buffer;
-
-		if (!FileUtility::ReadFile(filepath, buffer))
-			return {};
-
-		bitstream::fixed_bit_reader reader(buffer.data(), buffer.size() * 8U);
-
-		AssetID assetID;
-		std::string extension;
-		if (!SerializeAssetHeader(reader, assetID, extension))
-			return {};
-
-		AssetInfo info;
-		info.ID = assetID;
-		info.Extension = extension;
-
-		return info;
 	}
 
 	Asset<void> AssetDatabase::ReadAsset(const std::filesystem::path& filepath)
@@ -102,7 +84,7 @@ namespace Mahakam
 
 		BS_ASSERT(SerializeAssetHeader(writer, id, extension));
 
-		BS_ASSERT(iter->second.Serialize(writer, asset.get()));
+		BS_ASSERT(iter->second.Serialize(writer, asset));
 
 		// TODO
 		//std::ofstream filestream(filepath);

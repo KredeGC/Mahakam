@@ -14,7 +14,10 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include <magic_enum/magic_enum.hpp>
+
 #include <filesystem>
+#include <type_traits>
 
 namespace c4::yml
 {
@@ -33,7 +36,36 @@ namespace c4::yml
 	bool read(ryml::NodeRef const& n, glm::mat3* val);
 	bool read(ryml::NodeRef const& n, glm::mat4* val);
 
-	// Filesyste,
+	// Enums
+	template<typename T>
+	typename std::enable_if_t<std::is_enum_v<T>, size_t>
+	to_chars(ryml::substr buf, T v)
+	{
+		std::string_view name = magic_enum::enum_name(v);
+
+		if (buf.len < name.size())
+			return name.size();
+
+		std::memcpy(buf.str, name.data(), name.size());
+
+		return name.size();
+	}
+
+	template<typename T>
+	typename std::enable_if_t<std::is_enum_v<T>, bool>
+	from_chars(ryml::csubstr buf, T* v)
+	{
+		std::string name(buf.str, buf.str + buf.len);
+
+		auto opt = magic_enum::enum_cast<T>(name);
+		if (!opt)
+			return false;
+
+		*v = *opt;
+		return true;
+	}
+
+	// Filesystem
 	void write(ryml::NodeRef* n, std::filesystem::path const& val);
 
 	bool read(ryml::NodeRef const& n, std::filesystem::path* val);
