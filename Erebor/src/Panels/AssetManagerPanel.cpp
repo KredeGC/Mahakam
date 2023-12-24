@@ -13,19 +13,14 @@ namespace Mahakam::Editor
 		if (ImGui::Begin("Asset Manager", &m_Open))
 		{
 			// Search field, with dragdrop
-			char searchBuffer[GUI::MAX_STR_LEN]{ 0 };
-			strncpy(searchBuffer, m_SearchString.c_str(), m_SearchString.size());
-			if (ImGui::InputText("Search", searchBuffer, GUI::MAX_STR_LEN))
-				m_SearchString = std::string(searchBuffer);
-
 			const auto& importers = AssetDatabase::GetAssetImporters();
 			std::vector<std::string> extensions;
 			for (auto& importer : importers)
 				extensions.push_back(importer.first);
 
-			std::filesystem::path path;
-			if (GUI::DrawDragDropTarget(extensions, path))
-				m_SearchString = path.string();
+			std::filesystem::path search = m_SearchString;
+			if (GUI::DrawDragDropField("Search", extensions, search))
+				m_SearchString = search.string();
 
 			// TODO: Sort by references
 

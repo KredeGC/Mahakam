@@ -4,6 +4,8 @@
 #include "ResourceImporter.h"
 
 #include "AnimationResourceImporter.h"
+#include "MaterialResourceImporter.h"
+#include "ShaderResourceImporter.h"
 #include "SoundResourceImporter.h"
 #include "Texture2DResourceImporter.h"
 
@@ -79,10 +81,10 @@ namespace Mahakam
 		RegisterAssetImporter(".gltf", animationImporter);
 		RegisterAssetImporter(".glb", animationImporter);
 
-		//// Material
-		//Ref<MaterialAssetImporter> materialAssetImporter = CreateRef<MaterialAssetImporter>();
+		// Material
+		Ref<MaterialResourceImporter> materialImporter = CreateRef<MaterialResourceImporter>();
 
-		//RegisterAssetImporter(".material", materialAssetImporter);
+		RegisterAssetImporter(".material", materialImporter);
 
 		//// BoneMesh
 		//Ref<BoneMeshAssetImporter> boneAssetImporter = CreateRef<BoneMeshAssetImporter>();
@@ -110,10 +112,10 @@ namespace Mahakam
 
 		//RegisterAssetImporter(".uvsphere", uvSphereAssetImporter);
 
-		//// Shader
-		//Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
+		// Shader
+		Ref<ShaderResourceImporter> shaderImporter = CreateRef<ShaderResourceImporter>();
 
-		//RegisterAssetImporter(".shader", shaderAssetImporter);
+		RegisterAssetImporter(".shader", shaderImporter);
 
 		// Sound
 		Ref<SoundResourceImporter> soundImporter = CreateRef<SoundResourceImporter>();

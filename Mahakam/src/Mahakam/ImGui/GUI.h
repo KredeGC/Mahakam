@@ -30,6 +30,7 @@ namespace Mahakam::GUI
 	bool DrawDragDropEntity(const std::string& label, Entity& entity);
 
 	bool DrawDragDropField(const std::string& label, const std::string& extension, std::filesystem::path& importPath);
+	bool DrawDragDropField(const std::string& label, const std::vector<std::string>& extensions, std::filesystem::path& importPath);
 	bool DrawDragDropTarget(const std::vector<std::string>& extensions, std::filesystem::path& importPath);
 
 	bool DrawColor3Edit(const std::string& label, glm::vec3& value, ImGuiColorEditFlags flags = ImGuiColorEditFlags_None);
@@ -46,6 +47,36 @@ namespace Mahakam::GUI
 	bool DrawFloat4Drag(const std::string& label, glm::vec4& value, float speed, float min, float max);
 
 	bool DrawIntDrag(const std::string& label, int32_t& value, float speed, int32_t min, int32_t max);
+
+	template<size_t Size>
+	bool DrawDragDropField(const std::string& label, const std::array<std::string_view, Size>& extensions, std::filesystem::path& importPath)
+	{
+		std::string importString = importPath.string();
+		char filepathBuffer[MAX_STR_LEN]{ 0 };
+		strncpy(filepathBuffer, importString.c_str(), importString.size());
+		if (ImGui::InputText(label.c_str(), filepathBuffer, MAX_STR_LEN))
+		{
+			importPath = std::string(filepathBuffer);
+
+			return true;
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			for (auto& extension : extensions)
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(extension.c_str()))
+				{
+					importPath = (const char*)payload->Data;
+					return true;
+				}
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		return false;
+	}
 
 	template<typename T, size_t Size>
 	bool DrawComboBox(const std::string& label, T& value, const char* (&values)[Size])

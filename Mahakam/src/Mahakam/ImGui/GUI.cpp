@@ -242,6 +242,21 @@ namespace Mahakam::GUI
 		return false;
 	}
 
+	bool DrawDragDropField(const std::string& label, const std::vector<std::string>& extensions, std::filesystem::path& importPath)
+	{
+		std::string importString = importPath.string();
+		char filepathBuffer[MAX_STR_LEN]{ 0 };
+		strncpy(filepathBuffer, importString.c_str(), importString.size());
+		if (ImGui::InputText(label.c_str(), filepathBuffer, MAX_STR_LEN))
+		{
+			importPath = std::string(filepathBuffer);
+
+			return true;
+		}
+
+		return DrawDragDropTarget(extensions, importPath);
+	}
+
 	bool DrawDragDropTarget(const std::vector<std::string>& extensions, std::filesystem::path& importPath)
 	{
 		if (ImGui::BeginDragDropTarget())
