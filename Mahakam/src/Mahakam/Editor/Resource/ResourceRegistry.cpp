@@ -4,22 +4,15 @@
 #include "ResourceImporter.h"
 
 #include "AnimationResourceImporter.h"
+#include "BoneMeshResourceImporter.h"
+#include "CubeMeshResourceImporter.h"
+#include "CubeSphereMeshResourceImporter.h"
 #include "MaterialResourceImporter.h"
+#include "PlaneMeshResourceImporter.h"
 #include "ShaderResourceImporter.h"
 #include "SoundResourceImporter.h"
 #include "Texture2DResourceImporter.h"
-
-#include "../../Asset/AssetImporter.h"
-#include "../../Asset/AnimationAssetImporter.h"
-#include "../../Asset/BoneMeshAssetImporter.h"
-#include "../../Asset/CubeMeshAssetImporter.h"
-#include "../../Asset/CubeSphereMeshAssetImporter.h"
-#include "../../Asset/MaterialAssetImporter.h"
-#include "../../Asset/PlaneMeshAssetImporter.h"
-#include "../../Asset/ShaderAssetImporter.h"
-#include "../../Asset/SoundAssetImporter.h"
-#include "../../Asset/TextureAssetImporter.h"
-#include "../../Asset/UVSphereMeshAssetImporter.h"
+#include "UVSphereMeshResourceImporter.h"
 
 namespace Mahakam
 {
@@ -86,31 +79,31 @@ namespace Mahakam
 
 		RegisterAssetImporter(".material", materialImporter);
 
-		//// BoneMesh
-		//Ref<BoneMeshAssetImporter> boneAssetImporter = CreateRef<BoneMeshAssetImporter>();
+		// BoneMesh
+		Ref<BoneMeshResourceImporter> boneImporter = CreateRef<BoneMeshResourceImporter>();
 
-		//RegisterAssetImporter(".gltf", boneAssetImporter);
-		//RegisterAssetImporter(".glb", boneAssetImporter);
+		RegisterAssetImporter(".gltf", boneImporter);
+		RegisterAssetImporter(".glb", boneImporter);
 
-		//// CubeMesh
-		//Ref<CubeMeshAssetImporter> cubeAssetImporter = CreateRef<CubeMeshAssetImporter>();
+		// CubeMesh
+		Ref<CubeMeshResourceImporter> cubeImporter = CreateRef<CubeMeshResourceImporter>();
 
-		//RegisterAssetImporter(".cube", cubeAssetImporter);
+		RegisterAssetImporter(".cube", cubeImporter);
 
-		//// CubeSphereMesh
-		//Ref<CubeSphereMeshAssetImporter> cubeSphereAssetImporter = CreateRef<CubeSphereMeshAssetImporter>();
+		// CubeSphereMesh
+		Ref<CubeSphereMeshResourceImporter> cubeSphereImporter = CreateRef<CubeSphereMeshResourceImporter>();
 
-		//RegisterAssetImporter(".cubesphere", cubeSphereAssetImporter);
+		RegisterAssetImporter(".cubesphere", cubeSphereImporter);
 
-		//// PlaneMesh
-		//Ref<PlaneMeshAssetImporter> planeAssetImporter = CreateRef<PlaneMeshAssetImporter>();
+		// PlaneMesh
+		Ref<PlaneMeshResourceImporter> planeImporter = CreateRef<PlaneMeshResourceImporter>();
 
-		//RegisterAssetImporter(".plane", planeAssetImporter);
+		RegisterAssetImporter(".plane", planeImporter);
 
-		//// UVSphereMesh
-		//Ref<UVSphereMeshAssetImporter> uvSphereAssetImporter = CreateRef<UVSphereMeshAssetImporter>();
+		// UVSphereMesh
+		Ref<UVSphereMeshResourceImporter> uvSphereImporter = CreateRef<UVSphereMeshResourceImporter>();
 
-		//RegisterAssetImporter(".uvsphere", uvSphereAssetImporter);
+		RegisterAssetImporter(".uvsphere", uvSphereImporter);
 
 		// Shader
 		Ref<ShaderResourceImporter> shaderImporter = CreateRef<ShaderResourceImporter>();
