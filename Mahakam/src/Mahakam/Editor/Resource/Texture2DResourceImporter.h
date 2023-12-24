@@ -29,6 +29,6 @@ namespace Mahakam
 
 	private:
 		void CreatePreviewTexture();
-		TextureProps Texture2DResourceImporter::DeserializeProps(ryml::NodeRef& node);
+		TextureProps DeserializeProps(ryml::NodeRef& node);
 	};
 }
