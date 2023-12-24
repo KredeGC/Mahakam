@@ -110,12 +110,12 @@ namespace Mahakam
 
 	void Texture2DResourceImporter::OnImport(ryml::NodeRef& node)
 	{
-		node["Filepath"] << m_Filepath;
-		node["Format"] << m_Props.Format;
-		node["Filter"] << m_Props.FilterMode;
-		node["WrapX"] << m_Props.WrapX;
-		node["WrapY"] << m_Props.WrapY;
-		node["Mipmaps"] << m_Props.Mipmaps;
+		SerializeYAMLNode(node, "Filepath", m_Filepath);
+		SerializeYAMLNode(node, "Format", m_Props.Format);
+		SerializeYAMLNode(node, "Filter", m_Props.FilterMode);
+		SerializeYAMLNode(node, "WrapX", m_Props.WrapX);
+		SerializeYAMLNode(node, "WrapY", m_Props.WrapY);
+		SerializeYAMLNode(node, "Mipmaps", m_Props.Mipmaps);
 	}
 
 	Asset<void> Texture2DResourceImporter::CreateAsset(ryml::NodeRef& node)

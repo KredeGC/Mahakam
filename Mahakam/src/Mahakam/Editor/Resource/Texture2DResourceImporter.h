@@ -6,7 +6,6 @@
 
 namespace Mahakam
 {
-	class FrameBuffer;
 	class Texture;
 
 	class Texture2DResourceImporter : public ResourceImporter

@@ -36,35 +36,6 @@ namespace c4::yml
 	bool read(ryml::NodeRef const& n, glm::mat3* val);
 	bool read(ryml::NodeRef const& n, glm::mat4* val);
 
-	// Enums
-	template<typename T>
-	typename std::enable_if_t<std::is_enum_v<T>, size_t>
-	to_chars(ryml::substr buf, T v)
-	{
-		std::string_view name = magic_enum::enum_name(v);
-
-		if (buf.len < name.size())
-			return name.size();
-
-		std::memcpy(buf.str, name.data(), name.size());
-
-		return name.size();
-	}
-
-	template<typename T>
-	typename std::enable_if_t<std::is_enum_v<T>, bool>
-	from_chars(ryml::csubstr buf, T* v)
-	{
-		std::string name(buf.str, buf.str + buf.len);
-
-		auto opt = magic_enum::enum_cast<T>(name);
-		if (!opt)
-			return false;
-
-		*v = *opt;
-		return true;
-	}
-
 	// Filesystem
 	void write(ryml::NodeRef* n, std::filesystem::path const& val);
 
@@ -89,19 +60,48 @@ namespace c4::yml
 
 namespace Mahakam
 {
+	// Normal values
 	template<typename V>
-	void SerializeYAMLNode(ryml::NodeRef& node, const c4::csubstr& name, const V& value)
+	typename std::enable_if_t<!std::is_enum_v<V>>
+	SerializeYAMLNode(ryml::NodeRef& node, const c4::csubstr& name, const V& value)
 	{
 		node[name] << value;
 	}
 
 	template<typename V>
-	bool DeserializeYAMLNode(ryml::NodeRef& node, const c4::csubstr& name, V& value)
+	typename std::enable_if_t<!std::is_enum_v<V>, bool>
+	DeserializeYAMLNode(ryml::NodeRef& node, const c4::csubstr& name, V& value)
 	{
 		if (!node.has_child(name))
 			return false;
 
 		node[name] >> value;
+
+		return true;
+	}
+
+	// Enums
+	template<typename V>
+	typename std::enable_if_t<std::is_enum_v<V>>
+	SerializeYAMLNode(ryml::NodeRef& node, const c4::csubstr& name, V value)
+	{
+		std::string enum_name(magic_enum::enum_name(value));
+		SerializeYAMLNode(node, name, enum_name);
+	}
+
+	template<typename V>
+	typename std::enable_if_t<std::is_enum_v<V>, bool>
+	DeserializeYAMLNode(ryml::NodeRef& node, const c4::csubstr& name, V& value)
+	{
+		std::string enum_name;
+		if (!DeserializeYAMLNode(node, name, enum_name))
+			return false;
+
+		auto opt = magic_enum::enum_cast<V>(enum_name);
+		if (!opt)
+			return false;
+
+		value = *opt;
 
 		return true;
 	}
