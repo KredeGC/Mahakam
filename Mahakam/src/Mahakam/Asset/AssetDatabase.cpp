@@ -30,23 +30,27 @@ namespace Mahakam
 	void AssetDatabase::LoadDefaultSerializers()
 	{
 		AssetSerializer serializer;
-		serializer.Serialize = [](bitstream::growing_bit_writer<TrivialVector<uint32_t>>& writer, Asset<void> asset)
+		serializer.Serialize = [](bitstream::growing_bit_writer<TrivialVector<uint32_t>>& writer, void* asset)
 			{
-				return writer.serialize<std::string>(asset.GetImportPath().string(), 256);
-			};
-		serializer.Deserialize = [](bitstream::fixed_bit_reader& reader) -> Asset<void>
-			{
-				std::string filepath;
-				BS_ASSERT(reader.serialize<std::string>(filepath, 256));
+				return false;
 
-				// TODO: Move to AssetBaker
-				return Asset<void>(filepath);
+				//return writer.serialize<std::string>(asset.GetImportPath().string(), 256);
+			};
+		serializer.Deserialize = [](bitstream::fixed_bit_reader& reader) -> ControlBlock*
+			{
+				return nullptr;
+
+				//std::string filepath;
+				//BS_ASSERT(reader.serialize<std::string>(filepath, 256));
+
+				//// TODO: Move to AssetBaker
+				//return Asset<void>(filepath);
 			};
 
 		s_Serializers.emplace("mesh", serializer);
 	}
 
-	Asset<void> AssetDatabase::ReadAsset(const std::filesystem::path& filepath)
+	AssetDatabase::ControlBlock* AssetDatabase::ReadAsset(const std::filesystem::path& filepath)
 	{
 		TrivialVector<char> buffer;
 
@@ -67,7 +71,7 @@ namespace Mahakam
 		return iter->second.Deserialize(reader);
 	}
 
-	bool AssetDatabase::WriteAsset(Asset<void> asset, const std::string& extension, const std::filesystem::path& filepath)
+	bool AssetDatabase::WriteAsset(ControlBlock* asset, const std::string& extension, const std::filesystem::path& filepath)
 	{
 		auto iter = s_Serializers.find(extension);
 		if (iter == s_Serializers.end())
@@ -77,14 +81,14 @@ namespace Mahakam
 		bitstream::growing_bit_writer<TrivialVector<uint32_t>> writer(buffer);
 
 		AssetID id = 0;
-		if (asset.GetID())
-			id = asset.GetID();
+		if (asset->ID)
+			id = asset->ID;
 		else
 			id = Random::GetRandomID64();
 
 		BS_ASSERT(SerializeAssetHeader(writer, id, extension));
 
-		BS_ASSERT(iter->second.Serialize(writer, asset));
+		BS_ASSERT(iter->second.Serialize(writer, asset + 1));
 
 		// TODO
 		//std::ofstream filestream(filepath);
