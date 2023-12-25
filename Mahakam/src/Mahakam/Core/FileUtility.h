@@ -18,6 +18,8 @@ namespace Mahakam
 		inline static Filepath IMPORT_PATH = "import";
 		inline static Filepath ASSET_PATH = "assets";
 
+		inline static const std::string AssetExtension = ".asset";
+
 		static void SetProjectDirectory(const Filepath& filepath);
 
 		static void SetWorkingDirectory(const Filepath& filepath);
@@ -28,7 +30,7 @@ namespace Mahakam
 		static bool Exists(const Filepath& src);
 		static void CreateDirectories(const Filepath& src);
 		static Filepath GetCachePath(const Filepath& filepath);
-		static Filepath GetImportPath(const Filepath& filepath);
+		static Filepath GetImportPath(const Filepath& filepath, const std::string& extension);
 		static Filepath GetAssetPath(const Filepath& filepath);
 
 		// Defined by each platform

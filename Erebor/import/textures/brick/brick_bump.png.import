@@ -1,0 +1,8 @@
+Filepath: resource/textures/brick/brick_bump.png
+Extension: .tex2d
+ID: 125392180592167870
+Format: RG_BC5
+Filter: Point
+WrapX: Repeat
+WrapY: Repeat
+Mipmaps: true

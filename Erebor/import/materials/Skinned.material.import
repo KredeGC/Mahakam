@@ -1,0 +1,10 @@
+Extension: .material
+ID: 7079340428320316353
+Shader: 9447544911046152283
+Properties:
+  Uniforms.Color: [0.678431392, 0.43921569, 0.219607845]
+  Uniforms.MetallicMul: 0
+  Uniforms.EmissionColor: [0, 0, 0]
+  Uniforms.RoughnessMul: 0.430999994
+  Uniforms.UVTransform: [0, 0, 0, 0]
+  Uniforms.finalBonesMatrices: [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]

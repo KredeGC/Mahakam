@@ -1,0 +1,8 @@
+Filepath: resource/textures/fabric/fabric_roughness.png
+Extension: .tex2d
+ID: 10341743577412507490
+Format: R_BC4
+Filter: Bilinear
+WrapX: Repeat
+WrapY: Repeat
+Mipmaps: true

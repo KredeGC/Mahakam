@@ -1,0 +1,8 @@
+Filepath: resource/textures/backpack/roughness.jpg
+Extension: .tex2d
+ID: 1646747611554353250
+Format: R_BC4
+Filter: Bilinear
+WrapX: RepeaBilinear
+WrapY: Repeat
+Mipmaps: true

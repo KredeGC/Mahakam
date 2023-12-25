@@ -13,6 +13,79 @@ namespace Mahakam::Editor
 		return tree;
 	}
 
+	static ryml::Tree ImportTree(ResourceImporter& importer)
+	{
+		ryml::Tree tree;
+
+		ryml::NodeRef root = tree.rootref();
+		root |= ryml::MAP;
+
+		importer.OnImport(root);
+
+		return tree;
+	}
+
+	static ryml::Tree ReadImport(const std::filesystem::path& importPath)
+	{
+		if (!FileUtility::Exists(importPath))
+			return CreateEmptyTree();
+
+		TrivialVector<char> buffer;
+
+		if (!FileUtility::ReadFile(importPath, buffer))
+			return CreateEmptyTree();
+
+		try
+		{
+			return ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
+		}
+		catch (std::runtime_error const& e)
+		{
+			MH_WARN("Asset Import Wizard experienced an error when reading {0}: {1}", importPath.string(), e.what());
+
+			return CreateEmptyTree();
+		}
+	}
+
+	static void SaveImport(ryml::Tree& tree, const std::filesystem::path& importPath, const std::string& extension, AssetDatabase::AssetID id)
+	{
+		MH_ASSERT(id, "AssetID cannot be 0");
+
+		ryml::NodeRef root = tree.rootref();
+
+		root["Extension"] << extension;
+		root["ID"] << id;
+
+		std::ofstream filestream(importPath);
+		filestream << tree;
+
+		filestream.close();
+	}
+
+	static void SaveImport(ryml::Tree& tree, const std::filesystem::path& importPath, ResourceImporter& importer, AssetDatabase::AssetID id)
+	{
+		MH_ASSERT(id, "AssetID cannot be 0");
+
+		ryml::NodeRef root = tree.rootref();
+
+		// Create asset from tree
+		Asset<void> asset = importer.CreateAsset(root);
+
+		// Add ID and extension to tree root
+		root["Extension"] << importer.GetImporterProps().Extension;
+		root["ID"] << id;
+
+		// Save tree to file
+		std::ofstream filestream(importPath);
+		filestream << tree;
+		filestream.close();
+
+		// Save asset
+		asset.Save(importer.GetImporterProps().Extension, FileUtility::GetAssetPath(importPath));
+
+		// TODO: Asset<T> should not have a Save() function any longer
+	}
+
 	void ImportWizardPanel::OnImGuiRender()
 	{
 		Ref<ResourceImporter> importer;
@@ -58,12 +131,7 @@ namespace Mahakam::Editor
 					ryml::Tree tree = ImportTree(*importer);
 
 					// Save tree
-					SaveImport(tree, m_ImportPath, importer->GetImporterProps().Extension, m_AssetID);
-
-					Asset<void> asset = importer->CreateAsset(tree.rootref());
-
-					// TODO: CreateAsset and Save
-					// TODO: Asset<T> should not have a Save() function any longer
+					SaveImport(tree, m_ImportPath, *importer, m_AssetID);
 
 					m_Open = false;
 				}
@@ -71,55 +139,6 @@ namespace Mahakam::Editor
 
 			ImGui::End();
 		}
-	}
-
-	ryml::Tree ImportWizardPanel::ImportTree(ResourceImporter& importer)
-	{
-		ryml::Tree tree;
-
-		ryml::NodeRef root = tree.rootref();
-		root |= ryml::MAP;
-
-		importer.OnImport(root);
-
-		return tree;
-	}
-
-	ryml::Tree ImportWizardPanel::ReadImport(const std::filesystem::path& importPath)
-	{
-		if (!FileUtility::Exists(importPath))
-			return CreateEmptyTree();
-
-		TrivialVector<char> buffer;
-
-		if (!FileUtility::ReadFile(importPath, buffer))
-			return CreateEmptyTree();
-
-		try
-		{
-			return ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
-		}
-		catch (std::runtime_error const& e)
-		{
-			MH_WARN("Asset Import Wizard experienced an error when reading {0}: {1}", importPath.string(), e.what());
-
-			return CreateEmptyTree();
-		}
-	}
-
-	void ImportWizardPanel::SaveImport(ryml::Tree& tree, const std::filesystem::path& importPath, const std::string& extension, AssetDatabase::AssetID id)
-	{
-		MH_ASSERT(id, "AssetID cannot be 0");
-
-		ryml::NodeRef root = tree.rootref();
-
-		root["Extension"] << extension;
-		root["ID"] << id;
-
-		std::ofstream filestream(importPath);
-		filestream << tree;
-
-		filestream.close();
 	}
 
 	void ImportWizardPanel::ResourceOpen(const std::filesystem::path& filepath, const std::string& extension)
@@ -132,7 +151,7 @@ namespace Mahakam::Editor
 				ryml::Tree tree = ImportTree(*importer);
 
 				// Save tree
-				std::filesystem::path importPath = FileUtility::GetImportPath(filepath);
+				std::filesystem::path importPath = FileUtility::GetImportPath(filepath, importer->GetImporterProps().Extension);
 				SaveImport(tree, importPath, importer->GetImporterProps().Extension, Random::GetRandomID64());
 			}
 			else
@@ -141,7 +160,7 @@ namespace Mahakam::Editor
 
 				window->m_Open = true;
 				window->m_Importer = importer;
-				window->m_ImportPath = FileUtility::GetImportPath(filepath);
+				window->m_ImportPath = FileUtility::GetImportPath(filepath, importer->GetImporterProps().Extension);
 				window->m_AssetID = Random::GetRandomID64();
 
 				// Open the wizard with the filepath

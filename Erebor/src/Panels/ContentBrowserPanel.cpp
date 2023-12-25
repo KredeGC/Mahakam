@@ -32,7 +32,7 @@ namespace Mahakam::Editor
 
 			ClearFileStructure(m_RootDir);
 
-			CreateFileStructure(m_RootDir, FileUtility::ASSET_PATH);
+			CreateFileStructure(m_RootDir, FileUtility::RESOURCE_PATH);
 
 			CreateDirectories(m_CurrentDirectory);
             
@@ -55,7 +55,7 @@ namespace Mahakam::Editor
 
 					ImGui::BeginChild("File Browser Child", { 0, -2 }, false);
 
-					DrawDirectoryRecursive(m_RootDir, FileUtility::ASSET_PATH);
+					DrawDirectoryRecursive(m_RootDir, FileUtility::RESOURCE_PATH);
 
 					ImGui::EndChild();
 
@@ -106,7 +106,7 @@ namespace Mahakam::Editor
 		}
 
 		// Search the "imports/assets" path
-		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
+		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::RESOURCE_PATH);
 		if (FileUtility::Exists(importPath))
 		{
 			auto importIter = std::filesystem::directory_iterator(importPath);
@@ -148,7 +148,7 @@ namespace Mahakam::Editor
 			}
 		}
 
-		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
+		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::RESOURCE_PATH);
 		if (FileUtility::Exists(importPath))
 		{
 			auto importIter = std::filesystem::directory_iterator(importPath);
@@ -166,7 +166,7 @@ namespace Mahakam::Editor
         
         //m_Icons.clear();
         
-        Filepath importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(m_CurrentDirectory, FileUtility::PROJECT_PATH);
+        Filepath importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(m_CurrentDirectory, FileUtility::RESOURCE_PATH);
         for (auto& file : std::filesystem::directory_iterator(importDirectory))
         {
             if (std::filesystem::is_directory(file)) continue;
@@ -251,7 +251,7 @@ namespace Mahakam::Editor
 			if (ImGui::BeginTable("Directory Divisor", numColumns))
 			{
 				// Draw .. directory
-				if (basePath != FileUtility::ASSET_PATH)
+				if (basePath != FileUtility::RESOURCE_PATH)
 				{
 					ImGui::TableNextColumn();
 
@@ -304,7 +304,7 @@ namespace Mahakam::Editor
 		{
 			if (ImGui::BeginTable("Import Divisor", numColumns))
 			{
-				std::filesystem::path importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(basePath, FileUtility::PROJECT_PATH);
+				std::filesystem::path importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(basePath, FileUtility::RESOURCE_PATH);
 				if (std::filesystem::exists(importDirectory))
 				{
 					for (auto& file : std::filesystem::directory_iterator(importDirectory))
@@ -406,8 +406,6 @@ namespace Mahakam::Editor
 							{
 								ImGui::Text("Import asset as...");
 
-								std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
-
 								auto ext = ResourceRegistry::GetAssetImporterExtension(m_ImporterExtension);
 								auto iter = ext.first;
 								auto iterEnd = ext.second;
@@ -438,7 +436,7 @@ namespace Mahakam::Editor
 		{
 			if (ImGui::BeginMenu("Create"))
 			{
-				const auto& importers = AssetDatabase::GetAssetImporters();
+				const auto& importers = ResourceRegistry::GetAssetImporters();
 
 				for (const auto& kv : importers)
 				{
@@ -447,9 +445,8 @@ namespace Mahakam::Editor
 					{
 						if (ImGui::MenuItem(props.Name.c_str()))
 						{
-							std::string filename = props.Name + props.Extension;
-							std::filesystem::path filepath = m_CurrentDirectory / filename;
-							std::filesystem::path importPath = FileUtility::GetImportPath(filepath);
+							std::filesystem::path filepath = m_CurrentDirectory / props.Name;
+							std::filesystem::path importPath = FileUtility::GetImportPath(filepath, props.Extension);
 							ImportWizardPanel::ImportOpen(importPath, props.Extension);
 						}
 					}

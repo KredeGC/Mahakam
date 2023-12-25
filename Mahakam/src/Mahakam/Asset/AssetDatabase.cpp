@@ -315,7 +315,7 @@ namespace Mahakam
 	MH_DEFINE_FUNC(AssetDatabase::RefreshAssetImports, void)
 	{
 		s_AssetPaths.clear();
-		RecursiveCacheAssets(FileUtility::IMPORT_PATH);
+		RecursiveCacheAssets(FileUtility::ASSET_PATH);
 	};
 
 	//std::filesystem::path AssetDatabase::GetAssetImportPath(AssetDatabase::AssetID id)
@@ -577,7 +577,7 @@ namespace Mahakam
 			{
 				RecursiveCacheAssets(directory.path());
 			}
-			else if (directory.path().extension() == ".import")
+			else if (directory.path().extension() == FileUtility::AssetExtension)
 			{
 				AssetID id = ReadAssetInfo(directory.path()).ID;
 
@@ -594,6 +594,10 @@ namespace Mahakam
 
 					s_AssetPaths[id] = filepathUnix;
 				}
+			}
+			else
+			{
+				MH_WARN("Found a file without the .asset extension inside the assets/ directory: {0}", directory.path().string());
 			}
 		}
 	}

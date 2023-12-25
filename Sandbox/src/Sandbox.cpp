@@ -75,7 +75,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<Mesh> planeMesh = Asset<Mesh>("import/assets/models/Plane.plane.import");
+	Asset<Mesh> planeMesh = Asset<Mesh>("assets/models/Plane.plane.asset");
 
 	/*Ref<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
 
@@ -95,9 +95,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 0
 	// Create backpack model
-	Asset<Mesh> backpackModel = Mesh::LoadMesh("assets/models/backpack.gltf");
+	Asset<Mesh> backpackModel = Mesh::LoadMesh("resource/models/backpack.gltf");
 
-	Asset<Material> backpackMaterial = Asset<Material>("import/assets/materials/Backpack.material.import");
+	Asset<Material> backpackMaterial = Asset<Material>("assets/materials/Backpack.material.asset");
 
 	// Create backpack entity
 	Entity backpackEntity = scene->CreateEntity("Bacpack");
@@ -111,12 +111,12 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
 
 	// Create glTF skinned model
-	Asset<BoneMesh> skinnedModel = Asset<BoneMesh>("import/assets/models/mannequin_clap.bone.import");
-	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.glb");
-	Asset<Animation> skinnedAnimation = Asset<Animation>("import/assets/models/ClapAnimation.anim.import");
-	//Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.glb");
+	Asset<BoneMesh> skinnedModel = Asset<BoneMesh>("assets/models/mannequin_clap.bone.asset");
+	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("resource/models/mannequin_clap.glb");
+	Asset<Animation> skinnedAnimation = Asset<Animation>("assets/models/ClapAnimation.anim.asset");
+	//Asset<Animation> skinnedAnimation = Animation::Load("resource/models/mannequin_clap.glb");
 
-	//Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
+	//Asset<Material> skinnedMaterial = Asset<Material>("assets/materials/Skinned.material.asset");
 
 	// Create backpack entity
 	Entity skinnedEntity = scene->CreateEntity("Skinned glTF");
@@ -132,7 +132,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 0
 	// Create piano sound entity
-	Asset<Sound> pianoSound = Asset<Sound>("import/assets/sounds/piano.wav.import");
+	Asset<Sound> pianoSound = Asset<Sound>("assets/sounds/piano.wav.asset");
 
 	Entity pianoEntity = scene->CreateEntity("Piano");
 	pianoEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
@@ -143,7 +143,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create vespa sound entity
-	Asset<Sound> vespaSound = Asset<Sound>("import/assets/sounds/vespa.wav.import");
+	Asset<Sound> vespaSound = Asset<Sound>("assets/sounds/vespa.wav.asset");
 
 	Entity vespaEntity = scene->CreateEntity("Vespa Sound");
 	vespaEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
@@ -154,7 +154,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create base collection entity to store in
-	Asset<Mesh> sphereMesh = Asset<Mesh>("import/assets/models/CubeSphere.cubesphere.import");
+	Asset<Mesh> sphereMesh = Asset<Mesh>("assets/models/CubeSphere.cubesphere.asset");
 
 	// Create base collection entity to store in
 	Entity sphereCollection = scene->CreateEntity("Spheres");

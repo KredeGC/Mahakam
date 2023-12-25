@@ -96,9 +96,9 @@ namespace Mahakam
 	void MaterialResourceImporter::OnImportOpen(ryml::NodeRef& node)
 	{
 		// Load the preview skybox
-		Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/internal/PreviewSky.material.import");
-		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/internal/previewirradiance.hdr.import");
-		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/internal/previewspecular.hdr.import");
+		Asset<Material> skyboxMaterial = Asset<Material>("assets/materials/internal/PreviewSky.material.asset");
+		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("assets/textures/internal/previewirradiance.hdr.asset");
+		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("assets/textures/internal/previewspecular.hdr.asset");
 
 		m_SceneData->Environment.SkyboxMaterial = skyboxMaterial;
 		m_SceneData->Environment.IrradianceMap = skyboxIrradiance;
