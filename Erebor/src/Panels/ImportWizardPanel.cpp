@@ -63,6 +63,7 @@ namespace Mahakam::Editor
 					Asset<void> asset = importer->CreateAsset(tree.rootref());
 
 					// TODO: CreateAsset and Save
+					// TODO: Asset<T> should not have a Save() function any longer
 
 					m_Open = false;
 				}

@@ -12,6 +12,7 @@
 #include "ShaderResourceImporter.h"
 #include "SoundResourceImporter.h"
 #include "Texture2DResourceImporter.h"
+#include "TextureCubeResourceImporter.h"
 #include "UVSphereMeshResourceImporter.h"
 
 namespace Mahakam
@@ -116,13 +117,21 @@ namespace Mahakam
 		RegisterAssetImporter(".wav", soundImporter);
 		RegisterAssetImporter(".mp3", soundImporter);
 
-		// Texture
+		// Texture2D
 		Ref<Texture2DResourceImporter> texture2DImporter = CreateRef<Texture2DResourceImporter>();
 
 		RegisterAssetImporter(".png", texture2DImporter);
 		RegisterAssetImporter(".jpeg", texture2DImporter);
 		RegisterAssetImporter(".jpg", texture2DImporter);
 		//RegisterAssetImporter(".hdr", texture2DImporter);
+
+		// TextureCube
+		Ref<TextureCubeResourceImporter> textureCubeImporter = CreateRef<TextureCubeResourceImporter>();
+
+		RegisterAssetImporter(".png", textureCubeImporter);
+		RegisterAssetImporter(".jpeg", textureCubeImporter);
+		RegisterAssetImporter(".jpg", textureCubeImporter);
+		RegisterAssetImporter(".hdr", textureCubeImporter);
 	}
 
 	void ResourceRegistry::DeregisterDefaultAssetImporters()
@@ -157,7 +166,13 @@ namespace Mahakam
 		DeregisterAssetImporter(".wav");
 		DeregisterAssetImporter(".mp3");
 
-		// Texture
+		// Texture2D
+		DeregisterAssetImporter(".png");
+		DeregisterAssetImporter(".jpeg");
+		DeregisterAssetImporter(".jpg");
+		//DeregisterAssetImporter(".hdr");
+
+		// TextureCube
 		DeregisterAssetImporter(".png");
 		DeregisterAssetImporter(".jpeg");
 		DeregisterAssetImporter(".jpg");

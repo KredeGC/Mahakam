@@ -57,7 +57,7 @@ namespace Mahakam
 		if (!FileUtility::ReadFile(filepath, buffer))
 			return nullptr;
 
-		bitstream::fixed_bit_reader reader(buffer.data(), buffer.size() * 8U);
+		bitstream::fixed_bit_reader reader(buffer.data(), static_cast<uint32_t>(buffer.size() * 8U));
 
 		AssetID assetID;
 		std::string extension;
