@@ -6,28 +6,29 @@ Skybox:
 Entities:
   - ID: 0
     Tag: Main Camera
+    Audio Listener: {}
     Transform:
       Translation: [4.5,4.5,12.5]
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Camera:
       Projection: 0
-      FOV: 0.785398
+      FOV: 0.7853982
       NearZ: 0.01
       FarZ: 100
       Size: 10
-      Ratio: 1.74958
+      Ratio: 1.5687733
       FixedRatio: 0
   - ID: 1
     Tag: Main Light
     Transform:
       Translation: [0,0,0]
-      Rotation: [0.0664486,-0.0242556,-0.93702,-0.342039]
+      Rotation: [0.06644859,-0.02425563,-0.9370196,-0.34203884]
       Scale: [1,1,1]
     Light:
       LightType: 0
       Range: 20
-      FOV: 1.0472
+      FOV: 1.0471976
       Color: [1,1,1]
       ShadowCasting: 1
       ShadowBias: 0.05
@@ -37,12 +38,12 @@ Entities:
     Tag: Spot Light
     Transform:
       Translation: [1,2.5,4]
-      Rotation: [-1.13133e-08,4.2222e-08,0.258819,0.965926]
+      Rotation: [-1.1313341e-08,4.222196e-08,0.25881907,0.9659258]
       Scale: [1,1,1]
     Light:
       LightType: 2
       Range: 10
-      FOV: 0.785398
+      FOV: 0.7853982
       Color: [1,1,1]
       ShadowCasting: 1
       ShadowBias: 0.1
@@ -164,566 +165,566 @@ Entities:
     Parent: 6
     Transform:
       Translation: [0,0,-0]
-      Rotation: [0.707107,0.707107,0,-0]
+      Rotation: [0.7071067,0.7071068,0,-0]
       Scale: [0.01,0.01,0.01]
   - ID: 8
     Tag: Ch36
     Parent: 7
     Transform:
       Translation: [0,0,0]
-      Rotation: [0.707107,0,0,-0.707107]
-      Scale: [100,100,100]
+      Rotation: [0.7071069,0,0,-0.70710665]
+      Scale: [100.00001,100.00001,99.999985]
   - ID: 9
     Tag: 'mixamorig1:Hips'
     Parent: 7
     Transform:
-      Translation: [-0.0883508,0.749492,-60.0242]
-      Rotation: [0.705639,-0.70842,0.0128174,0.00705915]
-      Scale: [1,1,1]
+      Translation: [0.18484241,0.578847,-59.973637]
+      Rotation: [0.7025814,-0.7115917,0.00407482,0.00021583326]
+      Scale: [0.9999999,0.9999999,1]
   - ID: 10
     Tag: 'mixamorig1:Spine'
     Parent: 9
     Transform:
-      Translation: [-3.58793e-07,9.71727,-1.18024]
-      Rotation: [0.999487,0.0301928,0.000161895,-0.0106661]
-      Scale: [1,1,1]
+      Translation: [-2.3841858e-07,9.717266,-1.1802443]
+      Rotation: [0.9994431,0.027084094,-0.0007827864,-0.019478688]
+      Scale: [1,1.0000002,1.0000005]
   - ID: 11
     Tag: 'mixamorig1:Spine1'
     Parent: 10
     Transform:
-      Translation: [-4.71384e-08,11.4201,1.21041e-06]
-      Rotation: [0.99997,-0.00349818,0.000465433,0.00682258]
+      Translation: [2.3753184e-07,11.420133,1.6093254e-06]
+      Rotation: [0.999903,-0.008874942,0.0014537838,-0.010641456]
       Scale: [1,1,1]
   - ID: 12
     Tag: 'mixamorig1:Spine2'
     Parent: 11
     Transform:
-      Translation: [0,13.0516,-1.35026e-06]
-      Rotation: [0.999968,-0.00347892,0.000734628,0.00720419]
-      Scale: [1,1,1]
+      Translation: [8.867455e-10,13.051567,-1.430509e-06]
+      Rotation: [0.9999062,-0.008898367,0.0017435524,-0.010265198]
+      Scale: [0.9999999,1,0.9999999]
   - ID: 13
     Tag: 'mixamorig1:Neck'
     Parent: 12
     Transform:
-      Translation: [3.18668e-07,14.683,3.04481e-06]
-      Rotation: [0.998584,0.0457386,-0.0191894,0.0192102]
-      Scale: [1,0.999999,0.999999]
+      Translation: [4.7506367e-07,14.68303,2.6150138e-07]
+      Rotation: [0.99845374,0.04726461,-0.0023018713,-0.029169079]
+      Scale: [0.9999998,0.9999994,0.9999993]
   - ID: 14
     Tag: 'mixamorig1:Head'
     Parent: 13
     Transform:
-      Translation: [1.55837e-07,6.7202,1.97216]
-      Rotation: [0.999524,-0.0146557,-0.0179941,0.0203342]
-      Scale: [1,1,1]
+      Translation: [3.546982e-09,6.7201996,1.9721574]
+      Rotation: [0.9994858,-0.013124718,-0.0040593566,-0.028976824]
+      Scale: [1.0000001,1,0.99999994]
   - ID: 15
     Tag: 'mixamorig1:HeadTop_End'
     Parent: 14
     Transform:
-      Translation: [1.26535e-06,20.9998,6.16276]
-      Rotation: [1,-4.35224e-09,-1.23569e-09,-1.2578e-09]
-      Scale: [1,1,1]
+      Translation: [-3.7934171e-06,20.999847,6.162764]
+      Rotation: [1,-3.7322185e-09,-3.5141093e-10,1.1061546e-08]
+      Scale: [0.99999994,0.9999999,0.99999994]
   - ID: 16
     Tag: 'mixamorig1:HeadTop_End_end'
     Parent: 15
     Transform:
-      Translation: [3.11675e-07,21.8855,1.12041e-07]
-      Rotation: [1,4.44516e-09,-1.86264e-09,-2.22586e-10]
-      Scale: [1,1,1]
+      Translation: [-1.8931607e-06,21.885468,-3.4343594e-07]
+      Rotation: [1,4.4451576e-09,-2.3239764e-10,-1.30859e-10]
+      Scale: [1.0000001,1.0000001,1.0000001]
   - ID: 17
     Tag: 'mixamorig1:LeftShoulder'
     Parent: 12
     Transform:
-      Translation: [6.14016,13.0008,-0.233593]
-      Rotation: [0.428873,0.630818,0.377659,-0.524891]
-      Scale: [1,0.999999,0.999999]
+      Translation: [6.140153,13.000744,-0.23359258]
+      Rotation: [0.43261594,0.65463674,0.3555446,-0.50782114]
+      Scale: [0.99999946,0.99999946,0.99999934]
   - ID: 18
     Tag: 'mixamorig1:LeftArm'
     Parent: 17
     Transform:
-      Translation: [-7.11569e-07,13.0059,-4.67351e-06]
-      Rotation: [0.926862,0.32588,0.10105,0.156581]
-      Scale: [1,1,1]
+      Translation: [-4.598437e-07,13.005935,-1.7522622e-06]
+      Rotation: [0.8520183,0.50290954,-0.10630075,0.099232204]
+      Scale: [0.99999994,0.9999997,0.99999976]
   - ID: 19
     Tag: 'mixamorig1:LeftForeArm'
     Parent: 18
     Transform:
-      Translation: [2.48251e-06,25.5608,1.3867e-05]
-      Rotation: [0.678389,0.0870019,-0.00189433,0.729531]
-      Scale: [1,1,1]
+      Translation: [1.0000025e-05,25.560787,1.1200226e-05]
+      Rotation: [0.737999,0.079839766,-0.002123331,0.6700587]
+      Scale: [1.0000005,1,0.9999998]
   - ID: 20
     Tag: 'mixamorig1:LeftHand'
     Parent: 19
     Transform:
-      Translation: [7.46472e-06,23.4041,1.20074e-05]
-      Rotation: [0.935726,-0.244786,-0.175631,-0.183442]
-      Scale: [1,1,1]
+      Translation: [-2.2729187e-06,23.404125,1.6021713e-05]
+      Rotation: [0.83443534,-0.41325673,-0.3167079,-0.18064561]
+      Scale: [0.99999964,0.9999998,0.9999996]
   - ID: 21
     Tag: 'mixamorig1:LeftHandThumb1'
     Parent: 20
     Transform:
-      Translation: [-2.86771,3.93583,1.1883]
-      Rotation: [0.962238,0.0335086,0.155864,0.220639]
-      Scale: [1,1,1]
+      Translation: [-2.8677082,3.9358308,1.188304]
+      Rotation: [0.9268736,-0.07006576,0.18778566,0.3173838]
+      Scale: [1.0000002,0.9999997,1.0000005]
   - ID: 22
     Tag: 'mixamorig1:LeftHandThumb2'
     Parent: 21
     Transform:
-      Translation: [-0.405414,3.98958,2.24535e-05]
-      Rotation: [0.988927,0.109236,-0.100107,-0.00828777]
-      Scale: [1,1,1]
+      Translation: [-0.40539533,3.9895842,2.7457128e-05]
+      Rotation: [0.98408264,0.083241634,-0.0010523102,-0.15700677]
+      Scale: [0.99999994,1.0000006,1]
   - ID: 23
     Tag: 'mixamorig1:LeftHandThumb3'
     Parent: 22
     Transform:
-      Translation: [-0.0373157,3.59991,9.83992e-06]
-      Rotation: [0.994379,-0.0729376,-0.0593835,-0.0486191]
-      Scale: [1,1,1]
+      Translation: [-0.037305623,3.5999126,7.898361e-06]
+      Rotation: [0.994793,-0.09139383,0.01998811,-0.040430292]
+      Scale: [0.9999999,0.99999964,0.99999964]
   - ID: 24
     Tag: 'mixamorig1:LeftHandThumb4'
     Parent: 23
     Transform:
-      Translation: [0.442699,2.97906,5.6488e-06]
-      Rotation: [1,2.35692e-08,2.53555e-07,2.87142e-08]
-      Scale: [1,1,1]
+      Translation: [0.44271424,2.9790506,5.020982e-06]
+      Rotation: [1,-3.6698544e-09,2.635435e-07,2.8370703e-08]
+      Scale: [0.9999999,1,0.99999994]
   - ID: 25
     Tag: 'mixamorig1:LeftHandThumb4_end'
     Parent: 24
     Transform:
-      Translation: [-8.58307e-06,3.01177,-1.77895e-05]
-      Rotation: [1,-1.19136e-07,5.74089e-07,3.39306e-07]
-      Scale: [1,1,1]
+      Translation: [-1.6184094e-05,3.01177,-2.0973734e-05]
+      Rotation: [1,-1.1184186e-07,5.727288e-07,3.3622138e-07]
+      Scale: [0.99999994,0.9999999,0.99999994]
   - ID: 26
     Tag: 'mixamorig1:LeftHandIndex1'
     Parent: 20
     Transform:
-      Translation: [-3.48424,11.7579,0.113076]
-      Rotation: [0.993357,0.109975,0.0338643,-0.000997107]
-      Scale: [1,1,1]
+      Translation: [-3.4842484,11.7579,0.113075286]
+      Rotation: [0.98560166,-0.15452181,0.021401634,0.065226994]
+      Scale: [1.0000004,0.9999997,1.0000007]
   - ID: 27
     Tag: 'mixamorig1:LeftHandIndex2'
     Parent: 26
     Transform:
-      Translation: [0.0231127,3.2984,7.27775e-06]
-      Rotation: [0.998336,0.0563396,1.07656e-05,-0.0122826]
-      Scale: [1,1,1]
+      Translation: [0.02311018,3.2983983,8.739975e-06]
+      Rotation: [0.9991736,0.039405987,5.139487e-05,-0.009976698]
+      Scale: [1.0000002,0.9999998,0.99999976]
   - ID: 28
     Tag: 'mixamorig1:LeftHandIndex3'
     Parent: 27
     Transform:
-      Translation: [-0.00681538,3.08105,-8.21991e-06]
-      Rotation: [0.995745,0.0910377,0.000271414,-0.0143071]
-      Scale: [1,1,1]
+      Translation: [-0.0068128114,3.081052,-7.908778e-06]
+      Rotation: [0.9981503,-0.06046391,-0.00035127415,0.0063461657]
+      Scale: [1,1.0000004,0.9999999]
   - ID: 29
     Tag: 'mixamorig1:LeftHandIndex4'
     Parent: 28
     Transform:
-      Translation: [-0.016302,2.71209,-3.00532e-07]
-      Rotation: [1,8.17987e-07,-4.04788e-09,9.14127e-08]
-      Scale: [1,1,1]
+      Translation: [-0.016299544,2.7120905,4.79817e-06]
+      Rotation: [1,8.0567725e-07,7.488675e-09,8.429509e-08]
+      Scale: [1.0000001,1,1]
   - ID: 30
     Tag: 'mixamorig1:LeftHandIndex4_end'
     Parent: 29
     Transform:
-      Translation: [-4.76837e-07,2.71213,1.31105e-05]
-      Rotation: [1,-3.21306e-08,-4.33403e-09,8.56141e-09]
-      Scale: [1,1,1]
+      Translation: [-8.077856e-06,2.7121363,1.0579824e-05]
+      Rotation: [1,-3.210292e-08,-9.340937e-09,1.2500116e-08]
+      Scale: [0.99999994,0.9999999,0.9999999]
   - ID: 31
     Tag: 'mixamorig1:LeftHandMiddle1'
     Parent: 20
     Transform:
-      Translation: [-1.02927,12.3471,-0.315818]
-      Rotation: [0.994322,0.105761,0.00241708,-0.0114648]
-      Scale: [1,1,1]
+      Translation: [-1.0292841,12.347131,-0.31582502]
+      Rotation: [0.9910575,-0.13064344,-0.0050319564,0.026683047]
+      Scale: [1.0000008,0.9999999,1.0000002]
   - ID: 32
     Tag: 'mixamorig1:LeftHandMiddle2'
     Parent: 31
     Transform:
-      Translation: [0.00994723,3.43217,-1.04911e-05]
-      Rotation: [0.979762,0.197811,2.05757e-05,-0.0306039]
-      Scale: [1,1,1]
+      Translation: [0.009934601,3.432167,-1.2260195e-05]
+      Rotation: [0.9979669,0.06263806,1.5786086e-06,-0.011770557]
+      Scale: [1,0.9999995,0.99999994]
   - ID: 33
     Tag: 'mixamorig1:LeftHandMiddle3'
     Parent: 32
     Transform:
-      Translation: [-0.00997317,3.16092,-2.2537e-06]
-      Rotation: [0.981675,0.188934,0.000341818,-0.0248406]
-      Scale: [1,1,0.999999]
+      Translation: [-0.009980769,3.1609282,-3.2139794e-06]
+      Rotation: [0.99732536,-0.07215387,-7.069787e-05,0.011657274]
+      Scale: [0.99999994,0.9999998,0.99999934]
   - ID: 34
     Tag: 'mixamorig1:LeftHandMiddle4'
     Parent: 33
     Transform:
-      Translation: [3.00507e-05,2.87637,-1.96236e-05]
-      Rotation: [1,2.66779e-09,3.90479e-09,-1.2539e-09]
-      Scale: [1,1,1]
+      Translation: [3.2515763e-05,2.8763719,-1.6450882e-05]
+      Rotation: [1,7.627986e-09,-1.400445e-09,3.7599306e-09]
+      Scale: [1.0000001,1.0000005,1.0000002]
   - ID: 35
     Tag: 'mixamorig1:LeftHandMiddle4_end'
     Parent: 34
     Transform:
-      Translation: [-1.96695e-06,2.87637,4.21578e-06]
-      Rotation: [1,-5.46176e-09,2.39282e-08,4.31582e-09]
-      Scale: [1,1,1]
+      Translation: [-1.9669535e-06,2.8763807,2.95043e-06]
+      Rotation: [1,-1.04496705e-08,2.6018148e-08,-7.4367255e-09]
+      Scale: [1,0.9999999,1]
   - ID: 36
     Tag: 'mixamorig1:LeftHandRing1'
     Parent: 20
     Transform:
-      Translation: [1.26675,12.5059,-0.277082]
-      Rotation: [0.985082,0.166301,0.0026536,-0.0441639]
-      Scale: [1,1,1]
+      Translation: [1.266753,12.505952,-0.2770875]
+      Rotation: [0.9934722,-0.112898484,-0.013509875,0.009172214]
+      Scale: [1.0000001,1.0000001,1.0000001]
   - ID: 37
     Tag: 'mixamorig1:LeftHandRing2'
     Parent: 36
     Transform:
-      Translation: [-0.0065794,2.72607,2.11493e-05]
-      Rotation: [0.96592,0.256158,0.000163963,-0.0371761]
-      Scale: [1,1,1]
+      Translation: [-0.0065869717,2.726071,2.2714084e-05]
+      Rotation: [0.9981446,0.060444415,5.4905784e-05,-0.007340369]
+      Scale: [1,1,1.0000005]
   - ID: 38
     Tag: 'mixamorig1:LeftHandRing3'
     Parent: 37
     Transform:
-      Translation: [0.00341368,2.62029,1.23876e-05]
-      Rotation: [0.988434,0.149933,-0.000207553,-0.0227388]
-      Scale: [1,1,1]
+      Translation: [0.0034060762,2.620305,1.23319e-05]
+      Rotation: [0.99872684,-0.04986206,6.528689e-05,0.007655345]
+      Scale: [1,1.0000002,1.0000001]
   - ID: 39
     Tag: 'mixamorig1:LeftHandRing4'
     Parent: 38
     Transform:
-      Translation: [0.00316548,2.2269,-4.08292e-06]
-      Rotation: [1,-2.50075e-08,-3.72529e-09,-6.68055e-09]
-      Scale: [1,1,1]
+      Translation: [0.0031730845,2.22689,-2.8240845e-07]
+      Rotation: [1,-3.2366245e-08,-3.7460732e-09,6.9017845e-09]
+      Scale: [1.0000002,1.0000002,1]
   - ID: 40
     Tag: 'mixamorig1:LeftHandRing4_end'
     Parent: 39
     Transform:
-      Translation: [8.27005e-06,2.2269,4.36729e-06]
-      Rotation: [1,3.52888e-09,-6.26848e-08,-4.84288e-08]
-      Scale: [1,1,1]
+      Translation: [7.152559e-07,2.2268949,3.753666e-06]
+      Rotation: [1,1.0998463e-08,-6.708294e-08,-5.6779502e-08]
+      Scale: [1.0000001,1,1]
   - ID: 41
     Tag: 'mixamorig1:LeftHandPinky1'
     Parent: 20
     Transform:
-      Translation: [3.24679,11.102,-0.11283]
-      Rotation: [0.961379,0.259836,-0.00714544,-0.0904644]
-      Scale: [1,1,1]
+      Translation: [3.2467866,11.101999,-0.112835765]
+      Rotation: [0.9941201,-0.10394153,-0.026762247,-0.014315323]
+      Scale: [1.0000004,1,1.0000005]
   - ID: 42
     Tag: 'mixamorig1:LeftHandPinky2'
     Parent: 41
     Transform:
-      Translation: [0.00842457,2.7346,-2.70432e-05]
-      Rotation: [0.970128,0.239487,-0.000175699,-0.0387007]
-      Scale: [1,0.999999,1]
+      Translation: [0.008423286,2.7345998,-3.0190748e-05]
+      Rotation: [0.9979124,0.06347868,-2.073631e-05,-0.011884993]
+      Scale: [0.9999996,0.9999994,0.9999996]
   - ID: 43
     Tag: 'mixamorig1:LeftHandPinky3'
     Parent: 42
     Transform:
-      Translation: [-0.0029071,2.19395,-1.23632e-05]
-      Rotation: [0.985161,0.169556,0.0003208,-0.0266111]
-      Scale: [1,1,0.999999]
+      Translation: [-0.0029121637,2.193959,-9.710861e-06]
+      Rotation: [0.9996691,-0.025524488,-7.9992875e-05,0.0031660723]
+      Scale: [1.0000001,1.0000004,0.99999946]
   - ID: 44
     Tag: 'mixamorig1:LeftHandPinky4'
     Parent: 43
     Transform:
-      Translation: [-0.0055133,1.97554,6.94304e-07]
-      Rotation: [1,9.09688e-07,1.75254e-08,1.72989e-07]
-      Scale: [1,1,1]
+      Translation: [-0.0055146073,1.9755415,-3.5620612e-06]
+      Rotation: [1,9.325756e-07,2.0626295e-08,1.8140973e-07]
+      Scale: [1,1.0000001,1]
   - ID: 45
     Tag: 'mixamorig1:LeftHandPinky4_end'
     Parent: 44
     Transform:
-      Translation: [-2.6226e-06,1.97556,-8.40425e-06]
-      Rotation: [1,-4.4511e-09,7.21775e-09,1.7495e-10]
-      Scale: [1,1,1]
+      Translation: [-2.6509804e-06,1.9755609,-8.390067e-06]
+      Rotation: [1,-9.900874e-09,-1.319514e-08,-6.9849193e-09]
+      Scale: [1.0000001,1.0000001,1.0000001]
   - ID: 46
     Tag: 'mixamorig1:RightShoulder'
     Parent: 12
     Transform:
-      Translation: [-6.14015,12.9937,-0.175914]
-      Rotation: [0.343766,0.54508,-0.447876,0.619773]
-      Scale: [1,0.999999,0.999999]
+      Translation: [-6.1401544,12.993736,-0.17591335]
+      Rotation: [0.36610875,0.59887457,-0.39827225,0.59050214]
+      Scale: [0.9999996,0.9999993,0.9999992]
   - ID: 47
     Tag: 'mixamorig1:RightArm'
     Parent: 46
     Transform:
-      Translation: [3.20841e-06,13.0059,8.87821e-06]
-      Rotation: [0.876219,0.411957,-0.0600236,-0.242754]
-      Scale: [1,1,1]
+      Translation: [3.3795295e-06,13.005938,6.4305636e-06]
+      Rotation: [0.8227106,0.471317,0.13100222,-0.28956172]
+      Scale: [1,1.0000001,1.0000001]
   - ID: 48
     Tag: 'mixamorig1:RightForeArm'
     Parent: 47
     Transform:
-      Translation: [2.5756e-06,25.5711,1.3312e-05]
-      Rotation: [0.689872,0.0828357,0.00202691,-0.719173]
-      Scale: [1,1,1]
+      Translation: [-2.1092776e-06,25.571087,1.0292984e-05]
+      Rotation: [0.6963152,0.08216843,0.0020019382,-0.7130144]
+      Scale: [0.99999994,0.99999994,1.0000004]
   - ID: 49
     Tag: 'mixamorig1:RightHand'
     Parent: 48
     Transform:
-      Translation: [-6.35787e-06,23.4017,1.62047e-05]
-      Rotation: [0.986883,-0.123735,-0.103306,0.00891992]
-      Scale: [1,1,1]
+      Translation: [-1.2983865e-06,23.401714,1.3685924e-05]
+      Rotation: [0.94952,-0.27685288,-0.13803647,0.052061114]
+      Scale: [1.0000002,1.0000001,1.0000002]
   - ID: 50
     Tag: 'mixamorig1:RightHandThumb1'
     Parent: 49
     Transform:
-      Translation: [2.88509,4.05434,1.21202]
-      Rotation: [0.948742,0.0941235,0.0962725,-0.28594]
-      Scale: [0.999999,0.999999,0.999999]
+      Translation: [2.8850863,4.0543227,1.2120143]
+      Rotation: [0.82082295,0.19224907,0.4239131,-0.3310405]
+      Scale: [0.99999946,0.99999946,0.9999997]
   - ID: 51
     Tag: 'mixamorig1:RightHandThumb2'
     Parent: 50
     Transform:
-      Translation: [0.42842,4.07479,-1.51027e-05]
-      Rotation: [0.99266,0.0181607,-0.084195,0.0848942]
-      Scale: [1,1,1]
+      Translation: [0.4284129,4.0747795,-1.3893277e-05]
+      Rotation: [0.98428714,-0.0059525403,-0.05583605,0.16740909]
+      Scale: [0.99999994,1.0000006,0.99999946]
   - ID: 52
     Tag: 'mixamorig1:RightHandThumb3'
     Parent: 51
     Transform:
-      Translation: [0.0364841,3.53041,-8.88828e-06]
-      Rotation: [0.993378,0.0068289,0.015383,0.113653]
-      Scale: [1,1,1]
+      Translation: [0.036493048,3.5304215,-1.049686e-05]
+      Rotation: [0.9814279,-0.14362979,-0.018084534,0.12586796]
+      Scale: [0.99999994,0.9999997,1.0000012]
   - ID: 53
     Tag: 'mixamorig1:RightHandThumb4'
     Parent: 52
     Transform:
-      Translation: [-0.464905,2.87356,3.63089e-06]
-      Rotation: [1,9.56401e-08,-1.44659e-07,6.72347e-08]
-      Scale: [1,1,1]
+      Translation: [-0.46491432,2.8735566,4.6442634e-07]
+      Rotation: [1,8.940699e-08,-1.4151948e-07,4.237517e-08]
+      Scale: [0.99999994,1,0.9999996]
   - ID: 54
     Tag: 'mixamorig1:RightHandThumb4_end'
     Parent: 53
     Transform:
-      Translation: [3.72997e-08,2.9109,-1.54426e-05]
-      Rotation: [1,-3.64233e-11,-1.93429e-07,-1.25263e-07]
-      Scale: [1,1,1]
+      Translation: [7.6293923e-06,2.9108932,-1.1926249e-05]
+      Rotation: [1,7.4367272e-09,-1.8903772e-07,-1.2523518e-07]
+      Scale: [0.99999994,1,1]
   - ID: 55
     Tag: 'mixamorig1:RightHandIndex1'
     Parent: 49
     Transform:
-      Translation: [3.61449,12.3466,-0.00774654]
-      Rotation: [0.998583,0.0162722,-0.00199005,-0.0506207]
-      Scale: [0.999999,1,0.999999]
+      Translation: [3.6144974,12.346586,-0.0077478075]
+      Rotation: [0.9872423,0.044703625,-0.012359232,-0.15232061]
+      Scale: [0.999999,0.99999964,0.9999995]
   - ID: 56
     Tag: 'mixamorig1:RightHandIndex2'
     Parent: 55
     Transform:
-      Translation: [-0.0118704,3.11741,5.36909e-06]
-      Rotation: [0.994066,0.107894,4.98711e-05,0.0138657]
-      Scale: [1,1,1]
+      Translation: [-0.011867895,3.1174197,5.9975205e-06]
+      Rotation: [0.9992849,0.037196077,-3.4775871e-06,0.0067922026]
+      Scale: [0.9999998,1.0000005,1]
   - ID: 57
     Tag: 'mixamorig1:RightHandIndex3'
     Parent: 56
     Transform:
-      Translation: [0.00661471,2.85606,-9.00719e-06]
-      Rotation: [0.959755,0.279447,-0.000618375,0.027906]
-      Scale: [1,1,1]
+      Translation: [0.006608367,2.856068,-1.414856e-05]
+      Rotation: [0.9990088,0.04430232,-0.00010104003,0.004330635]
+      Scale: [0.99999994,0.99999976,1]
   - ID: 58
     Tag: 'mixamorig1:RightHandIndex4'
     Parent: 57
     Transform:
-      Translation: [0.00526391,2.5346,-1.17123e-05]
-      Rotation: [1,2.35692e-08,-2.47867e-08,-1.01015e-08]
-      Scale: [1,1,1]
+      Translation: [0.005261421,2.534607,-1.1698125e-05]
+      Rotation: [1,3.3482586e-08,-1.4897697e-08,-8.930698e-09]
+      Scale: [1.0000001,1,1.0000001]
   - ID: 59
     Tag: 'mixamorig1:RightHandIndex4_end'
     Parent: 58
     Transform:
-      Translation: [6.32809e-06,2.53461,-1.77076e-05]
-      Rotation: [1,-3.59098e-07,8.15974e-08,1.21967e-07]
-      Scale: [1,1,1]
+      Translation: [-1.0181059e-05,2.5346096,-1.512539e-05]
+      Rotation: [1,-3.7388443e-07,9.776809e-08,1.1082737e-07]
+      Scale: [1.0000001,1.0000002,1]
   - ID: 60
     Tag: 'mixamorig1:RightHandMiddle1'
     Parent: 49
     Transform:
-      Translation: [0.922429,12.1764,-0.222204]
-      Rotation: [0.999801,0.00342515,0.000474127,-0.0196483]
-      Scale: [0.999999,1,0.999999]
+      Translation: [0.92242223,12.1763935,-0.22220884]
+      Rotation: [0.9967873,0.010109808,8.7285705e-05,-0.079454914]
+      Scale: [0.999999,1.0000004,0.99999946]
   - ID: 61
     Tag: 'mixamorig1:RightHandMiddle2'
     Parent: 60
     Transform:
-      Translation: [-0.0161581,3.47921,-6.33312e-06]
-      Rotation: [0.985118,0.170513,2.04377e-05,0.0216165]
-      Scale: [1,1,1]
+      Translation: [-0.016160607,3.479208,-3.7942382e-06]
+      Rotation: [0.9898055,0.14119725,1.4360268e-05,0.01867471]
+      Scale: [0.99999994,0.99999994,0.99999994]
   - ID: 62
     Tag: 'mixamorig1:RightHandMiddle3'
     Parent: 61
     Transform:
-      Translation: [0.0136761,3.22595,2.15223e-05]
-      Rotation: [0.973106,0.22935,-0.00065257,0.0215069]
-      Scale: [1,0.999999,1]
+      Translation: [0.013672278,3.2259562,1.2428429e-05]
+      Rotation: [0.9994173,0.034089535,-0.00015636967,0.0017467488]
+      Scale: [1,0.99999946,0.99999994]
   - ID: 63
     Tag: 'mixamorig1:RightHandMiddle4'
     Parent: 62
     Transform:
-      Translation: [0.00249639,2.92797,7.72625e-06]
-      Rotation: [1,-5.3551e-09,-2.04215e-09,-5.94694e-09]
-      Scale: [1,1,1]
+      Translation: [0.0024912953,2.9279778,7.740439e-06]
+      Rotation: [1,-2.0270122e-08,-2.3075255e-09,-9.590356e-10]
+      Scale: [1.0000002,1.0000001,0.99999994]
   - ID: 64
     Tag: 'mixamorig1:RightHandMiddle4_end'
     Parent: 63
     Transform:
-      Translation: [1.16729e-06,2.92796,-3.97488e-06]
-      Rotation: [1,1.47217e-08,1.14985e-08,4.65661e-09]
-      Scale: [1,1,1]
+      Translation: [6.2003096e-06,2.9279637,3.6686977e-06]
+      Rotation: [1,7.9266345e-09,4.6358295e-09,-6.4084142e-09]
+      Scale: [1.0000001,0.99999994,0.99999994]
   - ID: 65
     Tag: 'mixamorig1:RightHandRing1'
     Parent: 49
     Transform:
-      Translation: [-1.21658,12.2821,-0.150962]
-      Rotation: [0.99936,0.0355336,0.00406823,-0.000890647]
-      Scale: [0.999999,1,1]
+      Translation: [-1.2165803,12.282087,-0.15096147]
+      Rotation: [0.9974307,-0.040283263,0.0037703535,-0.059122268]
+      Scale: [0.99999934,1.0000004,0.99999994]
   - ID: 66
     Tag: 'mixamorig1:RightHandRing2'
     Parent: 65
     Transform:
-      Translation: [-0.00370264,2.82159,6.99829e-06]
-      Rotation: [0.990263,0.138129,-7.4992e-05,0.0173243]
-      Scale: [1,1,0.999999]
+      Translation: [-0.003695082,2.8215897,9.558178e-07]
+      Rotation: [0.99907184,0.04253644,1.4144075e-06,0.006797468]
+      Scale: [1.0000002,1.0000001,0.999999]
   - ID: 67
     Tag: 'mixamorig1:RightHandRing3'
     Parent: 66
     Transform:
-      Translation: [0.00779447,2.6877,-3.57026e-06]
-      Rotation: [0.993664,0.111945,-9.39061e-05,0.0100482]
-      Scale: [1,1,1]
+      Translation: [0.0078045614,2.6876872,-4.3520877e-06]
+      Rotation: [0.99582255,0.09098292,-8.1752696e-05,0.0077304994]
+      Scale: [1.0000001,0.99999994,1.0000005]
   - ID: 68
     Tag: 'mixamorig1:RightHandRing4'
     Parent: 67
     Transform:
-      Translation: [-0.00408753,2.36845,-1.22488e-05]
-      Rotation: [1,3.41728e-08,1.54748e-08,3.49246e-09]
-      Scale: [1,1,1]
+      Translation: [-0.004083781,2.368451,-1.2277128e-05]
+      Rotation: [1,5.0270636e-08,8.642444e-09,1.45852e-08]
+      Scale: [0.99999994,0.99999994,1.0000001]
   - ID: 69
     Tag: 'mixamorig1:RightHandRing4_end'
     Parent: 68
     Transform:
-      Translation: [-3.52167e-06,2.36846,-1.11113e-05]
-      Rotation: [1,4.19583e-09,5.38177e-09,-1.9693e-09]
-      Scale: [1,1,1]
+      Translation: [-4.725808e-06,2.3684492,-7.935939e-06]
+      Rotation: [1,1.7018777e-09,-4.540198e-09,4.656613e-10]
+      Scale: [0.99999994,0.9999999,0.99999994]
   - ID: 70
     Tag: 'mixamorig1:RightHandPinky1'
     Parent: 49
     Transform:
-      Translation: [-3.32035,11.1946,-0.13794]
-      Rotation: [0.993634,0.0274082,0.108799,0.01013]
-      Scale: [0.999999,1,0.999999]
+      Translation: [-3.3203418,11.19461,-0.13794538]
+      Rotation: [0.99012303,-0.11918922,0.01755458,-0.071708865]
+      Scale: [0.99999934,1.0000004,0.9999996]
   - ID: 71
     Tag: 'mixamorig1:RightHandPinky2'
     Parent: 70
     Transform:
-      Translation: [-0.0080402,2.64045,1.668e-05]
-      Rotation: [0.990844,0.133789,1.70411e-05,0.0181464]
-      Scale: [1,1,1]
+      Translation: [-0.008061767,2.640443,1.8920093e-05]
+      Rotation: [0.99995995,0.008123364,-1.1887995e-05,0.0037673928]
+      Scale: [1.0000001,0.9999997,1.0000001]
   - ID: 72
     Tag: 'mixamorig1:RightHandPinky3'
     Parent: 71
     Transform:
-      Translation: [0.0055868,2.14904,1.4201e-06]
-      Rotation: [0.986861,0.160588,-0.000354264,0.0177669]
-      Scale: [1,1,1]
+      Translation: [0.005581722,2.149052,1.7445059e-06]
+      Rotation: [0.9867583,0.16121349,-0.00035555,0.017838612]
+      Scale: [0.9999998,0.9999999,1.0000005]
   - ID: 73
     Tag: 'mixamorig1:RightHandPinky4'
     Parent: 72
     Transform:
-      Translation: [0.00248509,1.88843,-1.65701e-05]
-      Rotation: [1,-6.52361e-08,-1.34366e-09,5.65947e-09]
-      Scale: [1,1,1]
+      Translation: [0.0024913892,1.888419,-1.0855139e-05]
+      Rotation: [1,-4.297803e-08,1.0449665e-08,7.2620177e-10]
+      Scale: [1.0000001,1.0000001,1.0000002]
   - ID: 74
     Tag: 'mixamorig1:RightHandPinky4_end'
     Parent: 73
     Transform:
-      Translation: [5.18061e-06,1.88843,7.06065e-06]
-      Rotation: [1,7.27108e-09,-1.2539e-09,-2.97347e-09]
-      Scale: [1,1,1]
+      Translation: [1.3339724e-07,1.8884311,2.6438863e-06]
+      Rotation: [1,1.3524961e-08,-1.3003878e-08,-1.525598e-08]
+      Scale: [0.99999994,1,1]
   - ID: 75
     Tag: 'mixamorig1:LeftUpLeg'
     Parent: 9
     Transform:
-      Translation: [8.0782,-5.40238,-0.535869]
-      Rotation: [0.0963697,-0.0348879,-0.672814,-0.732678]
-      Scale: [0.999993,1,0.999996]
+      Translation: [8.078201,-5.402385,-0.53586936]
+      Rotation: [0.0999015,-0.03917798,-0.6707908,-0.73384243]
+      Scale: [0.99999326,1.0000004,0.99999666]
   - ID: 76
     Tag: 'mixamorig1:LeftLeg'
     Parent: 75
     Transform:
-      Translation: [-1.50165e-06,42.7898,-2.91361e-06]
-      Rotation: [0.745535,-0.664132,-0.0456875,0.0319228]
-      Scale: [0.999999,1,1]
+      Translation: [7.499353e-07,42.789837,-3.9557133e-07]
+      Rotation: [0.7438176,-0.6664412,-0.04189267,0.02892353]
+      Scale: [0.9999994,0.9999996,1.0000002]
   - ID: 77
     Tag: 'mixamorig1:LeftFoot'
     Parent: 76
     Transform:
-      Translation: [5.09294e-07,42.1737,8.96182e-06]
-      Rotation: [0.894458,0.444827,0.0362807,-0.0275159]
-      Scale: [1,1,1]
+      Translation: [-6.667661e-07,42.173748,1.0885481e-05]
+      Rotation: [0.8945296,0.44476184,0.038822446,-0.022284308]
+      Scale: [0.99999964,1.0000004,0.99999964]
   - ID: 78
     Tag: 'mixamorig1:LeftToeBase'
     Parent: 77
     Transform:
-      Translation: [1.74653e-06,16.1822,-3.75035e-06]
-      Rotation: [0.954902,0.290975,-0.056578,0.0171759]
-      Scale: [1,1,0.999999]
+      Translation: [4.1069e-06,16.182209,6.5384916e-07]
+      Rotation: [0.9549018,0.29097503,-0.05657803,0.01717589]
+      Scale: [1.0000001,0.9999998,0.9999993]
   - ID: 79
     Tag: 'mixamorig1:LeftToe_End'
     Parent: 78
     Transform:
-      Translation: [2.11179e-08,6.20585,-2.01165e-07]
-      Rotation: [1,-1.1544e-08,7.74447e-07,-2.49778e-07]
-      Scale: [1,1,1]
+      Translation: [-1.2500134e-06,6.2058473,-2.0071936e-07]
+      Rotation: [1,-1.0885684e-08,7.7368514e-07,-2.5469265e-07]
+      Scale: [0.99999994,0.9999997,0.99999976]
   - ID: 80
     Tag: 'mixamorig1:LeftToe_End_end'
     Parent: 79
     Transform:
-      Translation: [-1.39076e-06,6.20592,-8.94067e-08]
-      Rotation: [1,-4.15976e-09,-3.10071e-07,3.03841e-07]
-      Scale: [1,1,1]
+      Translation: [-2.6712162e-06,6.2059345,-8.9407614e-08]
+      Rotation: [1,-4.0156793e-09,-3.1016964e-07,3.0137883e-07]
+      Scale: [1.0000001,1,0.99999994]
   - ID: 81
     Tag: 'mixamorig1:RightUpLeg'
     Parent: 9
     Transform:
-      Translation: [-8.0782,-5.40237,-0.75177]
-      Rotation: [0.0935589,-0.00706435,0.67818,0.728882]
-      Scale: [1,1,1]
+      Translation: [-8.0782,-5.4023824,-0.7517699]
+      Rotation: [0.08745523,-0.005817997,0.6729619,0.7344657]
+      Scale: [1.0000012,1,1.0000012]
   - ID: 82
     Tag: 'mixamorig1:RightLeg'
     Parent: 81
     Transform:
-      Translation: [-1.97047e-06,42.7759,-2.031e-06]
-      Rotation: [0.745618,-0.664308,0.0334597,-0.0403622]
-      Scale: [1,1,1]
+      Translation: [5.088867e-07,42.775894,4.2024603e-06]
+      Rotation: [0.7480409,-0.66126114,0.036723904,-0.042661738]
+      Scale: [1.0000006,1.0000001,1.0000001]
   - ID: 83
     Tag: 'mixamorig1:RightFoot'
     Parent: 82
     Transform:
-      Translation: [7.65873e-07,42.1797,2.5246e-06]
-      Rotation: [0.898894,0.437666,0.0204871,0.00421008]
-      Scale: [0.999999,0.999999,0.999999]
+      Translation: [1.7824647e-07,42.179726,3.6366512e-06]
+      Rotation: [0.89995766,0.4353313,0.022293942,0.008116059]
+      Scale: [0.9999991,0.99999946,0.9999992]
   - ID: 84
     Tag: 'mixamorig1:RightToeBase'
     Parent: 83
     Transform:
-      Translation: [-2.79124e-06,16.2605,-1.53491e-06]
-      Rotation: [0.955104,0.290122,0.0574817,-0.0173397]
-      Scale: [1,1,1]
+      Translation: [-2.470556e-06,16.260466,2.290994e-06]
+      Rotation: [0.9551044,0.2901221,0.05748168,-0.017339734]
+      Scale: [1.0000001,1.0000007,0.9999998]
   - ID: 85
     Tag: 'mixamorig1:RightToe_End'
     Parent: 84
     Transform:
-      Translation: [1.3577e-06,6.18003,-8.94049e-08]
-      Rotation: [1,9.46801e-09,-3.12159e-07,-9.74493e-08]
-      Scale: [1,1,1]
+      Translation: [2.1767212e-06,6.1800237,-8.9847745e-08]
+      Rotation: [1,9.661793e-09,-3.123731e-07,-1.0737997e-07]
+      Scale: [1.0000001,1.0000004,1]
   - ID: 86
     Tag: 'mixamorig1:RightToe_End_end'
     Parent: 85
     Transform:
-      Translation: [-2.3072e-06,6.18003,5.74411e-09]
-      Rotation: [1,-1.11354e-09,7.00768e-10,7.07472e-09]
+      Translation: [1.9517765e-09,6.180031,1.6346938e-07]
+      Rotation: [1,-1.2507883e-09,1.6095003e-09,2.0868067e-09]
       Scale: [1,1,1]
   - ID: 87
     Tag: Spheres
     Transform:
       Translation: [0,0,0]
-      Rotation: [0.525322,0,0.850904,0]
+      Rotation: [0.52532196,0,0.8509035,0]
       Scale: [1,1,1]
   - ID: 88
     Tag: 'Sphere 0,0'
@@ -733,10 +734,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [2,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 89
     Tag: 'Sphere 1,0'
     Parent: 87
@@ -745,10 +744,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 90
     Tag: 'Sphere 2,0'
     Parent: 87
@@ -757,10 +754,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 91
     Tag: 'Sphere 3,0'
     Parent: 87
@@ -769,10 +764,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 92
     Tag: 'Sphere 4,0'
     Parent: 87
@@ -781,10 +774,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 93
     Tag: 'Sphere 5,0'
     Parent: 87
@@ -793,10 +784,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 94
     Tag: 'Sphere 6,0'
     Parent: 87
@@ -805,10 +794,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 95
     Tag: 'Sphere 7,0'
     Parent: 87
@@ -817,10 +804,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 96
     Tag: 'Sphere 8,0'
     Parent: 87
@@ -829,10 +814,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 97
     Tag: 'Sphere 9,0'
     Parent: 87
@@ -841,10 +824,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 98
     Tag: 'Sphere 0,1'
     Parent: 87
@@ -853,10 +834,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 99
     Tag: 'Sphere 1,1'
     Parent: 87
@@ -865,10 +844,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 100
     Tag: 'Sphere 2,1'
     Parent: 87
@@ -877,10 +854,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 101
     Tag: 'Sphere 3,1'
     Parent: 87
@@ -889,10 +864,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 102
     Tag: 'Sphere 4,1'
     Parent: 87
@@ -901,10 +874,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 103
     Tag: 'Sphere 5,1'
     Parent: 87
@@ -913,10 +884,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 104
     Tag: 'Sphere 6,1'
     Parent: 87
@@ -925,10 +894,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 105
     Tag: 'Sphere 7,1'
     Parent: 87
@@ -937,10 +904,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 106
     Tag: 'Sphere 8,1'
     Parent: 87
@@ -949,10 +914,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 107
     Tag: 'Sphere 9,1'
     Parent: 87
@@ -961,10 +924,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 108
     Tag: 'Sphere 0,2'
     Parent: 87
@@ -973,10 +934,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 109
     Tag: 'Sphere 1,2'
     Parent: 87
@@ -985,10 +944,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 110
     Tag: 'Sphere 2,2'
     Parent: 87
@@ -997,10 +954,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 111
     Tag: 'Sphere 3,2'
     Parent: 87
@@ -1009,10 +964,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 112
     Tag: 'Sphere 4,2'
     Parent: 87
@@ -1021,10 +974,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 113
     Tag: 'Sphere 5,2'
     Parent: 87
@@ -1033,10 +984,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 114
     Tag: 'Sphere 6,2'
     Parent: 87
@@ -1045,10 +994,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 115
     Tag: 'Sphere 7,2'
     Parent: 87
@@ -1057,10 +1004,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 116
     Tag: 'Sphere 8,2'
     Parent: 87
@@ -1069,10 +1014,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 117
     Tag: 'Sphere 9,2'
     Parent: 87
@@ -1081,10 +1024,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 118
     Tag: 'Sphere 0,3'
     Parent: 87
@@ -1093,10 +1034,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 119
     Tag: 'Sphere 1,3'
     Parent: 87
@@ -1105,10 +1044,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 120
     Tag: 'Sphere 2,3'
     Parent: 87
@@ -1117,10 +1054,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 121
     Tag: 'Sphere 3,3'
     Parent: 87
@@ -1129,10 +1064,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 122
     Tag: 'Sphere 4,3'
     Parent: 87
@@ -1141,10 +1074,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 123
     Tag: 'Sphere 5,3'
     Parent: 87
@@ -1153,10 +1084,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 124
     Tag: 'Sphere 6,3'
     Parent: 87
@@ -1165,10 +1094,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 125
     Tag: 'Sphere 7,3'
     Parent: 87
@@ -1177,10 +1104,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 126
     Tag: 'Sphere 8,3'
     Parent: 87
@@ -1189,10 +1114,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 127
     Tag: 'Sphere 9,3'
     Parent: 87
@@ -1201,10 +1124,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 128
     Tag: 'Sphere 0,4'
     Parent: 87
@@ -1213,10 +1134,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 129
     Tag: 'Sphere 1,4'
     Parent: 87
@@ -1225,10 +1144,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 130
     Tag: 'Sphere 2,4'
     Parent: 87
@@ -1237,10 +1154,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 131
     Tag: 'Sphere 3,4'
     Parent: 87
@@ -1249,10 +1164,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 132
     Tag: 'Sphere 4,4'
     Parent: 87
@@ -1261,10 +1174,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 133
     Tag: 'Sphere 5,4'
     Parent: 87
@@ -1273,10 +1184,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 134
     Tag: 'Sphere 6,4'
     Parent: 87
@@ -1285,10 +1194,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 135
     Tag: 'Sphere 7,4'
     Parent: 87
@@ -1297,10 +1204,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 136
     Tag: 'Sphere 8,4'
     Parent: 87
@@ -1309,10 +1214,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 137
     Tag: 'Sphere 9,4'
     Parent: 87
@@ -1321,10 +1224,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 138
     Tag: 'Sphere 0,5'
     Parent: 87
@@ -1333,10 +1234,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 139
     Tag: 'Sphere 1,5'
     Parent: 87
@@ -1345,10 +1244,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 140
     Tag: 'Sphere 2,5'
     Parent: 87
@@ -1357,10 +1254,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 141
     Tag: 'Sphere 3,5'
     Parent: 87
@@ -1369,10 +1264,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 142
     Tag: 'Sphere 4,5'
     Parent: 87
@@ -1381,10 +1274,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 143
     Tag: 'Sphere 5,5'
     Parent: 87
@@ -1393,10 +1284,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 144
     Tag: 'Sphere 6,5'
     Parent: 87
@@ -1405,10 +1294,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 145
     Tag: 'Sphere 7,5'
     Parent: 87
@@ -1417,10 +1304,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 146
     Tag: 'Sphere 8,5'
     Parent: 87
@@ -1429,10 +1314,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 147
     Tag: 'Sphere 9,5'
     Parent: 87
@@ -1441,10 +1324,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 148
     Tag: 'Sphere 0,6'
     Parent: 87
@@ -1453,10 +1334,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 149
     Tag: 'Sphere 1,6'
     Parent: 87
@@ -1465,10 +1344,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 150
     Tag: 'Sphere 2,6'
     Parent: 87
@@ -1477,10 +1354,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 151
     Tag: 'Sphere 3,6'
     Parent: 87
@@ -1489,10 +1364,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 152
     Tag: 'Sphere 4,6'
     Parent: 87
@@ -1501,10 +1374,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 153
     Tag: 'Sphere 5,6'
     Parent: 87
@@ -1513,10 +1384,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 154
     Tag: 'Sphere 6,6'
     Parent: 87
@@ -1525,10 +1394,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 155
     Tag: 'Sphere 7,6'
     Parent: 87
@@ -1537,10 +1404,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 156
     Tag: 'Sphere 8,6'
     Parent: 87
@@ -1549,10 +1414,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 157
     Tag: 'Sphere 9,6'
     Parent: 87
@@ -1561,10 +1424,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 158
     Tag: 'Sphere 0,7'
     Parent: 87
@@ -1573,10 +1434,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 159
     Tag: 'Sphere 1,7'
     Parent: 87
@@ -1585,10 +1444,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 160
     Tag: 'Sphere 2,7'
     Parent: 87
@@ -1597,10 +1454,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 161
     Tag: 'Sphere 3,7'
     Parent: 87
@@ -1609,10 +1464,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 162
     Tag: 'Sphere 4,7'
     Parent: 87
@@ -1621,10 +1474,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 163
     Tag: 'Sphere 5,7'
     Parent: 87
@@ -1633,10 +1484,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 164
     Tag: 'Sphere 6,7'
     Parent: 87
@@ -1645,10 +1494,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 165
     Tag: 'Sphere 7,7'
     Parent: 87
@@ -1657,10 +1504,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 166
     Tag: 'Sphere 8,7'
     Parent: 87
@@ -1669,10 +1514,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 167
     Tag: 'Sphere 9,7'
     Parent: 87
@@ -1681,10 +1524,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 168
     Tag: 'Sphere 0,8'
     Parent: 87
@@ -1693,10 +1534,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 169
     Tag: 'Sphere 1,8'
     Parent: 87
@@ -1705,10 +1544,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 170
     Tag: 'Sphere 2,8'
     Parent: 87
@@ -1717,10 +1554,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 171
     Tag: 'Sphere 3,8'
     Parent: 87
@@ -1729,10 +1564,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 172
     Tag: 'Sphere 4,8'
     Parent: 87
@@ -1741,10 +1574,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 173
     Tag: 'Sphere 5,8'
     Parent: 87
@@ -1753,10 +1584,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 174
     Tag: 'Sphere 6,8'
     Parent: 87
@@ -1765,10 +1594,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 175
     Tag: 'Sphere 7,8'
     Parent: 87
@@ -1777,10 +1604,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 176
     Tag: 'Sphere 8,8'
     Parent: 87
@@ -1789,10 +1614,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 177
     Tag: 'Sphere 9,8'
     Parent: 87
@@ -1801,10 +1624,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 178
     Tag: 'Sphere 0,9'
     Parent: 87
@@ -1813,10 +1634,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 179
     Tag: 'Sphere 1,9'
     Parent: 87
@@ -1825,10 +1644,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 180
     Tag: 'Sphere 2,9'
     Parent: 87
@@ -1837,10 +1654,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 181
     Tag: 'Sphere 3,9'
     Parent: 87
@@ -1849,10 +1664,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 182
     Tag: 'Sphere 4,9'
     Parent: 87
@@ -1861,10 +1674,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 183
     Tag: 'Sphere 5,9'
     Parent: 87
@@ -1873,10 +1684,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 184
     Tag: 'Sphere 6,9'
     Parent: 87
@@ -1885,10 +1694,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 185
     Tag: 'Sphere 7,9'
     Parent: 87
@@ -1897,10 +1704,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 186
     Tag: 'Sphere 8,9'
     Parent: 87
@@ -1909,10 +1714,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 187
     Tag: 'Sphere 9,9'
     Parent: 87
@@ -1921,10 +1724,8 @@ Entities:
       Rotation: [1,0,0,0]
       Scale: [1,1,1]
     Mesh:
-      Mesh:
-        Primitive: 3
-      Materials:
-        - 0
+      Mesh: {}
+      Materials: []
   - ID: 193
     Tag: ID 6
   - ID: 188
