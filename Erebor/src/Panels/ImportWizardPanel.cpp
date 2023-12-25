@@ -103,6 +103,9 @@ namespace Mahakam::Editor
 				int step_fast = 100;
 				ImGui::InputScalar("ID", ImGuiDataType_U64, &m_AssetID, nullptr, nullptr, "%llu", 0);
 
+				if (ImGui::Button("Regenerate ID"))
+					m_AssetID = Random::GetRandomID64();
+
 				//if (AssetDatabase::AssetExists(m_AssetID))
 				//	ImGui::Text("An asset with this ID already exists");
 

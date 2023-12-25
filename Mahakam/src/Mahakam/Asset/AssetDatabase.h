@@ -11,6 +11,8 @@
 
 namespace Mahakam
 {
+	template<typename T>
+	class Asset;
 	class AssetImporter;
 
 	class AssetDatabase
@@ -56,7 +58,7 @@ namespace Mahakam
 		struct AssetSerializer
 		{
 			bool (*Serialize)(bitstream::growing_bit_writer<TrivialVector<uint32_t>>&, void* asset) = nullptr;
-			ControlBlock* (*Deserialize)(bitstream::fixed_bit_reader&) = nullptr;
+			Asset<void> (*Deserialize)(bitstream::fixed_bit_reader&) = nullptr;
 		};
 
 	private:
@@ -95,7 +97,7 @@ namespace Mahakam
 		void LoadDefaultSerializers();
 
 		ControlBlock* ReadAsset(const std::filesystem::path& filepath);
-		bool WriteAsset(ControlBlock* asset, const std::string& extension, const std::filesystem::path& filepath);
+		ControlBlock* WriteAsset(ControlBlock* asset, const std::string& extension, const std::filesystem::path& filepath);
 
 	public:
 		// Registering asset importers

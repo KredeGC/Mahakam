@@ -36,7 +36,7 @@ namespace Mahakam
 
 				//return writer.serialize<std::string>(asset.GetImportPath().string(), 256);
 			};
-		serializer.Deserialize = [](bitstream::fixed_bit_reader& reader) -> ControlBlock*
+		serializer.Deserialize = [](bitstream::fixed_bit_reader& reader) -> Asset<void>
 			{
 				return nullptr;
 
@@ -68,35 +68,73 @@ namespace Mahakam
 		if (iter == s_Serializers.end())
 			return nullptr;
 
-		return iter->second.Deserialize(reader);
+		Asset<void> asset = iter->second.Deserialize(reader);
+
+		asset.m_Control->ID = assetID;
+		asset.IncrementRef();
+
+		return asset.m_Control;
 	}
 
-	bool AssetDatabase::WriteAsset(ControlBlock* asset, const std::string& extension, const std::filesystem::path& filepath)
+	AssetDatabase::ControlBlock* AssetDatabase::WriteAsset(ControlBlock* control, const std::string& extension, const std::filesystem::path& filepath)
 	{
 		auto iter = s_Serializers.find(extension);
 		if (iter == s_Serializers.end())
-			return false;
+			return nullptr;
 
 		TrivialVector<uint32_t> buffer;
 		bitstream::growing_bit_writer<TrivialVector<uint32_t>> writer(buffer);
 
-		AssetID id = 0;
-		if (asset->ID)
-			id = asset->ID;
-		else
-			id = Random::GetRandomID64();
+		if (!control->ID)
+			control->ID = Random::GetRandomID64();
 
-		BS_ASSERT(SerializeAssetHeader(writer, id, extension));
+		if (!SerializeAssetHeader(writer, control->ID, extension))
+			return nullptr;
 
-		BS_ASSERT(iter->second.Serialize(writer, asset + 1));
 
-		// TODO
-		//std::ofstream filestream(filepath);
-		//filestream.write(buffer.data(), buffer.size());
+		// TODO: Do this properly
+		if (!iter->second.Serialize(writer, control + 1))
+			return nullptr;
 
-		//filestream.close();
 
-		return true;
+		// Create the asset directory, if it doesn't exist
+		FileUtility::CreateDirectories(filepath.parent_path());
+
+		// Save the asset
+		std::ofstream filestream(filepath);
+		filestream.write(reinterpret_cast<char*>(buffer.data()), buffer.size() * 4);
+		filestream.close();
+
+		// If an asset with the given ID already exists, we may need to reload it
+		auto controlIter = s_LoadedAssets.find(control->ID);
+		if (controlIter != s_LoadedAssets.end())
+		{
+			ControlBlock* loadedControl = controlIter->second;
+
+			// If the control block is different, then copy and invalidate
+			if (loadedControl != control)
+			{
+				// Increment the UseCount
+				loadedControl->UseCount++;
+
+				// Move the pointer and destructor to the existing control block
+				loadedControl->MoveData(control + 1, loadedControl + 1);
+
+				// Invalidate the old control block, but don't delete it as others may reference it
+				control->MoveData = nullptr;
+				//control->DeleteData = nullptr;
+				control->ID = 0;
+			}
+
+			return loadedControl;
+		}
+
+		// Add as a new asset
+		s_LoadedAssets.insert({ control->ID, control });
+
+		RefreshAssetImports();
+
+		return control;
 	}
 
 	//void AssetDatabase::RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport)
@@ -314,6 +352,7 @@ namespace Mahakam
 	//void AssetDatabase::RefreshAssetImports()
 	MH_DEFINE_FUNC(AssetDatabase::RefreshAssetImports, void)
 	{
+		// TODO: Rename this function
 		s_AssetPaths.clear();
 		RecursiveCacheAssets(FileUtility::ASSET_PATH);
 	};
@@ -565,7 +604,7 @@ namespace Mahakam
 	{
 		if (!FileUtility::Exists(filepath))
 		{
-			MH_WARN("Could not import assets. Does the import folder exist?");
+			MH_WARN("Could not import assets. Does the '{0}' folder exist?", filepath.u8string());
 			return;
 		}
 
