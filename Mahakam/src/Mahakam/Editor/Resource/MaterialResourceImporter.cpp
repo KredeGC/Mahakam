@@ -48,14 +48,6 @@
 
 namespace Mahakam
 {
-	template<typename T, typename F>
-	void SetValue(ryml::NodeRef& node, F&& func)
-	{
-		T value;
-		node >> value;
-		func(value);
-	}
-
 	MaterialResourceImporter::MaterialResourceImporter() :
 		ResourceImporter("Material", ".material")
 	{
@@ -140,12 +132,8 @@ namespace Mahakam
 						{
 							switch (iter->second.DataType)
 							{
-							case ShaderDataType::Float:
-								SetValue<float>(node, [&](auto& value) { m_Material->SetFloat(propertyName, value); });
-								break;
-							case ShaderDataType::Float2:
-								SetValue<glm::vec2>(node, [&](auto& value) { m_Material->SetFloat2(propertyName, value); });
-								break;
+							case ShaderDataType::Float:			MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat, float);
+							case ShaderDataType::Float2:		MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat2, glm::vec2);
 							case ShaderDataType::Float3:		MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat3, glm::vec3);
 							case ShaderDataType::Float4:		MH_CONDITIONAL_SET_VALUE(m_Material->SetFloat4, glm::vec4);
 							case ShaderDataType::Mat3:			MH_CONDITIONAL_SET_VALUE(m_Material->SetMat3, glm::mat3);

@@ -34,6 +34,8 @@ namespace Mahakam::Editor
 
 		AssetDatabase::RefreshAssetImports();
 
+		ResourceRegistry::RegisterDefaultAssetImporters();
+
 #pragma region Windows
 		// AssetManagerPanel
 		EditorWindowRegistry::RegisterWindowClass<AssetManagerPanel>("Asset Manager");
@@ -126,6 +128,8 @@ namespace Mahakam::Editor
 		ComponentRegistry::DeregisterDefaultComponents();
 
 		AssetDatabase::DeregisterDefaultAssetImporters();
+
+		ResourceRegistry::DeregisterDefaultAssetImporters();
 	}
 
 	void EditorLayer::OnUpdate(Timestep dt)

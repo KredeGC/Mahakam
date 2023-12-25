@@ -26,13 +26,13 @@ namespace Mahakam
 		inline static ImporterMap s_AssetImporters;
 
 	public:
-		void RegisterAssetImporter(const std::string& extension, Ref<ResourceImporter> assetImport);
-		void DeregisterAssetImporter(const std::string& extension);
-		void DeregisterAllAssetImporters();
-		Ref<ResourceImporter> GetAssetImporter(const std::string& extension);
-		const ImporterMap& GetAssetImporters();
-		ExtensionIter GetAssetImporterExtension(const std::string& extension);
-		void RegisterDefaultAssetImporters();
-		void DeregisterDefaultAssetImporters();
+		static void RegisterAssetImporter(const std::string& extension, Ref<ResourceImporter> assetImport);
+		static void DeregisterAssetImporter(const std::string& extension);
+		static void DeregisterAllAssetImporters();
+		static Ref<ResourceImporter> GetAssetImporter(const std::string& extension);
+		static const ImporterMap& GetAssetImporters();
+		static ExtensionIter GetAssetImporterExtension(const std::string& extension);
+		static void RegisterDefaultAssetImporters();
+		static void DeregisterDefaultAssetImporters();
 	};
 }

@@ -12,6 +12,7 @@
 #include "Mahakam/Math/Math.h"
 #include "Mahakam/Core/MouseButtonCodes.h"
 #include "Mahakam/Core/Profiler.h"
+#include "Mahakam/Core/Random.h"
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Timestep.h"
 #include "Mahakam/Core/Types.h"
@@ -34,6 +35,8 @@
 
 // Editor
 #ifndef MH_STANDALONE
+#include "Mahakam/Editor/Resource/ResourceImporter.h"
+#include "Mahakam/Editor/Resource/ResourceRegistry.h"
 #include "Mahakam/Editor/EditorCamera.h"
 #include "Mahakam/Editor/EditorWindow.h"
 #include "Mahakam/Editor/EditorWindowRegistry.h"

@@ -345,7 +345,8 @@ namespace Mahakam::Editor
 							{
 								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
 
-								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
+								ImportWizardPanel::ImportOpen(importPath, info.Extension);
+								//ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
 							}
 
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
@@ -382,7 +383,7 @@ namespace Mahakam::Editor
 							{
 								m_ImporterExtension = file.path().extension().string();
 
-								auto ext = AssetDatabase::GetAssetImporterExtension(m_ImporterExtension);
+								auto ext = ResourceRegistry::GetAssetImporterExtension(m_ImporterExtension);
 								auto iter = ext.first;
 								auto iterEnd = ext.second;
 
@@ -395,9 +396,7 @@ namespace Mahakam::Editor
 									}
 									else
 									{
-										std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
-
-										ImportWizardPanel::ImportAsset(file.path(), props.Extension, importPath);
+										ImportWizardPanel::ResourceOpen(file.path(), props.Extension);
 									}
 								}
 							}
@@ -409,14 +408,14 @@ namespace Mahakam::Editor
 
 								std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
 
-								auto ext = AssetDatabase::GetAssetImporterExtension(m_ImporterExtension);
+								auto ext = ResourceRegistry::GetAssetImporterExtension(m_ImporterExtension);
 								auto iter = ext.first;
 								auto iterEnd = ext.second;
 								while (iter != iterEnd)
 								{
 									const auto& props = iter->second->GetImporterProps();
 									if (ImGui::MenuItem(props.Name.c_str()))
-										ImportWizardPanel::ImportAsset(file.path(), props.Extension, importPath);
+										ImportWizardPanel::ResourceOpen(file.path(), props.Extension);
 
 									++iter;
 								}
@@ -451,7 +450,7 @@ namespace Mahakam::Editor
 							std::string filename = props.Name + props.Extension;
 							std::filesystem::path filepath = m_CurrentDirectory / filename;
 							std::filesystem::path importPath = FileUtility::GetImportPath(filepath);
-							ImportWizardPanel::ImportAsset(filepath, props.Extension, importPath);
+							ImportWizardPanel::ImportOpen(importPath, props.Extension);
 						}
 					}
 				}
