@@ -32,7 +32,7 @@ namespace Mahakam::Editor
 
 		AssetDatabase::RegisterDefaultAssetImporters();
 
-		AssetDatabase::RefreshAssetImports();
+		AssetDatabase::RefreshAssetPaths();
 
 		ResourceRegistry::RegisterDefaultAssetImporters();
 

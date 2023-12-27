@@ -111,122 +111,6 @@ namespace Mahakam
 		LoadLegacySerializer<texcubeExtension, textureExtension>();
 	}
 
-	AssetDatabase::ControlBlock* AssetDatabase::ReadAsset(AssetID id)
-	{
-		MH_ASSERT(id, "Attempting to load an Asset with id 0");
-
-		// Increment loaded asset
-		auto assetIter = s_LoadedAssets.find(id);
-		if (assetIter != s_LoadedAssets.end())
-		{
-			assetIter->second->UseCount++;
-
-			return assetIter->second;
-		}
-
-		// Get asset path from ID
-		auto pathIter = s_AssetPaths.find(id);
-		if (pathIter == s_AssetPaths.end())
-			return nullptr;
-		
-		std::filesystem::path filepath = pathIter->second;
-
-		if (!std::filesystem::exists(filepath))
-		{
-			MH_WARN("AssetDatabase::ReadAsset: The path '{0}' doesn't exist", filepath.string());
-			return nullptr;
-		}
-
-		// Read file into buffer
-		TrivialVector<char> buffer;
-
-		if (!FileUtility::ReadFile(filepath, buffer))
-			return nullptr;
-
-		Reader reader(buffer.data(), static_cast<uint32_t>(buffer.size() * 8U));
-
-		AssetID assetID;
-		std::string extension;
-		if (!SerializeAssetHeader(reader, assetID, extension))
-			return nullptr;
-
-		auto iter = s_Serializers.find(extension);
-		if (iter == s_Serializers.end())
-			return nullptr;
-
-		Asset<void> asset = iter->second.Deserialize(reader, filepath);
-
-		asset.m_Control->ID = assetID;
-		asset.IncrementRef();
-
-		s_LoadedAssets.insert({ id, asset.m_Control });
-
-		return asset.m_Control;
-	}
-
-	AssetDatabase::ControlBlock* AssetDatabase::WriteAsset(ControlBlock* control, AssetID id, const std::string& extension, const std::filesystem::path& filepath)
-	{
-		auto iter = s_Serializers.find(extension);
-		if (iter == s_Serializers.end())
-			return nullptr;
-
-		TrivialVector<uint32_t> buffer;
-		Writer writer(buffer);
-
-		if (control->ID != id)
-			control->ID = id;
-
-		if (!SerializeAssetHeader(writer, control->ID, extension))
-			return nullptr;
-
-
-		// TODO: Do this properly
-		if (!iter->second.Serialize(writer, filepath, control + 1))
-			return nullptr;
-
-		uint32_t num_bits = writer.flush();
-
-
-		// Create the asset directory, if it doesn't exist
-		FileUtility::CreateDirectories(filepath.parent_path());
-
-		// Save the asset
-		std::ofstream filestream(filepath, std::ios::binary);
-		filestream.write(reinterpret_cast<char*>(writer.get_buffer()), writer.get_num_bytes_serialized());
-		filestream.close();
-
-		// If an asset with the given ID already exists, we may need to reload it
-		auto controlIter = s_LoadedAssets.find(id);
-		if (controlIter != s_LoadedAssets.end())
-		{
-			ControlBlock* loadedControl = controlIter->second;
-
-			// If the control block is different, then copy and invalidate
-			if (loadedControl != control)
-			{
-				// Increment the UseCount
-				loadedControl->UseCount++;
-
-				// Move the pointer and destructor to the existing control block
-				loadedControl->MoveData(control + 1, loadedControl + 1);
-
-				// Invalidate the old control block, but don't delete it as others may reference it
-				control->MoveData = nullptr;
-				//control->DeleteData = nullptr;
-				control->ID = 0;
-			}
-
-			return loadedControl;
-		}
-
-		// Add as a new asset
-		s_LoadedAssets.insert({ id, control });
-
-		RefreshAssetImports();
-
-		return control;
-	}
-
 	//void AssetDatabase::RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport)
 	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImporter)
 	{
@@ -390,7 +274,7 @@ namespace Mahakam
 	{
 		auto pathIter = s_AssetPaths.find(id);
 		if (pathIter == s_AssetPaths.end())
-			RefreshAssetImports();
+			RefreshAssetPaths();
 
 		// TODO: Is this even needed anymore? SaveAsset does something similar
 		//auto iter = s_LoadedAssets.find(id);
@@ -419,7 +303,7 @@ namespace Mahakam
 	MH_DEFINE_FUNC(AssetDatabase::ReloadAssets, void)
 	{
 		// Recreate asset ID to filepath mapping
-		RefreshAssetImports();
+		RefreshAssetPaths();
 
 		// Reimport all imported assets
 		for (auto& [id, loadedControl] : s_LoadedAssets)
@@ -436,27 +320,26 @@ namespace Mahakam
 			}
 			else
 			{
-				MH_WARN("Could not reload previously loaded Asset with ID: {0}", id);
+				MH_WARN("Could not reload previously loaded Asset with ID: {0} as it was empty", id);
 			}
 		}
 	};
 
-	//void AssetDatabase::RefreshAssetImports()
-	MH_DEFINE_FUNC(AssetDatabase::RefreshAssetImports, void)
+	//void AssetDatabase::RefreshAssetPaths()
+	MH_DEFINE_FUNC(AssetDatabase::RefreshAssetPaths, void)
 	{
-		// TODO: Rename this function
 		s_AssetPaths.clear();
 		RecursiveCacheAssets(FileUtility::ASSET_PATH);
 	};
 
-	//std::filesystem::path AssetDatabase::GetAssetImportPath(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetImportPath, std::filesystem::path, AssetDatabase::AssetID id)
+	//const std::filesystem::path& AssetDatabase::GetAssetImportPath(AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetImportPath, const std::filesystem::path&, AssetDatabase::AssetID id)
 	{
 		auto iter = s_AssetPaths.find(id);
 		if (iter != s_AssetPaths.end())
 			return iter->second;
 
-		return "";
+		return EmptyPath;
 	};
 
 	//const AssetDatabase::AssetMap& AssetDatabase::GetAssetHandles()
@@ -491,95 +374,45 @@ namespace Mahakam
 		Reader reader(buffer.data(), static_cast<uint32_t>(buffer.size() * 8U));
 
 		AssetInfo assetInfo;
-		if (SerializeAssetHeader(reader, assetInfo.ID, assetInfo.Extension))
-			return assetInfo;
+		if (!SerializeAssetHeader(reader, assetInfo.ID, assetInfo.Extension))
+			return {};
 
-
-
-		// TODO: Remove
-		try
-		{
-			ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
-
-			ryml::NodeRef root = tree.rootref();
-
-			if (!root.valid())
-				return {};
-
-			AssetInfo info;
-
-			if (root.has_child("ID"))
-				root["ID"] >> info.ID;
-
-			if (root.has_child("Filepath"))
-			{
-				ryml::NodeRef filepathNode = root["Filepath"];
-				char seperator = std::filesystem::path::preferred_separator;
-
-				std::string filepathUnix;
-				filepathNode >> filepathUnix;
-				std::replace(filepathUnix.begin(), filepathUnix.end(), '/', seperator);
-
-				info.Filepath = filepathUnix;
-			}
-
-			std::string extension;
-			if (root.has_child("Extension"))
-				root["Extension"] >> extension;
-
-#ifdef MH_STANDALONE
-			info.Extension = std::hash<std::string>()(extension);
-#else
-			info.Extension = extension;
-#endif
-
-			return info;
-		}
-		catch (std::runtime_error const& e)
-		{
-			MH_WARN("Weird yaml file found in {0}: {1}", importPath.string(), e.what());
-		}
-
-		return {};
+		return assetInfo;
 	};
 
-	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension, const std::filesystem::path& importPath)
-	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, AssetID idNew, const ExtensionType& extension, const std::filesystem::path& importPath)
+	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension, const std::filesystem::path& filepath)
+	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, AssetID id, const ExtensionType& extension, const std::filesystem::path& filepath)
 	{
-		// TEMP
-		return WriteAsset(control, idNew, extension, importPath);
-
-		// Read asset info and ID
-		AssetID id = 0;
-		if (std::filesystem::exists(importPath))
-			id = ReadAssetInfo(importPath).ID;
-		else
-			id = Random::GetRandomID64();
-
-		// If no importer exists with this extension
-		auto iter = s_AssetImporters.find(extension);
-		if (iter == s_AssetImporters.end())
+		auto iter = s_Serializers.find(extension);
+		if (iter == s_Serializers.end())
 			return nullptr;
 
-		// Create the import directory, if it doesn't exist
-		FileUtility::CreateDirectories(importPath.parent_path());
+		TrivialVector<uint32_t> buffer;
+		Writer writer(buffer);
 
-		// Serialize the asset
-		ryml::Tree tree;
+		if (control->ID != id)
+			control->ID = id;
 
-		ryml::NodeRef root = tree.rootref();
-		root |= ryml::MAP;
+		if (!SerializeAssetHeader(writer, control->ID, extension))
+			return nullptr;
 
-		root["Extension"] << iter->second->GetImporterProps().Extension;
-		root["ID"] << id;
 
-		iter->second->Serialize(root, control + 1);
+		// TODO: Do this properly
+		if (!iter->second.Serialize(writer, filepath, control + 1))
+			return nullptr;
 
-		std::ofstream filestream(importPath);
-		filestream << tree;
+		uint32_t num_bits = writer.flush();
 
+
+		// Create the asset directory, if it doesn't exist
+		FileUtility::CreateDirectories(filepath.parent_path());
+
+		// Save the asset
+		std::ofstream filestream(filepath, std::ios::binary);
+		filestream.write(reinterpret_cast<char*>(writer.get_buffer()), writer.get_num_bytes_serialized());
 		filestream.close();
 
+		// If an asset with the given ID already exists, we may need to reload it
 		auto controlIter = s_LoadedAssets.find(id);
 		if (controlIter != s_LoadedAssets.end())
 		{
@@ -602,24 +435,18 @@ namespace Mahakam
 
 			return loadedControl;
 		}
-		else
-		{
-			control->ID = id;
 
-			s_LoadedAssets.insert({ id, control });
+		// Add as a new asset
+		s_LoadedAssets.insert({ id, control });
 
-			RefreshAssetImports();
+		RefreshAssetPaths();
 
-			return control;
-		}
+		return control;
 	};
 
 	//AssetDatabase::ControlBlock* AssetDatabase::IncrementAsset(AssetDatabase::AssetID id)
 	MH_DEFINE_FUNC(AssetDatabase::IncrementAsset, AssetDatabase::ControlBlock*, AssetDatabase::AssetID id)
 	{
-		// TEMP
-		return ReadAsset(id);
-
 		MH_ASSERT(id, "Attempting to load an Asset with id 0");
 
 		auto iter = s_LoadedAssets.find(id);
@@ -648,65 +475,51 @@ namespace Mahakam
 		if (s_LoadedAssets.find(control->ID) != s_LoadedAssets.end())
 			s_LoadedAssets.erase(control->ID);
 		else
-			MH_WARN("Attempting to unload an already unloaded asset ({0})", control->ID);
+			MH_ERROR("Attempting to unload an already unloaded asset ({0})", control->ID);
 	};
 
 	AssetDatabase::ControlBlock* AssetDatabase::LoadAndIncrementAsset(AssetID id)
 	{
-		MH_ASSERT(id, "Asset ID to be loaded cannot be 0");
+		MH_ASSERT(id, "Attempting to load an Asset with id 0");
 
-		// Find the import path from the ID
-		std::filesystem::path importPath;
-		auto iter = s_AssetPaths.find(id);
-		if (iter != s_AssetPaths.end())
-			importPath = iter->second;
+		// Get asset path from ID
+		auto pathIter = s_AssetPaths.find(id);
+		if (pathIter == s_AssetPaths.end())
+			return nullptr;
 
-		if (!std::filesystem::exists(importPath))
+		std::filesystem::path filepath = pathIter->second;
+
+		if (!std::filesystem::exists(filepath))
 		{
-			MH_WARN("AssetDatabase::LoadAssetFromID: The path '{0}' doesn't exist", importPath.string());
+			MH_WARN("AssetDatabase::ReadAsset: The path '{0}' doesn't exist", filepath.string());
 			return nullptr;
 		}
 
+		// Read file into buffer
 		TrivialVector<char> buffer;
-		if (!FileUtility::ReadFile(importPath, buffer))
+
+		if (!FileUtility::ReadFile(filepath, buffer))
 			return nullptr;
 
-		try
-		{
-			ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
+		Reader reader(buffer.data(), static_cast<uint32_t>(buffer.size() * 8U));
 
-			ryml::NodeRef root = tree.rootref();
+		AssetID assetID;
+		std::string extension;
+		if (!SerializeAssetHeader(reader, assetID, extension))
+			return nullptr;
 
-			// If the asset type has an importer
-			std::string extension;
-			if (root.has_child("Extension"))
-				root["Extension"] >> extension;
+		auto iter = s_Serializers.find(extension);
+		if (iter == s_Serializers.end())
+			return nullptr;
 
-#ifdef MH_STANDALONE
-			auto importIter = s_AssetImporters.find(std::hash<std::string>()(extension));
-#else
-			auto importIter = s_AssetImporters.find(extension);
-#endif
-			if (importIter == s_AssetImporters.end())
-				return nullptr;
+		Asset<void> asset = iter->second.Deserialize(reader, filepath);
 
-			// Deserialize the asset using the YAML node
-			Asset<void> asset = importIter->second->Deserialize(root);
+		asset.m_Control->ID = assetID;
+		asset.IncrementRef();
 
-			if (!asset)
-				return nullptr;
+		s_LoadedAssets.insert({ id, asset.m_Control });
 
-			asset.m_Control->ID = id;
-			asset.IncrementRef();
-
-			return asset.m_Control;
-		}
-		catch (std::runtime_error const& e)
-		{
-			MH_WARN("AssetDatabase encountered exception trying to import yaml file {0}: {1}", importPath.string(), e.what());
-		}
-
-		return nullptr;
+		return asset.m_Control;
 	}
 
 	void AssetDatabase::RecursiveCacheAssets(const std::filesystem::path& filepath)

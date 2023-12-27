@@ -33,16 +33,11 @@ namespace Mahakam
         
         typedef uint64_t AssetID;
 
-#ifdef MH_STANDALONE
-		typedef uint64_t ExtensionType;
-#else
 		typedef std::string ExtensionType;
-#endif
 
 		struct AssetInfo
 		{
 			AssetID ID = 0;
-			std::filesystem::path Filepath = "";
 			ExtensionType Extension;
 		};
 
@@ -86,6 +81,8 @@ namespace Mahakam
 
 
 		// TODO: Move into own class
+		inline static const std::filesystem::path EmptyPath = "";
+
 		inline static UnorderedMap<std::string, AssetSerializer> s_Serializers;
 
 		template<typename Stream>
@@ -102,9 +99,6 @@ namespace Mahakam
 
 		static void LoadDefaultSerializers();
 
-		static ControlBlock* ReadAsset(AssetID id);
-		static ControlBlock* WriteAsset(ControlBlock* asset, AssetID id, const std::string& extension, const std::filesystem::path& filepath);
-
 	public:
 		// Registering asset importers
 		MH_DECLARE_FUNC(RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImport); // Registers a specific asset importer to an extension
@@ -119,10 +113,10 @@ namespace Mahakam
 		// Asset reloading
 		MH_DECLARE_FUNC(ReloadAsset, void, AssetID id); // Reloads a specific asset
 		MH_DECLARE_FUNC(ReloadAssets, void); // Reloads all assets, essentially recreating them
-		MH_DECLARE_FUNC(RefreshAssetImports, void); // Refreshes the asset paths, finding new assets and removing unused ones
+		MH_DECLARE_FUNC(RefreshAssetPaths, void); // Refreshes the asset paths, finding new assets and removing unused ones
 
 		// Various getters
-		MH_DECLARE_FUNC(GetAssetImportPath, std::filesystem::path, AssetID id); // Gets the import path of a given asset
+		MH_DECLARE_FUNC(GetAssetImportPath, const std::filesystem::path&, AssetID id); // Gets the import path of a given asset
 		MH_DECLARE_FUNC(GetAssetHandles, const AssetMap&); // Gets a reference to all assets, whether they're currently loaded or not
 		MH_DECLARE_FUNC(GetAssetReferences, size_t, AssetID id); // Gets the amount of references to this asset, if any
 
