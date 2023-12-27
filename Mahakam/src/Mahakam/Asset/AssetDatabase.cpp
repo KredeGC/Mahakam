@@ -485,10 +485,18 @@ namespace Mahakam
 		}
 
 		TrivialVector<char> buffer;
-
 		if (!FileUtility::ReadFile(importPath, buffer))
 			return {};
 
+		Reader reader(buffer.data(), static_cast<uint32_t>(buffer.size() * 8U));
+
+		AssetInfo assetInfo;
+		if (SerializeAssetHeader(reader, assetInfo.ID, assetInfo.Extension))
+			return assetInfo;
+
+
+
+		// TODO: Remove
 		try
 		{
 			ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));

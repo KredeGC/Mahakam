@@ -1,14 +1,14 @@
-Extension: .material
-ID: 46003763570734560
 Shader: 11869644962294522068
 Properties:
-  Uniforms.EmissionColor: [0, 0, 0]
-  u_Occlussion: 4967946425892475307
-  Uniforms.RoughnessMul: 1
-  u_Roughness: 1646747611554353250
-  Uniforms.MetallicMul: 1
-  u_Bump: 5968966049936667336
+  Uniforms.UVTransform: [1,1,0,0]
   u_Metallic: 9795171254709206469
-  Uniforms.Color: [1, 1, 1]
   u_Albedo: 14377480984110579021
-  Uniforms.UVTransform: [1, 1, 0, 0]
+  u_Roughness: 1646747611554353250
+  u_Bump: 5968966049936667336
+  Uniforms.Color: [1,1,1]
+  Uniforms.MetallicMul: 1
+  Uniforms.RoughnessMul: 1
+  u_Occlussion: 4967946425892475307
+  Uniforms.EmissionColor: [0,0,0]
+Extension: .material
+ID: 46003763570734560

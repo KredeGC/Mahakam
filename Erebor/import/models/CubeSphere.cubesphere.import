@@ -1,6 +1,6 @@
-Extension: .cubesphere
-ID: 14539941857077216621
 Materials:
   - 15739498696759362444
 Tessellation: 9
-Invert: false
+Invert: 0
+Extension: .cubesphere
+ID: 14539941857077216621

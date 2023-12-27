@@ -42,7 +42,7 @@ namespace Mahakam
 	{
 		Animation* animationAsset = static_cast<Animation*>(asset);
 
-		//node["Filepath"] << animationAsset->GetFilepath();
+		node["Filepath"] << animationAsset->GetFilepath();
 		node["Index"] << animationAsset->GetIndex();
 	}
 

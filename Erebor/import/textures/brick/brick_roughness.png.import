@@ -1,8 +1,8 @@
 Filepath: resource/textures/brick/brick_roughness.png
-Extension: .tex2d
-ID: 4232175179651810790
 Format: R_BC4
 Filter: Point
 WrapX: Repeat
 WrapY: Repeat
-Mipmaps: true
+Mipmaps: 1
+Extension: .tex2d
+ID: 4232175179651810790

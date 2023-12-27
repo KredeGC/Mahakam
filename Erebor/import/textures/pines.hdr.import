@@ -1,8 +1,8 @@
 Filepath: resource/textures/pines.hdr
-Extension: .texcube
-ID: 15966881194349846934
 Format: RG11B10F
 Filter: Trilinear
 Resolution: 4096
 Prefilter: None
-Mipmaps: true
+Mipmaps: 1
+Extension: .texcube
+ID: 15966881194349846934

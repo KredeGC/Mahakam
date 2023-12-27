@@ -75,7 +75,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<Mesh> planeMesh = Asset<Mesh>(556425745901094492ULL);
+	Asset<Mesh> planeMesh = Asset<Mesh>("assets/models/Plane.plane.asset");
 
 	/*Ref<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
 
@@ -107,7 +107,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 #endif
 
 
-#if 0
+#if 1
 	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
 
 	// Create glTF skinned model
@@ -153,7 +153,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 #endif
 
 
-#if 0
+#if 1
 	// Create base collection entity to store in
 	Asset<Mesh> sphereMesh = Asset<Mesh>("assets/models/CubeSphere.cubesphere.asset");
 

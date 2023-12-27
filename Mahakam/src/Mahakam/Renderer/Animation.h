@@ -34,6 +34,7 @@ namespace Mahakam
 		Animation(const std::filesystem::path& filepath, int index);
 
 		inline const std::string& GetName() const { return m_Name; }
+		inline const std::filesystem::path& GetFilepath() const { return m_Filepath; }
 		inline int GetIndex() const { return m_AnimationIndex; }
 		inline float GetDuration() const { return m_Duration; }
 

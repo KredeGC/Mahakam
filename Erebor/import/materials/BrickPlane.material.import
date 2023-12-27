@@ -1,12 +1,12 @@
-Extension: .material
-ID: 660037763570734260
 Shader: 332566198138111729
 Properties:
-  Uniforms.UVTransform: [2, 2, 0, 0]
-  Uniforms.Color: [1, 1, 1]
+  Uniforms.UVTransform: [2,2,0,0]
   u_Albedo: 8387792792684495064
   u_Roughness: 4232175179651810790
   u_Bump: 125392180592167870
+  Uniforms.Color: [1,1,1]
   Uniforms.MetallicMul: 0
-  Uniforms.EmissionColor: [0, 0, 0]
   Uniforms.RoughnessMul: 1
+  Uniforms.EmissionColor: [0,0,0]
+Extension: .material
+ID: 660037763570734260
