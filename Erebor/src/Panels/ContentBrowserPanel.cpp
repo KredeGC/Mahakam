@@ -328,7 +328,7 @@ namespace Mahakam::Editor
 
 							if (ImGui::BeginDragDropSource())
 							{
-								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
+								ResourceRegistry::AssetInfo info = ResourceRegistry::ReadAssetInfo(importPath);
 
 								std::string importString = importPath.string();
 								const char* importBuffer = importString.c_str();
@@ -343,7 +343,7 @@ namespace Mahakam::Editor
 
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{
-								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
+								ResourceRegistry::AssetInfo info = ResourceRegistry::ReadAssetInfo(importPath);
 
 								ImportWizardPanel::ImportOpen(importPath, info.Extension);
 								//ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);

@@ -165,9 +165,24 @@ namespace Mahakam
 		}
 #pragma endregion
 
+		// TODO: Remove this overload once AssetImporter is removed
+		[[deprecated]]
 		void Save(const ExtensionType& extension, const std::filesystem::path& importPath)
 		{
-			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, extension, importPath);
+			AssetID id = m_Control ? m_Control->ID : Random::GetRandomID64();
+			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, id, extension, importPath);
+
+			// If the control block is changed, we might need to remove the old one
+			if (control != m_Control)
+				DecrementRef();
+
+			m_Control = control;
+		}
+
+		// TODO: Remove importPath and rely solely on the ID, since that should be unique
+		void Save(AssetID id, const ExtensionType& extension, const std::filesystem::path& importPath)
+		{
+			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, id, extension, importPath);
 
 			// If the control block is changed, we might need to remove the old one
 			if (control != m_Control)

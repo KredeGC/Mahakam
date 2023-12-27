@@ -35,7 +35,7 @@ namespace Mahakam
 
 		m_Props = DeserializeProps(node);
 
-		m_Texture = nullptr;
+		CreatePreviewTexture();
 	}
 
 	void Texture2DResourceImporter::OnRender()

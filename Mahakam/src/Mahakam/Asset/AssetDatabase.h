@@ -55,10 +55,13 @@ namespace Mahakam
 			void (*DeleteData)(void*);
 		};
 
+		using Writer = bitstream::growing_bit_writer<TrivialVector<uint32_t>>;
+		using Reader = bitstream::fixed_bit_reader;
+
 		struct AssetSerializer
 		{
-			bool (*Serialize)(bitstream::growing_bit_writer<TrivialVector<uint32_t>>&, void* asset) = nullptr;
-			Asset<void> (*Deserialize)(bitstream::fixed_bit_reader&) = nullptr;
+			bool (*Serialize)(bitstream::growing_bit_writer<TrivialVector<uint32_t>>&, const std::filesystem::path& filepath, void* asset) = nullptr;
+			Asset<void> (*Deserialize)(Reader&, const std::filesystem::path& filepath) = nullptr;
 		};
 
 	private:
@@ -86,7 +89,7 @@ namespace Mahakam
 		inline static UnorderedMap<std::string, AssetSerializer> s_Serializers;
 
 		template<typename Stream>
-		bool SerializeAssetHeader(Stream& stream, bitstream::inout<Stream, AssetID> assetID, bitstream::inout<Stream, std::string> extension)
+		static bool SerializeAssetHeader(Stream& stream, bitstream::inout<Stream, AssetID> assetID, bitstream::inout<Stream, std::string> extension)
 		{
 			BS_ASSERT(stream.template serialize<AssetID>(assetID));
 			BS_ASSERT(stream.template serialize<std::string>(extension, 32));
@@ -94,10 +97,13 @@ namespace Mahakam
 			return true;
 		}
 
-		void LoadDefaultSerializers();
+		template<const char* Extension, const char* LegacyExt>
+		static void LoadLegacySerializer();
 
-		ControlBlock* ReadAsset(const std::filesystem::path& filepath);
-		ControlBlock* WriteAsset(ControlBlock* asset, const std::string& extension, const std::filesystem::path& filepath);
+		static void LoadDefaultSerializers();
+
+		static ControlBlock* ReadAsset(AssetID id);
+		static ControlBlock* WriteAsset(ControlBlock* asset, AssetID id, const std::string& extension, const std::filesystem::path& filepath);
 
 	public:
 		// Registering asset importers
@@ -125,7 +131,7 @@ namespace Mahakam
 
 	private:
 		// Saving and loading assets
-		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, const ExtensionType& extension, const std::filesystem::path& importPath);
+		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, AssetID id, const ExtensionType& extension, const std::filesystem::path& importPath);
 
 		MH_DECLARE_FUNC(IncrementAsset, ControlBlock*, AssetID id);
 		MH_DECLARE_FUNC(UnloadAsset, void, ControlBlock* control);

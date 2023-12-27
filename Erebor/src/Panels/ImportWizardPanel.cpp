@@ -47,21 +47,6 @@ namespace Mahakam::Editor
 		}
 	}
 
-	static void SaveImport(ryml::Tree& tree, const std::filesystem::path& importPath, const std::string& extension, AssetDatabase::AssetID id)
-	{
-		MH_ASSERT(id, "AssetID cannot be 0");
-
-		ryml::NodeRef root = tree.rootref();
-
-		root["Extension"] << extension;
-		root["ID"] << id;
-
-		std::ofstream filestream(importPath);
-		filestream << tree;
-
-		filestream.close();
-	}
-
 	static void SaveImport(ryml::Tree& tree, const std::filesystem::path& importPath, ResourceImporter& importer, AssetDatabase::AssetID id)
 	{
 		MH_ASSERT(id, "AssetID cannot be 0");
@@ -81,9 +66,8 @@ namespace Mahakam::Editor
 		filestream.close();
 
 		// Save asset
-		asset.Save(importer.GetImporterProps().Extension, FileUtility::GetAssetPath(importPath));
-
-		// TODO: Asset<T> should not have a Save() function any longer
+		// TODO: Remove assetPath entirely
+		asset.Save(id, importer.GetImporterProps().Extension, FileUtility::GetAssetPath(importPath));
 	}
 
 	void ImportWizardPanel::OnImGuiRender()
@@ -150,12 +134,14 @@ namespace Mahakam::Editor
 		{
 			if (importer->GetImporterProps().NoWizard)
 			{
+				// TODO: Call OnResourceOpen
+
 				// Import tree
 				ryml::Tree tree = ImportTree(*importer);
 
 				// Save tree
 				std::filesystem::path importPath = FileUtility::GetImportPath(filepath, importer->GetImporterProps().Extension);
-				SaveImport(tree, importPath, importer->GetImporterProps().Extension, Random::GetRandomID64());
+				SaveImport(tree, importPath, *importer, Random::GetRandomID64());
 			}
 			else
 			{
@@ -178,11 +164,20 @@ namespace Mahakam::Editor
 		{
 			if (importer->GetImporterProps().NoWizard)
 			{
-				// Import tree
-				ryml::Tree tree = ImportTree(*importer);
+				// Read tree
+				ryml::Tree tree = ReadImport(importPath);
+
+				ryml::NodeRef root = tree.rootref();
+
+				AssetDatabase::AssetID assetID;
+				DeserializeYAMLNode(root, "ID", assetID);
+
+				importer->OnImportOpen(root);
+
+				importer->OnImport(root);
 
 				// Save tree
-				SaveImport(tree, importPath, importer->GetImporterProps().Extension, Random::GetRandomID64());
+				SaveImport(tree, importPath, *importer, assetID);
 			}
 			else
 			{

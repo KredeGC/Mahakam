@@ -21,6 +21,12 @@ namespace Mahakam
 
 		using ImporterMap = UnorderedMap<std::string, Ref<ResourceImporter>>;
 
+		struct AssetInfo
+		{
+			AssetID ID = 0;
+			std::string Extension;
+		};
+
 	private:
 		inline static ExtensionMap s_AssetExtensions;
 		inline static ImporterMap s_AssetImporters;
@@ -34,5 +40,7 @@ namespace Mahakam
 		static ExtensionIter GetAssetImporterExtension(const std::string& extension);
 		static void RegisterDefaultAssetImporters();
 		static void DeregisterDefaultAssetImporters();
+
+		static AssetInfo ReadAssetInfo(const std::filesystem::path& filepath);
 	};
 }

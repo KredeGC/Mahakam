@@ -178,4 +178,44 @@ namespace Mahakam
 		DeregisterAssetImporter(".jpg");
 		DeregisterAssetImporter(".hdr");
 	}
+
+	ResourceRegistry::AssetInfo ResourceRegistry::ReadAssetInfo(const std::filesystem::path& filepath)
+	{
+		if (!std::filesystem::exists(filepath) || std::filesystem::is_directory(filepath))
+		{
+			MH_WARN("AssetDatabase::ReadAssetInfo: The path '{0}' doesn't point to an asset", filepath.string());
+			return {};
+		}
+
+		TrivialVector<char> buffer;
+
+		if (!FileUtility::ReadFile(filepath, buffer))
+			return {};
+
+		try
+		{
+			ryml::Tree tree = ryml::parse_in_arena(ryml::csubstr(buffer.data(), buffer.size()));
+
+			ryml::NodeRef root = tree.rootref();
+
+			if (!root.valid())
+				return {};
+
+			AssetInfo info;
+
+			if (root.has_child("ID"))
+				root["ID"] >> info.ID;
+
+			if (root.has_child("Extension"))
+				root["Extension"] >> info.Extension;
+
+			return info;
+		}
+		catch (std::runtime_error const& e)
+		{
+			MH_WARN("Weird yaml file found in {0}: {1}", filepath.string(), e.what());
+		}
+
+		return {};
+	}
 }
