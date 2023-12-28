@@ -66,8 +66,7 @@ namespace Mahakam::Editor
 		filestream.close();
 
 		// Save asset
-		// TODO: Remove assetPath entirely
-		asset.Save(id, importer.GetImporterProps().Extension, FileUtility::GetAssetPath(importPath));
+		asset.Save(id, importer.GetImporterProps().Extension);
 	}
 
 	void ImportWizardPanel::OnImGuiRender()

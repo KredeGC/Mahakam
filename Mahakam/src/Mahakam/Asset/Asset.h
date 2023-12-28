@@ -174,7 +174,7 @@ namespace Mahakam
 		void Save(const ExtensionType& extension, const std::filesystem::path& importPath)
 		{
 			AssetID id = m_Control ? m_Control->ID : Random::GetRandomID64();
-			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, id, extension, importPath);
+			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, id, extension);
 
 			// If the control block is changed, we might need to remove the old one
 			if (control != m_Control)
@@ -184,9 +184,9 @@ namespace Mahakam
 		}
 
 		// TODO: Remove importPath and rely solely on the ID, since that should be unique
-		void Save(AssetID id, const ExtensionType& extension, const std::filesystem::path& importPath)
+		void Save(AssetID id, const ExtensionType& extension)
 		{
-			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, id, extension, importPath);
+			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, id, extension);
 
 			// If the control block is changed, we might need to remove the old one
 			if (control != m_Control)

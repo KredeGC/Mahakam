@@ -125,7 +125,7 @@ namespace Mahakam
 
 	private:
 		// Saving and loading assets
-		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, AssetID id, const ExtensionType& extension, const std::filesystem::path& importPath);
+		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, AssetID id, const ExtensionType& extension);
 
 		MH_DECLARE_FUNC(IncrementAsset, ControlBlock*, AssetID id);
 		MH_DECLARE_FUNC(UnloadAsset, void, ControlBlock* control);

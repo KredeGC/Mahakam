@@ -75,7 +75,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<Mesh> planeMesh = Asset<Mesh>("assets/models/Plane.plane.asset");
+	Asset<Mesh> planeMesh = Asset<Mesh>(556425745901094492ULL);
 
 	/*Ref<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
 

@@ -380,8 +380,8 @@ namespace Mahakam
 		return assetInfo;
 	};
 
-	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension, const std::filesystem::path& filepath)
-	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, AssetID id, const ExtensionType& extension, const std::filesystem::path& filepath)
+	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension)
+	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, AssetID id, const ExtensionType& extension)
 	{
 		auto iter = s_Serializers.find(extension);
 		if (iter == s_Serializers.end())
@@ -391,18 +391,20 @@ namespace Mahakam
 		Writer writer(buffer);
 
 		if (control->ID != id)
+		{
+			// Remove old ID
+			s_LoadedAssets.erase(control->ID);
 			control->ID = id;
+		}
 
 		if (!SerializeAssetHeader(writer, control->ID, extension))
 			return nullptr;
 
-
-		// TODO: Do this properly
+		std::filesystem::path filepath = FileUtility::ASSET_PATH / (std::to_string(id) + FileUtility::AssetExtension);
 		if (!iter->second.Serialize(writer, filepath, control + 1))
 			return nullptr;
 
-		uint32_t num_bits = writer.flush();
-
+		writer.flush();
 
 		// Create the asset directory, if it doesn't exist
 		FileUtility::CreateDirectories(filepath.parent_path());
@@ -540,7 +542,7 @@ namespace Mahakam
 			}
 			else if (directory.path().extension() == FileUtility::AssetExtension)
 			{
-				// IDEA: Make assets have their ID as filename
+				// TODO: Make assets have their ID as filename
 				// That way there's no need to read in order to index
 				TrivialVector<char> buffer;
 
