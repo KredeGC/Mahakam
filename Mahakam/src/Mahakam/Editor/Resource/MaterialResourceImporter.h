@@ -34,14 +34,14 @@ namespace Mahakam
 		// Preview
 		Ref<SubMesh> m_PreviewSphereMesh;
 		Camera m_PreviewCamera;
-		Ref<SceneData> m_SceneData;
+		Scope<SceneData> m_SceneData;
 		glm::ivec2 m_ViewportSize{ 0 };
 		glm::vec2 m_MousePos{ 0.0f };
 		glm::vec3 m_OrbitEulerAngles{ 0.0f };
 
-		Ref<RenderPass> m_GeometryPass;
-		Ref<RenderPass> m_LightingPass;
-		Ref<RenderPass> m_TonemapPass;
+		Scope<RenderPass> m_GeometryPass;
+		Scope<RenderPass> m_LightingPass;
+		Scope<RenderPass> m_TonemapPass;
 
 	public:
 		MaterialResourceImporter();

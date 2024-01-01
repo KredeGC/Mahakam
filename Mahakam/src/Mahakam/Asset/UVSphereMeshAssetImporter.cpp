@@ -54,9 +54,7 @@ namespace Mahakam
 
 	void UVSphereMeshAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Mesh> meshAsset = UVSphereMesh::Create(m_MeshProps);
-
-		meshAsset.Save(m_ImporterProps.Extension, importPath);
+		
 	}
 #endif
 

@@ -23,6 +23,7 @@
 #include <ryml/rapidyaml-0.4.1.hpp>
 
 #include <algorithm>
+#include <charconv>
 #include <fstream>
 
 namespace Mahakam
@@ -542,33 +543,16 @@ namespace Mahakam
 			}
 			else if (directory.path().extension() == FileUtility::AssetExtension)
 			{
-				// TODO: Make assets have their ID as filename
-				// That way there's no need to read in order to index
-				TrivialVector<char> buffer;
-
-				if (!FileUtility::ReadFile(directory.path(), buffer))
-					continue;
-
-				bitstream::fixed_bit_reader reader(buffer.data(), static_cast<uint32_t>(buffer.size() * 8U));
-
+				std::string pathString = directory.path().filename().string();
 				AssetID id;
-				std::string extension;
-				if (!SerializeAssetHeader(reader, id, extension))
+				if (std::from_chars(pathString.data(), pathString.data() + pathString.size(), id).ec != std::errc{})
 					continue;
 
-				if (id)
-				{
-					char seperator = std::filesystem::path::preferred_separator;
+				auto iter = s_AssetPaths.find(id);
+				if (iter != s_AssetPaths.end())
+					MH_WARN("Attempting to load multiple Assets with ID {0} at {1} and {2}", id, iter->second.string(), directory.path().string());
 
-					std::string filepathUnix = directory.path().string();
-					std::replace(filepathUnix.begin(), filepathUnix.end(), '/', seperator);
-
-					auto iter = s_AssetPaths.find(id);
-					if (iter != s_AssetPaths.end())
-						MH_WARN("Attempting to load multiple Assets with ID {0} at {1} and {2}", id, iter->second.string(), filepathUnix);
-
-					s_AssetPaths[id] = filepathUnix;
-				}
+				s_AssetPaths[id] = directory.path().string();
 			}
 			else
 			{

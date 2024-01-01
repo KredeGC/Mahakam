@@ -26,9 +26,7 @@ namespace Mahakam
 
 	void ShaderAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Shader> shaderAsset = Shader::Create(filepath);
-
-		shaderAsset.Save(m_ImporterProps.Extension, importPath);
+		
 	}
 #endif
 

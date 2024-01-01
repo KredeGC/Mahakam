@@ -179,7 +179,13 @@ namespace Mahakam
 		DeregisterAssetImporter(".hdr");
 	}
 
-	ResourceRegistry::AssetInfo ResourceRegistry::ReadAssetInfo(const std::filesystem::path& filepath)
+	void ResourceRegistry::RefreshImportPaths()
+	{
+		s_ImportPaths.clear();
+		RecursiveCacheAssets(FileUtility::IMPORT_PATH);
+	}
+
+	ResourceRegistry::ImportInfo ResourceRegistry::ReadAssetInfo(const std::filesystem::path& filepath)
 	{
 		if (!std::filesystem::exists(filepath) || std::filesystem::is_directory(filepath))
 		{
@@ -201,13 +207,14 @@ namespace Mahakam
 			if (!root.valid())
 				return {};
 
-			AssetInfo info;
+			ImportInfo info;
+			info.Filepath = filepath;
 
 			if (root.has_child("ID"))
 				root["ID"] >> info.ID;
 
 			if (root.has_child("Extension"))
-				root["Extension"] >> info.Extension;
+				root["Extension"] >> info.Type;
 
 			return info;
 		}
@@ -217,5 +224,43 @@ namespace Mahakam
 		}
 
 		return {};
+	}
+
+	void ResourceRegistry::RecursiveCacheAssets(const std::filesystem::path& filepath)
+	{
+		if (!FileUtility::Exists(filepath))
+		{
+			MH_WARN("Could not import assets. Does the '{0}' folder exist?", filepath.u8string());
+			return;
+		}
+
+		auto iter = std::filesystem::directory_iterator(filepath);
+
+		for (auto& directory : iter)
+		{
+			std::filesystem::path path = directory.path();
+
+			if (directory.is_directory())
+			{
+				RecursiveCacheAssets(path);
+			}
+			else if (path.extension() == ImportExtension)
+			{
+				ImportInfo info = ReadAssetInfo(path);
+
+				if (info.ID)
+				{
+					auto iter = s_ImportPaths.find(info.ID);
+					if (iter != s_ImportPaths.end())
+						MH_WARN("Attempting to load multiple Assets with ID {0} at {1} and {2}", info.ID, iter->second.Filepath.string(), path.string());
+
+					s_ImportPaths[info.ID] = info;
+				}
+			}
+			else
+			{
+				MH_WARN("Found a file without the .import extension at: {0}", path.string());
+			}
+		}
 	}
 }

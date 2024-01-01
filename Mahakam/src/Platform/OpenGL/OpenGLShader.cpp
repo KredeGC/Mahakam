@@ -186,7 +186,7 @@ namespace Mahakam
 			// AMD GPUs do not load SPIR-V shaders correctly in OpenGL
 			// https://github.com/TheCherno/Hazel/issues/440
 			// TODO: Make this an automatic check based on drivers?
-#if true // ifdef MH_AMD_GPU
+#ifdef MH_AMD_GPU
 			spirv_cross::CompilerGLSL glsl(kv.second);
 
 			spirv_cross::CompilerGLSL::Options options;

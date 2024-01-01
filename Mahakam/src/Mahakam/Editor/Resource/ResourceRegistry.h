@@ -16,18 +16,25 @@ namespace Mahakam
 	public:
 		typedef uint64_t AssetID; // TODO: Use AssetDatabase::AssetID
 
+		struct ImportInfo
+		{
+			AssetID ID = 0;
+			std::filesystem::path Filepath;
+			std::string Type;
+		};
+
+		using AssetMap = UnorderedMap<AssetID, ImportInfo>;
+
 		using ExtensionMap = std::unordered_multimap<std::string, Ref<ResourceImporter>>;
 		using ExtensionIter = std::pair<ExtensionMap::const_iterator, ExtensionMap::const_iterator>;
 
 		using ImporterMap = UnorderedMap<std::string, Ref<ResourceImporter>>;
 
-		struct AssetInfo
-		{
-			AssetID ID = 0;
-			std::string Extension;
-		};
+		inline static const std::string ImportExtension = ".import";
 
 	private:
+		inline static AssetMap s_ImportPaths;
+
 		inline static ExtensionMap s_AssetExtensions;
 		inline static ImporterMap s_AssetImporters;
 
@@ -41,6 +48,13 @@ namespace Mahakam
 		static void RegisterDefaultAssetImporters();
 		static void DeregisterDefaultAssetImporters();
 
-		static AssetInfo ReadAssetInfo(const std::filesystem::path& filepath);
+		static void RefreshImportPaths();
+
+		static const AssetMap& GetImports() { return s_ImportPaths; }
+
+		static ImportInfo ReadAssetInfo(const std::filesystem::path& filepath);
+
+	private:
+		static void RecursiveCacheAssets(const std::filesystem::path& filepath);
 	};
 }

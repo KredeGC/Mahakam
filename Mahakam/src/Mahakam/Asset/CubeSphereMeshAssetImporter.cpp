@@ -54,9 +54,7 @@ namespace Mahakam
 
 	void CubeSphereMeshAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Mesh> meshAsset = CubeSphereMesh::Create(m_MeshProps);
-
-		meshAsset.Save(m_ImporterProps.Extension, importPath);
+		
 	}
 #endif
 

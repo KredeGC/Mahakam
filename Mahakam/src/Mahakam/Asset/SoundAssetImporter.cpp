@@ -28,22 +28,7 @@ namespace Mahakam
 
 	void SoundAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		if (asset)
-		{
-			// If the sound already exists, just update some parameters and save
-			Asset<Sound> sound(std::move(asset));
-
-			sound->SetProps(m_Props);
-
-			sound.Save(m_ImporterProps.Extension, importPath);
-		}
-		else
-		{
-			// If the sound doesn't exist, or the filepath has changed, reload everything
-			Asset<Sound> sound = Sound::Create(filepath.string(), m_Props);
-
-			sound.Save(m_ImporterProps.Extension, importPath);
-		}
+		
 	}
 #endif
 

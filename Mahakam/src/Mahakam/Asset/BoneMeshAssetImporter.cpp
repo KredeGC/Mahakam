@@ -53,11 +53,7 @@ namespace Mahakam
 
 	void BoneMeshAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		m_MeshProps.Filepath = filepath;
-
-		Asset<Mesh> meshAsset = BoneMesh::Create(m_MeshProps);
-
-		meshAsset.Save(m_ImporterProps.Extension, importPath);
+		
 	}
 #endif
 

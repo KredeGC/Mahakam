@@ -328,12 +328,12 @@ namespace Mahakam::Editor
 
 							if (ImGui::BeginDragDropSource())
 							{
-								ResourceRegistry::AssetInfo info = ResourceRegistry::ReadAssetInfo(importPath);
+								ResourceRegistry::ImportInfo info = ResourceRegistry::ReadAssetInfo(importPath);
 
 								std::string importString = importPath.string();
 								const char* importBuffer = importString.c_str();
 
-								ImGui::SetDragDropPayload(info.Extension.c_str(), importBuffer, strlen(importBuffer) + 1);
+								ImGui::SetDragDropPayload(info.Type.c_str(), importBuffer, strlen(importBuffer) + 1);
 								
 								ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
 								ImGui::Text("%s", pathName.c_str());
@@ -343,10 +343,9 @@ namespace Mahakam::Editor
 
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{
-								ResourceRegistry::AssetInfo info = ResourceRegistry::ReadAssetInfo(importPath);
+								ResourceRegistry::ImportInfo info = ResourceRegistry::ReadAssetInfo(importPath);
 
-								ImportWizardPanel::ImportOpen(importPath, info.Extension);
-								//ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
+								ImportWizardPanel::ImportOpen(importPath, info.Type);
 							}
 
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
@@ -453,6 +452,13 @@ namespace Mahakam::Editor
 				}
 
 				ImGui::EndMenu();
+			}
+
+			if (ImGui::MenuItem("Reimport all assets"))
+			{
+				// TODO: For each registered importer and file
+				// Call CreateAsset
+				// Call Save
 			}
 
 			ImGui::EndPopup();

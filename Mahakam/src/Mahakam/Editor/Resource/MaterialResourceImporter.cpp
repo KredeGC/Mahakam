@@ -60,12 +60,23 @@ namespace Mahakam
 		m_PreviewCamera = Camera(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.03f, 5.0f);
 
 		// Setup scene data
-		m_SceneData = CreateRef<SceneData>();
+		m_SceneData = CreateScope<SceneData>();
 		m_SceneData->MeshIDLookup[0] = m_PreviewSphereMesh;
 		m_SceneData->MeshRefLookup[m_PreviewSphereMesh] = 0;
 		m_SceneData->TransformIDLookup[0] = glm::mat4(1.0f);
 
 		m_SceneData->RenderQueue.push_back(0);
+
+		// Load the preview skybox
+		CubeTextureProps irradianceProps{ 32, TextureFormat::RG11B10F, TextureCubePrefilter::Convolute, false };
+		CubeTextureProps specularProps{ 128, TextureFormat::RG11B10F, TextureCubePrefilter::Prefilter, true };
+		CubeTextureProps skyboxProps{ 1024, TextureFormat::RG11B10F, TextureCubePrefilter::None, false };
+
+		m_SceneData->Environment.SkyboxMaterial = Material::Create(Shader::Create("internal/shaders/default/Skybox.shader"));;
+		m_SceneData->Environment.IrradianceMap = TextureCube::Create("internal/textures/night.hdr", irradianceProps);
+		m_SceneData->Environment.SpecularMap = TextureCube::Create("internal/textures/night.hdr", specularProps);
+
+		m_SceneData->Environment.SkyboxMaterial->SetTexture("u_Environment", 0, TextureCube::Create("internal/textures/night.hdr", skyboxProps));
 
 		// Lights
 		glm::quat rot = glm::quat({ -0.7f, -glm::radians(45.0f), 0.0f });
@@ -84,9 +95,9 @@ namespace Mahakam
 		m_SceneData->UniformValueBuffer = UniformBuffer::Create(2 << 14); // 16KB
 
 		// Renderpasses
-		m_GeometryPass = CreateRef<GeometryRenderPass>();
-		m_LightingPass = CreateRef<LightingRenderPass>();
-		m_TonemapPass = CreateRef<TonemappingRenderPass>();
+		m_GeometryPass = CreateScope<GeometryRenderPass>();
+		m_LightingPass = CreateScope<LightingRenderPass>();
+		m_TonemapPass = CreateScope<TonemappingRenderPass>();
 
 		m_GeometryPass->Init(1, 1);
 		m_LightingPass->Init(1, 1);
@@ -95,15 +106,6 @@ namespace Mahakam
 
 	void MaterialResourceImporter::OnImportOpen(ryml::NodeRef& node)
 	{
-		// Load the preview skybox
-		Asset<Material> skyboxMaterial = Asset<Material>("assets/materials/internal/PreviewSky.material.asset");
-		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("assets/textures/internal/previewirradiance.hdr.asset");
-		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("assets/textures/internal/previewspecular.hdr.asset");
-
-		m_SceneData->Environment.SkyboxMaterial = skyboxMaterial;
-		m_SceneData->Environment.IrradianceMap = skyboxIrradiance;
-		m_SceneData->Environment.SpecularMap = skyboxSpecular;
-
 		// Reset orbit angles
 		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
 

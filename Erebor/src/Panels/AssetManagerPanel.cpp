@@ -27,24 +27,26 @@ namespace Mahakam::Editor
 			// List all assets within search field
 			if (ImGui::BeginTable("Asset Table", 1, ImGuiTableFlags_Borders))
 			{
-				auto assets = AssetDatabase::GetAssetHandles();
+				auto& assets = ResourceRegistry::GetImports();
 				for (auto& asset : assets)
 				{
 					std::string assetIDString = std::to_string(asset.first);
 
 					bool idMatch = assetIDString.find(m_SearchString) != std::string::npos;
-					bool pathMatch = asset.second.string().find(m_SearchString) != std::string::npos;
+					bool typeMatch = asset.second.Type.find(m_SearchString) != std::string::npos;
+					bool pathMatch = asset.second.Filepath.string().find(m_SearchString) != std::string::npos;
 
-					if (idMatch || pathMatch)
+					if (idMatch || typeMatch || pathMatch)
 					{
 						ImGui::TableNextColumn();
 
-						ImGui::TextWrapped("Asset ID: %s", assetIDString.c_str());
-						ImGui::TextWrapped("Asset Import path: %s", asset.second.string().c_str());
+						ImGui::TextWrapped("ID: %s", assetIDString.c_str());
+						ImGui::TextWrapped("Type: %s", asset.second.Type.c_str());
+						ImGui::TextWrapped("Import path: %s", asset.second.Filepath.string().c_str());
 
 						size_t assetCount = AssetDatabase::GetAssetReferences(asset.first);
 						std::string assetCountString = std::to_string(assetCount);
-						ImGui::TextWrapped("Asset references: %s", assetCountString.c_str());
+						ImGui::TextWrapped("References: %s", assetCountString.c_str());
 					}
 				}
 

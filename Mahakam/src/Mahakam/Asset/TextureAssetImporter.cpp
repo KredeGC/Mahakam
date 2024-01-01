@@ -215,11 +215,7 @@ namespace Mahakam
 
 	void TextureAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		m_Texture.Save(m_ImporterProps.Extension, importPath);
-
-		//AssetDatabase::ReloadAsset(m_Texture.GetID());
-
-		m_Texture = nullptr;
+		
 	}
     
     bool TextureAssetImporter::OnIconRender(Asset<void> asset)

@@ -1,5 +1,5 @@
 Filepath: resource/textures/brick/brick_albedo.png
-Format: RGB_DXT1
+Format: SRGB_DXT1
 Filter: Point
 WrapX: Repeat
 WrapY: Repeat
