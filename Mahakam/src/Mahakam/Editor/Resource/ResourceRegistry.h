@@ -19,9 +19,19 @@ namespace Mahakam
 
 		struct ImportInfo
 		{
-			AssetID ID = 0;
+			AssetID ID;
 			std::filesystem::path Filepath;
 			std::string Type;
+
+			ImportInfo() noexcept :
+				ID(0),
+				Filepath(),
+				Type() {}
+
+			ImportInfo(AssetID id, const std::filesystem::path& filepath, const std::string& type) noexcept :
+				ID(id),
+				Filepath(filepath),
+				Type(type) {}
 		};
 
 		using AssetMap = UnorderedMap<AssetID, ImportInfo>;
