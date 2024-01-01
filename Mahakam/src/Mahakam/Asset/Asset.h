@@ -5,10 +5,6 @@
 #include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Log.h"
 
-// TEMP
-#include "Mahakam/Core/Random.h"
-// TEMP
-
 #include <cstddef>
 #include <filesystem>
 #include <memory>
@@ -173,13 +169,6 @@ namespace Mahakam
 		AssetID GetID() const
 		{
 			return m_Control ? m_Control->ID : 0;
-		}
-
-		std::filesystem::path GetImportPath() const
-		{
-			if (m_Control)
-				return AssetDatabase::GetAssetImportPath(m_Control->ID);
-			return "";
 		}
 
 		size_t UseCount() const noexcept

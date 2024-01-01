@@ -4,6 +4,7 @@
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Types.h"
 
+#include <cstdint>
 #include <filesystem>
 #include <string>
 
@@ -30,7 +31,7 @@ namespace Mahakam
 
 		using ImporterMap = UnorderedMap<std::string, Ref<ResourceImporter>>;
 
-		inline static const ImportInfo EmptyInfo;
+		inline static const ImportInfo EmptyInfo{};
 		inline static const std::string ImportExtension = ".import";
 
 	private:
