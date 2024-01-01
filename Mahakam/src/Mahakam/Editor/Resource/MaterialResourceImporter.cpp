@@ -111,18 +111,15 @@ namespace Mahakam
 		// Reset orbit angles
 		m_OrbitEulerAngles = { 0.0f, 0.0f, 0.0f };
 
-		Asset<Shader> shader;
-		if (DeserializeYAMLNode(node, "Shader", shader))
+		if (DeserializeYAMLNode(node, "Shader", m_Shader))
 		{
-			m_ShaderImportPath = shader.GetImportPath();
-
-			if (shader)
+			if (m_Shader)
 			{
-				m_Material = Material::Create(shader);
+				m_Material = Material::Create(m_Shader);
 
-				SetupMaterialProperties(shader->GetProperties());
+				SetupMaterialProperties(m_Shader->GetProperties());
 
-				const UnorderedMap<std::string, ShaderProperty>& properties = shader->GetProperties();
+				const UnorderedMap<std::string, ShaderProperty>& properties = m_Shader->GetProperties();
 				if (node.has_child("Properties"))
 				{
 					ryml::NodeRef propertiesNode = node["Properties"];
@@ -163,7 +160,7 @@ namespace Mahakam
 		}
 		else
 		{
-			m_ShaderImportPath = "";
+			m_Shader = nullptr;
 			m_Material = nullptr;
 
 			SetupMaterialProperties({});
@@ -172,22 +169,17 @@ namespace Mahakam
 
 	void MaterialResourceImporter::OnRender()
 	{
-		if (GUI::DrawDragDropField("Shader", ".shader", m_ShaderImportPath))
+		if (GUI::DrawDragDropAsset("Shader", m_Shader, ".shader"))
 		{
-			if (std::filesystem::exists(m_ShaderImportPath))
+			if (m_Shader)
 			{
-				Asset<Shader> shader = Asset<Shader>(ResourceRegistry::GetImportInfo(m_ShaderImportPath).ID);
-
-				if (shader)
-				{
-					m_Material = Material::Create(shader);
-					SetupMaterialProperties(shader->GetProperties());
-				}
-				else
-				{
-					m_Material = nullptr;
-					SetupMaterialProperties({});
-				}
+				m_Material = Material::Create(m_Shader);
+				SetupMaterialProperties(m_Shader->GetProperties());
+			}
+			else
+			{
+				m_Material = nullptr;
+				SetupMaterialProperties({});
 			}
 		}
 
@@ -202,7 +194,6 @@ namespace Mahakam
 			float dragSpeed = glm::max(property.Max - property.Min, 1.0f) / 100.0f;
 			ImGuiColorEditFlags colorFlags = ImGuiColorEditFlags_None;
 
-			std::filesystem::path texturePath;
 			Asset<Texture> texture;
 
 			switch (propertyType)
@@ -243,15 +234,8 @@ namespace Mahakam
 			case ShaderPropertyType::Texture: // Textures and normals are handled the same, for now
 			case ShaderPropertyType::Normal:
 				texture = m_Material->GetTexture(propertyName);
-				if (texture)
-					texturePath = texture.GetImportPath();
-				if (GUI::DrawDragDropField(propertyName, ".texture", texturePath))
-				{
-					texture = Asset<Texture>(ResourceRegistry::GetImportInfo(texturePath).ID);
-					if (!texture)
-						texture = m_DefaultTextures[propertyName];
+				if (GUI::DrawDragDropAsset(propertyName, texture, ".tex2d", ".texcube"))
 					m_Material->SetTexture(propertyName, 0, texture);
-				}
 
 				if (texture && ImGui::IsItemHovered())
 				{

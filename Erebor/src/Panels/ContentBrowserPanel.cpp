@@ -330,11 +330,8 @@ namespace Mahakam::Editor
 							{
 								ResourceRegistry::ImportInfo info = ResourceRegistry::GetImportInfo(importPath);
 
-								std::string importString = importPath.string();
-								const char* importBuffer = importString.c_str();
+								ImGui::SetDragDropPayload(info.Type.c_str(), &info.ID, sizeof(ResourceRegistry::AssetID));
 
-								ImGui::SetDragDropPayload(info.Type.c_str(), importBuffer, strlen(importBuffer) + 1);
-								
 								ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
 								ImGui::Text("%s", pathName.c_str());
 
@@ -377,6 +374,8 @@ namespace Mahakam::Editor
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
 							ImGui::PushID(file.path().string().c_str());
 							ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, { 0.48f, 0.5f, 0.53f, 1 });
+
+							// TODO: Add ImGui::BeginDragDropSource()
 
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{

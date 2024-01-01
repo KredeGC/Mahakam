@@ -254,23 +254,30 @@ namespace Mahakam::GUI
 			return true;
 		}
 
-		return DrawDragDropTarget(extensions, importPath);
-	}
-
-	bool DrawDragDropTarget(const std::vector<std::string>& extensions, std::filesystem::path& importPath)
-	{
 		if (ImGui::BeginDragDropTarget())
 		{
 			for (auto& extension : extensions)
 			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(extension.c_str()))
+				AssetDatabase::AssetID id;
+				if (AcceptPayloadTarget(id, extension))
 				{
-					importPath = (const char*)payload->Data;
+					importPath = std::to_string(id);
 					return true;
 				}
 			}
 
 			ImGui::EndDragDropTarget();
+		}
+
+		return false;
+	}
+
+	bool AcceptPayloadTarget(AssetDatabase::AssetID& id, std::string_view target)
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(target.data()))
+		{
+			id = *static_cast<AssetDatabase::AssetID*>(payload->Data);
+			return true;
 		}
 
 		return false;

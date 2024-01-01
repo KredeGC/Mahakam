@@ -32,9 +32,7 @@ namespace Mahakam
 		ImGui::Indent();
 		for (size_t i = 0; i < m_Props.Materials.size(); i++)
 		{
-			std::filesystem::path importPath = m_Props.Materials[i].GetImportPath();
-			if (GUI::DrawDragDropField("Material " + std::to_string(i), ".material", importPath))
-				m_Props.Materials[i] = Asset<Material>(ResourceRegistry::GetImportInfo(importPath).ID);
+			GUI::DrawDragDropAsset("Material " + std::to_string(i), m_Props.Materials[i], ".material");
 		}
 		ImGui::Unindent();
 

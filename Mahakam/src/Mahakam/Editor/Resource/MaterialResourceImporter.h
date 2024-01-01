@@ -23,9 +23,8 @@ namespace Mahakam
 	private:
 		const float m_DragSpeed = 0.3f;
 
+		Asset<Shader> m_Shader;
 		Asset<Material> m_Material;
-
-		std::filesystem::path m_ShaderImportPath;
 
 		UnorderedMap<std::string, ShaderProperty> m_MaterialProperties;
 

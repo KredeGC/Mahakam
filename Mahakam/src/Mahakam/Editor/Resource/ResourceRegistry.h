@@ -30,6 +30,7 @@ namespace Mahakam
 
 		using ImporterMap = UnorderedMap<std::string, Ref<ResourceImporter>>;
 
+		inline static const ImportInfo EmptyInfo;
 		inline static const std::string ImportExtension = ".import";
 
 	private:
@@ -53,6 +54,7 @@ namespace Mahakam
 		static const AssetMap& GetImports() { return s_ImportPaths; }
 
 		static ImportInfo GetImportInfo(const std::filesystem::path& filepath);
+		static const ImportInfo& GetImportInfo(AssetID id);
 
 	private:
 		static void RecursiveCacheAssets(const std::filesystem::path& filepath);

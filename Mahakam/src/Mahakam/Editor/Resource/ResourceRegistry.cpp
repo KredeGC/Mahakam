@@ -226,6 +226,15 @@ namespace Mahakam
 		return {};
 	}
 
+	const ResourceRegistry::ImportInfo& ResourceRegistry::GetImportInfo(AssetID id)
+	{
+		auto iter = s_ImportPaths.find(id);
+		if (iter == s_ImportPaths.end())
+			return EmptyInfo;
+
+		return iter->second;
+	}
+
 	void ResourceRegistry::RecursiveCacheAssets(const std::filesystem::path& filepath)
 	{
 		if (!FileUtility::Exists(filepath))

@@ -112,13 +112,8 @@ namespace Mahakam
 			Animator& animator = entity.GetComponent<AnimatorComponent>();
 
 			Asset<Animation> animation = animator.GetAnimation();
-
-			std::filesystem::path importPath = animation.GetImportPath();
-			if (GUI::DrawDragDropField("Animation", ".anim", importPath))
-			{
-				animation = Asset<Animation>(ResourceRegistry::GetImportInfo(importPath).ID);
+			if (GUI::DrawDragDropAsset("Animation", animation, ".anim"))
 				animator.SetAnimation(animation);
-			}
 
 			if (animation)
 			{
@@ -190,10 +185,9 @@ namespace Mahakam
 			AudioSource& source = entity.GetComponent<AudioSourceComponent>();
 			Asset<Sound> sound = source.GetSound();
 
-			std::filesystem::path importPath = sound.GetImportPath();
-			if (GUI::DrawDragDropField("Sound", ".sound", importPath))
+			if (GUI::DrawDragDropAsset("Sound", sound, ".sound"))
 			{
-				source.SetSound(Asset<Sound>(ResourceRegistry::GetImportInfo(importPath).ID));
+				source.SetSound(sound);
 				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
 			}
 
@@ -442,10 +436,9 @@ namespace Mahakam
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
 
 			// Mesh dragdrop
-			std::filesystem::path importPath = meshComponent.GetMesh().GetImportPath();
-			if (GUI::DrawDragDropField("Mesh", ".mesh", importPath))
+			Asset<Mesh> mesh = meshComponent.GetMesh();
+			if (GUI::DrawDragDropAsset("Mesh", mesh, ".mesh"))
 			{
-				Asset<Mesh> mesh = Asset<Mesh>(ResourceRegistry::GetImportInfo(importPath).ID);
 				if (mesh)
 					meshComponent.SetMesh(mesh);
 				else
