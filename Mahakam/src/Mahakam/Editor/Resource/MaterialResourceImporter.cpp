@@ -4,6 +4,8 @@
 #include "Mahakam/Core/Input.h"
 #include "Mahakam/Core/Log.h"
 
+#include "Mahakam/Editor/Resource/ResourceRegistry.h"
+
 #include "Mahakam/ImGui/GUI.h"
 
 #include "Mahakam/Renderer/RenderPasses/GeometryRenderPass.h"
@@ -174,7 +176,7 @@ namespace Mahakam
 		{
 			if (std::filesystem::exists(m_ShaderImportPath))
 			{
-				Asset<Shader> shader = Asset<Shader>(m_ShaderImportPath);
+				Asset<Shader> shader = Asset<Shader>(ResourceRegistry::GetImportInfo(m_ShaderImportPath).ID);
 
 				if (shader)
 				{
@@ -245,7 +247,7 @@ namespace Mahakam
 					texturePath = texture.GetImportPath();
 				if (GUI::DrawDragDropField(propertyName, ".texture", texturePath))
 				{
-					texture = Asset<Texture>(texturePath);
+					texture = Asset<Texture>(ResourceRegistry::GetImportInfo(texturePath).ID);
 					if (!texture)
 						texture = m_DefaultTextures[propertyName];
 					m_Material->SetTexture(propertyName, 0, texture);

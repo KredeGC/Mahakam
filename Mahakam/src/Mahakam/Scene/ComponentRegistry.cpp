@@ -18,6 +18,8 @@
 
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Mahakam/Editor/Resource/ResourceRegistry.h"
+
 #include "Mahakam/ImGui/GUI.h"
 
 #include "Mahakam/Renderer/Animation.h"
@@ -114,8 +116,8 @@ namespace Mahakam
 			std::filesystem::path importPath = animation.GetImportPath();
 			if (GUI::DrawDragDropField("Animation", ".anim", importPath))
 			{
-				animation = Asset<Animation>(importPath);
-				animator.SetAnimation(Asset<Sound>(importPath));
+				animation = Asset<Animation>(ResourceRegistry::GetImportInfo(importPath).ID);
+				animator.SetAnimation(animation);
 			}
 
 			if (animation)
@@ -191,7 +193,7 @@ namespace Mahakam
 			std::filesystem::path importPath = sound.GetImportPath();
 			if (GUI::DrawDragDropField("Sound", ".sound", importPath))
 			{
-				source.SetSound(Asset<Sound>(importPath));
+				source.SetSound(Asset<Sound>(ResourceRegistry::GetImportInfo(importPath).ID));
 				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
 			}
 
@@ -443,7 +445,7 @@ namespace Mahakam
 			std::filesystem::path importPath = meshComponent.GetMesh().GetImportPath();
 			if (GUI::DrawDragDropField("Mesh", ".mesh", importPath))
 			{
-				Asset<Mesh> mesh = Asset<Mesh>(importPath);
+				Asset<Mesh> mesh = Asset<Mesh>(ResourceRegistry::GetImportInfo(importPath).ID);
 				if (mesh)
 					meshComponent.SetMesh(mesh);
 				else

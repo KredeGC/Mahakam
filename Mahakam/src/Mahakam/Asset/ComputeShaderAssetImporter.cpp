@@ -16,20 +16,6 @@ namespace Mahakam
 		m_ImporterProps.NoWizard = true;
 	}
 
-#ifndef MH_STANDALONE
-	void ComputeShaderAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node) { }
-
-	void ComputeShaderAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
-	{
-		ImGui::Text("Compute shaders have no options");
-	}
-
-	void ComputeShaderAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-	{
-		
-	}
-#endif
-
 	void ComputeShaderAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
 		ComputeShader* shader = static_cast<ComputeShader*>(asset);

@@ -52,7 +52,7 @@ namespace Mahakam
 
 		static const AssetMap& GetImports() { return s_ImportPaths; }
 
-		static ImportInfo ReadAssetInfo(const std::filesystem::path& filepath);
+		static ImportInfo GetImportInfo(const std::filesystem::path& filepath);
 
 	private:
 		static void RecursiveCacheAssets(const std::filesystem::path& filepath);

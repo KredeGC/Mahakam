@@ -14,24 +14,6 @@ namespace Mahakam
 		Setup(m_ImporterProps, "Sound", ".sound");
 	}
 
-#ifndef MH_STANDALONE
-	void SoundAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node)
-	{
-		m_Props = DeserializeProps(node);
-	}
-
-	void SoundAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
-	{
-		ImGui::DragFloat("Sound Volume", &m_Props.Volume, 0.01f, 0.0f);
-		ImGui::Checkbox("Sound Looping", &m_Props.Loop);
-	}
-
-	void SoundAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-	{
-		
-	}
-#endif
-
 	void SoundAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
 		Sound* sound = static_cast<Sound*>(asset);

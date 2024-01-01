@@ -12,21 +12,21 @@ namespace Mahakam::Editor
 			std::filesystem::path skyboxPath = scene->GetSkyboxMaterial().GetImportPath();
 			if (GUI::DrawDragDropField("Skybox material", ".material", skyboxPath))
 			{
-				Asset<Material> skyboxMaterial = Asset<Material>(skyboxPath);
+				Asset<Material> skyboxMaterial = Asset<Material>(ResourceRegistry::GetImportInfo(skyboxPath).ID);
 				scene->SetSkyboxMaterial(skyboxMaterial);
 			}
 
 			std::filesystem::path irradiancePath = scene->GetSkyboxIrradiance().GetImportPath();
 			if (GUI::DrawDragDropField("Skybox irradiance", ".texture", irradiancePath))
 			{
-				Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>(irradiancePath);
+				Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>(ResourceRegistry::GetImportInfo(irradiancePath).ID);
 				scene->SetSkyboxIrradiance(skyboxIrradiance);
 			}
 
 			std::filesystem::path specularPath = scene->GetSkyboxSpecular().GetImportPath();
 			if (GUI::DrawDragDropField("Skybox specular", ".texture", specularPath))
 			{
-				Asset<TextureCube> skyboxSpecular = Asset<TextureCube>(specularPath);
+				Asset<TextureCube> skyboxSpecular = Asset<TextureCube>(ResourceRegistry::GetImportInfo(specularPath).ID);
 				scene->SetSkyboxSpecular(skyboxSpecular);
 			}
 		}

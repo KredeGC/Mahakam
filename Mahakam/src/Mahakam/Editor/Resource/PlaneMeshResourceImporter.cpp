@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "PlaneMeshResourceImporter.h"
 
+#include "Mahakam/Editor/Resource/ResourceRegistry.h"
+
 #include "Mahakam/ImGui/GUI.h"
 
 #include "Mahakam/Renderer/Mesh.h"
@@ -32,7 +34,7 @@ namespace Mahakam
 		{
 			std::filesystem::path importPath = m_Props.Materials[i].GetImportPath();
 			if (GUI::DrawDragDropField("Material " + std::to_string(i), ".material", importPath))
-				m_Props.Materials[i] = Asset<Material>(importPath);
+				m_Props.Materials[i] = Asset<Material>(ResourceRegistry::GetImportInfo(importPath).ID);
 		}
 		ImGui::Unindent();
 

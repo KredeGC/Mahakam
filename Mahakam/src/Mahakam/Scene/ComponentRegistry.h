@@ -8,6 +8,7 @@
 
 namespace Mahakam
 {
+	// TODO: Separate into 2 different classes: 1 for (de)serialization and 1 for the editor
 	class ComponentRegistry
 	{
 	public:

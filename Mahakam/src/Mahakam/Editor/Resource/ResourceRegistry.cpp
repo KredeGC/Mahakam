@@ -185,7 +185,7 @@ namespace Mahakam
 		RecursiveCacheAssets(FileUtility::IMPORT_PATH);
 	}
 
-	ResourceRegistry::ImportInfo ResourceRegistry::ReadAssetInfo(const std::filesystem::path& filepath)
+	ResourceRegistry::ImportInfo ResourceRegistry::GetImportInfo(const std::filesystem::path& filepath)
 	{
 		if (!std::filesystem::exists(filepath) || std::filesystem::is_directory(filepath))
 		{
@@ -246,7 +246,7 @@ namespace Mahakam
 			}
 			else if (path.extension() == ImportExtension)
 			{
-				ImportInfo info = ReadAssetInfo(path);
+				ImportInfo info = GetImportInfo(path);
 
 				if (info.ID)
 				{

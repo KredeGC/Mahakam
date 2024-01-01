@@ -1,9 +1,8 @@
 Filepath: resource/textures/studio.hdr
-Extension: .texture
+Extension: .texcube
 ID: 13999946918634877686
-Type: 1
-Format: 12
-Filter: 2
+Format: RG11B10F
+Filter: Trilinear
 Resolution: 1024
-Prefilter: 0
+Prefilter: None
 Mipmaps: true

@@ -75,7 +75,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<Mesh> planeMesh = Asset<Mesh>(556425745901094492ULL);
+	Asset<Mesh> planeMesh = Asset<Mesh>(556425745901094492ull);
 
 	/*Ref<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
 
@@ -111,9 +111,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
 
 	// Create glTF skinned model
-	Asset<BoneMesh> skinnedModel = Asset<BoneMesh>(11945816250811211738ULL);
+	Asset<BoneMesh> skinnedModel = Asset<BoneMesh>(11945816250811211738ull);
 	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("resource/models/mannequin_clap.glb");
-	Asset<Animation> skinnedAnimation = Asset<Animation>(1494460746093480384ULL);
+	Asset<Animation> skinnedAnimation = Asset<Animation>(1494460746093480384ull);
 	//Asset<Animation> skinnedAnimation = Animation::Load("resource/models/mannequin_clap.glb");
 
 	//Asset<Material> skinnedMaterial = Asset<Material>("assets/materials/Skinned.material.asset");
@@ -155,7 +155,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 1
 	// Create base collection entity to store in
-	Asset<Mesh> sphereMesh = Asset<Mesh>(14539941857077216621ULL);
+	Asset<Mesh> sphereMesh = Asset<Mesh>(14539941857077216621ull);
 
 	// Create base collection entity to store in
 	Entity sphereCollection = scene->CreateEntity("Spheres");

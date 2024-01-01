@@ -56,17 +56,6 @@ namespace Mahakam
 				m_Control = nullptr;
 		}
 
-		// TODO: Remove this constructor
-		explicit Asset(const std::filesystem::path& importPath)
-		{
-			// Register if the ID is valid
-			AssetID id = AssetDatabase::ReadAssetInfo(importPath).ID;
-			if (id)
-				m_Control = AssetDatabase::IncrementAsset(id);
-			else
-				m_Control = nullptr;
-		}
-
 #pragma region Copy & Move constructors
 		Asset(const Asset& other) noexcept :
 			m_Control(other.m_Control)

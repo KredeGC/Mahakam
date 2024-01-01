@@ -20,43 +20,6 @@ namespace Mahakam
 		m_ImporterProps.NoFilepath = true;
 	}
 
-#ifndef MH_STANDALONE
-	void UVSphereMeshAssetImporter::OnWizardOpen(const std::filesystem::path& filepath, ryml::NodeRef& node)
-	{
-		m_MeshProps = UVSphereMeshProps();
-
-		if (!node.valid())
-			return;
-
-		m_MeshProps = DeserializeProps(node);
-	}
-
-	void UVSphereMeshAssetImporter::OnWizardRender(const std::filesystem::path& filepath)
-	{
-		int materialCount = (int)m_MeshProps.Materials.size();
-		if (ImGui::InputInt("Material count", &materialCount) && materialCount >= 0)
-			m_MeshProps.Materials.resize(materialCount);
-
-		ImGui::Indent();
-		for (size_t i = 0; i < m_MeshProps.Materials.size(); i++)
-		{
-			std::filesystem::path importPath = m_MeshProps.Materials[i].GetImportPath();
-			if (GUI::DrawDragDropField("Material " + std::to_string(i), ".material", importPath))
-				m_MeshProps.Materials[i] = Asset<Material>(importPath);
-		}
-		ImGui::Unindent();
-
-		ImGui::DragInt("Rows", &m_MeshProps.Rows, 1.0f, 0, std::numeric_limits<int>::max(), "%d", ImGuiSliderFlags_AlwaysClamp);
-		ImGui::DragInt("Columns", &m_MeshProps.Columns, 1.0f, 0, std::numeric_limits<int>::max(), "%d", ImGuiSliderFlags_AlwaysClamp);
-
-		// TODO: Show a preview of the mesh
-	}
-
-	void UVSphereMeshAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
-	{
-		
-	}
-#endif
 
 	void UVSphereMeshAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
