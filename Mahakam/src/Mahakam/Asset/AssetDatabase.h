@@ -33,13 +33,8 @@ namespace Mahakam
         
         typedef uint64_t AssetID;
 
+		// TODO: Remove
 		typedef std::string ExtensionType;
-
-		struct AssetInfo
-		{
-			AssetID ID = 0;
-			ExtensionType Extension;
-		};
 
 		struct ControlBlock
 		{
@@ -55,28 +50,20 @@ namespace Mahakam
 
 		struct AssetSerializer
 		{
-			bool (*Serialize)(bitstream::growing_bit_writer<TrivialVector<uint32_t>>&, const std::filesystem::path& filepath, void* asset) = nullptr;
+			bool (*Serialize)(Writer&, const std::filesystem::path& filepath, void* asset) = nullptr;
 			Asset<void> (*Deserialize)(Reader&, const std::filesystem::path& filepath) = nullptr;
 		};
 
 	private:
-		// Asset importers are divided into editor and standalone
-		// ExtensionMap is used by the editor to equate various file formats to the importers
-		// The same format can use multiple importers
-		// ImporterMap is used by the runtime to equate some key (string for editor, ID for standalone) to an importer
-
 		using AssetMap = UnorderedMap<AssetID, std::filesystem::path>;
-		using ExtensionMap = std::unordered_multimap<std::string, Ref<AssetImporter>>;
-		using ExtensionIter = std::pair<ExtensionMap::const_iterator, ExtensionMap::const_iterator>;
 
 		using ImporterMap = UnorderedMap<ExtensionType, Ref<AssetImporter>>;
 		using LoadedMap = UnorderedMap<AssetID, ControlBlock*>;
 
 		// TODO: Use AssetInfo instead of filepath
 		inline static AssetMap s_AssetPaths;
-		inline static ExtensionMap s_AssetExtensions;
 
-		inline static ImporterMap s_AssetImporters;
+		inline static ImporterMap s_AssetImporters; // Legacy importers
 		inline static LoadedMap s_LoadedAssets;
 
 
@@ -101,12 +88,11 @@ namespace Mahakam
 
 	public:
 		// Registering asset importers
-		MH_DECLARE_FUNC(RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImport); // Registers a specific asset importer to an extension
+		MH_DECLARE_FUNC(RegisterAssetImporter, void, Ref<AssetImporter> assetImport); // Registers a specific asset importer to an extension
 		MH_DECLARE_FUNC(DeregisterAssetImporter, void, const std::string& extension); // Deregisters a specific asset importer, given an extension
 		MH_DECLARE_FUNC(DeregisterAllAssetImporters, void); // Removes all currently assigned asset importers
 		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const ExtensionType& extension); // Returns a specific importer, given an extension
 		MH_DECLARE_FUNC(GetAssetImporters, const ImporterMap&); // Returns a map of extensions and importers
-		MH_DECLARE_FUNC(GetAssetImporterExtension, ExtensionIter, const std::string& extension); // Returns an iterator to an importer, given an extension
 		MH_DECLARE_FUNC(RegisterDefaultAssetImporters, void); // Register default asset importers
 		MH_DECLARE_FUNC(DeregisterDefaultAssetImporters, void); // Deregister default asset importers
 
@@ -121,11 +107,11 @@ namespace Mahakam
 		MH_DECLARE_FUNC(GetAssetReferences, size_t, AssetID id); // Gets the amount of references to this asset, if any
 
 		// If you don't want to load the asset first
-		MH_DECLARE_FUNC(ReadAssetInfo, AssetInfo, const std::filesystem::path& importPath); // Gets information about the given asset without loading it
+		MH_DECLARE_FUNC(AssetExists, bool, AssetID id);
 
 	private:
 		// Saving and loading assets
-		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, AssetID id, const ExtensionType& extension);
+		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, AssetID id, const std::string& extension);
 
 		MH_DECLARE_FUNC(IncrementAsset, ControlBlock*, AssetID id);
 		MH_DECLARE_FUNC(UnloadAsset, void, ControlBlock* control);

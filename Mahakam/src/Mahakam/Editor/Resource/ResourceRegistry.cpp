@@ -189,7 +189,7 @@ namespace Mahakam
 	{
 		if (!std::filesystem::exists(filepath) || std::filesystem::is_directory(filepath))
 		{
-			MH_WARN("AssetDatabase::ReadAssetInfo: The path '{0}' doesn't point to an asset", filepath.string());
+			MH_WARN("ResourceRegistry::GetImportInfo: The path '{0}' doesn't point to an asset", filepath.string());
 			return {};
 		}
 

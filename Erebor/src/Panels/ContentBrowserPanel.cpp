@@ -166,44 +166,44 @@ namespace Mahakam::Editor
         
         //m_Icons.clear();
         
-        Filepath importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(m_CurrentDirectory, FileUtility::RESOURCE_PATH);
-        for (auto& file : std::filesystem::directory_iterator(importDirectory))
-        {
-            if (std::filesystem::is_directory(file)) continue;
-            if (m_Icons.find(file.path().string()) != m_Icons.end()) continue;
-            
-            auto info = AssetDatabase::ReadAssetInfo(file.path());
-            auto importer = AssetDatabase::GetAssetImporter(info.Extension);
-            
-            if (!importer) continue;
-            
-            Asset<void> asset(ResourceRegistry::GetImportInfo(file.path()).ID);
-            
-            if (!asset) continue;
-            
-            // Make sure it's always loaded
-            m_CachedAssets.push_back(asset);
-            
-            // Render the icon
-            FrameBufferProps props;
-            props.Width = ICON_SIZE;
-            props.Height = ICON_SIZE;
-            props.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RGBA8 };
-            props.DontUseDepth = true;
-            
-            Asset<FrameBuffer> framebuffer = FrameBuffer::Create(props);
-            
-            framebuffer->Bind();
-            
-            GL::Clear();
-            
-            bool useIcon = importer->OnIconRender(asset);
-            
-            framebuffer->Unbind();
-            
-            if (useIcon)
-				m_Icons.insert({ file.path().string(), framebuffer });
-        }
+    //    Filepath importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(m_CurrentDirectory, FileUtility::RESOURCE_PATH);
+    //    for (auto& file : std::filesystem::directory_iterator(importDirectory))
+    //    {
+    //        if (std::filesystem::is_directory(file)) continue;
+    //        if (m_Icons.find(file.path().string()) != m_Icons.end()) continue;
+    //        
+    //        auto info = ResourceRegistry::GetImportInfo(file.path());
+    //        auto importer = ResourceRegistry::GetAssetImporter(info.Type);
+    //        
+    //        if (!importer) continue;
+    //        
+    //        Asset<void> asset(ResourceRegistry::GetImportInfo(file.path()).ID);
+    //        
+    //        if (!asset) continue;
+    //        
+    //        // Make sure it's always loaded
+    //        m_CachedAssets.push_back(asset);
+    //        
+    //        // Render the icon
+    //        FrameBufferProps props;
+    //        props.Width = ICON_SIZE;
+    //        props.Height = ICON_SIZE;
+    //        props.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RGBA8 };
+    //        props.DontUseDepth = true;
+    //        
+    //        Asset<FrameBuffer> framebuffer = FrameBuffer::Create(props);
+    //        
+    //        framebuffer->Bind();
+    //        
+    //        GL::Clear();
+    //        
+    //        bool useIcon = importer->OnIconRender(asset);
+    //        
+    //        framebuffer->Unbind();
+    //        
+    //        if (useIcon)
+				//m_Icons.insert({ file.path().string(), framebuffer });
+    //    }
     }
 
 	void ContentBrowserPanel::DrawDirectoryRecursive(DirNode* parent, const std::filesystem::path& path)

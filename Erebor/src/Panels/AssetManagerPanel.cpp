@@ -13,7 +13,7 @@ namespace Mahakam::Editor
 		if (ImGui::Begin("Asset Manager", &m_Open))
 		{
 			// Search field, with dragdrop
-			const auto& importers = AssetDatabase::GetAssetImporters();
+			const auto& importers = ResourceRegistry::GetAssetImporters();
 			std::vector<std::string> extensions;
 			for (auto& importer : importers)
 				extensions.push_back(importer.first);

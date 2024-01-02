@@ -89,8 +89,8 @@ namespace Mahakam::Editor
 				if (ImGui::Button("Regenerate ID"))
 					m_AssetID = Random::GetRandomID64();
 
-				//if (AssetDatabase::AssetExists(m_AssetID))
-				//	ImGui::Text("An asset with this ID already exists");
+				if (AssetDatabase::AssetExists(m_AssetID))
+					ImGui::Text("An asset with this ID already exists");
 
 				// Draw filename input without path/**.extension.import
 				std::string nameString = m_ImportPath.stem().stem().string();

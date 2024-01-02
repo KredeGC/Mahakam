@@ -112,38 +112,23 @@ namespace Mahakam
 		LoadLegacySerializer<texcubeExtension, textureExtension>();
 	}
 
-	//void AssetDatabase::RegisterAssetImporter(const std::string& extension, Ref<AssetImporter> assetImport)
-	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImporter)
+	//void AssetDatabase::RegisterAssetImporter(Ref<AssetImporter> assetImport)
+	MH_DEFINE_FUNC(AssetDatabase::RegisterAssetImporter, void, Ref<AssetImporter> assetImporter)
 	{
 		if (s_AssetImporters.find(assetImporter->GetImporterProps().Extension) == s_AssetImporters.end())
 			s_AssetImporters.insert({ assetImporter->GetImporterProps().Extension, assetImporter });
-
-		s_AssetExtensions.insert({ extension, assetImporter });
 	};
 
 	//void AssetDatabase::DeregisterAssetImporter(const std::string& extension)
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterAssetImporter, void, const std::string& extension)
 	{
-		auto iter = s_AssetExtensions.find(extension);
-		if (iter != s_AssetExtensions.end())
-		{
-			long useCount = iter->second.use_count();
-
-			ExtensionType ext = iter->second->GetImporterProps().Extension;
-
-			s_AssetExtensions.erase(iter);
-
-			// 2 references should exist before the erase, 1 in s_AssetExtensions and 1 in s_AssetImporters
-			if (useCount <= 2)
-				s_AssetImporters.erase(ext);
-		}
+		s_AssetImporters.erase(extension);
 	};
 
 	//void AssetDatabase::DeregisterAllAssetImporters()
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterAllAssetImporters, void)
 	{
 		s_AssetImporters.clear();
-		s_AssetExtensions.clear();
 	};
 
 	//Ref<AssetImporter> AssetDatabase::GetAssetImporter(const Extension& extension)
@@ -162,80 +147,47 @@ namespace Mahakam
 		return s_AssetImporters;
 	};
 
-	//AssetDatabase::ExtensionIter AssetDatabase::GetAssetImporterExtension(const std::string& extension)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetImporterExtension, AssetDatabase::ExtensionIter, const std::string& extension)
-	{
-		return s_AssetExtensions.equal_range(extension);
-	};
-
 	//void AssetDatabase::RegisterDefaultAssetImporters()
 	MH_DEFINE_FUNC(AssetDatabase::RegisterDefaultAssetImporters, void)
 	{
 		LoadDefaultSerializers();
 
 		// Animation
-		Ref<AnimationAssetImporter> animationAssetImporter = CreateRef<AnimationAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".gltf", animationAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".glb", animationAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<AnimationAssetImporter>());
 
 		// Material
-		Ref<MaterialAssetImporter> materialAssetImporter = CreateRef<MaterialAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".material", materialAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<MaterialAssetImporter>());
 
 		// BoneMesh
-		Ref<BoneMeshAssetImporter> boneAssetImporter = CreateRef<BoneMeshAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".gltf", boneAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".glb", boneAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<BoneMeshAssetImporter>());
 
 		// CubeMesh
-		Ref<CubeMeshAssetImporter> cubeAssetImporter = CreateRef<CubeMeshAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".cube", cubeAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<CubeMeshAssetImporter>());
 
 		// CubeSphereMesh
-		Ref<CubeSphereMeshAssetImporter> cubeSphereAssetImporter = CreateRef<CubeSphereMeshAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".cubesphere", cubeSphereAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<CubeSphereMeshAssetImporter>());
 
 		// PlaneMesh
-		Ref<PlaneMeshAssetImporter> planeAssetImporter = CreateRef<PlaneMeshAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".plane", planeAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<PlaneMeshAssetImporter>());
 
 		// UVSphereMesh
-		Ref<UVSphereMeshAssetImporter> uvSphereAssetImporter = CreateRef<UVSphereMeshAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".uvsphere", uvSphereAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<UVSphereMeshAssetImporter>());
 
 		// Shader
-		Ref<ShaderAssetImporter> shaderAssetImporter = CreateRef<ShaderAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".shader", shaderAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<ShaderAssetImporter>());
 
 		// Sound
-		Ref<SoundAssetImporter> soundAssetImporter = CreateRef<SoundAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".wav", soundAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".mp3", soundAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<SoundAssetImporter>());
 
 		// Texture
-		Ref<TextureAssetImporter> textureAssetImporter = CreateRef<TextureAssetImporter>();
-
-		AssetDatabase::RegisterAssetImporter(".png", textureAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".jpeg", textureAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".jpg", textureAssetImporter);
-		AssetDatabase::RegisterAssetImporter(".hdr", textureAssetImporter);
+		AssetDatabase::RegisterAssetImporter(CreateRef<TextureAssetImporter>());
 	};
 
 	//void AssetDatabase::DeregisterDefaultAssetImporters()
 	MH_DEFINE_FUNC(AssetDatabase::DeregisterDefaultAssetImporters, void)
 	{
 		// Animation
-		AssetDatabase::DeregisterAssetImporter(".gltf");
-		AssetDatabase::DeregisterAssetImporter(".glb");
+		AssetDatabase::DeregisterAssetImporter(".anim");
 
 		// Material
 		AssetDatabase::DeregisterAssetImporter(".material");
@@ -247,8 +199,7 @@ namespace Mahakam
 		AssetDatabase::DeregisterAssetImporter(".cubesphere");
 
 		// BoneMesh
-		AssetDatabase::DeregisterAssetImporter(".gltf");
-		AssetDatabase::DeregisterAssetImporter(".glb");
+		AssetDatabase::DeregisterAssetImporter(".bone");
 
 		// PlaneMesh
 		AssetDatabase::DeregisterAssetImporter(".plane");
@@ -260,14 +211,10 @@ namespace Mahakam
 		AssetDatabase::DeregisterAssetImporter(".shader");
 
 		// Sound
-		AssetDatabase::DeregisterAssetImporter(".wav");
-		AssetDatabase::DeregisterAssetImporter(".mp3");
+		AssetDatabase::DeregisterAssetImporter(".sound");
 
 		// Texture
-		AssetDatabase::DeregisterAssetImporter(".png");
-		AssetDatabase::DeregisterAssetImporter(".jpeg");
-		AssetDatabase::DeregisterAssetImporter(".jpg");
-		AssetDatabase::DeregisterAssetImporter(".hdr");
+		AssetDatabase::DeregisterAssetImporter(".texture");
 	};
 
 	//void AssetDatabase::ReloadAsset(AssetDatabase::AssetID id)
@@ -359,26 +306,12 @@ namespace Mahakam
 		return 0;
 	};
 
-	//std::string GetAssetType::GetAssetType(const std::filesystem::path& importPath)
-	MH_DEFINE_FUNC(AssetDatabase::ReadAssetInfo, AssetDatabase::AssetInfo, const std::filesystem::path& importPath)
+	//bool AssetDatabase::AssetExists(AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::AssetExists, bool, AssetID id)
 	{
-		if (!std::filesystem::exists(importPath) || std::filesystem::is_directory(importPath))
-		{
-			MH_WARN("AssetDatabase::ReadAssetInfo: The path '{0}' doesn't point to an asset", importPath.string());
-			return {};
-		}
-
-		TrivialVector<char> buffer;
-		if (!FileUtility::ReadFile(importPath, buffer))
-			return {};
-
-		Reader reader(buffer.data(), static_cast<uint32_t>(buffer.size() * 8U));
-
-		AssetInfo assetInfo;
-		if (!SerializeAssetHeader(reader, assetInfo.ID, assetInfo.Extension))
-			return {};
-
-		return assetInfo;
+		auto iter = s_AssetPaths.find(id);
+		
+		return iter != s_AssetPaths.end();
 	};
 
 	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension)
