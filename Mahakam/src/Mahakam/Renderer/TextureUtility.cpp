@@ -87,6 +87,106 @@ namespace Mahakam
 		return result;
 	}
 
+	uint32_t TextureFormatToByteSize(TextureFormat format) noexcept
+	{
+		switch (format)
+		{
+		case TextureFormat::R8:
+			return 1;
+		case TextureFormat::RG8:
+			return 2;
+		case TextureFormat::RGB8:
+			return 3;
+		case TextureFormat::RGBA8:
+			return 4;
+		case TextureFormat::R16F:
+			return 2;
+		case TextureFormat::RG16F:
+			return 4;
+		case TextureFormat::RGB16F:
+			return 6;
+		case TextureFormat::RGBA16F:
+			return 8;
+		case TextureFormat::R32F:
+			return 4;
+		case TextureFormat::RG32F:
+			return 8;
+		case TextureFormat::RGB32F:
+			return 12;
+		case TextureFormat::RGBA32F:
+			return 16;
+		case TextureFormat::RG11B10F:
+			return 4;
+		case TextureFormat::RGB10A2:
+			return 4;
+		case TextureFormat::SRGB8:
+			return 3;
+		case TextureFormat::SRGBA8:
+			return 4;
+		case TextureFormat::R_BC4:
+			return 0;
+		case TextureFormat::RG_BC5:
+			return 0;
+		case TextureFormat::RGBA_BC7:
+			return 0;
+		case TextureFormat::RGB_DXT1:
+			return 0;
+		case TextureFormat::RGBA_DXT5:
+			return 0;
+		case TextureFormat::SRGB_DXT1:
+			return 0;
+		case TextureFormat::SRGBA_DXT5:
+			return 0;
+		case TextureFormat::Depth16:
+			return 2;
+		case TextureFormat::Depth24:
+			return 3;
+		case TextureFormat::Depth24Stencil8:
+			return 4;
+		default:
+			MH_BREAK("Unknown TextureFormat provided!");
+			return 0;
+		}
+	}
+
+	bool IsTextureFormatCompressed(TextureFormat format) noexcept
+	{
+		switch (format)
+		{
+		case TextureFormat::R_BC4:
+		case TextureFormat::RG_BC5:
+		case TextureFormat::RGBA_BC7:
+		case TextureFormat::RGB_DXT1:
+		case TextureFormat::RGBA_DXT5:
+		case TextureFormat::SRGB_DXT1:
+		case TextureFormat::SRGBA_DXT5:
+			return true;
+		case TextureFormat::R8:
+		case TextureFormat::RG8:
+		case TextureFormat::RGB8:
+		case TextureFormat::RGBA8:
+		case TextureFormat::R16F:
+		case TextureFormat::RG16F:
+		case TextureFormat::RGB16F:
+		case TextureFormat::RGBA16F:
+		case TextureFormat::R32F:
+		case TextureFormat::RG32F:
+		case TextureFormat::RGB32F:
+		case TextureFormat::RGBA32F:
+		case TextureFormat::RG11B10F:
+		case TextureFormat::RGB10A2:
+		case TextureFormat::SRGB8:
+		case TextureFormat::SRGBA8:
+		case TextureFormat::Depth16:
+		case TextureFormat::Depth24:
+		case TextureFormat::Depth24Stencil8:
+			return false;
+		default:
+			MH_BREAK("Unknown TextureFormat provided!");
+			return false;
+		}
+	}
+
 	static const std::array<std::array<glm::vec3, 3>, 6> startRightUp = { {
 		{{{1.0f, 1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}},  // front (Right)
 		{{{-1.0f, 1.0f, 1.0f},  {1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}},  // back (Left)

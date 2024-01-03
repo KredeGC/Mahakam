@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TextureFormats.h"
+
 #include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Types.h"
 
@@ -26,6 +28,10 @@ namespace Mahakam
 	image_data LoadImageFile(const char* filepath, int& w, int& h, int& channels, bool& hdr, int desiredChannels = 0) noexcept;
 
 	uint32_t Vec3ToRG11B10F(const glm::vec3& vec) noexcept;
+
+	uint32_t TextureFormatToByteSize(TextureFormat format) noexcept;
+
+	bool IsTextureFormatCompressed(TextureFormat format) noexcept;
 
 	TrivialArray<float, Allocator::BaseAllocator<float>> ProjectEquirectangularToCubemap(float* data, uint32_t width, uint32_t height, int channels, bool hdr, uint32_t resolution) noexcept;
 }

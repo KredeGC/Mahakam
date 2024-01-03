@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Asset/AssetDatabase.h"
+
 #include "Mahakam/Renderer/Mesh.h"
 #include "Mahakam/Renderer/Texture.h"
 
@@ -17,15 +19,35 @@ namespace Mahakam
 	struct AssetSerializeTraits;
 
 	template<>
-	struct AssetSerializeTraits<Texture>
+	struct AssetSerializeTraits<TextureCube>
 	{
-		static void Serialize(ryml::NodeRef& node, Texture* asset) {}
+		static bool Serialize(AssetDatabase::Writer& writer, const std::filesystem::path& filepath, void* asset)
+		{
+			TextureCube* textureAsset = static_cast<TextureCube*>(asset);
 
-		static Asset<Texture> Deserialize(ryml::NodeRef& node) { return nullptr; }
+			writer.serialize<TextureFormat>(textureAsset->GetProps().Format);
+			writer.serialize<TextureFilter>(textureAsset->GetProps().FilterMode);
+			writer.serialize<uint32_t>(textureAsset->GetProps().Resolution);
+			writer.serialize<TextureCubePrefilter>(textureAsset->GetProps().Prefilter);
+			writer.serialize<bool>(textureAsset->GetProps().Mipmaps);
 
-		static void Build(uint8_t* buffer, Texture* asset) {}
+			void* pixels;
 
-		static Asset<Texture> Read(uint8_t* buffer) { return nullptr; }
+			textureAsset->ReadPixels(pixels);
+		}
+
+		static Asset<void> Deserialize(AssetDatabase::Reader& reader, const std::filesystem::path& filepath)
+		{
+			CubeTextureProps props;
+
+			reader.serialize<TextureFormat>(props.Format);
+			reader.serialize<TextureFilter>(props.FilterMode);
+			reader.serialize<uint32_t>(props.Resolution);
+			reader.serialize<TextureCubePrefilter>(props.Prefilter);
+			reader.serialize<bool>(props.Mipmaps);
+
+			return nullptr;
+		}
 	};
 
 	template<>
