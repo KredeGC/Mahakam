@@ -67,6 +67,8 @@ namespace Mahakam
 		CubeTextureProps m_Props;
 
 		uint32_t m_InternalFormat;
+
+		// TODO: These 2 are not needed throughout the lifetime
 		uint32_t m_DataFormat;
 		uint32_t m_FormatType;
 
