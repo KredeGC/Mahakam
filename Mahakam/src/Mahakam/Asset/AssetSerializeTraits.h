@@ -5,7 +5,8 @@
 #include "Mahakam/Renderer/Mesh.h"
 #include "Mahakam/Renderer/Texture.h"
 
-#include "Mahakam/Serialization/BinarySerialization.h"
+#include "Mahakam/BinarySerialization/AssetSerialization.h"
+
 #include "Mahakam/Serialization/YAMLSerialization.h"
 
 #include <bitstream.h>
