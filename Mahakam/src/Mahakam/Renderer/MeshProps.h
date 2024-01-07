@@ -2,6 +2,8 @@
 
 #include "Mahakam/Asset/Asset.h"
 
+#include <ryml/rapidyaml-0.4.1.hpp>
+
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
 #define GLM_ENABLE_EXPERIMENTAL
@@ -34,13 +36,13 @@ namespace Mahakam
 	struct MeshProps
 	{
 		std::vector<Asset<Material>> Materials;
+		bool IncludeNodes = true; // TODO: Use flags instead of bools?
+		bool IncludeBones = true;
 	};
 
 	struct BoneMeshProps : public MeshProps
 	{
 		std::filesystem::path Filepath;
-		bool IncludeNodes = true; // TODO: Use flags instead of bools?
-		bool IncludeBones = true;
 	};
 
 	// Preferably this would only be needed in the editor
@@ -71,4 +73,11 @@ namespace Mahakam
 		int Rows = 10;
 		int Columns = 10;
 	};
+}
+
+namespace c4::yml
+{
+	void write(ryml::NodeRef* n, Mahakam::MeshProps const& val);
+
+	bool read(ryml::NodeRef const& n, Mahakam::MeshProps* val);
 }

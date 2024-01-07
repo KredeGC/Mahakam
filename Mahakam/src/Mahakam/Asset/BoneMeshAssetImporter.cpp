@@ -3,6 +3,8 @@
 
 #include "AssetSerializeTraits.h"
 
+#include "Mahakam/Editor/YAML/AssetSerialization.h"
+
 #include "Mahakam/ImGui/GUI.h"
 
 #include "Mahakam/Renderer/Mesh.h"
@@ -21,24 +23,14 @@ namespace Mahakam
 
 	void BoneMeshAssetImporter::Serialize(ryml::NodeRef& node, void* asset)
 	{
-		BoneMesh* mesh = static_cast<BoneMesh*>(asset);
-
-		ryml::NodeRef materialsNode = node["Materials"];
-		materialsNode |= ryml::SEQ;
-
-		for (auto& material : mesh->GetProps().Materials)
-			materialsNode.append_child() << material;
-
-		SerializeYAMLNode(node, "Filepath", mesh->Props.Filepath);
-		SerializeYAMLNode(node, "IncludeNodes", mesh->Props.IncludeNodes);
-		SerializeYAMLNode(node, "IncludeBones", mesh->Props.IncludeBones);
+		
 	}
 
 	Asset<void> BoneMeshAssetImporter::Deserialize(ryml::NodeRef& node)
 	{
 		BoneMeshProps props = DeserializeProps(node);
 
-		return BoneMesh::Create(props);
+		return Mesh::Load(props.Filepath, props);
 	}
 
 	BoneMeshProps BoneMeshAssetImporter::DeserializeProps(ryml::NodeRef& node)

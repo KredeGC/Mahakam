@@ -11,7 +11,8 @@ namespace Mahakam
 	class BoneMeshResourceImporter : public ResourceImporter
 	{
 	private:
-		BoneMeshProps m_Props;
+		MeshProps m_Props;
+		std::filesystem::path m_Filepath;
 
 		Asset<Mesh> m_PreviewMesh;
 
@@ -24,8 +25,5 @@ namespace Mahakam
 		virtual void OnImport(ryml::NodeRef& node) override;
 
 		virtual Asset<void> CreateAsset(ryml::NodeRef& node) override;
-
-	private:
-		BoneMeshProps DeserializeProps(ryml::NodeRef& node);
 	};
 }

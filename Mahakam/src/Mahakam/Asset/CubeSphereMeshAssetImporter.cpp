@@ -3,6 +3,8 @@
 
 #include "AssetSerializeTraits.h"
 
+#include "Mahakam/Editor/YAML/AssetSerialization.h"
+
 #include "Mahakam/ImGui/GUI.h"
 
 #include "Mahakam/Renderer/Mesh.h"
@@ -30,8 +32,8 @@ namespace Mahakam
 		for (auto& material : mesh->GetProps().Materials)
 			materialsNode.append_child() << material;
 
-		node["Tessellation"] << mesh->Props.Tessellation;
-		node["Invert"] << mesh->Props.Invert;
+		node["Tessellation"] << static_cast<CubeSphereMeshProps&>(mesh->GetProps()).Tessellation;
+		node["Invert"] << static_cast<CubeSphereMeshProps&>(mesh->GetProps()).Invert;
 	}
 
 	Asset<void> CubeSphereMeshAssetImporter::Deserialize(ryml::NodeRef& node)

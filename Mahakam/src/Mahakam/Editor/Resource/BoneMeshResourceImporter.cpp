@@ -2,6 +2,8 @@
 #include "BoneMeshResourceImporter.h"
 
 #include "Mahakam/Editor/Resource/ResourceRegistry.h"
+#include "Mahakam/Editor/YAML/AssetSerialization.h"
+#include "Mahakam/Editor/YAML/MeshSerialization.h"
 
 #include "Mahakam/ImGui/GUI.h"
 
@@ -19,18 +21,20 @@ namespace Mahakam
 
 	void BoneMeshResourceImporter::OnResourceOpen(const std::filesystem::path& filepath)
 	{
-		m_Props = BoneMeshProps();
-		m_Props.Filepath = filepath;
+		m_Props = MeshProps();
+		m_Filepath = filepath;
 	}
 
 	void BoneMeshResourceImporter::OnImportOpen(ryml::NodeRef& node)
 	{
-		m_Props = DeserializeProps(node);
+		DeserializeYAMLNode(node, "Filepath", m_Filepath);
+
+		node >> m_Props;
 	}
 
 	void BoneMeshResourceImporter::OnRender()
 	{
-		GUI::DrawDragDropField("File path", m_ImporterProps.Extension, m_Props.Filepath);
+		GUI::DrawDragDropField("File path", m_ImporterProps.Extension, m_Filepath);
 
 		ImGui::Checkbox("Include mesh nodes", &m_Props.IncludeNodes);
 		ImGui::Checkbox("Include mesh bones", &m_Props.IncludeBones);
@@ -57,40 +61,22 @@ namespace Mahakam
 		for (auto& material : m_Props.Materials)
 			materialsNode.append_child() << material;
 
-		SerializeYAMLNode(node, "Filepath", m_Props.Filepath);
+		SerializeYAMLNode(node, "Filepath", m_Filepath);
 		SerializeYAMLNode(node, "IncludeNodes", m_Props.IncludeNodes);
 		SerializeYAMLNode(node, "IncludeBones", m_Props.IncludeBones);
 	}
 
 	Asset<void> BoneMeshResourceImporter::CreateAsset(ryml::NodeRef& node)
 	{
-		BoneMeshProps props = DeserializeProps(node);
+		std::filesystem::path filepath;
+		DeserializeYAMLNode(node, "Filepath", filepath);
 
-		if (props.Filepath.empty())
+		MeshProps props;
+		node >> props;
+
+		if (filepath.empty())
 			return nullptr;
 
-		return BoneMesh::Create(props);
-	}
-
-	BoneMeshProps BoneMeshResourceImporter::DeserializeProps(ryml::NodeRef& node)
-	{
-		BoneMeshProps props;
-
-		if (node.has_child("Materials"))
-		{
-			for (auto materialNode : node["Materials"])
-			{
-				Asset<Material> material;
-				materialNode >> material;
-
-				props.Materials.push_back(std::move(material));
-			}
-		}
-
-		DeserializeYAMLNode(node, "Filepath", props.Filepath);
-		DeserializeYAMLNode(node, "IncludeNodes", props.IncludeNodes);
-		DeserializeYAMLNode(node, "IncludeBones", props.IncludeBones);
-
-		return props;
+		return Mesh::Load(filepath, props);
 	}
 }

@@ -31,56 +31,47 @@ namespace Mahakam
 	class Mesh
 	{
 	public:
-		MeshPrimitive Primitive;
+		MeshPrimitive Primitive; // TODO: Remove
+		Ref<MeshProps> Props; // TODO: Unref this so that copying actually works
 		std::vector<Ref<SubMesh>> Meshes; // List of sub meshes
+		std::vector<MeshNode> NodeHierarchy; // Hierarchy of nodes. Parents are always before children
+		TrivialVector<uint32_t> Skins; // List of node indices that are skin roots
+		UnorderedMap<uint32_t, uint32_t> SubMeshMap; // Hierarchy index to SubMesh index
+		UnorderedMap<uint32_t, uint32_t> BoneMap; // Hierarchy index to Joint ID
 
 		Mesh() = default;
 
 		explicit Mesh(MeshPrimitive primitive) :
 			Primitive(primitive) {}
 
-		virtual MeshProps& GetProps() = 0;
+		explicit Mesh(MeshPrimitive primitive, const MeshProps& props) :
+			Primitive(primitive),
+			Props(CreateRef<MeshProps>(props)) {}
+
+		MeshProps& GetProps() { return *Props; }
 
 		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
 
+		inline static Asset<Mesh> Load(const std::filesystem::path& filepath, const MeshProps& props) { return LoadImpl(filepath, props); }
+
 	private:
 		MH_DECLARE_FUNC(CopyImpl, Asset<Mesh>, Asset<Mesh> other);
+
+		MH_DECLARE_FUNC(LoadImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
 	};
 
-	class BoneMesh : public Mesh
-	{
-	public:
-		BoneMeshProps Props;
-		std::vector<MeshNode> NodeHierarchy; // Hierarchy of nodes. Parents are always before children
-		TrivialVector<uint32_t> Skins; // List of node indices that are skin roots
-		UnorderedMap<uint32_t, uint32_t> SubMeshMap; // Hierarchy index to SubMesh index
-		UnorderedMap<uint32_t, uint32_t> BoneMap; // Hierarchy index to Joint ID
+	using Model = Mesh;
 
-		BoneMesh(const BoneMeshProps& props) :
-			Mesh(MeshPrimitive::Model),
-			Props(props) {}
-
-		inline virtual MeshProps& GetProps() override { return Props; }
-
-		inline static Asset<BoneMesh> Create(const BoneMeshProps& props) { return CreateImpl(props); }
-
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<BoneMesh>, const BoneMeshProps& props);
-	};
+	using BoneMesh = Mesh;
 
 	class PlaneMesh : public Mesh
 	{
 	public:
-		PlaneMeshProps Props;
-
 		PlaneMesh(Ref<SubMesh> submesh, const PlaneMeshProps& props) :
-			Mesh(MeshPrimitive::Plane),
-			Props(props)
+			Mesh(MeshPrimitive::Plane, props)
 		{
 			Meshes.push_back(std::move(submesh));
 		}
-
-		inline virtual MeshProps& GetProps() override { return Props; }
 
 		inline static Asset<PlaneMesh> Create(const PlaneMeshProps& props) { return CreateImpl(props); }
 
@@ -91,16 +82,11 @@ namespace Mahakam
 	class CubeMesh : public Mesh
 	{
 	public:
-		CubeMeshProps Props;
-
 		CubeMesh(Ref<SubMesh> submesh, const CubeMeshProps& props) :
-			Mesh(MeshPrimitive::Cube),
-			Props(props)
+			Mesh(MeshPrimitive::Cube, props)
 		{
 			Meshes.push_back(std::move(submesh));
 		}
-
-		inline virtual MeshProps& GetProps() override { return Props; }
 
 		inline static Asset<CubeMesh> Create(const CubeMeshProps& props) { return CreateImpl(props); }
 
@@ -111,16 +97,11 @@ namespace Mahakam
 	class CubeSphereMesh : public Mesh
 	{
 	public:
-		CubeSphereMeshProps Props;
-
 		CubeSphereMesh(Ref<SubMesh> submesh, const CubeSphereMeshProps& props) :
-			Mesh(MeshPrimitive::CubeSphere),
-			Props(props)
+			Mesh(MeshPrimitive::CubeSphere, props)
 		{
 			Meshes.push_back(std::move(submesh));
 		}
-
-		inline virtual MeshProps& GetProps() override { return Props; }
 
 		inline static Asset<CubeSphereMesh> Create(const CubeSphereMeshProps& props) { return CreateImpl(props); }
 
@@ -131,16 +112,11 @@ namespace Mahakam
 	class UVSphereMesh : public Mesh
 	{
 	public:
-		UVSphereMeshProps Props;
-
 		UVSphereMesh(Ref<SubMesh> submesh, const UVSphereMeshProps& props) :
-			Mesh(MeshPrimitive::UVSphere),
-			Props(props)
+			Mesh(MeshPrimitive::UVSphere, props)
 		{
 			Meshes.push_back(std::move(submesh));
 		}
-
-		inline virtual MeshProps& GetProps() override { return Props; }
 
 		inline static Asset<UVSphereMesh> Create(const UVSphereMeshProps& props) { return CreateImpl(props); }
 

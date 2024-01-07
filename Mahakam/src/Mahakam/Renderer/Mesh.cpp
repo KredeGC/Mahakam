@@ -8,8 +8,12 @@
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
 #include "Platform/Headless/HeadlessMesh.h"
 #include "Platform/OpenGL/OpenGLMesh.h"
+
+#include <ryml/rapidyaml-0.4.1.hpp>
 
 #include <glm/gtx/fast_square_root.hpp>
 
@@ -185,8 +189,8 @@ namespace Mahakam
 		return nullptr;
 	};
 
-	//Asset<BoneMesh> BoneMesh::CreateImpl(const BoneMeshProps& props)
-	MH_DEFINE_FUNC(BoneMesh::CreateImpl, Asset<BoneMesh>, const BoneMeshProps& props)
+	//Asset<BoneMesh> Mesh::LoadImpl(const std::filesystem::path& filepath, const MeshProps& props)
+	MH_DEFINE_FUNC(Mesh::LoadImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -196,10 +200,10 @@ namespace Mahakam
 		std::string warn;
 
 		bool success;
-		if (props.Filepath.extension().string() == ".gltf")
-			success = loader.LoadASCIIFromFile(&model, &err, &warn, props.Filepath.string());
+		if (filepath.extension().string() == ".gltf")
+			success = loader.LoadASCIIFromFile(&model, &err, &warn, filepath.string());
 		else
-			success = loader.LoadBinaryFromFile(&model, &err, &warn, props.Filepath.string());
+			success = loader.LoadBinaryFromFile(&model, &err, &warn, filepath.string());
 
 		if (!warn.empty())
 			MH_WARN("[GLTF] Warning: {0}", warn);
@@ -208,7 +212,7 @@ namespace Mahakam
 			MH_ERROR("[GLTF] Error: {0}", err);
 
 		if (!success) {
-			MH_ERROR("[GLTF] Failed to parse glTF model at {0}", props.Filepath.string());
+			MH_ERROR("[GLTF] Failed to parse glTF model at {0}", filepath.string());
 			return nullptr;
 		}
 
@@ -225,7 +229,7 @@ namespace Mahakam
 		// TODO: Support interleaved data
 		// TODO: Support sparse data sets
 
-		Asset<BoneMesh> skinnedMesh = CreateAsset<BoneMesh>(props);
+		Asset<BoneMesh> skinnedMesh = CreateAsset<BoneMesh>(MeshPrimitive::Model, props);
 
 		// Extract vertex and index values
 		for (auto& m : model.meshes)
@@ -279,7 +283,7 @@ namespace Mahakam
 				// Extract vertex colors
 				GLTFLoadAttribute<glm::vec4>(model, p, "COLOR_0", colorOffset, colors);
 
-				if (skinnedMesh->Props.IncludeBones)
+				if (skinnedMesh->GetProps().IncludeBones)
 				{
 					// Extract joint information
 					GLTFLoadAttribute<glm::ivec4>(model, p, "JOINTS_0", boneIDOffset, boneIDs);
@@ -330,7 +334,7 @@ namespace Mahakam
 		}
 
 		// Extract nodes and bones
-		if (skinnedMesh->Props.IncludeNodes)
+		if (skinnedMesh->GetProps().IncludeNodes)
 		{
 			UnorderedMap<uint32_t, uint32_t> nodeIndex; // Node ID to hierarchy index
 
@@ -339,7 +343,7 @@ namespace Mahakam
 				GLTFReadNodeHierarchy(model, nodeIndex, rootNode, -1, skinnedMesh);
 
 			// Extract bone transformations
-			if (skinnedMesh->Props.IncludeBones)
+			if (skinnedMesh->GetProps().IncludeBones)
 			{
 				for (auto& skinNode : model.nodes)
 				{

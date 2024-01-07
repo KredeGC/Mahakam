@@ -15,6 +15,7 @@
 
 namespace Mahakam
 {
+	// TODO: Why not use serialize_traits directly?
 	template<typename>
 	struct AssetSerializeTraits;
 
@@ -53,147 +54,9 @@ namespace Mahakam
 	template<>
 	struct AssetSerializeTraits<Mesh>
 	{
-		static void Serialize(ryml::NodeRef& node, Mesh* asset)
-		{
-			ryml::NodeRef materialsNode = node["Materials"];
-			materialsNode |= ryml::SEQ;
-
-			for (auto& material : asset->GetProps().Materials)
-				materialsNode.append_child() << material;
-
-			node["Primitive"] << (int)asset->Primitive;
-
-			switch (asset->Primitive)
-			{
-			case MeshPrimitive::Model:
-			{
-				BoneMesh* boneMesh = static_cast<BoneMesh*>(asset);
-				node["IncludeNodes"] << boneMesh->Props.IncludeNodes;
-				node["IncludeBones"] << boneMesh->Props.IncludeBones;
-				break;
-			}
-			case MeshPrimitive::Plane:
-			{
-				PlaneMesh* planeMesh = static_cast<PlaneMesh*>(asset);
-				node["Rows"] << planeMesh->Props.Rows;
-				node["Columns"] << planeMesh->Props.Columns;
-				break;
-			}
-			case MeshPrimitive::Cube:
-			{
-				CubeMesh* cubeMesh = static_cast<CubeMesh*>(asset);
-				node["Tessellation"] << cubeMesh->Props.Tessellation;
-				node["Invert"] << cubeMesh->Props.Invert;
-				break;
-			}
-			case MeshPrimitive::CubeSphere:
-			{
-				CubeSphereMesh* sphereMesh = static_cast<CubeSphereMesh*>(asset);
-				node["Tessellation"] << sphereMesh->Props.Tessellation;
-				node["Invert"] << sphereMesh->Props.Invert;
-				break;
-			}
-			case MeshPrimitive::UVSphere:
-			{
-				UVSphereMesh* sphereMesh = static_cast<UVSphereMesh*>(asset);
-				node["Rows"] << sphereMesh->Props.Rows;
-				node["Columns"] << sphereMesh->Props.Columns;
-				break;
-			}
-			default:
-				MH_WARN("Unsupported Mesh primitive");
-				break;
-			}
-		}
-
-		static Asset<Mesh> Deserialize(ryml::NodeRef& node)
-		{
-			MeshPrimitive primitive;
-
-			int primitiveInt;
-			if (!DeserializeYAMLNode(node, "Primitive", primitiveInt))
-				return nullptr;
-
-			primitive = (MeshPrimitive)primitiveInt;
-
-			std::vector<Asset<Material>> materials;
-			if (node.has_child("Materials"))
-			{
-				for (auto materialNode : node["Materials"])
-				{
-					Asset<Material> material;
-					materialNode >> material;
-
-					materials.push_back(material);
-				}
-			}
-
-			switch (primitive)
-			{
-			case MeshPrimitive::Model:
-			{
-				BoneMeshProps props;
-				props.Materials = std::move(materials);
-
-				std::string filepath;
-				if (DeserializeYAMLNode(node, "Filepath", filepath))
-					props.Filepath = filepath;
-
-				DeserializeYAMLNode(node, "IncludeNodes", props.IncludeNodes);
-				DeserializeYAMLNode(node, "IncludeBones", props.IncludeBones);
-
-				return BoneMesh::Create(props);
-			}
-			case MeshPrimitive::Plane:
-			{
-				PlaneMeshProps props;
-				props.Materials = materials;
-
-				DeserializeYAMLNode(node, "Rows", props.Rows);
-				DeserializeYAMLNode(node, "Columns", props.Columns);
-
-				return PlaneMesh::Create(props);
-			}
-			case MeshPrimitive::Cube:
-			{
-				CubeMeshProps props;
-				props.Materials = materials;
-
-				DeserializeYAMLNode(node, "Tessellation", props.Tessellation);
-				DeserializeYAMLNode(node, "Invert", props.Invert);
-
-				return CubeMesh::Create(props);
-			}
-			case MeshPrimitive::CubeSphere:
-			{
-				CubeSphereMeshProps props;
-				props.Materials = materials;
-
-				DeserializeYAMLNode(node, "Tessellation", props.Tessellation);
-				DeserializeYAMLNode(node, "Invert", props.Invert);
-
-				return CubeSphereMesh::Create(props);
-			}
-			case MeshPrimitive::UVSphere:
-			{
-				UVSphereMeshProps props;
-				props.Materials = materials;
-
-				DeserializeYAMLNode(node, "Rows", props.Rows);
-				DeserializeYAMLNode(node, "Columns", props.Columns);
-
-				return UVSphereMesh::Create(props);
-			}
-			}
-
-			MH_WARN("Unsupported Mesh primitive");
-
-			return nullptr;
-		}
-
 		template<typename Stream>
 		typename bitstream::utility::is_writing_t<Stream>
-		static Build(Stream& writer, Mesh* asset) noexcept
+		static Serialize(Stream& writer, Mesh* asset) noexcept
 		{
 			// Write materials
 			BS_ASSERT(writer.template serialize<size_t>(asset->GetProps().Materials.size()));
@@ -201,7 +64,12 @@ namespace Mahakam
 			for (auto& material : asset->GetProps().Materials)
 				BS_ASSERT(writer.template serialize<Asset<Material>>(material));
 
-			// TODO: IncludeNodes and IncludeBones
+			// IncludeNodes and IncludeBones
+			BS_ASSERT(writer.template serialize<bool>(asset->GetProps().IncludeBones));
+			BS_ASSERT(writer.template serialize<bool>(asset->GetProps().IncludeNodes));
+
+			// TODO: Bones, nodes, hierarchy etc.
+
 
 			// Write submeshes
 			BS_ASSERT(writer.template serialize<size_t>(asset->Meshes.size()));
@@ -258,7 +126,7 @@ namespace Mahakam
 		
 		template<typename Stream>
 		typename bitstream::utility::is_reading_t<Stream, Asset<Texture>>
-		static Read(Stream& reader) noexcept
+		static Deserialize(Stream& reader) noexcept
 		{
 			MeshProps props;
 
@@ -269,6 +137,12 @@ namespace Mahakam
 
 			for (size_t i = 0; i < materialCount; ++i)
 				BS_ASSERT(reader.template serialize<Asset<Material>>(props.Materials[i]));
+
+			// IncludeNodes and IncludeBones
+			BS_ASSERT(reader.template serialize<bool>(props.IncludeBones));
+			BS_ASSERT(reader.template serialize<bool>(props.IncludeNodes));
+
+			// TODO: Bones, nodes, hierarchy etc.
 
 			// Read submeshes
 			size_t submeshCount;

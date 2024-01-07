@@ -37,9 +37,9 @@ namespace Mahakam
 		inline const std::vector<Asset<Material>>& GetMaterials() const { return m_SkinnedMesh->GetProps().Materials; }
 
 		inline MeshPrimitive GetPrimitive() const { return m_SkinnedMesh->Primitive; }
-		inline const std::vector<MeshNode>& GetNodeHierarchy() const { return static_cast<BoneMesh&>(*m_SkinnedMesh.get()).NodeHierarchy; }
-		inline const TrivialVector<uint32_t>& GetSkins() const { return static_cast<BoneMesh&>(*m_SkinnedMesh.get()).Skins; }
-		inline const UnorderedMap<uint32_t, uint32_t>& GetSubMeshMap() const { return static_cast<BoneMesh&>(*m_SkinnedMesh.get()).SubMeshMap; }
-		inline const UnorderedMap<uint32_t, uint32_t>& GetBoneInfo() const { return static_cast<BoneMesh&>(*m_SkinnedMesh.get()).BoneMap; }
+		inline const std::vector<MeshNode>& GetNodeHierarchy() const { return m_SkinnedMesh->NodeHierarchy; }
+		inline const TrivialVector<uint32_t>& GetSkins() const { return m_SkinnedMesh->Skins; }
+		inline const UnorderedMap<uint32_t, uint32_t>& GetSubMeshMap() const { return m_SkinnedMesh->SubMeshMap; }
+		inline const UnorderedMap<uint32_t, uint32_t>& GetBoneInfo() const { return m_SkinnedMesh->BoneMap; }
 	};
 }

@@ -17,6 +17,9 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Random.h"
 
+#include "Mahakam/BinarySerialization/AssetSerialization.h"
+#include "Mahakam/BinarySerialization/MeshSerialization.h"
+
 #include "Mahakam/Serialization/YAMLGuard.h"
 #include "Mahakam/Serialization/YAMLSerialization.h"
 

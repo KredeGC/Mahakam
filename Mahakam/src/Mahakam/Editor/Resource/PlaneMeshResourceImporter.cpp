@@ -2,6 +2,7 @@
 #include "PlaneMeshResourceImporter.h"
 
 #include "Mahakam/Editor/Resource/ResourceRegistry.h"
+#include "Mahakam/Editor/YAML/AssetSerialization.h"
 
 #include "Mahakam/ImGui/GUI.h"
 

@@ -3,6 +3,8 @@
 
 #include "AssetSerializeTraits.h"
 
+#include "Mahakam/Editor/YAML/AssetSerialization.h"
+
 #include "Mahakam/ImGui/GUI.h"
 
 #include "Mahakam/Renderer/Mesh.h"
@@ -31,8 +33,8 @@ namespace Mahakam
 		for (auto& material : mesh->GetProps().Materials)
 			materialsNode.append_child() << material;
 
-		node["Rows"] << mesh->Props.Rows;
-		node["Columns"] << mesh->Props.Columns;
+		node["Rows"] << static_cast<UVSphereMeshProps&>(mesh->GetProps()).Rows;
+		node["Columns"] << static_cast<UVSphereMeshProps&>(mesh->GetProps()).Columns;
 	}
 
 	Asset<void> UVSphereMeshAssetImporter::Deserialize(ryml::NodeRef& node)

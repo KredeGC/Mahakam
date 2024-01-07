@@ -5,6 +5,7 @@
 
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Texture.h"
+#include "Mahakam/Renderer/TextureUtility.h"
 
 #include "Mahakam/Serialization/YAMLSerialization.h"
 
@@ -85,6 +86,23 @@ namespace Mahakam
 		DeserializeYAMLNode(node, "Filepath", filepath);
 
 		CubeTextureProps props = DeserializeProps(node);
+
+		// Read image
+		int w, h, channels;
+		bool hdr;
+		auto data = LoadImageFile(m_Filepath.string().c_str(), w, h, channels, hdr);
+
+		// Convert image
+		if (m_Props.Format == TextureFormat::RG11B10F && channels == 3)
+		{
+			auto pixels = ProjectEquirectangularToCubemap(reinterpret_cast<float*>(data.get()), w, h, channels, hdr, m_Props.Resolution);
+			glm::vec3* buffer = reinterpret_cast<glm::vec3*>(pixels.data());
+
+			size_t size = static_cast<size_t>(m_Props.Resolution) * m_Props.Resolution * 6ull;
+			TrivialArray<uint32_t> converted_pixels(size);
+			for (size_t i = 0; i < size; i++)
+				converted_pixels[i] = Vec3ToRG11B10F(buffer[i]);
+		}
 
 		return TextureCube::Create(filepath, props);
 	}
