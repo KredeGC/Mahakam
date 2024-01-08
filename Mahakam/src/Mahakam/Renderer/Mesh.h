@@ -16,11 +16,6 @@
 #include <glm/ext/vector_float4.hpp>
 #include <glm/ext/vector_int4.hpp>
 
-namespace tinygltf
-{
-	class Model;
-}
-
 namespace Mahakam
 {
 	class Bounds;
