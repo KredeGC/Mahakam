@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ShaderDataTypes.h"
-#include "ShaderProps.h"
 
 #include "Mahakam/Asset/Asset.h"
 
@@ -14,8 +13,6 @@
 #include <glm/ext/matrix_float3x3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 
-#include <ryml/rapidyaml-0.4.1.hpp>
-
 #include <filesystem>
 #include <string>
 
@@ -23,15 +20,47 @@ namespace Mahakam
 {
 	class Texture;
 
+	class ShaderData
+	{
+	public:
+		ShaderData() :
+			m_ShaderData(Allocator::GetAllocator<uint32_t>()),
+			m_Offsets(Allocator::GetAllocator<std::pair<const ShaderStage, size_t>>()) {}
+
+		ShaderData(const ShaderData&) = delete;
+
+		ShaderData(ShaderData&&) noexcept = default;
+
+		void SetVertices(ShaderStage index, const uint32_t* data, size_t size)
+		{
+			auto iter = m_Offsets.find(index);
+			if (iter != m_Offsets.end())
+			{
+				MH_BREAK("Updating an existing ShaderData is not currently supported");
+				return;
+			}
+
+			m_Offsets[index] = m_ShaderData.size();
+			m_ShaderData.push_back(data, data + size);
+		}
+
+		template<typename T>
+		void SetVertices(ShaderStage index, const T& container)
+		{
+			SetVertices(index, container.data(), container.size());
+		}
+
+		const auto& GetShaderData() const { return m_ShaderData; }
+		const auto& GetOffsets() const { return m_Offsets; }
+
+	private:
+		TrivialVector<uint32_t, Allocator::BaseAllocator<uint32_t>> m_ShaderData;
+		UnorderedMap<ShaderStage, size_t, Allocator::BaseAllocator<std::pair<const ShaderStage, size_t>>> m_Offsets;
+	};
+
 	class Shader
 	{
 	public:
-		struct SourceDefinition
-		{
-			UnorderedMap<ShaderStage, std::string> Sources;
-			std::string Defines;
-		};
-
 		virtual ~Shader() = default;
 
 		virtual void Bind(const std::string& shaderPass) = 0;
@@ -39,6 +68,7 @@ namespace Mahakam
 		virtual const std::filesystem::path& GetFilepath() const = 0;
 		virtual const std::string& GetName() const = 0;
 
+		//virtual const UnorderedMap<std::string, UnorderedMap<ShaderStage, std::vector<uint32_t>>>& GetData() const = 0;
 		virtual const UnorderedMap<std::string, ShaderProperty>& GetProperties() const = 0;
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const = 0;
@@ -54,12 +84,6 @@ namespace Mahakam
 		virtual void SetUniformFloat2(const std::string& name, const glm::vec2& value) = 0;
 		virtual void SetUniformFloat3(const std::string& name, const glm::vec3& value) = 0;
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
-
-		static UnorderedMap<ShaderStage, std::string> ParseGLSLFile(const std::string& source);
-		static std::string ParseDefaultValue(const ryml::NodeRef& node);
-		static bool ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, SourceDefinition>& sources, UnorderedMap<std::string, ShaderProperty>& properties);
-		static bool CompileSPIRV(UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv, const SourceDefinition& source);
-		static uint32_t ReflectSPIRV(const std::vector<uint32_t>& spirv, UnorderedMap<std::string, ShaderProperty>& properties);
 
 		inline static Asset<Shader> Create(const std::filesystem::path& filepath) { return CreateFilepath(filepath); }
 

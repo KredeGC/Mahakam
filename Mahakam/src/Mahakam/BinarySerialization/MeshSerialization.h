@@ -3,6 +3,7 @@
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/MeshProps.h"
 #include "Mahakam/Renderer/Mesh.h"
+#include "Mahakam/Renderer/ShaderUtility.h"
 
 #include "AssetSerialization.h"
 #include "ContainerSerialization.h"
@@ -84,7 +85,7 @@ namespace bitstream
 				BS_ASSERT(writer.serialize(index));
 				BS_ASSERT(writer.serialize(type));
 
-				uint32_t dataTypeSize = ShaderDataTypeSize(type);
+				uint32_t dataTypeSize = Mahakam::ShaderUtility::ShaderDataTypeSize(type);
 				uint32_t valueCount = vertexCount * dataTypeSize;
 
 				// This will write it in native endian order... Too bad
@@ -127,7 +128,7 @@ namespace bitstream
 				BS_ASSERT(reader.serialize(index));
 				BS_ASSERT(reader.serialize(type));
 
-				uint32_t dataTypeSize = ShaderDataTypeSize(type);
+				uint32_t dataTypeSize = Mahakam::ShaderUtility::ShaderDataTypeSize(type);
 				uint32_t valueCount = vertexCount * dataTypeSize;
 
 				// Read vertices

@@ -4,7 +4,7 @@
 
 #include "Mahakam/Renderer/Camera.h"
 
-#include "Mahakam/Renderer/ShaderProps.h"
+#include "Mahakam/Renderer/ShaderDataTypes.h"
 
 namespace Mahakam
 {

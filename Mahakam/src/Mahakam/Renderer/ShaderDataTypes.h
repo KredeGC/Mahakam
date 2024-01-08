@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace Mahakam
 {
@@ -29,13 +30,35 @@ namespace Mahakam
 		SamplerCube
 	};
 
-	ShaderStage EShLanguageToShaderStage(uint32_t stage);
+	enum class ShaderPropertyType
+	{
+		Color,
+		HDR,
+		Vector,
+		Range,
+		Drag,
+		Texture,
+		Normal,
+		Default
+	};
 
-	uint32_t ShaderStageToEShLanguage(ShaderStage stage);
+	struct ShaderProperty
+	{
+		ShaderPropertyType PropertyType;
+		ShaderDataType DataType;
+		float Min = 0;
+		float Max = 0;
+		std::string DefaultString;
+		uint32_t Count = 1;
+		int Offset = 0;
+	};
 
-	ShaderDataType ShaderDataTypeBaseType(ShaderDataType type);
+	struct ShaderSource
+	{
+		UnorderedMap<ShaderStage, std::string> Sources;
+		std::string Defines;
+	};
 
-	uint32_t ShaderDataTypeComponentCount(ShaderDataType type);
-
-	uint32_t ShaderDataTypeSize(ShaderDataType type);
+	// TODO: Deprecated
+	using SourceDefinition = ShaderSource;
 }

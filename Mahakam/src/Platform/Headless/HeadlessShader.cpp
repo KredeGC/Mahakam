@@ -7,6 +7,7 @@
 #include "Mahakam/Math/Math.h"
 
 #include "Mahakam/Renderer/Buffer.h"
+#include "Mahakam/Renderer/ShaderUtility.h"
 #include "Mahakam/Renderer/Texture.h"
 
 #include <filesystem>
@@ -24,14 +25,14 @@ namespace Mahakam
 
 		// Read YAML file for shader passes
 		UnorderedMap<std::string, SourceDefinition> sources;
-		if (ParseYAMLFile(filepath, sources, m_Properties))
+		if (ShaderUtility::ParseYAMLFile(filepath, sources, m_Properties))
 		{
 			// Add each shader pass to the list
 			for (auto& [shaderPass, sourceDef]: sources)
             {
                 UnorderedMap<ShaderStage, std::vector<uint32_t>> spirv;
             
-                CompileSPIRV(spirv, sourceDef);
+				ShaderUtility::CompileSPIRV(spirv, sourceDef);
                 
 				m_ShaderPasses.insert(shaderPass);
             }

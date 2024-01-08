@@ -35,11 +35,32 @@ namespace Mahakam
 
 		// Read YAML file for shader passes
 		UnorderedMap<std::string, SourceDefinition> sources;
-		if (ParseYAMLFile(m_Filepath, sources, m_Properties))
+		if (ShaderUtility::ParseYAMLFile(m_Filepath, sources, m_Properties))
 		{
 			// Compile binaries for each shader pass
-			for (auto& [shaderPass, sourceDef]: sources)
-				m_ShaderPasses[shaderPass] = CompileBinary(sourceDef.Sources, sourceDef.Defines);
+			for (const auto& [shaderPass, sourceDef] : sources)
+			{
+				if (sources.empty())
+				{
+					MH_WARN("A shader file was empty for shader pass: {0}", shaderPass);
+					continue;
+				}
+
+				UnorderedMap<ShaderStage, std::vector<uint32_t>> spirv;
+
+				if (!ShaderUtility::CompileSPIRV(spirv, sourceDef))
+				{
+					MH_WARN("Failed to compile shader pass: {0}", shaderPass);
+					continue;
+				}
+
+				// TODO: OpenGLShader should store this as a member variable
+				ShaderData shaderData;
+				for (const auto& [stage, data] : spirv)
+					shaderData.SetVertices(stage, data);
+
+				m_ShaderPasses[shaderPass] = CompileBinary(spirv);
+			}
 		}
 	}
 
@@ -159,25 +180,21 @@ namespace Mahakam
 			MH_GL_CALL(glUniform4f(slot, value.x, value.y, value.z, value.w));
 	}
 
-	uint32_t OpenGLShader::CompileBinary(const UnorderedMap<ShaderStage, std::string>& sources, const std::string& directives)
+	uint32_t OpenGLShader::CompileBinary(const UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		if (sources.empty())
+		if (spirv.empty())
 		{
-			MH_WARN("At least one shader source is required to compile!");
+			MH_WARN("At least one shader stage is required to compile!");
 			return 0;
 		}
-
-		UnorderedMap<ShaderStage, std::vector<uint32_t>> spirv;
-
-		CompileSPIRV(spirv, { sources, directives });
 
 		GLuint program = glCreateProgram();
 
 		// Create shader stages
 		TrivialVector<GLuint> shaderIDs;
-		shaderIDs.reserve(sources.size());
+		shaderIDs.reserve(spirv.size());
 		for (auto& kv : spirv)
 		{
 			GLenum stage = ShaderStageToOpenGLStage(kv.first);
@@ -218,7 +235,7 @@ namespace Mahakam
 
 				MH_GL_CALL(glDeleteShader(shader));
 
-				spirv_cross::CompilerGLSL glsl(spirv[ShaderStage::Vertex]);
+				spirv_cross::CompilerGLSL glsl(kv.second);
 
 				spirv_cross::CompilerGLSL::Options options;
 				options.version = 430;
@@ -226,7 +243,7 @@ namespace Mahakam
 
 				std::string source = glsl.compile();
 
-				MH_WARN("{0}\r\n\r\n{1}\r\n\r\n{2}", source, directives, infoLog.data());
+				MH_WARN("{0}\r\n\r\n{1}", source, infoLog.data());
 
 				break;
 			}
@@ -253,16 +270,16 @@ namespace Mahakam
 			for (auto& id : shaderIDs)
 				MH_GL_CALL(glDeleteShader(id));
 
-			MH_WARN("{0}\r\n\r\n{1}", directives, infoLog.data());
+			MH_WARN("{0}", infoLog.data());
 
 			return 0;
 		}
 
-		for (int i = 0; i < sources.size(); i++)
+		for (int i = 0; i < spirv.size(); i++)
 			MH_GL_CALL(glDetachShader(program, shaderIDs[i]));
 
 		// Reflect the fragment shader using SPIR V
-		m_UniformSize = ReflectSPIRV(spirv[ShaderStage::Fragment], m_Properties);
+		m_UniformSize = ShaderUtility::ReflectSPIRV(spirv.at(ShaderStage::Fragment), m_Properties);
 
 		return program;
 	}
