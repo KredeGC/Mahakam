@@ -14,15 +14,6 @@ namespace Mahakam
 {
 	class Material;
 
-	enum class MeshPrimitive
-	{
-		Model,
-		Plane,
-		Cube,
-		CubeSphere,
-		UVSphere
-	};
-
 	struct MeshNode
 	{
 		std::string Name; // Node name

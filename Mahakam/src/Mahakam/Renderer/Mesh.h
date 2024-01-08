@@ -31,8 +31,7 @@ namespace Mahakam
 	class Mesh
 	{
 	public:
-		MeshPrimitive Primitive; // TODO: Remove
-		Ref<MeshProps> Props; // TODO: Unref this so that copying actually works
+		MeshProps Props;
 		std::vector<Ref<SubMesh>> Meshes; // List of sub meshes
 		std::vector<MeshNode> NodeHierarchy; // Hierarchy of nodes. Parents are always before children
 		TrivialVector<uint32_t> Skins; // List of node indices that are skin roots
@@ -41,27 +40,17 @@ namespace Mahakam
 
 		Mesh() = default;
 
-		explicit Mesh(MeshPrimitive primitive) :
-			Primitive(primitive) {}
-
-		explicit Mesh(MeshPrimitive primitive, const MeshProps& props) :
-			Primitive(primitive),
-			Props(CreateRef<MeshProps>(props)) {}
-
-
 		explicit Mesh(Ref<SubMesh> submesh, const MeshProps& props) :
-			Primitive(MeshPrimitive::Model),
-			Props(CreateRef<MeshProps>(props))
+			Props(props)
 		{
 			Meshes.push_back(std::move(submesh));
 		}
 
 		explicit Mesh(const MeshProps& props) :
-			Primitive(MeshPrimitive::Model),
-			Props(CreateRef<MeshProps>(props)) {}
+			Props(props) {}
 
-		MeshProps& GetProps() { return *Props; }
-		const MeshProps& GetProps() const { return *Props; }
+		MeshProps& GetProps() { return Props; }
+		const MeshProps& GetProps() const { return Props; }
 
 		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
 
