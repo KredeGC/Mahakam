@@ -110,7 +110,7 @@ namespace Mahakam
 		GLTFLoadIndex<T>(model, iter->second, offset, dst);
 	}
 
-	static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<uint32_t, uint32_t>& nodeIndex, uint32_t id, int parentID, Asset<BoneMesh>& skinnedMesh)
+	static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<uint32_t, uint32_t>& nodeIndex, uint32_t id, int parentID, Asset<Model>& skinnedMesh)
 	{
 		const tinygltf::Node& node = model.nodes[id];
 
@@ -170,27 +170,11 @@ namespace Mahakam
 	//Asset<Mesh> Mesh::CopyImpl(Asset<Mesh> other)
 	MH_DEFINE_FUNC(Mesh::CopyImpl, Asset<Mesh>, Asset<Mesh> other)
 	{
-		switch (other->Primitive)
-		{
-		case MeshPrimitive::Model:
-			return CreateAsset<BoneMesh>(static_cast<BoneMesh&>(*other.get()));
-		case MeshPrimitive::Plane:
-			return CreateAsset<PlaneMesh>(static_cast<PlaneMesh&>(*other.get()));
-		case MeshPrimitive::Cube:
-			return CreateAsset<CubeMesh>(static_cast<CubeMesh&>(*other.get()));
-		case MeshPrimitive::CubeSphere:
-			return CreateAsset<CubeSphereMesh>(static_cast<CubeSphereMesh&>(*other.get()));
-		case MeshPrimitive::UVSphere:
-			return CreateAsset<UVSphereMesh>(static_cast<UVSphereMesh&>(*other.get()));
-		}
-
-		MH_BREAK("Unknown MeshPrimitive");
-
-		return nullptr;
+		return CreateAsset<Mesh>(*other);
 	};
 
-	//Asset<BoneMesh> Mesh::LoadImpl(const std::filesystem::path& filepath, const MeshProps& props)
-	MH_DEFINE_FUNC(Mesh::LoadImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props)
+	//Asset<BoneMesh> Mesh::LoadImpl(const BoneMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::LoadImpl, Asset<Mesh>, const BoneMeshProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -200,10 +184,10 @@ namespace Mahakam
 		std::string warn;
 
 		bool success;
-		if (filepath.extension().string() == ".gltf")
-			success = loader.LoadASCIIFromFile(&model, &err, &warn, filepath.string());
+		if (props.Filepath.extension().string() == ".gltf")
+			success = loader.LoadASCIIFromFile(&model, &err, &warn, props.Filepath.string());
 		else
-			success = loader.LoadBinaryFromFile(&model, &err, &warn, filepath.string());
+			success = loader.LoadBinaryFromFile(&model, &err, &warn, props.Filepath.string());
 
 		if (!warn.empty())
 			MH_WARN("[GLTF] Warning: {0}", warn);
@@ -212,7 +196,7 @@ namespace Mahakam
 			MH_ERROR("[GLTF] Error: {0}", err);
 
 		if (!success) {
-			MH_ERROR("[GLTF] Failed to parse glTF model at {0}", filepath.string());
+			MH_ERROR("[GLTF] Failed to parse glTF model at {0}", props.Filepath.string());
 			return nullptr;
 		}
 
@@ -229,7 +213,7 @@ namespace Mahakam
 		// TODO: Support interleaved data
 		// TODO: Support sparse data sets
 
-		Asset<BoneMesh> skinnedMesh = CreateAsset<BoneMesh>(MeshPrimitive::Model, props);
+		Asset<Model> skinnedMesh = CreateAsset<Model>(props.Base);
 
 		// Extract vertex and index values
 		for (auto& m : model.meshes)
@@ -283,7 +267,7 @@ namespace Mahakam
 				// Extract vertex colors
 				GLTFLoadAttribute<glm::vec4>(model, p, "COLOR_0", colorOffset, colors);
 
-				if (skinnedMesh->GetProps().IncludeBones)
+				if (props.IncludeBones)
 				{
 					// Extract joint information
 					GLTFLoadAttribute<glm::ivec4>(model, p, "JOINTS_0", boneIDOffset, boneIDs);
@@ -334,7 +318,7 @@ namespace Mahakam
 		}
 
 		// Extract nodes and bones
-		if (skinnedMesh->GetProps().IncludeNodes)
+		if (props.IncludeNodes)
 		{
 			UnorderedMap<uint32_t, uint32_t> nodeIndex; // Node ID to hierarchy index
 
@@ -343,7 +327,7 @@ namespace Mahakam
 				GLTFReadNodeHierarchy(model, nodeIndex, rootNode, -1, skinnedMesh);
 
 			// Extract bone transformations
-			if (skinnedMesh->GetProps().IncludeBones)
+			if (props.IncludeBones)
 			{
 				for (auto& skinNode : model.nodes)
 				{
@@ -385,28 +369,28 @@ namespace Mahakam
 		return skinnedMesh;
 	};
 
-	//Asset<PlaneMesh> PlaneMesh::CreateImpl(const PlaneMeshProps& props)
-	MH_DEFINE_FUNC(PlaneMesh::CreateImpl, Asset<PlaneMesh>, const PlaneMeshProps& props)
+	//Asset<Mesh> CubeMesh::CreateCubeImpl(const CubeMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreateCubeImpl, Asset<Mesh>, const CubeMeshProps& props)
 	{
-		return CreateAsset<PlaneMesh>(SubMesh::CreatePlane(props.Rows, props.Columns), props);
+		return CreateAsset<Mesh>(SubMesh::CreateCube(props.Tessellation, props.Invert), props.Base);
 	};
 
-	//Asset<CubeMesh> CubeMesh::CreateImpl(const CubeMeshProps& props)
-	MH_DEFINE_FUNC(CubeMesh::CreateImpl, Asset<CubeMesh>, const CubeMeshProps& props)
+	//Asset<Mesh> CubeSphereMesh::CreateCubeSphereImpl(const CubeSphereMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreateCubeSphereImpl, Asset<Mesh>, const CubeSphereMeshProps& props)
 	{
-		return CreateAsset<CubeMesh>(SubMesh::CreateCube(props.Tessellation, props.Invert), props);
+		return CreateAsset<Mesh>(SubMesh::CreateCubeSphere(props.Tessellation, props.Invert), props.Base);
 	};
 
-	//Asset<CubeSphereMesh> CubeSphereMesh::CreateImpl(const CubeSphereMeshProps& props)
-	MH_DEFINE_FUNC(CubeSphereMesh::CreateImpl, Asset<CubeSphereMesh>, const CubeSphereMeshProps& props)
+	//Asset<Mesh> PlaneMesh::CreatePlaneImpl(const PlaneMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreatePlaneImpl, Asset<Mesh>, const PlaneMeshProps& props)
 	{
-		return CreateAsset<CubeSphereMesh>(SubMesh::CreateCubeSphere(props.Tessellation, props.Invert), props);
+		return CreateAsset<Mesh>(SubMesh::CreatePlane(props.Rows, props.Columns), props.Base);
 	};
 
-	//Asset<UVSphereMesh> UVSphereMesh::CreateImpl(const UVSphereMeshProps& props)
-	MH_DEFINE_FUNC(UVSphereMesh::CreateImpl, Asset<UVSphereMesh>, const UVSphereMeshProps& props)
+	//Asset<Mesh> UVSphereMesh::CreateUVSphereImpl(const UVSphereMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreateUVSphereImpl, Asset<Mesh>, const UVSphereMeshProps& props)
 	{
-		return CreateAsset<UVSphereMesh>(SubMesh::CreateUVSphere(props.Rows, props.Columns), props);
+		return CreateAsset<Mesh>(SubMesh::CreateUVSphere(props.Rows, props.Columns), props.Base);
 	};
 
 	//Ref<SubMesh> Mesh::CreateImpl(MeshData&& mesh)

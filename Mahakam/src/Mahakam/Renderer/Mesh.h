@@ -48,6 +48,14 @@ namespace Mahakam
 			Primitive(primitive),
 			Props(CreateRef<MeshProps>(props)) {}
 
+
+		explicit Mesh(Ref<SubMesh> submesh, const MeshProps& props) :
+			Primitive(MeshPrimitive::Model),
+			Props(CreateRef<MeshProps>(props))
+		{
+			Meshes.push_back(std::move(submesh));
+		}
+
 		explicit Mesh(const MeshProps& props) :
 			Primitive(MeshPrimitive::Model),
 			Props(CreateRef<MeshProps>(props)) {}
@@ -57,77 +65,31 @@ namespace Mahakam
 
 		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
 
-		inline static Asset<Mesh> Load(const std::filesystem::path& filepath, const MeshProps& props) { return LoadImpl(filepath, props); }
+		inline static Asset<Mesh> Load(const BoneMeshProps& props) { return LoadImpl(props); }
+
+		inline static Asset<Mesh> Create(const CubeMeshProps& props) { return CreateCubeImpl(props); }
+
+		inline static Asset<Mesh> Create(const CubeSphereMeshProps& props) { return CreateCubeSphereImpl(props); }
+
+		inline static Asset<Mesh> Create(const PlaneMeshProps& props) { return CreatePlaneImpl(props); }
+
+		inline static Asset<Mesh> Create(const UVSphereMeshProps& props) { return CreateUVSphereImpl(props); }
 
 	private:
 		MH_DECLARE_FUNC(CopyImpl, Asset<Mesh>, Asset<Mesh> other);
 
-		MH_DECLARE_FUNC(LoadImpl, Asset<Mesh>, const std::filesystem::path& filepath, const MeshProps& props);
+		MH_DECLARE_FUNC(LoadImpl, Asset<Mesh>, const BoneMeshProps& props);
+
+		MH_DECLARE_FUNC(CreateCubeImpl, Asset<Mesh>, const CubeMeshProps& props);
+
+		MH_DECLARE_FUNC(CreateCubeSphereImpl, Asset<Mesh>, const CubeSphereMeshProps& props);
+
+		MH_DECLARE_FUNC(CreatePlaneImpl, Asset<Mesh>, const PlaneMeshProps& props);
+
+		MH_DECLARE_FUNC(CreateUVSphereImpl, Asset<Mesh>, const UVSphereMeshProps& props);
 	};
 
 	using Model = Mesh;
-
-	using BoneMesh = Mesh;
-
-	class PlaneMesh : public Mesh
-	{
-	public:
-		PlaneMesh(Ref<SubMesh> submesh, const PlaneMeshProps& props) :
-			Mesh(MeshPrimitive::Plane, props)
-		{
-			Meshes.push_back(std::move(submesh));
-		}
-
-		inline static Asset<PlaneMesh> Create(const PlaneMeshProps& props) { return CreateImpl(props); }
-
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<PlaneMesh>, const PlaneMeshProps& props);
-	};
-
-	class CubeMesh : public Mesh
-	{
-	public:
-		CubeMesh(Ref<SubMesh> submesh, const CubeMeshProps& props) :
-			Mesh(MeshPrimitive::Cube, props)
-		{
-			Meshes.push_back(std::move(submesh));
-		}
-
-		inline static Asset<CubeMesh> Create(const CubeMeshProps& props) { return CreateImpl(props); }
-
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<CubeMesh>, const CubeMeshProps& props);
-	};
-
-	class CubeSphereMesh : public Mesh
-	{
-	public:
-		CubeSphereMesh(Ref<SubMesh> submesh, const CubeSphereMeshProps& props) :
-			Mesh(MeshPrimitive::CubeSphere, props)
-		{
-			Meshes.push_back(std::move(submesh));
-		}
-
-		inline static Asset<CubeSphereMesh> Create(const CubeSphereMeshProps& props) { return CreateImpl(props); }
-
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<CubeSphereMesh>, const CubeSphereMeshProps& props);
-	};
-
-	class UVSphereMesh : public Mesh
-	{
-	public:
-		UVSphereMesh(Ref<SubMesh> submesh, const UVSphereMeshProps& props) :
-			Mesh(MeshPrimitive::UVSphere, props)
-		{
-			Meshes.push_back(std::move(submesh));
-		}
-
-		inline static Asset<UVSphereMesh> Create(const UVSphereMeshProps& props) { return CreateImpl(props); }
-
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<UVSphereMesh>, const UVSphereMeshProps& props);
-	};
 
 	enum class VertexType
 	{

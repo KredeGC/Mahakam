@@ -1,8 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "PlaneMeshResourceImporter.h"
 
-#include "Mahakam/Editor/Resource/ResourceRegistry.h"
 #include "Mahakam/Editor/YAML/AssetSerialization.h"
+#include "Mahakam/Editor/YAML/MeshSerialization.h"
 
 #include "Mahakam/ImGui/GUI.h"
 
@@ -21,19 +21,19 @@ namespace Mahakam
 
 	void PlaneMeshResourceImporter::OnImportOpen(ryml::NodeRef& node)
 	{
-		m_Props = DeserializeProps(node);
+		node >> m_Props;
 	}
 
 	void PlaneMeshResourceImporter::OnRender()
 	{
-		int materialCount = (int)m_Props.Materials.size();
+		int materialCount = (int)m_Props.Base.Materials.size();
 		if (ImGui::InputInt("Material count", &materialCount) && materialCount >= 0)
-			m_Props.Materials.resize(materialCount);
+			m_Props.Base.Materials.resize(materialCount);
 
 		ImGui::Indent();
-		for (size_t i = 0; i < m_Props.Materials.size(); i++)
+		for (size_t i = 0; i < m_Props.Base.Materials.size(); i++)
 		{
-			GUI::DrawDragDropAsset("Material " + std::to_string(i), m_Props.Materials[i], ".material");
+			GUI::DrawDragDropAsset("Material " + std::to_string(i), m_Props.Base.Materials[i], ".material");
 		}
 		ImGui::Unindent();
 
@@ -45,41 +45,14 @@ namespace Mahakam
 
 	void PlaneMeshResourceImporter::OnImport(ryml::NodeRef& node)
 	{
-		ryml::NodeRef materialsNode = node["Materials"];
-		materialsNode |= ryml::SEQ;
-
-		for (auto& material : m_Props.Materials)
-			materialsNode.append_child() << material;
-
-		node["Rows"] << m_Props.Rows;
-		node["Columns"] << m_Props.Columns;
+		node << m_Props;
 	}
 
 	Asset<void> PlaneMeshResourceImporter::CreateAsset(ryml::NodeRef& node)
 	{
-		PlaneMeshProps props = DeserializeProps(node);
-
-		return PlaneMesh::Create(props);
-	}
-
-	PlaneMeshProps PlaneMeshResourceImporter::DeserializeProps(ryml::NodeRef& node)
-	{
 		PlaneMeshProps props;
+		node >> props;
 
-		DeserializeYAMLNode(node, "Rows", props.Rows);
-		DeserializeYAMLNode(node, "Columns", props.Columns);
-
-		if (node.has_child("Materials"))
-		{
-			for (auto materialNode : node["Materials"])
-			{
-				Asset<Material> material;
-				materialNode >> material;
-
-				props.Materials.push_back(std::move(material));
-			}
-		}
-
-		return props;
+		return Mesh::Create(props);
 	}
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Mahakam/Editor/YAML/FilepathSerialization.h"
+
 #include <ryml/rapidyaml-0.4.1.hpp>
 
 #define GLM_FORCE_INLINE
@@ -34,11 +36,6 @@ namespace c4::yml
 	bool read(ryml::NodeRef const& n, glm::quat* val);
 	bool read(ryml::NodeRef const& n, glm::mat3* val);
 	bool read(ryml::NodeRef const& n, glm::mat4* val);
-
-	// Filesystem
-	void write(ryml::NodeRef* n, std::filesystem::path const& val);
-
-	bool read(ryml::NodeRef const& n, std::filesystem::path* val);
 }
 
 namespace Mahakam

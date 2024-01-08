@@ -2,8 +2,6 @@
 
 #include "Mahakam/Asset/Asset.h"
 
-#include <ryml/rapidyaml-0.4.1.hpp>
-
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
 #define GLM_ENABLE_EXPERIMENTAL
@@ -36,48 +34,42 @@ namespace Mahakam
 	struct MeshProps
 	{
 		std::vector<Asset<Material>> Materials;
+	};
+
+	struct BoneMeshProps
+	{
+		MeshProps Base;
+		std::filesystem::path Filepath;
 		bool IncludeNodes = true; // TODO: Use flags instead of bools?
 		bool IncludeBones = true;
 	};
 
-	struct BoneMeshProps : public MeshProps
+	struct CubeMeshProps
 	{
-		std::filesystem::path Filepath;
-	};
-
-	// Preferably this would only be needed in the editor
-	// Once a mesh has been imported, these settings should not matter
-	// They could even be made into their own Mesh-classes instead of deriving from MeshProps
-	// Compared to BoneMeshProps, these props only specify how to generate the mesh, not how to use it afterwards
-	struct PlaneMeshProps : public MeshProps
-	{
-		int Rows = 10;
-		int Columns = 10;
-	};
-
-	struct CubeMeshProps : public MeshProps
-	{
+		MeshProps Base;
 		int Tessellation = 10;
 		bool Invert = false;
 	};
 
-	struct CubeSphereMeshProps : public MeshProps
+	struct CubeSphereMeshProps
 	{
+		MeshProps Base;
 		int Tessellation = 10;
 		bool Invert = false;
 		bool Equirectangular = false;
 	};
 
-	struct UVSphereMeshProps : public MeshProps
+	struct PlaneMeshProps
 	{
+		MeshProps Base;
 		int Rows = 10;
 		int Columns = 10;
 	};
-}
 
-namespace c4::yml
-{
-	void write(ryml::NodeRef* n, Mahakam::MeshProps const& val);
-
-	bool read(ryml::NodeRef const& n, Mahakam::MeshProps* val);
+	struct UVSphereMeshProps
+	{
+		MeshProps Base;
+		int Rows = 10;
+		int Columns = 10;
+	};
 }

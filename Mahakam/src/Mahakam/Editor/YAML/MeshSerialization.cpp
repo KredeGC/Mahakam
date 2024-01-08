@@ -3,9 +3,27 @@
 #include "MeshSerialization.h"
 
 #include "AssetSerialization.h"
+#include "FilepathSerialization.h"
 
 namespace c4::yml
 {
+	template<typename V>
+	static void Serialize(ryml::NodeRef& node, const c4::csubstr& name, const V& value)
+	{
+		node[name] << value;
+	}
+
+	template<typename V>
+	static bool Deserialize(const ryml::NodeRef& node, const c4::csubstr& name, V& value)
+	{
+		if (!node.has_child(name))
+			return false;
+
+		node[name] >> value;
+
+		return true;
+	}
+
 	// MeshProps
 	void write(ryml::NodeRef* n, Mahakam::MeshProps const& val)
 	{
@@ -16,9 +34,6 @@ namespace c4::yml
 
 		for (auto& material : val.Materials)
 			materialsNode.append_child() << material;
-
-		(*n)["IncludeBones"] << val.IncludeBones;
-		(*n)["IncludeNodes"] << val.IncludeNodes;
 	}
 
 	bool read(ryml::NodeRef const& n, Mahakam::MeshProps* val)
@@ -36,11 +51,102 @@ namespace c4::yml
 			}
 		}
 
-		if (n.has_child("IncludeBones"))
-			n["IncludeBones"] >> val->IncludeBones;
+		return true;
+	}
 
-		if (n.has_child("IncludeNodes"))
-			n["IncludeNodes"] >> val->IncludeNodes;
+	// BoneMeshProps
+	void write(ryml::NodeRef* n, Mahakam::BoneMeshProps const& val)
+	{
+		*n << val.Base;
+
+		Serialize(*n, "Filepath", val.Filepath);
+		Serialize(*n, "IncludeNodes", val.IncludeNodes);
+		Serialize(*n, "IncludeBones", val.IncludeBones);
+	}
+
+	bool read(ryml::NodeRef const& n, Mahakam::BoneMeshProps* val)
+	{
+		n >> val->Base;
+
+		Deserialize(n, "Filepath", val->Filepath);
+		Deserialize(n, "IncludeNodes", val->IncludeNodes);
+		Deserialize(n, "IncludeBones", val->IncludeBones);
+
+		return true;
+	}
+
+	// CubeMeshProps
+	void write(ryml::NodeRef* n, Mahakam::CubeMeshProps const& val)
+	{
+		*n << val.Base;
+
+		Serialize(*n, "Tessellation", val.Tessellation);
+		Serialize(*n, "Invert", val.Invert);
+	}
+
+	bool read(ryml::NodeRef const& n, Mahakam::CubeMeshProps* val)
+	{
+		n >> val->Base;
+
+		Deserialize(n, "Tessellation", val->Tessellation);
+		Deserialize(n, "Invert", val->Invert);
+
+		return true;
+	}
+
+	// CubeSphereMeshProps
+	void write(ryml::NodeRef* n, Mahakam::CubeSphereMeshProps const& val)
+	{
+		*n << val.Base;
+
+		Serialize(*n, "Tessellation", val.Tessellation);
+		Serialize(*n, "Invert", val.Invert);
+	}
+
+	bool read(ryml::NodeRef const& n, Mahakam::CubeSphereMeshProps* val)
+	{
+		n >> val->Base;
+
+		Deserialize(n, "Tessellation", val->Tessellation);
+		Deserialize(n, "Invert", val->Invert);
+
+		return true;
+	}
+
+	// PlaneMeshProps
+	void write(ryml::NodeRef* n, Mahakam::PlaneMeshProps const& val)
+	{
+		*n << val.Base;
+
+		Serialize(*n, "Rows", val.Rows);
+		Serialize(*n, "Columns", val.Columns);
+	}
+
+	bool read(ryml::NodeRef const& n, Mahakam::PlaneMeshProps* val)
+	{
+		n >> val->Base;
+
+		Deserialize(n, "Rows", val->Rows);
+		Deserialize(n, "Columns", val->Columns);
+
+		return true;
+	}
+
+	// UVSphereMeshProps
+	void write(ryml::NodeRef* n, Mahakam::UVSphereMeshProps const& val)
+	{
+		*n << val.Base;
+
+		Serialize(*n, "Rows", val.Rows);
+		Serialize(*n, "Columns", val.Columns);
+	}
+
+	bool read(ryml::NodeRef const& n, Mahakam::UVSphereMeshProps* val)
+	{
+		n >> val->Base;
+
+		Deserialize(n, "Rows", val->Rows);
+		Deserialize(n, "Columns", val->Columns);
 
 		return true;
 	}

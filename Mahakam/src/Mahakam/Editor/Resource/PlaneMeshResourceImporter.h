@@ -24,8 +24,5 @@ namespace Mahakam
 		virtual void OnImport(ryml::NodeRef& node) override;
 
 		virtual Asset<void> CreateAsset(ryml::NodeRef& node) override;
-
-	private:
-		PlaneMeshProps DeserializeProps(ryml::NodeRef& node);
 	};
 }

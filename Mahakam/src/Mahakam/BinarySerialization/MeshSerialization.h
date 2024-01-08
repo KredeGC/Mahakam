@@ -46,10 +46,6 @@ namespace bitstream
 				BS_ASSERT(stream.serialize(props.Materials[i]));
 			}
 
-			// TODO: Is this needed? Could it not just be deduced from whether or not NodeHierarchy and BoneMap is empty?
-			BS_ASSERT(stream.serialize(props.IncludeBones));
-			BS_ASSERT(stream.serialize(props.IncludeNodes));
-
 			return true;
 		}
 	};

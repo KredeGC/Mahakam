@@ -1,7 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "BoneMeshResourceImporter.h"
 
-#include "Mahakam/Editor/Resource/ResourceRegistry.h"
 #include "Mahakam/Editor/YAML/AssetSerialization.h"
 #include "Mahakam/Editor/YAML/MeshSerialization.h"
 
@@ -21,14 +20,12 @@ namespace Mahakam
 
 	void BoneMeshResourceImporter::OnResourceOpen(const std::filesystem::path& filepath)
 	{
-		m_Props = MeshProps();
+		m_Props = BoneMeshProps();
 		m_Filepath = filepath;
 	}
 
 	void BoneMeshResourceImporter::OnImportOpen(ryml::NodeRef& node)
 	{
-		DeserializeYAMLNode(node, "Filepath", m_Filepath);
-
 		node >> m_Props;
 	}
 
@@ -39,14 +36,14 @@ namespace Mahakam
 		ImGui::Checkbox("Include mesh nodes", &m_Props.IncludeNodes);
 		ImGui::Checkbox("Include mesh bones", &m_Props.IncludeBones);
 
-		int materialCount = (int)m_Props.Materials.size();
+		int materialCount = (int)m_Props.Base.Materials.size();
 		if (ImGui::InputInt("Material count", &materialCount) && materialCount >= 0)
-			m_Props.Materials.resize(materialCount);
+			m_Props.Base.Materials.resize(materialCount);
 
 		ImGui::Indent();
-		for (size_t i = 0; i < m_Props.Materials.size(); i++)
+		for (size_t i = 0; i < m_Props.Base.Materials.size(); i++)
 		{
-			GUI::DrawDragDropAsset("Material " + std::to_string(i), m_Props.Materials[i], ".material");
+			GUI::DrawDragDropAsset("Material " + std::to_string(i), m_Props.Base.Materials[i], ".material");
 		}
 		ImGui::Unindent();
 
@@ -55,28 +52,14 @@ namespace Mahakam
 
 	void BoneMeshResourceImporter::OnImport(ryml::NodeRef& node)
 	{
-		ryml::NodeRef materialsNode = node["Materials"];
-		materialsNode |= ryml::SEQ;
-
-		for (auto& material : m_Props.Materials)
-			materialsNode.append_child() << material;
-
-		SerializeYAMLNode(node, "Filepath", m_Filepath);
-		SerializeYAMLNode(node, "IncludeNodes", m_Props.IncludeNodes);
-		SerializeYAMLNode(node, "IncludeBones", m_Props.IncludeBones);
+		node << m_Props;
 	}
 
 	Asset<void> BoneMeshResourceImporter::CreateAsset(ryml::NodeRef& node)
 	{
-		std::filesystem::path filepath;
-		DeserializeYAMLNode(node, "Filepath", filepath);
-
-		MeshProps props;
+		BoneMeshProps props;
 		node >> props;
 
-		if (filepath.empty())
-			return nullptr;
-
-		return Mesh::Load(filepath, props);
+		return Mesh::Load(props);
 	}
 }
