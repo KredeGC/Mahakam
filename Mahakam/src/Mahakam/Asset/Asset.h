@@ -181,6 +181,14 @@ namespace Mahakam
 			return m_Control ? reinterpret_cast<T*>(m_Control + 1) : nullptr;
 		}
 
+		ControlBlock* leak() noexcept
+		{
+			ControlBlock* ptr = m_Control;
+			m_Control = nullptr;
+
+			return m_Control;
+		}
+
 		template<typename Ty = T, typename = std::enable_if_t<!std::is_void<Ty>::value>>
 		Ty& operator*() const noexcept
 		{

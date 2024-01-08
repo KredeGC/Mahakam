@@ -53,6 +53,7 @@ namespace Mahakam
 			Props(CreateRef<MeshProps>(props)) {}
 
 		MeshProps& GetProps() { return *Props; }
+		const MeshProps& GetProps() const { return *Props; }
 
 		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
 

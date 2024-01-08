@@ -50,7 +50,7 @@ namespace Mahakam
 
 		struct AssetSerializer
 		{
-			bool (*Serialize)(Writer&, const std::filesystem::path& filepath, void* asset) = nullptr;
+			bool (*Serialize)(Writer&, const std::filesystem::path& filepath, Asset<void>) = nullptr;
 			Asset<void> (*Deserialize)(Reader&, const std::filesystem::path& filepath) = nullptr;
 		};
 

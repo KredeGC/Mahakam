@@ -3,15 +3,10 @@
 
 #include "AssetImporter.h"
 #include "AnimationAssetImporter.h"
-#include "BoneMeshAssetImporter.h"
-#include "CubeMeshAssetImporter.h"
-#include "CubeSphereMeshAssetImporter.h"
 #include "MaterialAssetImporter.h"
-#include "PlaneMeshAssetImporter.h"
 #include "ShaderAssetImporter.h"
 #include "SoundAssetImporter.h"
 #include "TextureAssetImporter.h"
-#include "UVSphereMeshAssetImporter.h"
 
 #include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Core/Log.h"
@@ -23,8 +18,6 @@
 // TEMP
 #include "Mahakam/Serialization/YAMLGuard.h"
 #include "Mahakam/Serialization/YAMLSerialization.h"
-
-#include "AssetSerializeTraits.h"
 // TEMP
 
 #include <ryml/rapidyaml-0.4.1.hpp>
@@ -39,7 +32,7 @@ namespace Mahakam
 	void AssetDatabase::LoadLegacySerializer()
 	{
 		AssetSerializer serializer;
-		serializer.Serialize = [](Writer& writer, const std::filesystem::path& filepath, void* asset)
+		serializer.Serialize = [](Writer& writer, const std::filesystem::path& filepath, Asset<void> asset)
 			{
 				// If no importer exists with this extension
 				auto iter = s_AssetImporters.find(LegacyExt);
@@ -52,7 +45,7 @@ namespace Mahakam
 				ryml::NodeRef root = tree.rootref();
 				root |= ryml::MAP;
 
-				iter->second->Serialize(root, asset);
+				iter->second->Serialize(root, asset.get());
 
 				std::ofstream filestream(filepath.string() + ".legacy");
 				filestream << tree;
@@ -95,13 +88,21 @@ namespace Mahakam
 	AssetDatabase::AssetSerializer CreateSerializer()
 	{
 		AssetDatabase::AssetSerializer serializer;
-		serializer.Serialize = [](AssetDatabase::Writer& writer, const std::filesystem::path& filepath, void* asset)
+		serializer.Serialize = [](AssetDatabase::Writer& writer, const std::filesystem::path& filepath, Asset<void> asset)
 		{
-			return AssetSerializeTraits<T>::Serialize(writer, static_cast<T*>(asset));
+			return writer.serialize<T>(asset);
+
+			//return AssetSerializeTraits<T>::Serialize(writer, static_cast<T*>(asset));
 		};
 		serializer.Deserialize = [](AssetDatabase::Reader& reader, const std::filesystem::path& filepath) -> Asset<void>
 		{
-			return AssetSerializeTraits<T>::Deserialize(reader);
+			Asset<T> asset;
+			if (!reader.serialize<T>(asset))
+				return nullptr;
+
+			return asset;
+
+			//return AssetSerializeTraits<T>::Deserialize(reader);
 		};
 
 		return serializer;
@@ -124,17 +125,20 @@ namespace Mahakam
 
 		LoadLegacySerializer<animExtension, animExtension>();
 		LoadLegacySerializer<materialExtension, materialExtension>();
-		//LoadLegacySerializer<boneExtension, boneExtension>();
-		LoadLegacySerializer<cubeExtension, cubeExtension>();
-		LoadLegacySerializer<cubesphereExtension, cubesphereExtension>();
-		LoadLegacySerializer<planeExtension, planeExtension>();
-		LoadLegacySerializer<uvsphereExtension, uvsphereExtension>();
+		//LoadLegacySerializer<cubeExtension, cubeExtension>();
+		//LoadLegacySerializer<cubesphereExtension, cubesphereExtension>();
+		//LoadLegacySerializer<planeExtension, planeExtension>();
+		//LoadLegacySerializer<uvsphereExtension, uvsphereExtension>();
 		LoadLegacySerializer<shaderExtension, shaderExtension>();
 		LoadLegacySerializer<soundExtension, soundExtension>();
 		LoadLegacySerializer<tex2dExtension, textureExtension>();
 		LoadLegacySerializer<texcubeExtension, textureExtension>();
 
 		s_Serializers.emplace(boneExtension, CreateSerializer<boneExtension, Mesh>());
+		s_Serializers.emplace(cubeExtension, CreateSerializer<cubeExtension, Mesh>());
+		s_Serializers.emplace(cubesphereExtension, CreateSerializer<cubesphereExtension, Mesh>());
+		s_Serializers.emplace(planeExtension, CreateSerializer<planeExtension, Mesh>());
+		s_Serializers.emplace(uvsphereExtension, CreateSerializer<uvsphereExtension, Mesh>());
 	}
 
 	//void AssetDatabase::RegisterAssetImporter(Ref<AssetImporter> assetImport)
@@ -182,21 +186,6 @@ namespace Mahakam
 
 		// Material
 		AssetDatabase::RegisterAssetImporter(CreateRef<MaterialAssetImporter>());
-
-		// BoneMesh
-		AssetDatabase::RegisterAssetImporter(CreateRef<BoneMeshAssetImporter>());
-
-		// CubeMesh
-		AssetDatabase::RegisterAssetImporter(CreateRef<CubeMeshAssetImporter>());
-
-		// CubeSphereMesh
-		AssetDatabase::RegisterAssetImporter(CreateRef<CubeSphereMeshAssetImporter>());
-
-		// PlaneMesh
-		AssetDatabase::RegisterAssetImporter(CreateRef<PlaneMeshAssetImporter>());
-
-		// UVSphereMesh
-		AssetDatabase::RegisterAssetImporter(CreateRef<UVSphereMeshAssetImporter>());
 
 		// Shader
 		AssetDatabase::RegisterAssetImporter(CreateRef<ShaderAssetImporter>());
@@ -360,7 +349,7 @@ namespace Mahakam
 			return nullptr;
 
 		std::filesystem::path filepath = FileUtility::ASSET_PATH / (std::to_string(id) + FileUtility::AssetExtension);
-		if (!iter->second.Serialize(writer, filepath, control + 1))
+		if (!iter->second.Serialize(writer, filepath, Asset<void>(control)))
 			return nullptr;
 
 		writer.flush();
@@ -469,13 +458,22 @@ namespace Mahakam
 		if (!SerializeAssetHeader(reader, assetID, extension))
 			return nullptr;
 
+		if (assetID != id)
+			MH_WARN("Asset IDs do not match. Attempted to load ID {0} but got {1}", id, assetID);
+
 		auto iter = s_Serializers.find(extension);
 		if (iter == s_Serializers.end())
 			return nullptr;
 
+		// Convert from binary to an asset
 		Asset<void> asset = iter->second.Deserialize(reader, filepath);
+		if (!asset)
+		{
+			MH_WARN("Could not load asset with ID: {0}", id);
+			return nullptr;
+		}
 
-		asset.m_Control->ID = assetID;
+		asset.m_Control->ID = id;
 		asset.IncrementRef();
 
 		s_LoadedAssets.insert({ id, asset.m_Control });

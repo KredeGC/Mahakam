@@ -5,6 +5,7 @@
 #include "Mahakam/Renderer/Mesh.h"
 
 #include "AssetSerialization.h"
+#include "ContainerSerialization.h"
 #include "MathSerialization.h"
 
 #include <bitstream.h>
@@ -141,6 +142,40 @@ namespace bitstream
 			}
 
 			submesh = Mahakam::SubMesh::Create(std::move(meshData));
+
+			return true;
+		}
+	};
+
+	template<>
+	struct serialize_traits<Mahakam::Mesh>
+	{
+		template<typename Stream>
+		static bool serialize(Stream& stream, inout<Stream, Mahakam::Asset<Mahakam::Mesh>> mesh) noexcept
+		{
+			using namespace Mahakam;
+
+			// Props
+			if constexpr (Stream::writing)
+			{
+				BS_ASSERT(stream.serialize(mesh->GetProps()));
+			}
+			else
+			{
+				MeshProps props;
+				BS_ASSERT(stream.serialize(props));
+
+				mesh = CreateAsset<Mesh>(props);
+			}
+
+			// NodeHierarchy and bones
+			BS_ASSERT(stream.serialize(mesh->NodeHierarchy));
+			BS_ASSERT(stream.serialize(mesh->Skins));
+			BS_ASSERT(stream.serialize(mesh->SubMeshMap));
+			BS_ASSERT(stream.serialize(mesh->BoneMap));
+
+			// Submeshes
+			BS_ASSERT(stream.serialize(mesh->Meshes));
 
 			return true;
 		}
