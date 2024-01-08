@@ -31,7 +31,6 @@ namespace Mahakam
 		static void CreateDirectories(const Filepath& src);
 		static Filepath GetCachePath(const Filepath& filepath);
 		static Filepath GetImportPath(const Filepath& filepath, const std::string& extension);
-		static Filepath GetAssetPath(const Filepath& filepath);
 
 		// Defined by each platform
 		static Filepath OpenFile(const char* filter, const Filepath& basePath);

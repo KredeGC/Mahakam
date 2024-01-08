@@ -95,15 +95,4 @@ namespace Mahakam
 
 		return IMPORT_PATH / Filepath(importPath.string() + extension + ".import");
 	}
-
-	Filepath FileUtility::GetAssetPath(const Filepath& filepath)
-	{
-		Filepath importPath = std::filesystem::relative(filepath, IMPORT_PATH);
-
-		Filepath importDirectory = ASSET_PATH / importPath.parent_path();
-
-		CreateDirectories(importDirectory);
-
-		return importDirectory / Filepath(importPath.stem().string() + AssetExtension);
-	}
 }

@@ -125,10 +125,6 @@ namespace Mahakam
 
 		LoadLegacySerializer<animExtension, animExtension>();
 		LoadLegacySerializer<materialExtension, materialExtension>();
-		//LoadLegacySerializer<cubeExtension, cubeExtension>();
-		//LoadLegacySerializer<cubesphereExtension, cubesphereExtension>();
-		//LoadLegacySerializer<planeExtension, planeExtension>();
-		//LoadLegacySerializer<uvsphereExtension, uvsphereExtension>();
 		LoadLegacySerializer<shaderExtension, shaderExtension>();
 		LoadLegacySerializer<soundExtension, soundExtension>();
 		LoadLegacySerializer<tex2dExtension, textureExtension>();
@@ -332,35 +328,41 @@ namespace Mahakam
 	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, AssetID id, const ExtensionType& extension)
 	{
 		auto iter = s_Serializers.find(extension);
+		MH_ASSERT(iter != s_Serializers.end(), "Asset missing serializer");
 		if (iter == s_Serializers.end())
-			return nullptr;
+			return control;
 
 		TrivialVector<uint32_t> buffer;
 		Writer writer(buffer);
 
-		if (control->ID != id)
+		// The asset must either be blank or use the same ID as earlier
+		if (control->ID && control->ID != id)
 		{
-			// Remove old ID
-			s_LoadedAssets.erase(control->ID);
-			control->ID = id;
+			MH_WARN("Asset IDs do not match. Attempted to override existing ID {0} with {1}", control->ID, id);
+			return control;
 		}
 
 		if (!SerializeAssetHeader(writer, control->ID, extension))
-			return nullptr;
+		{
+			MH_WARN("Failed to serialize header of asset with ID: {0}", id);
+			return control;
+		}
 
 		std::filesystem::path filepath = FileUtility::ASSET_PATH / (std::to_string(id) + FileUtility::AssetExtension);
 		if (!iter->second.Serialize(writer, filepath, Asset<void>(control)))
-			return nullptr;
+		{
+			MH_WARN("Failed to save asset with ID: {0}", id);
+			return control;
+		}
 
 		writer.flush();
-
-		// Create the asset directory, if it doesn't exist
-		FileUtility::CreateDirectories(filepath.parent_path());
 
 		// Save the asset
 		std::ofstream filestream(filepath, std::ios::binary);
 		filestream.write(reinterpret_cast<char*>(writer.get_buffer()), writer.get_num_bytes_serialized());
 		filestream.close();
+
+		s_AssetPaths[id] = filepath;
 
 		// If an asset with the given ID already exists, we may need to reload it
 		auto controlIter = s_LoadedAssets.find(id);
@@ -387,9 +389,7 @@ namespace Mahakam
 		}
 
 		// Add as a new asset
-		s_LoadedAssets.insert({ id, control });
-
-		RefreshAssetPaths();
+		s_LoadedAssets.emplace(id, control);
 
 		return control;
 	};
@@ -441,7 +441,7 @@ namespace Mahakam
 
 		if (!std::filesystem::exists(filepath))
 		{
-			MH_WARN("AssetDatabase::ReadAsset: The path '{0}' doesn't exist", filepath.string());
+			MH_WARN("The path '{0}' doesn't exist", filepath.string());
 			return nullptr;
 		}
 
