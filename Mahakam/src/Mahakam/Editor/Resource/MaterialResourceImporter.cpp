@@ -52,7 +52,7 @@
 namespace Mahakam
 {
 	MaterialResourceImporter::MaterialResourceImporter() :
-		ResourceImporter("Material", ".material")
+		ResourceImporter("Material", ".material", "mat")
 	{
 		m_ImporterProps.CreateMenu = true;
 		m_ImporterProps.NoFilepath = true;

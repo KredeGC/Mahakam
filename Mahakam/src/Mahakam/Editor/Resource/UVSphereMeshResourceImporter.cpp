@@ -13,7 +13,7 @@
 namespace Mahakam
 {
 	UVSphereMeshResourceImporter::UVSphereMeshResourceImporter() :
-		ResourceImporter("UV Sphere", ".uvsphere"),
+		ResourceImporter("UV Sphere", ".uvsphere", "mesh"),
 		m_Props()
 	{
 		m_ImporterProps.CreateMenu = true;

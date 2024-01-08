@@ -84,7 +84,7 @@ namespace Mahakam
 		s_Serializers.emplace(Extension, serializer);
 	}
 
-	template<const char* Type, typename T>
+	template<typename T>
 	AssetDatabase::AssetSerializer CreateSerializer()
 	{
 		AssetDatabase::AssetSerializer serializer;
@@ -112,29 +112,28 @@ namespace Mahakam
 	{
 		static const char animExtension[] = ".anim";
 		static const char materialExtension[] = ".material";
-		static const char boneExtension[] = ".bone";
-		static const char cubeExtension[] = ".cube";
-		static const char cubesphereExtension[] = ".cubesphere";
-		static const char planeExtension[] = ".plane";
-		static const char uvsphereExtension[] = ".uvsphere";
 		static const char shaderExtension[] = ".shader";
 		static const char soundExtension[] = ".sound";
 		static const char tex2dExtension[] = ".tex2d";
 		static const char texcubeExtension[] = ".texcube";
 		static const char textureExtension[] = ".texture";
 
-		LoadLegacySerializer<animExtension, animExtension>();
-		LoadLegacySerializer<materialExtension, materialExtension>();
-		LoadLegacySerializer<shaderExtension, shaderExtension>();
-		LoadLegacySerializer<soundExtension, soundExtension>();
-		LoadLegacySerializer<tex2dExtension, textureExtension>();
-		LoadLegacySerializer<texcubeExtension, textureExtension>();
+		static const char animType[] = "anim";
+		static const char matType[] = "mat";
+		static const char shaderType[] = "shader";
+		static const char soundType[] = "sound";
+		static const char tex2dType[] = "tex2d";
+		static const char texcubeType[] = "texcube";
+		static const char meshType[] = "mesh";
 
-		s_Serializers.emplace(boneExtension, CreateSerializer<boneExtension, Mesh>());
-		s_Serializers.emplace(cubeExtension, CreateSerializer<cubeExtension, Mesh>());
-		s_Serializers.emplace(cubesphereExtension, CreateSerializer<cubesphereExtension, Mesh>());
-		s_Serializers.emplace(planeExtension, CreateSerializer<planeExtension, Mesh>());
-		s_Serializers.emplace(uvsphereExtension, CreateSerializer<uvsphereExtension, Mesh>());
+		LoadLegacySerializer<animType, animExtension>();
+		LoadLegacySerializer<matType, materialExtension>();
+		LoadLegacySerializer<shaderType, shaderExtension>();
+		LoadLegacySerializer<soundType, soundExtension>();
+		LoadLegacySerializer<tex2dType, textureExtension>();
+		LoadLegacySerializer<texcubeType, textureExtension>();
+
+		s_Serializers.emplace(meshType, CreateSerializer<Mesh>());
 	}
 
 	//void AssetDatabase::RegisterAssetImporter(Ref<AssetImporter> assetImport)
@@ -341,6 +340,8 @@ namespace Mahakam
 			MH_WARN("Asset IDs do not match. Attempted to override existing ID {0} with {1}", control->ID, id);
 			return control;
 		}
+
+		control->ID = id;
 
 		if (!SerializeAssetHeader(writer, control->ID, extension))
 		{

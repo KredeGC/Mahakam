@@ -16,7 +16,7 @@
 namespace Mahakam
 {
 	BoneMeshResourceImporter::BoneMeshResourceImporter() :
-		ResourceImporter("Bone", ".bone"),
+		ResourceImporter("Bone", ".bone", "mesh"),
 		m_Props() {}
 
 	void BoneMeshResourceImporter::OnResourceOpen(const std::filesystem::path& filepath)

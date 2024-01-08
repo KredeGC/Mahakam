@@ -16,7 +16,7 @@
 namespace Mahakam
 {
 	Texture2DResourceImporter::Texture2DResourceImporter() :
-		ResourceImporter("Texture2D", ".tex2d"),
+		ResourceImporter("Texture2D", ".tex2d", "tex2d"),
 		m_Filepath(),
 		m_Props(),
 		m_Texture() {}

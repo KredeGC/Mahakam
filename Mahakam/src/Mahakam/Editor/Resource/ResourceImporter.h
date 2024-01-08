@@ -22,17 +22,19 @@ namespace Mahakam
 			bool NoWizard = false;
 			std::string Name;
 			std::string Extension;
+			std::string Type;
 
-			ImporterProps(const std::string& name, const std::string& extension) :
+			ImporterProps(const std::string& name, const std::string& extension, const std::string& type) :
 				CreateMenu(false),
 				NoFilepath(false),
 				NoWizard(false),
 				Name(name),
-				Extension(extension) {}
+				Extension(extension),
+				Type(type) {}
 		};
 
-		ResourceImporter(const std::string& name, const std::string& extension) :
-			m_ImporterProps(name, extension) {}
+		ResourceImporter(const std::string& name, const std::string& extension, const std::string& type) :
+			m_ImporterProps(name, extension, type) {}
 
 		virtual ~ResourceImporter() = default;
 

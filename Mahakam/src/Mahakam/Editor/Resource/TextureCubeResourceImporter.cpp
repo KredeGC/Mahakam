@@ -16,7 +16,7 @@
 namespace Mahakam
 {
 	TextureCubeResourceImporter::TextureCubeResourceImporter() :
-		ResourceImporter("TextureCube", ".texcube"),
+		ResourceImporter("TextureCube", ".texcube", "texcube"),
 		m_Filepath(),
 		m_Props(),
 		m_Texture() {}

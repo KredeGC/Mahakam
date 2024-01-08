@@ -12,7 +12,7 @@
 namespace Mahakam
 {
 	SoundResourceImporter::SoundResourceImporter() :
-		ResourceImporter("Sound", ".sound"),
+		ResourceImporter("Sound", ".sound", "sound"),
 		m_Props() {}
 
 	void SoundResourceImporter::OnResourceOpen(const std::filesystem::path& filepath)

@@ -10,7 +10,7 @@
 namespace Mahakam
 {
 	ShaderResourceImporter::ShaderResourceImporter() :
-		ResourceImporter("Shader", ".shader"),
+		ResourceImporter("Shader", ".shader", "shader"),
 		m_Filepath()
 	{
 		m_ImporterProps.NoWizard = true;

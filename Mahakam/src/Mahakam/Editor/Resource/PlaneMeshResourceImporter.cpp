@@ -13,7 +13,7 @@
 namespace Mahakam
 {
 	PlaneMeshResourceImporter::PlaneMeshResourceImporter() :
-		ResourceImporter("Plane", ".plane"),
+		ResourceImporter("Plane", ".plane", "mesh"),
 		m_Props()
 	{
 		m_ImporterProps.CreateMenu = true;

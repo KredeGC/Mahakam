@@ -12,7 +12,7 @@
 namespace Mahakam
 {
 	AnimationResourceImporter::AnimationResourceImporter() :
-		ResourceImporter("Animation", ".anim"),
+		ResourceImporter("Animation", ".anim", "anim"),
 		m_Filepath(),
 		m_Index(0) {}
 

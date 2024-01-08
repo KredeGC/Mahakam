@@ -13,7 +13,7 @@
 namespace Mahakam
 {
 	CubeMeshResourceImporter::CubeMeshResourceImporter() :
-		ResourceImporter("Cube", ".cube"),
+		ResourceImporter("Cube", ".cube", "mesh"),
 		m_Props()
 	{
 		m_ImporterProps.CreateMenu = true;
