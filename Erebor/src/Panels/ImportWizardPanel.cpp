@@ -65,6 +65,7 @@ namespace Mahakam::Editor
 		filestream << tree;
 		filestream.close();
 
+		// TODO: It should not use the extension, but rather be based on a typename ("mesh", not ".bone" etc.)
 		// Save asset
 		asset.Save(id, importer.GetImporterProps().Extension);
 	}

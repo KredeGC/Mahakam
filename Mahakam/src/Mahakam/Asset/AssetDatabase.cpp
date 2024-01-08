@@ -20,8 +20,12 @@
 #include "Mahakam/BinarySerialization/AssetSerialization.h"
 #include "Mahakam/BinarySerialization/MeshSerialization.h"
 
+// TEMP
 #include "Mahakam/Serialization/YAMLGuard.h"
 #include "Mahakam/Serialization/YAMLSerialization.h"
+
+#include "AssetSerializeTraits.h"
+// TEMP
 
 #include <ryml/rapidyaml-0.4.1.hpp>
 
@@ -87,6 +91,22 @@ namespace Mahakam
 		s_Serializers.emplace(Extension, serializer);
 	}
 
+	template<const char* Type, typename T>
+	AssetDatabase::AssetSerializer CreateSerializer()
+	{
+		AssetDatabase::AssetSerializer serializer;
+		serializer.Serialize = [](AssetDatabase::Writer& writer, const std::filesystem::path& filepath, void* asset)
+		{
+			return AssetSerializeTraits<T>::Serialize(writer, static_cast<T*>(asset));
+		};
+		serializer.Deserialize = [](AssetDatabase::Reader& reader, const std::filesystem::path& filepath) -> Asset<void>
+		{
+			return AssetSerializeTraits<T>::Deserialize(reader);
+		};
+
+		return serializer;
+	}
+
 	void AssetDatabase::LoadDefaultSerializers()
 	{
 		static const char animExtension[] = ".anim";
@@ -104,7 +124,7 @@ namespace Mahakam
 
 		LoadLegacySerializer<animExtension, animExtension>();
 		LoadLegacySerializer<materialExtension, materialExtension>();
-		LoadLegacySerializer<boneExtension, boneExtension>();
+		//LoadLegacySerializer<boneExtension, boneExtension>();
 		LoadLegacySerializer<cubeExtension, cubeExtension>();
 		LoadLegacySerializer<cubesphereExtension, cubesphereExtension>();
 		LoadLegacySerializer<planeExtension, planeExtension>();
@@ -113,6 +133,8 @@ namespace Mahakam
 		LoadLegacySerializer<soundExtension, soundExtension>();
 		LoadLegacySerializer<tex2dExtension, textureExtension>();
 		LoadLegacySerializer<texcubeExtension, textureExtension>();
+
+		s_Serializers.emplace(boneExtension, CreateSerializer<boneExtension, Mesh>());
 	}
 
 	//void AssetDatabase::RegisterAssetImporter(Ref<AssetImporter> assetImport)

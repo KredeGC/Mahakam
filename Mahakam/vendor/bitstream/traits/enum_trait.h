@@ -20,7 +20,7 @@ namespace bitstream
 	 * @brief A trait used to serialize an enum type with runtime bounds
 	*/
 	template<typename T>
-	struct serialize_traits<T, typename std::enable_if_t<std::is_enum_v<T>>>
+	struct serialize_traits<T, typename std::enable_if_t<std::is_enum_v<T> && !std::is_const_v<T>>>
 	{
         using value_type = std::underlying_type_t<T>;
 

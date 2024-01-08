@@ -48,6 +48,10 @@ namespace Mahakam
 			Primitive(primitive),
 			Props(CreateRef<MeshProps>(props)) {}
 
+		explicit Mesh(const MeshProps& props) :
+			Primitive(MeshPrimitive::Model),
+			Props(CreateRef<MeshProps>(props)) {}
+
 		MeshProps& GetProps() { return *Props; }
 
 		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
@@ -140,6 +144,12 @@ namespace Mahakam
 	public:
 		using Input = int;
 
+		MeshData() :
+			m_VertexCount(0),
+			m_VertexData(Allocator::GetAllocator<uint8_t>()),
+			m_Indices(Allocator::GetAllocator<uint32_t>()),
+			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
+
 		MeshData(uint32_t vertexCount) :
 			m_VertexCount(vertexCount),
 			m_VertexData(Allocator::GetAllocator<uint8_t>()),
@@ -163,21 +173,26 @@ namespace Mahakam
 
 		MeshData(MeshData&&) noexcept = default;
 
-		template<typename U, typename T>
-		void SetVertices(U index, ShaderDataType dataType, const T* data)
+		void SetVertices(Input index, ShaderDataType dataType, const void* data, size_t size)
 		{
-			auto iter = m_Offsets.find(size_t(index));
+			auto iter = m_Offsets.find(index);
 			if (iter != m_Offsets.end())
 			{
 				uint8_t* begin = m_VertexData.begin() + iter->second.first;
 
-				std::memcpy(begin, data, m_VertexCount * sizeof(T));
+				std::memcpy(begin, data, m_VertexCount * size);
 			}
 			else
 			{
-				m_Offsets[Input(index)] = std::make_pair(m_VertexData.size(), dataType);
-				m_VertexData.push_back(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data + m_VertexCount));
+				m_Offsets[index] = std::make_pair(m_VertexData.size(), dataType);
+				m_VertexData.push_back(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data) + m_VertexCount * size);
 			}
+		}
+
+		template<typename U, typename T>
+		void SetVertices(U index, ShaderDataType dataType, const T* data)
+		{
+			SetVertices(Input(index), dataType, data, sizeof(T));
 		}
 
 		template<typename T>
