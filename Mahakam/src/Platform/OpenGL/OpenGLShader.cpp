@@ -25,8 +25,23 @@
 
 namespace Mahakam
 {
-	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
-		: m_Filepath(filepath)
+	OpenGLShader::OpenGLShader(const UnorderedMap<std::string, ShaderData>& data) :
+		m_Filepath(),
+		m_Name()
+	{
+		MH_PROFILE_FUNCTION();
+
+		/*for (const auto& [shaderPass, shaderData] : data)
+		{
+			const auto& spirv = shaderData.GetShaderData();
+
+			m_ShaderData[shaderPass] = std::move(shaderData); // TODO: std::move the shaderData
+			m_ShaderPasses[shaderPass] = CompileBinary(spirv); // TODO: CompileBinary should take a const ShaderData& instead
+		}*/
+	}
+
+	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath) :
+		m_Filepath(filepath)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -46,19 +61,22 @@ namespace Mahakam
 					continue;
 				}
 
-				UnorderedMap<ShaderStage, std::vector<uint32_t>> spirv;
-
-				if (!ShaderUtility::CompileSPIRV(spirv, sourceDef))
+				ShaderData shaderData = ShaderUtility::CompileSPIRV(sourceDef);
+				if (!shaderData)
 				{
 					MH_WARN("Failed to compile shader pass: {0}", shaderPass);
 					continue;
 				}
 
-				// TODO: OpenGLShader should store this as a member variable
-				ShaderData shaderData;
-				for (const auto& [stage, data] : spirv)
-					shaderData.SetVertices(stage, data);
+				// TODO: CompileBinary should take a const ShaderData&
+				UnorderedMap<ShaderStage, std::vector<uint32_t>> spirv;
+				for (auto& [stage, offset] : shaderData.GetOffsets())
+				{
+					auto [data, size] = shaderData.GetStage(stage);
+					spirv[stage].assign(data, data + size);
+				}
 
+				m_ShaderData[shaderPass] = std::move(shaderData);
 				m_ShaderPasses[shaderPass] = CompileBinary(spirv);
 			}
 		}

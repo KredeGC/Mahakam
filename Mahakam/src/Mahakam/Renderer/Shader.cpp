@@ -539,6 +539,125 @@ namespace Mahakam::ShaderUtility
 		return success;
 	}
 
+	ShaderData CompileSPIRV(const ShaderSource& sourceDef)
+	{
+		glslang::InitializeProcess();
+
+		glslang::TProgram* program = Allocator::New<glslang::TProgram>();
+
+		EShMessages messages = (EShMessages)(EShMsgSpvRules | EShMsgEnhanced);
+
+		bool success = true;
+
+		// Parse each shader stage
+		TrivialVector<glslang::TShader*> shaders;
+		shaders.reserve(sourceDef.Sources.size());
+		for (auto& source : sourceDef.Sources)
+		{
+			glslang::TShader* shader = Allocator::New<glslang::TShader>((EShLanguage)ShaderStageToEShLanguage(source.first));
+			const char* shaderStrings[1];
+
+			std::string sortedSource = SortIncludes(source.second);
+
+			shaderStrings[0] = sortedSource.c_str();
+
+			// Set preprocessor defines
+			shader->setPreamble(sourceDef.Defines.c_str());
+
+			// Set target and version
+			shader->setEnvClient(glslang::EShClient::EShClientOpenGL, glslang::EShTargetClientVersion::EShTargetOpenGL_450);
+
+			// Set source code
+			shader->setStrings(shaderStrings, 1);
+
+			// TODO: Use HLSL instead of GLSL
+			/*shader.setEnvInput(glslang::EShSourceHlsl,
+				stage, glslang::EShClient::EShClientOpenGL, 100);
+			shader.setEnvTargetHlslFunctionality1();*/
+
+			if (!shader->parse(&DefaultTBuiltInResource, 100, false, messages))
+			{
+				MH_WARN(shader->getInfoLog());
+				MH_WARN(shader->getInfoDebugLog());
+
+				success = false;
+			}
+
+			shaders.push_back(shader);
+
+			program->addShader(shader);
+		}
+
+		// Link program with shaders
+		if (!program->link(messages))
+		{
+			MH_WARN(program->getInfoLog());
+			MH_WARN(program->getInfoDebugLog());
+
+			success = false;
+		}
+
+		// Retrieve SPIR-V
+		ShaderData shaderData;
+		if (success)
+		{
+			for (int stage = 0; stage < EShLangCount; stage++)
+			{
+				// Output into 1 big SPIR-V binary
+				if (glslang::TIntermediate* ptr = program->getIntermediate((EShLanguage)stage))
+				{
+					std::vector<uint32_t> spirv;
+					glslang::GlslangToSpv(*ptr, spirv);
+
+					ShaderStage stageEnum = EShLanguageToShaderStage(stage);
+					shaderData.SetStage(stageEnum, spirv);
+				}
+			}
+		}
+
+		// Cleanup
+		Allocator::Delete(program);
+		for (auto& shader : shaders)
+			Allocator::Delete(shader);
+
+		glslang::FinalizeProcess();
+
+
+		// TEMP
+		//if (success)
+		//{
+		//	// GLSL
+		//	{
+		//		spirv_cross::CompilerGLSL glsl(spirv[ShaderStage::Vertex]);
+
+		//		spirv_cross::CompilerGLSL::Options options;
+		//		options.version = 430;
+		//		glsl.set_common_options(options);
+
+		//		// Compile to GLSL, ready to give to GL driver.
+		//		std::string source = glsl.compile();
+
+		//		MH_TRACE(source);
+		//	}
+
+		//	// HLSL
+		//	{
+		//		spirv_cross::CompilerHLSL hlsl(spirv[ShaderStage::Vertex]);
+
+		//		spirv_cross::CompilerHLSL::Options options;
+		//		options.shader_model = 40;
+		//		hlsl.set_hlsl_options(options);
+
+		//		// Compile to HLSL, ready to give to DX driver.
+		//		std::string source = hlsl.compile();
+
+		//		MH_TRACE(source);
+		//	}
+		//}
+
+		return shaderData;
+	}
+
 	uint32_t ReflectSPIRV(const std::vector<uint32_t>& spirv, UnorderedMap<std::string, ShaderProperty>& properties)
 	{
 		uint32_t uniform_size = 0;
