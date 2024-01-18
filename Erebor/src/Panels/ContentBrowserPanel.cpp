@@ -32,7 +32,7 @@ namespace Mahakam::Editor
 
 			ClearFileStructure(m_RootDir);
 
-			CreateFileStructure(m_RootDir, FileUtility::ASSET_PATH);
+			CreateFileStructure(m_RootDir, FileUtility::RESOURCE_PATH);
 
 			CreateDirectories(m_CurrentDirectory);
             
@@ -55,7 +55,7 @@ namespace Mahakam::Editor
 
 					ImGui::BeginChild("File Browser Child", { 0, -2 }, false);
 
-					DrawDirectoryRecursive(m_RootDir, FileUtility::ASSET_PATH);
+					DrawDirectoryRecursive(m_RootDir, FileUtility::RESOURCE_PATH);
 
 					ImGui::EndChild();
 
@@ -106,7 +106,7 @@ namespace Mahakam::Editor
 		}
 
 		// Search the "imports/assets" path
-		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
+		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::RESOURCE_PATH);
 		if (FileUtility::Exists(importPath))
 		{
 			auto importIter = std::filesystem::directory_iterator(importPath);
@@ -148,7 +148,7 @@ namespace Mahakam::Editor
 			}
 		}
 
-		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::PROJECT_PATH);
+		std::filesystem::path importPath = FileUtility::IMPORT_PATH / std::filesystem::relative(path, FileUtility::RESOURCE_PATH);
 		if (FileUtility::Exists(importPath))
 		{
 			auto importIter = std::filesystem::directory_iterator(importPath);
@@ -166,44 +166,44 @@ namespace Mahakam::Editor
         
         //m_Icons.clear();
         
-        Filepath importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(m_CurrentDirectory, FileUtility::PROJECT_PATH);
-        for (auto& file : std::filesystem::directory_iterator(importDirectory))
-        {
-            if (std::filesystem::is_directory(file)) continue;
-            if (m_Icons.find(file.path().string()) != m_Icons.end()) continue;
-            
-            auto info = AssetDatabase::ReadAssetInfo(file.path());
-            auto importer = AssetDatabase::GetAssetImporter(info.Extension);
-            
-            if (!importer) continue;
-            
-            Asset<void> asset(file.path());
-            
-            if (!asset) continue;
-            
-            // Make sure it's always loaded
-            m_CachedAssets.push_back(asset);
-            
-            // Render the icon
-            FrameBufferProps props;
-            props.Width = ICON_SIZE;
-            props.Height = ICON_SIZE;
-            props.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RGBA8 };
-            props.DontUseDepth = true;
-            
-            Asset<FrameBuffer> framebuffer = FrameBuffer::Create(props);
-            
-            framebuffer->Bind();
-            
-            GL::Clear();
-            
-            bool useIcon = importer->OnIconRender(asset);
-            
-            framebuffer->Unbind();
-            
-            if (useIcon)
-				m_Icons.insert({ file.path().string(), framebuffer });
-        }
+    //    Filepath importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(m_CurrentDirectory, FileUtility::RESOURCE_PATH);
+    //    for (auto& file : std::filesystem::directory_iterator(importDirectory))
+    //    {
+    //        if (std::filesystem::is_directory(file)) continue;
+    //        if (m_Icons.find(file.path().string()) != m_Icons.end()) continue;
+    //        
+    //        auto info = ResourceRegistry::GetImportInfo(file.path());
+    //        auto importer = ResourceRegistry::GetAssetImporter(info.Type);
+    //        
+    //        if (!importer) continue;
+    //        
+    //        Asset<void> asset(ResourceRegistry::GetImportInfo(file.path()).ID);
+    //        
+    //        if (!asset) continue;
+    //        
+    //        // Make sure it's always loaded
+    //        m_CachedAssets.push_back(asset);
+    //        
+    //        // Render the icon
+    //        FrameBufferProps props;
+    //        props.Width = ICON_SIZE;
+    //        props.Height = ICON_SIZE;
+    //        props.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RGBA8 };
+    //        props.DontUseDepth = true;
+    //        
+    //        Asset<FrameBuffer> framebuffer = FrameBuffer::Create(props);
+    //        
+    //        framebuffer->Bind();
+    //        
+    //        GL::Clear();
+    //        
+    //        bool useIcon = importer->OnIconRender(asset);
+    //        
+    //        framebuffer->Unbind();
+    //        
+    //        if (useIcon)
+				//m_Icons.insert({ file.path().string(), framebuffer });
+    //    }
     }
 
 	void ContentBrowserPanel::DrawDirectoryRecursive(DirNode* parent, const std::filesystem::path& path)
@@ -251,7 +251,7 @@ namespace Mahakam::Editor
 			if (ImGui::BeginTable("Directory Divisor", numColumns))
 			{
 				// Draw .. directory
-				if (basePath != FileUtility::ASSET_PATH)
+				if (basePath != FileUtility::RESOURCE_PATH)
 				{
 					ImGui::TableNextColumn();
 
@@ -304,7 +304,7 @@ namespace Mahakam::Editor
 		{
 			if (ImGui::BeginTable("Import Divisor", numColumns))
 			{
-				std::filesystem::path importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(basePath, FileUtility::PROJECT_PATH);
+				std::filesystem::path importDirectory = FileUtility::IMPORT_PATH / std::filesystem::relative(basePath, FileUtility::RESOURCE_PATH);
 				if (std::filesystem::exists(importDirectory))
 				{
 					for (auto& file : std::filesystem::directory_iterator(importDirectory))
@@ -328,13 +328,10 @@ namespace Mahakam::Editor
 
 							if (ImGui::BeginDragDropSource())
 							{
-								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
+								ResourceRegistry::ImportInfo info = ResourceRegistry::GetImportInfo(importPath);
 
-								std::string importString = importPath.string();
-								const char* importBuffer = importString.c_str();
+								ImGui::SetDragDropPayload(info.Type.c_str(), &info.ID, sizeof(ResourceRegistry::AssetID));
 
-								ImGui::SetDragDropPayload(info.Extension.c_str(), importBuffer, strlen(importBuffer) + 1);
-								
 								ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 });
 								ImGui::Text("%s", pathName.c_str());
 
@@ -343,9 +340,9 @@ namespace Mahakam::Editor
 
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{
-								AssetDatabase::AssetInfo info = AssetDatabase::ReadAssetInfo(importPath);
+								ResourceRegistry::ImportInfo info = ResourceRegistry::GetImportInfo(importPath);
 
-								ImportWizardPanel::ImportAsset(info.Filepath, info.Extension, importPath);
+								ImportWizardPanel::ImportOpen(importPath, info.Type);
 							}
 
 							ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ICON_PADDING / 2);
@@ -378,11 +375,13 @@ namespace Mahakam::Editor
 							ImGui::PushID(file.path().string().c_str());
 							ImGui::ImageButton((ImTextureID)(uintptr_t)m_FileIcon->GetRendererID(), { ICON_SIZE, ICON_SIZE }, { 0, 1 }, { 1, 0 }, -1, { 0, 0, 0, 0 }, { 0.48f, 0.5f, 0.53f, 1 });
 
+							// TODO: Add ImGui::BeginDragDropSource()
+
 							if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 							{
 								m_ImporterExtension = file.path().extension().string();
 
-								auto ext = AssetDatabase::GetAssetImporterExtension(m_ImporterExtension);
+								auto ext = ResourceRegistry::GetAssetImporterExtension(m_ImporterExtension);
 								auto iter = ext.first;
 								auto iterEnd = ext.second;
 
@@ -395,9 +394,7 @@ namespace Mahakam::Editor
 									}
 									else
 									{
-										std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
-
-										ImportWizardPanel::ImportAsset(file.path(), props.Extension, importPath);
+										ImportWizardPanel::ResourceOpen(file.path(), props.Extension);
 									}
 								}
 							}
@@ -407,16 +404,14 @@ namespace Mahakam::Editor
 							{
 								ImGui::Text("Import asset as...");
 
-								std::filesystem::path importPath = FileUtility::GetImportPath(file.path());
-
-								auto ext = AssetDatabase::GetAssetImporterExtension(m_ImporterExtension);
+								auto ext = ResourceRegistry::GetAssetImporterExtension(m_ImporterExtension);
 								auto iter = ext.first;
 								auto iterEnd = ext.second;
 								while (iter != iterEnd)
 								{
 									const auto& props = iter->second->GetImporterProps();
 									if (ImGui::MenuItem(props.Name.c_str()))
-										ImportWizardPanel::ImportAsset(file.path(), props.Extension, importPath);
+										ImportWizardPanel::ResourceOpen(file.path(), props.Extension);
 
 									++iter;
 								}
@@ -439,7 +434,7 @@ namespace Mahakam::Editor
 		{
 			if (ImGui::BeginMenu("Create"))
 			{
-				const auto& importers = AssetDatabase::GetAssetImporters();
+				const auto& importers = ResourceRegistry::GetAssetImporters();
 
 				for (const auto& kv : importers)
 				{
@@ -448,15 +443,21 @@ namespace Mahakam::Editor
 					{
 						if (ImGui::MenuItem(props.Name.c_str()))
 						{
-							std::string filename = props.Name + props.Extension;
-							std::filesystem::path filepath = m_CurrentDirectory / filename;
-							std::filesystem::path importPath = FileUtility::GetImportPath(filepath);
-							ImportWizardPanel::ImportAsset(filepath, props.Extension, importPath);
+							std::filesystem::path filepath = m_CurrentDirectory / props.Name;
+							std::filesystem::path importPath = FileUtility::GetImportPath(filepath, props.Extension);
+							ImportWizardPanel::ImportOpen(importPath, props.Extension);
 						}
 					}
 				}
 
 				ImGui::EndMenu();
+			}
+
+			if (ImGui::MenuItem("Reimport all assets"))
+			{
+				// TODO: For each registered importer and file
+				// Call CreateAsset
+				// Call Save
 			}
 
 			ImGui::EndPopup();

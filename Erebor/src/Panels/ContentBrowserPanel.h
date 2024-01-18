@@ -29,7 +29,7 @@ namespace Mahakam::Editor
 
 		bool m_Open = true;
 
-		std::filesystem::path m_CurrentDirectory = FileUtility::ASSET_PATH;
+		std::filesystem::path m_CurrentDirectory = FileUtility::RESOURCE_PATH;
 		std::string m_ImporterExtension;
 
 		DirNode* m_RootDir;

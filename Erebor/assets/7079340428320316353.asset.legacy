@@ -1,0 +1,8 @@
+Shader: 9447544911046152283
+Properties:
+  Uniforms.Color: [0.678431,0.439216,0.219608]
+  Uniforms.MetallicMul: 0
+  Uniforms.RoughnessMul: 0.431
+  Uniforms.EmissionColor: [0,0,0]
+  Uniforms.BoneMatrices: [0,0,0,0]
+  Uniforms.UVTransform: [0,0,0,0]

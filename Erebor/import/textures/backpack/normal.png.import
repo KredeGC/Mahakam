@@ -1,0 +1,8 @@
+Filepath: resource/textures/backpack/normal.png
+Format: RG_BC5
+Filter: Bilinear
+WrapX: Repeat
+WrapY: Repeat
+Mipmaps: 1
+Extension: .tex2d
+ID: 5968966049936667336

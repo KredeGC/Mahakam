@@ -4,11 +4,15 @@
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Types.h"
 
+#include <bitstream/bitstream.h>
+
 #include <filesystem>
 #include <string>
 
 namespace Mahakam
 {
+	template<typename T>
+	class Asset;
 	class AssetImporter;
 
 	class AssetDatabase
@@ -29,18 +33,8 @@ namespace Mahakam
         
         typedef uint64_t AssetID;
 
-#ifdef MH_STANDALONE
-		typedef uint64_t ExtensionType;
-#else
+		// TODO: Remove
 		typedef std::string ExtensionType;
-#endif
-
-		struct AssetInfo
-		{
-			AssetID ID = 0;
-			std::filesystem::path Filepath = "";
-			ExtensionType Extension;
-		};
 
 		struct ControlBlock
 		{
@@ -51,53 +45,73 @@ namespace Mahakam
 			void (*DeleteData)(void*);
 		};
 
-	private:
-		// Asset importers are divided into editor and standalone
-		// ExtensionMap is used by the editor to equate various file formats to the importers
-		// The same format can use multiple importers
-		// ImporterMap is used by the runtime to equate some key (string for editor, ID for standalone) to an importer
+		using Writer = bitstream::growing_bit_writer<TrivialVector<uint32_t>>;
+		using Reader = bitstream::fixed_bit_reader;
 
+		struct AssetSerializer
+		{
+			bool (*Serialize)(Writer&, const std::filesystem::path& filepath, Asset<void>) = nullptr;
+			Asset<void> (*Deserialize)(Reader&, const std::filesystem::path& filepath) = nullptr;
+		};
+
+	private:
 		using AssetMap = UnorderedMap<AssetID, std::filesystem::path>;
-		using ExtensionMap = std::unordered_multimap<std::string, Ref<AssetImporter>>;
-		using ExtensionIter = std::pair<ExtensionMap::const_iterator, ExtensionMap::const_iterator>;
 
 		using ImporterMap = UnorderedMap<ExtensionType, Ref<AssetImporter>>;
 		using LoadedMap = UnorderedMap<AssetID, ControlBlock*>;
 
 		// TODO: Use AssetInfo instead of filepath
 		inline static AssetMap s_AssetPaths;
-		inline static ExtensionMap s_AssetExtensions;
 
-		inline static ImporterMap s_AssetImporters;
+		inline static ImporterMap s_AssetImporters; // Legacy importers
 		inline static LoadedMap s_LoadedAssets;
+
+
+		// TODO: Move into own class
+		inline static const std::filesystem::path EmptyPath = "";
+
+		inline static UnorderedMap<std::string, AssetSerializer> s_Serializers;
+
+		template<typename Stream>
+		static bool SerializeAssetHeader(Stream& stream, bitstream::inout<Stream, AssetID> assetID, bitstream::inout<Stream, std::string> extension)
+		{
+			BS_ASSERT(stream.template serialize<AssetID>(assetID));
+			BS_ASSERT(stream.template serialize<std::string>(extension, 32));
+
+			return true;
+		}
+
+		template<const char* Extension, const char* LegacyExt>
+		static void LoadLegacySerializer();
+
+		static void LoadDefaultSerializers();
 
 	public:
 		// Registering asset importers
-		MH_DECLARE_FUNC(RegisterAssetImporter, void, const std::string& extension, Ref<AssetImporter> assetImport); // Registers a specific asset importer to an extension
+		MH_DECLARE_FUNC(RegisterAssetImporter, void, Ref<AssetImporter> assetImport); // Registers a specific asset importer to an extension
 		MH_DECLARE_FUNC(DeregisterAssetImporter, void, const std::string& extension); // Deregisters a specific asset importer, given an extension
 		MH_DECLARE_FUNC(DeregisterAllAssetImporters, void); // Removes all currently assigned asset importers
 		MH_DECLARE_FUNC(GetAssetImporter, Ref<AssetImporter>, const ExtensionType& extension); // Returns a specific importer, given an extension
 		MH_DECLARE_FUNC(GetAssetImporters, const ImporterMap&); // Returns a map of extensions and importers
-		MH_DECLARE_FUNC(GetAssetImporterExtension, ExtensionIter, const std::string& extension); // Returns an iterator to an importer, given an extension
 		MH_DECLARE_FUNC(RegisterDefaultAssetImporters, void); // Register default asset importers
 		MH_DECLARE_FUNC(DeregisterDefaultAssetImporters, void); // Deregister default asset importers
 
 		// Asset reloading
 		MH_DECLARE_FUNC(ReloadAsset, void, AssetID id); // Reloads a specific asset
 		MH_DECLARE_FUNC(ReloadAssets, void); // Reloads all assets, essentially recreating them
-		MH_DECLARE_FUNC(RefreshAssetImports, void); // Refreshes the asset paths, finding new assets and removing unused ones
+		MH_DECLARE_FUNC(RefreshAssetPaths, void); // Refreshes the asset paths, finding new assets and removing unused ones
 
 		// Various getters
-		MH_DECLARE_FUNC(GetAssetImportPath, std::filesystem::path, AssetID id); // Gets the import path of a given asset
+		MH_DECLARE_FUNC(GetAssetImportPath, const std::filesystem::path&, AssetID id); // Gets the import path of a given asset
 		MH_DECLARE_FUNC(GetAssetHandles, const AssetMap&); // Gets a reference to all assets, whether they're currently loaded or not
 		MH_DECLARE_FUNC(GetAssetReferences, size_t, AssetID id); // Gets the amount of references to this asset, if any
 
 		// If you don't want to load the asset first
-		MH_DECLARE_FUNC(ReadAssetInfo, AssetInfo, const std::filesystem::path& importPath); // Gets information about the given asset without loading it
+		MH_DECLARE_FUNC(AssetExists, bool, AssetID id);
 
 	private:
 		// Saving and loading assets
-		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, const ExtensionType& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath);
+		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, AssetID id, const std::string& extension);
 
 		MH_DECLARE_FUNC(IncrementAsset, ControlBlock*, AssetID id);
 		MH_DECLARE_FUNC(UnloadAsset, void, ControlBlock* control);

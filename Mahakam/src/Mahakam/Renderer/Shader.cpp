@@ -18,7 +18,7 @@
 #include <spirv_cross/spirv_hlsl.hpp>
 #include <glslang/SPIRV/GlslangToSpv.h>
 
-namespace Mahakam
+namespace Mahakam::ShaderUtility
 {
 	static const TBuiltInResource DefaultTBuiltInResource = {
 		/* .MaxLights = */ 32,
@@ -147,7 +147,138 @@ namespace Mahakam
 		return ShaderStage::None;
 	}
 
-	UnorderedMap<ShaderStage, std::string> Shader::ParseGLSLFile(const std::string& source)
+	static ShaderDataType SPIRVDimToShaderDataType(spv::Dim dimension)
+	{
+		switch (dimension)
+		{
+		case spv::Dim::Dim2D:
+			return ShaderDataType::Sampler2D;
+		case spv::Dim::DimCube:
+			return ShaderDataType::SamplerCube;
+		default:
+			MH_BREAK("Unknown SPIR V dimension provided!");
+			return ShaderDataType::None;
+		}
+	}
+
+	static ShaderDataType SPIRTypeToShaderDataType(spirv_cross::SPIRType::BaseType type, uint32_t size)
+	{
+		switch (type)
+		{
+		case spirv_cross::SPIRType::BaseType::Float:
+			switch (size)
+			{
+			case 1: return ShaderDataType::Float;
+			case 2: return ShaderDataType::Float2;
+			case 3: return ShaderDataType::Float3;
+			case 4: return ShaderDataType::Float4;
+			default:
+				MH_BREAK("Unknown SPIR V data type provided!");
+				return ShaderDataType::None;
+			}
+		case spirv_cross::SPIRType::BaseType::Int:
+			switch (size)
+			{
+			case 1: return ShaderDataType::Int;
+			case 2: return ShaderDataType::Int2;
+			case 3: return ShaderDataType::Int3;
+			case 4: return ShaderDataType::Int4;
+			default:
+				MH_BREAK("Unknown SPIR V data type provided!");
+				return ShaderDataType::None;
+			}
+		default:
+			MH_BREAK("Unknown SPIR V data type provided!");
+			return ShaderDataType::None;
+		}
+	}
+
+	static std::string ParseDefaultValue(const ryml::NodeRef& node)
+	{
+		if (node.is_seq())
+		{
+			std::stringstream value;
+			for (auto iter = node.begin(); iter != node.end();)
+			{
+				value << ParseDefaultValue(*iter);
+				if (++iter != node.end())
+					value << ",";
+			}
+			return "[" + value.str() + "]";
+		}
+		// TODO: Maps
+		else
+		{
+			ryml::csubstr val = node.val();
+			return std::string(val.str, val.size());
+		}
+	}
+
+	std::string SortIncludes(const std::string& source)
+	{
+		MH_PROFILE_FUNCTION();
+
+		std::stringstream sourceStream;
+
+		const char* typeToken = "#include \"";
+		size_t typeTokenLength = strlen(typeToken);
+		size_t lastPos = 0;
+		size_t pos = source.find(typeToken, 0);
+		while (pos != std::string::npos)
+		{
+			sourceStream << source.substr(lastPos, pos - lastPos);
+
+			size_t end = source.find("\"", pos + typeTokenLength);
+			size_t begin = pos + typeTokenLength;
+
+			lastPos = end + 1;
+
+			pos = source.find(typeToken, end);
+
+
+			std::string includeFile = source.substr(begin, end - begin);
+
+			std::string includeSource = ReadFile(includeFile);
+
+			sourceStream << SortIncludes(includeSource);
+		}
+
+		sourceStream << source.substr(lastPos, source.size() - lastPos);
+
+		return sourceStream.str();
+	}
+
+	std::string ReadFile(const std::filesystem::path& filepath)
+	{
+		MH_PROFILE_FUNCTION();
+
+		std::filesystem::path assetPath;
+		if (FileUtility::Exists(filepath))
+			assetPath = filepath;
+		else
+			assetPath = FileUtility::ASSET_PATH / filepath;
+
+		std::string result;
+		std::ifstream stream(assetPath, std::ios::in | std::ios::binary);
+		if (stream)
+		{
+			stream.seekg(0, std::ios::end);
+			result.resize(stream.tellg());
+
+			stream.seekg(0, std::ios::beg);
+			stream.read(&result[0], result.size());
+
+			stream.close();
+		}
+		else
+		{
+			MH_WARN("Could not open file {0}", filepath);
+		}
+
+		return result;
+	}
+
+	UnorderedMap<ShaderStage, std::string> ParseGLSLFile(const std::string& source)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -172,28 +303,7 @@ namespace Mahakam
 		return sources;
 	}
 
-	std::string Shader::ParseDefaultValue(const ryml::NodeRef& node)
-	{
-		if (node.is_seq())
-		{
-			std::stringstream value;
-			for (auto iter = node.begin(); iter != node.end();)
-			{
-				value << ParseDefaultValue(*iter);
-				if (++iter != node.end())
-					value << ",";
-			}
-			return "[" + value.str() + "]";
-		}
-		// TODO: Maps
-		else
-		{
-			ryml::csubstr val = node.val();
-			return std::string(val.str, val.size());
-		}
-	}
-
-	bool Shader::ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, SourceDefinition>& sources, UnorderedMap<std::string, ShaderProperty>& properties)
+	bool ParseYAMLFile(const std::filesystem::path& filepath, UnorderedMap<std::string, ShaderSource>& sources, UnorderedMap<std::string, ShaderProperty>& properties)
 	{
 		TrivialVector<char> buffer;
 
@@ -292,7 +402,7 @@ namespace Mahakam
 							std::string shaderPath;
 							includeNode >> shaderPath;
 
-							source << ShaderUtility::ReadFile(shaderPath);
+							source << ReadFile(shaderPath);
 						}
 
 						auto glslSources = ParseGLSLFile(source.str());
@@ -313,7 +423,7 @@ namespace Mahakam
 		return false;
 	}
 
-	bool Shader::CompileSPIRV(UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv, const SourceDefinition& sourceDef)
+	bool CompileSPIRV(UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv, const ShaderSource& sourceDef)
 	{
 		glslang::InitializeProcess();
 
@@ -331,7 +441,7 @@ namespace Mahakam
 			glslang::TShader* shader = Allocator::New<glslang::TShader>((EShLanguage)ShaderStageToEShLanguage(source.first));
 			const char* shaderStrings[1];
 
-			std::string sortedSource = ShaderUtility::SortIncludes(source.second);
+			std::string sortedSource = SortIncludes(source.second);
 
 			shaderStrings[0] = sortedSource.c_str();
 
@@ -429,42 +539,126 @@ namespace Mahakam
 		return success;
 	}
 
-	ShaderDataType SPIRVDimToShaderDataType(spv::Dim dimension)
+	ShaderData CompileSPIRV(const ShaderSource& sourceDef)
 	{
-		switch (dimension)
-		{
-		case spv::Dim::Dim2D:
-			return ShaderDataType::Sampler2D;
-		case spv::Dim::DimCube:
-			return ShaderDataType::SamplerCube;
-		default:
-			MH_BREAK("Unknown SPIR V dimension provided!");
-			return ShaderDataType::None;
-		}
-	}
+		glslang::InitializeProcess();
 
-	ShaderDataType SPIRTypeToShaderDataType(spirv_cross::SPIRType::BaseType type, uint32_t size)
-	{
-		switch (type)
+		glslang::TProgram* program = Allocator::New<glslang::TProgram>();
+
+		EShMessages messages = (EShMessages)(EShMsgSpvRules | EShMsgEnhanced);
+
+		bool success = true;
+
+		// Parse each shader stage
+		TrivialVector<glslang::TShader*> shaders;
+		shaders.reserve(sourceDef.Sources.size());
+		for (auto& source : sourceDef.Sources)
 		{
-		case spirv_cross::SPIRType::BaseType::Float:
-			switch (size)
+			glslang::TShader* shader = Allocator::New<glslang::TShader>((EShLanguage)ShaderStageToEShLanguage(source.first));
+			const char* shaderStrings[1];
+
+			std::string sortedSource = SortIncludes(source.second);
+
+			shaderStrings[0] = sortedSource.c_str();
+
+			// Set preprocessor defines
+			shader->setPreamble(sourceDef.Defines.c_str());
+
+			// Set target and version
+			shader->setEnvClient(glslang::EShClient::EShClientOpenGL, glslang::EShTargetClientVersion::EShTargetOpenGL_450);
+
+			// Set source code
+			shader->setStrings(shaderStrings, 1);
+
+			// TODO: Use HLSL instead of GLSL
+			/*shader.setEnvInput(glslang::EShSourceHlsl,
+				stage, glslang::EShClient::EShClientOpenGL, 100);
+			shader.setEnvTargetHlslFunctionality1();*/
+
+			if (!shader->parse(&DefaultTBuiltInResource, 100, false, messages))
 			{
-			case 1: return ShaderDataType::Float;
-			case 2: return ShaderDataType::Float2;
-			case 3: return ShaderDataType::Float3;
-			case 4: return ShaderDataType::Float4;
-			default:
-				MH_BREAK("Unknown SPIR V data type provided!");
-				return ShaderDataType::None;
+				MH_WARN(shader->getInfoLog());
+				MH_WARN(shader->getInfoDebugLog());
+
+				success = false;
 			}
-		default:
-			MH_BREAK("Unknown SPIR V data type provided!");
-			return ShaderDataType::None;
+
+			shaders.push_back(shader);
+
+			program->addShader(shader);
 		}
+
+		// Link program with shaders
+		if (!program->link(messages))
+		{
+			MH_WARN(program->getInfoLog());
+			MH_WARN(program->getInfoDebugLog());
+
+			success = false;
+		}
+
+		// Retrieve SPIR-V
+		ShaderData shaderData;
+		if (success)
+		{
+			for (int stage = 0; stage < EShLangCount; stage++)
+			{
+				// Output into 1 big SPIR-V binary
+				if (glslang::TIntermediate* ptr = program->getIntermediate((EShLanguage)stage))
+				{
+					std::vector<uint32_t> spirv;
+					glslang::GlslangToSpv(*ptr, spirv);
+
+					ShaderStage stageEnum = EShLanguageToShaderStage(stage);
+					shaderData.SetStage(stageEnum, spirv);
+				}
+			}
+		}
+
+		// Cleanup
+		Allocator::Delete(program);
+		for (auto& shader : shaders)
+			Allocator::Delete(shader);
+
+		glslang::FinalizeProcess();
+
+
+		// TEMP
+		//if (success)
+		//{
+		//	// GLSL
+		//	{
+		//		spirv_cross::CompilerGLSL glsl(spirv[ShaderStage::Vertex]);
+
+		//		spirv_cross::CompilerGLSL::Options options;
+		//		options.version = 430;
+		//		glsl.set_common_options(options);
+
+		//		// Compile to GLSL, ready to give to GL driver.
+		//		std::string source = glsl.compile();
+
+		//		MH_TRACE(source);
+		//	}
+
+		//	// HLSL
+		//	{
+		//		spirv_cross::CompilerHLSL hlsl(spirv[ShaderStage::Vertex]);
+
+		//		spirv_cross::CompilerHLSL::Options options;
+		//		options.shader_model = 40;
+		//		hlsl.set_hlsl_options(options);
+
+		//		// Compile to HLSL, ready to give to DX driver.
+		//		std::string source = hlsl.compile();
+
+		//		MH_TRACE(source);
+		//	}
+		//}
+
+		return shaderData;
 	}
 
-	uint32_t Shader::ReflectSPIRV(const std::vector<uint32_t>& spirv, UnorderedMap<std::string, ShaderProperty>& properties)
+	uint32_t ReflectSPIRV(const std::vector<uint32_t>& spirv, UnorderedMap<std::string, ShaderProperty>& properties)
 	{
 		uint32_t uniform_size = 0;
 
@@ -521,22 +715,6 @@ namespace Mahakam
 		return uniform_size;
 	}
 
-	//Asset<Shader> Shader::Create(const std::string& filepath, const std::initializer_list<std::string>& keywords)
-	MH_DEFINE_FUNC(Shader::CreateFilepath, Asset<Shader>, const std::filesystem::path& filepath)
-	{
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPI::API::None:
-			return CreateAsset<HeadlessShader>(filepath);
-		case RendererAPI::API::OpenGL:
-			return CreateAsset<OpenGLShader>(filepath);
-		}
-
-		MH_BREAK("Unknown renderer API!");
-
-		return nullptr;
-	};
-
 	ShaderStage EShLanguageToShaderStage(uint32_t stage)
 	{
 		switch (stage)
@@ -562,6 +740,38 @@ namespace Mahakam
 		default:
 			MH_BREAK("Unknown shader data type!");
 			return 0;
+		}
+	}
+
+	ShaderDataType ShaderDataTypeBaseType(ShaderDataType type)
+	{
+		switch (type)
+		{
+		case ShaderDataType::Float:
+			return ShaderDataType::Float;
+		case ShaderDataType::Float2:
+			return ShaderDataType::Float;
+		case ShaderDataType::Float3:
+			return ShaderDataType::Float;
+		case ShaderDataType::Float4:
+			return ShaderDataType::Float;
+		case ShaderDataType::Mat3:
+			return ShaderDataType::Float;
+		case ShaderDataType::Mat4:
+			return ShaderDataType::Float;
+		case ShaderDataType::Int:
+			return ShaderDataType::Int;
+		case ShaderDataType::Int2:
+			return ShaderDataType::Int;
+		case ShaderDataType::Int3:
+			return ShaderDataType::Int;
+		case ShaderDataType::Int4:
+			return ShaderDataType::Int;
+		case ShaderDataType::Bool:
+			return ShaderDataType::Bool;
+		default:
+			MH_BREAK("Unknown shader data type!");
+			return ShaderDataType::None;
 		}
 	}
 
@@ -628,4 +838,23 @@ namespace Mahakam
 			return 0;
 		}
 	}
+}
+
+namespace Mahakam
+{
+	//Asset<Shader> Shader::Create(const std::string& filepath, const std::initializer_list<std::string>& keywords)
+	MH_DEFINE_FUNC(Shader::CreateFilepath, Asset<Shader>, const std::filesystem::path& filepath)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::None:
+			return CreateAsset<HeadlessShader>(filepath);
+		case RendererAPI::API::OpenGL:
+			return CreateAsset<OpenGLShader>(filepath);
+		}
+
+		MH_BREAK("Unknown renderer API!");
+
+		return nullptr;
+	};
 }

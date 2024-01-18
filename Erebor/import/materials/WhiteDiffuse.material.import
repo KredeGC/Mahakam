@@ -1,0 +1,9 @@
+Shader: 17048867044831516029
+Properties:
+  Uniforms.Color: [1,1,1]
+  Uniforms.MetallicMul: 0
+  Uniforms.RoughnessMul: 0.497
+  Uniforms.EmissionColor: [0,0,0]
+  Uniforms.UVTransform: [0,0,0,0]
+Extension: .material
+ID: 15739498696759362444

@@ -4,6 +4,8 @@
 
 #include "Mahakam/Core/Profiler.h"
 
+#include "Mahakam/Renderer/ShaderUtility.h"
+
 #include <glad/gl.h>
 
 namespace Mahakam
@@ -127,8 +129,8 @@ namespace Mahakam
 			auto& [offset, type] = value;
 
 			GLenum dataType = ShaderDataTypeToOpenGLBaseType(type);
-			uint32_t dataTypeSize = ShaderDataTypeSize(type);
-			uint32_t componentCount = ShaderDataTypeComponentCount(type);
+			uint32_t dataTypeSize = ShaderUtility::ShaderDataTypeSize(type);
+			uint32_t componentCount = ShaderUtility::ShaderDataTypeComponentCount(type);
 
 			MH_GL_CALL(glEnableVertexAttribArray(index));
 			if (dataType == GL_INT)

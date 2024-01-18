@@ -1,0 +1,8 @@
+Filepath: resource/textures/backpack/ao.jpg
+Format: R_BC4
+Filter: Bilinear
+WrapX: Repeat
+WrapY: Repeat
+Mipmaps: 1
+Extension: .tex2d
+ID: 4967946425892475307

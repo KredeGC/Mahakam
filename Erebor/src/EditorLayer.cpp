@@ -32,7 +32,11 @@ namespace Mahakam::Editor
 
 		AssetDatabase::RegisterDefaultAssetImporters();
 
-		AssetDatabase::RefreshAssetImports();
+		AssetDatabase::RefreshAssetPaths();
+
+		ResourceRegistry::RegisterDefaultAssetImporters();
+
+		ResourceRegistry::RefreshImportPaths();
 
 #pragma region Windows
 		// AssetManagerPanel
@@ -93,9 +97,9 @@ namespace Mahakam::Editor
 			CreateRef<TonemappingRenderPass>() });
 
 		// Use this once scenes are setup correctly
-		Asset<Material> skyboxMaterial = Asset<Material>("import/assets/materials/Skybox.material.import");
-		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>("import/assets/textures/pines.irradiance.import");
-		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>("import/assets/textures/pines.specular.import");
+		Asset<Material> skyboxMaterial = Asset<Material>(1413214623375882268ull);
+		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>(5839156319952352249ull);
+		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>(14413137597893043784ull);
 
 		Ref<Scene> activeScene = Scene::Create();
 		activeScene->SetSkyboxMaterial(skyboxMaterial);
@@ -126,6 +130,8 @@ namespace Mahakam::Editor
 		ComponentRegistry::DeregisterDefaultComponents();
 
 		AssetDatabase::DeregisterDefaultAssetImporters();
+
+		ResourceRegistry::DeregisterDefaultAssetImporters();
 	}
 
 	void EditorLayer::OnUpdate(Timestep dt)

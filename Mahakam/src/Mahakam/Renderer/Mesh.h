@@ -16,11 +16,6 @@
 #include <glm/ext/vector_float4.hpp>
 #include <glm/ext/vector_int4.hpp>
 
-namespace tinygltf
-{
-	class Model;
-}
-
 namespace Mahakam
 {
 	class Bounds;
@@ -31,122 +26,54 @@ namespace Mahakam
 	class Mesh
 	{
 	public:
-		MeshPrimitive Primitive;
+		MeshProps Props;
 		std::vector<Ref<SubMesh>> Meshes; // List of sub meshes
-
-		Mesh() = default;
-
-		explicit Mesh(MeshPrimitive primitive) :
-			Primitive(primitive) {}
-
-		virtual MeshProps& GetProps() = 0;
-
-		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
-
-	private:
-		MH_DECLARE_FUNC(CopyImpl, Asset<Mesh>, Asset<Mesh> other);
-	};
-
-	class BoneMesh : public Mesh
-	{
-	public:
-		BoneMeshProps Props;
 		std::vector<MeshNode> NodeHierarchy; // Hierarchy of nodes. Parents are always before children
 		TrivialVector<uint32_t> Skins; // List of node indices that are skin roots
 		UnorderedMap<uint32_t, uint32_t> SubMeshMap; // Hierarchy index to SubMesh index
 		UnorderedMap<uint32_t, uint32_t> BoneMap; // Hierarchy index to Joint ID
 
-		BoneMesh(const BoneMeshProps& props) :
-			Mesh(MeshPrimitive::Model),
+		Mesh() = default;
+
+		explicit Mesh(Ref<SubMesh> submesh, const MeshProps& props) :
+			Props(props)
+		{
+			Meshes.push_back(std::move(submesh));
+		}
+
+		explicit Mesh(const MeshProps& props) :
 			Props(props) {}
 
-		inline virtual MeshProps& GetProps() override { return Props; }
+		MeshProps& GetProps() { return Props; }
+		const MeshProps& GetProps() const { return Props; }
 
-		inline static Asset<BoneMesh> Create(const BoneMeshProps& props) { return CreateImpl(props); }
+		inline static Asset<Mesh> Copy(Asset<Mesh> other) { return CopyImpl(std::move(other)); }
 
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<BoneMesh>, const BoneMeshProps& props);
-	};
+		inline static Asset<Mesh> Load(const BoneMeshProps& props) { return LoadImpl(props); }
 
-	class PlaneMesh : public Mesh
-	{
-	public:
-		PlaneMeshProps Props;
+		inline static Asset<Mesh> Create(const CubeMeshProps& props) { return CreateCubeImpl(props); }
 
-		PlaneMesh(Ref<SubMesh> submesh, const PlaneMeshProps& props) :
-			Mesh(MeshPrimitive::Plane),
-			Props(props)
-		{
-			Meshes.push_back(std::move(submesh));
-		}
+		inline static Asset<Mesh> Create(const CubeSphereMeshProps& props) { return CreateCubeSphereImpl(props); }
 
-		inline virtual MeshProps& GetProps() override { return Props; }
+		inline static Asset<Mesh> Create(const PlaneMeshProps& props) { return CreatePlaneImpl(props); }
 
-		inline static Asset<PlaneMesh> Create(const PlaneMeshProps& props) { return CreateImpl(props); }
+		inline static Asset<Mesh> Create(const UVSphereMeshProps& props) { return CreateUVSphereImpl(props); }
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<PlaneMesh>, const PlaneMeshProps& props);
+		MH_DECLARE_FUNC(CopyImpl, Asset<Mesh>, Asset<Mesh> other);
+
+		MH_DECLARE_FUNC(LoadImpl, Asset<Mesh>, const BoneMeshProps& props);
+
+		MH_DECLARE_FUNC(CreateCubeImpl, Asset<Mesh>, const CubeMeshProps& props);
+
+		MH_DECLARE_FUNC(CreateCubeSphereImpl, Asset<Mesh>, const CubeSphereMeshProps& props);
+
+		MH_DECLARE_FUNC(CreatePlaneImpl, Asset<Mesh>, const PlaneMeshProps& props);
+
+		MH_DECLARE_FUNC(CreateUVSphereImpl, Asset<Mesh>, const UVSphereMeshProps& props);
 	};
 
-	class CubeMesh : public Mesh
-	{
-	public:
-		CubeMeshProps Props;
-
-		CubeMesh(Ref<SubMesh> submesh, const CubeMeshProps& props) :
-			Mesh(MeshPrimitive::Cube),
-			Props(props)
-		{
-			Meshes.push_back(std::move(submesh));
-		}
-
-		inline virtual MeshProps& GetProps() override { return Props; }
-
-		inline static Asset<CubeMesh> Create(const CubeMeshProps& props) { return CreateImpl(props); }
-
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<CubeMesh>, const CubeMeshProps& props);
-	};
-
-	class CubeSphereMesh : public Mesh
-	{
-	public:
-		CubeSphereMeshProps Props;
-
-		CubeSphereMesh(Ref<SubMesh> submesh, const CubeSphereMeshProps& props) :
-			Mesh(MeshPrimitive::CubeSphere),
-			Props(props)
-		{
-			Meshes.push_back(std::move(submesh));
-		}
-
-		inline virtual MeshProps& GetProps() override { return Props; }
-
-		inline static Asset<CubeSphereMesh> Create(const CubeSphereMeshProps& props) { return CreateImpl(props); }
-
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<CubeSphereMesh>, const CubeSphereMeshProps& props);
-	};
-
-	class UVSphereMesh : public Mesh
-	{
-	public:
-		UVSphereMeshProps Props;
-
-		UVSphereMesh(Ref<SubMesh> submesh, const UVSphereMeshProps& props) :
-			Mesh(MeshPrimitive::UVSphere),
-			Props(props)
-		{
-			Meshes.push_back(std::move(submesh));
-		}
-
-		inline virtual MeshProps& GetProps() override { return Props; }
-
-		inline static Asset<UVSphereMesh> Create(const UVSphereMeshProps& props) { return CreateImpl(props); }
-
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<UVSphereMesh>, const UVSphereMeshProps& props);
-	};
+	using Model = Mesh;
 
 	enum class VertexType
 	{
@@ -164,16 +91,20 @@ namespace Mahakam
 	public:
 		using Input = int;
 
+		MeshData() :
+			m_VertexCount(0),
+			m_VertexData(Allocator::GetAllocator<uint8_t>()),
+			m_Indices(Allocator::GetAllocator<uint32_t>()),
+			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
+
 		MeshData(uint32_t vertexCount) :
 			m_VertexCount(vertexCount),
-			m_IndexCount(0),
 			m_VertexData(Allocator::GetAllocator<uint8_t>()),
 			m_Indices(Allocator::GetAllocator<uint32_t>()),
 			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
 
 		MeshData(uint32_t vertexCount, const uint32_t* indices, uint32_t indexCount) :
 			m_VertexCount(vertexCount),
-			m_IndexCount(indexCount),
 			m_VertexData(Allocator::GetAllocator<uint8_t>()),
 			m_Indices(indices, indices + indexCount, Allocator::GetAllocator<uint32_t>()),
 			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
@@ -181,7 +112,6 @@ namespace Mahakam
 		template<typename T>
 		MeshData(uint32_t vertexCount, T&& container) :
 			m_VertexCount(vertexCount),
-			m_IndexCount(static_cast<uint32_t>(container.size())),
 			m_VertexData(Allocator::GetAllocator<uint8_t>()),
 			m_Indices(std::forward<T>(container)),
 			m_Offsets(Allocator::GetAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>()) {}
@@ -190,21 +120,26 @@ namespace Mahakam
 
 		MeshData(MeshData&&) noexcept = default;
 
-		template<typename U, typename T>
-		void SetVertices(U index, ShaderDataType dataType, const T* data)
+		void SetVertices(Input index, ShaderDataType dataType, const void* data, size_t size)
 		{
-			auto iter = m_Offsets.find(size_t(index));
+			auto iter = m_Offsets.find(index);
 			if (iter != m_Offsets.end())
 			{
 				uint8_t* begin = m_VertexData.begin() + iter->second.first;
 
-				std::memcpy(begin, data, m_VertexCount * sizeof(T));
+				std::memcpy(begin, data, m_VertexCount * size);
 			}
 			else
 			{
-				m_Offsets[Input(index)] = std::make_pair(m_VertexData.size(), dataType);
-				m_VertexData.push_back(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data + m_VertexCount));
+				m_Offsets[index] = std::make_pair(m_VertexData.size(), dataType);
+				m_VertexData.push_back(reinterpret_cast<const uint8_t*>(data), reinterpret_cast<const uint8_t*>(data) + m_VertexCount * size);
 			}
+		}
+
+		template<typename U, typename T>
+		void SetVertices(U index, ShaderDataType dataType, const T* data)
+		{
+			SetVertices(Input(index), dataType, data, sizeof(T));
 		}
 
 		template<typename T>
@@ -225,21 +160,17 @@ namespace Mahakam
 
 		void SetIndices(const uint32_t* data, uint32_t indexCount)
 		{
-			m_IndexCount = indexCount;
-
 			m_Indices.assign(data, data + indexCount);
 		}
 
 		template<typename T>
 		void SetIndices(T&& container)
 		{
-			m_IndexCount = static_cast<uint32_t>(container.size());
-
 			m_Indices = std::forward<T>(container);
 		}
 
 		uint32_t GetVertexCount() const { return m_VertexCount; }
-		uint32_t GetIndexCount() const { return m_IndexCount; }
+		uint32_t GetIndexCount() const { return static_cast<uint32_t>(m_Indices.size()); }
 
 		const auto& GetVertexData() const { return m_VertexData; }
 		const auto& GetOffsets() const { return m_Offsets; }
@@ -247,7 +178,6 @@ namespace Mahakam
 
 	private:
 		uint32_t m_VertexCount;
-		uint32_t m_IndexCount;
 		TrivialVector<uint8_t, Allocator::BaseAllocator<uint8_t>> m_VertexData;
 		TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> m_Indices;
 		UnorderedMap<Input, std::pair<size_t, ShaderDataType>, Allocator::BaseAllocator<std::pair<const Input, std::pair<size_t, ShaderDataType>>>> m_Offsets;
@@ -270,6 +200,8 @@ namespace Mahakam
 		virtual const Bounds& GetBounds() const = 0;
 
 		virtual uint32_t GetVertexCount() const = 0;
+
+		virtual const MeshData& GetMeshData() const = 0;
 
 		virtual const void* GetVertices(int index) const = 0;
 

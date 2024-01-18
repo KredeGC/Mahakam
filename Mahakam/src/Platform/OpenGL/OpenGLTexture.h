@@ -65,7 +65,9 @@ namespace Mahakam
 		std::filesystem::path m_Filepath;
 
 		CubeTextureProps m_Props;
+		//uint32_t m_Channels // Might be useful
 
+		// These can just be calculated on the fly?
 		uint32_t m_InternalFormat;
 		uint32_t m_DataFormat;
 		uint32_t m_FormatType;
@@ -77,6 +79,7 @@ namespace Mahakam
 	public:
 		OpenGLTextureCube(const CubeTextureProps& props);
 		OpenGLTextureCube(const std::filesystem::path& filepath, const CubeTextureProps& props);
+		OpenGLTextureCube(void* data, uint32_t bpp, uint32_t mipLevels, const CubeTextureProps& props);
 
 		OpenGLTextureCube(const OpenGLTextureCube& other);
 		OpenGLTextureCube(OpenGLTextureCube&& other) noexcept;

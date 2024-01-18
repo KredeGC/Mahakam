@@ -52,16 +52,6 @@ namespace Mahakam
 				m_Control = nullptr;
 		}
 
-		explicit Asset(const std::filesystem::path& importPath)
-		{
-			// Register if the ID is valid
-			AssetID id = AssetDatabase::ReadAssetInfo(importPath).ID;
-			if (id)
-				m_Control = AssetDatabase::IncrementAsset(id);
-			else
-				m_Control = nullptr;
-		}
-
 #pragma region Copy & Move constructors
 		Asset(const Asset& other) noexcept :
 			m_Control(other.m_Control)
@@ -165,9 +155,9 @@ namespace Mahakam
 		}
 #pragma endregion
 
-		void Save(const ExtensionType& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+		void Save(AssetID id, const ExtensionType& extension)
 		{
-			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, extension, filepath, importPath);
+			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, id, extension);
 
 			// If the control block is changed, we might need to remove the old one
 			if (control != m_Control)
@@ -181,13 +171,6 @@ namespace Mahakam
 			return m_Control ? m_Control->ID : 0;
 		}
 
-		std::filesystem::path GetImportPath() const
-		{
-			if (m_Control)
-				return AssetDatabase::GetAssetImportPath(m_Control->ID);
-			return "";
-		}
-
 		size_t UseCount() const noexcept
 		{
 			return m_Control ? m_Control->UseCount : 0;
@@ -196,6 +179,14 @@ namespace Mahakam
 		T* get() const noexcept
 		{
 			return m_Control ? reinterpret_cast<T*>(m_Control + 1) : nullptr;
+		}
+
+		ControlBlock* leak() noexcept
+		{
+			ControlBlock* ptr = m_Control;
+			m_Control = nullptr;
+
+			return m_Control;
 		}
 
 		template<typename Ty = T, typename = std::enable_if_t<!std::is_void<Ty>::value>>

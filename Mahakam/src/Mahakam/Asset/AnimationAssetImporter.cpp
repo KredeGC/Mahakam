@@ -5,6 +5,8 @@
 
 #include "Mahakam/Renderer/Animation.h"
 
+#include "Mahakam/Serialization/YAMLSerialization.h"
+
 #include <imgui/imgui.h>
 
 namespace Mahakam
@@ -30,9 +32,7 @@ namespace Mahakam
 
 	void AnimationAssetImporter::OnWizardImport(Asset<void> asset, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
 	{
-		Asset<Animation> shaderAsset = Animation::Load(filepath, m_Index);
-
-		shaderAsset.Save(m_ImporterProps.Extension, filepath, importPath);
+		
 	}
 #endif
 
@@ -40,6 +40,7 @@ namespace Mahakam
 	{
 		Animation* animationAsset = static_cast<Animation*>(asset);
 
+		node["Filepath"] << animationAsset->GetFilepath();
 		node["Index"] << animationAsset->GetIndex();
 	}
 

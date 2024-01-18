@@ -26,6 +26,7 @@ namespace Mahakam
 			PROJECT_PATH = filepath;
 			ASSET_PATH = std::filesystem::relative(filepath / "assets", GetWorkingDirectory());
 			IMPORT_PATH = std::filesystem::relative(filepath / "import", GetWorkingDirectory());
+			RESOURCE_PATH = std::filesystem::relative(filepath / "resource", GetWorkingDirectory());
 
 			AssetDatabase::ReloadAssets();
 		}
@@ -84,14 +85,14 @@ namespace Mahakam
 		return CACHE_PATH / Filepath(filepath.string() + ".cache");
 	}
 
-	Filepath FileUtility::GetImportPath(const Filepath& filepath)
+	Filepath FileUtility::GetImportPath(const Filepath& filepath, const std::string& extension)
 	{
-		Filepath importPath = std::filesystem::relative(filepath, PROJECT_PATH);
+		Filepath importPath = std::filesystem::relative(filepath, RESOURCE_PATH);
 
 		Filepath importDirectory = IMPORT_PATH / importPath.parent_path();
 
 		CreateDirectories(importDirectory);
 
-		return IMPORT_PATH / Filepath(importPath.string() + ".import");
+		return IMPORT_PATH / Filepath(importPath.string() + extension + ".import");
 	}
 }

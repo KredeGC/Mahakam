@@ -77,6 +77,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #ifdef MH_ENABLE_ASSERT
+#define BS_DEBUG_BREAK
+#endif
+#include <bitstream/bitstream.h>
+
+#ifdef MH_ENABLE_ASSERT
 #define KTL_DEBUG_ASSERT
 #endif
 #include <ktl/containers/trivial_vector.h>

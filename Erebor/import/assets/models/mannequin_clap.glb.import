@@ -1,8 +1,0 @@
-Filepath: assets/models/mannequin_clap.glb
-Extension: .mesh
-ID: 11945816250811211738
-Materials:
-  - 7079340428320316353
-Primitive: 0
-IncludeNodes: true
-IncludeBones: true

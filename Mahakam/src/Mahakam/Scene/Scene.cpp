@@ -186,10 +186,6 @@ namespace Mahakam
 				if (!meshComponent.HasMesh())
 					return;
 
-				// Skeleton requires a bone mesh
-				if (meshComponent.GetPrimitive() != MeshPrimitive::Model)
-					return;
-
 				auto& animator = animatorComponent.GetAnimator();
 
 				const auto& translations = animator.GetTranslations();
@@ -269,10 +265,6 @@ namespace Mahakam
 			m_Registry.view<TransformComponent, SkeletonComponent, MeshComponent>().each([=](TransformComponent& transformComponent, SkeletonComponent& skeletonComponent, MeshComponent& meshComponent)
 			{
 				if (!meshComponent.HasMesh())
-					return;
-
-				// Skeleton requires a bone mesh
-				if (meshComponent.GetPrimitive() != MeshPrimitive::Model)
 					return;
 
 				const auto& boneEntities = skeletonComponent.GetBoneEntities();
@@ -439,15 +431,11 @@ namespace Mahakam
 					const auto& materials = meshComponent.GetMaterials();
 					uint32_t materialCount = static_cast<uint32_t>(materials.size());
 
-					if (materialCount-- <= 0)
+					if (materialCount-- == 0)
 						return;
 
 					if (SkeletonComponent* skeletonComponent = m_Registry.try_get<SkeletonComponent>(entity))
 					{
-						// Skeleton requires a bone mesh
-						if (meshComponent.GetPrimitive() != MeshPrimitive::Model)
-							return;
-
 						const auto& boneEntities = skeletonComponent->GetBoneEntities();
 						const auto& hierarchy = meshComponent.GetNodeHierarchy();
 

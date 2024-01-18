@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Mahakam/Renderer/Material.h"
-#include "Mahakam/Renderer/ShaderProps.h"
+#include "Mahakam/Renderer/ShaderDataTypes.h"
 
 namespace Mahakam
 {

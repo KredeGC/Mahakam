@@ -9,26 +9,17 @@ namespace Mahakam::Editor
 		{
 			Ref<Scene> scene = SceneManager::GetActiveScene();
 
-			std::filesystem::path skyboxPath = scene->GetSkyboxMaterial().GetImportPath();
-			if (GUI::DrawDragDropField("Skybox material", ".material", skyboxPath))
-			{
-				Asset<Material> skyboxMaterial = Asset<Material>(skyboxPath);
+			Asset<Material> skyboxMaterial = scene->GetSkyboxMaterial();
+			if (GUI::DrawDragDropAsset("Skybox material", skyboxMaterial, ".material"))
 				scene->SetSkyboxMaterial(skyboxMaterial);
-			}
 
-			std::filesystem::path irradiancePath = scene->GetSkyboxIrradiance().GetImportPath();
-			if (GUI::DrawDragDropField("Skybox irradiance", ".texture", irradiancePath))
-			{
-				Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>(irradiancePath);
+			Asset<TextureCube> skyboxIrradiance = scene->GetSkyboxIrradiance();
+			if (GUI::DrawDragDropAsset("Skybox irradiance", skyboxIrradiance, ".texcube"))
 				scene->SetSkyboxIrradiance(skyboxIrradiance);
-			}
 
-			std::filesystem::path specularPath = scene->GetSkyboxSpecular().GetImportPath();
-			if (GUI::DrawDragDropField("Skybox specular", ".texture", specularPath))
-			{
-				Asset<TextureCube> skyboxSpecular = Asset<TextureCube>(specularPath);
+			Asset<TextureCube> skyboxSpecular = scene->GetSkyboxSpecular();
+			if (GUI::DrawDragDropAsset("Skybox specular", skyboxSpecular, ".texcube"))
 				scene->SetSkyboxSpecular(skyboxSpecular);
-			}
 		}
 
 		ImGui::End();

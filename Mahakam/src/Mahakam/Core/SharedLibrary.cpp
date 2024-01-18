@@ -12,7 +12,7 @@
 
 namespace Mahakam
 {
-	static constexpr int NUM_FUNC_PTRS = 113;
+	static constexpr int NUM_FUNC_PTRS = 112;
 
 	static bool g_SharedLibraryInitialized = false;
 	static int g_FuncPointerCounter = 0;

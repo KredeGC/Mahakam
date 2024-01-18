@@ -1,0 +1,8 @@
+Filepath: resource/textures/brick/brick_albedo.png
+Format: SRGB_DXT1
+Filter: Point
+WrapX: Repeat
+WrapY: Repeat
+Mipmaps: 1
+Extension: .tex2d
+ID: 8387792792684495064
