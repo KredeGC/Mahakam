@@ -115,8 +115,21 @@ namespace bitstream
 				BS_ASSERT(stream.serialize(k));
 				BS_ASSERT(stream.serialize(v));
 
-				container.emplace(k, v);
+				container.emplace(std::move(k), std::move(v));
 			}
+
+			return true;
+		}
+	};
+
+	template<typename K, typename V>
+	struct serialize_traits<std::pair<K, V>>
+	{
+		template<typename Stream>
+		static bool serialize(Stream& stream, bitstream::inout<Stream, std::pair<K, V>> pair) noexcept
+		{
+			BS_ASSERT(stream.serialize(pair.first));
+			BS_ASSERT(stream.serialize(pair.second));
 
 			return true;
 		}

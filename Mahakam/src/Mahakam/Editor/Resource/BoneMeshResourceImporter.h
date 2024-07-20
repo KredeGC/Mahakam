@@ -12,7 +12,6 @@ namespace Mahakam
 	{
 	private:
 		BoneMeshProps m_Props;
-		std::filesystem::path m_Filepath;
 
 		Asset<Mesh> m_PreviewMesh;
 

@@ -4,7 +4,6 @@
 #include "AssetImporter.h"
 #include "AnimationAssetImporter.h"
 #include "MaterialAssetImporter.h"
-#include "ShaderAssetImporter.h"
 #include "SoundAssetImporter.h"
 #include "TextureAssetImporter.h"
 
@@ -14,6 +13,8 @@
 
 #include "Mahakam/BinarySerialization/AssetSerialization.h"
 #include "Mahakam/BinarySerialization/MeshSerialization.h"
+#include "Mahakam/BinarySerialization/ShaderSerialization.h"
+#include "Mahakam/BinarySerialization/TextureCubeSerialization.h"
 
 // TEMP
 #include "Mahakam/Serialization/YAMLGuard.h"
@@ -128,12 +129,14 @@ namespace Mahakam
 
 		LoadLegacySerializer<animType, animExtension>();
 		LoadLegacySerializer<matType, materialExtension>();
-		LoadLegacySerializer<shaderType, shaderExtension>();
 		LoadLegacySerializer<soundType, soundExtension>();
 		LoadLegacySerializer<tex2dType, textureExtension>();
 		LoadLegacySerializer<texcubeType, textureExtension>();
 
+		// TODO: Port all legacy importers to this
 		s_Serializers.emplace(meshType, CreateSerializer<Mesh>());
+		s_Serializers.emplace(shaderType, CreateSerializer<Shader>());
+		//s_Serializers.emplace(texcubeType, CreateSerializer<TextureCube>());
 	}
 
 	//void AssetDatabase::RegisterAssetImporter(Ref<AssetImporter> assetImport)
@@ -181,9 +184,6 @@ namespace Mahakam
 
 		// Material
 		AssetDatabase::RegisterAssetImporter(CreateRef<MaterialAssetImporter>());
-
-		// Shader
-		AssetDatabase::RegisterAssetImporter(CreateRef<ShaderAssetImporter>());
 
 		// Sound
 		AssetDatabase::RegisterAssetImporter(CreateRef<SoundAssetImporter>());

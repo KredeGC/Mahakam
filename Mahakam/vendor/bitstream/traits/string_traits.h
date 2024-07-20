@@ -228,7 +228,7 @@ namespace bitstream
 		*/
 		template<typename Stream>
 		typename utility::is_writing_t<Stream>
-		static serialize(Stream& writer, in<std::basic_string<T, Traits, Alloc>> value, uint32_t max_size) noexcept
+		static serialize(Stream& writer, in<std::basic_string<T, Traits, Alloc>> value, uint32_t max_size = 256) noexcept
 		{
 			uint32_t length = static_cast<uint32_t>(value.size());
 
@@ -253,7 +253,7 @@ namespace bitstream
 		*/
 		template<typename Stream>
 		typename utility::is_reading_t<Stream>
-		static serialize(Stream& reader, out<std::basic_string<T, Traits, Alloc>> value, uint32_t max_size)
+		static serialize(Stream& reader, out<std::basic_string<T, Traits, Alloc>> value, uint32_t max_size = 256)
 		{
 			uint32_t num_bits = utility::bits_to_represent(max_size);
 

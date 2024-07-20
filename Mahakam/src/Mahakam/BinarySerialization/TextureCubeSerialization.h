@@ -14,7 +14,7 @@ namespace bitstream
 	{
 		template<typename Stream>
 		typename utility::is_writing_t<Stream>
-		static serialize(Stream& writer, const Mahakam::Asset<Mahakam::TextureCube>& texture)
+		static serialize(Stream& writer, const Mahakam::Asset<Mahakam::TextureCube>& texture) noexcept
 		{
 			/*writer.serialize<TextureFormat>(textureAsset->GetProps().Format);
 			writer.serialize<TextureFilter>(textureAsset->GetProps().FilterMode);
@@ -31,7 +31,7 @@ namespace bitstream
 
 		template<typename Stream>
 		typename utility::is_reading_t<Stream>
-		static Deserialize(Stream& reader, Mahakam::Asset<Mahakam::TextureCube>& texture)
+		static Deserialize(Stream& reader, Mahakam::Asset<Mahakam::TextureCube>& texture) noexcept
 		{
 			Mahakam::CubeTextureProps props;
 

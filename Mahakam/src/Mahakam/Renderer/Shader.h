@@ -27,11 +27,8 @@ namespace Mahakam
 
 		virtual void Bind(const std::string& shaderPass) = 0;
 
-		virtual const std::filesystem::path& GetFilepath() const = 0;
-		virtual const std::string& GetName() const = 0;
-
-		//virtual const UnorderedMap<std::string, UnorderedMap<ShaderStage, std::vector<uint32_t>>>& GetData() const = 0;
 		virtual const UnorderedMap<std::string, ShaderProperty>& GetProperties() const = 0;
+		virtual const UnorderedMap<std::string, ShaderData>& GetShaderData() const = 0;
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const = 0;
 
@@ -48,6 +45,7 @@ namespace Mahakam
 		virtual void SetUniformFloat4(const std::string& name, const glm::vec4& value) = 0;
 
 		inline static Asset<Shader> Create(const std::filesystem::path& filepath) { return CreateFilepath(filepath); }
+		static Asset<Shader> Create(UnorderedMap<std::string, ShaderProperty>&& properties, UnorderedMap<std::string, ShaderData>&& data);
 
 	private:
 		MH_DECLARE_FUNC(CreateFilepath, Asset<Shader>, const std::filesystem::path& filepath);

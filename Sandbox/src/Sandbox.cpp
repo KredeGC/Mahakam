@@ -53,6 +53,8 @@ MH_EXTERN_EXPORTED void Load()
 
 MH_EXTERN_EXPORTED void Run(Scene* scene)
 {
+	//if (true) return;
+
 	// Scene camera
 	Entity cameraEntity = scene->CreateEntity("Main Camera");
 	cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);

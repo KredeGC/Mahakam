@@ -42,6 +42,10 @@ namespace Mahakam
 
 	class ShaderData
 	{
+	private:
+		using DataContainerType = TrivialVector<uint32_t, Allocator::BaseAllocator<uint32_t>>;
+		using OffsetContainerType = UnorderedMap<ShaderStage, std::pair<size_t, size_t>, Allocator::BaseAllocator<std::pair<const ShaderStage, std::pair<size_t, size_t>>>>;
+
 	public:
 		ShaderData() :
 			m_ShaderData(Allocator::GetAllocator<uint32_t>()),
@@ -81,15 +85,17 @@ namespace Mahakam
 			return std::make_pair(m_ShaderData.data() + iter->second.first, iter->second.second);
 		}
 
-		const auto& GetShaderData() const { return m_ShaderData; }
-		const auto& GetOffsets() const { return m_Offsets; }
+		const DataContainerType& GetShaderData() const { return m_ShaderData; }
+		const OffsetContainerType& GetOffsets() const { return m_Offsets; }
+		DataContainerType& GetShaderData() { return m_ShaderData; }
+		OffsetContainerType& GetOffsets() { return m_Offsets; }
 		size_t GetStageCount() const noexcept { return m_Offsets.size(); }
 
 		explicit operator bool() const noexcept { return !m_Offsets.empty(); }
 
 	private:
-		TrivialVector<uint32_t, Allocator::BaseAllocator<uint32_t>> m_ShaderData;
-		UnorderedMap<ShaderStage, std::pair<size_t, size_t>, Allocator::BaseAllocator<std::pair<const ShaderStage, std::pair<size_t, size_t>>>> m_Offsets;
+		DataContainerType m_ShaderData;
+		OffsetContainerType m_Offsets;
 	};
 
 

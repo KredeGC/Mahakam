@@ -857,4 +857,20 @@ namespace Mahakam
 
 		return nullptr;
 	};
+
+	Asset<Shader> Shader::Create(UnorderedMap<std::string, ShaderProperty>&& properties, UnorderedMap<std::string, ShaderData>&& data)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::None:
+			MH_BREAK("Currently not supported");
+			//return CreateAsset<HeadlessShader>(std::move(properties), std::move(data));
+		case RendererAPI::API::OpenGL:
+			return CreateAsset<OpenGLShader>(std::move(properties), std::move(data));
+		}
+
+		MH_BREAK("Unknown renderer API!");
+
+		return nullptr;
+	}
 }

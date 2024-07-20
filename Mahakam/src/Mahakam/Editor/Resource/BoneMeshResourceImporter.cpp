@@ -21,7 +21,7 @@ namespace Mahakam
 	void BoneMeshResourceImporter::OnResourceOpen(const std::filesystem::path& filepath)
 	{
 		m_Props = BoneMeshProps();
-		m_Filepath = filepath;
+		m_Props.Filepath = filepath;
 	}
 
 	void BoneMeshResourceImporter::OnImportOpen(ryml::NodeRef& node)
@@ -31,7 +31,7 @@ namespace Mahakam
 
 	void BoneMeshResourceImporter::OnRender()
 	{
-		GUI::DrawDragDropField("File path", m_ImporterProps.Extension, m_Filepath);
+		GUI::DrawDragDropField("File path", m_ImporterProps.Extension, m_Props.Filepath);
 
 		ImGui::Checkbox("Include mesh nodes", &m_Props.IncludeNodes);
 		ImGui::Checkbox("Include mesh bones", &m_Props.IncludeBones);

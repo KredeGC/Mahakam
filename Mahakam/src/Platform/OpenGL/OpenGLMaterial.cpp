@@ -293,7 +293,7 @@ namespace Mahakam
 		if (texIter != m_Textures.end())
 			return texIter->second;
 
-		MH_WARN("Material ({0}) has no texture named {1}", GetShader()->GetName(), name);
+		MH_WARN("Material has no texture named {0}", name);
 
 		return nullptr;
 	}
@@ -304,7 +304,7 @@ namespace Mahakam
 		if (matIter != m_Mat3s.end())
 			return matIter->second;
 
-		MH_WARN("Material ({0}) has no mat3 named {1}", GetShader()->GetName(), name);
+		MH_WARN("Material has no mat3 named {0}", name);
 
 		return glm::mat3(1.0f);
 	}
@@ -315,7 +315,7 @@ namespace Mahakam
 		if (matIter != m_Mat4s.end())
 			return matIter->second;
 
-		MH_WARN("Material ({0}) has no mat4 named {1}", GetShader()->GetName(), name);
+		MH_WARN("Material has no mat4 named {0}", name);
 
 		return glm::mat4(1.0f);
 	}
@@ -326,7 +326,7 @@ namespace Mahakam
 		if (intIter != m_Ints.end())
 			return intIter->second;
 
-		MH_WARN("Material ({0}) has no int named {1}", GetShader()->GetName(), name);
+		MH_WARN("Material has no int named {0}", name);
 
 		return 0;
 	}
@@ -337,7 +337,7 @@ namespace Mahakam
 		if (floatIter != m_Floats.end())
 			return floatIter->second;
 
-		MH_WARN("Material ({0}) has no float named {1}", GetShader()->GetName(), name);
+		MH_WARN("Material has no float named {0}", name);
 
 		return 0.0f;
 	}
@@ -348,7 +348,7 @@ namespace Mahakam
 		if (floatIter != m_Float2s.end())
 			return floatIter->second;
 
-		MH_WARN("Material ({0}) has no float2 named {1}", GetShader()->GetName(), name);
+		MH_WARN("Material has no float2 named {0}", name);
 
 		return glm::vec2(0.0f);
 	}
@@ -359,7 +359,7 @@ namespace Mahakam
 		if (floatIter != m_Float3s.end())
 			return floatIter->second;
 
-		MH_WARN("Material ({0}) has no float3 named {1}", GetShader()->GetName(), name);
+		MH_WARN("Material has no float3 named {0}", name);
 
 		return glm::vec3(0.0f);
 	}
@@ -370,7 +370,7 @@ namespace Mahakam
 		if (floatIter != m_Float4s.end())
 			return floatIter->second;
 
-		MH_WARN("Material ({0}) has no float4 named {1}", GetShader()->GetName(), name);
+		MH_WARN("Material has no float4 named {0}", name);
 
 		return glm::vec4(0.0f);
 	}
@@ -409,7 +409,7 @@ namespace Mahakam
 				m_Ints[prop.first] = 0;
 				break;
 			default:
-				MH_WARN("Material properties for {0} shader include unused property: {1}", m_Shader->GetName(), prop.first);
+				MH_WARN("Material properties for shader include unused property: {0}", prop.first);
 				break;
 			}
 		}

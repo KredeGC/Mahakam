@@ -13,7 +13,7 @@ Properties:
     Default: Bump
   u_Metallic:
     Type: Texture
-    Default: Black
+    Default: White
   Uniforms.MetallicMul:
     Type: Range
     Min: 0

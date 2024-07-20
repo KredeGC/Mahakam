@@ -25,19 +25,25 @@
 
 namespace Mahakam
 {
-	OpenGLShader::OpenGLShader(const UnorderedMap<std::string, ShaderData>& data) :
+	OpenGLShader::OpenGLShader(UnorderedMap<std::string, ShaderProperty>&& properties, UnorderedMap<std::string, ShaderData>&& data) :
 		m_Filepath(),
-		m_Name()
+		m_Name(),
+		m_Properties(std::move(properties)),
+		m_ShaderData(std::move(data))
 	{
 		MH_PROFILE_FUNCTION();
 
-		/*for (const auto& [shaderPass, shaderData] : data)
+		for (const auto& [shaderPass, shaderData] : m_ShaderData)
 		{
-			const auto& spirv = shaderData.GetShaderData();
+			UnorderedMap<ShaderStage, std::vector<uint32_t>> spirv;
+			for (auto& [stage, offset] : shaderData.GetOffsets())
+			{
+				auto [data, size] = shaderData.GetStage(stage);
+				spirv[stage].assign(data, data + size);
+			}
 
-			m_ShaderData[shaderPass] = std::move(shaderData); // TODO: std::move the shaderData
 			m_ShaderPasses[shaderPass] = CompileBinary(spirv); // TODO: CompileBinary should take a const ShaderData& instead
-		}*/
+		}
 	}
 
 	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath) :
