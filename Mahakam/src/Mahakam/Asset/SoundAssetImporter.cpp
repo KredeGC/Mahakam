@@ -18,11 +18,7 @@ namespace Mahakam
 	{
 		Sound* sound = static_cast<Sound*>(asset);
 
-		const SoundProps& props = sound->GetProps();
-
 		node["Filepath"] << sound->GetFilepath();
-		node["Volume"] << props.Volume;
-		node["Loop"] << props.Loop;
 	}
 
 	Asset<void> SoundAssetImporter::Deserialize(ryml::NodeRef& node)
@@ -30,18 +26,6 @@ namespace Mahakam
 		std::filesystem::path filepath;
 		DeserializeYAMLNode(node, "Filepath", filepath);
 
-		SoundProps props = DeserializeProps(node);
-
-		return Sound::Create(filepath.string(), props);
-	}
-
-	SoundProps SoundAssetImporter::DeserializeProps(ryml::NodeRef& node)
-	{
-		SoundProps props;
-
-		DeserializeYAMLNode(node, "Volume", props.Volume);
-		DeserializeYAMLNode(node, "Loop", props.Loop);
-
-		return props;
+		return Sound::Create(filepath.string());
 	}
 }

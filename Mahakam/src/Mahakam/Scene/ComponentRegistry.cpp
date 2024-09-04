@@ -192,6 +192,14 @@ namespace Mahakam
 				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
 			}
 
+			float volume = source.GetVolume();
+			if (ImGui::DragFloat("Volume", &volume, 0.01f, 0.0f, 1.0f))
+				source.SetVolume(volume);
+
+			bool looping = source.GetLooping();
+			if (ImGui::Checkbox("Loop", &looping))
+				source.SetLooping(looping);
+
 			float spatialBlend = source.GetSpatialBlend();
 			if (ImGui::DragFloat("Spatial blend", &spatialBlend, 0.01f, 0.0f, 1.0f))
 				source.SetSpatialBlend(spatialBlend);

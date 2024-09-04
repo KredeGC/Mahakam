@@ -26,8 +26,5 @@ namespace Mahakam
 
 		virtual void Serialize(ryml::NodeRef& node, void* asset) override;
 		virtual Asset<void> Deserialize(ryml::NodeRef& node) override;
-
-	private:
-		SoundProps DeserializeProps(ryml::NodeRef& node);
 	};
 }

@@ -10,7 +10,6 @@ namespace Mahakam
 	{
 	private:
 		std::filesystem::path m_Filepath;
-		SoundProps m_Props;
 
 	public:
 		SoundResourceImporter();
@@ -21,8 +20,5 @@ namespace Mahakam
 		virtual void OnImport(ryml::NodeRef& node) override;
 
 		virtual Asset<void> CreateAsset(ryml::NodeRef& node) override;
-
-	private:
-		SoundProps DeserializeProps(ryml::NodeRef& node);
 	};
 }

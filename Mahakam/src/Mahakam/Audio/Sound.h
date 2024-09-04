@@ -1,7 +1,6 @@
 #pragma once
 
 #include "AudioEngine.h"
-#include "SoundProps.h"
 
 #include "Mahakam/Asset/Asset.h"
 
@@ -12,14 +11,10 @@ namespace Mahakam
 	public:
 		virtual const std::string& GetFilepath() const = 0;
 
-		virtual const SoundProps& GetProps() const = 0;
-
-		virtual void SetProps(const SoundProps& props) = 0;
-
-		inline static Asset<Sound> Create(const std::string& filepath, const SoundProps& props = {}) { return CreateImpl(filepath, props, AudioEngine::GetContext()); }
-		inline static Asset<Sound> Create(const std::string& filepath, AudioContext* context, const SoundProps& props = {}) { return CreateImpl(filepath, props, context); }
+		inline static Asset<Sound> Create(const std::string& filepath) { return CreateImpl(filepath, AudioEngine::GetContext()); }
+		inline static Asset<Sound> Create(const std::string& filepath, AudioContext* context) { return CreateImpl(filepath, context); }
 
 	private:
-		MH_DECLARE_FUNC(CreateImpl, Asset<Sound>, const std::string& filepath, const SoundProps& props, AudioContext* context);
+		MH_DECLARE_FUNC(CreateImpl, Asset<Sound>, const std::string& filepath, AudioContext* context);
 	};
 }

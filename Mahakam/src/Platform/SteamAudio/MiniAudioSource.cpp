@@ -11,8 +11,9 @@ namespace Mahakam
 		return CreateScope<MiniAudioSource>(static_cast<MiniAudioContext*>(context));
 	};
 
-	MiniAudioSource::MiniAudioSource(MiniAudioContext* context)
-		: m_Context(context)
+	MiniAudioSource::MiniAudioSource(MiniAudioContext* context) :
+		m_Context(context),
+		m_Props()
 	{
 		ma_steamaudio_binaural_node_config binauralNodeConfig;
 
@@ -72,6 +73,29 @@ namespace Mahakam
 		{
 			m_DataSource = nullptr;
 		}
+	}
+
+	void MiniAudioSource::SetProps(const SoundProps& props)
+	{
+		// Update volume, if it has changed
+		if (props.Volume != m_Props.Volume)
+			SetVolume(props.Volume);
+
+		// Update looping, if it has changed
+		if (props.Loop != m_Props.Loop)
+			SetLooping(props.Loop);
+	}
+
+	void MiniAudioSource::SetVolume(float volume)
+	{
+		m_Props.Volume = volume;
+		ma_sound_set_volume(&m_MaSound, volume);
+	}
+
+	void MiniAudioSource::SetLooping(bool loop)
+	{
+		m_Props.Loop = loop;
+		ma_sound_set_looping(&m_MaSound, loop ? MA_TRUE : MA_FALSE);
 	}
 
 	void MiniAudioSource::SetInterpolation(bool interpolate)

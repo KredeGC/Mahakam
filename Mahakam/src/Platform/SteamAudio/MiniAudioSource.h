@@ -24,6 +24,8 @@ namespace Mahakam
 		// Need to keep a reference to data source
 		Scope<AudioDataSource> m_DataSource;
 
+		SoundProps m_Props;
+
 		glm::vec4 m_Source{ 0 };
 
 	public:
@@ -35,6 +37,15 @@ namespace Mahakam
 
 		virtual void SetDataSource(Scope<AudioDataSource> dataSource) override;
 		virtual AudioDataSource* GetDataSource() const override { return m_DataSource.get(); }
+
+		virtual const SoundProps& GetProps() const override { return m_Props; }
+		virtual void SetProps(const SoundProps& props) override;
+
+		virtual void SetVolume(float volume) override;
+		virtual float GetVolume() const override { return m_Props.Volume; }
+
+		virtual void SetLooping(bool loop) override;
+		virtual bool GetLooping() const override { return m_Props.Loop; }
 
 		virtual void SetInterpolation(bool interpolate) override;
 		virtual bool GetInterpolation() const override { return m_Node.interpolate; }
