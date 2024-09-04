@@ -35,6 +35,8 @@ namespace Mahakam
 		virtual void Play() override;
 		virtual void Stop() override;
 
+		virtual bool IsPlaying() const override;
+
 		virtual void SetDataSource(Scope<AudioDataSource> dataSource) override;
 		virtual AudioDataSource* GetDataSource() const override { return m_DataSource.get(); }
 

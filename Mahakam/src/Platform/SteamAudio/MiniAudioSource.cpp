@@ -58,6 +58,14 @@ namespace Mahakam
 			ma_sound_stop(&m_MaSound);
 	}
 
+	bool MiniAudioSource::IsPlaying() const
+	{
+		if (m_DataSource)
+			return ma_sound_is_playing(&m_MaSound);
+
+		return false;
+	}
+
 	void MiniAudioSource::SetDataSource(Scope<AudioDataSource> dataSource)
 	{
 		if (m_DataSource)

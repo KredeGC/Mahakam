@@ -26,6 +26,8 @@ namespace Mahakam
 
 		virtual void Play() = 0;
 		virtual void Stop() = 0;
+
+		virtual bool IsPlaying() const = 0;
 		
 		virtual void SetDataSource(Scope<AudioDataSource> dataSource) = 0;
 		virtual AudioDataSource* GetDataSource() const = 0;
