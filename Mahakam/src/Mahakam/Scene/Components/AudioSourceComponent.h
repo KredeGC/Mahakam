@@ -20,8 +20,12 @@ namespace Mahakam
 		AudioSourceComponent(const AudioSourceComponent& other) noexcept :
 			m_Source(AudioSource::Create(other.GetContext()))
 		{
-			m_Sound = other.GetSound();
-			m_Source->SetDataSource(AudioDataSource::Create(other.GetSound()));
+			if (other.GetSound())
+			{
+				m_Sound = other.GetSound();
+				m_Source->SetDataSource(AudioDataSource::Create(other.GetSound()));
+			}
+
 			m_Source->SetInterpolation(other.GetInterpolation());
 			m_Source->SetSpatialBlend(other.GetSpatialBlend());
 		}
@@ -35,8 +39,12 @@ namespace Mahakam
 		{
 			m_Source = AudioSource::Create(other.GetContext());
 
-			m_Sound = other.GetSound();
-			m_Source->SetDataSource(AudioDataSource::Create(other.GetSound()));
+			if (other.GetSound())
+			{
+				m_Sound = other.GetSound();
+				m_Source->SetDataSource(AudioDataSource::Create(other.GetSound()));
+			}
+
 			m_Source->SetInterpolation(other.GetInterpolation());
 			m_Source->SetSpatialBlend(other.GetSpatialBlend());
 
