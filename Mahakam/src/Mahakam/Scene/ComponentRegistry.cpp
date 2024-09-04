@@ -182,12 +182,13 @@ namespace Mahakam
 		// audio icon
 		componentInterface.SetEditor(u8"\ueea8", [](Entity entity)
 		{
-			AudioSource& source = entity.GetComponent<AudioSourceComponent>();
-			Asset<Sound> sound = source.GetSound();
+			AudioSourceComponent& component = entity.GetComponent<AudioSourceComponent>();
+			AudioSource& source = component.GetAudioSource();
+			Asset<Sound> sound = component.GetSound();
 
 			if (GUI::DrawDragDropAsset("Sound", sound, ".sound"))
 			{
-				source.SetSound(sound);
+				component.SetSound(sound);
 				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
 			}
 

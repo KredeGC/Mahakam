@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mahakam/Audio/AudioSource.h"
+#include "Mahakam/Audio/AudioDataSource.h"
 
 #include "MiniAudioContext.h"
 #include "MiniAudioSound.h"
@@ -20,13 +21,8 @@ namespace Mahakam
 		// ma_sound is internally ref-counted, so this doesn't matter performance-wise
 		ma_sound m_MaSound;
 
-		// Need to keep a reference to the filepath, in case it changes
-		std::filesystem::path m_SoundFilepath;
-
-		// Need to keep a reference to props, in case they change
-		SoundProps m_SoundProps;
-
-		Asset<MiniAudioSound> m_Sound;
+		// Need to keep a reference to data source
+		Scope<AudioDataSource> m_DataSource;
 
 		glm::vec4 m_Source{ 0 };
 
@@ -37,8 +33,8 @@ namespace Mahakam
 		virtual void Play() override;
 		virtual void Stop() override;
 
-		virtual void SetSound(Asset<Sound> sound) override;
-		virtual Asset<Sound> GetSound() const override { return m_Sound; }
+		virtual void SetDataSource(Scope<AudioDataSource> dataSource) override;
+		virtual AudioDataSource* GetDataSource() const override { return m_DataSource.get(); }
 
 		virtual void SetInterpolation(bool interpolate) override;
 		virtual bool GetInterpolation() const override { return m_Node.interpolate; }

@@ -39,7 +39,7 @@ namespace Mahakam
 	{
 		m_Context->RemoveSource(this);
 
-		if (m_Sound)
+		if (m_DataSource)
 			UninitSound();
 
 		ma_steamaudio_binaural_node_uninit(&m_Node, NULL);
@@ -47,32 +47,30 @@ namespace Mahakam
 
 	void MiniAudioSource::Play()
 	{
-		if (m_Sound)
+		if (m_DataSource)
 			ma_sound_start(&m_MaSound);
 	}
 
 	void MiniAudioSource::Stop()
 	{
-		if (m_Sound)
+		if (m_DataSource)
 			ma_sound_stop(&m_MaSound);
 	}
 
-	void MiniAudioSource::SetSound(Asset<Sound> sound)
+	void MiniAudioSource::SetDataSource(Scope<AudioDataSource> dataSource)
 	{
-		if (m_Sound)
+		if (m_DataSource)
 			UninitSound();
 
-		if (sound)
+		if (dataSource)
 		{
-			m_Sound = static_cast<Asset<MiniAudioSound>>(sound);
-			m_SoundProps = m_Sound->GetProps();
-			m_SoundFilepath = m_Sound->GetFilepath();
+			m_DataSource = std::move(dataSource);
 
 			InitSound();
 		}
 		else
 		{
-			m_Sound = nullptr;
+			m_DataSource = nullptr;
 		}
 	}
 
@@ -93,7 +91,7 @@ namespace Mahakam
 
 	float MiniAudioSource::GetTime() const
 	{
-		if (!m_Sound)
+		if (!m_DataSource)
 			return 0.0f;
 
 		float out;
@@ -105,7 +103,7 @@ namespace Mahakam
 
 	float MiniAudioSource::GetDuration() const
 	{
-		if (!m_Sound)
+		if (!m_DataSource)
 			return 0.0f;
 
 		float out;
@@ -117,37 +115,7 @@ namespace Mahakam
 
 	void MiniAudioSource::UpdatePosition(const glm::mat4& listenerView, const glm::vec3& listenerPos)
 	{
-		if (!m_Sound) return;
-
-		const SoundProps& props = m_Sound->GetProps();
-
-		// Reload the sound if the path changed
-		// A better solution might be to have a callback system on Assets when they get reloaded
-		if (m_Sound->GetFilepath() != m_SoundFilepath)
-		{
-			UninitSound();
-
-			m_SoundProps = props;
-			m_SoundFilepath = m_Sound->GetFilepath();
-
-			InitSound();
-
-			Play(); // TEMP
-		}
-
-		// Update volume, if it has changed
-		if (props.Volume != m_SoundProps.Volume)
-		{
-			m_SoundProps.Volume = props.Volume;
-			ma_sound_set_volume(&m_MaSound, props.Volume);
-		}
-
-		// Update looping, if it has changed
-		if (props.Loop != m_SoundProps.Loop)
-		{
-			m_SoundProps.Loop = props.Loop;
-			ma_sound_set_looping(&m_MaSound, props.Loop ? MA_TRUE : MA_FALSE);
-		}
+		if (!m_DataSource) return;
 
 		if (m_Node.spatialBlend > 0.0f)
 		{
@@ -170,11 +138,8 @@ namespace Mahakam
 		*/
 		ma_sound_config soundConfig;
 
-		std::string filepath = m_Sound->GetFilepath();
-
 		soundConfig = ma_sound_config_init();
-		soundConfig.pFilePath = filepath.c_str();
-		soundConfig.isLooping = m_Sound->GetProps().Loop ? MA_TRUE : MA_FALSE;
+		soundConfig.pDataSource = m_DataSource->GetDataSource();
 		soundConfig.flags = MA_SOUND_FLAG_NO_DEFAULT_ATTACHMENT | MA_SOUND_FLAG_NO_SPATIALIZATION;  /* We'll attach this to the graph later. */
 
 		ma_result result = ma_sound_init_ex(&m_Context->GetEngine(), &soundConfig, &m_MaSound);
@@ -183,7 +148,8 @@ namespace Mahakam
 		/* We'll let the Steam Audio binaural effect do the directional attenuation for us. */
 		ma_sound_set_directional_attenuation_factor(&m_MaSound, 0);
 
-		ma_sound_set_volume(&m_MaSound, m_Sound->GetProps().Volume);
+		// ma_sound_set_volume(&m_MaSound, m_Sound->GetProps().Volume); // TODO: Source should probably have the controls, not the file
+		// ma_sound_set_looping(&m_MaSound, m_Sound->GetProps().Looping);
 
 		/* We can now wire up the sound to the binaural node and start it. */
 		ma_node_attach_output_bus(&m_MaSound, 0, &m_Node, 0);

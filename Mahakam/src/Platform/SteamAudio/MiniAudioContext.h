@@ -28,6 +28,9 @@ namespace Mahakam
 		MiniAudioContext();
 		~MiniAudioContext();
 
+		virtual uint32_t GetChannels() const override;
+		virtual uint32_t GetSampleRate() const override;
+
 		virtual void UpdateSounds(const glm::mat4& listenerTransform) override;
 
 		void AddSource(MiniAudioSource* node) { m_Sources.push_back(node); }

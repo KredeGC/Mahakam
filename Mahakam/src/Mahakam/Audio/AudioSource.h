@@ -5,6 +5,7 @@
 #include "Mahakam/Asset/Asset.h"
 
 #include "AudioEngine.h"
+#include "AudioDataSource.h"
 
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
@@ -24,8 +25,8 @@ namespace Mahakam
 		virtual void Play() = 0;
 		virtual void Stop() = 0;
 		
-		virtual void SetSound(Asset<Sound> sound) = 0;
-		virtual Asset<Sound> GetSound() const = 0;
+		virtual void SetDataSource(Scope<AudioDataSource> dataSource) = 0;
+		virtual AudioDataSource* GetDataSource() const = 0;
 
 		virtual void SetInterpolation(bool interpolate) = 0;
 		virtual bool GetInterpolation() const = 0;

@@ -69,6 +69,16 @@ namespace Mahakam
 		ma_engine_uninit(&m_Engine);
 	}
 
+	uint32_t MiniAudioContext::GetChannels() const
+	{
+		return ma_engine_get_channels(&m_Engine);
+	}
+
+	uint32_t MiniAudioContext::GetSampleRate() const
+	{
+		return ma_engine_get_sample_rate(&m_Engine);
+	}
+
 	void MiniAudioContext::UpdateSounds(const glm::mat4& listenerTransform)
 	{
 		glm::mat4 listenerView = glm::inverse(listenerTransform);
