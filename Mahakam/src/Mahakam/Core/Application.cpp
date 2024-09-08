@@ -74,6 +74,8 @@ namespace Mahakam
 
 	void Application::Run()
 	{
+		m_LastFrameTime = m_Window->GetTime();
+
 		while (m_Running)
 		{
 			double time = m_Window->GetTime();

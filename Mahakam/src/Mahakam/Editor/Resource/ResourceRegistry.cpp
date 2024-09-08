@@ -239,7 +239,7 @@ namespace Mahakam
 	{
 		if (!FileUtility::Exists(filepath))
 		{
-			MH_WARN("Could not import assets. Does the '{0}' folder exist?", filepath.u8string());
+			MH_WARN("Could not import assets. Does the '{0}' folder exist?", filepath.string());
 			return;
 		}
 

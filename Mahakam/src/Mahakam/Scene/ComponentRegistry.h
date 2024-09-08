@@ -49,6 +49,15 @@ namespace Mahakam
 				OnPropertyDraw = onPropertyDraw;
 #endif
 			}
+
+			template<typename T>
+			inline void SetEditor(const T* icon = nullptr, void (*onPropertyDraw)(Entity) = nullptr)
+			{
+#ifndef MH_STANDALONE
+				Icon = reinterpret_cast<const char*>(icon);
+				OnPropertyDraw = onPropertyDraw;
+#endif
+			}
 		};
 
 	private:
