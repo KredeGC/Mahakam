@@ -1,4 +1,4 @@
-#include "ebpch.h"
+#include "Mahakam/mhpch.h"
 #include "SceneViewPanel.h"
 
 #include <glm/gtc/type_ptr.hpp>
@@ -78,9 +78,9 @@ namespace Mahakam::Editor
 						ImGui::EndMenu();
 					}
 
-					ImGui::MenuItem(u8"\ueca6");
-					ImGui::MenuItem(u8"\uecb1");
-					ImGui::MenuItem(u8"\ueca5");
+					ImGui::MenuItem(reinterpret_cast<const char*>(u8"\ueca6"));
+					ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uecb1"));
+					ImGui::MenuItem(reinterpret_cast<const char*>(u8"\ueca5"));
 					
 					ImGui::EndMenuBar();
 				}

@@ -1,5 +1,4 @@
 Make Erebor into an asset importer instead of an editor
 Make Sandbox the editor
-Editor windows should be part of Mahakam
 Scenes should hold the AssetDatabase, AudioEngine and PhysicsEngine
 Maybe replace Bullet with Jolt?

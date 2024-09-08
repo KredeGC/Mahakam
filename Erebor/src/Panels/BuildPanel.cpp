@@ -11,17 +11,17 @@ namespace Mahakam::Editor
 			
 			if (Runtime::HasRuntime(hasRun, hasStop, hasUpdate))
 			{
-				ImGui::Text(u8"\ueed7" "  Runtime loaded correctly");
+				ImGui::Text(reinterpret_cast<const char*>(u8"\ueed7  Runtime loaded correctly"));
 
-				ImGui::Text("%s  Run(Scene*)", hasRun ? u8"\ueed7" : u8"\ueedd");
+				ImGui::Text("%s  Run(Scene*)", reinterpret_cast<const char*>(hasRun ? u8"\ueed7" : u8"\ueedd"));
 
-				ImGui::Text("%s  Stop(Scene*)", hasStop ? u8"\ueed7" : u8"\ueedd");
+				ImGui::Text("%s  Stop(Scene*)", reinterpret_cast<const char*>(hasStop ? u8"\ueed7" : u8"\ueedd"));
 
-				ImGui::Text("%s  Update(Scene*, Timestep)", hasUpdate ? u8"\ueed7" : u8"\ueedd");
+				ImGui::Text("%s  Update(Scene*, Timestep)", reinterpret_cast<const char*>(hasUpdate ? u8"\ueed7" : u8"\ueedd"));
 			}
 			else
 			{
-				ImGui::Text(u8"\ueedd" "  Runtime not loaded");
+				ImGui::Text(reinterpret_cast<const char*>(u8"\ueedd  Runtime not loaded"));
 			}
 
 			// TODO: Make button disabled in playmode

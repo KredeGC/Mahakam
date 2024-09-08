@@ -1,4 +1,4 @@
-#include "ebpch.h"
+#include "Mahakam/mhpch.h"
 #include "SceneHierarchyPanel.h"
 
 #include <imgui/imgui.h>
@@ -25,7 +25,7 @@ namespace Mahakam::Editor
 
 		// Use default icon
 		if (tagStream.tellp() == 0)
-			tagStream << u8"\ueea5"; // Archive icon
+			tagStream << reinterpret_cast<const char*>(u8"\ueea5"); // Archive icon
 
 		// Add tag at the end
 		tagStream << " " << tag.c_str();

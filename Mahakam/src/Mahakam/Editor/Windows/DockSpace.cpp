@@ -1,4 +1,4 @@
-#include "ebpch.h"
+#include "Mahakam/mhpch.h"
 #include "DockSpace.h"
 
 #include <imgui/imgui.h>
@@ -42,7 +42,7 @@ namespace Mahakam::Editor
 		{
 			if (ImGui::BeginMenu("Project"))
 			{
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uec5b Open Project")))
+				if (ImGui::MenuItem("\uec5b" " Open Project"))
 				{
 					std::filesystem::path projectPath = FileUtility::OpenDirectory();
 
@@ -54,7 +54,7 @@ namespace Mahakam::Editor
 					}
 				}
 
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uef1d Exit")))
+				if (ImGui::MenuItem("\uef1d" " Exit"))
 					Application::GetInstance()->Close();
 
 				ImGui::EndMenu();
@@ -65,16 +65,16 @@ namespace Mahakam::Editor
 				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
 				// which we can't undo at the moment without finer window depth/z control.
 				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);1
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uef10 New Scene"), "Ctrl+N"))
+				if (ImGui::MenuItem("\uef10" " New Scene", "Ctrl+N"))
 					NewScene();
 
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uec5b Open Scene..."), "Ctrl+O"))
+				if (ImGui::MenuItem("\uec5b" " Open Scene...", "Ctrl+O"))
 					OpenScene();
 
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uee00 Save Scene..."), "Ctrl+S"))
+				if (ImGui::MenuItem("\uee00" " Save Scene...", "Ctrl+S"))
 					SaveScene();
 
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uee00 Save Scene As..."), "Ctrl+Shift+S"))
+				if (ImGui::MenuItem("\uee00" " Save Scene As...", "Ctrl+Shift+S"))
 					SaveSceneAs();
 
 				ImGui::EndMenu();

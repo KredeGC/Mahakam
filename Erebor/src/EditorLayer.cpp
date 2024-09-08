@@ -1,20 +1,22 @@
 #include "ebpch.h"
 #include "EditorLayer.h"
 
-#include "Panels/AssetManagerPanel.h"
-#include "Panels/BuildPanel.h"
-#include "Panels/ConsolePanel.h"
-#include "Panels/ContentBrowserPanel.h"
-#include "Panels/EnvironmentPanel.h"
-#include "Panels/ImportWizardPanel.h"
-#include "Panels/ProfilerPanel.h"
-#include "Panels/RenderPassPanel.h"
-#include "Panels/SceneHierarchyPanel.h"
-#include "Panels/SceneViewPanel.h"
-#include "Panels/StatsPanel.h"
 #include "ConsoleLogSink.h"
 
+#include "Panels/BuildPanel.h"
+#include "Panels/ConsolePanel.h"
+
 #include "RenderPasses/BoundingBoxRenderPass.h"
+
+#include <Mahakam/Editor/Windows/AssetManagerPanel.h>
+#include <Mahakam/Editor/Windows/ContentBrowserPanel.h>
+#include <Mahakam/Editor/Windows/EnvironmentPanel.h>
+#include <Mahakam/Editor/Windows/ImportWizardPanel.h>
+#include <Mahakam/Editor/Windows/ProfilerPanel.h>
+#include <Mahakam/Editor/Windows/RenderPassPanel.h>
+#include <Mahakam/Editor/Windows/SceneHierarchyPanel.h>
+#include <Mahakam/Editor/Windows/SceneViewPanel.h>
+#include <Mahakam/Editor/Windows/StatsPanel.h>
 
 #include <fstream>
 #include <filesystem>
