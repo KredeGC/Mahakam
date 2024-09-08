@@ -130,7 +130,7 @@ LinuxLinks = {
 
 workspace "Mahakam"
     architecture "x64"
-    startproject(_OPTIONS["standalone"] and "Sandbox" or "Erebor")
+    startproject("Sandbox")
     toolset(_OPTIONS["toolset"])
     
     configurations {

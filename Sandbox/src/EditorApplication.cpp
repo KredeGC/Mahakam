@@ -6,7 +6,7 @@
 
 namespace Mahakam::Editor
 {
-	EditorApplication::EditorApplication() : Application("Sandbox", { "Sandbox " + FileUtility::GetWorkingDirectory().string(), "internal/icons/icon-64.png" })
+	EditorApplication::EditorApplication() : Application("Sandbox", { "Sandbox " + FileUtility::GetWorkingDirectory().string(), "internal/icons/icon-64.png", 1600, 900, true })
 	{
 		// Create editor layer
 		m_EditorLayer = new EditorLayer();

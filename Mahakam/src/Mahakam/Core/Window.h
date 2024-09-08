@@ -41,9 +41,6 @@ namespace Mahakam
 
 		virtual RenderingContext& GetContext() const = 0;
 
-		inline static Scope<Window> Create(const WindowProps& props = WindowProps()) { return CreateImpl(props); }
-
-	private:
-		MH_DECLARE_FUNC(CreateImpl, Scope<Window>, const WindowProps& props);
+		static Scope<Window> Create(const WindowProps& props = WindowProps());
 	};
 }

@@ -83,7 +83,7 @@ namespace Mahakam
 
 		// Lights
 		glm::quat rot = glm::quat({ -0.7f, -glm::radians(45.0f), 0.0f });
-		Light light(Light::LightType::Directional, 10.0f, { 1.0f, 1.0f, 1.0f });
+		Light light(Light::LightType::Directional, 10.0f, { 1.0f, 1.0f, 1.0f }, true);
 		m_SceneData->Environment.DirectionalLights.push_back({ glm::vec3{ 0.0f }, rot, light });
 
 		// Camera

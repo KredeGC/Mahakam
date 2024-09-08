@@ -58,7 +58,7 @@ namespace Mahakam
 		template<typename T>
 		static BaseAllocator<T> GetAllocator()
 		{
-			return BaseAllocator<T>(GetAllocatorImpl());
+			return BaseAllocator<T>(ReferenceAllocator(s_Alloc));
 		}
 
 		template<typename T>
@@ -105,7 +105,5 @@ namespace Mahakam
 	private:
         inline static ktl::stack<MAX_STACK_SIZE * BUFFER_SIZE> s_Buffer;
 		inline static AllocatorType s_Alloc{ s_Buffer };
-
-		MH_DECLARE_FUNC(GetAllocatorImpl, ReferenceAllocator);
 	};
 }

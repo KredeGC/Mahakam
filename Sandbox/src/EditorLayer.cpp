@@ -3,7 +3,6 @@
 
 #include "ConsoleLogSink.h"
 
-#include "Panels/BuildPanel.h"
 #include "Panels/ConsolePanel.h"
 
 #include "RenderPasses/BoundingBoxRenderPass.h"
@@ -44,10 +43,6 @@ namespace Mahakam::Editor
 		// AssetManagerPanel
 		EditorWindowRegistry::RegisterWindowClass<AssetManagerPanel>("Asset Manager");
 		//EditorWindowRegistry::OpenWindow("Asset Manager");
-
-		// ConsolePanel
-		EditorWindowRegistry::RegisterWindowClass<BuildPanel>("Build Runtime");
-		EditorWindowRegistry::OpenWindow("Build Runtime");
 
 		// ConsolePanel
 		EditorWindowRegistry::RegisterWindowClass<ConsolePanel>("Console");

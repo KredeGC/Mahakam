@@ -10,8 +10,7 @@
 
 namespace Mahakam
 {
-	//Scope<Window> Window::Create(const WindowProps& props)
-	MH_DEFINE_FUNC(Window::CreateImpl, Scope<Window>, const WindowProps& props)
+	Scope<Window> Window::Create(const WindowProps& props)
 	{
 		switch (RendererAPI::GetAPI())
 		{
