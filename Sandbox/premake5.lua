@@ -1,5 +1,5 @@
 project "Sandbox"
-    kind "SharedLib"
+    kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
     staticruntime "off"
@@ -25,8 +25,7 @@ project "Sandbox"
     defines { "_CRT_SECURE_NO_WARNINGS" }
     
     postbuildcommands {
-        "{MKDIR} \"../Erebor/runtime/\"",
-        "{COPYDIR} \"bin/%{outputdir}/.\" \"../Erebor/runtime/\""
+        "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/".._OPTIONS["target"].."-x64/.\" \"bin/%{outputdir}/\""
     }
 
     -- Windows
@@ -39,7 +38,6 @@ project "Sandbox"
         
         defines {
             "MH_PLATFORM_WINDOWS",
-            "MH_WIN_EXPORT",
             "WIN32_LEAN_AND_MEAN",
             "NOMINMAX"
         }
@@ -61,16 +59,6 @@ project "Sandbox"
     -- Unity build
     filter "options:unity"
         unity "on"
-        
-    -- Standalone
-    filter "options:standalone"
-        kind "ConsoleApp"
-        
-        defines { "MH_STANDALONE" }
-    
-        postbuildcommands {
-            "{COPYDIR} \"../Mahakam/vendor/steamaudio/lib/".._OPTIONS["target"].."-x64/.\" \"bin/%{outputdir}/\""
-        }
     
     -- Configs
     filter "configurations:Debug"

@@ -1,0 +1,14 @@
+Shader: 11869644962294522068
+Properties:
+  Uniforms.UVTransform: [4,4,0,0]
+  u_Metallic: 0
+  u_Albedo: 7949174308391436228
+  u_Roughness: 10341743577412507490
+  u_Bump: 13572513555684069288
+  Uniforms.Color: [1,1,1]
+  Uniforms.MetallicMul: 0
+  Uniforms.RoughnessMul: 1
+  u_Occlussion: 8361894711875152675
+  Uniforms.EmissionColor: [0,0,0]
+Extension: .material
+ID: 10127498216877445756

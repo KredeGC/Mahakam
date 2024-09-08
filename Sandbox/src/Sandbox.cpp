@@ -1,14 +1,10 @@
 #include "sbpch.h"
 
-#define MH_STANDALONE_TITLE "Sandbox"
-#define MH_STANDALONE_ICON "internal/icons/icon-64.png"
-
-#include <Mahakam/MahakamRuntime.h>
-#include <Mahakam/MahakamEntrypoint.h>
+#include <Mahakam/Mahakam.h>
 
 using namespace Mahakam;
 
-struct MH_EXPORTED RotatorComponent
+struct RotatorComponent
 {
 	float rotation = 0.0f;
 	float rotationSpeed = 10.0f;
@@ -16,7 +12,7 @@ struct MH_EXPORTED RotatorComponent
 	RotatorComponent() {}
 };
 
-struct MH_EXPORTED CamerControllerComponent
+struct CamerControllerComponent
 {
 	float moveSpeed = 5.0f;
 	float rotationSpeed = 2.0f;
@@ -24,7 +20,7 @@ struct MH_EXPORTED CamerControllerComponent
 	CamerControllerComponent() {}
 };
 
-MH_EXTERN_EXPORTED void Load()
+void Load()
 {
 	MH_TRACE("DLL Loaded!");
 
@@ -51,7 +47,7 @@ MH_EXTERN_EXPORTED void Load()
 #pragma endregion
 }
 
-MH_EXTERN_EXPORTED void Run(Scene* scene)
+void Run(Scene* scene)
 {
 	//if (true) return;
 
@@ -206,7 +202,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 }
 
 
-MH_EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
+void Update(Scene* scene, Timestep dt)
 {
 	MH_PROFILE_FUNCTION();
 
@@ -281,12 +277,12 @@ MH_EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
 	});
 }
 
-MH_EXTERN_EXPORTED void Stop(Scene* scene)
+void Stop(Scene* scene)
 {
 	// TODO: Remove entities again
 }
 
-MH_EXTERN_EXPORTED void Unload()
+void Unload()
 {
 	MH_TRACE("DLL Unloaded!");
 

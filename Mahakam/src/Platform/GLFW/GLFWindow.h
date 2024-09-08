@@ -15,6 +15,7 @@ namespace Mahakam
 			std::string Title;
 			unsigned int Width, Height;
 			bool VSync, CursorVisible;
+			bool Maximized;
 
 			EventCallbackFn EventCallback;
 		};

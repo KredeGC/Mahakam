@@ -1,8 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "FileUtility.h"
 
-#include "Mahakam/Scene/SceneManager.h"
-
 #ifndef MH_STANDALONE
 #include "Mahakam/Editor/Selection.h"
 #endif
@@ -17,10 +15,6 @@ namespace Mahakam
 #ifndef MH_STANDALONE
 			Editor::Selection::SetSelectedEntity({});
 #endif
-
-			// Reset the scene
-			Ref<Scene> scene = Scene::Create();
-			SceneManager::SetActiveScene(scene);
 
 			// Set the project paths
 			PROJECT_PATH = filepath;

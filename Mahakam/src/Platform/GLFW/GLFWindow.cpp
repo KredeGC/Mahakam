@@ -28,6 +28,7 @@ namespace Mahakam
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
+		m_Data.Maximized = props.Maximized;
 
 		if (!glfwInitialized)
 		{
@@ -68,7 +69,8 @@ namespace Mahakam
 
 		// Creating the window
 #ifndef MH_STANDALONE
-		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+		if (props.Maximized)
+			glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 		m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 #else
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());

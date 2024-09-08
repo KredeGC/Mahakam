@@ -60,6 +60,7 @@ project "Erebor"
     filter "options:unity"
         unity "on"
     
+    -- Configs
     filter "configurations:Debug"
         defines "MH_DEBUG"
         runtime "Debug"

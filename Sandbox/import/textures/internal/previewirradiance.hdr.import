@@ -1,0 +1,8 @@
+Filepath: resource/textures/night.hdr
+Format: RG11B10F
+Filter: Trilinear
+Resolution: 32
+Prefilter: Convolute
+Mipmaps: 0
+Extension: .texcube
+ID: 2660197233324719856

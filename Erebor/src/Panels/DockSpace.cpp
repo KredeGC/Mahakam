@@ -50,7 +50,12 @@ namespace Mahakam::Editor
 					{
 						Application::GetInstance()->GetWindow().SetTitle("Erebor " + projectPath.string());
 
+						FileUtility::SetWorkingDirectory(projectPath);
+
 						FileUtility::SetProjectDirectory(projectPath);
+
+						AssetDatabase::RefreshAssetPaths();
+						ResourceRegistry::RefreshImportPaths();
 					}
 				}
 
@@ -59,67 +64,6 @@ namespace Mahakam::Editor
 
 				ImGui::EndMenu();
 			}
-
-			if (ImGui::BeginMenu("Scene"))
-			{
-				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
-				// which we can't undo at the moment without finer window depth/z control.
-				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);1
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uef10 New Scene"), "Ctrl+N"))
-					NewScene();
-
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uec5b Open Scene..."), "Ctrl+O"))
-					OpenScene();
-
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uee00 Save Scene..."), "Ctrl+S"))
-					SaveScene();
-
-				if (ImGui::MenuItem(reinterpret_cast<const char*>(u8"\uee00 Save Scene As..."), "Ctrl+Shift+S"))
-					SaveSceneAs();
-
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("View"))
-			{
-				auto& windowProps = EditorWindowRegistry::GetWindowProps();
-				for (auto& props : windowProps)
-				{
-					if (props.second.Viewable)
-					{
-						bool enabled = false;
-						if (props.second.Unique && props.second.Instance)
-							enabled = true;
-
-						if (ImGui::MenuItem(props.second.Name.c_str(), nullptr, enabled))
-						{
-							if (!enabled)
-								EditorWindowRegistry::OpenWindow(props.second.Name);
-							else if (props.second.Unique)
-								EditorWindowRegistry::CloseWindow(props.second.Instance);
-						}
-					}
-				}
-
-				ImGui::EndMenu();
-			}
-            
-            if (ImGui::BeginMenu("Build"))
-            {
-                if (ImGui::MenuItem("Build Assets"))
-                {
-                    // TODO: Build binary assets
-                    
-                    
-                }
-                
-                if (ImGui::MenuItem("Build Executable"))
-                {
-                    // TODO: Build executable in MH_STANDALONE
-                }
-                
-                ImGui::EndMenu();
-            }
 
 			ImGui::EndMenuBar();
 		}
@@ -140,62 +84,13 @@ namespace Mahakam::Editor
 
 		switch (event.GetKeyCode())
 		{
-		case Key::N:
-			if (controlPressed)
-				NewScene();
-			break;
 		case Key::O:
-			if (controlPressed)
-				OpenScene();
-			break;
-		case Key::S:
-			if (controlPressed && shiftPressed)
-				SaveSceneAs();
-			else if (controlPressed)
-				SaveScene();
+			
 			break;
 		default:
 			break;
 		}
 
 		return false;
-	}
-
-	void DockSpace::NewScene()
-	{
-		Selection::SetSelectedEntity({});
-		Ref<Scene> scene = Scene::Create();
-		SceneManager::SetActiveScene(scene);
-	}
-
-	void DockSpace::OpenScene()
-	{
-		std::filesystem::path filepath = FileUtility::OpenFile("Mahakam Scene (*.mhk)\0*.mhk\0", FileUtility::GetWorkingDirectory() / FileUtility::ASSET_PATH);
-
-		if (!filepath.empty())
-		{
-			Selection::SetSelectedEntity({});
-			Ref<Scene> scene = Scene::Create();
-			SceneManager::SetActiveScene(scene);
-
-			SceneSerializer serializer(scene);
-			serializer.DeserializeFromPath(filepath);
-		}
-	}
-
-	void DockSpace::SaveScene()
-	{
-
-	}
-
-	void DockSpace::SaveSceneAs()
-	{
-		std::filesystem::path filepath = FileUtility::SaveFile("Mahakam Scene (*.mhk)\0*.mhk\0", FileUtility::GetWorkingDirectory() / FileUtility::ASSET_PATH);
-
-		if (!filepath.empty())
-		{
-			SceneSerializer serializer(SceneManager::GetActiveScene());
-			serializer.SerializeToPath(filepath);
-		}
 	}
 }
