@@ -230,6 +230,12 @@ void main() {
     roughness *= RoughnessMul;
     emission *= EmissionColor;
     
+    // Geometric aliasing roughness
+    vec3 vNormalWsDdx = dFdx(worldNormal);
+    vec3 vNormalWsDdy = dFdy(worldNormal);
+    float geometricRoughnessFactor = pow(clamp(max(dot(vNormalWsDdx, vNormalWsDdx), dot(vNormalWsDdy, vNormalWsDdy)), 0.0, 1.0), 0.333);
+    roughness = max(roughness, geometricRoughnessFactor);
+    
     o_Albedo = vec4(albedo, ao);
     o_Specular = vec4(0.0, 0.0, metallic, roughness);
     o_Emission = vec4(emission, 0.0);
