@@ -12,6 +12,7 @@
 #include "Mahakam/Core/Random.h"
 
 #include "Mahakam/BinarySerialization/AssetSerialization.h"
+#include "Mahakam/BinarySerialization/MaterialSerialization.h"
 #include "Mahakam/BinarySerialization/MeshSerialization.h"
 #include "Mahakam/BinarySerialization/ShaderSerialization.h"
 #include "Mahakam/BinarySerialization/TextureCubeSerialization.h"
@@ -128,12 +129,12 @@ namespace Mahakam
 		static const char meshType[] = "mesh";
 
 		LoadLegacySerializer<animType, animExtension>();
-		LoadLegacySerializer<matType, materialExtension>();
 		LoadLegacySerializer<soundType, soundExtension>();
 		LoadLegacySerializer<tex2dType, textureExtension>();
 		LoadLegacySerializer<texcubeType, textureExtension>();
 
 		// TODO: Port all legacy importers to this
+		s_Serializers.emplace(matType, CreateSerializer<Material>());
 		s_Serializers.emplace(meshType, CreateSerializer<Mesh>());
 		s_Serializers.emplace(shaderType, CreateSerializer<Shader>());
 		//s_Serializers.emplace(texcubeType, CreateSerializer<TextureCube>());
