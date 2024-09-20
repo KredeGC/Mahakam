@@ -28,7 +28,7 @@ namespace Mahakam
 	{
 		MH_PROFILE_FUNCTION();
 
-		int status = gladLoadGL(glfwGetProcAddress);
+		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 		MH_ASSERT(status, "Could not initialize glad!");
 
 		MH_ASSERT(glGetError, "Could not initialize OpenGL functions!");

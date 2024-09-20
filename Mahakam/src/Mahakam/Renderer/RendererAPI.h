@@ -65,6 +65,7 @@ namespace Mahakam
 		virtual void SetFillMode(bool fill) = 0;
 		virtual void SetBlendMode(BlendMode src, BlendMode dst, bool enable) = 0;
 
+		virtual void MultiDrawIndexed(const void* indirect, uint32_t stride, uint32_t count) = 0;
 		virtual void DrawIndexed(uint32_t count) = 0;
 		virtual void DrawInstanced(uint32_t indexCount, uint32_t count) = 0;
 

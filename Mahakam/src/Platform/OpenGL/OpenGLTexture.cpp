@@ -277,8 +277,6 @@ namespace Mahakam
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
-		//glGetTextureHandleARB(m_RendererID);
-
 		MH_GL_CALL(glBindTextureUnit(slot, m_RendererID));
 	}
 

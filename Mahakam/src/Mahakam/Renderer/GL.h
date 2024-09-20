@@ -4,10 +4,11 @@
 
 #include "Mahakam/Core/Types.h"
 
-#include "Mahakam/Asset/Asset.h"
-
 namespace Mahakam
 {
+	template<typename T>
+	class Asset;
+
 	class SubMesh;
 	class Texture2D;
 	class TextureCube;
@@ -42,10 +43,10 @@ namespace Mahakam
 		MH_DECLARE_FUNC(GetInvertedCube, Ref<SubMesh>);
 		MH_DECLARE_FUNC(GetCube, Ref<SubMesh>);
 
-		MH_DECLARE_FUNC(GetTexture2DRed, Asset<Texture2D>);
-		MH_DECLARE_FUNC(GetTexture2DWhite, Asset<Texture2D>);
-		MH_DECLARE_FUNC(GetTexture2DBlack, Asset<Texture2D>);
-		MH_DECLARE_FUNC(GetTexture2DBump, Asset<Texture2D>);
+		static Asset<Texture2D> GetTexture2DRed();
+		static Asset<Texture2D> GetTexture2DWhite();
+		static Asset<Texture2D> GetTexture2DBlack();
+		static Asset<Texture2D> GetTexture2DBump();
 		MH_DECLARE_FUNC(GetTextureCubeWhite, Asset<TextureCube>);
 		MH_DECLARE_FUNC(GetTextureCubeGrey, Asset<TextureCube>);
 
@@ -66,11 +67,19 @@ namespace Mahakam
 		MH_DECLARE_FUNC(SetFillMode, void, bool fill);
 		MH_DECLARE_FUNC(SetBlendMode, void, RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable);
 
-		MH_DECLARE_FUNC(DrawScreenQuad, void);
-		MH_DECLARE_FUNC(DrawIndexed, void, uint32_t indexCount);
-		MH_DECLARE_FUNC(DrawInstanced, void, uint32_t indexCount, uint32_t count);
+		static void DrawScreenQuad();
+		static void DrawIndexed(uint32_t indexCount);
+		static void DrawInstanced(uint32_t indexCount, uint32_t count);
+
+		template<typename T>
+		static void MultiDrawIndexed(const T* indirect, uint32_t count)
+		{
+			MultiDrawIndexed(indirect, sizeof(T), count);
+		}
 
 	private:
+		static void MultiDrawIndexed(const void* indirect, uint32_t stride, uint32_t count);
+
 		static Ref<SubMesh> CreateScreenQuad();
 		static Ref<SubMesh> CreatePyramid();
 

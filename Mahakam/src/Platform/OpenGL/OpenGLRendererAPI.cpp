@@ -187,6 +187,11 @@ namespace Mahakam
 		}
 	}
 
+	void OpenGLRendererAPI::MultiDrawIndexed(const void* indirect, uint32_t stride, uint32_t count)
+	{
+		MH_GL_CALL(glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, indirect, count, stride));
+	}
+
 	void OpenGLRendererAPI::DrawIndexed(uint32_t count)
 	{
 		MH_GL_CALL(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr));
