@@ -22,7 +22,6 @@
 #include "Mahakam/Asset/Asset.h"
 #include "Mahakam/Asset/AssetDatabase.h"
 #include "Mahakam/Asset/AssetImporter.h"
-#include "Mahakam/Asset/MaterialAssetImporter.h"
 #include "Mahakam/Asset/SoundAssetImporter.h"
 #include "Mahakam/Asset/TextureAssetImporter.h"
 

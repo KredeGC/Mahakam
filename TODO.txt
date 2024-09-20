@@ -1,2 +1,6 @@
 Scenes should hold the AssetDatabase, AudioEngine and PhysicsEngine
 Maybe replace Bullet with Jolt?
+
+Remake renderer:
+Use glMultiDrawIndirect
+Textures can be queried as Uniforms.sampler2D[gl_DrawID] (8-byte stride ^_^!)

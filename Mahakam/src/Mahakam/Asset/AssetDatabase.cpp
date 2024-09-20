@@ -3,7 +3,6 @@
 
 #include "AssetImporter.h"
 #include "AnimationAssetImporter.h"
-#include "MaterialAssetImporter.h"
 #include "SoundAssetImporter.h"
 #include "TextureAssetImporter.h"
 
@@ -182,9 +181,6 @@ namespace Mahakam
 
 		// Animation
 		AssetDatabase::RegisterAssetImporter(CreateRef<AnimationAssetImporter>());
-
-		// Material
-		AssetDatabase::RegisterAssetImporter(CreateRef<MaterialAssetImporter>());
 
 		// Sound
 		AssetDatabase::RegisterAssetImporter(CreateRef<SoundAssetImporter>());
