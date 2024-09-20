@@ -110,8 +110,8 @@ namespace Mahakam
 		FrameBufferProps lightingProps;
 		lightingProps.Width = width;
 		lightingProps.Height = height;
-		lightingProps.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RG11B10F };
-		lightingProps.DepthAttachment = { TextureFormat::Depth24 };
+		lightingProps.ColorAttachments = { TextureFormat::RG11B10F };
+		lightingProps.DepthAttachment = TextureFormat::Depth24;
 
 		m_HDRFrameBuffer = FrameBuffer::Create(lightingProps);
 
