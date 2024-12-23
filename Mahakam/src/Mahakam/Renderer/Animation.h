@@ -12,7 +12,7 @@ namespace Mahakam
 {
 	class Animation
 	{
-	private:
+	public:
 		struct Sampler
 		{
 			TrivialArray<float> Timestamps;
@@ -22,27 +22,25 @@ namespace Mahakam
 			UnorderedMap<int, TrivialArray<glm::vec3>> Scales;
 		};
 
-		std::filesystem::path m_Filepath;
+		using SamplerType = std::vector<Sampler, Allocator::BaseAllocator<Sampler>>;
+
+	private:
 		std::string m_Name;
 
-		int m_AnimationIndex;
 		float m_Duration = 0.0f;
 
-		std::vector<Sampler, Allocator::BaseAllocator<Sampler>> m_Samplers;
+		SamplerType m_Samplers;
 
 	public:
 		Animation(const std::filesystem::path& filepath, int index);
+		Animation(const std::string& name, SamplerType&& samplers, float duration);
 
 		inline const std::string& GetName() const { return m_Name; }
-		inline const std::filesystem::path& GetFilepath() const { return m_Filepath; }
-		inline int GetIndex() const { return m_AnimationIndex; }
 		inline float GetDuration() const { return m_Duration; }
 
-		inline const std::vector<Sampler, Allocator::BaseAllocator<Sampler>>& GetSamplers() const { return m_Samplers; }
+		inline const SamplerType& GetSamplers() const { return m_Samplers; }
 
-		inline static Asset<Animation> Load(const std::filesystem::path& filepath, int index = 0) { return LoadImpl(filepath, index); }
-
-	private:
-		MH_DECLARE_FUNC(LoadImpl, Asset<Animation>, const std::filesystem::path& filepath, int index);
+		inline static Asset<Animation> Load(const std::filesystem::path& filepath, int index = 0) { return CreateAsset<Animation>(filepath, index); }
+		inline static Asset<Animation> Create(const std::string& name, SamplerType&& samplers, float duration) { return CreateAsset<Animation>(name, std::move(samplers), duration); }
 	};
 }

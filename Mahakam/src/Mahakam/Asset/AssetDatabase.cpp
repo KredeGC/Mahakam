@@ -1,8 +1,6 @@
 #include "Mahakam/mhpch.h"
 #include "AssetDatabase.h"
 
-#include "AssetImporter.h"
-#include "AnimationAssetImporter.h"
 #include "SoundAssetImporter.h"
 #include "TextureAssetImporter.h"
 
@@ -11,6 +9,7 @@
 #include "Mahakam/Core/Random.h"
 
 #include "Mahakam/BinarySerialization/AssetSerialization.h"
+#include "Mahakam/BinarySerialization/AnimationSerialization.h"
 #include "Mahakam/BinarySerialization/MaterialSerialization.h"
 #include "Mahakam/BinarySerialization/MeshSerialization.h"
 #include "Mahakam/BinarySerialization/ShaderSerialization.h"
@@ -127,12 +126,12 @@ namespace Mahakam
 		static const char texcubeType[] = "texcube";
 		static const char meshType[] = "mesh";
 
-		LoadLegacySerializer<animType, animExtension>();
 		LoadLegacySerializer<soundType, soundExtension>();
 		LoadLegacySerializer<tex2dType, textureExtension>();
 		LoadLegacySerializer<texcubeType, textureExtension>();
 
 		// TODO: Port all legacy importers to this
+		s_Serializers.emplace(animType, CreateSerializer<Animation>());
 		s_Serializers.emplace(matType, CreateSerializer<Material>());
 		s_Serializers.emplace(meshType, CreateSerializer<Mesh>());
 		s_Serializers.emplace(shaderType, CreateSerializer<Shader>());
@@ -178,9 +177,6 @@ namespace Mahakam
 	MH_DEFINE_FUNC(AssetDatabase::RegisterDefaultAssetImporters, void)
 	{
 		LoadDefaultSerializers();
-
-		// Animation
-		AssetDatabase::RegisterAssetImporter(CreateRef<AnimationAssetImporter>());
 
 		// Sound
 		AssetDatabase::RegisterAssetImporter(CreateRef<SoundAssetImporter>());

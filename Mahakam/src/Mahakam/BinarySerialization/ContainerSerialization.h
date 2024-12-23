@@ -8,6 +8,23 @@
 
 namespace bitstream
 {
+	template<typename Stream, typename T>
+	bool SerializeContainer(Stream& stream, bitstream::inout<Stream, T> container) noexcept
+	{
+		auto size = container.size();
+		BS_ASSERT(stream.serialize(size));
+
+		if constexpr (Stream::reading)
+			container.resize(size);
+
+		for (decltype(size) i = 0; i < size; ++i)
+		{
+			BS_ASSERT(stream.serialize(container[i]));
+		}
+
+		return true;
+	}
+
 	template<typename T, typename Alloc>
 	struct serialize_traits<Mahakam::TrivialArray<T, Alloc>>
 	{
@@ -16,18 +33,7 @@ namespace bitstream
 		template<typename Stream>
 		static bool serialize(Stream& stream, bitstream::inout<Stream, Container> container) noexcept
 		{
-			size_t size = container.size();
-			BS_ASSERT(stream.template serialize<size_t>(size));
-
-			if constexpr (Stream::reading)
-				container.resize(size);
-
-			for (size_t i = 0; i < size; ++i)
-			{
-				BS_ASSERT(stream.template serialize<T>(container[i]));
-			}
-
-			return true;
+			return SerializeContainer<Stream, Container>(stream, container);
 		}
 	};
 
@@ -39,18 +45,7 @@ namespace bitstream
 		template<typename Stream>
 		static bool serialize(Stream& stream, bitstream::inout<Stream, Container> container) noexcept
 		{
-			size_t size = container.size();
-			BS_ASSERT(stream.template serialize<size_t>(size));
-
-			if constexpr (Stream::reading)
-				container.resize(size);
-
-			for (size_t i = 0; i < size; ++i)
-			{
-				BS_ASSERT(stream.template serialize<T>(container[i]));
-			}
-
-			return true;
+			return SerializeContainer<Stream, Container>(stream, container);
 		}
 	};
 
@@ -62,18 +57,7 @@ namespace bitstream
 		template<typename Stream>
 		static bool serialize(Stream& stream, bitstream::inout<Stream, Container> container) noexcept
 		{
-			size_t size = container.size();
-			BS_ASSERT(stream.template serialize<size_t>(size));
-
-			if constexpr (Stream::reading)
-				container.resize(size);
-
-			for (size_t i = 0; i < size; ++i)
-			{
-				BS_ASSERT(stream.template serialize<T>(container[i]));
-			}
-
-			return true;
+			return SerializeContainer<Stream, Container>(stream, container);
 		}
 	};
 
@@ -101,7 +85,7 @@ namespace bitstream
 		typename utility::is_reading_t<Stream>
 		static serialize(Stream& stream, Container& container) noexcept
 		{
-			size_t size = container.size();
+			auto size = container.size();
 			BS_ASSERT(stream.serialize(size));
 
 			if constexpr (Stream::reading)

@@ -11,8 +11,6 @@
 namespace Mahakam
 {
 	Animation::Animation(const std::filesystem::path& filepath, int index) :
-		m_Filepath(filepath),
-		m_AnimationIndex(index),
 		m_Samplers(Allocator::GetAllocator<Sampler>())
 	{
 		MH_PROFILE_FUNCTION();
@@ -40,7 +38,7 @@ namespace Mahakam
 		}
 
 		auto& animations = model.animations;
-		auto& animation = animations[m_AnimationIndex];
+		auto& animation = animations[index];
 		m_Name = animation.name;
 
 		UnorderedMap<int, Sampler, Allocator::BaseAllocator<std::pair<const int, Sampler>>> samplers(Allocator::GetAllocator<std::pair<const int, Sampler>>());
@@ -107,9 +105,11 @@ namespace Mahakam
 			m_Samplers.push_back(kv.second);
 	}
 
-	//Asset<Animation> Animation::LoadImpl(const std::filesystem::path& filepath)
-	MH_DEFINE_FUNC(Animation::LoadImpl, Asset<Animation>, const std::filesystem::path& filepath, int index)
+	Animation::Animation(const std::string& name, SamplerType&& samplers, float duration) :
+		m_Name(name),
+		m_Samplers(std::move(samplers)),
+		m_Duration(duration)
 	{
-		return CreateAsset<Animation>(filepath, index);
-	};
+
+	}
 }

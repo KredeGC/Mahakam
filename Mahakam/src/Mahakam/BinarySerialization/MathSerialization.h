@@ -57,6 +57,21 @@ namespace bitstream
 	};
 
 	template<>
+	struct serialize_traits<glm::quat>
+	{
+		template<typename Stream>
+		static bool serialize(Stream& stream, bitstream::inout<Stream, glm::quat> value) noexcept
+		{
+			BS_ASSERT(stream.template serialize<float>(value[0]));
+			BS_ASSERT(stream.template serialize<float>(value[1]));
+			BS_ASSERT(stream.template serialize<float>(value[2]));
+			BS_ASSERT(stream.template serialize<float>(value[3]));
+
+			return true;
+		}
+	};
+
+	template<>
 	struct serialize_traits<glm::mat3>
 	{
 		template<typename Stream>
