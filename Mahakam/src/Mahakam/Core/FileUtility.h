@@ -29,6 +29,7 @@ namespace Mahakam
 
 		static bool Exists(const Filepath& src);
 		static void CreateDirectories(const Filepath& src);
+		static Filepath Relative(const Filepath& filepath);
 		static Filepath GetCachePath(const Filepath& filepath);
 		static Filepath GetImportPath(const Filepath& filepath, const std::string& extension);
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Mahakam/Mahakam.h>
+#include "Mahakam/Editor/EditorWindow.h"
 
 namespace Mahakam::Editor
 {

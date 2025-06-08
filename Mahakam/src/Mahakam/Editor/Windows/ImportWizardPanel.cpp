@@ -117,7 +117,7 @@ namespace Mahakam::Editor
 					ryml::Tree tree = ImportTree(*importer);
 
 					// Save tree
-					SaveImport(tree, m_ImportPath, *importer, m_AssetID);
+					SaveImport(tree, FileUtility::PROJECT_PATH / m_ImportPath, *importer, m_AssetID);
 
 					m_Open = false;
 				}
@@ -148,7 +148,7 @@ namespace Mahakam::Editor
 
 				window->m_Open = true;
 				window->m_Importer = importer;
-				window->m_ImportPath = FileUtility::GetImportPath(filepath, importer->GetImporterProps().Extension);
+				window->m_ImportPath = FileUtility::Relative(FileUtility::GetImportPath(filepath, importer->GetImporterProps().Extension));
 				window->m_AssetID = Random::GetRandomID64();
 
 				// Open the wizard with the filepath
@@ -184,7 +184,7 @@ namespace Mahakam::Editor
 
 				window->m_Open = true;
 				window->m_Importer = importer;
-				window->m_ImportPath = importPath;
+				window->m_ImportPath = FileUtility::Relative(importPath);
 				window->m_AssetID = Random::GetRandomID64();
 
 				// Read the import file and open the wizard

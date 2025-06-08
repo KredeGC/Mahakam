@@ -36,8 +36,8 @@ namespace Mahakam::GUI
 	bool DrawDragDropEntity(const std::string& label, const std::string& component, Entity& entity);
 	bool DrawDragDropEntity(const std::string& label, Entity& entity);
 
-	bool DrawDragDropField(const std::string& label, const std::string& extension, std::filesystem::path& importPath);
-	bool DrawDragDropField(const std::string& label, const std::vector<std::string>& extensions, std::filesystem::path& importPath); // TODO: Move this into Erebor
+	bool DrawDragDropAssetField(const std::string& label, const std::vector<std::string>& extensions, std::filesystem::path& importPath);
+	bool AcceptPayloadTarget(std::filesystem::path& importPath, std::string_view target);
 	bool AcceptPayloadTarget(AssetDatabase::AssetID& id, std::string_view target);
 
 	bool DrawColor3Edit(const std::string& label, glm::vec3& value, ImGuiColorEditFlags flags = ImGuiColorEditFlags_None);
@@ -55,8 +55,8 @@ namespace Mahakam::GUI
 
 	bool DrawIntDrag(const std::string& label, int32_t& value, float speed, int32_t min, int32_t max);
 
-	template<typename... Ts>
-	bool DrawDragDropTarget(AssetDatabase::AssetID& id, Ts&&... extensions)
+	template<typename T, typename... Ts>
+	bool DrawDragDropTarget(T& id, Ts&&... extensions)
 	{
 		if (ImGui::BeginDragDropTarget())
 		{
@@ -69,13 +69,34 @@ namespace Mahakam::GUI
 		return false;
 	}
 
+	template<typename... Ts>
+	bool DrawDragDropField(const std::string& label, std::filesystem::path& importPath, Ts&&... extensions)
+	{
+		std::string importString = FileUtility::Relative(importPath).generic_string();
+		char filepathBuffer[MAX_STR_LEN]{ 0 };
+		strncpy(filepathBuffer, importString.c_str(), importString.size());
+		if (ImGui::InputText(label.c_str(), filepathBuffer, MAX_STR_LEN))
+		{
+			importPath = FileUtility::PROJECT_PATH / std::string(filepathBuffer);
+
+			return true;
+		}
+
+		if (DrawDragDropTarget(importPath, std::forward<Ts>(extensions) ...))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	template<typename T, typename... Ts>
 	bool DrawDragDropAsset(const std::string& label, Asset<T>& value, Ts&&... extensions)
 	{
 #ifndef MH_STANDALONE
 		ResourceRegistry::ImportInfo info = ResourceRegistry::GetImportInfo(value.GetID());
 
-		std::string importString = info.Filepath.string();
+		std::string importString = FileUtility::Relative(info.Filepath).generic_string();
 #else // MH_STANDALONE
 		std::string importString = std::to_string(value.GetID());
 #endif // MH_STANDALONE
@@ -93,7 +114,7 @@ namespace Mahakam::GUI
 #ifndef MH_STANDALONE
 			else
 			{
-				info = ResourceRegistry::GetImportInfo(pathString);
+				info = ResourceRegistry::GetImportInfo(FileUtility::PROJECT_PATH / pathString);
 				value = Asset<T>(info.ID);
 			}
 #endif // MH_STANDALONE

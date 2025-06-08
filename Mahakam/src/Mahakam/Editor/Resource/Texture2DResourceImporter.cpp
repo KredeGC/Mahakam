@@ -40,7 +40,7 @@ namespace Mahakam
 
 	void Texture2DResourceImporter::OnRender()
 	{
-		if (GUI::DrawDragDropField("File path", ".png", m_Filepath))
+		if (GUI::DrawDragDropField("File path", m_Filepath, ".png", ".jpeg", ".jpg"))
 			CreatePreviewTexture();
 
 		// Format

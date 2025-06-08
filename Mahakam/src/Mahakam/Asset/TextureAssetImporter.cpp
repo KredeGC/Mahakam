@@ -65,7 +65,7 @@ namespace Mahakam
 
 		int enumInt;
 
-		std::string filepath;
+		std::filesystem::path filepath;
 		if (node.has_child("Filepath"))
 			node["Filepath"] >> filepath;
 

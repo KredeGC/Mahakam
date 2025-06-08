@@ -33,7 +33,7 @@ namespace Mahakam
 		GUI::DrawIntDrag("Animation Index", m_Index, 1, 0, 0);
 
 		// TODO: glTF and glb extensions
-		GUI::DrawDragDropField("File path", m_ImporterProps.Extension, m_Filepath);
+		GUI::DrawDragDropField("File path", m_Filepath, ".gltf", ".glb");
 	}
 
 	void AnimationResourceImporter::OnImport(ryml::NodeRef& node)

@@ -15,11 +15,6 @@
 #include "Mahakam/BinarySerialization/ShaderSerialization.h"
 #include "Mahakam/BinarySerialization/TextureCubeSerialization.h"
 
-// TEMP
-#include "Mahakam/Serialization/YAMLGuard.h"
-#include "Mahakam/Serialization/YAMLSerialization.h"
-// TEMP
-
 #include <ryml/rapidyaml-0.4.1.hpp>
 
 #include <algorithm>

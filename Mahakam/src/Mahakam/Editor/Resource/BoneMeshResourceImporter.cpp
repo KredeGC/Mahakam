@@ -31,7 +31,7 @@ namespace Mahakam
 
 	void BoneMeshResourceImporter::OnRender()
 	{
-		GUI::DrawDragDropField("File path", m_ImporterProps.Extension, m_Props.Filepath);
+		GUI::DrawDragDropField("File path", m_Props.Filepath, ".gltf", ".glb");
 
 		ImGui::Checkbox("Include mesh nodes", &m_Props.IncludeNodes);
 		ImGui::Checkbox("Include mesh bones", &m_Props.IncludeBones);

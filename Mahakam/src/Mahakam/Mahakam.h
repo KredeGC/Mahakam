@@ -5,7 +5,6 @@
 #include "Mahakam/Core/Input.h"
 #include "Mahakam/Core/Instrumentor.h"
 #include "Mahakam/Core/FileUtility.h"
-#include "Mahakam/Core/Frustum.h"
 #include "Mahakam/Core/KeyCodes.h"
 #include "Mahakam/Core/Layer.h"
 #include "Mahakam/Core/Log.h"
@@ -53,6 +52,7 @@
 
 // Math
 #include "Mahakam/Math/Bounds.h"
+#include "Mahakam/Math/Frustum.h"
 #include "Mahakam/Math/Math.h"
 
 // Physics

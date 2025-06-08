@@ -1,6 +1,9 @@
 #include "Mahakam/mhpch.h"
 #include "StatsPanel.h"
 
+#include "Mahakam/Renderer/GL.h"
+#include "Mahakam/Renderer/Renderer.h"
+
 namespace Mahakam::Editor
 {
 	void StatsPanel::OnUpdate(Timestep dt)

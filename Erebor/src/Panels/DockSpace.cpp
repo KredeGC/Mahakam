@@ -50,8 +50,6 @@ namespace Mahakam::Editor
 					{
 						Application::GetInstance()->GetWindow().SetTitle("Erebor " + projectPath.string());
 
-						FileUtility::SetWorkingDirectory(projectPath);
-
 						FileUtility::SetProjectDirectory(projectPath);
 
 						AssetDatabase::RefreshAssetPaths();

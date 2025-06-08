@@ -216,35 +216,10 @@ namespace Mahakam::GUI
 		return false;
 	}
 
-	bool DrawDragDropField(const std::string& label, const std::string& extension, std::filesystem::path& importPath)
+	// TODO: Rename to SearchField
+	bool DrawDragDropAssetField(const std::string& label, const std::vector<std::string>& extensions, std::filesystem::path& importPath)
 	{
-		std::string importString = importPath.string();
-		char filepathBuffer[MAX_STR_LEN]{ 0 };
-		strncpy(filepathBuffer, importString.c_str(), importString.size());
-		if (ImGui::InputText(label.c_str(), filepathBuffer, MAX_STR_LEN))
-		{
-			importPath = std::string(filepathBuffer);
-
-			return true;
-		}
-
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(extension.c_str()))
-			{
-				importPath = (const char*)payload->Data;
-				return true;
-			}
-
-			ImGui::EndDragDropTarget();
-		}
-
-		return false;
-	}
-
-	bool DrawDragDropField(const std::string& label, const std::vector<std::string>& extensions, std::filesystem::path& importPath)
-	{
-		std::string importString = importPath.string();
+		std::string importString = importPath.generic_string();
 		char filepathBuffer[MAX_STR_LEN]{ 0 };
 		strncpy(filepathBuffer, importString.c_str(), importString.size());
 		if (ImGui::InputText(label.c_str(), filepathBuffer, MAX_STR_LEN))
@@ -267,6 +242,17 @@ namespace Mahakam::GUI
 			}
 
 			ImGui::EndDragDropTarget();
+		}
+
+		return false;
+	}
+
+	bool AcceptPayloadTarget(std::filesystem::path& importPath, std::string_view target)
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(target.data()))
+		{
+			importPath = (const char*)payload->Data;
+			return true;
 		}
 
 		return false;

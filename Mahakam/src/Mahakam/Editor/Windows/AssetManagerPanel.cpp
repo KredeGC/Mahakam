@@ -1,6 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "AssetManagerPanel.h"
 
+#include "Mahakam/ImGui/GUI.h"
+
 namespace Mahakam::Editor
 {
 	AssetManagerPanel::AssetManagerPanel()
@@ -19,33 +21,47 @@ namespace Mahakam::Editor
 				extensions.push_back(importer.first);
 
 			std::filesystem::path search = m_SearchString;
-			if (GUI::DrawDragDropField("Search", extensions, search))
+			if (GUI::DrawDragDropAssetField("Search", extensions, search))
 				m_SearchString = search.string();
-
-			// TODO: Sort by references
 
 			// List all assets within search field
 			if (ImGui::BeginTable("Asset Table", 1, ImGuiTableFlags_Borders))
 			{
-				auto& assets = ResourceRegistry::GetImports();
+				auto& resources = ResourceRegistry::GetImports();
+
+				struct AssetInfo
+				{
+					AssetDatabase::AssetID ID;
+					std::filesystem::path Filepath;
+					std::string Type;
+					size_t RefCount;
+				};
+
+				std::vector<AssetInfo> assets;
+				assets.reserve(resources.size());
+
+				for (auto& resource : resources)
+					assets.emplace_back(resource.first, FileUtility::Relative(resource.second.Filepath), resource.second.Type, AssetDatabase::GetAssetReferences(resource.first));
+
+				std::sort(assets.begin(), assets.end(), [](AssetInfo& a, AssetInfo& b) { return a.RefCount > b.RefCount; });
+
 				for (auto& asset : assets)
 				{
-					std::string assetIDString = std::to_string(asset.first);
+					std::string assetIDString = std::to_string(asset.ID);
 
 					bool idMatch = assetIDString.find(m_SearchString) != std::string::npos;
-					bool typeMatch = asset.second.Type.find(m_SearchString) != std::string::npos;
-					bool pathMatch = asset.second.Filepath.string().find(m_SearchString) != std::string::npos;
+					bool typeMatch = asset.Type.find(m_SearchString) != std::string::npos;
+					bool pathMatch = asset.Filepath.string().find(m_SearchString) != std::string::npos;
 
 					if (idMatch || typeMatch || pathMatch)
 					{
 						ImGui::TableNextColumn();
 
 						ImGui::TextWrapped("ID: %s", assetIDString.c_str());
-						ImGui::TextWrapped("Type: %s", asset.second.Type.c_str());
-						ImGui::TextWrapped("Import path: %s", asset.second.Filepath.string().c_str());
+						ImGui::TextWrapped("Type: %s", asset.Type.c_str());
+						ImGui::TextWrapped("Import path: %s", asset.Filepath.string().c_str());
 
-						size_t assetCount = AssetDatabase::GetAssetReferences(asset.first);
-						std::string assetCountString = std::to_string(assetCount);
+						std::string assetCountString = std::to_string(asset.RefCount);
 						ImGui::TextWrapped("References: %s", assetCountString.c_str());
 					}
 				}

@@ -26,7 +26,7 @@ namespace Mahakam
 
 	void SoundResourceImporter::OnRender()
 	{
-		GUI::DrawDragDropField("File path", m_ImporterProps.Extension, m_Filepath);
+		GUI::DrawDragDropField("File path", m_Filepath, ".wav", ".mp3");
 	}
 
 	void SoundResourceImporter::OnImport(ryml::NodeRef& node)
