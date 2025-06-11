@@ -5,8 +5,7 @@
 
 namespace Mahakam
 {
-	//Scope<AudioSource> AudioSource::Create(AudioContext* context)
-	MH_DEFINE_FUNC(AudioSource::CreateImpl, Scope<AudioSource>, AudioContext* context)
+	Scope<AudioSource> AudioSource::CreateImpl(AudioContext* context)
 	{
 		return CreateScope<MiniAudioSource>(static_cast<MiniAudioContext*>(context));
 	};
@@ -71,16 +70,10 @@ namespace Mahakam
 		if (m_DataSource)
 			UninitSound();
 
-		if (dataSource)
-		{
-			m_DataSource = std::move(dataSource);
+		m_DataSource = std::move(dataSource);
 
+		if (m_DataSource)
 			InitSound();
-		}
-		else
-		{
-			m_DataSource = nullptr;
-		}
 	}
 
 	void MiniAudioSource::SetProps(const SoundProps& props)
@@ -97,13 +90,15 @@ namespace Mahakam
 	void MiniAudioSource::SetVolume(float volume)
 	{
 		m_Props.Volume = volume;
-		ma_sound_set_volume(&m_MaSound, volume);
+		if (m_DataSource)
+			ma_sound_set_volume(&m_MaSound, volume);
 	}
 
 	void MiniAudioSource::SetLooping(bool loop)
 	{
 		m_Props.Loop = loop;
-		ma_sound_set_looping(&m_MaSound, loop ? MA_TRUE : MA_FALSE);
+		if (m_DataSource)
+			ma_sound_set_looping(&m_MaSound, loop ? MA_TRUE : MA_FALSE);
 	}
 
 	void MiniAudioSource::SetInterpolation(bool interpolate)
@@ -180,8 +175,8 @@ namespace Mahakam
 		/* We'll let the Steam Audio binaural effect do the directional attenuation for us. */
 		ma_sound_set_directional_attenuation_factor(&m_MaSound, 0);
 
-		// ma_sound_set_volume(&m_MaSound, m_Sound->GetProps().Volume); // TODO: Source should probably have the controls, not the file
-		// ma_sound_set_looping(&m_MaSound, m_Sound->GetProps().Looping);
+		ma_sound_set_volume(&m_MaSound, m_Props.Volume);
+		ma_sound_set_looping(&m_MaSound, m_Props.Loop);
 
 		/* We can now wire up the sound to the binaural node and start it. */
 		ma_node_attach_output_bus(&m_MaSound, 0, &m_Node, 0);

@@ -16,7 +16,7 @@
 #include "Entity.h"
 #include "SceneSerializer.h"
 
-#include "Mahakam/Core/SharedLibrary.h"
+#include "Mahakam/Audio/AudioContext.h"
 
 #include "Mahakam/Editor/Resource/ResourceRegistry.h"
 
@@ -163,7 +163,12 @@ namespace Mahakam
 
 #pragma region AudioListener
 		// headphone icon
-		componentInterface.SetEditor(u8"\uea33");
+		componentInterface.SetEditor(u8"\uea33", [](Entity entity)
+		{
+			float volume = AudioEngine::GetContext()->GetVolume();
+			if (ImGui::DragFloat("Global Volume", &volume, 0.01f, 0.0f, 1.0f))
+				AudioEngine::GetContext()->SetVolume(volume);
+		});
 		componentInterface.SetComponent<AudioListenerComponent>();
 		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
