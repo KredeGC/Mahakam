@@ -8,12 +8,10 @@
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
-#include "Mahakam/Serialization/YAMLSerialization.h"
-
 #include "Platform/Headless/HeadlessMesh.h"
 #include "Platform/OpenGL/OpenGLMesh.h"
 
-#include <ryml/rapidyaml-0.4.1.hpp>
+#include <meshoptimizer.h>
 
 #include <glm/gtx/fast_square_root.hpp>
 
@@ -167,14 +165,104 @@ namespace Mahakam
 			GLTFReadNodeHierarchy(model, nodeIndex, child, id, skinnedMesh);
 	}
 
-	//Asset<Mesh> Mesh::CopyImpl(Asset<Mesh> other)
-	MH_DEFINE_FUNC(Mesh::CopyImpl, Asset<Mesh>, Asset<Mesh> other)
+	template<typename T, typename S>
+	static void AddToRemapStream(S& stream, bool hasData, T& data)
+	{
+		constexpr size_t dataSize = sizeof(decltype(*data.data()));
+		if (hasData)
+			stream.emplace_back(data.data(), dataSize, dataSize);
+	}
+
+	template<typename I, typename T, typename R>
+	static void RemapIndices(I& indices, T& streams, R& remap, uint32_t vertexCount)
+	{
+		meshopt_remapIndexBuffer(indices.data(), indices.data(), indices.size(), remap.data());
+
+		// Casting const here is not UB, but still messy...
+		for (auto& stream : streams)
+			meshopt_remapVertexBuffer(const_cast<void*>(stream.data), stream.data, vertexCount, stream.size, remap.data());
+	}
+
+	template<typename I>
+	static void OptimizeVertexCache(I& indices, size_t totalVertices)
+	{
+		meshopt_optimizeVertexCache(indices.data(), indices.data(), indices.size(), totalVertices);
+	}
+
+	template<typename I>
+	static void OptimizeOverdraw(I& indices, const float* positions, size_t totalVertices)
+	{
+		meshopt_optimizeOverdraw(indices.data(), indices.data(), indices.size(), positions, totalVertices, sizeof(float) * 3, 1.01f);
+	}
+
+	template<typename I, typename T, typename R>
+	static void OptimizeVertexFetch(I& indices, T& streams, R& remap, size_t totalVertices)
+	{
+		meshopt_optimizeVertexFetchRemap(remap.data(), indices.data(), indices.size(), totalVertices);
+
+		meshopt_remapIndexBuffer(indices.data(), indices.data(), indices.size(), remap.data());
+
+		// Casting const here is not UB, but still messy...
+		for (auto& stream : streams)
+			meshopt_remapVertexBuffer(const_cast<void*>(stream.data), stream.data, totalVertices, stream.size, remap.data());
+	}
+
+	template<typename I, typename T>
+	static uint32_t OptimizeMesh(I& indices, T& streams, uint32_t vertexCount)
+	{
+		size_t vertexSize = 0;
+		for (auto& stream : streams)
+			vertexSize += stream.size;
+
+		const float* positions = reinterpret_cast<const float*>(streams[0].data);
+
+		meshopt_VertexCacheStatistics bvcs_nv = meshopt_analyzeVertexCache(indices.data(), indices.size(), vertexCount, 32, 32, 32);
+		meshopt_VertexCacheStatistics bvcs_amd = meshopt_analyzeVertexCache(indices.data(), indices.size(), vertexCount, 14, 64, 128);
+		meshopt_VertexCacheStatistics bvcs_intel = meshopt_analyzeVertexCache(indices.data(), indices.size(), vertexCount, 128, 0, 0);
+		meshopt_VertexFetchStatistics bvfs = meshopt_analyzeVertexFetch(indices.data(), indices.size(), vertexCount, vertexSize);
+		meshopt_OverdrawStatistics bos = meshopt_analyzeOverdraw(indices.data(), indices.size(), positions, vertexCount, sizeof(glm::vec3));
+
+		TrivialArray<unsigned int, Allocator::BaseAllocator<unsigned int>> remap(vertexCount, Allocator::GetAllocator<unsigned int>());
+		size_t totalVertices = meshopt_generateVertexRemapMulti(remap.data(), indices.data(), indices.size(), vertexCount, streams.data(), streams.size());
+
+		if (totalVertices != vertexCount)
+			MH_TRACE("Vertex count changed from {} to {}", vertexCount, totalVertices);
+
+		RemapIndices(indices, streams, remap, vertexCount);
+
+		OptimizeVertexCache(indices, totalVertices);
+
+		// Assumes that streams[0] is position vertex data
+		OptimizeOverdraw(indices, positions, totalVertices);
+
+		OptimizeVertexFetch(indices, streams, remap, totalVertices);
+
+		meshopt_VertexCacheStatistics vcs_nv = meshopt_analyzeVertexCache(indices.data(), indices.size(), totalVertices, 32, 32, 32);
+		meshopt_VertexCacheStatistics vcs_amd = meshopt_analyzeVertexCache(indices.data(), indices.size(), totalVertices, 14, 64, 128);
+		meshopt_VertexCacheStatistics vcs_intel = meshopt_analyzeVertexCache(indices.data(), indices.size(), totalVertices, 128, 0, 0);
+		meshopt_VertexFetchStatistics vfs = meshopt_analyzeVertexFetch(indices.data(), indices.size(), totalVertices, vertexSize);
+		meshopt_OverdrawStatistics os = meshopt_analyzeOverdraw(indices.data(), indices.size(), positions, totalVertices, sizeof(glm::vec3));
+
+		if (bvcs_nv.atvr != vcs_nv.atvr || bvcs_nv.acmr != vcs_nv.acmr)
+			MH_TRACE("Vertex ACMR (NV) - ATVR: Before {}, After {} - ACMR: Before {}, After {}", bvcs_nv.atvr, vcs_nv.atvr, bvcs_nv.acmr, vcs_nv.acmr);
+		if (bvcs_amd.atvr != vcs_amd.atvr || bvcs_amd.acmr != vcs_amd.acmr)
+			MH_TRACE("Vertex ACMR (AMD) - ATVR: Before {}, After {} - ACMR: Before {}, After {}", bvcs_amd.atvr, vcs_amd.atvr, bvcs_amd.acmr, vcs_amd.acmr);
+		if (bvcs_intel.atvr != vcs_intel.atvr || bvcs_intel.acmr != vcs_intel.acmr)
+			MH_TRACE("Vertex ACMR (Intel) - ATVR: Before {}, After {} - ACMR: Before {}, After {}", bvcs_intel.atvr, vcs_intel.atvr, bvcs_intel.acmr, vcs_intel.acmr);
+		if (bvfs.overfetch != vfs.overfetch)
+			MH_TRACE("Vertex Overfetch Before {}, After {}", bvfs.overfetch, vfs.overfetch);
+		if (bos.overdraw != os.overdraw)
+			MH_TRACE("Vertex Overdraw Before {}, After {}", bos.overdraw, os.overdraw);
+
+		return uint32_t(totalVertices);
+	}
+
+	Asset<Mesh> Mesh::CopyImpl(Asset<Mesh> other)
 	{
 		return CreateAsset<Mesh>(*other);
 	};
 
-	//Asset<BoneMesh> Mesh::LoadImpl(const BoneMeshProps& props)
-	MH_DEFINE_FUNC(Mesh::LoadImpl, Asset<Mesh>, const BoneMeshProps& props)
+	Asset<Mesh> Mesh::LoadImpl(const BoneMeshProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -231,14 +319,14 @@ namespace Mahakam
 			}
 
 			// Setup variables
-			TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> positions(vertexCount, Allocator::GetAllocator<glm::vec3>());
-			TrivialArray<glm::vec2, Allocator::BaseAllocator<glm::vec2>> texcoords(vertexCount, Allocator::GetAllocator<glm::vec2>());
-			TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> normals(vertexCount, Allocator::GetAllocator<glm::vec3>());
-			TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> tangents(vertexCount, Allocator::GetAllocator<glm::vec4>());
-			TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> colors(vertexCount, Allocator::GetAllocator<glm::vec4>());
-			TrivialArray<glm::ivec4, Allocator::BaseAllocator<glm::ivec4>> boneIDs(vertexCount, { -1, -1, -1, -1 }, Allocator::GetAllocator<glm::ivec4>());
-			TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> boneWeights(vertexCount, { 0.0f, 0.0f, 0.0f, 0.0f }, Allocator::GetAllocator<glm::vec4>());
-			TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> indices(indexCount, 0, Allocator::GetAllocator<uint32_t>());
+			auto positions = CreateTrivialArray<glm::vec3>(vertexCount);
+			auto texcoords = CreateTrivialArray<glm::vec2>(vertexCount);
+			auto normals = CreateTrivialArray<glm::vec3>(vertexCount);
+			auto tangents = CreateTrivialArray<glm::vec4>(vertexCount);
+			auto colors = CreateTrivialArray<glm::vec4>(vertexCount);
+			auto boneIDs = CreateTrivialArray<glm::ivec4>(vertexCount, glm::ivec4{ -1, -1, -1, -1 });
+			auto boneWeights = CreateTrivialArray<glm::vec4>(vertexCount, glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f });
+			auto indices = CreateTrivialArray<uint32_t>(indexCount, 0);
 
 			size_t positionOffset = 0;
 			size_t texcoordOffset = 0;
@@ -274,24 +362,38 @@ namespace Mahakam
 
 					// Extract weight information
 					GLTFLoadAttribute<glm::vec4>(model, p, "WEIGHTS_0", boneWeightOffset, boneWeights);
-
-					// Normalize weights
-					for (size_t i = 0; i < vertexCount; i++)
-					{
-						glm::vec4& weight = boneWeights[i];
-
-						float sum = weight.x + weight.y + weight.z + weight.w;
-
-						weight /= sum;
-					}
 				}
 
 				// Extract indices
 				GLTFLoadIndex<uint32_t>(model, p.indices, indexOffset, indices);
 			}
 
+			// Normalize bone weights
+			if (props.IncludeBones)
+			{
+				for (size_t i = 0; i < vertexCount; i++)
+				{
+					glm::vec4& weight = boneWeights[i];
+
+					float sum = weight.x + weight.y + weight.z + weight.w;
+
+					weight /= sum;
+				}
+			}
+
 			MH_ASSERT(vertexCount == positionOffset, "Vertex count mismatch");
 			MH_ASSERT(indexCount == indexOffset, "Index count mismatch");
+
+			auto streams = CreateTrivialVector<meshopt_Stream>();
+			AddToRemapStream(streams, positionOffset, positions);
+			AddToRemapStream(streams, texcoordOffset, texcoords);
+			AddToRemapStream(streams, normalOffset, normals);
+			AddToRemapStream(streams, tangentOffset, tangents);
+			AddToRemapStream(streams, colorOffset, colors);
+			AddToRemapStream(streams, boneIDOffset, boneIDs);
+			AddToRemapStream(streams, boneWeightOffset, boneWeights);
+
+			vertexCount = OptimizeMesh(indices, streams, vertexCount);
 
 			// Populate a single struct with the vertex data
 			MeshData meshData(vertexCount, std::move(indices));

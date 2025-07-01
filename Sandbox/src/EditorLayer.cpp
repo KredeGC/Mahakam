@@ -144,17 +144,14 @@ namespace Mahakam::Editor
 		particleEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
-#if 0
+#if 1
 		// Create backpack model
-		Asset<Mesh> backpackModel = Mesh::LoadMesh("resource/models/backpack.gltf");
-
-		Asset<Material> backpackMaterial = Asset<Material>("assets/materials/Backpack.material.asset");
+		Asset<Model> backpackModel = Asset<Model>(13155307824895996659ull);
 
 		// Create backpack entity
 		Entity backpackEntity = scene->CreateEntity("Bacpack");
-		backpackEntity.AddComponent<MeshComponent>(backpackModel, backpackMaterial);
+		backpackEntity.AddComponent<MeshComponent>(backpackModel);
 		backpackEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
-		backpackEntity.AddComponent<RotatorComponent>();
 #endif
 
 

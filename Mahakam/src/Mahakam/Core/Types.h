@@ -36,6 +36,18 @@ namespace Mahakam
 	template<typename T>
 	using WeakRef = std::weak_ptr<T>;
 
+	template<typename T, typename... Args>
+	TrivialArray<T, Allocator::BaseAllocator<T>> CreateTrivialArray(Args&&... args)
+	{
+		return TrivialArray<T, Allocator::BaseAllocator<T>>(std::forward<Args>(args) ..., Allocator::GetAllocator<T>());
+	}
+
+	template<typename T, typename... Args>
+	TrivialVector<T, Allocator::BaseAllocator<T>> CreateTrivialVector(Args&&... args)
+	{
+		return TrivialVector<T, Allocator::BaseAllocator<T>>(std::forward<Args>(args) ..., Allocator::GetAllocator<T>());
+	}
+
 	template<typename T, typename ... Args>
 	constexpr Scope<T> CreateScope(Args&& ... args)
 	{

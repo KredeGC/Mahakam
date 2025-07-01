@@ -64,6 +64,7 @@ IncludeDir["imgui"]             = "../Mahakam/vendor"
 IncludeDir["imguizmo"]          = "../Mahakam/vendor"
 IncludeDir["ktl"]               = "../Mahakam/vendor/ktl"
 IncludeDir["magic_enum"]        = "../Mahakam/vendor"
+IncludeDir["meshoptimizer"]     = "../Mahakam/vendor/meshoptimizer/src"
 IncludeDir["miniaudio"]         = "../Mahakam/vendor/miniaudio/include"
 IncludeDir["ryml"]              = "../Mahakam/vendor/ryml/include"
 IncludeDir["spdlog"]            = "../Mahakam/vendor/spdlog/include"
@@ -103,6 +104,7 @@ VendorLinks = {
     "glslang",
     "ImGui",
     "ImGuizmo",
+    "MeshOptimizer",
     "spirv_cross",
     "phonon"
 }
@@ -150,6 +152,7 @@ group "Dependencies"
     include "Mahakam/vendor/imguizmo"
     include "Mahakam/vendor/glad"
     include "Mahakam/vendor/glslang"
+    include "Mahakam/vendor/meshoptimizer"
     include "Mahakam/vendor/spirv_cross"
     include "Mahakam/vendor/bullet/build3"
 group ""
