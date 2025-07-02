@@ -34,6 +34,42 @@ namespace Mahakam
 		SamplerCube
 	};
 
+	template<typename T, typename = void>
+	struct ShaderDataTypeTraits {};
+
+	template<>
+	struct ShaderDataTypeTraits<float> : std::integral_constant<ShaderDataType, ShaderDataType::Float> {};
+
+	template<>
+	struct ShaderDataTypeTraits<glm::vec2> : std::integral_constant<ShaderDataType, ShaderDataType::Float2> {};
+
+	template<>
+	struct ShaderDataTypeTraits<glm::vec3> : std::integral_constant<ShaderDataType, ShaderDataType::Float3> {};
+
+	template<>
+	struct ShaderDataTypeTraits<glm::vec4> : std::integral_constant<ShaderDataType, ShaderDataType::Float4> {};
+
+	template<>
+	struct ShaderDataTypeTraits<glm::mat3> : std::integral_constant<ShaderDataType, ShaderDataType::Mat3> {};
+
+	template<>
+	struct ShaderDataTypeTraits<glm::mat4> : std::integral_constant<ShaderDataType, ShaderDataType::Mat4> {};
+
+	template<>
+	struct ShaderDataTypeTraits<int> : std::integral_constant<ShaderDataType, ShaderDataType::Int> {};
+
+	template<>
+	struct ShaderDataTypeTraits<glm::ivec2> : std::integral_constant<ShaderDataType, ShaderDataType::Int2> {};
+
+	template<>
+	struct ShaderDataTypeTraits<glm::ivec3> : std::integral_constant<ShaderDataType, ShaderDataType::Int3> {};
+
+	template<>
+	struct ShaderDataTypeTraits<glm::ivec4> : std::integral_constant<ShaderDataType, ShaderDataType::Int4> {};
+
+	template<>
+	struct ShaderDataTypeTraits<bool> : std::integral_constant<ShaderDataType, ShaderDataType::Bool> {};
+
 	struct ShaderSource
 	{
 		UnorderedMap<ShaderStage, std::string> Sources;

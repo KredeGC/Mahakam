@@ -137,9 +137,9 @@ namespace Mahakam
 		}
 
 		template<typename U, typename T>
-		void SetVertices(U index, ShaderDataType dataType, const T* data)
+		void SetVertices(U index, const T* data)
 		{
-			SetVertices(Input(index), dataType, data, sizeof(T));
+			SetVertices(Input(index), ShaderDataTypeTraits<T>::value, data, sizeof(T));
 		}
 
 		template<typename T>
@@ -210,13 +210,7 @@ namespace Mahakam
 
 		bool HasVertices(int index) { return GetVertices(index) == nullptr; }
 
-		const glm::vec3* GetPositions() const	{ return reinterpret_cast<const glm::vec3*>(GetVertices(0)); }
-		const glm::vec2* GetTexcoords() const	{ return reinterpret_cast<const glm::vec2*>(GetVertices(1)); }
-		const glm::vec3* GetNormals() const		{ return reinterpret_cast<const glm::vec3*>(GetVertices(2)); }
-		const glm::vec4* GetTangents() const	{ return reinterpret_cast<const glm::vec4*>(GetVertices(3)); }
-		const glm::vec4* GetColors() const		{ return reinterpret_cast<const glm::vec4*>(GetVertices(4)); }
-		const glm::ivec4* GetBoneIDs() const	{ return reinterpret_cast<const glm::ivec4*>(GetVertices(5)); }
-		const glm::vec4* GetBoneWeights() const { return reinterpret_cast<const glm::vec4*>(GetVertices(6)); }
+		const glm::vec3* GetPositions() const { return reinterpret_cast<const glm::vec3*>(GetVertices(0)); }
 
 		inline static Ref<SubMesh> Create(MeshData&& mesh) { return CreateImpl(std::move(mesh)); }
 		

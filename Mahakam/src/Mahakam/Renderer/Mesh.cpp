@@ -399,24 +399,22 @@ namespace Mahakam
 			MeshData meshData(vertexCount, std::move(indices));
 
 			if (positionOffset)
-				meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
+				meshData.SetVertices(VertexType::Position, positions.data());
 			if (texcoordOffset)
-				meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, texcoords.data());
+				meshData.SetVertices(VertexType::TexCoords, texcoords.data());
 			if (normalOffset)
-				meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
+				meshData.SetVertices(VertexType::Normals, normals.data());
 			if (tangentOffset)
-				meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
+				meshData.SetVertices(VertexType::Tangents, tangents.data());
 			if (colorOffset)
-				meshData.SetVertices(VertexType::Colors, ShaderDataType::Float4, colors.data());
+				meshData.SetVertices(VertexType::Colors, colors.data());
 			if (boneIDOffset && boneWeightOffset)
 			{
-				meshData.SetVertices(VertexType::BoneIDs, ShaderDataType::Int4, boneIDs.data());
-				meshData.SetVertices(VertexType::BoneWeights, ShaderDataType::Float4, boneWeights.data());
+				meshData.SetVertices(VertexType::BoneIDs, boneIDs.data());
+				meshData.SetVertices(VertexType::BoneWeights, boneWeights.data());
 			}
 
-			Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
-
-			skinnedMesh->Meshes.push_back(mesh);
+			skinnedMesh->Meshes.push_back(SubMesh::Create(std::move(meshData)));
 		}
 
 		// Extract nodes and bones
@@ -589,9 +587,9 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, std::move(indices));
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
-		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
+		meshData.SetVertices(VertexType::Position, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, uvs.data());
+		meshData.SetVertices(VertexType::Normals, normals.data());
 		//meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
 
 		Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
@@ -651,10 +649,10 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, std::move(indices));
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
-		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
-		meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
+		meshData.SetVertices(VertexType::Position, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, uvs.data());
+		meshData.SetVertices(VertexType::Normals, normals.data());
+		meshData.SetVertices(VertexType::Tangents, tangents.data());
 
 		Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
 
@@ -714,10 +712,10 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, std::move(indices));
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
-		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
-		meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
+		meshData.SetVertices(VertexType::Position, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, uvs.data());
+		meshData.SetVertices(VertexType::Normals, normals.data());
+		meshData.SetVertices(VertexType::Tangents, tangents.data());
 
 		Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
 
@@ -813,10 +811,10 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, std::move(indices));
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
-		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
-		meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
+		meshData.SetVertices(VertexType::Position, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, uvs.data());
+		meshData.SetVertices(VertexType::Normals, normals.data());
+		meshData.SetVertices(VertexType::Tangents, tangents.data());
 
 		Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
 

@@ -267,8 +267,8 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, indices, indexCount);
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions);
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs);
+		meshData.SetVertices(VertexType::Position, positions);
+		meshData.SetVertices(VertexType::TexCoords, uvs);
 
 		return SubMesh::Create(std::move(meshData));
 	}
@@ -315,7 +315,7 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, indices, indexCount);
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions);
+		meshData.SetVertices(VertexType::Position, positions);
 
 		return SubMesh::Create(std::move(meshData));
 	}
