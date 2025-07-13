@@ -260,6 +260,7 @@ namespace Mahakam
 
 		block->Control.UseCount = 0;
 		block->Control.ID = 0;
+		block->Control.State = AssetDatabase::AssetState::Loaded;
 		block->Control.MoveData = mover;
 		block->Control.DeleteData = deleter;
 

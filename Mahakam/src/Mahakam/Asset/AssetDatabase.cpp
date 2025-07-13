@@ -103,6 +103,10 @@ namespace Mahakam
 
 			return asset;
 		};
+		serializer.Load = [](AssetDatabase::Reader& reader) -> Asset<void>
+		{
+			return nullptr;
+		};
 
 		return serializer;
 	}
@@ -279,16 +283,6 @@ namespace Mahakam
 	{
 		s_AssetPaths.clear();
 		RecursiveCacheAssets(FileUtility::ASSET_PATH);
-	};
-
-	//const std::filesystem::path& AssetDatabase::GetAssetImportPath(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetImportPath, const std::filesystem::path&, AssetDatabase::AssetID id)
-	{
-		auto iter = s_AssetPaths.find(id);
-		if (iter != s_AssetPaths.end())
-			return iter->second;
-
-		return EmptyPath;
 	};
 
 	//const AssetDatabase::AssetMap& AssetDatabase::GetAssetHandles()

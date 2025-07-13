@@ -18,6 +18,9 @@ namespace Mahakam::Serialization
         FileReader(const std::filesystem::path& filepath) :
             m_File(std::fopen(filepath.string().c_str(), "rb")) {}
 
+        FileReader(const FileReader&) = delete;
+        FileReader(FileReader&&) = delete;
+
         ~FileReader()
         {
             if (m_File)
@@ -82,6 +85,9 @@ namespace Mahakam::Serialization
     public:
         FileWriter(const std::filesystem::path& filepath) :
             m_File(std::fopen(filepath.string().c_str(), "wb")) {}
+
+        FileWriter(const FileWriter&) = delete;
+        FileWriter(FileWriter&&) = delete;
 
         ~FileWriter()
         {

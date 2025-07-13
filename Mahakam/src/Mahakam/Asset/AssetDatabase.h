@@ -31,16 +31,24 @@ namespace Mahakam
 		// - A move function is used in the control block for moving another asset (of the same type) into this space
 		// - A delete function is used in the control block for deleting when no longer used
         
-        typedef uint64_t AssetID;
+        using AssetID = uint64_t;
 
 		// TODO: Remove
 		typedef std::string ExtensionType;
+
+		enum class AssetState
+		{
+			Loaded = 0,
+			Processing,
+			Streaming
+		};
 
 		struct ControlBlock
 		{
 			// ID 0 is guaranteed to be invalid
 			size_t UseCount;
 			AssetID ID;
+			AssetState State;
 			void (*MoveData)(void*, void*);
 			void (*DeleteData)(void*);
 		};
@@ -51,36 +59,31 @@ namespace Mahakam
 		struct StreamBlock
 		{
 			Reader File;
-			void (*Stream)(void*) = nullptr;
-			void (*Load)(void*) = nullptr;
 		};
 
 		struct AssetSerializer
 		{
 			bool (*Serialize)(Writer&, const std::filesystem::path& filepath, Asset<void>) = nullptr;
 			Asset<void> (*Deserialize)(Reader&, const std::filesystem::path& filepath) = nullptr;
+			Asset<void> (*Load)(Reader&) = nullptr;
 		};
 
 	private:
 		using AssetMap = UnorderedMap<AssetID, std::filesystem::path>;
-
-		using ImporterMap = UnorderedMap<ExtensionType, Ref<AssetImporter>>;
 		using LoadedMap = UnorderedMap<AssetID, ControlBlock*>;
 
-		// TODO: Use AssetInfo instead of filepath
+		// TODO: Remove since filepaths are the same as ID
 		inline static AssetMap s_AssetPaths;
-
-		inline static ImporterMap s_AssetImporters; // Legacy importers
 		inline static LoadedMap s_LoadedAssets;
-
-
-		// TODO: Move into own class
-		inline static const std::filesystem::path EmptyPath = "";
 
 		inline static UnorderedMap<std::string, AssetSerializer> s_Serializers;
 
+		// Legacy importers
+		using ImporterMap = UnorderedMap<ExtensionType, Ref<AssetImporter>>;
+		inline static ImporterMap s_AssetImporters;
 		template<const char* Extension, const char* LegacyExt>
 		static void LoadLegacySerializer();
+		// Legacy importers
 
 		static void LoadDefaultSerializers();
 
@@ -100,7 +103,6 @@ namespace Mahakam
 		MH_DECLARE_FUNC(RefreshAssetPaths, void); // Refreshes the asset paths, finding new assets and removing unused ones
 
 		// Various getters
-		MH_DECLARE_FUNC(GetAssetImportPath, const std::filesystem::path&, AssetID id); // Gets the import path of a given asset
 		MH_DECLARE_FUNC(GetAssetHandles, const AssetMap&); // Gets a reference to all assets, whether they're currently loaded or not
 		MH_DECLARE_FUNC(GetAssetReferences, size_t, AssetID id); // Gets the amount of references to this asset, if any
 
