@@ -1,81 +1,81 @@
 #pragma once
 
-#include "Mahakam/Core/Types.h"
+#include "SerializeTraits.h"
 
-#include <bitstream.h>
+#include "Mahakam/Core/Types.h"
 
 #include <vector>
 
-namespace bitstream
+namespace Mahakam::Serialization
 {
 	template<typename Stream, typename T>
-	bool SerializeContainer(Stream& stream, bitstream::inout<Stream, T> container) noexcept
+	bool SerializeContainer(Stream& stream, inout<Stream, T> container) noexcept
 	{
 		auto size = container.size();
-		BS_ASSERT(stream.serialize(size));
+		MH_SER_ASSERT(stream.serialize(size));
 
 		if constexpr (Stream::reading)
 			container.resize(size);
 
 		for (decltype(size) i = 0; i < size; ++i)
 		{
-			BS_ASSERT(stream.serialize(container[i]));
+			MH_SER_ASSERT(stream.serialize(container[i]));
 		}
 
 		return true;
 	}
 
 	template<typename T, typename Alloc>
-	struct serialize_traits<Mahakam::TrivialArray<T, Alloc>>
+	struct SerializeTraits<TrivialArray<T, Alloc>>
 	{
-		using Container = Mahakam::TrivialArray<T, Alloc>;
+		using Container = TrivialArray<T, Alloc>;
 
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, Container> container) noexcept
+		static bool serialize(Stream& stream, inout<Stream, Container> container) noexcept
 		{
 			return SerializeContainer<Stream, Container>(stream, container);
 		}
 	};
 
 	template<typename T, typename Alloc>
-	struct serialize_traits<Mahakam::TrivialVector<T, Alloc>>
+	struct SerializeTraits<Mahakam::TrivialVector<T, Alloc>>
 	{
 		using Container = Mahakam::TrivialVector<T, Alloc>;
 
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, Container> container) noexcept
+		static bool serialize(Stream& stream, inout<Stream, Container> container) noexcept
 		{
 			return SerializeContainer<Stream, Container>(stream, container);
 		}
 	};
 
 	template<typename T, typename Alloc>
-	struct serialize_traits<std::vector<T, Alloc>>
+	struct SerializeTraits<std::vector<T, Alloc>>
 	{
 		using Container = std::vector<T, Alloc>;
 
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, Container> container) noexcept
+		static bool serialize(Stream& stream, inout<Stream, Container> container) noexcept
 		{
 			return SerializeContainer<Stream, Container>(stream, container);
 		}
 	};
 
 	template<typename K, typename V, typename Alloc>
-	struct serialize_traits<Mahakam::UnorderedMap<K, V, Alloc>>
+	struct SerializeTraits<UnorderedMap<K, V, Alloc>>
 	{
-		using Container = Mahakam::UnorderedMap<K, V, Alloc>;
+		using Container = UnorderedMap<K, V, Alloc>;
 
 		template<typename Stream>
 		typename utility::is_writing_t<Stream>
 		static serialize(Stream& stream, const Container& container) noexcept
 		{
-			BS_ASSERT(stream.serialize(container.size()));
+			MH_SER_ASSERT(stream.serialize(container.size()));
 
 			for (auto& [k, v] : container)
 			{
-				BS_ASSERT(stream.serialize(k));
-				BS_ASSERT(stream.serialize(v));
+				MH_SER_ASSERT(stream.serialize(k));
+				MH_SER_ASSERT(stream.serialize(v));
 			}
 
 			return true;
@@ -86,7 +86,7 @@ namespace bitstream
 		static serialize(Stream& stream, Container& container) noexcept
 		{
 			auto size = container.size();
-			BS_ASSERT(stream.serialize(size));
+			MH_SER_ASSERT(stream.serialize(size));
 
 			if constexpr (Stream::reading)
 				container.reserve(size);
@@ -96,8 +96,8 @@ namespace bitstream
 				K k;
 				V v;
 
-				BS_ASSERT(stream.serialize(k));
-				BS_ASSERT(stream.serialize(v));
+				MH_SER_ASSERT(stream.serialize(k));
+				MH_SER_ASSERT(stream.serialize(v));
 
 				container.emplace(std::move(k), std::move(v));
 			}
@@ -107,13 +107,13 @@ namespace bitstream
 	};
 
 	template<typename K, typename V>
-	struct serialize_traits<std::pair<K, V>>
+	struct SerializeTraits<std::pair<K, V>>
 	{
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, std::pair<K, V>> pair) noexcept
+		static bool serialize(Stream& stream, inout<Stream, std::pair<K, V>> pair) noexcept
 		{
-			BS_ASSERT(stream.serialize(pair.first));
-			BS_ASSERT(stream.serialize(pair.second));
+			MH_SER_ASSERT(stream.serialize(pair.first));
+			MH_SER_ASSERT(stream.serialize(pair.second));
 
 			return true;
 		}

@@ -17,6 +17,8 @@
 #include <Mahakam/Editor/Windows/SceneViewPanel.h>
 #include <Mahakam/Editor/Windows/StatsPanel.h>
 
+#include "Mahakam/Asset/AssetLookup.h"
+
 #include <fstream>
 #include <filesystem>
 
@@ -94,7 +96,7 @@ namespace Mahakam::Editor
 			CreateRef<TonemappingRenderPass>() });
 
 		// Use this once scenes are setup correctly
-		Asset<Material> skyboxMaterial = Asset<Material>(1413214623375882268ull);
+		Asset<Material> skyboxMaterial = AssetLookup<"test/assets/materials/skybox">();
 		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>(5839156319952352249ull);
 		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>(14413137597893043784ull);
 

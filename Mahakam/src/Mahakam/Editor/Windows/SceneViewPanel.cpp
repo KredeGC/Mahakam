@@ -17,7 +17,9 @@ namespace Mahakam::Editor
 
 			AudioEngine::UpdateSounds(m_EditorCamera.GetModelMatrix());
 
-			SceneManager::GetActiveScene()->OnRender(m_EditorCamera, m_EditorCamera.GetModelMatrix());
+			auto scene = SceneManager::GetActiveScene();
+			if (scene)
+				scene->OnRender(m_EditorCamera, m_EditorCamera.GetModelMatrix());
 		}
 	}
 
@@ -106,7 +108,9 @@ namespace Mahakam::Editor
 					m_ViewportSize.x = newViewportSize.x;
 					m_ViewportSize.y = newViewportSize.y;
 
-					SceneManager::GetActiveScene()->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+					auto scene = SceneManager::GetActiveScene();
+					if (scene)
+						scene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 
 					m_EditorCamera.GetCamera().SetRatio(m_ViewportSize.x / m_ViewportSize.y);
 				}

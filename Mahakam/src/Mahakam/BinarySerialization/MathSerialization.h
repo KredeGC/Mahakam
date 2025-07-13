@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bitstream.h>
+#include "SerializeTraits.h"
 
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
@@ -12,91 +12,75 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-namespace bitstream
+namespace Mahakam::Serialization
 {
 	template<>
-	struct serialize_traits<glm::vec2>
+	struct SerializeTraits<float>
 	{
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, glm::vec2> value) noexcept
+		static bool serialize(Stream& stream, inout<Stream, float> value)
 		{
-			BS_ASSERT(stream.template serialize<float>(value[0]));
-			BS_ASSERT(stream.template serialize<float>(value[1]));
-
-			return true;
+			return stream.serialize_bytes(&value, 1);
 		}
 	};
 
 	template<>
-	struct serialize_traits<glm::vec3>
+	struct SerializeTraits<glm::vec2>
 	{
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, glm::vec3> value) noexcept
+		static bool serialize(Stream& stream, inout<Stream, glm::vec2> value)
 		{
-			BS_ASSERT(stream.template serialize<float>(value[0]));
-			BS_ASSERT(stream.template serialize<float>(value[1]));
-			BS_ASSERT(stream.template serialize<float>(value[2]));
-
-			return true;
+			return stream.serialize_bytes(&value, 1);
 		}
 	};
 
 	template<>
-	struct serialize_traits<glm::vec4>
+	struct SerializeTraits<glm::vec3>
 	{
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, glm::vec4> value) noexcept
+		static bool serialize(Stream& stream, inout<Stream, glm::vec3> value)
 		{
-			BS_ASSERT(stream.template serialize<float>(value[0]));
-			BS_ASSERT(stream.template serialize<float>(value[1]));
-			BS_ASSERT(stream.template serialize<float>(value[2]));
-			BS_ASSERT(stream.template serialize<float>(value[3]));
-
-			return true;
+			return stream.serialize_bytes(&value, 1);
 		}
 	};
 
 	template<>
-	struct serialize_traits<glm::quat>
+	struct SerializeTraits<glm::vec4>
 	{
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, glm::quat> value) noexcept
+		static bool serialize(Stream& stream, inout<Stream, glm::vec4> value)
 		{
-			BS_ASSERT(stream.template serialize<float>(value[0]));
-			BS_ASSERT(stream.template serialize<float>(value[1]));
-			BS_ASSERT(stream.template serialize<float>(value[2]));
-			BS_ASSERT(stream.template serialize<float>(value[3]));
-
-			return true;
+			return stream.serialize_bytes(&value, 1);
 		}
 	};
 
 	template<>
-	struct serialize_traits<glm::mat3>
+	struct SerializeTraits<glm::quat>
 	{
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, glm::mat3> value) noexcept
+		static bool serialize(Stream& stream, inout<Stream, glm::quat> value)
 		{
-			BS_ASSERT(stream.template serialize<glm::vec3>(value[0]));
-			BS_ASSERT(stream.template serialize<glm::vec3>(value[1]));
-			BS_ASSERT(stream.template serialize<glm::vec3>(value[2]));
-
-			return true;
+			return stream.serialize_bytes(&value, 1);
 		}
 	};
 
 	template<>
-	struct serialize_traits<glm::mat4>
+	struct SerializeTraits<glm::mat3>
 	{
 		template<typename Stream>
-		static bool serialize(Stream& stream, bitstream::inout<Stream, glm::mat4> value) noexcept
+		static bool serialize(Stream& stream, inout<Stream, glm::mat3> value)
 		{
-			BS_ASSERT(stream.template serialize<glm::vec4>(value[0]));
-			BS_ASSERT(stream.template serialize<glm::vec4>(value[1]));
-			BS_ASSERT(stream.template serialize<glm::vec4>(value[2]));
-			BS_ASSERT(stream.template serialize<glm::vec4>(value[3]));
+			return stream.serialize_bytes(&value, 1);
+		}
+	};
 
-			return true;
+	template<>
+	struct SerializeTraits<glm::mat4>
+	{
+		template<typename Stream>
+		static bool serialize(Stream& stream, inout<Stream, glm::mat4> value)
+		{
+			return stream.serialize_bytes(&value, 1);
 		}
 	};
 }

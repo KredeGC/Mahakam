@@ -4,7 +4,7 @@
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Types.h"
 
-#include <bitstream/bitstream.h>
+#include "Mahakam/BinarySerialization/FileStream.h"
 
 #include <filesystem>
 #include <string>
@@ -45,8 +45,15 @@ namespace Mahakam
 			void (*DeleteData)(void*);
 		};
 
-		using Writer = bitstream::growing_bit_writer<TrivialVector<uint32_t>>;
-		using Reader = bitstream::fixed_bit_reader;
+		using Writer = Serialization::FileWriter;
+		using Reader = Serialization::FileReader;
+
+		struct StreamBlock
+		{
+			Reader Reader;
+			void (*Stream)(void*) = nullptr;
+			void (*Load)(void*) = nullptr;
+		};
 
 		struct AssetSerializer
 		{
@@ -71,15 +78,6 @@ namespace Mahakam
 		inline static const std::filesystem::path EmptyPath = "";
 
 		inline static UnorderedMap<std::string, AssetSerializer> s_Serializers;
-
-		template<typename Stream>
-		static bool SerializeAssetHeader(Stream& stream, bitstream::inout<Stream, AssetID> assetID, bitstream::inout<Stream, std::string> extension)
-		{
-			BS_ASSERT(stream.template serialize<AssetID>(assetID));
-			BS_ASSERT(stream.template serialize<std::string>(extension, 32));
-
-			return true;
-		}
 
 		template<const char* Extension, const char* LegacyExt>
 		static void LoadLegacySerializer();

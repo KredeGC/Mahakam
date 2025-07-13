@@ -8,12 +8,13 @@
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Random.h"
 
-#include "Mahakam/BinarySerialization/AssetSerialization.h"
-#include "Mahakam/BinarySerialization/AnimationSerialization.h"
-#include "Mahakam/BinarySerialization/MaterialSerialization.h"
-#include "Mahakam/BinarySerialization/MeshSerialization.h"
-#include "Mahakam/BinarySerialization/ShaderSerialization.h"
-#include "Mahakam/BinarySerialization/TextureCubeSerialization.h"
+#include "Mahakam/Asset/AssetSerializeTraits.h"
+
+#include "Mahakam/Asset/AnimationSerialization.h"
+#include "Mahakam/Asset/MaterialSerialization.h"
+#include "Mahakam/Asset/MeshSerialization.h"
+#include "Mahakam/Asset/ShaderSerialization.h"
+#include "Mahakam/Asset/TextureCubeSerialization.h"
 
 #include <ryml/rapidyaml-0.4.1.hpp>
 
@@ -23,6 +24,13 @@
 
 namespace Mahakam
 {
+	template<typename Stream>
+	static bool SerializeAssetHeader(Stream& stream, Mahakam::Serialization::inout<Stream, AssetDatabase::AssetID> assetID, Mahakam::Serialization::inout<Stream, std::string> extension)
+	{
+		return stream.serialize(assetID)
+			&& stream.serialize(extension);
+	}
+
 	template<const char* Extension, const char* LegacyExt>
 	void AssetDatabase::LoadLegacySerializer()
 	{
@@ -85,19 +93,15 @@ namespace Mahakam
 		AssetDatabase::AssetSerializer serializer;
 		serializer.Serialize = [](AssetDatabase::Writer& writer, const std::filesystem::path& filepath, Asset<void> asset)
 		{
-			return writer.serialize<T>(asset);
-
-			//return AssetSerializeTraits<T>::Serialize(writer, static_cast<T*>(asset));
+			return Serialization::AssetSerializeTraits<T>::serialize(writer, asset);
 		};
 		serializer.Deserialize = [](AssetDatabase::Reader& reader, const std::filesystem::path& filepath) -> Asset<void>
 		{
 			Asset<T> asset;
-			if (!reader.serialize<T>(asset))
+			if (!Serialization::AssetSerializeTraits<T>::serialize(reader, asset))
 				return nullptr;
 
 			return asset;
-
-			//return AssetSerializeTraits<T>::Deserialize(reader);
 		};
 
 		return serializer;
@@ -319,8 +323,9 @@ namespace Mahakam
 		if (iter == s_Serializers.end())
 			return control;
 
-		TrivialVector<uint32_t> buffer;
-		Writer writer(buffer);
+		std::filesystem::path filepath = FileUtility::ASSET_PATH / (std::to_string(id) + FileUtility::AssetExtension);
+
+		Writer writer(filepath);
 
 		// The asset must either be blank or use the same ID as earlier
 		if (control->ID && control->ID != id)
@@ -337,19 +342,13 @@ namespace Mahakam
 			return control;
 		}
 
-		std::filesystem::path filepath = FileUtility::ASSET_PATH / (std::to_string(id) + FileUtility::AssetExtension);
 		if (!iter->second.Serialize(writer, filepath, Asset<void>(control)))
 		{
 			MH_WARN("Failed to save asset with ID: {0}", id);
 			return control;
 		}
 
-		writer.flush();
-
-		// Save the asset
-		std::ofstream filestream(filepath, std::ios::binary);
-		filestream.write(reinterpret_cast<char*>(writer.get_buffer()), writer.get_num_bytes_serialized());
-		filestream.close();
+		writer.close();
 
 		s_AssetPaths[id] = filepath;
 
@@ -434,13 +433,7 @@ namespace Mahakam
 			return nullptr;
 		}
 
-		// Read file into buffer
-		TrivialVector<char> buffer;
-
-		if (!FileUtility::ReadFile(filepath, buffer))
-			return nullptr;
-
-		Reader reader(buffer.data(), static_cast<uint32_t>(buffer.size() * 8U));
+		Reader reader(filepath);
 
 		AssetID assetID;
 		std::string extension;

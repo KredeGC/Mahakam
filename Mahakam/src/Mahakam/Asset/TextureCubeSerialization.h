@@ -1,16 +1,16 @@
 #pragma once
 
+#include "AssetSerializeTraits.h"
+
 #include "Mahakam/Renderer/Texture.h"
 
-#include "AssetSerialization.h"
-#include "MathSerialization.h"
+#include "Mahakam/BinarySerialization/AssetIDSerialization.h"
+#include "Mahakam/BinarySerialization/MathSerialization.h"
 
-#include <bitstream.h>
-
-namespace bitstream
+namespace Mahakam::Serialization
 {
 	template<>
-	struct serialize_traits<Mahakam::TextureCube>
+	struct AssetSerializeTraits<Mahakam::TextureCube>
 	{
 		template<typename Stream>
 		typename utility::is_writing_t<Stream>
@@ -31,7 +31,7 @@ namespace bitstream
 
 		template<typename Stream>
 		typename utility::is_reading_t<Stream>
-		static Deserialize(Stream& reader, Mahakam::Asset<Mahakam::TextureCube>& texture) noexcept
+		static serialize(Stream& reader, Mahakam::Asset<Mahakam::TextureCube>& texture) noexcept
 		{
 			Mahakam::CubeTextureProps props;
 
