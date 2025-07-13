@@ -50,7 +50,7 @@ namespace Mahakam
 
 		struct StreamBlock
 		{
-			Reader Reader;
+			Reader Stream;
 			void (*Stream)(void*) = nullptr;
 			void (*Load)(void*) = nullptr;
 		};
