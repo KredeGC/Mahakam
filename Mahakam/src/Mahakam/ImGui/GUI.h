@@ -38,7 +38,7 @@ namespace Mahakam::GUI
 
 	bool DrawDragDropAssetField(const std::string& label, const std::vector<std::string>& extensions, std::filesystem::path& importPath);
 	bool AcceptPayloadTarget(std::filesystem::path& importPath, std::string_view target);
-	bool AcceptPayloadTarget(AssetDatabase::AssetID& id, std::string_view target);
+	bool AcceptPayloadTarget(AssetID& id, std::string_view target);
 
 	bool DrawColor3Edit(const std::string& label, glm::vec3& value, ImGuiColorEditFlags flags = ImGuiColorEditFlags_None);
 	bool DrawColor4Edit(const std::string& label, glm::vec4& value, ImGuiColorEditFlags flags = ImGuiColorEditFlags_None);
@@ -106,7 +106,7 @@ namespace Mahakam::GUI
 		if (ImGui::InputText(label.c_str(), filepathBuffer, MAX_STR_LEN))
 		{
 			std::string pathString = filepathBuffer;
-			AssetDatabase::AssetID id;
+			AssetID id;
 			if (std::from_chars(pathString.data(), pathString.data() + pathString.size(), id).ec == std::errc{})
 			{
 				value = Asset<T>(id);
@@ -122,7 +122,7 @@ namespace Mahakam::GUI
 			return true;
 		}
 
-		AssetDatabase::AssetID id;
+		AssetID id;
 		if (DrawDragDropTarget(id, std::forward<Ts>(extensions) ...))
 		{
 			value = Asset<T>(id);

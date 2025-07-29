@@ -42,23 +42,24 @@ namespace Mahakam::Serialization
 	struct AssetSerializeTraits<Shader>
 	{
 		template<typename Stream>
-		static bool serialize(Stream& stream, inout<Stream, Asset<Shader>> shader) noexcept
+		typename utility::is_writing_t<Stream>
+			static serialize(Stream& writer, inout<Stream, Asset<Shader>> shader) noexcept
 		{
-			if constexpr (Stream::writing)
-			{
-				return stream.serialize(shader->GetProperties())
-					&& stream.serialize(shader->GetShaderData());
-			}
-			else
-			{
-				UnorderedMap<std::string, ShaderProperty> shaderProperties;
-				UnorderedMap<std::string, ShaderData> shaderData;
+			return writer.serialize(shader->GetProperties())
+				&& writer.serialize(shader->GetShaderData());
+		}
 
-				if (!stream.serialize(shaderProperties) || !stream.serialize(shaderData))
-					return false;
+		template<typename Stream>
+		typename utility::is_reading_t<Stream>
+			static serialize(Stream& reader, inout<Stream, Asset<Shader>> shader) noexcept
+		{
+			UnorderedMap<std::string, ShaderProperty> shaderProperties;
+			UnorderedMap<std::string, ShaderData> shaderData;
 
-				shader = Shader::Create(std::move(shaderProperties), std::move(shaderData));
-			}
+			if (!reader.serialize(shaderProperties) || !reader.serialize(shaderData))
+				return false;
+
+			shader = Shader::Create(std::move(shaderProperties), std::move(shaderData));
 
 			return true;
 		}

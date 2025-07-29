@@ -10,7 +10,7 @@ namespace Mahakam::Editor
 		bool m_Open = true;
 
 		std::filesystem::path m_ImportPath;
-		AssetDatabase::AssetID m_AssetID;
+		AssetID m_AssetID;
 
 		WeakRef<ResourceImporter> m_Importer;
 

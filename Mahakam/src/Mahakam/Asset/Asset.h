@@ -1,9 +1,11 @@
 #pragma once
 
-#include "AssetDatabase.h"
 
 #include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Log.h"
+
+#include "AssetDatabase.h"
+#include "AssetDataFunctions.h"
 
 #include <cstddef>
 #include <filesystem>
@@ -23,8 +25,6 @@ namespace Mahakam
 
 		friend class AssetDatabase;
 
-		using AssetID = AssetDatabase::AssetID;
-		using ControlBlock = AssetDatabase::ControlBlock;
 		using ExtensionType = AssetDatabase::ExtensionType;
 
 		ControlBlock* m_Control;
@@ -176,6 +176,11 @@ namespace Mahakam
 			return m_Control ? m_Control->UseCount : 0;
 		}
 
+		AssetState GetState() const noexcept
+		{
+			return m_Control ? m_Control->State : AssetState::Failed;
+		}
+
 		T* get() const noexcept
 		{
 			return m_Control ? reinterpret_cast<T*>(m_Control + 1) : nullptr;
@@ -202,7 +207,7 @@ namespace Mahakam
 
 		explicit operator bool() const noexcept
 		{
-			return m_Control;
+			return m_Control ? (m_Control->State == AssetState::Loaded || m_Control->State == AssetState::Streaming) : false;
 		}
 
 	private:
@@ -222,7 +227,7 @@ namespace Mahakam
 				if (m_Control->ID)
 					AssetDatabase::UnloadAsset(m_Control);
 
-				auto destroy = m_Control->DeleteData;
+				auto destroy = m_Control->Functions->Delete;
 
 				MH_ASSERT(destroy, "Asset destructor encountered invalid control block");
 
@@ -234,35 +239,10 @@ namespace Mahakam
 	template<typename T, typename ... Args>
 	constexpr Asset<T> CreateAsset(Args&& ... args)
 	{
-		struct DataBlock
-		{
-			AssetDatabase::ControlBlock Control;
-			T Data;
-		};
-
-		DataBlock* block = Allocator::Allocate<DataBlock>(1);
+		DataBlock<T>* block = reinterpret_cast<DataBlock<T>*>(GetAssetDataFunctions<T>()->CreateControlBlock());
 
 		Allocator::Construct(&block->Data, std::forward<Args>(args)...);
-
-		auto mover = [](void* from, void* to)
-		{
-			*static_cast<T*>(to) = std::move(*static_cast<T*>(from));
-		};
-
-		auto deleter = [](void* p)
-		{
-			DataBlock* block = static_cast<DataBlock*>(p);
-
-			Allocator::Deconstruct(&block->Data);
-
-			Allocator::Deallocate(block, 1);
-		};
-
-		block->Control.UseCount = 0;
-		block->Control.ID = 0;
-		block->Control.State = AssetDatabase::AssetState::Loaded;
-		block->Control.MoveData = mover;
-		block->Control.DeleteData = deleter;
+		block->Control.State = AssetState::Loaded;
 
 		return Asset<T>(&block->Control);
 	}

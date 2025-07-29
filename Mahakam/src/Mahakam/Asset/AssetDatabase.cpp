@@ -4,6 +4,7 @@
 #include "SoundAssetImporter.h"
 #include "TextureAssetImporter.h"
 
+#include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/FileUtility.h"
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Core/Random.h"
@@ -25,7 +26,7 @@
 namespace Mahakam
 {
 	template<typename Stream>
-	static bool SerializeAssetHeader(Stream& stream, Mahakam::Serialization::inout<Stream, AssetDatabase::AssetID> assetID, Mahakam::Serialization::inout<Stream, std::string> extension)
+	static bool SerializeAssetHeader(Stream& stream, Mahakam::Serialization::inout<Stream, AssetID> assetID, Mahakam::Serialization::inout<Stream, std::string> extension)
 	{
 		return stream.serialize(assetID)
 			&& stream.serialize(extension);
@@ -87,8 +88,8 @@ namespace Mahakam
 		s_Serializers.emplace(Extension, serializer);
 	}
 
-	template<typename T>
-	AssetDatabase::AssetSerializer CreateSerializer()
+	template<typename T, bool Async = false>
+	static AssetDatabase::AssetSerializer CreateSerializer()
 	{
 		AssetDatabase::AssetSerializer serializer;
 		serializer.Serialize = [](AssetDatabase::Writer& writer, const std::filesystem::path& filepath, Asset<void> asset)
@@ -103,10 +104,36 @@ namespace Mahakam
 
 			return asset;
 		};
-		serializer.Load = [](AssetDatabase::Reader& reader) -> Asset<void>
+		if constexpr (Async)
 		{
-			return nullptr;
-		};
+			serializer.CreateEmpty = []
+			{
+				return T::GetDataFunctions()->CreateControlBlock();
+			};
+			serializer.Load = [](AssetDatabase::Reader& reader, ControlBlock* control)
+			{
+				// Need to rethink this:
+				// When we load an asset that depends on other assets it might fail, or at the very least need a lot of tweaking
+				// Eg. when loading a material it needs a shader which is only loaded after, but is required in order to set the properties
+				// One solution is to instead return an object / list of dependencies to keep track of
+				// When all dependencies are fully loaded we can then assemble the final asset eg. call Material::Create(..)
+
+				Asset<T> asset;
+				if (Serialization::AssetSerializeTraits<T>::serialize(reader, asset))
+				{
+					control->Functions->MoveConstruct(reinterpret_cast<T*>(control + 1), asset.get());
+					control->State = AssetState::Loaded;
+				}
+				else
+				{
+					control->State = AssetState::Failed;
+					MH_WARN("Failed to load asset with ID: {}, currently in use {} places", control->ID, control->UseCount - 1);
+				}
+
+				// Decrement so that it can be deleted
+				control->UseCount--;
+			};
+		}
 
 		return serializer;
 	}
@@ -134,8 +161,8 @@ namespace Mahakam
 		LoadLegacySerializer<texcubeType, textureExtension>();
 
 		// TODO: Port all legacy importers to this
-		s_Serializers.emplace(animType, CreateSerializer<Animation>());
-		s_Serializers.emplace(matType, CreateSerializer<Material>());
+		s_Serializers.emplace(animType, CreateSerializer<Animation, true>());
+		s_Serializers.emplace(matType, CreateSerializer<Material, true>());
 		s_Serializers.emplace(meshType, CreateSerializer<Mesh>());
 		s_Serializers.emplace(shaderType, CreateSerializer<Shader>());
 		//s_Serializers.emplace(texcubeType, CreateSerializer<TextureCube>());
@@ -223,7 +250,7 @@ namespace Mahakam
 	};
 
 	//void AssetDatabase::ReloadAsset(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::ReloadAsset, void, AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::ReloadAsset, void, AssetID id)
 	{
 		auto pathIter = s_AssetPaths.find(id);
 		if (pathIter == s_AssetPaths.end())
@@ -266,9 +293,9 @@ namespace Mahakam
 
 			if (control)
 			{
-				loadedControl->MoveData(control + 1, loadedControl + 1);
+				loadedControl->Functions->MoveAssign(control + 1, loadedControl + 1);
 
-				auto destroy = control->DeleteData;
+				auto destroy = control->Functions->Delete;
 				destroy(control);
 			}
 			else
@@ -292,7 +319,7 @@ namespace Mahakam
 	};
 
 	//uint32_t AssetDatabase::GetAssetReferences(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::GetAssetReferences, size_t, AssetDatabase::AssetID id)
+	MH_DEFINE_FUNC(AssetDatabase::GetAssetReferences, size_t, AssetID id)
 	{
 		auto iter = s_LoadedAssets.find(id);
 		if (iter != s_LoadedAssets.end())
@@ -309,8 +336,35 @@ namespace Mahakam
 		return iter != s_AssetPaths.end();
 	};
 
-	//AssetDatabase::ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, const Extension& extension)
-	MH_DEFINE_FUNC(AssetDatabase::SaveAsset, AssetDatabase::ControlBlock*, ControlBlock* control, AssetID id, const ExtensionType& extension)
+	void AssetDatabase::ProcessAssets()
+	{
+		if (!s_AssetQueue.empty())
+			ProcessAssetFromQueue();
+
+		if (!s_AssetFileQueue.empty())
+		{
+
+		}
+	}
+
+	void AssetDatabase::ProcessAssetFromQueue()
+	{
+		ReadBlock block = s_AssetQueue.pop();
+		block.Load(block.FileStream, block.Control);
+
+		if (block.Control->UseCount == 0)
+		{
+			UnloadAsset(block.Control);
+
+			auto destroy = block.Control->Functions->Delete;
+
+			MH_ASSERT(destroy, "Asset destructor encountered invalid control block");
+
+			destroy(block.Control);
+		}
+	}
+
+	ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, AssetID id, const ExtensionType& extension)
 	{
 		auto iter = s_Serializers.find(extension);
 		MH_ASSERT(iter != s_Serializers.end(), "Asset missing serializer");
@@ -359,10 +413,10 @@ namespace Mahakam
 				loadedControl->UseCount++;
 
 				// Move the pointer and destructor to the existing control block
-				loadedControl->MoveData(control + 1, loadedControl + 1);
+				loadedControl->Functions->MoveAssign(control + 1, loadedControl + 1);
 
 				// Invalidate the old control block, but don't delete it as others may reference it
-				control->MoveData = nullptr;
+				//control->MoveData = nullptr;
 				//control->DeleteData = nullptr;
 				control->ID = 0;
 			}
@@ -374,10 +428,9 @@ namespace Mahakam
 		s_LoadedAssets.emplace(id, control);
 
 		return control;
-	};
+	}
 
-	//AssetDatabase::ControlBlock* AssetDatabase::IncrementAsset(AssetDatabase::AssetID id)
-	MH_DEFINE_FUNC(AssetDatabase::IncrementAsset, AssetDatabase::ControlBlock*, AssetDatabase::AssetID id)
+	ControlBlock* AssetDatabase::IncrementAsset(AssetID id)
 	{
 		MH_ASSERT(id, "Attempting to load an Asset with id 0");
 
@@ -397,20 +450,25 @@ namespace Mahakam
 
 			return control;
 		}
-	};
+	}
 
-	//void AssetDatabase::DecrementAsset(ControlBlock* control)
-	MH_DEFINE_FUNC(AssetDatabase::UnloadAsset, void, ControlBlock* control)
+	void AssetDatabase::UnloadAsset(ControlBlock* control)
 	{
 		MH_ASSERT(control->UseCount == 0, "Attempting to unload multiple instances of Asset");
 
-		if (s_LoadedAssets.find(control->ID) != s_LoadedAssets.end())
-			s_LoadedAssets.erase(control->ID);
+		auto iter = s_LoadedAssets.find(control->ID);
+		if (iter != s_LoadedAssets.end())
+		{
+			//if (iter->second->State == AssetState::Loaded || iter->second->State == AssetState::Streaming)
+				s_LoadedAssets.erase(control->ID);
+		}
 		else
+		{
 			MH_ERROR("Attempting to unload an already unloaded asset ({0})", control->ID);
-	};
+		}
+	}
 
-	AssetDatabase::ControlBlock* AssetDatabase::LoadAndIncrementAsset(AssetID id)
+	ControlBlock* AssetDatabase::LoadAndIncrementAsset(AssetID id)
 	{
 		MH_ASSERT(id, "Attempting to load an Asset with id 0");
 
@@ -441,20 +499,35 @@ namespace Mahakam
 		if (iter == s_Serializers.end())
 			return nullptr;
 
-		// Convert from binary to an asset
-		Asset<void> asset = iter->second.Deserialize(reader, filepath);
-		if (!asset)
+		ControlBlock* control = nullptr;
+		if (iter->second.CreateEmpty)
 		{
-			MH_WARN("Could not load asset with ID: {0}", id);
-			return nullptr;
+			// Create an empty asset
+			control = iter->second.CreateEmpty();
+			control->UseCount += 2; // Increment ref count by 2. Once for the asset itself and once for the loader
+
+			// Add the asset to a queue to process later
+			s_AssetQueue.emplace(control, std::move(reader), iter->second.Load);
+		}
+		else
+		{
+			// Convert from binary to an asset
+			Asset<void> asset = iter->second.Deserialize(reader, filepath);
+			if (!asset)
+			{
+				MH_WARN("Could not load asset with ID: {0}", id);
+				return nullptr;
+			}
+
+			control = asset.m_Control;
+			control->UseCount++;
 		}
 
-		asset.m_Control->ID = id;
-		asset.IncrementRef();
+		control->ID = id;
 
-		s_LoadedAssets.insert({ id, asset.m_Control });
+		s_LoadedAssets.insert({ id, control });
 
-		return asset.m_Control;
+		return control;
 	}
 
 	void AssetDatabase::RecursiveCacheAssets(const std::filesystem::path& filepath)

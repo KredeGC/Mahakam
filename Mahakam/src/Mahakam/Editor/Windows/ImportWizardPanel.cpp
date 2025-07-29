@@ -47,7 +47,7 @@ namespace Mahakam::Editor
 		}
 	}
 
-	static void SaveImport(ryml::Tree& tree, const std::filesystem::path& importPath, ResourceImporter& importer, AssetDatabase::AssetID id)
+	static void SaveImport(ryml::Tree& tree, const std::filesystem::path& importPath, ResourceImporter& importer, AssetID id)
 	{
 		MH_ASSERT(id, "AssetID cannot be 0");
 
@@ -168,7 +168,7 @@ namespace Mahakam::Editor
 
 				ryml::NodeRef root = tree.rootref();
 
-				AssetDatabase::AssetID assetID;
+				AssetID assetID;
 				DeserializeYAMLNode(root, "ID", assetID);
 
 				importer->OnImportOpen(root);

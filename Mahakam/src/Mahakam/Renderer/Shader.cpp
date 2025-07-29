@@ -873,4 +873,19 @@ namespace Mahakam
 
 		return nullptr;
 	}
+
+	AssetDataFunctions* Shader::GetDataFunctions()
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::None:
+			return GetAssetDataFunctions<HeadlessShader>();
+		case RendererAPI::API::OpenGL:
+			return GetAssetDataFunctions<OpenGLShader>();
+		}
+
+		MH_BREAK("Unknown renderer API!");
+
+		return nullptr;
+	}
 }

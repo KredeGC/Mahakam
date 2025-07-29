@@ -1,12 +1,17 @@
 #pragma once
 
 #include "Mahakam/Core/Core.h"
+#include "Mahakam/Core/ConcurrentQueue.h"
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Types.h"
 
+#include "Mahakam/Asset/AssetDataFunctions.h"
+
 #include "Mahakam/BinarySerialization/FileStream.h"
 
+#include <deque>
 #include <filesystem>
+#include <queue>
 #include <string>
 
 namespace Mahakam
@@ -31,50 +36,38 @@ namespace Mahakam
 		// - A move function is used in the control block for moving another asset (of the same type) into this space
 		// - A delete function is used in the control block for deleting when no longer used
         
-        using AssetID = uint64_t;
-
 		// TODO: Remove
 		typedef std::string ExtensionType;
-
-		enum class AssetState
-		{
-			Loaded = 0,
-			Processing,
-			Streaming
-		};
-
-		struct ControlBlock
-		{
-			// ID 0 is guaranteed to be invalid
-			size_t UseCount;
-			AssetID ID;
-			AssetState State;
-			void (*MoveData)(void*, void*);
-			void (*DeleteData)(void*);
-		};
 
 		using Writer = Serialization::FileWriter;
 		using Reader = Serialization::FileReader;
 
-		struct StreamBlock
+		struct ReadBlock
 		{
-			Reader File;
+			ControlBlock* Control;
+			Reader FileStream;
+			void (*Load)(Reader&, ControlBlock*);
 		};
 
 		struct AssetSerializer
 		{
 			bool (*Serialize)(Writer&, const std::filesystem::path& filepath, Asset<void>) = nullptr;
 			Asset<void> (*Deserialize)(Reader&, const std::filesystem::path& filepath) = nullptr;
-			Asset<void> (*Load)(Reader&) = nullptr;
+			ControlBlock* (*CreateEmpty)() = nullptr;
+			void (*Load)(Reader&, ControlBlock*) = nullptr;
 		};
 
 	private:
 		using AssetMap = UnorderedMap<AssetID, std::filesystem::path>;
 		using LoadedMap = UnorderedMap<AssetID, ControlBlock*>;
+		using AssetFileQueue = std::queue<AssetID>;
+		using AssetQueue = ConcurrentQueue<ReadBlock>;
 
 		// TODO: Remove since filepaths are the same as ID
 		inline static AssetMap s_AssetPaths;
 		inline static LoadedMap s_LoadedAssets;
+		inline static AssetFileQueue s_AssetFileQueue; // Queue for assets that have not been opened yet
+		inline static AssetQueue s_AssetQueue; // Queue for assets with open files
 
 		inline static UnorderedMap<std::string, AssetSerializer> s_Serializers;
 
@@ -109,7 +102,12 @@ namespace Mahakam
 		// If you don't want to load the asset first
 		MH_DECLARE_FUNC(AssetExists, bool, AssetID id);
 
+		static void ProcessAssets();
+
 	private:
+		// Loading asset asynchronously
+		static void ProcessAssetFromQueue();
+
 		// Saving and loading assets
 		MH_DECLARE_FUNC(SaveAsset, ControlBlock*, ControlBlock* control, AssetID id, const std::string& extension);
 

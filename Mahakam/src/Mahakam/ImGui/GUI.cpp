@@ -233,7 +233,7 @@ namespace Mahakam::GUI
 		{
 			for (auto& extension : extensions)
 			{
-				AssetDatabase::AssetID id;
+				AssetID id;
 				if (AcceptPayloadTarget(id, extension))
 				{
 					importPath = std::to_string(id);
@@ -258,11 +258,11 @@ namespace Mahakam::GUI
 		return false;
 	}
 
-	bool AcceptPayloadTarget(AssetDatabase::AssetID& id, std::string_view target)
+	bool AcceptPayloadTarget(AssetID& id, std::string_view target)
 	{
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(target.data()))
 		{
-			id = *static_cast<AssetDatabase::AssetID*>(payload->Data);
+			id = *static_cast<AssetID*>(payload->Data);
 			return true;
 		}
 

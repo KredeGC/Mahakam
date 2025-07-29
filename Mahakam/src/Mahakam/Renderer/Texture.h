@@ -40,6 +40,7 @@ namespace Mahakam
 
 		inline static Asset<Texture2D> Create(const TextureProps& props = TextureProps()) { return CreateProps(props); }
 		inline static Asset<Texture2D> Create(const std::filesystem::path& filepath, const TextureProps& props = TextureProps()) { return CreateFilepath(filepath, props); }
+		static AssetDataFunctions* GetDataFunctions();
 
 	private:
 		MH_DECLARE_FUNC(CreateProps, Asset<Texture2D>, const TextureProps& props);

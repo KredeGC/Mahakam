@@ -4,6 +4,7 @@
 #include "Mahakam/Core/Types.h"
 
 #include "Mahakam/Asset/Asset.h"
+#include "Mahakam/Asset/AssetDataFunctions.h"
 
 #include <filesystem>
 #include <string>
@@ -42,5 +43,6 @@ namespace Mahakam
 
 		inline static Asset<Animation> Load(const std::filesystem::path& filepath, int index = 0) { return CreateAsset<Animation>(filepath, index); }
 		inline static Asset<Animation> Create(const std::string& name, SamplerType&& samplers, float duration) { return CreateAsset<Animation>(name, std::move(samplers), duration); }
+		inline static AssetDataFunctions* GetDataFunctions() { return GetAssetDataFunctions<Animation>(); }
 	};
 }

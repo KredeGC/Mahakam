@@ -15,7 +15,7 @@ namespace c4::yml
 	template<typename T>
 	bool read(ryml::NodeRef const& n, Mahakam::Asset<T>* val)
 	{
-		Mahakam::AssetDatabase::AssetID id;
+		Mahakam::AssetID id;
 		n >> id;
 		*val = Mahakam::Asset<T>(id);
 		return true;

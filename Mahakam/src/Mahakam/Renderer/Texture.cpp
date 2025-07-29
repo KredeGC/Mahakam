@@ -45,6 +45,21 @@ namespace Mahakam
 		return nullptr;
 	};
 
+	AssetDataFunctions* Texture2D::GetDataFunctions()
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::None:
+			return GetAssetDataFunctions<HeadlessTexture2D>();
+		case RendererAPI::API::OpenGL:
+			return GetAssetDataFunctions<OpenGLTexture2D>();
+		}
+
+		MH_BREAK("Unknown renderer API!");
+
+		return nullptr;
+	}
+
 
 	//Ref<TextureCube> TextureCube::Create(const CubeTextureProps& props)
 	MH_DEFINE_FUNC(TextureCube::CreateProps, Asset<TextureCube>, const CubeTextureProps& props)

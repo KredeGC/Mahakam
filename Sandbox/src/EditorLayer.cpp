@@ -146,7 +146,7 @@ namespace Mahakam::Editor
 		particleEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 0.0f, 1.0f });
 
 
-#if 1
+#if 0
 		// Create backpack model
 		Asset<Model> backpackModel = Asset<Model>(13155307824895996659ull);
 
@@ -203,7 +203,7 @@ namespace Mahakam::Editor
 #endif
 
 
-#if 1
+#if 0
 		// Create base collection entity to store in
 		Asset<Mesh> sphereMesh = Asset<Mesh>(14539941857077216621ull);
 
@@ -267,6 +267,8 @@ namespace Mahakam::Editor
 	void EditorLayer::OnUpdate(Timestep dt)
 	{
 		MH_PROFILE_RENDERING_FUNCTION();
+
+		AssetDatabase::ProcessAssets();
 
 		static const bool m_PlayMode = false;
 		if (m_PlayMode)

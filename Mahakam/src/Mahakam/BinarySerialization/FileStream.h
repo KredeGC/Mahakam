@@ -19,7 +19,20 @@ namespace Mahakam::Serialization
             m_File(std::fopen(filepath.string().c_str(), "rb")) {}
 
         FileReader(const FileReader&) = delete;
-        FileReader(FileReader&&) = delete;
+
+        FileReader(FileReader&& other) noexcept :
+            m_File(other.m_File)
+        {
+            other.m_File = nullptr;
+        }
+
+        FileReader& operator=(const FileReader&) = delete;
+
+        FileReader& operator=(FileReader&& rhs) noexcept
+        {
+            m_File = rhs.m_File;
+            rhs.m_File = nullptr;
+        }
 
         ~FileReader()
         {
@@ -87,7 +100,20 @@ namespace Mahakam::Serialization
             m_File(std::fopen(filepath.string().c_str(), "wb")) {}
 
         FileWriter(const FileWriter&) = delete;
-        FileWriter(FileWriter&&) = delete;
+
+        FileWriter(FileWriter&& other) noexcept :
+            m_File(other.m_File)
+        {
+            other.m_File = nullptr;
+        }
+
+        FileWriter& operator=(const FileWriter&) = delete;
+
+        FileWriter& operator=(FileWriter&& rhs) noexcept
+        {
+            m_File = rhs.m_File;
+            rhs.m_File = nullptr;
+        }
 
         ~FileWriter()
         {

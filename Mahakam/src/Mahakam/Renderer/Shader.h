@@ -46,6 +46,7 @@ namespace Mahakam
 
 		inline static Asset<Shader> Create(const std::filesystem::path& filepath) { return CreateFilepath(filepath); }
 		static Asset<Shader> Create(UnorderedMap<std::string, ShaderProperty>&& properties, UnorderedMap<std::string, ShaderData>&& data);
+		static AssetDataFunctions* GetDataFunctions();
 
 	private:
 		MH_DECLARE_FUNC(CreateFilepath, Asset<Shader>, const std::filesystem::path& filepath);

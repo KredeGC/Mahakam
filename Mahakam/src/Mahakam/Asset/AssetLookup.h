@@ -22,10 +22,10 @@ namespace Mahakam
     template<fixed_string S>
     struct AssetLookup {};
 
-    template<typename T, AssetDatabase::AssetID I>
+    template<typename T, AssetID I>
     struct AssetBaseLookup
     {
-        constexpr static AssetDatabase::AssetID ID = I;
+        constexpr static AssetID ID = I;
 
         operator Asset<T>()
         {

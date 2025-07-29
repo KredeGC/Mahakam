@@ -31,12 +31,12 @@ namespace Mahakam::Editor
 
 				struct AssetInfo
 				{
-					AssetDatabase::AssetID ID;
+					AssetID ID;
 					std::filesystem::path Filepath;
 					std::string Type;
 					size_t RefCount;
 
-					AssetInfo(AssetDatabase::AssetID id, const std::filesystem::path& filepath, const std::string& type, size_t ref) noexcept :
+					AssetInfo(AssetID id, const std::filesystem::path& filepath, const std::string& type, size_t ref) noexcept :
 						ID(id),
 						Filepath(filepath),
 						Type(type),

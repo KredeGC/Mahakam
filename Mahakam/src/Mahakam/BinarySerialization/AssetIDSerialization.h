@@ -21,7 +21,7 @@ namespace Mahakam::Serialization
 		typename utility::is_reading_t<Stream>
 		static serialize(Stream& reader, Asset<T>& asset) noexcept
 		{
-			AssetDatabase::AssetID assetID;
+			AssetID assetID;
 			if (!reader.serialize(assetID))
 				return false;
 

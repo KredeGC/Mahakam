@@ -42,4 +42,19 @@ namespace Mahakam
 
 		return nullptr;
 	};
+
+	AssetDataFunctions* Material::GetDataFunctions()
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::None:
+			return GetAssetDataFunctions<HeadlessMaterial>();
+		case RendererAPI::API::OpenGL:
+			return GetAssetDataFunctions<OpenGLMaterial>();
+		}
+
+		MH_BREAK("Unknown renderer API!");
+
+		return nullptr;
+	}
 }
