@@ -80,17 +80,28 @@ namespace Mahakam::Editor
 
 				ImGui::Separator();
 
-				// TODO: Draw AssetID so it can be easily changed
+				// Draw AssetID so it can be easily changed
 				// Could also warn if an asset already exists with that ID
 				int step = 1;
 				int step_fast = 100;
 				ImGui::InputScalar("ID", ImGuiDataType_U64, &m_AssetID, nullptr, nullptr, "%llu", 0);
 
 				if (ImGui::Button("Regenerate ID"))
+					m_AssetID = FileUtility::Hash(m_ImportPath);
+
+				if (ImGui::Button("Generate new ID"))
 					m_AssetID = Random::GetRandomID64();
 
 				if (AssetDatabase::AssetExists(m_AssetID))
+				{
 					ImGui::Text("An asset with this ID already exists");
+					size_t useCount = AssetDatabase::GetAssetReferences(m_AssetID);
+					if (useCount > 0)
+					{
+						ImGui::Text("The asset is currently in use %llu places", useCount);
+						ImGui::Text("It might not be a good idea to regenerate the ID");
+					}
+				}
 
 				// Draw filename input without path/**.extension.import
 				std::string nameString = m_ImportPath.stem().stem().string();
@@ -149,7 +160,7 @@ namespace Mahakam::Editor
 				window->m_Open = true;
 				window->m_Importer = importer;
 				window->m_ImportPath = FileUtility::Relative(FileUtility::GetImportPath(filepath, importer->GetImporterProps().Extension));
-				window->m_AssetID = Random::GetRandomID64();
+				window->m_AssetID = FileUtility::Hash(window->m_ImportPath);
 
 				// Open the wizard with the filepath
 				importer->OnResourceOpen(filepath);
@@ -185,7 +196,7 @@ namespace Mahakam::Editor
 				window->m_Open = true;
 				window->m_Importer = importer;
 				window->m_ImportPath = FileUtility::Relative(importPath);
-				window->m_AssetID = Random::GetRandomID64();
+				window->m_AssetID = FileUtility::Hash(window->m_ImportPath);
 
 				// Read the import file and open the wizard
 				ryml::Tree tree = ReadImport(importPath);

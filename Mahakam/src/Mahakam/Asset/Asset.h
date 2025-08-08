@@ -2,6 +2,7 @@
 
 #include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/FileUtility.h"
 
 #include "AssetDatabase.h"
 #include "AssetDataFunctions.h"
@@ -32,6 +33,16 @@ namespace Mahakam
 		static constexpr bool IsBaseOrVoid = std::is_void_v<T> || std::is_void_v<T2> || std::is_base_of_v<T, T2> || std::is_base_of_v<T2, T>;
 
 	public:
+		struct HashedID
+		{
+			AssetID ID;
+			const char* Path;
+
+			inline consteval HashedID(const char* filepath) :
+				ID(FileUtility::Hash(filepath)),
+				Path(filepath) { }
+		};
+
 		Asset() :
 			m_Control(nullptr) {}
 
@@ -52,6 +63,17 @@ namespace Mahakam
 				m_Control = AssetDatabase::IncrementAsset(id);
 			else
 				m_Control = nullptr;
+		}
+
+		explicit Asset(HashedID value)
+		{
+			// Register if the ID is valid
+			m_Control = AssetDatabase::IncrementAsset(value.ID);
+
+			if (!m_Control)
+			{
+				MH_WARN("Attempt to load asset with invalid hashed ID ({}) from path: {}", value.ID, value.Path);
+			}
 		}
 
 #pragma region Copy & Move constructors

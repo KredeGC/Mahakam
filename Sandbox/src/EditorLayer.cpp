@@ -96,7 +96,7 @@ namespace Mahakam::Editor
 			CreateRef<TonemappingRenderPass>() });
 
 		// Use this once scenes are setup correctly
-		Asset<Material> skyboxMaterial = AssetLookup<"test/assets/materials/skybox">();
+		Asset<Material> skyboxMaterial = Asset<Material>("import/materials/Skybox.material.import");
 		Asset<TextureCube> skyboxIrradiance = Asset<TextureCube>(5839156319952352249ull);
 		Asset<TextureCube> skyboxSpecular = Asset<TextureCube>(14413137597893043784ull);
 
