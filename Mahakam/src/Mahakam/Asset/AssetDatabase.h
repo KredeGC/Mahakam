@@ -46,14 +46,16 @@ namespace Mahakam
 		{
 			ControlBlock* Control;
 			Reader FileStream;
+			std::vector<Asset<void>> Dependencies;
 			void (*Load)(Reader&, ControlBlock*);
 		};
 
 		struct AssetSerializer
 		{
-			bool (*Serialize)(Writer&, const std::filesystem::path& filepath, Asset<void>) = nullptr;
-			Asset<void> (*Deserialize)(Reader&, const std::filesystem::path& filepath) = nullptr;
+			bool (*Serialize)(Writer&, const std::filesystem::path&, Asset<void>) = nullptr;
+			Asset<void> (*Deserialize)(Reader&, const std::filesystem::path&) = nullptr;
 			ControlBlock* (*CreateEmpty)() = nullptr;
+			std::vector<Asset<void>>(*Dependencies)(Reader&);
 			void (*Load)(Reader&, ControlBlock*) = nullptr;
 		};
 
@@ -106,6 +108,7 @@ namespace Mahakam
 
 	private:
 		// Loading asset asynchronously
+		static void ReadAssetFromQueue();
 		static void ProcessAssetFromQueue();
 
 		// Saving and loading assets

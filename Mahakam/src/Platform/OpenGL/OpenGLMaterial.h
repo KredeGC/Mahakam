@@ -40,7 +40,7 @@ namespace Mahakam
 
 		virtual uint64_t Hash() const override;
 
-		inline virtual Asset<Shader> GetShader() const override { return m_Shader; }
+		virtual Asset<Shader> GetShader() const override;
 
 		virtual void BindShader(const std::string& shaderPass) override;
 		virtual void Bind(UniformBuffer& uniformBuffer) override;

@@ -27,6 +27,12 @@ namespace Mahakam::Serialization
 	struct AssetSerializeTraits<Animation>
 	{
 		template<typename Stream>
+		static std::vector<Asset<void>> dependencies(Stream& reader) noexcept
+		{
+			return {};
+		}
+
+		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, Asset<Animation>> animation) noexcept
 		{
 			if constexpr (Stream::writing)

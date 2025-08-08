@@ -110,18 +110,16 @@ namespace Mahakam
 			{
 				return T::GetDataFunctions()->CreateControlBlock();
 			};
+			serializer.Dependencies = [](AssetDatabase::Reader& reader)
+				{
+					return Serialization::AssetSerializeTraits<T>::dependencies(reader);
+				};
 			serializer.Load = [](AssetDatabase::Reader& reader, ControlBlock* control)
 			{
-				// Need to rethink this:
-				// When we load an asset that depends on other assets it might fail, or at the very least need a lot of tweaking
-				// Eg. when loading a material it needs a shader which is only loaded after, but is required in order to set the properties
-				// One solution is to instead return an object / list of dependencies to keep track of
-				// When all dependencies are fully loaded we can then assemble the final asset eg. call Material::Create(..)
-
 				Asset<T> asset;
 				if (Serialization::AssetSerializeTraits<T>::serialize(reader, asset))
 				{
-					control->Functions->MoveConstruct(reinterpret_cast<T*>(control + 1), asset.get());
+					control->Functions->MoveConstruct(control + 1, asset.get());
 					control->State = AssetState::Loaded;
 				}
 				else
@@ -164,7 +162,7 @@ namespace Mahakam
 		s_Serializers.emplace(animType, CreateSerializer<Animation, true>());
 		s_Serializers.emplace(matType, CreateSerializer<Material, true>());
 		s_Serializers.emplace(meshType, CreateSerializer<Mesh>());
-		s_Serializers.emplace(shaderType, CreateSerializer<Shader>());
+		s_Serializers.emplace(shaderType, CreateSerializer<Shader, true>());
 		//s_Serializers.emplace(texcubeType, CreateSerializer<TextureCube>());
 	}
 
@@ -339,7 +337,7 @@ namespace Mahakam
 	void AssetDatabase::ProcessAssets()
 	{
 		if (!s_AssetQueue.empty())
-			ProcessAssetFromQueue();
+			ReadAssetFromQueue();
 
 		if (!s_AssetFileQueue.empty())
 		{
@@ -347,9 +345,20 @@ namespace Mahakam
 		}
 	}
 
-	void AssetDatabase::ProcessAssetFromQueue()
+	void AssetDatabase::ReadAssetFromQueue()
 	{
 		ReadBlock block = s_AssetQueue.pop();
+
+		// If dependencies are not ready, push back on queue :(
+		for (auto& asset : block.Dependencies)
+		{
+			if (asset.GetState() != AssetState::Loaded && asset.GetState() != AssetState::Streaming)
+			{
+				s_AssetQueue.emplace(std::move(block));
+				return;
+			}
+		}
+
 		block.Load(block.FileStream, block.Control);
 
 		if (block.Control->UseCount == 0)
@@ -362,6 +371,11 @@ namespace Mahakam
 
 			destroy(block.Control);
 		}
+	}
+
+	void AssetDatabase::ProcessAssetFromQueue()
+	{
+		
 	}
 
 	ControlBlock* AssetDatabase::SaveAsset(ControlBlock* control, AssetID id, const ExtensionType& extension)
@@ -502,12 +516,17 @@ namespace Mahakam
 		ControlBlock* control = nullptr;
 		if (iter->second.CreateEmpty)
 		{
+			// Get dependencies of the asset
+			size_t pos = reader.tell();
+			auto dependencies = iter->second.Dependencies(reader);
+			reader.seek(pos);
+
 			// Create an empty asset
 			control = iter->second.CreateEmpty();
 			control->UseCount += 2; // Increment ref count by 2. Once for the asset itself and once for the loader
 
 			// Add the asset to a queue to process later
-			s_AssetQueue.emplace(control, std::move(reader), iter->second.Load);
+			s_AssetQueue.emplace(control, std::move(reader), std::move(dependencies), iter->second.Load);
 		}
 		else
 		{

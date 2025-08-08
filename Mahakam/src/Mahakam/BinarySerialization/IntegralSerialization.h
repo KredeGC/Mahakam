@@ -10,7 +10,7 @@ namespace Mahakam::Serialization
 		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, T> value)
 		{
-			return stream.serialize_bytes(&value, 1);
+			return stream.serialize_elements(&value, 1);
 		}
 	};
 }

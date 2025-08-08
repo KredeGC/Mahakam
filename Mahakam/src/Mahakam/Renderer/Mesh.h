@@ -59,6 +59,8 @@ namespace Mahakam
 
 		inline static Asset<Mesh> Create(const UVSphereMeshProps& props) { return CreateUVSphereImpl(props); }
 
+		inline static AssetDataFunctions* GetDataFunctions() { return GetAssetDataFunctions<Mesh>(); }
+
 	private:
 		MH_DECLARE_FUNC(CopyImpl, Asset<Mesh>, Asset<Mesh> other);
 

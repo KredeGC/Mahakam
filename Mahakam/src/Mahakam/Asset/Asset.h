@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Log.h"
 
@@ -28,6 +27,9 @@ namespace Mahakam
 		using ExtensionType = AssetDatabase::ExtensionType;
 
 		ControlBlock* m_Control;
+
+		template<typename T2>
+		static constexpr bool IsBaseOrVoid = std::is_void_v<T> || std::is_void_v<T2> || std::is_base_of_v<T, T2> || std::is_base_of_v<T2, T>;
 
 	public:
 		Asset() :
@@ -67,7 +69,7 @@ namespace Mahakam
 			other.m_Control = nullptr;
 		}
 
-		template<typename T2>
+		template<typename T2, typename = std::enable_if_t<IsBaseOrVoid<T2>>>
 		Asset(const Asset<T2>& other) noexcept :
 			m_Control(other.m_Control)
 		{
@@ -75,7 +77,7 @@ namespace Mahakam
 			IncrementRef();
 		}
 
-		template<typename T2>
+		template<typename T2, typename = std::enable_if_t<IsBaseOrVoid<T2>>>
 		Asset(Asset<T2>&& other) noexcept :
 			m_Control(other.m_Control)
 		{
@@ -88,12 +90,6 @@ namespace Mahakam
 		{
 			// Remember to clear on delete
 			DecrementRef();
-		}
-
-		template<typename T2>
-		explicit operator Asset<T2>() const
-		{
-			return Asset<T2>(m_Control);
 		}
 
 #pragma region Copy & Move operators
@@ -120,7 +116,7 @@ namespace Mahakam
 			return *this;
 		}
 
-		template<typename T2>
+		template<typename T2, typename = std::enable_if_t<IsBaseOrVoid<T2>>>
 		Asset& operator=(const Asset<T2>& rhs)
 		{
 			// Remember to clear if we already have something
@@ -133,7 +129,7 @@ namespace Mahakam
 			return *this;
 		}
 
-		template<typename T2>
+		template<typename T2, typename = std::enable_if_t<IsBaseOrVoid<T2>>>
 		Asset& operator=(Asset<T2>&& rhs) noexcept
 		{
 			// Remember to clear if we already have something

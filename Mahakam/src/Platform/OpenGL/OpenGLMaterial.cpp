@@ -221,6 +221,11 @@ namespace Mahakam
 		return hash;
 	}
 
+	Asset<Shader> OpenGLMaterial::GetShader() const
+	{
+		return m_Shader;
+	}
+
 	void OpenGLMaterial::BindShader(const std::string& shaderPass)
 	{
 		m_Shader->Bind(shaderPass);

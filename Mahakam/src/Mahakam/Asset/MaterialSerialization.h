@@ -33,6 +33,18 @@ namespace Mahakam::Serialization
 		}
 
 		template<typename Stream>
+		static std::vector<Asset<void>> dependencies(Stream& reader) noexcept
+		{
+			Asset<Shader> shader;
+			if (!reader.serialize(shader))
+				return {};
+
+			// TODO: Textures... Requires that they are stored first
+
+			return { shader };
+		}
+
+		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, Asset<Material>> material) noexcept
 		{
 			if constexpr (Stream::writing)

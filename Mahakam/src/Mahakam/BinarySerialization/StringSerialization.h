@@ -19,7 +19,7 @@ namespace Mahakam::Serialization
 
 			MH_SER_ASSERT(writer.serialize(length));
 
-			return writer.serialize_bytes(value.data(), length);
+			return writer.serialize_elements(value.data(), length);
 		}
 
 		template<typename Stream>
@@ -37,7 +37,7 @@ namespace Mahakam::Serialization
 
 			value.resize(length);
 
-			return reader.serialize_bytes(value.data(), length);
+			return reader.serialize_elements(value.data(), length);
 		}
 	};
 }

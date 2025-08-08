@@ -42,6 +42,12 @@ namespace Mahakam::Serialization
 	struct AssetSerializeTraits<Shader>
 	{
 		template<typename Stream>
+		static std::vector<Asset<void>> dependencies(Stream& reader) noexcept
+		{
+			return {};
+		}
+
+		template<typename Stream>
 		typename utility::is_writing_t<Stream>
 			static serialize(Stream& writer, inout<Stream, Asset<Shader>> shader) noexcept
 		{

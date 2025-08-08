@@ -79,7 +79,7 @@ namespace Mahakam::Serialization
 				uint32_t valueCount = vertexCount * dataTypeSize;
 
 				// This will write it in native endian order... Too bad
-				MH_SER_ASSERT(writer.serialize_bytes(vertexData.data() + offset, valueCount));
+				MH_SER_ASSERT(writer.serialize_elements(vertexData.data() + offset, valueCount));
 			}
 
 			return true;
@@ -123,7 +123,7 @@ namespace Mahakam::Serialization
 
 				// Read vertices
 				values.resize(valueCount);
-				MH_SER_ASSERT(reader.serialize_bytes(values.data(), valueCount));
+				MH_SER_ASSERT(reader.serialize_elements(values.data(), valueCount));
 
 				meshData.SetVertices(index, type, values.data(), dataTypeSize);
 			}
@@ -137,6 +137,23 @@ namespace Mahakam::Serialization
 	template<>
 	struct AssetSerializeTraits<Mesh>
 	{
+		template<typename Stream>
+		static std::vector<Asset<void>> dependencies(Stream& reader) noexcept
+		{
+			MeshProps props;
+			if (!reader.serialize(props))
+				return {};
+
+			std::vector<Asset<void>> assets;
+			assets.reserve(props.Materials.size());
+			for (auto& material : props.Materials)
+			{
+				assets.emplace_back(std::move(material));
+			}
+
+			return assets;
+		}
+
 		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, Asset<Mesh>> mesh) noexcept
 		{

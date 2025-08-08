@@ -3,7 +3,6 @@
 #include "SerializeTraits.h"
 
 #include <cstdint>
-#include <cstdio>
 #include <filesystem>
 
 namespace Mahakam::Serialization
@@ -15,44 +14,30 @@ namespace Mahakam::Serialization
         static constexpr bool reading = true;
 
     public:
-        FileReader(const std::filesystem::path& filepath) :
-            m_File(std::fopen(filepath.string().c_str(), "rb")) {}
+        FileReader(const std::filesystem::path& filepath);
 
         FileReader(const FileReader&) = delete;
 
-        FileReader(FileReader&& other) noexcept :
-            m_File(other.m_File)
-        {
-            other.m_File = nullptr;
-        }
+        FileReader(FileReader&& other) noexcept;
 
         FileReader& operator=(const FileReader&) = delete;
 
-        FileReader& operator=(FileReader&& rhs) noexcept
-        {
-            m_File = rhs.m_File;
-            rhs.m_File = nullptr;
-        }
+        FileReader& operator=(FileReader&& rhs) noexcept;
 
-        ~FileReader()
-        {
-            if (m_File)
-                fclose(m_File);
-        }
+        ~FileReader();
 
-        bool close() noexcept
-        {
-            int status = fclose(m_File);
+        bool close() noexcept;
 
-            m_File = nullptr;
+        size_t tell() noexcept;
 
-            return status == 0;
-        }
+        void seek(size_t offset) noexcept;
+
+        [[nodiscard]] bool serialize_bytes(void* bytes, uint32_t num_elements, size_t element_size) noexcept;
 
         template<typename T>
-        [[nodiscard]] bool serialize_bytes(T* bytes, uint32_t num_elements) noexcept
+        [[nodiscard]] bool serialize_elements(T* bytes, uint32_t num_elements) noexcept
         {
-            return std::fread(bytes, sizeof(T), num_elements, m_File) == num_elements;
+            return serialize_bytes(bytes, num_elements, sizeof(T));
         }
 
         /**
@@ -86,7 +71,7 @@ namespace Mahakam::Serialization
         }
 
     private:
-        std::FILE* m_File;
+        void* m_File;
     };
 
     class FileWriter
@@ -96,44 +81,26 @@ namespace Mahakam::Serialization
         static constexpr bool reading = false;
 
     public:
-        FileWriter(const std::filesystem::path& filepath) :
-            m_File(std::fopen(filepath.string().c_str(), "wb")) {}
+        FileWriter(const std::filesystem::path& filepath);
 
         FileWriter(const FileWriter&) = delete;
 
-        FileWriter(FileWriter&& other) noexcept :
-            m_File(other.m_File)
-        {
-            other.m_File = nullptr;
-        }
+        FileWriter(FileWriter&& other) noexcept;
 
         FileWriter& operator=(const FileWriter&) = delete;
 
-        FileWriter& operator=(FileWriter&& rhs) noexcept
-        {
-            m_File = rhs.m_File;
-            rhs.m_File = nullptr;
-        }
+        FileWriter& operator=(FileWriter&& rhs) noexcept;
 
-        ~FileWriter()
-        {
-            if (m_File)
-                fclose(m_File);
-        }
+        ~FileWriter();
 
-        bool close() noexcept
-        {
-            int status = fclose(m_File);
+        bool close() noexcept;
 
-            m_File = nullptr;
-
-            return status == 0;
-        }
+        [[nodiscard]] bool serialize_bytes(const void* bytes, size_t num_elements, size_t element_size) noexcept;
 
         template<typename T>
-        [[nodiscard]] bool serialize_bytes(const T* bytes, uint32_t num_elements) noexcept
+        [[nodiscard]] bool serialize_elements(const T* bytes, size_t num_elements) noexcept
         {
-            return std::fwrite(bytes, sizeof(T), num_elements, m_File) == num_elements;
+            return serialize_bytes(bytes, num_elements, sizeof(T));
         }
 
         /**
@@ -167,6 +134,6 @@ namespace Mahakam::Serialization
         }
 
     private:
-        std::FILE* m_File;
+        void* m_File;
     };
 }

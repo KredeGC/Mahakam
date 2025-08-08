@@ -20,7 +20,7 @@ namespace Mahakam::Serialization
 		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, float> value)
 		{
-			return stream.serialize_bytes(&value, 1);
+			return stream.serialize_elements(&value, 1);
 		}
 	};
 
@@ -30,7 +30,7 @@ namespace Mahakam::Serialization
 		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, glm::vec2> value)
 		{
-			return stream.serialize_bytes(&value, 1);
+			return stream.serialize_elements(&value, 1);
 		}
 	};
 
@@ -40,7 +40,7 @@ namespace Mahakam::Serialization
 		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, glm::vec3> value)
 		{
-			return stream.serialize_bytes(&value, 1);
+			return stream.serialize_elements(&value, 1);
 		}
 	};
 
@@ -50,7 +50,7 @@ namespace Mahakam::Serialization
 		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, glm::vec4> value)
 		{
-			return stream.serialize_bytes(&value, 1);
+			return stream.serialize_elements(&value, 1);
 		}
 	};
 
@@ -60,7 +60,7 @@ namespace Mahakam::Serialization
 		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, glm::quat> value)
 		{
-			return stream.serialize_bytes(&value, 1);
+			return stream.serialize_elements(&value, 1);
 		}
 	};
 
@@ -70,7 +70,7 @@ namespace Mahakam::Serialization
 		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, glm::mat3> value)
 		{
-			return stream.serialize_bytes(&value, 1);
+			return stream.serialize_elements(&value, 1);
 		}
 	};
 
@@ -80,7 +80,7 @@ namespace Mahakam::Serialization
 		template<typename Stream>
 		static bool serialize(Stream& stream, inout<Stream, glm::mat4> value)
 		{
-			return stream.serialize_bytes(&value, 1);
+			return stream.serialize_elements(&value, 1);
 		}
 	};
 }
