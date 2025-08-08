@@ -1,9 +1,11 @@
 #pragma once
 
-#include "AssetDatabase.h"
-
 #include "Mahakam/Core/Allocator.h"
 #include "Mahakam/Core/Log.h"
+#include "Mahakam/Core/FileUtility.h"
+
+#include "AssetDatabase.h"
+#include "AssetDataFunctions.h"
 
 #include <cstddef>
 #include <filesystem>
@@ -23,13 +25,24 @@ namespace Mahakam
 
 		friend class AssetDatabase;
 
-		using AssetID = AssetDatabase::AssetID;
-		using ControlBlock = AssetDatabase::ControlBlock;
 		using ExtensionType = AssetDatabase::ExtensionType;
 
 		ControlBlock* m_Control;
 
+		template<typename T2>
+		static constexpr bool IsBaseOrVoid = std::is_void_v<T> || std::is_void_v<T2> || std::is_base_of_v<T, T2> || std::is_base_of_v<T2, T>;
+
 	public:
+		struct HashedID
+		{
+			AssetID ID;
+			const char* Path;
+
+			inline consteval HashedID(const char* filepath) :
+				ID(FileUtility::Hash(filepath)),
+				Path(filepath) { }
+		};
+
 		Asset() :
 			m_Control(nullptr) {}
 
@@ -52,14 +65,15 @@ namespace Mahakam
 				m_Control = nullptr;
 		}
 
-		explicit Asset(const std::filesystem::path& importPath)
+		explicit Asset(HashedID value)
 		{
 			// Register if the ID is valid
-			AssetID id = AssetDatabase::ReadAssetInfo(importPath).ID;
-			if (id)
-				m_Control = AssetDatabase::IncrementAsset(id);
-			else
-				m_Control = nullptr;
+			m_Control = AssetDatabase::IncrementAsset(value.ID);
+
+			if (!m_Control)
+			{
+				MH_WARN("Attempt to load asset with invalid hashed ID ({}) from path: {}", value.ID, value.Path);
+			}
 		}
 
 #pragma region Copy & Move constructors
@@ -77,7 +91,7 @@ namespace Mahakam
 			other.m_Control = nullptr;
 		}
 
-		template<typename T2>
+		template<typename T2, typename = std::enable_if_t<IsBaseOrVoid<T2>>>
 		Asset(const Asset<T2>& other) noexcept :
 			m_Control(other.m_Control)
 		{
@@ -85,7 +99,7 @@ namespace Mahakam
 			IncrementRef();
 		}
 
-		template<typename T2>
+		template<typename T2, typename = std::enable_if_t<IsBaseOrVoid<T2>>>
 		Asset(Asset<T2>&& other) noexcept :
 			m_Control(other.m_Control)
 		{
@@ -98,12 +112,6 @@ namespace Mahakam
 		{
 			// Remember to clear on delete
 			DecrementRef();
-		}
-
-		template<typename T2>
-		explicit operator Asset<T2>() const
-		{
-			return Asset<T2>(m_Control);
 		}
 
 #pragma region Copy & Move operators
@@ -130,7 +138,7 @@ namespace Mahakam
 			return *this;
 		}
 
-		template<typename T2>
+		template<typename T2, typename = std::enable_if_t<IsBaseOrVoid<T2>>>
 		Asset& operator=(const Asset<T2>& rhs)
 		{
 			// Remember to clear if we already have something
@@ -143,7 +151,7 @@ namespace Mahakam
 			return *this;
 		}
 
-		template<typename T2>
+		template<typename T2, typename = std::enable_if_t<IsBaseOrVoid<T2>>>
 		Asset& operator=(Asset<T2>&& rhs) noexcept
 		{
 			// Remember to clear if we already have something
@@ -165,9 +173,9 @@ namespace Mahakam
 		}
 #pragma endregion
 
-		void Save(const ExtensionType& extension, const std::filesystem::path& filepath, const std::filesystem::path& importPath)
+		void Save(AssetID id, const ExtensionType& extension)
 		{
-			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, extension, filepath, importPath);
+			ControlBlock* control = AssetDatabase::SaveAsset(m_Control, id, extension);
 
 			// If the control block is changed, we might need to remove the old one
 			if (control != m_Control)
@@ -181,21 +189,27 @@ namespace Mahakam
 			return m_Control ? m_Control->ID : 0;
 		}
 
-		std::filesystem::path GetImportPath() const
-		{
-			if (m_Control)
-				return AssetDatabase::GetAssetImportPath(m_Control->ID);
-			return "";
-		}
-
 		size_t UseCount() const noexcept
 		{
 			return m_Control ? m_Control->UseCount : 0;
 		}
 
+		AssetState GetState() const noexcept
+		{
+			return m_Control ? m_Control->State : AssetState::Failed;
+		}
+
 		T* get() const noexcept
 		{
 			return m_Control ? reinterpret_cast<T*>(m_Control + 1) : nullptr;
+		}
+
+		ControlBlock* leak() noexcept
+		{
+			ControlBlock* ptr = m_Control;
+			m_Control = nullptr;
+
+			return m_Control;
 		}
 
 		template<typename Ty = T, typename = std::enable_if_t<!std::is_void<Ty>::value>>
@@ -211,7 +225,7 @@ namespace Mahakam
 
 		explicit operator bool() const noexcept
 		{
-			return m_Control;
+			return m_Control ? (m_Control->State == AssetState::Loaded || m_Control->State == AssetState::Streaming) : false;
 		}
 
 	private:
@@ -231,7 +245,7 @@ namespace Mahakam
 				if (m_Control->ID)
 					AssetDatabase::UnloadAsset(m_Control);
 
-				auto destroy = m_Control->DeleteData;
+				auto destroy = m_Control->Functions->Delete;
 
 				MH_ASSERT(destroy, "Asset destructor encountered invalid control block");
 
@@ -243,34 +257,10 @@ namespace Mahakam
 	template<typename T, typename ... Args>
 	constexpr Asset<T> CreateAsset(Args&& ... args)
 	{
-		struct DataBlock
-		{
-			AssetDatabase::ControlBlock Control;
-			T Data;
-		};
-
-		DataBlock* block = Allocator::Allocate<DataBlock>(1);
+		DataBlock<T>* block = reinterpret_cast<DataBlock<T>*>(GetAssetDataFunctions<T>()->CreateControlBlock());
 
 		Allocator::Construct(&block->Data, std::forward<Args>(args)...);
-
-		auto mover = [](void* from, void* to)
-		{
-			*static_cast<T*>(to) = std::move(*static_cast<T*>(from));
-		};
-
-		auto deleter = [](void* p)
-		{
-			DataBlock* block = static_cast<DataBlock*>(p);
-
-			Allocator::Deconstruct(&block->Data);
-
-			Allocator::Deallocate(block, 1);
-		};
-
-		block->Control.UseCount = 0;
-		block->Control.ID = 0;
-		block->Control.MoveData = mover;
-		block->Control.DeleteData = deleter;
+		block->Control.State = AssetState::Loaded;
 
 		return Asset<T>(&block->Control);
 	}

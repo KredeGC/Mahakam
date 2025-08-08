@@ -14,7 +14,8 @@ namespace Mahakam
 		return CreateScope<MiniAudioContext>();
 	}
 
-	MiniAudioContext::MiniAudioContext()
+	MiniAudioContext::MiniAudioContext() :
+		m_Volume(1.0f)
 	{
 		ma_result result;
 
@@ -67,6 +68,28 @@ namespace Mahakam
 		iplContextRelease(&m_IplContext);
 
 		ma_engine_uninit(&m_Engine);
+	}
+
+	uint32_t MiniAudioContext::GetChannels() const
+	{
+		return ma_engine_get_channels(&m_Engine);
+	}
+
+	uint32_t MiniAudioContext::GetSampleRate() const
+	{
+		return ma_engine_get_sample_rate(&m_Engine);
+	}
+
+	float MiniAudioContext::GetVolume() const
+	{
+		return m_Volume;
+	}
+
+	void MiniAudioContext::SetVolume(float volume)
+	{
+		m_Volume = volume;
+		ma_result result = ma_engine_set_volume(&m_Engine, volume);
+		MH_ASSERT(result == MA_SUCCESS, "Failed to set audio context volume");
 	}
 
 	void MiniAudioContext::UpdateSounds(const glm::mat4& listenerTransform)

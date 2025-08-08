@@ -19,8 +19,6 @@
 #include "Mahakam/Renderer/Renderer.h"
 #include "Mahakam/Renderer/RendererAPI.h"
 
-#include "Mahakam/Serialization/YAMLGuard.h"
-
 namespace Mahakam
 {
 	Application* Application::s_Instance = nullptr;
@@ -37,8 +35,6 @@ namespace Mahakam
 
 		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(MH_BIND_EVENT(Application::OnEvent));
-
-		YAMLGuard::Init();
 
 		Renderer::Init(props.Width, props.Height);
 
@@ -66,14 +62,14 @@ namespace Mahakam
 
 		Renderer::Shutdown();
 
-		YAMLGuard::Shutdown();
-
         MH_INFO("Logging uninitialized");
         Log::Shutdown();
 	}
 
 	void Application::Run()
 	{
+		m_LastFrameTime = m_Window->GetTime();
+
 		while (m_Running)
 		{
 			double time = m_Window->GetTime();

@@ -1,10 +1,10 @@
 #include "Mahakam/mhpch.h"
 #include "LightingRenderPass.h"
 
-#include "Mahakam/Core/Frustum.h"
 #include "Mahakam/Core/FileUtility.h"
 
 #include "Mahakam/Math/Bounds.h"
+#include "Mahakam/Math/Frustum.h"
 
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/FrameBuffer.h"
@@ -110,8 +110,8 @@ namespace Mahakam
 		FrameBufferProps lightingProps;
 		lightingProps.Width = width;
 		lightingProps.Height = height;
-		lightingProps.ColorAttachments = TrivialVector<FrameBufferAttachmentProps>{ TextureFormat::RG11B10F };
-		lightingProps.DepthAttachment = { TextureFormat::Depth24 };
+		lightingProps.ColorAttachments = { TextureFormat::RG11B10F };
+		lightingProps.DepthAttachment = TextureFormat::Depth24;
 
 		m_HDRFrameBuffer = FrameBuffer::Create(lightingProps);
 

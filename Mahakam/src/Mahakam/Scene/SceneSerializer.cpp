@@ -6,7 +6,6 @@
 #include "Mahakam/Renderer/Material.h"
 #include "Mahakam/Renderer/Shader.h"
 
-#include "Mahakam/Serialization/YAMLGuard.h"
 #include "Mahakam/Serialization/YAMLSerialization.h"
 
 #include "Components/RelationshipComponent.h"

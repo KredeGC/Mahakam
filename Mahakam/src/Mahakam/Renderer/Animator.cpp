@@ -41,6 +41,12 @@ namespace Mahakam
 
 		const auto& samplers = m_Animation->GetSamplers();
 
+		if (samplers.size() != m_Indices.size())
+		{
+			m_Indices.resize(samplers.size());
+			std::memset(m_Indices.data(), 0, m_Indices.size() * sizeof(size_t));
+		}
+
 		m_Time += dt;
 
 		if (m_Time > m_Animation->GetDuration())

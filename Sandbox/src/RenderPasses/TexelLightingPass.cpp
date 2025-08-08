@@ -1,7 +1,7 @@
 #include "sbpch.h"
 #include "TexelLightingPass.h"
 
-#include "Mahakam/Core/Frustum.h"
+#include "Mahakam/Math/Frustum.h"
 
 #include "Mahakam/Renderer/GL.h"
 #include "Mahakam/Renderer/Renderer.h"

@@ -61,6 +61,7 @@ namespace Mahakam
 
 		inline static Asset<Material> Create(Asset<Shader> shader) { return CreateImpl(std::move(shader)); }
 		MH_DECLARE_FUNC(Copy, Asset<Material>, Asset<Material> material);
+		static AssetDataFunctions* GetDataFunctions();
 
 	private:
 		MH_DECLARE_FUNC(CreateImpl, Asset<Material>, Asset<Shader> shader);

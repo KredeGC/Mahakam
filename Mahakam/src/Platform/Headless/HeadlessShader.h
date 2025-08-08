@@ -29,10 +29,8 @@ namespace Mahakam
 
 		virtual void Bind(const std::string& shaderPass) override;
 
-		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
-		virtual const std::string& GetName() const override { return m_Name; }
-
 		virtual const UnorderedMap<std::string, ShaderProperty>& GetProperties() const override { return m_Properties; }
+		virtual const UnorderedMap<std::string, ShaderData>& GetShaderData() const override { return {}; }
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const override;
 

@@ -11,6 +11,7 @@
 #include <ktl/allocators/segragator.h>
 #include <ktl/allocators/shared.h>
 #include <ktl/allocators/stack_allocator.h>
+#include <ktl/allocators/threaded.h>
 
 #include <cstdint>
 
@@ -31,7 +32,7 @@ namespace Mahakam
         
         using CascadingFreelistLinear = ktl::cascading<FreelistLinear>;
         
-        using Fallback = ktl::fallback<FreelistStack, CascadingFreelistLinear>;
+        using Fallback = ktl::threaded<ktl::fallback<FreelistStack, CascadingFreelistLinear>>;
         
 		using AllocatorType = ktl::segragator<MAX_LINEAR_SIZE, Fallback, ktl::mallocator>;
 
@@ -58,7 +59,7 @@ namespace Mahakam
 		template<typename T>
 		static BaseAllocator<T> GetAllocator()
 		{
-			return BaseAllocator<T>(GetAllocatorImpl());
+			return BaseAllocator<T>(ReferenceAllocator(s_Alloc));
 		}
 
 		template<typename T>
@@ -105,7 +106,5 @@ namespace Mahakam
 	private:
         inline static ktl::stack<MAX_STACK_SIZE * BUFFER_SIZE> s_Buffer;
 		inline static AllocatorType s_Alloc{ s_Buffer };
-
-		MH_DECLARE_FUNC(GetAllocatorImpl, ReferenceAllocator);
 	};
 }

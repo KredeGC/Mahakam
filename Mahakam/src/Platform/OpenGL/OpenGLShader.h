@@ -11,6 +11,7 @@ namespace Mahakam
 		std::filesystem::path m_Filepath;
 		std::string m_Name;
 
+		UnorderedMap<std::string, ShaderData> m_ShaderData;
 		UnorderedMap<std::string, uint32_t> m_ShaderPasses;
 
 		UnorderedMap<std::string, int> m_UniformIDCache;
@@ -19,6 +20,7 @@ namespace Mahakam
 		uint32_t m_UniformSize = 0;
 
 	public:
+		OpenGLShader(UnorderedMap<std::string, ShaderProperty>&& properties, UnorderedMap<std::string, ShaderData>&& data);
 		OpenGLShader(const std::filesystem::path& filepath);
 
 		OpenGLShader(const OpenGLShader&) = delete;
@@ -31,10 +33,8 @@ namespace Mahakam
 
 		virtual void Bind(const std::string& shaderPass) override;
 
-		virtual const std::filesystem::path& GetFilepath() const override { return m_Filepath; }
-		virtual const std::string& GetName() const override { return m_Name; }
-
 		virtual const UnorderedMap<std::string, ShaderProperty>& GetProperties() const override { return m_Properties; }
+		virtual const UnorderedMap<std::string, ShaderData>& GetShaderData() const override { return m_ShaderData; }
 
 		virtual bool HasShaderPass(const std::string& shaderPass) const override;
 
@@ -53,7 +53,7 @@ namespace Mahakam
 		uint32_t GetUniformSize() const { return m_UniformSize; }
 
 	private:
-		uint32_t CompileBinary(const UnorderedMap<ShaderStage, std::string>& sources, const std::string& directives);
+		uint32_t CompileBinary(const UnorderedMap<ShaderStage, std::vector<uint32_t>>& spirv);
 
 		int GetUniformLocation(const std::string& name);
 	};

@@ -41,6 +41,13 @@ namespace Mahakam
 
 		GL::Init();
 
+		// TODO: Rendering should be split into more buffers
+		// 1 Buffer for environment data (mostly updated when lights change)
+		// 1 Buffer for camera data (position + vp matrix)
+		// 1 Buffer for uniform data, as an array (+model matrix or maybe this should be another buffer?)
+
+		// TODO: FrameBuffers should be able to use RenderBuffers instead of Texture2D
+
 		// Initialize camera buffer
 		s_SceneData->CameraBuffer = UniformBuffer::Create(sizeof(CameraData));
 		s_SceneData->UniformValueBuffer = UniformBuffer::Create(2 << 13); // 16KB

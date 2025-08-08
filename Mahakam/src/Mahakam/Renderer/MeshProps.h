@@ -14,15 +14,6 @@ namespace Mahakam
 {
 	class Material;
 
-	enum class MeshPrimitive
-	{
-		Model,
-		Plane,
-		Cube,
-		CubeSphere,
-		UVSphere
-	};
-
 	struct MeshNode
 	{
 		std::string Name; // Node name
@@ -36,34 +27,39 @@ namespace Mahakam
 		std::vector<Asset<Material>> Materials;
 	};
 
-	struct BoneMeshProps : public MeshProps
+	struct BoneMeshProps
 	{
+		MeshProps Base;
 		std::filesystem::path Filepath;
 		bool IncludeNodes = true; // TODO: Use flags instead of bools?
 		bool IncludeBones = true;
 	};
 
-	struct PlaneMeshProps : public MeshProps
+	struct CubeMeshProps
 	{
-		int Rows = 10;
-		int Columns = 10;
-	};
-
-	struct CubeMeshProps : public MeshProps
-	{
+		MeshProps Base;
 		int Tessellation = 10;
 		bool Invert = false;
 	};
 
-	struct CubeSphereMeshProps : public MeshProps
+	struct CubeSphereMeshProps
 	{
+		MeshProps Base;
 		int Tessellation = 10;
 		bool Invert = false;
 		bool Equirectangular = false;
 	};
 
-	struct UVSphereMeshProps : public MeshProps
+	struct PlaneMeshProps
 	{
+		MeshProps Base;
+		int Rows = 10;
+		int Columns = 10;
+	};
+
+	struct UVSphereMeshProps
+	{
+		MeshProps Base;
 		int Rows = 10;
 		int Columns = 10;
 	};

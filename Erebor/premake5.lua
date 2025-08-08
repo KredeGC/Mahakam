@@ -1,7 +1,7 @@
 project "Erebor"
     kind "ConsoleApp"
     language "C++"
-    cppdialect "C++17"
+    cppdialect "C++20"
     staticruntime "off"
     pic "on"
     
@@ -60,6 +60,7 @@ project "Erebor"
     filter "options:unity"
         unity "on"
     
+    -- Configs
     filter "configurations:Debug"
         defines "MH_DEBUG"
         runtime "Debug"

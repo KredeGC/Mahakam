@@ -5,13 +5,13 @@
 #include "Mahakam/Core/Input.h"
 #include "Mahakam/Core/Instrumentor.h"
 #include "Mahakam/Core/FileUtility.h"
-#include "Mahakam/Core/Frustum.h"
 #include "Mahakam/Core/KeyCodes.h"
 #include "Mahakam/Core/Layer.h"
 #include "Mahakam/Core/Log.h"
 #include "Mahakam/Math/Math.h"
 #include "Mahakam/Core/MouseButtonCodes.h"
 #include "Mahakam/Core/Profiler.h"
+#include "Mahakam/Core/Random.h"
 #include "Mahakam/Core/SharedLibrary.h"
 #include "Mahakam/Core/Timestep.h"
 #include "Mahakam/Core/Types.h"
@@ -21,8 +21,6 @@
 #include "Mahakam/Asset/Asset.h"
 #include "Mahakam/Asset/AssetDatabase.h"
 #include "Mahakam/Asset/AssetImporter.h"
-#include "Mahakam/Asset/MaterialAssetImporter.h"
-#include "Mahakam/Asset/ShaderAssetImporter.h"
 #include "Mahakam/Asset/SoundAssetImporter.h"
 #include "Mahakam/Asset/TextureAssetImporter.h"
 
@@ -34,10 +32,11 @@
 
 // Editor
 #ifndef MH_STANDALONE
+#include "Mahakam/Editor/Resource/ResourceImporter.h"
+#include "Mahakam/Editor/Resource/ResourceRegistry.h"
 #include "Mahakam/Editor/EditorCamera.h"
 #include "Mahakam/Editor/EditorWindow.h"
 #include "Mahakam/Editor/EditorWindowRegistry.h"
-#include "Mahakam/Editor/Runtime.h"
 #include "Mahakam/Editor/Selection.h"
 #endif
 
@@ -53,6 +52,7 @@
 
 // Math
 #include "Mahakam/Math/Bounds.h"
+#include "Mahakam/Math/Frustum.h"
 #include "Mahakam/Math/Math.h"
 
 // Physics

@@ -216,9 +216,10 @@ namespace Mahakam::GUI
 		return false;
 	}
 
-	bool DrawDragDropField(const std::string& label, const std::string& extension, std::filesystem::path& importPath)
+	// TODO: Rename to SearchField
+	bool DrawDragDropAssetField(const std::string& label, const std::vector<std::string>& extensions, std::filesystem::path& importPath)
 	{
-		std::string importString = importPath.string();
+		std::string importString = importPath.generic_string();
 		char filepathBuffer[MAX_STR_LEN]{ 0 };
 		strncpy(filepathBuffer, importString.c_str(), importString.size());
 		if (ImGui::InputText(label.c_str(), filepathBuffer, MAX_STR_LEN))
@@ -230,10 +231,14 @@ namespace Mahakam::GUI
 
 		if (ImGui::BeginDragDropTarget())
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(extension.c_str()))
+			for (auto& extension : extensions)
 			{
-				importPath = (const char*)payload->Data;
-				return true;
+				AssetID id;
+				if (AcceptPayloadTarget(id, extension))
+				{
+					importPath = std::to_string(id);
+					return true;
+				}
 			}
 
 			ImGui::EndDragDropTarget();
@@ -242,20 +247,23 @@ namespace Mahakam::GUI
 		return false;
 	}
 
-	bool DrawDragDropTarget(const std::vector<std::string>& extensions, std::filesystem::path& importPath)
+	bool AcceptPayloadTarget(std::filesystem::path& importPath, std::string_view target)
 	{
-		if (ImGui::BeginDragDropTarget())
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(target.data()))
 		{
-			for (auto& extension : extensions)
-			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(extension.c_str()))
-				{
-					importPath = (const char*)payload->Data;
-					return true;
-				}
-			}
+			importPath = (const char*)payload->Data;
+			return true;
+		}
 
-			ImGui::EndDragDropTarget();
+		return false;
+	}
+
+	bool AcceptPayloadTarget(AssetID& id, std::string_view target)
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(target.data()))
+		{
+			id = *static_cast<AssetID*>(payload->Data);
+			return true;
 		}
 
 		return false;

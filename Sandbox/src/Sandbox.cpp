@@ -1,14 +1,10 @@
 #include "sbpch.h"
 
-#define MH_STANDALONE_TITLE "Sandbox"
-#define MH_STANDALONE_ICON "internal/icons/icon-64.png"
-
-#include <Mahakam/MahakamRuntime.h>
-#include <Mahakam/MahakamEntrypoint.h>
+#include <Mahakam/Mahakam.h>
 
 using namespace Mahakam;
 
-struct MH_EXPORTED RotatorComponent
+struct RotatorComponent
 {
 	float rotation = 0.0f;
 	float rotationSpeed = 10.0f;
@@ -16,7 +12,7 @@ struct MH_EXPORTED RotatorComponent
 	RotatorComponent() {}
 };
 
-struct MH_EXPORTED CamerControllerComponent
+struct CamerControllerComponent
 {
 	float moveSpeed = 5.0f;
 	float rotationSpeed = 2.0f;
@@ -24,7 +20,7 @@ struct MH_EXPORTED CamerControllerComponent
 	CamerControllerComponent() {}
 };
 
-MH_EXTERN_EXPORTED void Load()
+void Load()
 {
 	MH_TRACE("DLL Loaded!");
 
@@ -51,8 +47,10 @@ MH_EXTERN_EXPORTED void Load()
 #pragma endregion
 }
 
-MH_EXTERN_EXPORTED void Run(Scene* scene)
+void Run(Scene* scene)
 {
+	//if (true) return;
+
 	// Scene camera
 	Entity cameraEntity = scene->CreateEntity("Main Camera");
 	cameraEntity.AddComponent<CameraComponent>(Camera::ProjectionType::Perspective, glm::radians(45.0f), 0.01f, 100.0f);
@@ -75,7 +73,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Setup plane
-	Asset<Mesh> planeMesh = Asset<Mesh>("import/assets/models/Plane.mesh.import");
+	Asset<Mesh> planeMesh = Asset<Mesh>(556425745901094492ull);
 
 	/*Ref<SubMesh> planeMesh = SubMesh::CreatePlane(2, 2);
 
@@ -95,9 +93,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 0
 	// Create backpack model
-	Asset<Mesh> backpackModel = Mesh::LoadMesh("assets/models/backpack.gltf");
+	Asset<Mesh> backpackModel = Mesh::LoadMesh("resource/models/backpack.gltf");
 
-	Asset<Material> backpackMaterial = Asset<Material>("import/assets/materials/Backpack.material.import");
+	Asset<Material> backpackMaterial = Asset<Material>("assets/materials/Backpack.material.asset");
 
 	// Create backpack entity
 	Entity backpackEntity = scene->CreateEntity("Bacpack");
@@ -111,12 +109,12 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 	Entity animatedArchive = scene->CreateEntity("Animated Skeletons");
 
 	// Create glTF skinned model
-	Asset<BoneMesh> skinnedModel = Asset<BoneMesh>("import/assets/models/mannequin_clap.glb.import");
-	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("assets/models/mannequin_clap.glb");
-	Asset<Animation> skinnedAnimation = Asset<Animation>("import/assets/models/ClapAnimation.anim.import");
-	//Asset<Animation> skinnedAnimation = Animation::Load("assets/models/mannequin_clap.glb");
+	Asset<Model> skinnedModel = Asset<Model>(11945816250811211738ull);
+	//Asset<Mesh> skinnedModel = Mesh::LoadMesh("resource/models/mannequin_clap.glb");
+	Asset<Animation> skinnedAnimation = Asset<Animation>(1494460746093480384ull);
+	//Asset<Animation> skinnedAnimation = Animation::Load("resource/models/mannequin_clap.glb");
 
-	//Asset<Material> skinnedMaterial = Asset<Material>("import/assets/materials/Skinned.material.import");
+	//Asset<Material> skinnedMaterial = Asset<Material>("assets/materials/Skinned.material.asset");
 
 	// Create backpack entity
 	Entity skinnedEntity = scene->CreateEntity("Skinned glTF");
@@ -132,7 +130,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 #if 0
 	// Create piano sound entity
-	Asset<Sound> pianoSound = Asset<Sound>("import/assets/sounds/piano.wav.import");
+	Asset<Sound> pianoSound = Asset<Sound>("assets/sounds/piano.wav.asset");
 
 	Entity pianoEntity = scene->CreateEntity("Piano");
 	pianoEntity.AddComponent<TransformComponent>().SetPosition({ 2.5f, 4.0f, 7.5f });
@@ -143,7 +141,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 
 
 	// Create vespa sound entity
-	Asset<Sound> vespaSound = Asset<Sound>("import/assets/sounds/vespa.wav.import");
+	Asset<Sound> vespaSound = Asset<Sound>("assets/sounds/vespa.wav.asset");
 
 	Entity vespaEntity = scene->CreateEntity("Vespa Sound");
 	vespaEntity.AddComponent<TransformComponent>().SetPosition({ 0.0f, 1.0f, 2.0f });
@@ -153,8 +151,9 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 #endif
 
 
+#if 1
 	// Create base collection entity to store in
-	Asset<Mesh> sphereMesh = Asset<Mesh>("import/assets/models/CubeSphere.mesh.import");
+	Asset<Mesh> sphereMesh = Asset<Mesh>(14539941857077216621ull);
 
 	// Create base collection entity to store in
 	Entity sphereCollection = scene->CreateEntity("Spheres");
@@ -182,6 +181,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 			//sphereCollection = entity; // TEMPORARY: Just to see the depth
 		}
 	}
+#endif
 
 	Entity entity1 = scene->CreateEntity("ID 1");
 	Entity entity2 = scene->CreateEntity("ID 2");
@@ -202,7 +202,7 @@ MH_EXTERN_EXPORTED void Run(Scene* scene)
 }
 
 
-MH_EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
+void Update(Scene* scene, Timestep dt)
 {
 	MH_PROFILE_FUNCTION();
 
@@ -277,12 +277,12 @@ MH_EXTERN_EXPORTED void Update(Scene* scene, Timestep dt)
 	});
 }
 
-MH_EXTERN_EXPORTED void Stop(Scene* scene)
+void Stop(Scene* scene)
 {
 	// TODO: Remove entities again
 }
 
-MH_EXTERN_EXPORTED void Unload()
+void Unload()
 {
 	MH_TRACE("DLL Unloaded!");
 

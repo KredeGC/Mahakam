@@ -50,6 +50,7 @@ require "Scripts/unity"
 outputdir = "%{cfg.buildcfg}-%{_OPTIONS['target']}-%{_OPTIONS['toolset']}-%{cfg.architecture}"
 
 IncludeDir = {}
+IncludeDir["bitstream"]         = "../Mahakam/vendor/bitstream"
 IncludeDir["bullet"]            = "../Mahakam/vendor/bullet/src"
 IncludeDir["bullet_dynamics"]   = "../Mahakam/vendor/bullet/src/BulletDynamics"
 IncludeDir["bullet_collision"]  = "../Mahakam/vendor/bullet/src/BulletCollision"
@@ -63,6 +64,7 @@ IncludeDir["imgui"]             = "../Mahakam/vendor"
 IncludeDir["imguizmo"]          = "../Mahakam/vendor"
 IncludeDir["ktl"]               = "../Mahakam/vendor/ktl"
 IncludeDir["magic_enum"]        = "../Mahakam/vendor"
+IncludeDir["meshoptimizer"]     = "../Mahakam/vendor/meshoptimizer/src"
 IncludeDir["miniaudio"]         = "../Mahakam/vendor/miniaudio/include"
 IncludeDir["ryml"]              = "../Mahakam/vendor/ryml/include"
 IncludeDir["spdlog"]            = "../Mahakam/vendor/spdlog/include"
@@ -77,6 +79,7 @@ SteamAudioLibDir = "../Mahakam/vendor/steamaudio/lib/".._OPTIONS["target"].."-x6
 VendorIncludes = {
     "src",
     "../Mahakam/src",
+    "%{IncludeDir.bitstream}",
     "%{IncludeDir.entt}",
     "%{IncludeDir.glm}",
     "%{IncludeDir.imgui}",
@@ -101,6 +104,7 @@ VendorLinks = {
     "glslang",
     "ImGui",
     "ImGuizmo",
+    "MeshOptimizer",
     "spirv_cross",
     "phonon"
 }
@@ -128,7 +132,7 @@ LinuxLinks = {
 
 workspace "Mahakam"
     architecture "x64"
-    startproject(_OPTIONS["standalone"] and "Sandbox" or "Erebor")
+    startproject("Sandbox")
     toolset(_OPTIONS["toolset"])
     
     configurations {
@@ -148,6 +152,7 @@ group "Dependencies"
     include "Mahakam/vendor/imguizmo"
     include "Mahakam/vendor/glad"
     include "Mahakam/vendor/glslang"
+    include "Mahakam/vendor/meshoptimizer"
     include "Mahakam/vendor/spirv_cross"
     include "Mahakam/vendor/bullet/build3"
 group ""

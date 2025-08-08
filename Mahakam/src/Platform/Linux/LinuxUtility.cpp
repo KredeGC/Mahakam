@@ -10,7 +10,7 @@
 
 namespace Mahakam
 {
-	static bool FileDialogsUtilityCheck()
+	static bool FileDialogsUtilityCheck() noexcept
 	{
 		FILE* fp;
 		char path[LINUX_PATH_MAX];
@@ -30,7 +30,7 @@ namespace Mahakam
 		return true;
 	}
 
-	Filepath FileUtility::OpenFile(const char* filter, const Filepath& basePath)
+	Filepath FileUtility::OpenFile(const char* filter, const Filepath& basePath) noexcept
 	{
 		if (!FileDialogsUtilityCheck())
 			return Filepath();
@@ -61,7 +61,7 @@ namespace Mahakam
 		return file_choice;
 	}
 
-	Filepath FileUtility::SaveFile(const char* filter, const Filepath& basePath)
+	Filepath FileUtility::SaveFile(const char* filter, const Filepath& basePath) noexcept
 	{
 		if (!FileDialogsUtilityCheck())
 			return Filepath();
@@ -94,7 +94,7 @@ namespace Mahakam
 		return file_choice;
 	}
 
-	Filepath FileUtility::OpenDirectory()
+	Filepath FileUtility::OpenDirectory() noexcept
 	{
 		if (!FileDialogsUtilityCheck())
 			return Filepath();

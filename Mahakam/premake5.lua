@@ -1,7 +1,7 @@
 project "Mahakam"
     kind "StaticLib"
     language "C++"
-    cppdialect "C++17"
+    cppdialect "C++20"
     staticruntime "off"
     pic "on"
     
@@ -27,6 +27,7 @@ project "Mahakam"
     
     includedirs {
         "src",
+        "%{IncludeDir.bitstream}",
         "%{IncludeDir.bullet}",
         "%{IncludeDir.bullet_dynamics}",
         "%{IncludeDir.bullet_collision}",
@@ -40,6 +41,7 @@ project "Mahakam"
         "%{IncludeDir.imguizmo}",
         "%{IncludeDir.ktl}",
         "%{IncludeDir.magic_enum}",
+        "%{IncludeDir.meshoptimizer}",
         "%{IncludeDir.miniaudio}",
         "%{IncludeDir.ryml}",
         "%{IncludeDir.spdlog}",

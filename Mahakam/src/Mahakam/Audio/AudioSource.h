@@ -1,10 +1,13 @@
 #pragma once
 
+#include "SoundProps.h"
+
 #include "Mahakam/Core/Core.h"
 
 #include "Mahakam/Asset/Asset.h"
 
 #include "AudioEngine.h"
+#include "AudioDataSource.h"
 
 #define GLM_FORCE_INLINE
 #define GLM_FORCE_INTRINSICS
@@ -23,9 +26,20 @@ namespace Mahakam
 
 		virtual void Play() = 0;
 		virtual void Stop() = 0;
+
+		virtual bool IsPlaying() const = 0;
 		
-		virtual void SetSound(Asset<Sound> sound) = 0;
-		virtual Asset<Sound> GetSound() const = 0;
+		virtual void SetDataSource(Scope<AudioDataSource> dataSource) = 0;
+		virtual AudioDataSource* GetDataSource() const = 0;
+
+		virtual const SoundProps& GetProps() const = 0;
+		virtual void SetProps(const SoundProps& props) = 0;
+
+		virtual void SetVolume(float volume) = 0;
+		virtual float GetVolume() const = 0;
+
+		virtual void SetLooping(bool loop) = 0;
+		virtual bool GetLooping() const = 0;
 
 		virtual void SetInterpolation(bool interpolate) = 0;
 		virtual bool GetInterpolation() const = 0;

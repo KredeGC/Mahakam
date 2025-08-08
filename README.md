@@ -18,6 +18,14 @@ Physics will be handled by Bullet3 once integrated fully.</p>
 
 </div>
 
+# TODO
+* Remove binary hot-loading, since it's a mess.
+* Refactor the rest of the legacy asset importers.
+* Make each material have it's own uniform buffer in some way.
+* Integrate meshoptimizer when importing mesh assets.
+* Switch to Clustered forward rendering.
+* Look into JoltPhysics.
+
 # Usage
 Mahakam can be used by itself, simply by building and linking to it.
 An editor application also exists, called Erebor, which includes a level-editor and asset manager among other game-making tools.
@@ -49,6 +57,7 @@ Refer to the [BUILDING.md](BUILDING.md) file.
 * [Dear ImGui](https://github.com/ocornut/imgui) for GUI interaction and rendering.
 * [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) for editor interaction and rendering.
 * [magic_enum](https://github.com/Neargye/magic_enum) for enum introspection.
+* [meshoptimizer](https://github.com/zeux/meshoptimizer) for optimizing models.
 * [miniaudio](https://github.com/mackron/miniaudio) for audio playback.
 * [spdlog](https://github.com/gabime/spdlog) for easy and fast logging.
 * [spirv-cross](https://github.com/KhronosGroup/SPIRV-Cross) for shader transpiling and reflection.

@@ -19,6 +19,10 @@ namespace Mahakam
 	class PhysicsContext;
 	class TextureCube;
 
+	// TODO: Scene should hold the AssetDatabase, AudioEngine and PhysicsEngine
+	// This way, when a scene is destroyed everything is destroyed with it
+	// Should be careful with assets though, so we don't unload assets that are used in multiple scenes
+
 	class Scene
 	{
 	private:

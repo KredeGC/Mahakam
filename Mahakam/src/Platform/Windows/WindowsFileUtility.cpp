@@ -21,7 +21,7 @@ namespace Mahakam
 		~ComInit() { CoUninitialize(); }
 	};
 
-	Filepath FileUtility::OpenFile(const char* filter, const Filepath& basePath)
+	Filepath FileUtility::OpenFile(const char* filter, const Filepath& basePath) noexcept
 	{
 		std::string pathString = (FileUtility::GetWorkingDirectory() / basePath).string();
 
@@ -47,7 +47,7 @@ namespace Mahakam
 		return Filepath();
 	}
 
-	Filepath FileUtility::SaveFile(const char* filter, const Filepath& basePath)
+	Filepath FileUtility::SaveFile(const char* filter, const Filepath& basePath) noexcept
 	{
 		std::string pathString = (FileUtility::GetWorkingDirectory() / basePath).string();
 
@@ -76,7 +76,7 @@ namespace Mahakam
 		return Filepath();
 	}
 
-	Filepath FileUtility::OpenDirectory()
+	Filepath FileUtility::OpenDirectory() noexcept
 	{
 		std::wstring pathString = FileUtility::GetWorkingDirectory().wstring();
 

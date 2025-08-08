@@ -16,7 +16,9 @@
 #include "Entity.h"
 #include "SceneSerializer.h"
 
-#include "Mahakam/Core/SharedLibrary.h"
+#include "Mahakam/Audio/AudioContext.h"
+
+#include "Mahakam/Editor/Resource/ResourceRegistry.h"
 
 #include "Mahakam/ImGui/GUI.h"
 
@@ -110,13 +112,8 @@ namespace Mahakam
 			Animator& animator = entity.GetComponent<AnimatorComponent>();
 
 			Asset<Animation> animation = animator.GetAnimation();
-
-			std::filesystem::path importPath = animation.GetImportPath();
-			if (GUI::DrawDragDropField("Animation", ".anim", importPath))
-			{
-				animation = Asset<Animation>(importPath);
-				animator.SetAnimation(Asset<Sound>(importPath));
-			}
+			if (GUI::DrawDragDropAsset("Animation", animation, ".anim"))
+				animator.SetAnimation(animation);
 
 			if (animation)
 			{
@@ -166,7 +163,12 @@ namespace Mahakam
 
 #pragma region AudioListener
 		// headphone icon
-		componentInterface.SetEditor(u8"\uea33");
+		componentInterface.SetEditor(u8"\uea33", [](Entity entity)
+		{
+			float volume = AudioEngine::GetContext()->GetVolume();
+			if (ImGui::DragFloat("Global Volume", &volume, 0.01f, 0.0f, 1.0f))
+				AudioEngine::GetContext()->SetVolume(volume);
+		});
 		componentInterface.SetComponent<AudioListenerComponent>();
 		componentInterface.Serialize = [](ryml::NodeRef& node, Entity entity)
 		{
@@ -185,15 +187,23 @@ namespace Mahakam
 		// audio icon
 		componentInterface.SetEditor(u8"\ueea8", [](Entity entity)
 		{
-			AudioSource& source = entity.GetComponent<AudioSourceComponent>();
-			Asset<Sound> sound = source.GetSound();
+			AudioSourceComponent& component = entity.GetComponent<AudioSourceComponent>();
+			AudioSource& source = component.GetAudioSource();
+			Asset<Sound> sound = component.GetSound();
 
-			std::filesystem::path importPath = sound.GetImportPath();
-			if (GUI::DrawDragDropField("Sound", ".sound", importPath))
+			if (GUI::DrawDragDropAsset("Sound", sound, ".sound"))
 			{
-				source.SetSound(Asset<Sound>(importPath));
+				component.SetSound(sound);
 				source.Play(); // TODO: TEMPORARY, REMOVE WHEN PLAY MODE IS IMPL
 			}
+
+			float volume = source.GetVolume();
+			if (ImGui::DragFloat("Volume", &volume, 0.01f, 0.0f, 1.0f))
+				source.SetVolume(volume);
+
+			bool looping = source.GetLooping();
+			if (ImGui::Checkbox("Loop", &looping))
+				source.SetLooping(looping);
 
 			float spatialBlend = source.GetSpatialBlend();
 			if (ImGui::DragFloat("Spatial blend", &spatialBlend, 0.01f, 0.0f, 1.0f))
@@ -440,10 +450,9 @@ namespace Mahakam
 			MeshComponent& meshComponent = entity.GetComponent<MeshComponent>();
 
 			// Mesh dragdrop
-			std::filesystem::path importPath = meshComponent.GetMesh().GetImportPath();
-			if (GUI::DrawDragDropField("Mesh", ".mesh", importPath))
+			Asset<Mesh> mesh = meshComponent.GetMesh();
+			if (GUI::DrawDragDropAsset("Mesh", mesh, ".mesh"))
 			{
-				Asset<Mesh> mesh = Asset<Mesh>(importPath);
 				if (mesh)
 					meshComponent.SetMesh(mesh);
 				else

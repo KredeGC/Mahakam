@@ -11,6 +11,8 @@
 #include "Platform/Headless/HeadlessMesh.h"
 #include "Platform/OpenGL/OpenGLMesh.h"
 
+#include <meshoptimizer.h>
+
 #include <glm/gtx/fast_square_root.hpp>
 
 #include <tiny_gltf/tiny_gltf.h>
@@ -106,7 +108,7 @@ namespace Mahakam
 		GLTFLoadIndex<T>(model, iter->second, offset, dst);
 	}
 
-	static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<uint32_t, uint32_t>& nodeIndex, uint32_t id, int parentID, Asset<BoneMesh>& skinnedMesh)
+	static void GLTFReadNodeHierarchy(const tinygltf::Model& model, UnorderedMap<uint32_t, uint32_t>& nodeIndex, uint32_t id, int parentID, Asset<Model>& skinnedMesh)
 	{
 		const tinygltf::Node& node = model.nodes[id];
 
@@ -163,30 +165,104 @@ namespace Mahakam
 			GLTFReadNodeHierarchy(model, nodeIndex, child, id, skinnedMesh);
 	}
 
-	//Asset<Mesh> Mesh::CopyImpl(Asset<Mesh> other)
-	MH_DEFINE_FUNC(Mesh::CopyImpl, Asset<Mesh>, Asset<Mesh> other)
+	template<typename T, typename S>
+	static void AddToRemapStream(S& stream, bool hasData, T& data)
 	{
-		switch (other->Primitive)
-		{
-		case MeshPrimitive::Model:
-			return CreateAsset<BoneMesh>(static_cast<BoneMesh&>(*other.get()));
-		case MeshPrimitive::Plane:
-			return CreateAsset<PlaneMesh>(static_cast<PlaneMesh&>(*other.get()));
-		case MeshPrimitive::Cube:
-			return CreateAsset<CubeMesh>(static_cast<CubeMesh&>(*other.get()));
-		case MeshPrimitive::CubeSphere:
-			return CreateAsset<CubeSphereMesh>(static_cast<CubeSphereMesh&>(*other.get()));
-		case MeshPrimitive::UVSphere:
-			return CreateAsset<UVSphereMesh>(static_cast<UVSphereMesh&>(*other.get()));
-		}
+		constexpr size_t dataSize = sizeof(decltype(*data.data()));
+		if (hasData)
+			stream.emplace_back(data.data(), dataSize, dataSize);
+	}
 
-		MH_BREAK("Unknown MeshPrimitive");
+	template<typename I, typename T, typename R>
+	static void RemapIndices(I& indices, T& streams, R& remap, uint32_t vertexCount)
+	{
+		meshopt_remapIndexBuffer(indices.data(), indices.data(), indices.size(), remap.data());
 
-		return nullptr;
+		// Casting const here is not UB, but still messy...
+		for (auto& stream : streams)
+			meshopt_remapVertexBuffer(const_cast<void*>(stream.data), stream.data, vertexCount, stream.size, remap.data());
+	}
+
+	template<typename I>
+	static void OptimizeVertexCache(I& indices, size_t totalVertices)
+	{
+		meshopt_optimizeVertexCache(indices.data(), indices.data(), indices.size(), totalVertices);
+	}
+
+	template<typename I>
+	static void OptimizeOverdraw(I& indices, const float* positions, size_t totalVertices)
+	{
+		meshopt_optimizeOverdraw(indices.data(), indices.data(), indices.size(), positions, totalVertices, sizeof(float) * 3, 1.01f);
+	}
+
+	template<typename I, typename T, typename R>
+	static void OptimizeVertexFetch(I& indices, T& streams, R& remap, size_t totalVertices)
+	{
+		meshopt_optimizeVertexFetchRemap(remap.data(), indices.data(), indices.size(), totalVertices);
+
+		meshopt_remapIndexBuffer(indices.data(), indices.data(), indices.size(), remap.data());
+
+		// Casting const here is not UB, but still messy...
+		for (auto& stream : streams)
+			meshopt_remapVertexBuffer(const_cast<void*>(stream.data), stream.data, totalVertices, stream.size, remap.data());
+	}
+
+	template<typename I, typename T>
+	static uint32_t OptimizeMesh(I& indices, T& streams, uint32_t vertexCount)
+	{
+		size_t vertexSize = 0;
+		for (auto& stream : streams)
+			vertexSize += stream.size;
+
+		const float* positions = reinterpret_cast<const float*>(streams[0].data);
+
+		meshopt_VertexCacheStatistics bvcs_nv = meshopt_analyzeVertexCache(indices.data(), indices.size(), vertexCount, 32, 32, 32);
+		meshopt_VertexCacheStatistics bvcs_amd = meshopt_analyzeVertexCache(indices.data(), indices.size(), vertexCount, 14, 64, 128);
+		meshopt_VertexCacheStatistics bvcs_intel = meshopt_analyzeVertexCache(indices.data(), indices.size(), vertexCount, 128, 0, 0);
+		meshopt_VertexFetchStatistics bvfs = meshopt_analyzeVertexFetch(indices.data(), indices.size(), vertexCount, vertexSize);
+		meshopt_OverdrawStatistics bos = meshopt_analyzeOverdraw(indices.data(), indices.size(), positions, vertexCount, sizeof(glm::vec3));
+
+		TrivialArray<unsigned int, Allocator::BaseAllocator<unsigned int>> remap(vertexCount, Allocator::GetAllocator<unsigned int>());
+		size_t totalVertices = meshopt_generateVertexRemapMulti(remap.data(), indices.data(), indices.size(), vertexCount, streams.data(), streams.size());
+
+		if (totalVertices != vertexCount)
+			MH_TRACE("Vertex count changed from {} to {}", vertexCount, totalVertices);
+
+		RemapIndices(indices, streams, remap, vertexCount);
+
+		OptimizeVertexCache(indices, totalVertices);
+
+		// Assumes that streams[0] is position vertex data
+		OptimizeOverdraw(indices, positions, totalVertices);
+
+		OptimizeVertexFetch(indices, streams, remap, totalVertices);
+
+		meshopt_VertexCacheStatistics vcs_nv = meshopt_analyzeVertexCache(indices.data(), indices.size(), totalVertices, 32, 32, 32);
+		meshopt_VertexCacheStatistics vcs_amd = meshopt_analyzeVertexCache(indices.data(), indices.size(), totalVertices, 14, 64, 128);
+		meshopt_VertexCacheStatistics vcs_intel = meshopt_analyzeVertexCache(indices.data(), indices.size(), totalVertices, 128, 0, 0);
+		meshopt_VertexFetchStatistics vfs = meshopt_analyzeVertexFetch(indices.data(), indices.size(), totalVertices, vertexSize);
+		meshopt_OverdrawStatistics os = meshopt_analyzeOverdraw(indices.data(), indices.size(), positions, totalVertices, sizeof(glm::vec3));
+
+		if (bvcs_nv.atvr != vcs_nv.atvr || bvcs_nv.acmr != vcs_nv.acmr)
+			MH_TRACE("Vertex ACMR (NV) - ATVR: Before {}, After {} - ACMR: Before {}, After {}", bvcs_nv.atvr, vcs_nv.atvr, bvcs_nv.acmr, vcs_nv.acmr);
+		if (bvcs_amd.atvr != vcs_amd.atvr || bvcs_amd.acmr != vcs_amd.acmr)
+			MH_TRACE("Vertex ACMR (AMD) - ATVR: Before {}, After {} - ACMR: Before {}, After {}", bvcs_amd.atvr, vcs_amd.atvr, bvcs_amd.acmr, vcs_amd.acmr);
+		if (bvcs_intel.atvr != vcs_intel.atvr || bvcs_intel.acmr != vcs_intel.acmr)
+			MH_TRACE("Vertex ACMR (Intel) - ATVR: Before {}, After {} - ACMR: Before {}, After {}", bvcs_intel.atvr, vcs_intel.atvr, bvcs_intel.acmr, vcs_intel.acmr);
+		if (bvfs.overfetch != vfs.overfetch)
+			MH_TRACE("Vertex Overfetch Before {}, After {}", bvfs.overfetch, vfs.overfetch);
+		if (bos.overdraw != os.overdraw)
+			MH_TRACE("Vertex Overdraw Before {}, After {}", bos.overdraw, os.overdraw);
+
+		return uint32_t(totalVertices);
+	}
+
+	Asset<Mesh> Mesh::CopyImpl(Asset<Mesh> other)
+	{
+		return CreateAsset<Mesh>(*other);
 	};
 
-	//Asset<BoneMesh> BoneMesh::CreateImpl(const BoneMeshProps& props)
-	MH_DEFINE_FUNC(BoneMesh::CreateImpl, Asset<BoneMesh>, const BoneMeshProps& props)
+	Asset<Mesh> Mesh::LoadImpl(const BoneMeshProps& props)
 	{
 		MH_PROFILE_FUNCTION();
 
@@ -225,7 +301,7 @@ namespace Mahakam
 		// TODO: Support interleaved data
 		// TODO: Support sparse data sets
 
-		Asset<BoneMesh> skinnedMesh = CreateAsset<BoneMesh>(props);
+		Asset<Model> skinnedMesh = CreateAsset<Model>(props.Base);
 
 		// Extract vertex and index values
 		for (auto& m : model.meshes)
@@ -243,14 +319,14 @@ namespace Mahakam
 			}
 
 			// Setup variables
-			TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> positions(vertexCount, Allocator::GetAllocator<glm::vec3>());
-			TrivialArray<glm::vec2, Allocator::BaseAllocator<glm::vec2>> texcoords(vertexCount, Allocator::GetAllocator<glm::vec2>());
-			TrivialArray<glm::vec3, Allocator::BaseAllocator<glm::vec3>> normals(vertexCount, Allocator::GetAllocator<glm::vec3>());
-			TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> tangents(vertexCount, Allocator::GetAllocator<glm::vec4>());
-			TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> colors(vertexCount, Allocator::GetAllocator<glm::vec4>());
-			TrivialArray<glm::ivec4, Allocator::BaseAllocator<glm::ivec4>> boneIDs(vertexCount, { -1, -1, -1, -1 }, Allocator::GetAllocator<glm::ivec4>());
-			TrivialArray<glm::vec4, Allocator::BaseAllocator<glm::vec4>> boneWeights(vertexCount, { 0.0f, 0.0f, 0.0f, 0.0f }, Allocator::GetAllocator<glm::vec4>());
-			TrivialArray<uint32_t, Allocator::BaseAllocator<uint32_t>> indices(indexCount, 0, Allocator::GetAllocator<uint32_t>());
+			auto positions = CreateTrivialArray<glm::vec3>(vertexCount);
+			auto texcoords = CreateTrivialArray<glm::vec2>(vertexCount);
+			auto normals = CreateTrivialArray<glm::vec3>(vertexCount);
+			auto tangents = CreateTrivialArray<glm::vec4>(vertexCount);
+			auto colors = CreateTrivialArray<glm::vec4>(vertexCount);
+			auto boneIDs = CreateTrivialArray<glm::ivec4>(vertexCount, glm::ivec4{ -1, -1, -1, -1 });
+			auto boneWeights = CreateTrivialArray<glm::vec4>(vertexCount, glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f });
+			auto indices = CreateTrivialArray<uint32_t>(indexCount, 0);
 
 			size_t positionOffset = 0;
 			size_t texcoordOffset = 0;
@@ -279,58 +355,70 @@ namespace Mahakam
 				// Extract vertex colors
 				GLTFLoadAttribute<glm::vec4>(model, p, "COLOR_0", colorOffset, colors);
 
-				if (skinnedMesh->Props.IncludeBones)
+				if (props.IncludeBones)
 				{
 					// Extract joint information
 					GLTFLoadAttribute<glm::ivec4>(model, p, "JOINTS_0", boneIDOffset, boneIDs);
 
 					// Extract weight information
 					GLTFLoadAttribute<glm::vec4>(model, p, "WEIGHTS_0", boneWeightOffset, boneWeights);
-
-					// Normalize weights
-					for (size_t i = 0; i < vertexCount; i++)
-					{
-						glm::vec4& weight = boneWeights[i];
-
-						float sum = weight.x + weight.y + weight.z + weight.w;
-
-						weight /= sum;
-					}
 				}
 
 				// Extract indices
 				GLTFLoadIndex<uint32_t>(model, p.indices, indexOffset, indices);
 			}
 
+			// Normalize bone weights
+			if (props.IncludeBones)
+			{
+				for (size_t i = 0; i < vertexCount; i++)
+				{
+					glm::vec4& weight = boneWeights[i];
+
+					float sum = weight.x + weight.y + weight.z + weight.w;
+
+					weight /= sum;
+				}
+			}
+
 			MH_ASSERT(vertexCount == positionOffset, "Vertex count mismatch");
 			MH_ASSERT(indexCount == indexOffset, "Index count mismatch");
+
+			auto streams = CreateTrivialVector<meshopt_Stream>();
+			AddToRemapStream(streams, positionOffset, positions);
+			AddToRemapStream(streams, texcoordOffset, texcoords);
+			AddToRemapStream(streams, normalOffset, normals);
+			AddToRemapStream(streams, tangentOffset, tangents);
+			AddToRemapStream(streams, colorOffset, colors);
+			AddToRemapStream(streams, boneIDOffset, boneIDs);
+			AddToRemapStream(streams, boneWeightOffset, boneWeights);
+
+			vertexCount = OptimizeMesh(indices, streams, vertexCount);
 
 			// Populate a single struct with the vertex data
 			MeshData meshData(vertexCount, std::move(indices));
 
 			if (positionOffset)
-				meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
+				meshData.SetVertices(VertexType::Position, positions.data());
 			if (texcoordOffset)
-				meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, texcoords.data());
+				meshData.SetVertices(VertexType::TexCoords, texcoords.data());
 			if (normalOffset)
-				meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
+				meshData.SetVertices(VertexType::Normals, normals.data());
 			if (tangentOffset)
-				meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
+				meshData.SetVertices(VertexType::Tangents, tangents.data());
 			if (colorOffset)
-				meshData.SetVertices(VertexType::Colors, ShaderDataType::Float4, colors.data());
+				meshData.SetVertices(VertexType::Colors, colors.data());
 			if (boneIDOffset && boneWeightOffset)
 			{
-				meshData.SetVertices(VertexType::BoneIDs, ShaderDataType::Int4, boneIDs.data());
-				meshData.SetVertices(VertexType::BoneWeights, ShaderDataType::Float4, boneWeights.data());
+				meshData.SetVertices(VertexType::BoneIDs, boneIDs.data());
+				meshData.SetVertices(VertexType::BoneWeights, boneWeights.data());
 			}
 
-			Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
-
-			skinnedMesh->Meshes.push_back(mesh);
+			skinnedMesh->Meshes.push_back(SubMesh::Create(std::move(meshData)));
 		}
 
 		// Extract nodes and bones
-		if (skinnedMesh->Props.IncludeNodes)
+		if (props.IncludeNodes)
 		{
 			UnorderedMap<uint32_t, uint32_t> nodeIndex; // Node ID to hierarchy index
 
@@ -339,7 +427,7 @@ namespace Mahakam
 				GLTFReadNodeHierarchy(model, nodeIndex, rootNode, -1, skinnedMesh);
 
 			// Extract bone transformations
-			if (skinnedMesh->Props.IncludeBones)
+			if (props.IncludeBones)
 			{
 				for (auto& skinNode : model.nodes)
 				{
@@ -381,28 +469,28 @@ namespace Mahakam
 		return skinnedMesh;
 	};
 
-	//Asset<PlaneMesh> PlaneMesh::CreateImpl(const PlaneMeshProps& props)
-	MH_DEFINE_FUNC(PlaneMesh::CreateImpl, Asset<PlaneMesh>, const PlaneMeshProps& props)
+	//Asset<Mesh> CubeMesh::CreateCubeImpl(const CubeMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreateCubeImpl, Asset<Mesh>, const CubeMeshProps& props)
 	{
-		return CreateAsset<PlaneMesh>(SubMesh::CreatePlane(props.Rows, props.Columns), props);
+		return CreateAsset<Mesh>(SubMesh::CreateCube(props.Tessellation, props.Invert), props.Base);
 	};
 
-	//Asset<CubeMesh> CubeMesh::CreateImpl(const CubeMeshProps& props)
-	MH_DEFINE_FUNC(CubeMesh::CreateImpl, Asset<CubeMesh>, const CubeMeshProps& props)
+	//Asset<Mesh> CubeSphereMesh::CreateCubeSphereImpl(const CubeSphereMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreateCubeSphereImpl, Asset<Mesh>, const CubeSphereMeshProps& props)
 	{
-		return CreateAsset<CubeMesh>(SubMesh::CreateCube(props.Tessellation, props.Invert), props);
+		return CreateAsset<Mesh>(SubMesh::CreateCubeSphere(props.Tessellation, props.Invert), props.Base);
 	};
 
-	//Asset<CubeSphereMesh> CubeSphereMesh::CreateImpl(const CubeSphereMeshProps& props)
-	MH_DEFINE_FUNC(CubeSphereMesh::CreateImpl, Asset<CubeSphereMesh>, const CubeSphereMeshProps& props)
+	//Asset<Mesh> PlaneMesh::CreatePlaneImpl(const PlaneMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreatePlaneImpl, Asset<Mesh>, const PlaneMeshProps& props)
 	{
-		return CreateAsset<CubeSphereMesh>(SubMesh::CreateCubeSphere(props.Tessellation, props.Invert), props);
+		return CreateAsset<Mesh>(SubMesh::CreatePlane(props.Rows, props.Columns), props.Base);
 	};
 
-	//Asset<UVSphereMesh> UVSphereMesh::CreateImpl(const UVSphereMeshProps& props)
-	MH_DEFINE_FUNC(UVSphereMesh::CreateImpl, Asset<UVSphereMesh>, const UVSphereMeshProps& props)
+	//Asset<Mesh> UVSphereMesh::CreateUVSphereImpl(const UVSphereMeshProps& props)
+	MH_DEFINE_FUNC(Mesh::CreateUVSphereImpl, Asset<Mesh>, const UVSphereMeshProps& props)
 	{
-		return CreateAsset<UVSphereMesh>(SubMesh::CreateUVSphere(props.Rows, props.Columns), props);
+		return CreateAsset<Mesh>(SubMesh::CreateUVSphere(props.Rows, props.Columns), props.Base);
 	};
 
 	//Ref<SubMesh> Mesh::CreateImpl(MeshData&& mesh)
@@ -499,9 +587,9 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, std::move(indices));
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
-		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
+		meshData.SetVertices(VertexType::Position, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, uvs.data());
+		meshData.SetVertices(VertexType::Normals, normals.data());
 		//meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
 
 		Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
@@ -561,10 +649,10 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, std::move(indices));
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
-		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
-		meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
+		meshData.SetVertices(VertexType::Position, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, uvs.data());
+		meshData.SetVertices(VertexType::Normals, normals.data());
+		meshData.SetVertices(VertexType::Tangents, tangents.data());
 
 		Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
 
@@ -624,10 +712,10 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, std::move(indices));
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
-		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
-		meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
+		meshData.SetVertices(VertexType::Position, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, uvs.data());
+		meshData.SetVertices(VertexType::Normals, normals.data());
+		meshData.SetVertices(VertexType::Tangents, tangents.data());
 
 		Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
 
@@ -723,10 +811,10 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, std::move(indices));
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions.data());
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs.data());
-		meshData.SetVertices(VertexType::Normals, ShaderDataType::Float3, normals.data());
-		meshData.SetVertices(VertexType::Tangents, ShaderDataType::Float4, tangents.data());
+		meshData.SetVertices(VertexType::Position, positions.data());
+		meshData.SetVertices(VertexType::TexCoords, uvs.data());
+		meshData.SetVertices(VertexType::Normals, normals.data());
+		meshData.SetVertices(VertexType::Tangents, tangents.data());
 
 		Ref<SubMesh> mesh = SubMesh::Create(std::move(meshData));
 

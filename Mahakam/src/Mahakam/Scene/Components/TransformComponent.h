@@ -41,20 +41,22 @@ namespace Mahakam
 
 		operator const glm::mat4&() const { return m_ModelMatrix; }
 
-		inline void SetPosition(const glm::vec3& pos) { m_Position = pos; m_Flags |= FLAG_DIRTY; }
-		inline void SetRotation(const glm::quat& rot) { m_Rotation = rot; m_Flags |= FLAG_DIRTY; }
-		inline void SetEulerangles(const glm::vec3& euler) { m_Rotation = glm::quat(euler); m_Flags |= FLAG_DIRTY; }
-		inline void SetScale(const glm::vec3& sc) { m_Scale = sc; m_Flags |= FLAG_DIRTY; }
+		inline TransformComponent& SetPosition(const glm::vec3& pos) { m_Position = pos; m_Flags |= FLAG_DIRTY; return *this; }
+		inline TransformComponent& SetRotation(const glm::quat& rot) { m_Rotation = rot; m_Flags |= FLAG_DIRTY; return *this; }
+		inline TransformComponent& SetEulerangles(const glm::vec3& euler) { m_Rotation = glm::quat(euler); m_Flags |= FLAG_DIRTY; return *this; }
+		inline TransformComponent& SetScale(const glm::vec3& sc) { m_Scale = sc; m_Flags |= FLAG_DIRTY; return *this; }
 
 		inline const glm::vec3& GetPosition() const { return m_Position; }
 		inline const glm::quat& GetRotation() const { return m_Rotation; }
 		inline glm::vec3 GetEulerAngles() const { return glm::eulerAngles(m_Rotation); }
 		inline const glm::vec3& GetScale() const { return m_Scale; }
 
-		inline void SetNoMatrix(bool enable)
+		inline TransformComponent& SetNoMatrix(bool enable)
 		{
 			if (enable != HasNoMatrix())
 				m_Flags ^= FLAG_NO_MATRIX;
+
+			return *this;
 		}
 		inline bool HasNoMatrix() const { return (m_Flags & FLAG_NO_MATRIX) != 0; }
 

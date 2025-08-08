@@ -1,9 +1,8 @@
 #include "Mahakam/mhpch.h"
 #include "GeometryRenderPass.h"
 
-#include "Mahakam/Core/Frustum.h"
-
 #include "Mahakam/Math/Bounds.h"
+#include "Mahakam/Math/Frustum.h"
 
 #include "Mahakam/Renderer/Buffer.h"
 #include "Mahakam/Renderer/FrameBuffer.h"

@@ -17,7 +17,7 @@ namespace Mahakam
 
 		MH_PROFILE_RENDERING_FUNCTION();
 
-		particleCompute = ComputeShader::Create("assets/compute/Particles.glsl");
+		particleCompute = ComputeShader::Create("resource/compute/Particles.glsl");
 
 		return true;
 	}

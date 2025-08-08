@@ -28,6 +28,8 @@ namespace Mahakam
 
 	void HeadlessRendererAPI::SetBlendMode(BlendMode src, BlendMode dst, bool enable) {}
 
+	void HeadlessRendererAPI::MultiDrawIndexed(const void* indirect, uint32_t stride, uint32_t count) {}
+
 	void HeadlessRendererAPI::DrawIndexed(uint32_t count) {}
 
 	void HeadlessRendererAPI::DrawInstanced(uint32_t indexCount, uint32_t count) {}

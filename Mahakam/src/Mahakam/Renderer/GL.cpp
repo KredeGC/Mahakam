@@ -4,6 +4,8 @@
 #include "Mahakam/Core/Profiler.h"
 #include "Mahakam/Core/SharedLibrary.h"
 
+#include "Mahakam/Asset/Asset.h"
+
 #include "Mesh.h"
 #include "Texture.h"
 
@@ -101,160 +103,140 @@ namespace Mahakam
 	}
 
 #pragma region Mesh
-	//Ref<Mesh> GL::GetScreenQuad()
-	MH_DEFINE_FUNC(GL::GetScreenQuad, Ref<SubMesh>)
+	Ref<SubMesh> GL::GetScreenQuad()
 	{
 		return s_StaticScreenQuad;
-	};
+	}
 
-	//Ref<Mesh> GL::GetSphere()
-	MH_DEFINE_FUNC(GL::GetSphere, Ref<SubMesh>)
+	Ref<SubMesh> GL::GetSphere()
 	{
 		return s_StaticSphereMesh;
-	};
+	}
 
-	//Ref<Mesh> GL::GetInvertedPyramid()
-	MH_DEFINE_FUNC(GL::GetInvertedPyramid, Ref<SubMesh>)
+	Ref<SubMesh> GL::GetInvertedPyramid()
 	{
 		return s_StaticInvertedPyramid;
-	};
+	}
 
-	//Ref<Mesh> GL::GetInvertedSphere()
-	MH_DEFINE_FUNC(GL::GetInvertedSphere, Ref<SubMesh>)
+	Ref<SubMesh> GL::GetInvertedSphere()
 	{
 		return s_StaticInvertedSphereMesh;
-	};
+	}
 
-	//Ref<Mesh> GL::GetInvertedCube()
-	MH_DEFINE_FUNC(GL::GetInvertedCube, Ref<SubMesh>)
+	Ref<SubMesh> GL::GetInvertedCube()
 	{
 		return s_StaticInvertedCubemapMesh;
-	};
+	}
 
-	//Ref<Mesh> GL::GetCube()
-	MH_DEFINE_FUNC(GL::GetCube, Ref<SubMesh>)
+	Ref<SubMesh> GL::GetCube()
 	{
 		return s_StaticCube;
-	};
+	}
 #pragma endregion
 
 #pragma region Texture
-	//Ref<Texture2D> GL::GetTexture2DRed()
-	MH_DEFINE_FUNC(GL::GetTexture2DRed, Asset<Texture2D>)
+	Asset<Texture2D> GL::GetTexture2DRed()
 	{
 		return s_Texture2DRed;
-	};
+	}
 
-	//Ref<Texture2D> GL::GetTexture2DWhite()
-	MH_DEFINE_FUNC(GL::GetTexture2DWhite, Asset<Texture2D>)
+	Asset<Texture2D> GL::GetTexture2DWhite()
 	{
 		return s_Texture2DWhite;
-	};
+	}
 
-	//Ref<Texture2D> GL::GetTexture2DBlack()
-	MH_DEFINE_FUNC(GL::GetTexture2DBlack, Asset<Texture2D>)
+	Asset<Texture2D> GL::GetTexture2DBlack()
 	{
 		return s_Texture2DBlack;
-	};
+	}
 
-	//Ref<Texture2D> GL::GetTexture2DBump()
-	MH_DEFINE_FUNC(GL::GetTexture2DBump, Asset<Texture2D>)
+	Asset<Texture2D> GL::GetTexture2DBump()
 	{
 		return s_Texture2DBump;
-	};
+	}
 
-	//Ref<TextureCube> GL::GetTextureCubeWhite()
-	MH_DEFINE_FUNC(GL::GetTextureCubeWhite, Asset<TextureCube>)
+	Asset<TextureCube> GL::GetTextureCubeWhite()
 	{
 		return s_TextureCubeWhite;
-	};
+	}
 
-	//Ref<TextureCube> GL::GetTextureCubeGrey()
-	MH_DEFINE_FUNC(GL::GetTextureCubeGrey, Asset<TextureCube>)
+	Asset<TextureCube> GL::GetTextureCubeGrey()
 	{
 		return s_TextureCubeGrey;
-	};
+	}
 #pragma endregion
 
-	//const char* GL::GetGraphicsVendor()
-	MH_DEFINE_FUNC(GL::GetGraphicsVendor, const char*)
+	const char* GL::GetGraphicsVendor()
 	{
 		return s_RendererAPI->GetGraphicsVendor();
-	};
+	}
 
-	//void GL::SetViewportImpl(uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor)
-	MH_DEFINE_FUNC(GL::SetViewportImpl, void, uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor)
+	void GL::SetViewportImpl(uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool scissor)
 	{
 		s_RendererAPI->SetViewport(x, y, w, h, scissor);
-	};
+	}
 
-	//void GL::FinishRendering()
-	MH_DEFINE_FUNC(GL::FinishRendering, void)
+	void GL::FinishRendering()
 	{
 		s_RendererAPI->FinishRendering();
-	};
+	}
 
-	//void GL::SetClearColor(const glm::vec4& color)
-	MH_DEFINE_FUNC(GL::SetClearColor, void, const glm::vec4& color)
+	void GL::SetClearColor(const glm::vec4& color)
 	{
 		s_RendererAPI->SetClearColor(color);
-	};
+	}
 
-	//void GL::ClearImpl(bool color, bool depth)
-	MH_DEFINE_FUNC(GL::ClearImpl, void, bool color, bool depth)
+	void GL::ClearImpl(bool color, bool depth)
 	{
 		s_RendererAPI->Clear(color, depth);
-	};
+	}
 
-	//void GL::EnableCullingImpl(bool enable, bool cullFront)
-	MH_DEFINE_FUNC(GL::EnableCullingImpl, void, bool enable, bool cullFront)
+	void GL::EnableCullingImpl(bool enable, bool cullFront)
 	{
 		s_RendererAPI->EnableCulling(enable, cullFront);
-	};
+	}
 
-	//void GL::EnableZWriting(bool enable)
-	MH_DEFINE_FUNC(GL::EnableZWriting, void, bool enable)
+	void GL::EnableZWriting(bool enable)
 	{
 		s_RendererAPI->EnableZWriting(enable);
-	};
+	}
 
-	//void GL::SetZTesting(RendererAPI::DepthMode mode)
-	MH_DEFINE_FUNC(GL::SetZTesting, void, RendererAPI::DepthMode mode)
+	void GL::SetZTesting(RendererAPI::DepthMode mode)
 	{
 		s_RendererAPI->SetZTesting(mode);
-	};
+	}
 
-	//void GL::SetFillMode(bool enable)
-	MH_DEFINE_FUNC(GL::SetFillMode, void, bool enable)
+	void GL::SetFillMode(bool enable)
 	{
 		s_RendererAPI->SetFillMode(enable);
-	};
+	}
 
-	//void GL::SetBlendMode(RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable)
-	MH_DEFINE_FUNC(GL::SetBlendMode, void, RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable)
+	void GL::SetBlendMode(RendererAPI::BlendMode src, RendererAPI::BlendMode dst, bool enable)
 	{
 		s_RendererAPI->SetBlendMode(src, dst, enable);
-	};
+	}
 
 #pragma region Draw
-	//void GL::DrawScreenQuad()
-	MH_DEFINE_FUNC(GL::DrawScreenQuad, void)
+	void GL::DrawScreenQuad()
 	{
 		s_StaticScreenQuad->Bind();
 		s_RendererAPI->DrawIndexed(s_StaticScreenQuad->GetIndexCount());
-	};
+	}
 
-	//void GL::DrawIndexed(uint32_t indexCount)
-	MH_DEFINE_FUNC(GL::DrawIndexed, void, uint32_t indexCount)
+	void GL::DrawIndexed(uint32_t indexCount)
 	{
 		s_RendererAPI->DrawIndexed(indexCount);
-	};
+	}
 
-	//void GL::DrawInstanced(uint32_t indexCount, uint32_t count)
-	MH_DEFINE_FUNC(GL::DrawInstanced, void, uint32_t indexCount, uint32_t count)
+	void GL::DrawInstanced(uint32_t indexCount, uint32_t count)
 	{
 		s_RendererAPI->DrawInstanced(indexCount, count);
-	};
+	}
+
+	void GL::MultiDrawIndexed(const void* indirect, uint32_t stride, uint32_t count)
+	{
+		s_RendererAPI->MultiDrawIndexed(indirect, stride, count);
+	}
 #pragma endregion
 
 	Ref<SubMesh> GL::CreateScreenQuad()
@@ -285,8 +267,8 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, indices, indexCount);
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions);
-		meshData.SetVertices(VertexType::TexCoords, ShaderDataType::Float2, uvs);
+		meshData.SetVertices(VertexType::Position, positions);
+		meshData.SetVertices(VertexType::TexCoords, uvs);
 
 		return SubMesh::Create(std::move(meshData));
 	}
@@ -333,7 +315,7 @@ namespace Mahakam
 
 		// Interleave vertices
 		MeshData meshData(vertexCount, indices, indexCount);
-		meshData.SetVertices(VertexType::Position, ShaderDataType::Float3, positions);
+		meshData.SetVertices(VertexType::Position, positions);
 
 		return SubMesh::Create(std::move(meshData));
 	}

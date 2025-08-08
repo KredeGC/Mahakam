@@ -8,6 +8,7 @@
 
 namespace Mahakam
 {
+	// TODO: Separate into 2 different classes: 1 for (de)serialization and 1 for the editor
 	class ComponentRegistry
 	{
 	public:
@@ -45,6 +46,15 @@ namespace Mahakam
 			{
 #ifndef MH_STANDALONE
 				Icon = icon;
+				OnPropertyDraw = onPropertyDraw;
+#endif
+			}
+
+			template<typename T>
+			inline void SetEditor(const T* icon = nullptr, void (*onPropertyDraw)(Entity) = nullptr)
+			{
+#ifndef MH_STANDALONE
+				Icon = reinterpret_cast<const char*>(icon);
 				OnPropertyDraw = onPropertyDraw;
 #endif
 			}

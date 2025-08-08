@@ -1,0 +1,9 @@
+Scenes should hold the AssetDatabase, AudioEngine and PhysicsEngine
+Maybe replace Bullet with Jolt?
+
+Remake renderer:
+Use glMultiDrawIndirect (Sort by texture usage?)
+Bindless textures are not supported in SPIR-V...
+But sampler2D[] is not supported in OpenGL...
+Nothing to do about textures yet, until I switch to Vulkan
+Use glad for Vulkan? Instead of the SDK?

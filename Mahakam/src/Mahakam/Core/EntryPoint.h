@@ -59,4 +59,6 @@ int main(int argc, char** argv)
 	return 0;
 }
 
+#else
+#error "Windows and Linux are the only currently supported operating systems"
 #endif

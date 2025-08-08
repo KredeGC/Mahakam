@@ -2,8 +2,9 @@
 
 #include "YAMLSerialization.h"
 
-namespace glm
+namespace c4::yml
 {
+	// GLM
 	void write(ryml::NodeRef* n, glm::vec2 const& val)
 	{
 		*n |= ryml::SEQ;
